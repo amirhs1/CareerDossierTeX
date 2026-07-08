@@ -154,7 +154,7 @@ A configuration is supported only after its examples compile locally and in GitH
 - [`docs/API.md`](docs/API.md): public commands, keys, environments, defaults, and errors
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): module boundaries and internal design
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
-- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
 
@@ -186,7 +186,7 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for release boundaries and non-goals.
 
 ## Contributing
 
-Focused bug reports, feature proposals, documentation improvements, and pull requests are welcome. Read [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) before opening a pull request.
+Focused bug reports, feature proposals, documentation improvements, and pull requests are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request.
 
 ## License
 
