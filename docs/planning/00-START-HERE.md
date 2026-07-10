@@ -26,9 +26,9 @@ The architecture remains modular. The roadmap changes so that the smallest usefu
 | `06-CI-BRANCH-PROTECTION-AND-RELEASES.md` | GitHub Actions, status checks, branch rules, tags, and releases |
 | `07-REPOSITORY-STRUCTURE-AND-DOCUMENTATION.md` | Phase-based repository layout and documentation responsibilities |
 | `08-TONIGHT-EXECUTION-CHECKLIST.md` | Ordered checklist for the July 8, 2026 Phase 1 deadline |
-| `templates/FEATURE-ISSUE.md` | Copyable feature issue template |
-| `templates/BUG-ISSUE.md` | Copyable bug report template |
-| `templates/PULL-REQUEST-TEMPLATE.md` | Copyable pull-request template |
+| `.github/ISSUE_TEMPLATE/feature_request.md` | Active GitHub feature issue template |
+| `.github/ISSUE_TEMPLATE/bug_report.md` | Active GitHub bug report template |
+| `.github/pull_request_template.md` | Active GitHub pull-request template |
 
 ## Recommended location in the repository
 

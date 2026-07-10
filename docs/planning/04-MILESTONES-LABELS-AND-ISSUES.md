@@ -9,7 +9,7 @@ Create these milestones.
 Due:
 
 ```text
-July 8, 2026
+July 11, 2026
 ```
 
 Scope:
@@ -113,7 +113,6 @@ An issue may have more than one area label when the overlap is real.
 blocked
 technical-debt
 breaking-change
-good-first-issue
 help-wanted
 ```
 
