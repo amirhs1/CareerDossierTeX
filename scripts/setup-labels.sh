@@ -61,7 +61,6 @@ upsert_label "area:documentation" "README, API docs, architecture docs, roadmap,
 upsert_label "blocked" "Cannot move forward until another issue, decision, or dependency is resolved" "b60205"
 upsert_label "technical-debt" "Cleanup or improvement that reduces future maintenance cost" "fbca04"
 upsert_label "breaking-change" "Changes public commands, keys, options, or documented behavior incompatibly" "b60205"
-upsert_label "good-first-issue" "Small, well-scoped task suitable for a first contribution" "7057ff"
 upsert_label "help-wanted" "Extra input, review, testing, or contribution would be useful" "008672"
 
 echo "Labels created or updated successfully."

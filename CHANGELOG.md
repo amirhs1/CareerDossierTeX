@@ -16,11 +16,17 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 - Draft user documentation for the planned `v0.1.0` public interface.
 - Contributor workflow and coding conventions.
 - LaTeX Project Public License version 1.3c.
+- `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, and `docs/MIGRATION.md`, resolving links that `README.md` and `CONTRIBUTING.md` already pointed to.
+- GitHub issue templates (`.github/ISSUE_TEMPLATE/bug_report.md`, `.github/ISSUE_TEMPLATE/feature_request.md`) and a pull-request template (`.github/pull_request_template.md`).
 
 ### Changed
 
 - Clarified that the résumé, cover-letter class, shared profile interface, and CI workflow remain pre-release targets until implemented and verified.
 - Standardized licensing language around LPPL maintenance status and the current maintainer.
+
+### Fixed
+
+- Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
 ### Release preparation
 
