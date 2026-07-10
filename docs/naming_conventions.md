@@ -252,7 +252,6 @@ Use only when needed:
 blocked
 technical-debt
 breaking-change
-good-first-issue
 help-wanted
 ```
 
