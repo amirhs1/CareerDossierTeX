@@ -8,12 +8,12 @@ This project uses focused issues, short-lived branches, pull requests, repeatabl
 
 Read:
 
-- [`README.md`](../README.md) for current support;
-- [`API.md`](API.md) for the public interface;
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) for module boundaries;
-- [`ROADMAP.md`](ROADMAP.md) for release scope;
-- [`MIGRATION.md`](MIGRATION.md) before renaming public features;
-- [`../LICENSE`](../LICENSE) for the project license.
+- [`README.md`](README.md) for current support;
+- [`docs/API.md`](docs/API.md) for the public interface;
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for module boundaries;
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) for release scope;
+- [`docs/MIGRATION.md`](docs/MIGRATION.md) before renaming public features;
+- [`LICENSE`](LICENSE) for the project license.
 
 Do not implement a planned feature as though it is already part of the current release. Confirm that it belongs to the active milestone.
 
