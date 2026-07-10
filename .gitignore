@@ -1,0 +1,75 @@
+# =============================================================================
+# CareerDossierTeX keeps source text in Git. Generated documents, LaTeX build
+# artifacts, local configuration, private data, and third-party binaries belong
+# outside the repository.
+# =============================================================================
+
+# --- LaTeX build artifacts ---
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.dvi
+*.fdb_latexmk
+*.fls
+*.log
+*.lof
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+
+# --- Generated documents and archives ---
+*.pdf
+*.doc
+*.docx
+*.key
+*.numbers
+*.odt
+*.pages
+*.ppt
+*.pptx
+*.tar.gz
+*.zip
+
+# --- Generated images and media ---
+*.gif
+*.heic
+*.HEIC
+*.jpeg
+*.jpg
+*.mov
+*.mp4
+*.png
+*.webp
+
+# CONTRIBUTING.md permits reviewed preview PNGs under docs/assets/.
+!docs/assets/
+!docs/assets/**/*.png
+
+# --- Third-party font binaries ---
+*.otf
+*.ttf
+*.woff
+*.woff2
+
+# --- Secrets, local preferences, and private personal data ---
+CLAUDE.local.md
+.env
+*.local
+secrets/
+**/private/
+referees_private.csv
+recommendation_letters/
+
+# --- Operating-system and editor files ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
