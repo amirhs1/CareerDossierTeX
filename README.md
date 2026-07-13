@@ -154,6 +154,7 @@ A configuration is supported only after its examples compile locally and in GitH
 - [`docs/API.md`](docs/API.md): public commands, keys, environments, defaults, and errors
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): module boundaries and internal design
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
+- [`docs/guides/ats-and-extraction.md`](docs/guides/ats-and-extraction.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
