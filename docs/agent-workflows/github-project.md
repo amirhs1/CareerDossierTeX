@@ -102,8 +102,8 @@ missing, leave the corresponding PR field unset and report it.
 Use only labels already defined by `scripts/setup-labels.sh`.
 
 | Change | Labels |
-|---|---|
-| Public résumé feature | `type:feature`, `area:resume` |
+| --- | --- |
+| Public resume feature | `type:feature`, `area:resume` |
 | Contact-line bug | `type:bug`, `area:components` |
 | API documentation clarification | `type:docs`, `area:documentation` |
 | Typography implementation | `type:feature`, `area:typography` |
