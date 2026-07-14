@@ -1,0 +1,128 @@
+%% careerdossier-components.sty
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the file careerdossier-components.sty.
+%%
+%% careerdossier-components owns the shared rendered document parts: the
+%% identity block, the contact line, link wrappers, and separator handling.
+%% It carries no page geometry (see the classes) and no résumé- or letter-
+%% specific structure.
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplPackage {careerdossier-components} {2026-07-14} {0.1.0}
+  {CareerDossierTeX shared identity block, contact line, and link wrappers}
+
+\RequirePackage { careerdossier-base }
+\RequirePackage { careerdossier-typography }
+\RequirePackage { careerdossier-theme }
+
+%% ---------------------------------------------------------------------------
+%% Contact line.
+%%
+%% Fields are rendered in one fixed, logical order; missing fields are skipped
+%% and separators are inserted only between rendered items, so no stray or
+%% duplicated separators can appear.
+%% ---------------------------------------------------------------------------
+\clist_const:Nn \c__cdossier_components_contactorder_clist
+  { email , phone , location , website , linkedin , github , scholar }
+
+\tl_new:N   \l__cdossier_components_disp_tl
+\tl_new:N   \l__cdossier_components_url_tl
+\bool_new:N \l__cdossier_components_printed_bool
+
+%% Separator between present contact items: a spaced vertical bar.
+\cs_new_protected:Npn \__cdossier_components_sep: { ~|~ }
+
+%% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
+%% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
+%% \urlstyle{same} so the text stays in the body font rather than switching to
+%% monospace. Degrades to plain visible text when hyperref is absent, so the
+%% identifier is always present and extractable.
+\cs_new_protected:Npn \__cdossier_components_link:nn #1#2
+  { \cs_if_exist:NTF \href { \href {#1} { \nolinkurl {#2} } } { #2 } }
+\cs_generate_variant:Nn \__cdossier_components_link:nn { VV }
+
+%% Email: a mailto: link over the visible address.
+\cs_new_protected:Npn \__cdossier_components_mail:n #1
+  {
+    \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
+    \tl_set:Nx \l__cdossier_components_url_tl  { mailto: \l__cdossier_components_disp_tl }
+    \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
+  }
+
+%% Web profile: a link over the visible URL/identifier. The href target is
+%% normalized to include a scheme; the displayed text is left exactly as given.
+%% Input is expected as a full path such as github.com/name (not a bare handle).
+\cs_new_protected:Npn \__cdossier_components_web:n #1
+  {
+    \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
+    \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
+    \tl_if_in:NnF \l__cdossier_components_url_tl { :// }
+      { \tl_put_left:Nn \l__cdossier_components_url_tl { https:// } }
+    \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
+  }
+
+%% Render one contact field: link the web-facing fields, print the rest as text.
+\cs_new_protected:Npn \__cdossier_components_render:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { email }    { \__cdossier_components_mail:n { email }    }
+        { website }  { \__cdossier_components_web:n  { website }  }
+        { linkedin } { \__cdossier_components_web:n  { linkedin } }
+        { github }   { \__cdossier_components_web:n  { github }   }
+        { scholar }  { \__cdossier_components_web:n  { scholar }  }
+      }
+      { \CDossierPrintField {#1} }
+  }
+
+%% Build the contact line from the present fields, in order.
+\cs_new_protected:Npn \__cdossier_components_contactline:
+  {
+    \bool_set_false:N \l__cdossier_components_printed_bool
+    \clist_map_inline:Nn \c__cdossier_components_contactorder_clist
+      {
+        \CDossierIfFieldTF {##1}
+          {
+            \bool_if:NT \l__cdossier_components_printed_bool
+              { \__cdossier_components_sep: }
+            \__cdossier_components_render:n {##1}
+            \bool_set_true:N \l__cdossier_components_printed_bool
+          }
+          { }
+      }
+  }
+
+%% ---------------------------------------------------------------------------
+%% Identity block.
+%%
+%% A centered block of name, optional headline, and the contact line, shared by
+%% the résumé header and the cover-letter sender identity. Requires `name`.
+%% ---------------------------------------------------------------------------
+\NewDocumentCommand \MakeCDossierHeader { }
+  {
+    \__cdossier_base_require_name:N \MakeCDossierHeader
+    \begin { center }
+      { \CDossierNameStyle \Huge \CDossierPrintField { name } \par }
+      \CDossierIfFieldTF { headline }
+        {
+          \smallskip
+          { \CDossierHeadlineStyle \large \CDossierPrintField { headline } \par }
+        }
+        { }
+      \smallskip
+      { \CDossierBodyStyle \small \__cdossier_components_contactline: \par }
+    \end { center }
+  }

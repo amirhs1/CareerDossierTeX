@@ -331,6 +331,18 @@ For an unknown field name, it should produce an actionable error.
 
 Executes the first branch when the profile field exists and is nonblank; otherwise it executes the second branch.
 
+The two branches are long, so they may contain `\par` or full paragraphs.
+
+### `\CDossierFieldValue`
+
+```latex
+\CDossierFieldValue{email}
+```
+
+Expands to the stored value of a profile field, or to nothing when the field is absent. It does not typeset and does not validate the field name.
+
+This accessor is expandable and is intended mainly for shared components that need the raw value, for example to build a link target. Prefer `\CDossierPrintField` for ordinary typesetting.
+
 ### `\CDossierLabel`
 
 ```latex
