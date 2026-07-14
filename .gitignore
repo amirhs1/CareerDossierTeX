@@ -73,3 +73,10 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# --- test artifacts ---
+tests/extraction/*.pdf
+tests/extraction/*.log
+tests/extraction/*.aux
+tests/extraction/*.out
+tests/extraction/*.diff
