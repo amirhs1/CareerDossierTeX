@@ -1,0 +1,142 @@
+%% careerdossier-base.sty
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the file careerdossier-base.sty.
+%%
+%% careerdossier-base owns shared profile metadata, the profile keys, and
+%% required-field validation. It carries no layout, geometry, typography, or
+%% colour; those concerns belong to other modules.
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplPackage {careerdossier-base} {2026-07-14} {0.1.0}
+  {CareerDossierTeX shared profile metadata, keys, and validation}
+
+%% ---------------------------------------------------------------------------
+%% Known profile fields (fixed set for v0.1.0).
+%% ---------------------------------------------------------------------------
+\clist_const:Nn \c__cdossier_base_fields_clist
+  { name , headline , email , phone , location , website , linkedin , github }
+
+%% ---------------------------------------------------------------------------
+%% Storage: profile field name -> value.
+%% ---------------------------------------------------------------------------
+\prop_new:N \g__cdossier_base_fields_prop
+\tl_new:N   \l__cdossier_base_value_tl
+\tl_new:N   \l__cdossier_base_get_tl
+
+%% ---------------------------------------------------------------------------
+%% Messages.
+%% ---------------------------------------------------------------------------
+\msg_new:nnnn { careerdossier-base } { missing-name }
+  { The~required~profile~field~'name'~is~not~set~(needed~by~#1). }
+  {
+    Provide~a~name~before~rendering~identity~content,~for~example: \\
+    \c_backslash_str CDossierSetup~\c_left_brace_str ~name~=~
+      Ada~Lovelace~\c_right_brace_str
+  }
+
+\msg_new:nnnn { careerdossier-base } { unknown-field }
+  { Unknown~profile~field~'#1'. }
+  { The~supported~fields~are:~\clist_use:Nn \c__cdossier_base_fields_clist { ,~ } . }
+
+\msg_new:nnnn { careerdossier-base } { unknown-key }
+  { Unknown~\c_backslash_str CDossierSetup~key~'#1'. }
+  { The~supported~keys~are:~\clist_use:Nn \c__cdossier_base_fields_clist { ,~ } . }
+
+\msg_new:nnn { careerdossier-base } { overwrite }
+  { Profile~field~'#1'~was~already~set;~overwriting~with~the~new~value. }
+
+%% ---------------------------------------------------------------------------
+%% Internal: store a field, trimming surrounding spaces and treating a
+%% whitespace-only value as missing.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_base_store:nn #1#2
+  {
+    \tl_set:Nx \l__cdossier_base_value_tl { \tl_trim_spaces:n {#2} }
+    \tl_if_empty:NTF \l__cdossier_base_value_tl
+      { \prop_gremove:Nn \g__cdossier_base_fields_prop {#1} }
+      {
+        \prop_if_in:NnT \g__cdossier_base_fields_prop {#1}
+          { \msg_warning:nnn { careerdossier-base } { overwrite } {#1} }
+        \prop_gput:NnV \g__cdossier_base_fields_prop {#1} \l__cdossier_base_value_tl
+      }
+  }
+
+%% Internal: error out on an unrecognized field name.
+\cs_new_protected:Npn \__cdossier_base_check_known:n #1
+  {
+    \clist_if_in:NnF \c__cdossier_base_fields_clist {#1}
+      { \msg_error:nnn { careerdossier-base } { unknown-field } {#1} }
+  }
+
+%% Internal: is a field present (and therefore nonblank)?
+\prg_new_protected_conditional:Npnn \__cdossier_base_field_if_present:n #1
+  { T , F , TF }
+  {
+    \prop_if_in:NnTF \g__cdossier_base_fields_prop {#1}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+%% Internal: require `name` before identity content is rendered.
+%% #1 is the calling command; it is stringified, never executed, in the
+%% error message.
+\cs_new_protected:Npn \__cdossier_base_require_name:N #1
+  {
+    \__cdossier_base_field_if_present:nF { name }
+      { \msg_error:nnx { careerdossier-base } { missing-name } { \token_to_str:N #1 } }
+  }
+
+%% ---------------------------------------------------------------------------
+%% Profile keys.
+%% ---------------------------------------------------------------------------
+\keys_define:nn { cdossier / profile }
+  {
+    name     .code:n = { \__cdossier_base_store:nn { name }     {#1} } ,
+    headline .code:n = { \__cdossier_base_store:nn { headline } {#1} } ,
+    email    .code:n = { \__cdossier_base_store:nn { email }    {#1} } ,
+    phone    .code:n = { \__cdossier_base_store:nn { phone }    {#1} } ,
+    location .code:n = { \__cdossier_base_store:nn { location } {#1} } ,
+    website  .code:n = { \__cdossier_base_store:nn { website }  {#1} } ,
+    linkedin .code:n = { \__cdossier_base_store:nn { linkedin } {#1} } ,
+    github   .code:n = { \__cdossier_base_store:nn { github }   {#1} } ,
+    unknown  .code:n =
+      { \msg_error:nnx { careerdossier-base } { unknown-key } { \l_keys_key_str } } ,
+  }
+
+%% ---------------------------------------------------------------------------
+%% Public interface.
+%% ---------------------------------------------------------------------------
+
+%% \CDossierSetup { key = value, ... }
+\NewDocumentCommand \CDossierSetup { m }
+  { \keys_set:nn { cdossier / profile } {#1} }
+
+%% \CDossierPrintField {field} -- prints the stored value, nothing if absent,
+%% and errors on an unknown field name.
+\NewDocumentCommand \CDossierPrintField { m }
+  {
+    \__cdossier_base_check_known:n {#1}
+    \prop_get:NnNT \g__cdossier_base_fields_prop {#1} \l__cdossier_base_get_tl
+      { \tl_use:N \l__cdossier_base_get_tl }
+  }
+
+%% \CDossierIfFieldTF {field} {true} {false} -- true when the field is present
+%% (present implies nonblank); errors on an unknown field name.
+\NewDocumentCommand \CDossierIfFieldTF { m m m }
+  {
+    \__cdossier_base_check_known:n {#1}
+    \__cdossier_base_field_if_present:nTF {#1} {#2} {#3}
+  }
