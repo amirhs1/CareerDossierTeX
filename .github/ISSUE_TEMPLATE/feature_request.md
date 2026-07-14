@@ -40,7 +40,9 @@ Why is this feature needed?
 
 ## Testing
 
-Describe the example, compile command, or regression test that will prove the feature works.
+List the focused fixture, expected output, or runner that will be added under
+`tests/` with this feature. State how the test will demonstrate the behavior
+before implementation when practical, and list the broader suites to rerun.
 
 ## Parent and release
 

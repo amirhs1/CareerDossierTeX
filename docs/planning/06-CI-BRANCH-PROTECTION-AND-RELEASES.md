@@ -5,10 +5,13 @@
 Continuous integration should answer:
 
 ```text
+Does each committed behavior still pass its focused test?
 Can the supported examples compile from a clean GitHub runner?
 ```
 
-For Phase 1, it does not need to solve every future testing problem.
+For Phase 1, CI grows with the project: a test is added to CI as soon as the
+corresponding behavior and test runner exist. Tests are not saved for a
+milestone-end batch.
 
 Official documentation:
 
@@ -29,6 +32,7 @@ The workflow should:
 - run on pushes to `main`;
 - check out the repository;
 - install or invoke a XeLaTeX-capable TeX environment;
+- run every applicable suite under `tests/`;
 - compile the résumé example;
 - compile the letter example;
 - preserve PDFs and logs as artifacts;
@@ -94,15 +98,15 @@ Workflow artifacts are useful for:
 
 Artifacts are temporary build outputs. A GitHub Release is the correct place for long-lived release assets.
 
-## 5. Add quality checks incrementally
+## 5. Add quality checks with the behavior they protect
 
-After basic compilation works, add:
+As soon as basic compilation works, add:
 
 ```bash
 grep -E "LaTeX Error|Undefined control sequence|Emergency stop" file.log
 ```
 
-Then add checks for:
+Add the relevant checks in the same PR as behavior that can trigger them:
 
 - overfull boxes;
 - undefined citations;
@@ -178,7 +182,13 @@ latexmk -xelatex -interaction=nonstopmode -halt-on-error \
 
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   examples/industry/letter-industry.tex
+
+make extract-test
 ```
+
+Also run every other committed suite under `tests/`. Release preparation is a
+full rerun of coverage accumulated during implementation, not the point where
+feature tests are first created.
 
 Update:
 
@@ -256,12 +266,13 @@ See `CHANGELOG.md` and `docs/API.md` for details.
 
 ### `v0.1.0`
 
+- run Phase 1 regression, smoke, layout, and extraction suites as they land;
 - compile two examples;
 - upload artifacts.
 
 ### `v0.2.0`
 
-- add `l3build`;
+- extend the existing regression harness for academic behavior;
 - build Biber example;
 - inspect logs;
 - test long CV.

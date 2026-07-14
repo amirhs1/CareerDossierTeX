@@ -519,6 +519,9 @@ CareerDossierTeX/
 │   └── guides/
 │       └── ats-extraction.md
 ├── tests/
+│   ├── regression/
+│   ├── smoke/
+│   ├── layout/
 │   └── extraction/
 │       ├── extraction-torture.tex
 │       ├── extraction-torture.expected.txt
@@ -567,7 +570,10 @@ The local build pipeline is:
 source files
     │
     ▼
-latexmk -xelatex
+focused tests under tests/
+    │
+    ▼
+latexmk -xelatex / l3build / suite runner
     │
     ▼
 XeLaTeX passes
@@ -584,20 +590,42 @@ The Phase 1 CI pipeline should:
 
 1. check out the repository;
 2. provide a tested XeLaTeX environment;
-3. build the résumé example;
-4. build the letter example;
-5. fail on compilation errors;
-6. upload PDFs and logs as artifacts.
+3. run the committed regression, smoke, layout, and extraction tests that exist;
+4. build the résumé example;
+5. build the letter example;
+6. fail on test or compilation errors;
+7. upload PDFs and logs as artifacts.
 
-CI answers one main question:
+CI answers two main questions:
 
 ```text
+Does the committed behavior still satisfy its focused tests?
 Can the supported examples compile from a clean runner?
 ```
 
 ## Testing strategy
 
-### Phase 1 smoke tests
+### Continuous test development
+
+Tests are designed and committed with the behavior they protect. When practical,
+write a focused failing test before implementation, then make it pass. If the
+target file or public interface does not exist yet, add the fixture alongside the
+first usable implementation and record why a pre-implementation failure was not
+run.
+
+All automated test material belongs under `tests/`:
+
+- `tests/regression/` — stable API behavior, options, diagnostics, load order,
+  and fixed bugs;
+- `tests/smoke/` — supported document builds and required failure paths;
+- `tests/extraction/` — expected text, Unicode mapping, and reading order;
+- `tests/layout/` — long fields, multi-page content, and page-break stress.
+
+User examples remain under `examples/`. CI should build them, but they are not a
+substitute for focused tests. A milestone release reruns the accumulated suite;
+it does not introduce tests that were already known to be required.
+
+### Phase 1 coverage
 
 - valid résumé;
 - valid cover letter;
@@ -608,9 +636,17 @@ Can the supported examples compile from a clean runner?
 - two-page résumé stress example;
 - text extraction.
 
-### Phase 2 regression tests
+Already-merged Phase 1 modules have test debt because their local verification
+fixtures were not committed. Backfill that coverage before or alongside the next
+production feature.
 
-Introduce `l3build` when the academic CV and bibliography increase the supported state space.
+### Regression harness
+
+Adopt `l3build` during active Phase 1 work and point its test directory at
+`tests/regression/`. Add each regression when its behavior is introduced or a
+bug is fixed; do not wait for academic CV and bibliography work to start the
+suite. Verify the exact configuration variables against the current `l3build`
+manual when the harness is implemented.
 
 Tests should focus on stable behavior, not every line break or font metric before the design settles.
 
@@ -655,7 +691,7 @@ A feature enters a release only when:
 1. its public behavior is defined;
 2. a minimal example exists;
 3. documentation is updated;
-4. a repeatable test exists;
+4. a repeatable test was committed with the behavior under `tests/`;
 5. the repository does not claim unsupported configurations.
 
 Before tagging a release:

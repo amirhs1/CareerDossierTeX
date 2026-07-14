@@ -38,6 +38,8 @@ Confirm:
 - the branch is not `main`;
 - the focused issue is identified;
 - the diff is limited to the issue;
+- behavior changes include their focused committed tests under `tests/` rather
+  than deferring them to a later milestone task;
 - relevant tests and checks were run;
 - no generated artifacts, secrets, private data, or unrelated changes are included;
 - API, docs, design, and accessibility impacts are documented;
@@ -52,6 +54,8 @@ Include:
 - change list;
 - public-API impact;
 - tests run and exact outcomes;
+- tests added or updated under `tests/`, including the expected pre-fix failure
+  when it was demonstrated;
 - visual and accessibility checks when relevant;
 - documentation and changelog impact;
 - known limitations and follow-up work.

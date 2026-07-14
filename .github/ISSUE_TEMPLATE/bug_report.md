@@ -52,5 +52,5 @@ Paste the smallest useful log excerpt.
 
 - [ ] Minimal reproducer passes.
 - [ ] Existing examples still compile.
-- [ ] A regression test or stress example is added.
+- [ ] A focused regression or stress test is added under `tests/` with the fix.
 - [ ] Documentation is updated when behavior changes.

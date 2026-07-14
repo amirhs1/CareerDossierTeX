@@ -43,7 +43,7 @@ Examples:
 [components] Implement shared header and contact line
 [resume] Implement the English résumé class
 [letter] Implement the English industry cover-letter class
-[test] Add Phase 1 examples and smoke tests
+[test] Establish the shared regression harness
 [ci] Build Phase 1 examples in GitHub Actions
 [docs] Prepare README, changelog, and release documentation
 [release] Publish v0.1.0
@@ -96,7 +96,7 @@ docs/v0.1-api
 feat/shared-foundation
 feat/resume-class
 feat/industry-letter
-test/phase-1-examples
+test/regression-harness
 ci/xelatex-build
 docs/v0.1-release
 release/v0.1.0
@@ -194,7 +194,7 @@ docs(api): define v0.1 public API
 feat(core): add shared metadata foundation
 feat(resume): implement English résumé class
 feat(letter): implement industry cover-letter class
-test(examples): add Phase 1 smoke examples
+test(build): establish Phase 1 regression harness
 ci(build): compile Phase 1 examples with XeLaTeX
 release: prepare v0.1.0
 ```
@@ -369,7 +369,7 @@ Rules:
 [components] Implement shared header and contact line
 [resume] Implement the English résumé class
 [letter] Implement the English industry cover-letter class
-[test] Add Phase 1 examples and smoke tests
+[test] Establish the shared regression harness
 [ci] Build Phase 1 examples in GitHub Actions
 [docs] Prepare README, changelog, and release documentation
 [release] Publish v0.1.0
@@ -383,7 +383,7 @@ docs/v0.1-api
 feat/shared-foundation
 feat/resume-class
 feat/industry-letter
-test/phase-1-examples
+test/regression-harness
 ci/xelatex-build
 docs/v0.1-release
 release/v0.1.0
@@ -397,7 +397,7 @@ docs(api): define v0.1 public API
 feat(core): add shared metadata foundation
 feat(resume): implement English résumé class
 feat(letter): implement industry cover-letter class
-test(examples): add Phase 1 smoke examples
+test(build): establish Phase 1 regression harness
 ci(build): compile Phase 1 examples with XeLaTeX
 docs(release): prepare v0.1.0 documentation
 release: prepare v0.1.0

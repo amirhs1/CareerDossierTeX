@@ -39,7 +39,7 @@ refactor/current-class-inventory
 feat/shared-foundation
 feat/resume-class
 feat/industry-letter
-test/phase-1-examples
+test/regression-harness
 ci/xelatex-build
 docs/v0.1-release
 ```
@@ -75,6 +75,7 @@ Stage intentionally:
 ```bash
 git add careerdossier-resume.cls
 git add examples/industry/resume-english.tex
+git add tests/regression/resume-options.lvt tests/regression/resume-options.tlg
 ```
 
 Commit:
@@ -170,10 +171,11 @@ Draft: feat(resume): implement English resume class
 When ready:
 
 1. rebase or merge the latest `main` if needed;
-2. run local tests;
-3. update documentation;
-4. mark the PR ready for review;
-5. move the Project item to `In review`.
+2. confirm behavior changes include focused tests under `tests/`;
+3. run local tests;
+4. update documentation;
+5. mark the PR ready for review;
+6. move the Project item to `In review`.
 
 ## 7. Self-review checklist
 
@@ -184,6 +186,7 @@ Before merging your own PR:
 - Check public command names.
 - Check comments explain intent.
 - Confirm no generated build files were accidentally committed.
+- Confirm each behavior change has a focused committed test under `tests/`.
 - Compile the affected examples.
 - Check logs for overfull boxes and missing glyphs.
 - Confirm documentation matches behavior.
@@ -229,11 +232,15 @@ Use separate PRs when changes have separate review questions.
 Good split:
 
 1. API documentation.
-2. Shared foundation.
-3. Résumé class.
-4. Letter class.
+2. Shared foundation with its tests.
+3. Résumé class with its tests.
+4. Letter class with its tests.
 5. CI.
 6. Release documentation.
+
+Do not create a milestone-end PR for tests already required by items 2--4. A
+separate `test/` PR is appropriate only for shared test infrastructure,
+cross-cutting coverage, or explicit legacy test debt.
 
 Avoid an artificial PR for every one-line edit. The goal is a meaningful history, not maximum activity.
 
@@ -257,11 +264,11 @@ git switch main
 git pull --ff-only
 git switch -c feat/shared-foundation
 
-# Edit files.
+# Add focused tests under tests/, then edit the implementation.
 
 git status
 git diff
-git add careerdossier-base.sty careerdossier-i18n.sty
+git add careerdossier-base.sty careerdossier-i18n.sty tests/regression/
 git commit -m "feat(core): add shared metadata foundation"
 git push -u origin feat/shared-foundation
 ```

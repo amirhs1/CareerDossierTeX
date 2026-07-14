@@ -833,6 +833,9 @@ CareerDossierTeX/
 │       ├── resume-english.tex
 │       └── letter-industry.tex
 ├── tests/
+│   ├── regression/
+│   ├── smoke/
+│   ├── layout/
 │   └── extraction/
 │       ├── extraction-torture.tex
 │       └── extraction-torture.expected.txt
@@ -856,8 +859,10 @@ CareerDossierTeX/
 └── LICENSE
 ```
 
-Later phases add `careerdossier-cv.cls`, `careerdossier-biblatex.sty`, an
-`l3build` `build.lua`, and an `l3build` `testfiles/` suite **(planned — v0.2.0)**.
+Later phases add `careerdossier-cv.cls` and `careerdossier-biblatex.sty`.
+Regression infrastructure is not deferred to those phases: introduce an
+`l3build` `build.lua` during Phase 1 and keep its suite under
+`tests/regression/`.
 
 Separate: public commands from internal implementation; content semantics from
 visual details; user documentation from programmer documentation as the package
@@ -896,7 +901,7 @@ should fail CI until reviewed.
 ### 11.1 Test layers
 
 1. **Class/package regression tests** — API behaviour, options, errors, grouping,
-   and load order **(l3build; planned — v0.2.0)**.
+   and load order **(l3build; Phase 1 onward)**.
 2. **PDF extraction tests** — characters, spaces, reading order, and semantic
    adjacency **(Phase 1)**.
 3. **PDF structural tests** — syntax, embedded fonts, metadata, tags, and
@@ -904,13 +909,22 @@ should fail CI until reviewed.
 4. **Rendered-page tests** — overlap, clipping, density, page breaks, contrast.
 5. **Real-portal tests** — parsed preview or autofill where possible.
 
-### 11.2 `l3build` for package tests **(planned — v0.2.0)**
+Add each layer's focused fixture with the implementation it validates. When
+practical, run the new fixture before implementation and confirm that it fails
+for the intended reason. All automated sources, expected outputs, runners, and
+baselines belong under `tests/`; milestone release work reruns them but does not
+defer their creation.
 
-When `l3build` is adopted, the current manual uses engine names such as `xetex`
-for checks and an executable name for documentation typesetting:
+### 11.2 `l3build` for package tests **(Phase 1 onward)**
+
+When `l3build` is adopted, configure it to use `tests/regression/` rather than a
+top-level `testfiles/` directory. Verify the exact variable names against the
+current manual; current manuals use engine names such as `xetex` for checks and
+an executable name for documentation typesetting:
 
 ```lua
 module = "careerdossier"
+testfiledir = "tests/regression"
 
 checkengines = {"xetex"}
 stdengine    = "xetex"
@@ -1001,10 +1015,11 @@ treat that vendor-specific limit as universal, and re-check the current figure.
 
 ## 12. CI and release gates
 
-Phase 1 CI compiles both supported examples on pushes and pull requests, installs
-a XeLaTeX-capable TeX environment, uploads PDFs and logs as artifacts, and fails
-when compilation fails. Do not require a new status check in branch protection
-until it has passed at least once.
+Phase 1 CI runs every applicable committed suite under `tests/`, compiles both
+supported examples on pushes and pull requests, installs a XeLaTeX-capable TeX
+environment, uploads PDFs and logs as artifacts, and fails when tests or
+compilation fail. Do not require a new status check in branch protection until
+it has passed at least once.
 
 Broader gates are later-phase targets: a CI matrix (current TeX Live, optionally
 the oldest supported release, a scheduled pre-release job); mandatory failure on

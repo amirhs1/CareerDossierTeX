@@ -16,19 +16,20 @@ Implement in this order:
 
 ```text
 API definition
-  → engine and metadata base
-  → typography and theme
-  → shared components
-  → résumé class
-  → letter class
-  → examples
-  → smoke tests
+  → engine and metadata base + focused tests
+  → typography and theme + focused tests
+  → shared components + focused tests
+  → résumé class + example + focused tests
+  → letter class + example + focused tests
   → GitHub Actions
   → documentation
   → release
 ```
 
 Do not start with every planned class. Build one complete vertical slice.
+Do not place tests at the end of this sequence. Each implementation step adds
+the relevant fixture, runner, or baseline under `tests/` in the same branch.
+Write the test first when practical and confirm it fails for the intended reason.
 
 ## 2. Step 1: define the public API
 
@@ -74,6 +75,10 @@ Suggested public accessors:
 
 Do not put margins or résumé-specific spacing here.
 
+Add regression fixtures under `tests/regression/` for key parsing, blank-value
+handling, overwrites, unknown keys and fields, and required-name validation as
+part of this step.
+
 ## 4. Step 3: implement `careerdossier-i18n.sty`
 
 Phase 1 responsibilities:
@@ -91,6 +96,9 @@ For example:
 ```
 
 Do not implement unused Farsi code tonight. Do not hard-code English labels directly in every class.
+
+Add label lookup and unknown-label coverage under `tests/regression/` with this
+module.
 
 ## 5. Step 4: implement `careerdossier-typography.sty`
 
@@ -114,6 +122,10 @@ Suggested roles:
 
 Default fonts should be portable. Custom Merriweather or Neuton presets can be restored later after the public API is stable.
 
+Add XeLaTeX success, unsupported-engine failure, font/glyph, and extraction
+coverage under the appropriate `tests/regression/` and `tests/extraction/`
+directories with this module.
+
 ## 6. Step 5: implement `careerdossier-theme.sty`
 
 Phase 1 responsibilities:
@@ -134,6 +146,10 @@ Use semantic tokens, even when all are black or gray:
 ```
 
 This makes later color themes an extension rather than a rewrite.
+
+Add focused token and link-configuration tests under `tests/regression/`; keep
+rendered/grayscale inspection requirements with the layout fixtures that use the
+theme.
 
 ## 7. Step 6: implement `careerdossier-components.sty`
 
@@ -166,6 +182,9 @@ email | | website
 
 The component layer must expose reusable pieces without forcing the résumé and letter into identical page geometry.
 
+Add committed separator, link-target, missing-name, and long-contact fixtures
+under `tests/regression/` and `tests/layout/` as part of the component change.
+
 ## 8. Step 7: implement `careerdossier-resume.cls`
 
 Responsibilities:
@@ -194,6 +213,10 @@ language=english
 
 It is better to omit unsupported options than accept them while ignoring them.
 
+Add the valid build, option/error, missing-field, long-value, two-page, and
+reading-order fixtures under `tests/smoke/`, `tests/regression/`,
+`tests/layout/`, and `tests/extraction/` with the résumé implementation.
+
 ## 9. Step 8: implement `careerdossier-letter.cls`
 
 Responsibilities:
@@ -216,6 +239,10 @@ language=english
 
 The future `family=academic` option belongs to Phase 2.
 
+Add the valid build, option/error, optional-subject, one-page, two-page, and
+page-break fixtures under `tests/smoke/`, `tests/regression/`, and
+`tests/layout/` with the letter implementation.
+
 ## 10. Step 9: create shared-profile examples
 
 Create:
@@ -232,7 +259,14 @@ The résumé and cover letter contain document-specific content only.
 
 This demonstrates separation of data and presentation.
 
-## 11. Step 10: add repeatable smoke tests
+Examples are user-facing documentation. Tests may compile them, but focused test
+fixtures remain under `tests/` and are introduced with the behavior they cover.
+
+## 11. Continuous test matrix for Steps 2--9
+
+This matrix applies throughout implementation; it is not a later project step.
+Add each case when the behavior it covers is introduced, run the focused case
+while developing, and expand the full-suite run as the repository grows.
 
 Minimum test cases:
 
@@ -260,20 +294,21 @@ pdftotext examples/industry/resume-english.pdf \
 
 Do not claim these tests pass until they have actually been run.
 
-## 12. Step 11: add GitHub Actions
+## 12. Step 10: add GitHub Actions
 
 The first workflow should:
 
 - run on pull requests and pushes to `main`;
 - install a pinned or explicitly chosen TeX environment;
+- run every applicable committed suite under `tests/`;
 - compile the résumé;
 - compile the letter;
 - upload PDFs and logs as artifacts;
-- fail when compilation fails.
+- fail when a test or compilation fails.
 
 Do not introduce the release workflow before the build workflow is reliable.
 
-## 13. Step 12: document and release
+## 13. Step 11: document and release
 
 Update:
 
@@ -311,4 +346,5 @@ That person should be able to:
 4. compile with XeLaTeX;
 5. receive clear errors for invalid required metadata;
 6. build the same examples in GitHub Actions;
-7. download a known release.
+7. run the committed tests that were added throughout implementation;
+8. download a known release.
