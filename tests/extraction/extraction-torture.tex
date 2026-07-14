@@ -1,0 +1,73 @@
+% extraction-torture.tex
+% Standalone XeLaTeX extraction fixture for CareerDossierTeX.
+%
+% Purpose
+%   Prove that the package's default typography policy produces a PDF whose
+%   text layer is clean, Unicode-correct, and in reading order. It isolates the
+%   policy owned by careerdossier-typography.sty from any class layout code, so
+%   it can run before the classes exist.
+%
+% Policy under test (mirror of careerdossier-typography.sty):
+%   - XeLaTeX engine (fixture errors out under other engines)
+%   - \XeTeXgenerateactualtext=1
+%   - common / contextual / discretionary / historic ligatures OFF
+%   - lining numbers
+%   - TeX Gyre Heros, all four faces declared explicitly
+%
+% Font loading note
+%   The guide recommends loading the default face by file name for
+%   reproducibility. On stock XeLaTeX (TeX Live 2023) bare-file-name loading of
+%   the tex-gyre OTFs is NOT resolved by fontspec ("cannot be found"), while the
+%   fontconfig family name is. This fixture therefore loads by family name with
+%   explicit per-face files. careerdossier-typography.sty should resolve this
+%   deliberately (family name, or an explicit Path=), not assume bare file names.
+%
+% Compile: xelatex -halt-on-error -interaction=nonstopmode extraction-torture.tex
+% Extract: pdftotext -enc UTF-8 extraction-torture.pdf -
+\documentclass[11pt]{article}
+
+\usepackage{iftex}
+\ifXeTeX\else
+  \errmessage{extraction-torture.tex requires XeLaTeX}%
+\fi
+
+\XeTeXgenerateactualtext=1
+
+\usepackage{fontspec}
+\defaultfontfeatures+{
+  Ligatures = {CommonOff, ContextualOff, DiscretionaryOff, HistoricOff},
+  Numbers   = Lining
+}
+% Some fonts (e.g. TeX Gyre Heros) lack clig/hlig tables; fontspec then warns
+% that those ...Off features are "not available". That warning is benign and is
+% allowlisted by run.sh. The common-ligature suppression that matters is applied.
+\setmainfont{TeX Gyre Heros}[
+  Extension      = .otf,
+  UprightFont    = texgyreheros-regular,
+  BoldFont       = texgyreheros-bold,
+  ItalicFont     = texgyreheros-italic,
+  BoldItalicFont = texgyreheros-bolditalic
+]
+
+\usepackage[a4paper,margin=1in]{geometry}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\usepackage[hidelinks,unicode]{hyperref}
+
+\begin{document}
+
+Zoë Dvořák Łukasz İpek José
+
+office efficient affine waffle difficult
+
+(C++) (c++) C\# F\# R\&D 100\% AT\&T
+
+email@example.org +1 416 555 0199
+
+\href{https://example.org/a_b?q=one&lang=en}{https://example.org/a\_b?q=one\&lang=en}
+
+\textbf{Senior Research \& Development Engineer}
+
+\textit{January 2023 -- Present}
+
+\end{document}
