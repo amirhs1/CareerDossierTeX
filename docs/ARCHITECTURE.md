@@ -625,6 +625,18 @@ User examples remain under `examples/`. CI should build them, but they are not a
 substitute for focused tests. A milestone release reruns the accumulated suite;
 it does not introduce tests that were already known to be required.
 
+The test type follows the module's concern. Logic-bearing modules — metadata and
+separator logic in `careerdossier-base.sty`, label selection in
+`careerdossier-i18n.sty`, and the engine-check and role-dispatch logic in
+`careerdossier-typography.sty` — expose behavior that a log diff can assert, so
+they take `l3build` regression tests (`.lvt` sources with saved `.tlg`
+baselines) in `tests/regression/`. Layout classes —
+`careerdossier-resume.cls` and `careerdossier-letter.cls` — own visual results
+that no log diff fully captures, so they rely on smoke, extraction, and reviewed
+reference PDFs, with final layout correctness confirmed by human inspection. A
+saved baseline is the assertion: regenerate one only for an intended, reviewed
+output change.
+
 ### Phase 1 coverage
 
 - valid résumé;
@@ -647,6 +659,12 @@ Adopt `l3build` during active Phase 1 work and point its test directory at
 bug is fixed; do not wait for academic CV and bibliography work to start the
 suite. Verify the exact configuration variables against the current `l3build`
 manual when the harness is implemented.
+
+Because a `.lvt` test cannot run without the harness, the harness precedes the
+tests that depend on it: land `build.lua` before — or in the same change as — the
+first module that relies on `l3build` coverage, rather than accumulating `.lvt`
+sources no runner can execute. Regressions owed before the harness lands are
+tracked as explicit test debt.
 
 Tests should focus on stable behavior, not every line break or font metric before the design settles.
 

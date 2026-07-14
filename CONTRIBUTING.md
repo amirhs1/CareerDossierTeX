@@ -249,6 +249,53 @@ A separate test-only issue is appropriate for a reusable harness, a cross-cuttin
 quality improvement, or explicitly recorded legacy test debt. It must not be used
 to postpone tests already known to be necessary for an implementation issue.
 
+### Match the test to the module
+
+Test-as-you-go is not one uniform activity. What "the smallest relevant test"
+means depends on what the module owns, so match the test type to the concern:
+
+- **Logic-bearing modules** — `careerdossier-base.sty` (metadata, field
+  presence, separator logic), `careerdossier-i18n.sty` (label selection),
+  and the non-visual parts of `careerdossier-typography.sty` (engine checks,
+  role dispatch) — carry behavior that can be asserted directly. Write a focused
+  `l3build` regression test (`.lvt` source with a saved `.tlg` baseline) per
+  module as the behavior is added, in the same rhythm as writing a `test_*.py`
+  beside each Python module. This is where a pre-implementation failing test is
+  usually practical and most valuable.
+- **Layout classes** — `careerdossier-resume.cls` and
+  `careerdossier-letter.cls` — own page geometry and visual result, which no
+  log diff fully captures. Cover them with smoke tests (compiles clean, expected
+  diagnostics), extraction tests (text present and in logical order), and a small
+  set of reviewed reference PDFs. Final layout correctness stays a human visual
+  check. Do not force brittle per-line-break or per-metric assertions onto a
+  class before its design has settled.
+
+When a change spans both — a shared package edit that both classes render — add
+or update the unit-level regression for the shared logic *and* re-run the smoke,
+extraction, and layout coverage for both classes.
+
+### Baselines are load-bearing
+
+A saved baseline (an `l3build` `.tlg`, or the committed extraction reference) is
+the assertion. Capturing it is not a formality: an incorrect baseline silently
+records a bug as the expected result. Whenever you save or regenerate a baseline:
+
+1. do it only for an output change that is intended and understood;
+2. read the new baseline, or its diff against the previous one, and confirm every
+   change is one you meant to make;
+3. commit the baseline in the same change as the behavior it describes.
+
+Never regenerate a baseline merely to make a red suite green.
+
+### The harness precedes the tests that need it
+
+`l3build` regression tests cannot run until the harness exists. The harness
+(`build.lua` configured for `tests/regression/`) is therefore a prerequisite for
+the per-module `.lvt` workflow above, not a parallel nicety: stand it up before —
+or in the same change as — the first module whose coverage depends on it, rather
+than accumulating `.lvt` sources that no runner can execute. Until the harness
+lands, record the specific regression tests owed as explicit, tracked debt.
+
 ### Phase 1 coverage expectations
 
 Changes affecting shared packages should test both supported classes.

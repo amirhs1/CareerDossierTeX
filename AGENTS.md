@@ -129,6 +129,21 @@ implementation and committed in the same PR. A separate test-only issue is for
 test infrastructure, cross-cutting coverage, or explicit legacy test debt—not a
 place to postpone acceptance tests already required by a feature.
 
+Match the test to the module. Logic-bearing modules (`careerdossier-base.sty`,
+`careerdossier-i18n.sty`, and the non-visual parts of
+`careerdossier-typography.sty`) take a focused `l3build` regression test
+(`.lvt` source, saved `.tlg` baseline) per module. Layout classes
+(`careerdossier-resume.cls`, `careerdossier-letter.cls`) take smoke, extraction,
+and reviewed reference-PDF coverage; final layout correctness stays a human
+visual check, so do not force brittle per-metric assertions on unsettled design.
+
+A saved baseline is the assertion, not a formality: regenerate a `.tlg` or
+extraction reference only for an intended output change, review the diff before
+committing it, and never regenerate one merely to turn a red suite green. The
+`l3build` harness is a prerequisite for `.lvt` tests—stand it up before or with
+the first module that depends on it, and until then record owed regressions as
+tracked debt rather than committing tests no runner can execute.
+
 When the documented example exists, the baseline form is:
 
 ```bash
