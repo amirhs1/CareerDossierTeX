@@ -473,7 +473,7 @@ The extracted text should remain understandable and follow the visible document 
 The generated PDF's text layer is a first-class deliverable, owned jointly by
 `careerdossier-typography.sty` (how glyphs map back to characters) and the
 classes (reading order). The policy, with rationale and tests, lives in
-[`docs/guides/ats-and-extraction.md`](guides/ats-and-extraction.md). In summary:
+[`docs/guides/ats-extraction.md`](guides/ats-extraction.md). In summary:
 
 - compile with XeLaTeX and set `\XeTeXgenerateactualtext=1` in the typography
   module, early;
@@ -517,7 +517,7 @@ CareerDossierTeX/
 │   ├── ROADMAP.md
 │   ├── MIGRATION.md
 │   └── guides/
-│       └── ats-and-extraction.md
+│       └── ats-extraction.md
 ├── tests/
 │   └── extraction/
 │       ├── extraction-torture.tex
