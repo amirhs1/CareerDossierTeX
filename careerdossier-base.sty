@@ -146,5 +146,11 @@
 %% \CDossierFieldValue {field} -- expands to the stored value, or nothing if the
 %% field is absent. Intended for shared components that need the raw value (for
 %% example to build a link target). It does not typeset and does not validate.
+%% \prop_item:Nn returns \q_no_value when the key is absent; guard it so that a
+%% missing field always expands to empty rather than leaking the quark.
 \NewExpandableDocumentCommand \CDossierFieldValue { m }
-  { \prop_item:Nn \g__cdossier_base_fields_prop {#1} }
+  {
+    \prop_if_in:NnTF \g__cdossier_base_fields_prop {#1}
+      { \prop_item:Nn \g__cdossier_base_fields_prop {#1} }
+      { }
+  }
