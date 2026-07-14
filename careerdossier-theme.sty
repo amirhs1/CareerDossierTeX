@@ -1,0 +1,56 @@
+%% careerdossier-theme.sty
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the file careerdossier-theme.sty.
+%%
+%% careerdossier-theme owns the Phase 1 monochrome semantic colour, rule, and
+%% link tokens. Colour never carries meaning by itself; these tokens exist so
+%% components and classes do not hard-code colours.
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplPackage {careerdossier-theme} {2026-07-14} {0.1.0}
+  {CareerDossierTeX monochrome semantic colour, rule, and link tokens}
+
+\RequirePackage { xcolor }
+
+%% ---------------------------------------------------------------------------
+%% Monochrome palette. Body text is black; the muted grey is dark enough to
+%% keep at least 4.5:1 contrast on white (0.30 grey is about 8.5:1), so it is
+%% used only for de-emphasis, never to carry meaning on its own.
+%% ---------------------------------------------------------------------------
+\definecolor { cdossier-primary } { gray } { 0 }
+\definecolor { cdossier-text }    { gray } { 0 }
+\definecolor { cdossier-muted }   { gray } { 0.30 }
+\definecolor { cdossier-rule }    { gray } { 0 }
+\definecolor { cdossier-link }    { gray } { 0 }
+
+%% ---------------------------------------------------------------------------
+%% Public semantic colour tokens, usable as grouped switches:
+%%   {\CDossierMutedColor secondary text}
+%% ---------------------------------------------------------------------------
+\NewDocumentCommand \CDossierPrimaryColor { } { \color { cdossier-primary } }
+\NewDocumentCommand \CDossierTextColor    { } { \color { cdossier-text }    }
+\NewDocumentCommand \CDossierMutedColor   { } { \color { cdossier-muted }   }
+\NewDocumentCommand \CDossierRuleColor    { } { \color { cdossier-rule }    }
+\NewDocumentCommand \CDossierLinkColor    { } { \color { cdossier-link }    }
+
+%% ---------------------------------------------------------------------------
+%% Print-safe links. When hyperref is present, links are coloured black and
+%% drawn without borders, so they read as ordinary text on paper and in
+%% grayscale while the visible URL or identifier still stands on its own.
+%% The hook applies whenever hyperref loads, regardless of load order.
+%% ---------------------------------------------------------------------------
+\AddToHook { package/hyperref/after }
+  { \hypersetup { colorlinks = true , allcolors = cdossier-link } }
