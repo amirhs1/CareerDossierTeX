@@ -1,0 +1,86 @@
+%% careerdossier-typography.sty
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the file careerdossier-typography.sty.
+%%
+%% careerdossier-typography owns the XeLaTeX engine check, fontspec loading,
+%% the portable default fonts, and the semantic text roles. It carries no
+%% colour (see careerdossier-theme) and no page geometry (see the classes).
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplPackage {careerdossier-typography} {2026-07-14} {0.1.0}
+  {CareerDossierTeX XeLaTeX engine guard, portable fonts, and semantic text roles}
+
+%% ---------------------------------------------------------------------------
+%% Engine guard: XeLaTeX only. Fail early and clearly.
+%% ---------------------------------------------------------------------------
+\msg_new:nnn { careerdossier-typography } { engine }
+  {
+    CareerDossierTeX~requires~XeLaTeX. \\
+    Compile~with~xelatex,~not~pdflatex~or~lualatex.
+  }
+\sys_if_engine_xetex:F
+  { \msg_fatal:nn { careerdossier-typography } { engine } }
+
+%% ---------------------------------------------------------------------------
+%% Better copy/paste and search for shaped glyphs. Not a universal fix, but a
+%% cheap and worthwhile default (see the ATS guide, section 4.5).
+%% ---------------------------------------------------------------------------
+\XeTeXgenerateactualtext = 1 \scan_stop:
+
+%% ---------------------------------------------------------------------------
+%% Fonts. Conservative Latin defaults: disable optional ligature and alternate
+%% substitutions that can extract as Private Use Area characters, and use
+%% lining figures. See the ATS guide, section 4.4.
+%% ---------------------------------------------------------------------------
+\RequirePackage { fontspec }
+
+\defaultfontfeatures+
+  {
+    Ligatures = { CommonOff , ContextualOff , DiscretionaryOff , HistoricOff } ,
+    Numbers   = Lining ,
+  }
+
+%% Portable, freely redistributable TeX Live fonts, loaded by file name so the
+%% build does not depend on OS-installed fonts. All four faces are explicit.
+%%   body / serif : TeX Gyre Termes (Times-like)
+%%   headings / sans : TeX Gyre Heros (Helvetica-like)
+\setmainfont { texgyretermes }
+  [
+    Extension      = .otf ,
+    UprightFont    = *-regular ,
+    BoldFont       = *-bold ,
+    ItalicFont     = *-italic ,
+    BoldItalicFont = *-bolditalic ,
+  ]
+\setsansfont { texgyreheros }
+  [
+    Extension      = .otf ,
+    UprightFont    = *-regular ,
+    BoldFont       = *-bold ,
+    ItalicFont     = *-italic ,
+    BoldItalicFont = *-bolditalic ,
+  ]
+
+%% ---------------------------------------------------------------------------
+%% Semantic text roles. These describe meaning, not a fixed size; the classes
+%% add size and spacing. Colour is applied separately through the theme tokens.
+%% ---------------------------------------------------------------------------
+\NewDocumentCommand \CDossierNameStyle       { } { \sffamily \bfseries }
+\NewDocumentCommand \CDossierHeadlineStyle   { } { \sffamily \mdseries }
+\NewDocumentCommand \CDossierSectionStyle    { } { \sffamily \bfseries }
+\NewDocumentCommand \CDossierEntryTitleStyle { } { \rmfamily \bfseries }
+\NewDocumentCommand \CDossierBodyStyle       { } { \rmfamily \normalfont }
+\NewDocumentCommand \CDossierMutedStyle      { } { \rmfamily \itshape }
