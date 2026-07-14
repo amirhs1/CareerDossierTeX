@@ -256,7 +256,7 @@ change to output is intended and reviewed:
 
 Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
-[`docs/guides/ats-and-extraction.md`](docs/guides/ats-and-extraction.md).
+[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md).
 
 ### Log inspection
 

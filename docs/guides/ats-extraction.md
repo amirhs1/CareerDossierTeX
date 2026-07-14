@@ -842,7 +842,7 @@ CareerDossierTeX/
 │   ├── ROADMAP.md
 │   ├── MIGRATION.md
 │   └── guides/
-│       └── ats-and-extraction.md
+│       └── ats-extraction.md
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   ├── workflows/
@@ -1030,7 +1030,7 @@ repository's existing files:
   font/extraction policy summarized from this guide.
 - `docs/ROADMAP.md` — phases, non-goals, and backlog items (including CTAN
   packaging and the tagging revisit).
-- `docs/guides/ats-and-extraction.md` — this design and reference guide.
+- `docs/guides/ats-extraction.md` — this design and reference guide.
 - `README.md` — only behavior that actually works; never present planned features
   as supported.
 
