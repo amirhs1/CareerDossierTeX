@@ -69,7 +69,8 @@ Move everything else to later milestones.
 - [ ] Components issue
 - [ ] Résumé issue
 - [ ] Letter issue
-- [ ] Examples/tests issue
+- [ ] Add focused `tests/` acceptance criteria to every implementation issue
+- [ ] Test-harness issue only if shared infrastructure needs separate work
 - [ ] CI issue
 - [ ] Documentation issue
 - [ ] Release issue
@@ -92,7 +93,7 @@ Move everything else to later milestones.
 - [ ] `docs/ROADMAP.md`
 - [ ] `docs/API.md`
 - [ ] `docs/MIGRATION.md`
-- [ ] `docs/CONTRIBUTING.md`
+- [ ] `CONTRIBUTING.md`
 - [ ] `CHANGELOG.md`
 
 ## Part C: implementation branches
@@ -129,6 +130,8 @@ git switch -c feat/shared-foundation
 - [ ] Monochrome theme.
 - [ ] Shared header.
 - [ ] Contact separator handling.
+- [ ] Backfill committed base, typography/theme, and component regression tests
+      under `tests/` before or with the next production change.
 - [ ] Open PR and run local examples.
 - [ ] Merge.
 
@@ -144,6 +147,7 @@ git switch -c feat/resume-class
 - [ ] Implement section command.
 - [ ] Implement entry environment.
 - [ ] Implement compact itemize.
+- [ ] Add focused résumé tests under `tests/` before or alongside implementation.
 - [ ] Add résumé example.
 - [ ] Compile with XeLaTeX.
 - [ ] Inspect PDF and log.
@@ -164,6 +168,7 @@ git switch -c feat/industry-letter
 - [ ] Implement subject.
 - [ ] Implement salutation and closing.
 - [ ] Reuse profile and letterhead.
+- [ ] Add focused letter tests under `tests/` before or alongside implementation.
 - [ ] Add letter example.
 - [ ] Compile with XeLaTeX.
 - [ ] Open PR.
@@ -180,6 +185,7 @@ git switch -c ci/xelatex-build
 ```
 
 - [ ] Add build workflow.
+- [ ] Run every applicable suite under `tests/`.
 - [ ] Compile both examples.
 - [ ] Upload PDFs and logs.
 - [ ] Open PR.
@@ -233,9 +239,12 @@ Minimum acceptable `v0.1.0`:
 - working English résumé;
 - working English cover letter;
 - shared profile;
+- focused tests for every included behavior, committed as each feature lands;
 - local build instructions;
 - CI compiling both examples;
 - honest README;
 - Git tag and release.
 
-Move sophisticated tests, extra options, themes, and typography presets to `v0.1.1` or `v0.2.0`.
+Move extra options, themes, typography presets, and genuinely optional test
+infrastructure to `v0.1.1` or `v0.2.0`. Do not defer a focused test that is
+needed to prove behavior included in `v0.1.0`; reduce the feature scope instead.

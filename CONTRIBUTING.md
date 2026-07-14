@@ -25,7 +25,7 @@ Phase 1 development requires:
 - XeLaTeX;
 - `latexmk`;
 - a sufficiently complete TeX Live or MiKTeX installation;
-- optionally `pdftotext` for extraction checks.
+- `pdftotext` from Poppler when running extraction checks.
 
 CareerDossierTeX `v0.1.0` is XeLaTeX-only.
 
@@ -40,7 +40,8 @@ A good implementation issue explains:
 3. what is excluded;
 4. likely affected files;
 5. observable acceptance criteria;
-6. the parent issue and release milestone.
+6. the test files under `tests/` that will prove those criteria;
+7. the parent issue and release milestone.
 
 Use focused issues that can be completed on one branch. Split work that becomes too broad.
 
@@ -102,7 +103,7 @@ feat/shared-foundation
 feat/resume-class
 feat/industry-letter
 fix/contact-separators
-test/phase-1-examples
+test/regression-harness
 ci/xelatex-build
 release/v0.1.0
 ```
@@ -214,7 +215,41 @@ latexmk -C examples/industry/letter-industry.tex
 
 Do not state that a build passes unless you have run it or CI has run it successfully.
 
-## Phase 1 testing expectations
+## Test-driven where practical; test-as-you-go always
+
+Do not schedule known feature tests for the end of a milestone. A feature, fix,
+or behavior-changing refactor is incomplete until the smallest relevant test is
+committed with it. When practical:
+
+1. add a test that demonstrates the missing or incorrect behavior;
+2. run it and confirm it fails for the expected reason;
+3. implement the behavior;
+4. run the focused test and the affected broader suites;
+5. commit the test and implementation in the same pull request.
+
+If a pre-implementation failure cannot be demonstrated safely—for example, a
+new class does not exist yet—add the fixture alongside the first implementation
+commit and explain the limitation in the pull request.
+
+All automated test sources, expected outputs, fixtures, and runners belong under:
+
+```text
+tests/
+├── regression/   # package/class API, options, diagnostics, and fixed bugs
+├── smoke/        # supported document builds and failure-path fixtures
+├── extraction/   # text-layer and reading-order round trips
+└── layout/       # long-value, multi-page, and page-break stress sources
+```
+
+Create subdirectories only when the first real test needs them. Keep user-facing
+demonstrations under `examples/`; tests may compile those examples, but must not
+hide focused fixtures among them.
+
+A separate test-only issue is appropriate for a reusable harness, a cross-cutting
+quality improvement, or explicitly recorded legacy test debt. It must not be used
+to postpone tests already known to be necessary for an implementation issue.
+
+### Phase 1 coverage expectations
 
 Changes affecting shared packages should test both supported classes.
 
@@ -420,7 +455,8 @@ A pull request should include:
 - linked issues using `Closes #...` or `Fixes #...`;
 - a focused change list;
 - public API impact;
-- testing performed;
+- tests added or updated under `tests/`;
+- testing performed, including the expected pre-fix failure when demonstrated;
 - visual verification when layout changed;
 - design decisions or follow-up work.
 
@@ -437,6 +473,7 @@ Before marking a pull request ready:
 - confirm generated build files are not committed accidentally;
 - compile affected examples;
 - inspect PDFs and logs;
+- confirm new behavior has a focused committed test under `tests/`;
 - test missing optional fields;
 - update documentation;
 - update the changelog when appropriate;
@@ -515,6 +552,7 @@ The Phase 1 workflow should:
 
 - run on pull requests;
 - run on pushes to `main`;
+- run every committed automated suite under `tests/` that applies to Phase 1;
 - compile both supported examples;
 - fail when compilation fails;
 - upload PDFs and logs as artifacts.
@@ -527,6 +565,7 @@ Release preparation should verify:
 
 - release-blocking issues are closed;
 - supported examples compile locally;
+- the accumulated test suite passes without adding milestone-end coverage;
 - CI passes on `main`;
 - version strings are updated;
 - `README.md` reflects current support;

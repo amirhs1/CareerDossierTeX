@@ -21,12 +21,17 @@ CareerDossierTeX/
 │       ├── resume-english.tex
 │       └── letter-industry.tex
 │
+├── tests/
+│   ├── regression/
+│   ├── smoke/
+│   ├── extraction/
+│   └── layout/
+│
 ├── docs/
 │   ├── API.md
 │   ├── ARCHITECTURE.md
 │   ├── ROADMAP.md
 │   ├── MIGRATION.md
-│   ├── CONTRIBUTING.md
 │   └── planning/
 │       └── ...
 │
@@ -38,15 +43,20 @@ CareerDossierTeX/
 │   │   └── build.yml
 │   └── pull_request_template.md
 │
+├── build.lua
 ├── latexmkrc
 ├── Makefile
 ├── README.md
 ├── CHANGELOG.md
+├── CONTRIBUTING.md
 ├── LICENSE
 └── .gitignore
 ```
 
 Do not create empty placeholder files for every future class merely to make the repository look complete.
+Create a test subdirectory only when its first real fixture lands. Automated test
+sources, baselines, and runners belong under `tests/`; user examples stay under
+`examples/`.
 
 ## 2. Phase 2 additions
 
@@ -61,10 +71,11 @@ examples/
     ├── cv-english.tex
     ├── letter-academic.tex
     └── publications.bib
-
-testfiles/
-build.lua
 ```
+
+Extend the existing suites under `tests/` for academic behavior. Do not create a
+top-level `testfiles/` directory; configure `l3build` to use
+`tests/regression/`.
 
 ## 3. Phase 3 additions
 
@@ -193,7 +204,7 @@ old command
   → replacement example
 ```
 
-### `docs/CONTRIBUTING.md`
+### `CONTRIBUTING.md`
 
 Include:
 

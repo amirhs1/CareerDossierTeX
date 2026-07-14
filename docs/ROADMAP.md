@@ -4,7 +4,10 @@
 
 CareerDossierTeX is a reusable XeLaTeX toolkit for creating consistent career documents from shared profile data.
 
-The project follows incremental releases. Each release should provide one complete, documented, and tested vertical slice rather than several partially implemented features.
+The project follows incremental releases. Each implementation issue should
+produce one complete, documented, and tested vertical slice. Tests are added
+under `tests/` with the behavior they protect, not collected into a separate
+test pass at the end of a milestone.
 
 > **Current status:** Pre-release development toward `v0.1.0`.
 
@@ -60,6 +63,8 @@ Publish the smallest useful CareerDossierTeX release.
 - shared profile metadata;
 - required-field validation;
 - optional-field separator handling;
+- package/class regression coverage for implemented Phase 1 behavior;
+- smoke, error-path, layout-stress, and extraction fixtures under `tests/`;
 - example résumé and letter;
 - local `latexmk` builds;
 - GitHub Actions compilation;
@@ -84,6 +89,8 @@ Publish the smallest useful CareerDossierTeX release.
 - missing required metadata produces a clear error;
 - missing optional fields do not leave empty separators;
 - extracted résumé text follows logical reading order;
+- every implemented behavior has the relevant committed test under `tests/`;
+- the accumulated regression, smoke, layout, and extraction suites pass;
 - CI builds both examples;
 - README and API documentation match actual behavior;
 - tag and GitHub Release `v0.1.0` are published.
@@ -104,8 +111,7 @@ Extend the shared foundation to academic applications.
 - multi-page CV support;
 - running headers and page numbers;
 - Scholar and ORCID fields;
-- long-entry and page-break tests;
-- initial `l3build` regression tests.
+- long-entry and page-break tests added with the academic features they cover.
 
 ### Release criteria
 
@@ -175,13 +181,39 @@ Declare a stable and fully documented interface.
 - examples and manual are complete;
 - CI verifies all supported configurations.
 
-## Engineering backlog (tracked as issues)
+## Continuous testing policy
 
-These are accepted but out of the active milestone; each is tracked as a GitHub
-issue on its target milestone:
+Testing is part of each implementation issue and pull request:
 
-- Adopt `l3build` for package regression tests (`build.lua`, `testfiles/`) —
-  `v0.2.0`.
+1. define the observable behavior and its test before implementation;
+2. place automated sources, fixtures, runners, and baselines under `tests/`;
+3. write the test first when practical, or alongside the first usable
+   implementation when a pre-implementation run is not possible;
+4. run the focused test plus affected existing suites before merge;
+5. rerun the accumulated suite at release time without deferring new feature
+   coverage to release preparation.
+
+Dedicated test issues are reserved for shared harness work, cross-cutting quality
+improvements, or explicit legacy test debt. They are not a substitute for tests
+required by a feature's acceptance criteria.
+
+The repository currently has an extraction round-trip fixture but lacks committed
+regression coverage for already-merged Phase 1 modules. That debt should be
+backfilled before or with the next production feature. If `l3build` is adopted,
+configure it to use `tests/regression/` rather than a top-level `testfiles/`
+directory so all test material remains under `tests/`.
+
+## Engineering work (tracked as issues)
+
+The live issue and Project metadata now follow the continuous-testing policy:
+
+- Establish the `l3build` regression harness (`build.lua`,
+  `tests/regression/`) during active Phase 1 work in
+  [issue #25](https://github.com/amirhs1/CareerDossierTeX/issues/25). Add each
+  new regression with the behavior it protects.
+- Backfill committed coverage for the already-merged Phase 1 modules in
+  [issue #10](https://github.com/amirhs1/CareerDossierTeX/issues/10). Résumé and
+  letter tests remain owned by their feature issues rather than this debt item.
 - CTAN packaging via `l3build ctan`; decide handwritten vs `.dtx` — `v1.0.0`.
 - Revisit tagged PDF / PDF-UA once XeTeX supports real interword spaces —
   `v0.4.0`.
@@ -193,7 +225,8 @@ A feature may enter a release only when:
 1. its public behavior is defined;
 2. a minimal example exists;
 3. it is documented;
-4. it has a repeatable or automated test;
+4. its repeatable or automated test was added with the implementation under
+   `tests/`;
 5. it does not require claiming unsupported configurations.
 
 Attractive but nonessential features belong in the backlog until the current milestone is complete.

@@ -15,13 +15,13 @@ CareerDossierTeX separates personal information from document content and presen
 |---|---|
 | Industry résumé | Planned for `v0.1.0` |
 | Industry cover letter | Planned for `v0.1.0` |
-| Shared profile metadata | Planned for `v0.1.0` |
+| Shared profile metadata and components | Implemented; pre-release |
 | Language | English |
 | Engine | XeLaTeX |
 | Paper size | US Letter |
 | Theme | Monochrome |
 | Local build | `latexmk` |
-| Continuous integration | GitHub Actions |
+| Continuous integration | Extraction test active; example builds planned |
 
 The academic CV, bibliography integration, Farsi, bilingual layouts, statement classes, A4 paper, and additional themes belong to later releases.
 
@@ -149,6 +149,31 @@ make
 
 A configuration is supported only after its examples compile locally and in GitHub Actions.
 
+## Development and testing policy
+
+CareerDossierTeX is test-driven where practical and test-as-you-go always. Every
+behavior change adds or updates the relevant automated test in the same pull
+request; known tests are not deferred to a testing pass at the end of a
+milestone. When practical, write the test first and confirm that it detects the
+missing or incorrect behavior before implementing the change.
+
+All committed test fixtures, baselines, and runners live under `tests/`, grouped
+by purpose. Files under `examples/` teach users and may also be compiled by CI,
+but examples do not replace focused regression, smoke, error-path, extraction,
+or layout-stress tests.
+
+Run the currently available extraction suite with:
+
+```bash
+make extract-test
+```
+
+This suite requires `pdftotext` from Poppler in addition to XeLaTeX.
+
+Release preparation reruns the accumulated suite. It is a final verification
+gate, not the stage where feature tests are first created. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for the full workflow.
+
 ## Documentation
 
 - [`docs/API.md`](docs/API.md): public commands, keys, environments, defaults, and errors
@@ -159,7 +184,8 @@ A configuration is supported only after its examples compile locally and in GitH
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
 
-Only behavior documented in `docs/API.md` and verified by the examples should be treated as supported.
+Only behavior documented in `docs/API.md` and covered by the relevant tests and
+supported examples should be treated as supported.
 
 ## Releases
 

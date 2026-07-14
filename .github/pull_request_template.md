@@ -20,6 +20,8 @@ Closes #
 
 ## Testing
 
+- [ ] Focused tests were added or updated under `tests/` with behavior changes
+- [ ] Expected pre-fix failure was confirmed, or the reason it could not be was documented
 - [ ] Compiled affected examples with `latexmk -xelatex`
 - [ ] GitHub Actions passes
 - [ ] Relevant logs inspected

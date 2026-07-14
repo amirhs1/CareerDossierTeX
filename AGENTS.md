@@ -57,14 +57,17 @@ on it. When it is removed, update remaining references in the same change.
 4. **Module ownership:** place behavior in the module that owns the concern.
 5. **Optional fields:** build a list of present fields, then insert separators
    between items. Missing values must not leave stray separators.
-6. **Docs with behavior:** update affected documentation in the same change.
-7. **Source-only Git:** do not commit routine build output or example PDFs.
-8. **Dependencies and assets:** evaluate necessity, maintenance, licensing,
+6. **Tests with behavior:** add or update the relevant committed tests in
+   `tests/` in the same change as the behavior. Do not defer known coverage to a
+   milestone-end testing issue.
+7. **Docs with behavior:** update affected documentation in the same change.
+8. **Source-only Git:** do not commit routine build output or example PDFs.
+9. **Dependencies and assets:** evaluate necessity, maintenance, licensing,
    portability, and security before adding third-party packages, actions, fonts,
    images, binaries, or other assets.
-9. **No unsupported claims:** do not claim ATS compatibility, WCAG conformance,
+10. **No unsupported claims:** do not claim ATS compatibility, WCAG conformance,
    PDF/UA conformance, or broad accessibility without suitable validation.
-10. **Maintainer authority:** never push directly to `main`, mark a PR ready,
+11. **Maintainer authority:** never push directly to `main`, mark a PR ready,
     merge, enable auto-merge, publish a release, or alter repository protections
     unless the maintainer explicitly authorizes that exact action.
 
@@ -101,7 +104,9 @@ Before editing, identify the owning module and affected public API.
 
 1. **Understand:** inspect the issue, code, docs, tests, CI, and Project metadata.
 2. **Plan:** identify modules, API impact, tests, docs, and design implications.
-3. **Implement:** make the smallest coherent change and preserve unrelated work.
+3. **Test and implement:** add a failing regression test first when practical,
+   then make the smallest coherent change that passes it. Keep the test and
+   implementation in the same focused branch and preserve unrelated work.
 4. **Verify:** run relevant checks, then the supported suite when available.
 5. **Self-review:** inspect the full branch diff, logs, artifacts, and docs.
 6. **Commit:** create coherent commits on the focused feature branch.
@@ -114,6 +119,16 @@ destructive-action, or metadata decision that cannot be resolved from the repo.
 ## Build and test
 
 Prefer commands from the current `Makefile`, CI workflow, or `CONTRIBUTING.md`.
+All automated fixtures, baselines, runners, and regression sources belong under
+`tests/`. Examples under `examples/` are user documentation; CI may compile them,
+but they do not replace focused tests.
+
+Every behavior change must add or update the smallest test that would fail
+without the change. Tests should normally be written before or alongside the
+implementation and committed in the same PR. A separate test-only issue is for
+test infrastructure, cross-cutting coverage, or explicit legacy test debt—not a
+place to postpone acceptance tests already required by a feature.
+
 When the documented example exists, the baseline form is:
 
 ```bash
