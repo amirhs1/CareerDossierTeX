@@ -135,9 +135,16 @@
   }
 
 %% \CDossierIfFieldTF {field} {true} {false} -- true when the field is present
-%% (present implies nonblank); errors on an unknown field name.
-\NewDocumentCommand \CDossierIfFieldTF { m m m }
+%% (present implies nonblank); errors on an unknown field name. The branches are
+%% long, so they may contain \par or full paragraphs.
+\NewDocumentCommand \CDossierIfFieldTF { m +m +m }
   {
     \__cdossier_base_check_known:n {#1}
     \__cdossier_base_field_if_present:nTF {#1} {#2} {#3}
   }
+
+%% \CDossierFieldValue {field} -- expands to the stored value, or nothing if the
+%% field is absent. Intended for shared components that need the raw value (for
+%% example to build a link target). It does not typeset and does not validate.
+\NewExpandableDocumentCommand \CDossierFieldValue { m }
+  { \prop_item:Nn \g__cdossier_base_fields_prop {#1} }
