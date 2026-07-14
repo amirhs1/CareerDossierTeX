@@ -175,6 +175,17 @@ Declare a stable and fully documented interface.
 - examples and manual are complete;
 - CI verifies all supported configurations.
 
+## Engineering backlog (tracked as issues)
+
+These are accepted but out of the active milestone; each is tracked as a GitHub
+issue on its target milestone:
+
+- Adopt `l3build` for package regression tests (`build.lua`, `testfiles/`) —
+  `v0.2.0`.
+- CTAN packaging via `l3build ctan`; decide handwritten vs `.dtx` — `v1.0.0`.
+- Revisit tagged PDF / PDF-UA once XeTeX supports real interword spaces —
+  `v0.4.0`.
+
 ## Scope-control rule
 
 A feature may enter a release only when:

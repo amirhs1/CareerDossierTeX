@@ -240,6 +240,24 @@ pdftotext examples/industry/resume-english.pdf \
 
 Inspect the output for logical reading order.
 
+### Extraction round-trip test
+
+Beyond eyeballing reading order, run the automated extraction fixture, which
+compiles a torture document and diffs its `pdftotext` output against a committed
+baseline:
+
+    tests/extraction/run.sh
+
+It fails on any character, spacing, ordering, or Unicode-mapping change, and on
+any non-allowlisted XeLaTeX warning. Regenerate the baseline **only** when a
+change to output is intended and reviewed:
+
+    tests/extraction/run.sh --update
+
+Run it after any change to fonts, `fontspec` options, or the TeX distribution.
+Rationale and the full method are in
+[`docs/guides/ats-and-extraction.md`](docs/guides/ats-and-extraction.md).
+
 ### Log inspection
 
 After compiling, inspect logs for:
