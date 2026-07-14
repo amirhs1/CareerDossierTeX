@@ -138,7 +138,8 @@ Academic letter layouts belong to `v0.2.0`.
   location = {Ontario, Canada},
   website  = {example.com},
   linkedin = {linkedin.com/in/example},
-  github   = {github.com/example}
+  github   = {github.com/example},
+  scholar  = {scholar.google.com/citations?user=example}
 }
 ```
 
@@ -156,6 +157,7 @@ This command stores profile metadata for use by both document classes.
 | `website` | No | Personal or professional website |
 | `linkedin` | No | LinkedIn URL or profile path |
 | `github` | No | GitHub URL or profile path |
+| `scholar` | No | Google Scholar profile URL or identifier |
 
 Whitespace-only values should be treated as missing.
 
@@ -344,7 +346,7 @@ In `v0.1.0`, only English labels are available. This command exists to prevent E
 When present:
 
 - `email` should use a `mailto:` link;
-- `website`, `linkedin`, and `github` should use web links;
+- `website`, `linkedin`, `github`, and `scholar` should use web links;
 - printed text should remain readable in monochrome;
 - URLs should be breakable rather than extending beyond the margin.
 
