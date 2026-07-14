@@ -50,7 +50,12 @@
 %% Print-safe links. When hyperref is present, links are coloured black and
 %% drawn without borders, so they read as ordinary text on paper and in
 %% grayscale while the visible URL or identifier still stands on its own.
+%% \urlstyle{same} keeps \url/\nolinkurl text in the surrounding font instead of
+%% typewriter, so breakable contact URLs do not switch to a monospace face.
 %% The hook applies whenever hyperref loads, regardless of load order.
 %% ---------------------------------------------------------------------------
 \AddToHook { package/hyperref/after }
-  { \hypersetup { colorlinks = true , allcolors = cdossier-link } }
+  {
+    \hypersetup { colorlinks = true , allcolors = cdossier-link }
+    \urlstyle { same }
+  }

@@ -45,10 +45,13 @@
 %% Separator between present contact items: a spaced vertical bar.
 \cs_new_protected:Npn \__cdossier_components_sep: { ~|~ }
 
-%% Link wrapper. Degrades to plain visible text when hyperref is absent, so the
+%% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
+%% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
+%% \urlstyle{same} so the text stays in the body font rather than switching to
+%% monospace. Degrades to plain visible text when hyperref is absent, so the
 %% identifier is always present and extractable.
 \cs_new_protected:Npn \__cdossier_components_link:nn #1#2
-  { \cs_if_exist:NTF \href { \href {#1} {#2} } { #2 } }
+  { \cs_if_exist:NTF \href { \href {#1} { \nolinkurl {#2} } } { #2 } }
 \cs_generate_variant:Nn \__cdossier_components_link:nn { VV }
 
 %% Email: a mailto: link over the visible address.
