@@ -1,0 +1,7 @@
+  extraction:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extraction round-trip
+        run: tests/extraction/run.sh
