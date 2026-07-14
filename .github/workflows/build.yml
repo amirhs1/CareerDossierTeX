@@ -15,5 +15,7 @@ jobs:
     container: texlive/texlive:latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install poppler-utils
+        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Extraction round-trip
         run: tests/extraction/run.sh
