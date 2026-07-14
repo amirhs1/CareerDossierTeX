@@ -159,6 +159,12 @@ Responsibilities:
 - select portable default fonts;
 - define semantic styles such as name, headline, section, entry title, body, and muted text;
 - provide extension points for future font presets.
+- set `\XeTeXgenerateactualtext=1`;
+- apply the Latin ligature-suppression and lining-numbers defaults;
+- resolve the default font deliberately (fontconfig family name, or an explicit
+  `Path=`), not by bare file name — bare-file-name loading of the tex-gyre OTFs
+  is not resolved by fontspec on stock XeLaTeX;
+- record the tested font version for reproducibility.
 
 Typography commands should express meaning:
 
@@ -462,6 +468,30 @@ pdftotext examples/industry/resume-english.pdf \
 
 The extracted text should remain understandable and follow the visible document order.
 
+### Font and text-layer policy
+
+The generated PDF's text layer is a first-class deliverable, owned jointly by
+`careerdossier-typography.sty` (how glyphs map back to characters) and the
+classes (reading order). The policy, with rationale and tests, lives in
+[`docs/guides/ats-and-extraction.md`](guides/ats-and-extraction.md). In summary:
+
+- compile with XeLaTeX and set `\XeTeXgenerateactualtext=1` in the typography
+  module, early;
+- disable common/contextual/discretionary/historic ligatures in the Latin
+  default so `ffi`/`ffl` sequences extract as separate letters;
+- treat each font file, version, and OpenType-feature combination as testable
+  code; record the tested font version;
+- keep meaningful content in source (reading) order; never rely on visual
+  repositioning that a parser must undo.
+
+### Tagged PDF (status)
+
+Tagged PDF is not claimed for the XeLaTeX build in Phase 1. Current XeTeX does not
+support real interword spaces in the tagging pipeline, so no PDF/UA conformance is
+asserted. The classes stay tagging-compatible; the limitation is documented rather
+than silently ignored. See the guide's tagging section before adding any
+tagging-related dependency.
+
 ## Repository layout
 
 At the end of `v0.1.0`:
@@ -485,7 +515,14 @@ CareerDossierTeX/
 │   ├── API.md
 │   ├── ARCHITECTURE.md
 │   ├── ROADMAP.md
-│   └── MIGRATION.md
+│   ├── MIGRATION.md
+│   └── guides/
+│       └── ats-and-extraction.md
+├── tests/
+│   └── extraction/
+│       ├── extraction-torture.tex
+│       ├── extraction-torture.expected.txt
+│       └── run.sh
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   ├── workflows/
