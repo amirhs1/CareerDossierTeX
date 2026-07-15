@@ -126,3 +126,39 @@
       { \CDossierBodyStyle \small \__cdossier_components_contactline: \par }
     \end { center }
   }
+
+%% ---------------------------------------------------------------------------
+%% Entry heading primitive.
+%%
+%% Renders a single entry heading shared by résumé sections (experience,
+%% education, projects, ...). It takes a required title and up to three optional
+%% metadata fields, and carries no page geometry or vertical spacing of its own:
+%% the owning class decides how much room surrounds an entry. Layout:
+%%
+%%   Title .......................................... dates
+%%   Organization ................................... location
+%%
+%% Each optional cell is emitted only when its value is nonblank, so a missing
+%% field leaves no dangling punctuation, separator, or empty second line. The
+%% second line is emitted only when organization or location is present.
+%%
+%% #1 title (required, nonblank), #2 organization, #3 location, #4 dates.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_components_entryhead:nnnn #1#2#3#4
+  {
+    \noindent
+    { \CDossierEntryTitleStyle #1 }
+    \tl_if_blank:nF {#4}
+      { \hfill { \CDossierMutedStyle #4 } }
+    \par
+    \bool_lazy_or:nnT
+      { ! \tl_if_blank_p:n {#2} }
+      { ! \tl_if_blank_p:n {#3} }
+      {
+        \noindent
+        \tl_if_blank:nF {#2} { { \CDossierBodyStyle #2 } }
+        \tl_if_blank:nF {#3} { \hfill { \CDossierMutedStyle #3 } }
+        \par
+      }
+  }
+\cs_generate_variant:Nn \__cdossier_components_entryhead:nnnn { VVVV }
