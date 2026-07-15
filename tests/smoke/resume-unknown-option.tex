@@ -1,0 +1,8 @@
+% resume-unknown-option.tex — smoke fixture: a fixed setting offered as a user
+% option (here paper) must be rejected as an unknown class option (expected
+% failure).
+\documentclass[paper=a4]{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\end{document}

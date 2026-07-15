@@ -1,0 +1,79 @@
+% resume-two-page.tex — layout stress: enough content to span two pages, so a
+% page break falls inside the body. Verifies that entries, sections, and lists
+% break across pages without page numbers appearing and without overfull boxes.
+\documentclass[fontsize=11pt, density=standard]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+  linkedin = {linkedin.com/in/ada-lovelace},
+  github   = {github.com/ada-lovelace},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Summary}
+Data scientist with a decade of experience across public-sector analytics,
+reporting platforms, and reproducible research pipelines.
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Principal Data Scientist}, organization = {Digital Services Laboratory}, location = {Ottawa, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+    \item Mentored analysts and defined reusable standards for testing, release management, and technical documentation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Civic Technology Research Group}, location = {Toronto, ON}, dates = {2021--2024}]
+  \begin{CDossierItemize}
+    \item Designed models and processing pipelines that improved reliability during seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests, deployment checks, and operational dashboards that reduced production regressions.
+    \item Led technical discovery with program managers, documented trade-offs, and delivered phased modernization plans.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Scientist}, organization = {Public Data Analytics Incorporated}, location = {Waterloo, ON}, dates = {2018--2021}]
+  \begin{CDossierItemize}
+    \item Built data-import services and validation tools for public reporting datasets in CSV, JSON, and XML formats.
+    \item Improved processing performance through batching, indexing, and query optimization while preserving auditability.
+    \item Created internal libraries for schema validation, error reporting, and automated documentation generation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Selected Projects}
+\begin{CDossierEntry}[title = {Accessible Public Correspondence Platform}, dates = {2025--2026}]
+  \begin{CDossierItemize}
+    \item Defined a versioned content model supporting conditional sections, reusable clauses, and localization.
+    \item Added automated checks for required content, document metadata, reading order, and archival conformance.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Open Data Submission Gateway}, dates = {2024--2025}]
+  \begin{CDossierItemize}
+    \item Implemented schema validation, duplicate detection, detailed error reports, and resumable processing.
+    \item Added administrative review tools and audit records to support corrections, approvals, and publication.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Operational Reporting Modernization}, dates = {2023--2024}]
+  \begin{CDossierItemize}
+    \item Replaced spreadsheet-driven monthly reporting with a governed pipeline and reproducible publication process.
+    \item Standardized metric definitions and introduced automated reconciliation between source and published summaries.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Education}
+\begin{CDossierEntry}[title = {Ph.D. in Computer Science}, organization = {University of Toronto}, location = {Toronto, ON}, dates = {2021--2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {M.Sc. in Software Engineering}, organization = {McGill University}, location = {Montréal, QC}, dates = {2019--2021}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {B.A.Sc. in Computer Engineering, Honours}, organization = {University of Waterloo}, location = {Waterloo, ON}, dates = {2014--2019}]
+\end{CDossierEntry}
+
+\CDossierSection{Certificates}
+\begin{CDossierEntry}[title = {Professional Certificate in Accessible Document Production}, organization = {Standards and Accessibility Institute}, dates = {2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Cloud Architecture and Reliability Engineering}, organization = {Canadian Technology Learning Consortium}, dates = {2025}]
+\end{CDossierEntry}
+
+\end{document}

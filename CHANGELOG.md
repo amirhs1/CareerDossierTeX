@@ -10,6 +10,20 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `careerdossier-resume.cls`: the English industry résumé class. US Letter
+  geometry; `fontsize` (`10pt`, `11pt`) and `density` (`compact`, `standard`)
+  options with actionable rejection of unsupported keys and values; page numbers
+  disabled by default; `\CDossierSection`, the `CDossierEntry` environment, and
+  the `CDossierItemize` list.
+- Shared entry-heading primitive in `careerdossier-components.sty` that renders a
+  required title with optional organization, location, and dates and leaves no
+  stray separators when fields are absent.
+- `examples/industry/resume-english.tex` and `examples/profiles/profile-english.tex`:
+  the supported résumé example and its shared profile data.
+- Smoke tests (`tests/smoke/`) for the supported builds and the required failure
+  paths, layout-stress fixtures (`tests/layout/`) for long fields and a two-page
+  résumé, and a résumé extraction fixture (`tests/extraction/`) that pins the
+  contact line and reading order.
 - Initial project scope, phased roadmap, and Phase 1 implementation plan.
 - Repository architecture and documentation plan.
 - GitHub issue, branch, pull-request, CI, and release workflow documentation.

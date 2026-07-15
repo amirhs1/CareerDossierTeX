@@ -13,7 +13,7 @@ CareerDossierTeX separates personal information from document content and presen
 
 | Capability | Target |
 |---|---|
-| Industry résumé | Planned for `v0.1.0` |
+| Industry résumé | Implemented; pre-release |
 | Industry cover letter | Planned for `v0.1.0` |
 | Shared profile metadata and components | Implemented; pre-release |
 | Language | English |
@@ -21,7 +21,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Paper size | US Letter |
 | Theme | Monochrome |
 | Local build | `latexmk` |
-| Continuous integration | Extraction test active; example builds planned |
+| Continuous integration | Extraction, smoke, and layout tests plus example build active |
 
 The academic CV, bibliography integration, Farsi, bilingual layouts, statement classes, A4 paper, and additional themes belong to later releases.
 

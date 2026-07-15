@@ -1,0 +1,12 @@
+Ada Lovelace
+Data Scientist
+ada@example.com | Toronto, ON | github.com/ada
+
+Experience
+Senior Data Scientist
+Example Corp
+• Built a reproducible analytical workflow used across teams.
+• Led a migration to a governed reporting pipeline.
+
+2024–Present
+Toronto, ON

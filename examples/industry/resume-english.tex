@@ -1,0 +1,101 @@
+% examples/industry/resume-english.tex
+%
+% The supported v0.1.0 English industry résumé example. It is the reference
+% document for careerdossier-resume.cls: a single-column, monochrome, US Letter
+% résumé built entirely from the public API (\CDossierSetup, \MakeCDossierHeader,
+% \CDossierSection, CDossierEntry, CDossierItemize).
+%
+% Compile with XeLaTeX:
+%   latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+%     examples/industry/resume-english.tex
+% or:
+%   xelatex examples/industry/resume-english.tex
+%
+% Run from the repository root so the class and shared packages resolve, or add
+% the repository root to TEXINPUTS.
+
+\documentclass[fontsize=10pt, density=compact]{careerdossier-resume}
+
+\input{examples/profiles/profile-english.tex}
+
+\begin{document}
+
+\MakeCDossierHeader
+
+\CDossierSection{Summary}
+
+Data scientist with experience designing reliable analytical platforms,
+automated reporting pipelines, and accessible public-facing services. Skilled in
+translating operational requirements into maintainable systems, measurable
+service standards, and clear technical documentation.
+
+\CDossierSection{Experience}
+
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Government Digital Services Laboratory},
+  location     = {Ottawa, ON / Remote},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Lead the delivery of reporting services supporting high-volume public
+          programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline,
+          reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and
+          archival output.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\begin{CDossierEntry}[
+  title        = {Data Scientist},
+  organization = {Civic Technology Research Group},
+  location     = {Toronto, ON},
+  dates        = {2021--2024}
+]
+  \begin{CDossierItemize}
+    \item Built models and processing pipelines that improved reliability during
+          seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests and operational dashboards that shortened
+          incident investigation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Selected Projects}
+
+\begin{CDossierEntry}[
+  title = {Operational Reporting Modernization},
+  dates = {2023--2024}
+]
+  \begin{CDossierItemize}
+    \item Replaced spreadsheet-driven monthly reporting with a reproducible
+          publication process and reconciled metric definitions.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Education}
+
+\begin{CDossierEntry}[
+  title        = {M.Sc. in Software Engineering},
+  organization = {McGill University},
+  location     = {Montréal, QC},
+  dates        = {2019--2021}
+]
+\end{CDossierEntry}
+
+\begin{CDossierEntry}[
+  title        = {B.A.Sc. in Computer Engineering, Honours},
+  organization = {University of Waterloo},
+  location     = {Waterloo, ON},
+  dates        = {2014--2019}
+]
+\end{CDossierEntry}
+
+\CDossierSection{Technical Skills}
+
+\textbf{Programming:} Python, SQL, R, Bash \\
+\textbf{Platforms:} Linux, Docker, PostgreSQL, cloud CI/CD \\
+\textbf{Practices:} Reproducible analysis, automated testing, data validation,
+observability
+
+\end{document}

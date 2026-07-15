@@ -19,3 +19,19 @@ jobs:
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Extraction round-trip
         run: tests/extraction/run.sh
+
+  resume:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poppler-utils
+        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
+      - name: Smoke tests (supported builds and required failures)
+        run: tests/smoke/run.sh
+      - name: Layout-stress tests
+        run: tests/layout/run.sh
+      - name: Build the résumé example
+        run: >-
+          latexmk -xelatex -interaction=nonstopmode -halt-on-error
+          examples/industry/resume-english.tex
