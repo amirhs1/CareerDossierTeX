@@ -1,0 +1,48 @@
+% typography-roles.lvt — careerdossier-typography semantic text roles.
+%
+% Fonts and geometry are a visual concern checked by the layout and extraction
+% runners; what is stable here is the *intent* of each semantic role: which font
+% class (serif/sans), weight, and shape it selects, plus the ATS actual-text
+% setting the module turns on. Family is compared against the NFSS defaults
+% rather than a fontspec-generated name, so the assertion does not break when
+% font internals change.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-typography}
+
+\ExplSyntaxOn
+% Report the selected role as class/series/shape, e.g. "sans/b/n". The NFSS
+% current-font macros contain @, which is not a letter under \ExplSyntaxOn, so
+% they are reached with \use:c rather than written literally.
+\cs_new_protected:Npn \cdossiertestRole #1
+  {
+    \group_begin:
+      #1
+      \str_if_eq:eeTF { \use:c { f@family } } { \sfdefault }
+        { \TYPE{sans} }
+        {
+          \str_if_eq:eeTF { \use:c { f@family } } { \rmdefault }
+            { \TYPE{serif} } { \TYPE{other} }
+        }
+      \TYPE{ series = \use:c { f@series } , ~ shape = \use:c { f@shape } }
+    \group_end:
+  }
+\cs_new_protected:Npn \cdossiertestActualText
+  { \TYPE{ actualtext = \int_use:N \XeTeXgenerateactualtext } }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{name-is-sans-bold}{        \cdossiertestRole{\CDossierNameStyle}       }
+\TEST{headline-is-sans-medium}{  \cdossiertestRole{\CDossierHeadlineStyle}   }
+\TEST{section-is-sans-bold}{     \cdossiertestRole{\CDossierSectionStyle}    }
+\TEST{entrytitle-is-serif-bold}{ \cdossiertestRole{\CDossierEntryTitleStyle} }
+\TEST{body-is-serif-regular}{    \cdossiertestRole{\CDossierBodyStyle}       }
+\TEST{muted-is-serif-italic}{    \cdossiertestRole{\CDossierMutedStyle}      }
+
+\TEST{actual-text-enabled-for-extraction}{
+  \cdossiertestActualText
+}
+
+\END

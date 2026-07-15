@@ -1,0 +1,61 @@
+% components-contactline.lvt — careerdossier-components separator placement.
+%
+% The rendered contact line must join only the present fields, in a fixed order,
+% with a separator *between* items and never leading, trailing, or doubled. The
+% visible line is checked by the extraction fixtures; this test isolates the
+% control flow that guarantees clean separators, independently of fonts.
+%
+% The two leaf operations are stubbed to emit log markers instead of typeset
+% output: \__cdossier_components_sep: -> |, and \__cdossier_components_render:n
+% -> <field>. The real \__cdossier_components_contactline: (its presence tests
+% and separator bookkeeping) is exercised unchanged, so the marker sequence is
+% exactly the join the module would produce.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+\cs_set_protected:Npn \__cdossier_components_sep: { \TYPE{|} }
+\cs_set_protected:Npn \__cdossier_components_render:n #1 { \TYPE{<#1>} }
+\cs_new_protected:Npn \cdossiertestClearContacts
+  {
+    \clist_map_inline:nn { email , phone , location , website , linkedin , github , scholar }
+      { \CDossierSetup{ ##1 = {} } }
+  }
+\cs_new_protected:Npn \cdossiertestContactLine { \__cdossier_components_contactline: }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+% Gaps in the middle: present email, location, github; phone/website/linkedin/
+% scholar absent. Separators must appear only between the three present items.
+\TEST{separators-only-between-present-items}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ email = {a@b.co}, location = {Toronto}, github = {github.com/a} }
+  \cdossiertestContactLine
+}
+
+% A single present field must yield no separator at all.
+\TEST{single-field-has-no-separator}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ location = {Toronto} }
+  \cdossiertestContactLine
+}
+
+% The first field (email) is absent: there must be no leading separator before
+% the first item that is actually present.
+\TEST{no-leading-separator-when-first-absent}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ phone = {+1 000}, github = {github.com/a} }
+  \cdossiertestContactLine
+}
+
+% No present fields: the line emits nothing.
+\TEST{all-absent-emits-nothing}{
+  \cdossiertestClearContacts
+  \cdossiertestContactLine
+  \TYPE{[end]}
+}
+
+\END

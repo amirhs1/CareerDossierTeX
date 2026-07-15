@@ -197,11 +197,13 @@ Dedicated test issues are reserved for shared harness work, cross-cutting qualit
 improvements, or explicit legacy test debt. They are not a substitute for tests
 required by a feature's acceptance criteria.
 
-The repository currently has an extraction round-trip fixture but lacks committed
-regression coverage for already-merged Phase 1 modules. That debt should be
-backfilled before or with the next production feature. If `l3build` is adopted,
-configure it to use `tests/regression/` rather than a top-level `testfiles/`
-directory so all test material remains under `tests/`.
+The repository uses an `l3build` regression harness (`build.lua`, run with
+`l3build check`) whose sources and baselines live under `tests/regression/`, so
+all test material remains under `tests/` with no top-level `testfiles/`
+directory. Committed regression coverage for the already-merged Phase 1
+packages (base, components, theme, and the non-visual parts of typography) is in
+place alongside the extraction round-trip fixture; extend it with the behavior
+each future change adds.
 
 ## Engineering work (tracked as issues)
 

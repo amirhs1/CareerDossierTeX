@@ -79,3 +79,7 @@ Thumbs.db
 # these cover the remaining per-runner scratch files under tests/.
 *.stdout
 tests/extraction/*.diff
+
+# l3build writes its check sandbox and diffs here; the .tlg baselines under
+# tests/regression/ are source and are not ignored.
+/build/

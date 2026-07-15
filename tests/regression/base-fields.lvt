@@ -1,0 +1,38 @@
+% base-fields.lvt — careerdossier-base storage, trimming, and field access.
+%
+% Covers the happy-path metadata behavior of the base module: values are stored
+% trimmed, a whitespace-only value is treated as missing, re-setting a field
+% warns and overwrites, present/absent is reported correctly, and the raw value
+% accessor expands to the stored value (or nothing when absent).
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-base}
+\begin{document}
+\START
+
+\TEST{store-trims-surrounding-space}{
+  \CDossierSetup{ name = {   Ada Lovelace   } }
+  \TYPE{[\CDossierFieldValue{name}]}
+}
+
+\TEST{whitespace-only-value-is-missing}{
+  \CDossierSetup{ email = {    } }
+  \CDossierIfFieldTF{email}{\TYPE{email-present}}{\TYPE{email-absent}}
+}
+
+\TEST{present-and-absent-fields}{
+  \CDossierSetup{ location = {Toronto, ON} }
+  \CDossierIfFieldTF{location}{\TYPE{location-present}}{\TYPE{location-absent}}
+  \CDossierIfFieldTF{phone}{\TYPE{phone-present}}{\TYPE{phone-absent}}
+}
+
+\TEST{field-value-of-absent-is-empty}{
+  \TYPE{[\CDossierFieldValue{phone}]}
+}
+
+\TEST{re-setting-a-field-warns-and-overwrites}{
+  \CDossierSetup{ name = {Grace Hopper} }
+  \TYPE{[\CDossierFieldValue{name}]}
+}
+
+\END

@@ -1,0 +1,40 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: unknown-setup-key-errors
+============================================================
+! Package careerdossier-base Error: Unknown \CDossierSetup key 'twitter'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The supported keys are: name, headline, email, phone, location, website, linkedin, github, scholar.
+============================================================
+============================================================
+TEST 2: unknown-field-in-print-errors
+============================================================
+! Package careerdossier-base Error: Unknown profile field 'twitter'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The supported fields are: name, headline, email, phone, location, website, linkedin, github, scholar.
+============================================================
+============================================================
+TEST 3: unknown-field-in-conditional-errors
+============================================================
+! Package careerdossier-base Error: Unknown profile field 'twitter'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The supported fields are: name, headline, email, phone, location, website, linkedin, github, scholar.
+false-branch
+============================================================
+============================================================
+TEST 4: missing-required-name-errors
+============================================================
+! Package careerdossier-base Error: The required profile field 'name' is not set (needed by \MakeCDossierHeader).
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+Provide a name before rendering identity content, for example:
+\CDossierSetup {name = Ada Lovelace }
+============================================================

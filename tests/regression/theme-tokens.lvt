@@ -1,0 +1,47 @@
+% theme-tokens.lvt — careerdossier-theme monochrome palette and color tokens.
+%
+% Phase 1 is monochrome. This pins the defined colors: text, primary, rule, and
+% link are pure black, and muted is the single de-emphasis grey. The muted value
+% (0.30) is chosen to keep at least 4.5:1 contrast on white, so a change to it is
+% a deliberate, reviewable event, not an accident. Also checks that the public
+% semantic color tokens exist.
+%
+% \extractcolorspec reports a color's model and specification as {model}{spec};
+% comparing that string is stable across xcolor versions.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-theme}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestColor #1
+  {
+    \extractcolorspec{#1}\l_tmpa_tl
+    \TYPE{ #1 = \l_tmpa_tl }
+  }
+\cs_new_protected:Npn \cdossiertestTokenExists #1
+  {
+    \cs_if_exist:NTF #1 { \TYPE{ \token_to_str:N #1 ~defined } }
+      { \TYPE{ \token_to_str:N #1 ~MISSING } }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{monochrome-palette-values}{
+  \cdossiertestColor{cdossier-text}
+  \cdossiertestColor{cdossier-primary}
+  \cdossiertestColor{cdossier-muted}
+  \cdossiertestColor{cdossier-rule}
+  \cdossiertestColor{cdossier-link}
+}
+
+\TEST{public-color-tokens-defined}{
+  \cdossiertestTokenExists\CDossierPrimaryColor
+  \cdossiertestTokenExists\CDossierTextColor
+  \cdossiertestTokenExists\CDossierMutedColor
+  \cdossiertestTokenExists\CDossierRuleColor
+  \cdossiertestTokenExists\CDossierLinkColor
+}
+
+\END

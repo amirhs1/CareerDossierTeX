@@ -40,6 +40,7 @@
 
 \tl_new:N   \l__cdossier_components_disp_tl
 \tl_new:N   \l__cdossier_components_url_tl
+\str_new:N  \l__cdossier_components_scheme_str
 \bool_new:N \l__cdossier_components_printed_bool
 
 %% Separator between present contact items: a spaced vertical bar.
@@ -69,7 +70,12 @@
   {
     \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
     \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-    \tl_if_in:NnF \l__cdossier_components_url_tl { :// }
+    %% Detect an existing scheme by string, not by token list: the value's colon
+    %% is an ordinary character (catcode 12) while a literal colon in this
+    %% package is a letter (catcode 11) under expl3, so a catcode-sensitive
+    %% \tl_if_in: would never match and would double the scheme.
+    \str_set:NV \l__cdossier_components_scheme_str \l__cdossier_components_url_tl
+    \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
       { \tl_put_left:Nn \l__cdossier_components_url_tl { https:// } }
     \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
   }

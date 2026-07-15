@@ -340,6 +340,33 @@ Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
 [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md).
 
+### Module regression suite (l3build)
+
+The logic-bearing packages are covered by an `l3build` regression suite. Each
+`.lvt` source under `tests/regression/` is compiled on XeTeX and its filtered
+log is diffed against a committed `.tlg` baseline. Run the whole suite from the
+repository root:
+
+    l3build check
+
+Run a single test by name (without the `.lvt` extension):
+
+    l3build check base-diagnostics
+
+A failing check writes the difference to `build/test/<name>.xetex.diff`; read it
+to see the intended baseline versus the actual log. When an output change is
+intended and understood, re-save the baseline, then review the diff before
+committing it (see "Baselines are load-bearing" above):
+
+    l3build save base-diagnostics
+
+The harness is configured in `build.lua` (`tests/regression/`, XeTeX, LaTeX
+format). Writing a test: `\input{regression-test}`, load the package under test,
+and inside `\TEST{name}{...}` use `\TYPE{...}` to record the behavior in the log.
+Catcodes cannot be switched inside an already-tokenized `\TEST` body, so any
+expl3 or `@`-bearing name must be reached through a helper defined earlier under
+`\ExplSyntaxOn`, or via `\use:c`.
+
 ### Log inspection
 
 After compiling, inspect logs for:
