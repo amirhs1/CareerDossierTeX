@@ -10,6 +10,25 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `careerdossier-letter.cls`: the English industry cover-letter class. US Letter
+  geometry with one-inch margins; no user-facing class options (family, paper,
+  language, and theme are fixed, and any option is rejected with an actionable
+  message); page numbers disabled by default. `\CDossierLetterSetup` for letter
+  metadata (`date`, `recipient-name`, `recipient-title`,
+  `recipient-organization`, `recipient-address`, `subject`, `salutation`,
+  `closing`) with English defaults for `date`, `salutation`, and `closing` and
+  unknown keys rejected. `\MakeCDossierLetterhead` (centered sender identity,
+  date, collapsing recipient block, optional subject, salutation) and
+  `\MakeCDossierClosing` (closing, signature space, validated `name`). An absent
+  recipient field, subject, or contact field leaves no stray line or separator.
+- `examples/industry/letter-industry.tex`: the supported cover-letter example,
+  sharing `examples/profiles/profile-english.tex` with the résumé example.
+- Cover-letter tests: smoke fixtures for the supported builds and the required
+  failure paths (missing `name`, unknown class option, unknown
+  `\CDossierLetterSetup` key), layout-stress fixtures (`tests/layout/`) for long
+  fields and a two-page letter, and a letter extraction fixture
+  (`tests/extraction/`) pinning the recipient block, contact line, and reading
+  order when optional fields are absent.
 - `careerdossier-resume.cls`: the English industry résumé class. US Letter
   geometry; `fontsize` (`10pt`, `11pt`) and `density` (`compact`, `standard`)
   options with actionable rejection of unsupported keys and values; page numbers

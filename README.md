@@ -14,7 +14,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Capability | Target |
 |---|---|
 | Industry résumé | Implemented; pre-release |
-| Industry cover letter | Planned for `v0.1.0` |
+| Industry cover letter | Implemented; pre-release |
 | Shared profile metadata and components | Implemented; pre-release |
 | Language | English |
 | Engine | XeLaTeX |
