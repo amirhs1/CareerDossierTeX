@@ -10,6 +10,14 @@ permissions:
   contents: read
 
 jobs:
+  regression:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Module regression suite (l3build check on XeTeX)
+        run: l3build check
+
   extraction:
     runs-on: ubuntu-latest
     container: texlive/texlive:latest
