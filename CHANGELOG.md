@@ -8,6 +8,12 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-15
+
+First tagged release: an English industry résumé and a matching industry cover
+letter driven by shared profile metadata, built with XeLaTeX on US Letter paper
+in a monochrome theme.
+
 ### Added
 
 - `l3build` regression harness (`build.lua`) configured for XeTeX and
@@ -77,12 +83,5 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-### Release preparation
-
-When `v0.1.0` is ready:
-
-1. move completed entries from `[Unreleased]` into a new section;
-2. use the heading `## [0.1.0] - YYYY-MM-DD`;
-3. verify that the README and API documentation describe only tested behavior;
-4. confirm that both supported examples compile locally and in CI;
-5. create a new empty `[Unreleased]` section above the release.
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.1.0

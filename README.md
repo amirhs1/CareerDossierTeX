@@ -2,26 +2,28 @@
 
 A reusable XeLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** Pre-release development toward `v0.1.0 — English Industry Dossier`.  
-> The public interface may change before the first stable release.
+> **Status:** `v0.1.0 — English Industry Dossier` is the current release.  
+> Before `v1.0.0` the public interface may still change between minor versions;
+> such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
+> [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 ## What it provides
 
 CareerDossierTeX separates personal information from document content and presentation. A shared profile file can be reused across a résumé and matching cover letter, helping keep names, contact details, links, and visual styling consistent.
 
-### Target `v0.1.0` scope
+### `v0.1.0` scope
 
-| Capability | Target |
+| Capability | Status |
 |---|---|
-| Industry résumé | Implemented; pre-release |
-| Industry cover letter | Implemented; pre-release |
-| Shared profile metadata and components | Implemented; pre-release |
+| Industry résumé | Supported |
+| Industry cover letter | Supported |
+| Shared profile metadata and components | Supported |
 | Language | English |
 | Engine | XeLaTeX |
 | Paper size | US Letter |
 | Theme | Monochrome |
 | Local build | `latexmk` |
-| Continuous integration | Extraction, smoke, and layout tests plus example build active |
+| Continuous integration | Regression, extraction, smoke, and layout suites plus both example builds |
 
 The academic CV, bibliography integration, Farsi, bilingual layouts, statement classes, A4 paper, and additional themes belong to later releases.
 
@@ -34,8 +36,6 @@ The academic CV, bibliography integration, Farsi, bilingual layouts, statement c
 CareerDossierTeX is not intended to compile with pdfLaTeX in `v0.1.0`.
 
 ## Quick start
-
-> The examples below describe the proposed `v0.1.0` public interface. Until the implementation and CI build are complete, treat this interface as provisional.
 
 ### 1. Create a shared profile
 
@@ -189,15 +189,13 @@ supported examples should be treated as supported.
 
 ## Releases
 
-No public release has been published yet.
-
-The first planned release is:
+The current release is:
 
 ```text
 v0.1.0 — English Industry Dossier
 ```
 
-After it is published, source archives and selected example PDFs will be available through GitHub Releases.
+Source archives and selected example PDFs are available through GitHub Releases.
 
 ## Roadmap
 

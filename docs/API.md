@@ -2,13 +2,16 @@
 
 ## Status
 
-This document defines the proposed public interface for:
+This document defines the public interface for:
 
 ```text
 v0.1.0 — English Industry Dossier
 ```
 
-Until the implementation, examples, and CI builds are complete, treat this API as provisional. Before release, remove any command or option that is not implemented and tested.
+Every command and option below is implemented, exercised by the supported
+examples, and covered by the committed test suites. Before `v1.0.0` the
+interface may still change between minor versions; such changes are recorded in
+[`../CHANGELOG.md`](../CHANGELOG.md) and [`MIGRATION.md`](MIGRATION.md).
 
 The API is intentionally small. Internal helper commands are not public merely because they are technically accessible.
 
@@ -342,16 +345,6 @@ The two branches are long, so they may contain `\par` or full paragraphs.
 Expands to the stored value of a profile field, or to nothing when the field is absent. It does not typeset and does not validate the field name.
 
 This accessor is expandable and is intended mainly for shared components that need the raw value, for example to build a link target. Prefer `\CDossierPrintField` for ordinary typesetting.
-
-### `\CDossierLabel`
-
-```latex
-\CDossierLabel{experience}
-```
-
-Returns a fixed interface label from the active language table.
-
-In `v0.1.0`, only English labels are available. This command exists to prevent English text from being duplicated across classes and components.
 
 ## Hyperlink behavior
 
