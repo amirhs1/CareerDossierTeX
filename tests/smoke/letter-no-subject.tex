@@ -1,0 +1,19 @@
+% letter-no-subject.tex — smoke fixture: a letter with no subject and a partial
+% recipient block (name only) must build cleanly, with the subject line and the
+% absent recipient lines leaving no stray spacing. The extraction suite pins the
+% resulting reading order; this fixture guards the clean build.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  email    = {ada@example.com},
+}
+\CDossierLetterSetup{
+  recipient-name = {Hiring Manager},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Data Scientist position.
+
+\MakeCDossierClosing
+\end{document}

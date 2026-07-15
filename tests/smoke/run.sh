@@ -37,6 +37,11 @@ cases=(
   "resume-bad-fontsize fail|only accepts predefined values"
   "resume-unknown-option fail|Unknown class option 'paper'"
   "resume-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
+  "letter-valid pass"
+  "letter-no-subject pass"
+  "letter-missing-name fail|required profile field 'name' is not"
+  "letter-unknown-option fail|Unknown class option 'paper'"
+  "letter-unknown-meta-key fail|Unknown \CDossierLetterSetup key"
 )
 
 for entry in "${cases[@]}"; do

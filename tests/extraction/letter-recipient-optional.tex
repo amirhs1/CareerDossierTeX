@@ -1,0 +1,29 @@
+% letter-recipient-optional.tex — extraction fixture: a cover letter with only
+% some optional fields present. The recipient block has a name and organization
+% but no title or address, the subject is omitted, and the profile has no phone
+% or website. The committed baseline proves that the absent fields leave no blank
+% recipient line, no empty subject line, no stray contact separators, and that
+% the reading order runs identity -> date -> recipient -> salutation -> body ->
+% closing -> name. A fixed date keeps the baseline reproducible.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  location = {Toronto, ON},
+  github   = {github.com/ada},
+}
+\CDossierLetterSetup{
+  date                   = {14 July 2026},
+  recipient-name         = {Hiring Manager},
+  recipient-organization = {Example Organization},
+  salutation             = {Dear Hiring Manager,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Data Scientist position. My work combines
+reproducible analytical pipelines and accessible public-facing services.
+
+\MakeCDossierClosing
+\end{document}

@@ -1,0 +1,73 @@
+% letter-two-page.tex — layout stress: enough prose to span two pages, so a page
+% break falls inside the body. Verifies that body paragraphs and the closing
+% break across pages without a page-number folio appearing and without overfull
+% boxes.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+  linkedin = {linkedin.com/in/ada-lovelace},
+  github   = {github.com/ada-lovelace},
+}
+\CDossierLetterSetup{
+  date                   = {14 July 2026},
+  recipient-name         = {Hiring Committee},
+  recipient-title        = {Department of Applied Analytics},
+  recipient-organization = {Northbridge Research Institute},
+  recipient-address      = {123 Discovery Avenue\\Vancouver, British Columbia V6T 1Z4},
+  subject                = {Application for the Senior Data Scientist position},
+  salutation             = {Dear Members of the Hiring Committee,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position in computational
+analytics at the Northbridge Research Institute. I recently completed a decade
+of work spanning public-sector analytics, reporting platforms, and reproducible
+research pipelines, and I am eager to contribute that experience to your group's
+mission of building reliable, accessible scientific software.
+
+My most recent work focused on developing scalable, reproducible reporting
+services for high-volume public programs. I designed governed data pipelines,
+implemented performance-critical processing routines, and collaborated closely
+with program teams to translate operational requirements into maintainable
+systems with measurable service standards. This work reduced duplicated
+maintenance across teams, shortened incident investigation, and established
+automated validation for data quality, reproducibility, and archival output.
+
+Earlier in my career I built data-import services and validation tools for
+public reporting datasets in a range of interchange formats. I improved
+processing performance through batching, indexing, and query optimization while
+preserving auditability, and I created internal libraries for schema validation,
+error reporting, and automated documentation generation. Across these roles I
+have consistently favoured tested, documented, and reproducible tools over
+one-off analyses, because they are what allow a team to move quickly without
+sacrificing reliability.
+
+The position is especially appealing because of its emphasis on interdisciplinary
+collaboration and dependable scientific software. My experience translating
+analytical models into tested computational tools would allow me to contribute
+quickly to your current projects, and I would welcome the opportunity to mentor
+junior researchers and to support the group's documentation and reproducibility
+practices. I am particularly interested in the institute's work on accessible
+public correspondence platforms, where careful attention to content models,
+required-content checks, reading order, and archival conformance mirrors the
+standards I have applied throughout my own projects.
+
+Beyond the technical work, I care deeply about making analytical systems
+understandable to the people who depend on them. I have written operational
+documentation, run internal training sessions, and defined reusable standards for
+testing, release management, and technical writing. I believe that reliable
+software and clear communication are two halves of the same responsibility, and I
+try to hold both to the same standard in everything I deliver.
+
+Thank you for considering my application. I have enclosed my curriculum vitae and
+would be pleased to discuss how my background and interests align with the goals
+of your group. I am available at your convenience for a conversation and can
+provide references, code samples, and further documentation on request.
+
+\MakeCDossierClosing
+\end{document}

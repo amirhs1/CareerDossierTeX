@@ -1,0 +1,33 @@
+% letter-valid.tex — smoke fixture: a supported industry cover letter must build
+% cleanly. Exercises the letterhead (identity, date, full recipient block,
+% subject, salutation), body prose, and the closing with signature and name.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  location = {Toronto, ON},
+  github   = {github.com/ada},
+}
+\CDossierLetterSetup{
+  date                   = {14 July 2026},
+  recipient-name         = {Hiring Committee},
+  recipient-title        = {Department of Applied Analytics},
+  recipient-organization = {Northbridge Research Institute},
+  recipient-address      = {123 Discovery Avenue\\Vancouver, BC V6T 1Z4},
+  subject                = {Application for the Senior Data Scientist position},
+  salutation             = {Dear Members of the Hiring Committee,},
+  closing                = {Sincerely,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position. My work combines
+reproducible analytical pipelines, automated reporting, and accessible
+public-facing services.
+
+I would welcome the opportunity to discuss how my background aligns with the
+goals of your group.
+
+\MakeCDossierClosing
+\end{document}

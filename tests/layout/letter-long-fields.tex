@@ -1,0 +1,33 @@
+% letter-long-fields.tex — layout stress: long contact values, a long URL, a
+% long recipient organization, and a long subject must wrap or break without
+% producing overfull boxes, and no page-number folio may appear.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Augusta King, Countess of Lovelace},
+  headline = {Principal Data Scientist and Reproducible-Analytics Lead},
+  email    = {ada.lovelace@analytics.example-institute.org},
+  location = {Toronto, Ontario, Canada},
+  linkedin = {linkedin.com/in/ada-augusta-king-countess-of-lovelace},
+  github   = {github.com/ada-lovelace-reproducible-analytics-platform},
+}
+\CDossierLetterSetup{
+  date                   = {14 July 2026},
+  recipient-name         = {Chair, Faculty Search and Appointments Committee},
+  recipient-title        = {Department of Applied and Computational Analytics},
+  recipient-organization = {Northbridge Institute for Advanced Research in Computational Science and Public Data Systems},
+  recipient-address      = {123 Discovery Avenue, Research Park West\\Vancouver, British Columbia V6T 1Z4, Canada},
+  subject                = {Application for the Senior Data Scientist and Reproducible Reporting Platform Lead position advertised on your careers portal},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the position. My doctoral and professional work
+combined numerical modelling, high-performance computing, and data-driven
+analysis to build reproducible reporting platforms for large public programs.
+
+Further detail, including source code and documentation, is available through my
+public repository at
+\href{https://github.com/ada-lovelace-reproducible-analytics-platform}{github.com/ada-lovelace-reproducible-analytics-platform}.
+
+\MakeCDossierClosing
+\end{document}
