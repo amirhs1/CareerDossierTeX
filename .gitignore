@@ -75,8 +75,7 @@ Thumbs.db
 *.swp
 
 # --- test artifacts ---
-tests/extraction/*.pdf
-tests/extraction/*.log
-tests/extraction/*.aux
-tests/extraction/*.out
+# Compiled PDFs, logs, aux, and out files are already ignored globally above;
+# these cover the remaining per-runner scratch files under tests/.
+*.stdout
 tests/extraction/*.diff

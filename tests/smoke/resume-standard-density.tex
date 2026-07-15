@@ -1,0 +1,17 @@
+% resume-standard-density.tex — smoke fixture: the standard density option and
+% the 11pt body size are a supported combination and must build cleanly.
+\documentclass[fontsize=11pt, density=standard]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  email    = {ada@example.com},
+  location = {Toronto, ON},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Data Scientist}, organization = {Example Corp}]
+  \begin{CDossierItemize}
+    \item Delivered analytical services for public programs.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

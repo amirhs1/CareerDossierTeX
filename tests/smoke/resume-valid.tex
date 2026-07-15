@@ -1,0 +1,25 @@
+% resume-valid.tex — smoke fixture: a supported résumé must build cleanly.
+% Exercises the header, a section, an entry with all keys, and a bullet list.
+\documentclass[fontsize=10pt, density=compact]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  location = {Toronto, ON},
+  github   = {github.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Corp},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+    \item Led a migration to a governed reporting pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

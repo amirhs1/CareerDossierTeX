@@ -1,0 +1,30 @@
+% resume-long-fields.tex — layout stress: unusually long contact values, a long
+% URL, and a long entry title/organization must stay within the text block
+% (breakable links, wrapping headings) and produce no overfull boxes.
+\documentclass[fontsize=10pt, density=compact]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Alexandria Katherine Montgomery-Fitzgerald},
+  headline = {Principal Data Scientist and Machine Learning Platform Architect},
+  email    = {alexandria.montgomery.fitzgerald@a-very-long-department-name.example.org},
+  phone    = {+1 416 555 0142},
+  location = {Kitchener--Waterloo--Cambridge Regional Municipality, Ontario, Canada},
+  website  = {example.org/people/alexandria-montgomery-fitzgerald/portfolio/projects},
+  linkedin = {linkedin.com/in/alexandria-katherine-montgomery-fitzgerald-data-science},
+  github   = {github.com/alexandria-katherine-montgomery-fitzgerald},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist and Machine Learning Platform Architect for Public-Sector Analytics},
+  organization = {Intergovernmental Digital Services and Data Modernization Laboratory},
+  location     = {National Capital Region, Ontario / Fully Remote},
+  dates        = {September 2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Led an initiative documented at
+          https://example.org/programs/analytics-modernization/2024/final-report/appendix-b
+          covering reproducibility and archival output.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

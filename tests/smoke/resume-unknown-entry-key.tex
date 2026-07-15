@@ -1,0 +1,8 @@
+% resume-unknown-entry-key.tex — smoke fixture: an unsupported CDossierEntry key
+% must be rejected, not accepted and ignored (expected failure).
+\documentclass{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\begin{CDossierEntry}[title = {Data Scientist}, employer = {Example Corp}]
+\end{CDossierEntry}
+\end{document}

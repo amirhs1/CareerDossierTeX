@@ -15,6 +15,10 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 cd "$here"
+# Put the repository root on TEXINPUTS so fixtures that load the CareerDossierTeX
+# classes and packages resolve them; standalone fixtures are unaffected.
+root="$(cd "$here/../.." && pwd)"
+export TEXINPUTS="$root:${TEXINPUTS:-}"
 update=0; [ "${1:-}" = "--update" ] && update=1
 fail=0
 

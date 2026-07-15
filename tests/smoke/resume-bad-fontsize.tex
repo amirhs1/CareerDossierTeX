@@ -1,0 +1,8 @@
+% resume-bad-fontsize.tex — smoke fixture: an unsupported fontsize value must be
+% rejected with an actionable choice error, not silently ignored (expected
+% failure).
+\documentclass[fontsize=9pt]{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\end{document}

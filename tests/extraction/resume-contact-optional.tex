@@ -1,0 +1,40 @@
+% resume-contact-optional.tex — extraction fixture for careerdossier-resume.cls.
+%
+% Purpose
+%   Prove two things about the résumé class through its text layer:
+%     1. Optional-field handling: this profile sets email, location, and github
+%        but omits phone, website, linkedin, and scholar. The extracted contact
+%        line must read exactly
+%            email | location | github
+%        with no empty or doubled separators where the missing fields would be.
+%     2. Reading order: the header, section heading, entry heading, and bullet
+%        list must extract in the same order a reader sees them.
+%
+%   The committed baseline (resume-contact-optional.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: xelatex -halt-on-error -interaction=nonstopmode resume-contact-optional.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[fontsize=10pt, density=compact]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  location = {Toronto, ON},
+  github   = {github.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Corp},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow used across teams.
+    \item Led a migration to a governed reporting pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
