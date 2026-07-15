@@ -35,3 +35,13 @@ jobs:
         run: >-
           latexmk -xelatex -interaction=nonstopmode -halt-on-error
           examples/industry/resume-english.tex
+
+  letter:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the cover-letter example
+        run: >-
+          latexmk -xelatex -interaction=nonstopmode -halt-on-error
+          examples/industry/letter-industry.tex

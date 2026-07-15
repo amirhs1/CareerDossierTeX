@@ -1,0 +1,7 @@
+% letter-missing-name.tex — smoke fixture: rendering the letterhead without a
+% name must stop with the base module's required-field error (expected failure).
+\documentclass{careerdossier-letter}
+\CDossierLetterSetup{recipient-name = {Hiring Manager}}
+\begin{document}
+\MakeCDossierLetterhead
+\end{document}

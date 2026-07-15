@@ -1,0 +1,9 @@
+% letter-unknown-meta-key.tex — smoke fixture: an unknown \CDossierLetterSetup
+% key (here recipient, a mistyping of recipient-name) must be rejected with an
+% actionable error rather than silently ignored (expected failure).
+\documentclass{careerdossier-letter}
+\CDossierSetup{name = {Ada Lovelace}}
+\CDossierLetterSetup{recipient = {Hiring Manager}}
+\begin{document}
+\MakeCDossierLetterhead
+\end{document}

@@ -1,0 +1,60 @@
+% examples/industry/letter-industry.tex
+%
+% The supported v0.1.0 English industry cover-letter example. It is the
+% reference document for careerdossier-letter.cls: a single-column, monochrome,
+% US Letter cover letter built entirely from the public API (\CDossierSetup,
+% \CDossierLetterSetup, \MakeCDossierLetterhead, \MakeCDossierClosing). It shares
+% the same profile data as the résumé example.
+%
+% Compile with XeLaTeX:
+%   latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+%     examples/industry/letter-industry.tex
+% or:
+%   xelatex examples/industry/letter-industry.tex
+%
+% Run from the repository root so the class and shared packages resolve, or add
+% the repository root to TEXINPUTS.
+
+\documentclass{careerdossier-letter}
+
+\input{examples/profiles/profile-english.tex}
+
+\CDossierLetterSetup{
+  recipient-name         = {Hiring Committee},
+  recipient-title        = {Department of Applied Analytics},
+  recipient-organization = {Northbridge Research Institute},
+  recipient-address      = {123 Discovery Avenue\\Vancouver, British Columbia V6T 1Z4},
+  subject                = {Application for the Senior Data Scientist position},
+  salutation             = {Dear Members of the Hiring Committee,},
+}
+
+\begin{document}
+
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position in computational
+analytics at the Northbridge Research Institute. My work combines numerical
+modelling, reproducible reporting pipelines, and data-driven analysis in support
+of large public programs.
+
+My recent work focused on developing scalable, governed reporting services. I
+designed reproducible data pipelines, implemented performance-critical
+processing routines, and collaborated with program teams to translate
+operational requirements into maintainable systems with measurable service
+standards. This work reduced duplicated maintenance across teams and established
+automated validation for data quality, reproducibility, and archival output.
+
+The position is especially appealing because of its emphasis on interdisciplinary
+collaboration and dependable scientific software. My experience translating
+analytical models into tested computational tools would let me contribute
+quickly to your current projects, and I would welcome the opportunity to mentor
+junior researchers and to support the group's documentation and reproducibility
+practices.
+
+Thank you for considering my application. I have enclosed my curriculum vitae and
+would be pleased to discuss how my background and interests align with the goals
+of your group.
+
+\MakeCDossierClosing
+
+\end{document}
