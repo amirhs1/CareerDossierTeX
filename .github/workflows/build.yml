@@ -17,6 +17,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Module regression suite (l3build check on XeTeX)
         run: l3build check
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload regression logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: regression-logs
+          path: build/test/*.log
+          if-no-files-found: warn
 
   extraction:
     runs-on: ubuntu-latest
@@ -27,6 +35,16 @@ jobs:
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Extraction round-trip
         run: tests/extraction/run.sh
+      - name: Upload extraction PDFs and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: extraction-artifacts
+          path: |
+            tests/extraction/*.pdf
+            tests/extraction/*.log
+            tests/extraction/*.diff
+          if-no-files-found: warn
 
   resume:
     runs-on: ubuntu-latest
@@ -43,6 +61,21 @@ jobs:
         run: >-
           latexmk -xelatex -interaction=nonstopmode -halt-on-error
           examples/industry/resume-english.tex
+      - name: Upload résumé PDFs and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: resume-artifacts
+          path: |
+            tests/smoke/*.pdf
+            tests/smoke/*.log
+            tests/smoke/*.stdout
+            tests/layout/*.pdf
+            tests/layout/*.log
+            tests/layout/*.stdout
+            resume-english.pdf
+            resume-english.log
+          if-no-files-found: warn
 
   letter:
     runs-on: ubuntu-latest
@@ -53,3 +86,12 @@ jobs:
         run: >-
           latexmk -xelatex -interaction=nonstopmode -halt-on-error
           examples/industry/letter-industry.tex
+      - name: Upload cover-letter PDF and log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: letter-artifacts
+          path: |
+            letter-industry.pdf
+            letter-industry.log
+          if-no-files-found: warn
