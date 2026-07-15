@@ -1,0 +1,59 @@
+% components-links.lvt — careerdossier-components link targets.
+%
+% The visible contact text is checked by the extraction fixtures; pdftotext
+% cannot see a link's href target, so the target normalization is checked here
+% instead. Covers: web profiles gain an https:// scheme only when none is
+% present, an existing scheme is preserved, email becomes a mailto: target, and
+% the link wrapper degrades to plain visible text when hyperref is absent.
+%
+% Each helper is defined under \ExplSyntaxOn so the private names tokenize
+% correctly; catcodes cannot be switched inside a \TEST body. A field is cleared
+% to empty (which removes it, without warning) before each fresh value, so
+% re-using one field across cases raises no overwrite warnings.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestWebTarget #1
+  {
+    \CDossierSetup{ website = {} }
+    \CDossierSetup{ website = {#1} }
+    \__cdossier_components_web:n { website }
+    \TYPE{ [\l__cdossier_components_url_tl] }
+  }
+\cs_new_protected:Npn \cdossiertestMailTarget #1
+  {
+    \CDossierSetup{ email = {} }
+    \CDossierSetup{ email = {#1} }
+    \__cdossier_components_mail:n { email }
+    \TYPE{ [\l__cdossier_components_url_tl] }
+  }
+\cs_new_protected:Npn \cdossiertestHrefBranch
+  {
+    \cs_if_exist:NTF \href
+      { \TYPE{ href-present } }
+      { \TYPE{ degrades-to-plain-text } }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{web-gains-https-scheme-when-absent}{
+  \cdossiertestWebTarget{github.com/ada}
+}
+
+\TEST{web-preserves-existing-scheme}{
+  \cdossiertestWebTarget{http://ada.example}
+}
+
+\TEST{email-becomes-mailto-target}{
+  \cdossiertestMailTarget{ada@example.com}
+}
+
+\TEST{link-degrades-without-hyperref}{
+  \cdossiertestHrefBranch
+}
+
+\END

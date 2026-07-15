@@ -38,8 +38,14 @@ for tex in *.tex; do
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue; }
 
   # Normalize: drop form-feeds and trailing blank lines, keep meaningful text.
+  # The trailing-blank trim uses awk, not a sed label/branch loop, because the
+  # BSD sed shipped on macOS parses `{$d;N;ba}` differently from GNU sed; awk
+  # behaves identically on both, so the accumulated suite runs locally and in CI.
   got="$(pdftotext -enc UTF-8 "$base.pdf" - | sed '/^\f/d' \
-        | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba}')"
+        | awk '{ line[NR] = $0 }
+               END { last = NR
+                     while (last > 0 && line[last] ~ /^[[:space:]]*$/) last--
+                     for (i = 1; i <= last; i++) print line[i] }')"
 
   if [ "$update" -eq 1 ]; then
     printf '%s\n' "$got" > "$exp"; echo "  baseline updated: $exp"; continue

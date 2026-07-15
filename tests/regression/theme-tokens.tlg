@@ -1,0 +1,20 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: monochrome-palette-values
+============================================================
+cdossier-text={gray}{0}
+cdossier-primary={gray}{0}
+cdossier-muted={gray}{0.3}
+cdossier-rule={gray}{0}
+cdossier-link={gray}{0}
+============================================================
+============================================================
+TEST 2: public-color-tokens-defined
+============================================================
+\CDossierPrimaryColor defined
+\CDossierTextColor defined
+\CDossierMutedColor defined
+\CDossierRuleColor defined
+\CDossierLinkColor defined
+============================================================

@@ -1,0 +1,39 @@
+% base-diagnostics.lvt — careerdossier-base error paths.
+%
+% Covers the actionable diagnostics the base module must raise: an unknown
+% \CDossierSetup key, an unknown profile field passed to a field accessor, and
+% the required-name guard firing before any identity content is rendered. This
+% file never sets `name`, so the required-name state is clean.
+%
+% The required-name guard is a private expl3 call, so it is wrapped in a helper
+% defined here under \ExplSyntaxOn: catcodes cannot be switched inside the
+% already-tokenized body of a \TEST, so the expl3 name must be formed outside it.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-base}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestRequireName
+  { \__cdossier_base_require_name:N \MakeCDossierHeader }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-setup-key-errors}{
+  \CDossierSetup{ twitter = {@ada} }
+}
+
+\TEST{unknown-field-in-print-errors}{
+  \CDossierPrintField{twitter}
+}
+
+\TEST{unknown-field-in-conditional-errors}{
+  \CDossierIfFieldTF{twitter}{\TYPE{true-branch}}{\TYPE{false-branch}}
+}
+
+\TEST{missing-required-name-errors}{
+  \cdossiertestRequireName
+}
+
+\END

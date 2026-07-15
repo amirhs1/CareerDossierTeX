@@ -10,6 +10,14 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `l3build` regression harness (`build.lua`) configured for XeTeX and
+  `tests/regression/`, run with `l3build check`. Backfilled committed regression
+  coverage for the Phase 1 packages: `careerdossier-base` field storage,
+  trimming, presence, overwrite, and the unknown-key, unknown-field, and
+  missing-name diagnostics; `careerdossier-components` link-target scheme
+  normalization and contact-line separator placement; `careerdossier-theme`
+  monochrome palette values and color tokens; and `careerdossier-typography`
+  semantic role classes and the ATS actual-text setting.
 - `careerdossier-letter.cls`: the English industry cover-letter class. US Letter
   geometry with one-inch margins; no user-facing class options (family, paper,
   language, and theme are fixed, and any option is rejected with an actionable
@@ -60,6 +68,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- `careerdossier-components.sty`: a `website`, `linkedin`, `github`, or `scholar`
+  value that already carried a scheme (for example `https://example.com`) had a
+  second `https://` prepended to its link target, producing a broken href such as
+  `https://https://example.com`. The scheme is now detected by string comparison,
+  which is insensitive to the colon's category code, so an existing scheme is
+  preserved and `https://` is added only when none is present. The visible text
+  was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
 ### Release preparation
