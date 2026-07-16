@@ -9,13 +9,14 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** Pre-release development toward `v0.1.0`.
+> **Current status:** `v0.1.0` is released. The next planned release is
+> `v0.2.0 — Academic Dossier`.
 
 ## Release overview
 
 | Version | Release goal | Status |
 |---|---|---|
-| `v0.1.0` | English industry résumé and cover letter | In development |
+| `v0.1.0` | English industry résumé and cover letter | Released |
 | `v0.2.0` | Academic CV, academic letter, and bibliography support | Planned |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | Planned |
 | `v0.4.0` | Statement classes and broader customization | Planned |
