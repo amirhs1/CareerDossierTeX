@@ -39,8 +39,6 @@ careerdossier-resume.cls
         ├── careerdossier-typography.sty
         ├── careerdossier-theme.sty
         └── careerdossier-base.sty
-                    │
-                    └── careerdossier-i18n.sty
 
 careerdossier-letter.cls
         │
@@ -48,8 +46,6 @@ careerdossier-letter.cls
         ├── careerdossier-typography.sty
         ├── careerdossier-theme.sty
         └── careerdossier-base.sty
-                    │
-                    └── careerdossier-i18n.sty
 ```
 
 The exact package-loading order may differ when implementation requires it, but dependency direction should remain one-way. Shared packages must not depend on the résumé or letter classes.
@@ -128,25 +124,16 @@ It must not define:
 
 This package is analogous to a small data model or configuration module. It stores values and enforces basic rules but does not decide how a document page looks.
 
-### `careerdossier-i18n.sty`
+### Future `careerdossier-i18n.sty` (v0.3.0 target)
 
-Owns fixed interface labels and language abstraction.
+`v0.1.0` does not ship a language-abstraction module or a `\CDossierLabel`
+command. Its English letter defaults (`Dear Hiring Manager,` and `Sincerely,`)
+are defined inline in `careerdossier-letter.cls`.
 
-Phase 1 responsibilities:
-
-- provide English labels;
-- expose `\CDossierLabel`;
-- centralize label lookup;
-- provide neutral wrappers that can later support direction changes.
-
-Phase 1 does not implement:
-
-- Farsi fonts;
-- RTL page layout;
-- bilingual documents;
-- automatic translation of user content.
-
-In Phase 3, the package should grow translation tables and direction helpers without requiring duplicated language-specific classes.
+The planned `careerdossier-i18n.sty` module belongs to the v0.3.0 Farsi and
+bilingual release. It should centralize label lookup, provide translation tables
+and direction helpers, and allow future language support without duplicating
+document classes.
 
 ### `careerdossier-typography.sty`
 
@@ -499,7 +486,6 @@ At the end of `v0.1.0`:
 ```text
 CareerDossierTeX/
 ├── careerdossier-base.sty
-├── careerdossier-i18n.sty
 ├── careerdossier-typography.sty
 ├── careerdossier-theme.sty
 ├── careerdossier-components.sty
@@ -626,11 +612,10 @@ substitute for focused tests. A milestone release reruns the accumulated suite;
 it does not introduce tests that were already known to be required.
 
 The test type follows the module's concern. Logic-bearing modules — metadata and
-separator logic in `careerdossier-base.sty`, label selection in
-`careerdossier-i18n.sty`, and the engine-check and role-dispatch logic in
-`careerdossier-typography.sty` — expose behavior that a log diff can assert, so
-they take `l3build` regression tests (`.lvt` sources with saved `.tlg`
-baselines) in `tests/regression/`. Layout classes —
+separator logic in `careerdossier-base.sty`, and the engine-check and
+role-dispatch logic in `careerdossier-typography.sty` — expose behavior that a
+log diff can assert, so they take `l3build` regression tests (`.lvt` sources
+with saved `.tlg` baselines) in `tests/regression/`. Layout classes —
 `careerdossier-resume.cls` and `careerdossier-letter.cls` — own visual results
 that no log diff fully captures, so they rely on smoke, extraction, and reviewed
 reference PDFs, with final layout correctness confirmed by human inspection. A

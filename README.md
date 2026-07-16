@@ -131,7 +131,7 @@ examples/industry/letter-industry.tex
 
 ## Build
 
-After the Phase 1 source and example files are implemented, compile them with XeLaTeX:
+Compile the supported examples with XeLaTeX:
 
 ```bash
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
