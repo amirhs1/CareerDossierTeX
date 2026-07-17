@@ -19,13 +19,19 @@ it here; add only Claude Code-specific behavior below.
 
 Treat instruction files as behavioral guidance, not technical enforcement. Obey
 Claude Code permissions, sandbox settings, hooks, and GitHub branch protection.
-Never bypass a denied command or weaken a permission rule.
+Never bypass a denied command or weaken a permission rule. The committed
+`.claude/settings.json` denies built-in file access to private repository paths
+and enables sandbox enforcement for Bash when the effective settings and local
+installation support it; verify the effective state and do not claim OS-level
+isolation when the sandbox is inactive or unavailable.
 
 ## Git attribution
 
 Use Claude Code's current `attribution` configuration. Do not rely on the
-deprecated `includeCoAuthoredBy` setting, hard-code a model name, or add a
-duplicate attribution trailer. Preserve at most one attribution block.
+deprecated `includeCoAuthoredBy` setting, replace configured attribution with a
+hard-coded generic identity, or add a duplicate attribution trailer. Attribute
+Claude only when it materially co-authored the commit, and preserve at most one
+attribution block.
 
 ## Draft pull requests
 

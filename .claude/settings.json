@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(/**/.env)",
+      "Read(/**/.env.*)",
+      "Read(/**/*.local)",
+      "Read(/.claude/settings.local.json)",
+      "Read(/**/secrets/**)",
+      "Read(/**/private/**)",
+      "Read(/**/referees_private.csv)",
+      "Read(/**/recommendation_letters/**)",
+      "Edit(/**/.env)",
+      "Edit(/**/.env.*)",
+      "Edit(/**/*.local)",
+      "Edit(/.claude/settings.local.json)",
+      "Edit(/**/secrets/**)",
+      "Edit(/**/private/**)",
+      "Edit(/**/referees_private.csv)",
+      "Edit(/**/recommendation_letters/**)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true
+  }
+}

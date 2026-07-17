@@ -6,6 +6,11 @@ Explain the change and its purpose.
 
 Closes #
 
+## AI assistance
+
+State `None`, or name each AI tool that materially shaped the contribution and
+briefly describe its role. Do not include prompts, secrets, or personal data.
+
 ## Changes
 
 -

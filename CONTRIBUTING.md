@@ -17,6 +17,33 @@ Read:
 
 Do not implement a planned feature as though it is already part of the current release. Confirm that it belongs to the active milestone.
 
+## AI-assisted contributions
+
+AI coding assistants are welcome. The maintainer uses them, and the repository
+publishes an [`AI-POLICY.md`](AI-POLICY.md) and agent contract (`AGENTS.md`) for
+that reason. An AI-assisted contribution is held to the same standard as any
+other contribution.
+
+**Disclose material assistance.** If an agent or model wrote or substantially
+shaped code, tests, documentation, or other submitted content, name the tool and
+summarize its role in the pull-request description. A short statement is enough;
+do not include prompts, private reasoning, secrets, or personal data. Commit
+attribution does not replace the pull-request disclosure.
+
+**Own what you submit.** Before opening the pull request:
+
+- read and understand the change, and be prepared to explain it and respond to
+  review feedback;
+- meet the same `tests/` obligation as any behavior change and actually run
+  every check you claim passed;
+- verify citations, links, and factual claims against primary sources; and
+- confirm that no code, prose, font, image, data, or other asset has uncertain
+  provenance or a license incompatible with LPPL v1.3c or later (see
+  "Licensing contributions").
+
+Large, unrequested, or unreviewed generated changes may be closed without a
+line-by-line review. Open or claim a focused issue first for substantial work.
+
 ## Development requirements
 
 Phase 1 development requires:

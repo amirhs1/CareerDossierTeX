@@ -189,6 +189,7 @@ gate, not the stage where feature tests are first created. See
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
 - [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
+- [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
 
