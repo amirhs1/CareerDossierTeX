@@ -28,6 +28,11 @@ Before setting metadata, inspect:
 Do not invent labels, milestones, field names, or single-select values. Preserve
 existing remote metadata unless the current work clearly requires a change.
 
+If directly authorized work has no focused issue, stop before the first push and
+ask the maintainer whether to create or select one and which release metadata
+applies. Do not open a PR with milestone, Phase, or Priority omitted unless the
+maintainer explicitly authorizes that exception.
+
 If GitHub metadata conflicts with repository documentation, report the conflict
 and preserve the existing remote value until the maintainer decides.
 
@@ -51,6 +56,9 @@ Include:
 
 - concise summary;
 - `Closes #NN` for the focused issue when the PR should complete it;
+- AI-assistance disclosure naming each material tool and its role; when a commit
+  carries an AI co-author trailer, repeat that trailer's identity and email in
+  the disclosure so the commit and PR records agree;
 - change list;
 - public-API impact;
 - tests run and exact outcomes;
