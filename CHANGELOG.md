@@ -8,9 +8,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-17
+
 ### Added
 
-- `careerdossier-cv`: the unreleased English academic-CV class. It provides US
+- `careerdossier-cv`: the English academic-CV class. It provides US
   Letter, monochrome, multi-page CV layout with `fontsize` (`10pt` or `11pt`;
   default `11pt`) and `density` (`compact` or `standard`; default `standard`).
   The first page uses the shared dossier header; subsequent pages carry a
@@ -24,7 +26,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 - A supported academic-CV example, shared academic profile, CV smoke and
   extraction fixtures, and long-field/two-page layout checks. CI and `make`
   now build the academic-CV example.
-- `careerdossier-letter` now accepts `family=academic` for the unreleased
+- `careerdossier-letter` now accepts `family=academic` for the
   academic cover-letter family. `industry` remains the default and existing
   letter metadata, optional recipient handling, and public commands are shared
   unchanged. Academic letters derive the PDF title `Academic Cover Letter –
@@ -43,10 +45,9 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 - The supported no-BibLaTeX academic-CV example now demonstrates manual
   publications. README, API, roadmap, contributor requirements, and build
-  guidance now distinguish released `v0.1.1` behavior from implemented but
-  unreleased `v0.2.0` support, map every academic interface to a complete
-  example, document the Biber verification path, and state the release's
-  explicit non-goals.
+  guidance now distinguish `v0.1.1` behavior from released `v0.2.0` support,
+  map every academic interface to a complete example, document the Biber
+  verification path, and state the release's explicit non-goals.
 
 ## [0.1.1] - 2026-07-17
 
@@ -162,6 +163,7 @@ in a monochrome theme.
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.1.0

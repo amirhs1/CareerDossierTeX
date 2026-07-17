@@ -2,36 +2,33 @@
 
 ## Status
 
-This document records two API layers:
+This document records the released public interface:
 
 ```text
-Released: v0.1.1 — English Industry Dossier plus maintenance corrections
-Development: selected v0.2.0 Academic Dossier behavior (not yet released)
+Released: v0.2.0 — Academic Dossier
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.
-The `v0.2.0` section distinguishes development behavior from the remaining
-planned work; neither is shipped until the release is tagged. Before
-`v1.0.0` the interface may still change between minor versions; such changes are
-recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
+Before `v1.0.0` the interface may still change between minor versions; such
+changes are recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
 [`MIGRATION.md`](MIGRATION.md).
 
 The API is intentionally small. Internal helper commands are not public merely because they are technically accessible.
 
 ## Supported configuration
 
-| Setting | Released support | `v0.2.0` development / planned addition |
-|---|---|---|
-| Engine | XeLaTeX only | Unchanged |
-| Language | English | Unchanged |
-| Paper | US Letter | Unchanged |
-| Theme | Monochrome | Unchanged |
-| Résumé class | `careerdossier-resume` | Unchanged |
-| CV class | Not supported | `careerdossier-cv` implemented on the development branch |
-| Letter class | `careerdossier-letter`, industry family | Academic family |
-| Bibliography | Not supported | Optional `careerdossier-biblatex` implemented on the development branch |
-| Manual publications | Not supported | Implemented in `careerdossier-cv` on the development branch |
-| RTL or bilingual layout | Not supported | Unchanged |
+| Setting | `v0.2.0` support |
+|---|---|
+| Engine | XeLaTeX only |
+| Language | English |
+| Paper | US Letter |
+| Theme | Monochrome |
+| Résumé class | `careerdossier-resume` |
+| CV class | `careerdossier-cv` |
+| Letter class | `careerdossier-letter`, industry and academic families |
+| Bibliography | Optional `careerdossier-biblatex` |
+| Manual publications | `CDossierPublications` in `careerdossier-cv` |
+| RTL or bilingual layout | Not supported |
 
 ## Loading the classes
 
@@ -47,6 +44,12 @@ or:
 
 ```latex
 \documentclass{careerdossier-letter}
+```
+
+or:
+
+```latex
+\documentclass{careerdossier-cv}
 ```
 
 Do not depend on repository-specific paths such as:
@@ -104,7 +107,7 @@ compact
 
 ### Fixed settings
 
-The following are fixed in `v0.1.0` and should not be accepted as user options:
+The following remain fixed in `v0.2.0` and are not accepted as user options:
 
 ```text
 paper=letter
@@ -119,19 +122,17 @@ It is better to reject or omit an unsupported option than silently ignore it.
 ### Class declaration
 
 ```latex
-\documentclass{careerdossier-letter}
+\documentclass[family=industry]{careerdossier-letter}
 ```
 
-The following settings are fixed in `v0.1.0`:
+`family` accepts `industry` and `academic`; the default is `industry`. The
+following settings remain fixed:
 
 ```text
-family=industry
 paper=letter
 language=english
 theme=monochrome
 ```
-
-Academic letter layouts belong to `v0.2.0`.
 
 ## Shared profile metadata
 
@@ -152,8 +153,8 @@ Academic letter layouts belong to `v0.2.0`.
 ```
 
 This command stores profile metadata for reuse across the supported dossier
-classes. The optional `orcid` key is development behavior for `v0.2.0`; the
-other keys remain available to the released industry classes.
+classes. The optional `orcid` key was introduced in `v0.2.0`; the other keys
+remain compatible with the released industry classes.
 
 ### Profile keys
 
@@ -168,7 +169,7 @@ other keys remain available to the released industry classes.
 | `linkedin` | No | Released | LinkedIn URL or profile path |
 | `github` | No | Released | GitHub URL or profile path |
 | `scholar` | No | Released | Google Scholar profile URL or identifier |
-| `orcid` | No | `v0.2.0` development | ORCID identifier or profile URL |
+| `orcid` | No | `v0.2.0` | ORCID identifier or profile URL |
 
 Whitespace-only values should be treated as missing.
 
@@ -429,13 +430,12 @@ Their visual definitions may evolve before `v1.0.0`.
 
 ## `v0.2.0` academic API contract
 
-This section does not describe released behavior. The academic CV, its ORCID
-profile field, manual publications, optional BibLaTeX integration, and the
-academic letter family are implemented on the development branch. The
-implementation preserves the existing résumé and industry-letter interface
-unless an incompatibility is separately approved and documented.
+This section describes the academic CV, its ORCID profile field, manual
+publications, optional BibLaTeX integration, and the academic letter family
+released in `v0.2.0`. These additions preserve the existing résumé and
+industry-letter interface.
 
-The supported development examples map directly to the academic interfaces:
+The shipped examples map directly to the academic interfaces:
 
 | Interface | Complete example | Build command |
 |---|---|---|
