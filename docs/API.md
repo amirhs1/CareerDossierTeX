@@ -151,22 +151,24 @@ Academic letter layouts belong to `v0.2.0`.
 }
 ```
 
-This command stores profile metadata for use by both document classes.
+This command stores profile metadata for reuse across the supported dossier
+classes. The optional `orcid` key is development behavior for `v0.2.0`; the
+other keys remain available to the released industry classes.
 
 ### Profile keys
 
-| Key | Required | Purpose |
-|---|---:|---|
-| `name` | Yes | Person's display name |
-| `headline` | No | Professional title or short descriptor |
-| `email` | No | Email address |
-| `phone` | No | Telephone number |
-| `location` | No | City, region, or country |
-| `website` | No | Personal or professional website |
-| `linkedin` | No | LinkedIn URL or profile path |
-| `github` | No | GitHub URL or profile path |
-| `scholar` | No | Google Scholar profile URL or identifier |
-| `orcid` | No | ORCID identifier or profile URL |
+| Key | Required | Availability | Purpose |
+|---|---:|---|---|
+| `name` | Yes | Released | Person's display name |
+| `headline` | No | Released | Professional title or short descriptor |
+| `email` | No | Released | Email address |
+| `phone` | No | Released | Telephone number |
+| `location` | No | Released | City, region, or country |
+| `website` | No | Released | Personal or professional website |
+| `linkedin` | No | Released | LinkedIn URL or profile path |
+| `github` | No | Released | GitHub URL or profile path |
+| `scholar` | No | Released | Google Scholar profile URL or identifier |
+| `orcid` | No | `v0.2.0` development | ORCID identifier or profile URL |
 
 Whitespace-only values should be treated as missing.
 
@@ -433,6 +435,18 @@ academic letter family are implemented on the development branch. The
 implementation preserves the existing résumé and industry-letter interface
 unless an incompatibility is separately approved and documented.
 
+The supported development examples map directly to the academic interfaces:
+
+| Interface | Complete example | Build command |
+|---|---|---|
+| Academic CV and dependency-free manual publications | `examples/academic/cv-academic.tex` | `make academic-cv` |
+| Optional BibLaTeX/Biber profile | `examples/academic/cv-bibliography.tex` | `make academic-bibliography` |
+| Academic cover-letter family | `examples/academic/letter-academic.tex` | `make academic-letter` |
+
+`make bibliography-test` runs the focused Biber ordering, identifier-precedence,
+and extracted-text baseline. `latexmk` invokes Biber automatically for the
+external-bibliography example.
+
 ### Academic CV class
 
 Load the academic CV with:
@@ -668,7 +682,18 @@ The implementation should stop compilation for:
 - an unsupported class-option value;
 - a missing required `name` when rendering identity content;
 - an unknown public field or label name;
+- a manual publication used outside `CDossierPublications`;
+- a manual publication missing `authors` or `title`;
+- an unknown manual-publication or preferred-author key;
+- a preferred-author declaration missing `family` or `given`;
+- loading `careerdossier-biblatex` when the optional BibLaTeX dependency is
+  unavailable; and
 - malformed key-value input that cannot be interpreted safely.
+
+A missing BibLaTeX diagnostic must name BibLaTeX and Biber, recommend building
+with `latexmk` after installation, and point to `CDossierPublications` as the
+dependency-free alternative. A missing Biber executable is reported by the
+standard BibLaTeX/`latexmk` toolchain rather than a separate TeX preflight.
 
 ### Warnings
 

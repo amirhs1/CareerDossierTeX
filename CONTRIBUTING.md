@@ -46,15 +46,19 @@ line-by-line review. Open or claim a focused issue first for substantial work.
 
 ## Development requirements
 
-Phase 1 development requires:
+Development requires:
 
 - Git;
 - XeLaTeX;
 - `latexmk`;
 - a sufficiently complete TeX Live or MiKTeX installation;
-- `pdftotext` from Poppler when running extraction checks.
+- `pdftotext` from Poppler when running extraction, layout, or bibliography
+  checks; and
+- BibLaTeX and Biber when running the optional bibliography example or the full
+  `make check` suite.
 
-CareerDossierTeX `v0.1.0` is XeLaTeX-only.
+The ordinary résumé, letter, and no-BibLaTeX CV paths do not require BibLaTeX or
+Biber. CareerDossierTeX is XeLaTeX-only.
 
 ## Issue workflow
 
@@ -213,14 +217,14 @@ Each commit should represent one coherent change. Avoid combining unrelated API,
 
 ## Local builds
 
-Build both supported examples:
+Build every supported example:
 
 ```bash
 make
 ```
 
-Run every suite CI runs — regression, extraction, smoke, and layout, plus both
-example builds:
+Run every suite CI runs — regression, extraction, smoke, layout, and the focused
+BibLaTeX/Biber fixture — plus all supported example builds:
 
 ```bash
 make check
@@ -668,12 +672,13 @@ Project policy:
 
 ## CI expectations
 
-The Phase 1 workflow should:
+The build workflow should:
 
 - run on pull requests;
 - run on pushes to `main`;
-- run every committed automated suite under `tests/` that applies to Phase 1;
-- compile both supported examples;
+- run every committed automated suite under `tests/` that applies to the active
+  milestone;
+- compile every supported example;
 - fail when compilation fails;
 - upload PDFs and logs as artifacts;
 - pin every container and third-party action to an immutable reference.

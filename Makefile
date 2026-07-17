@@ -5,7 +5,8 @@
 # command in one place, change it in the other.
 #
 # Requirements: XeLaTeX and latexmk for everything; l3build for `regression`;
-# pdftotext (Poppler) for `layout` and `extract-test`.
+# pdftotext (Poppler) for `layout`, `extract-test`, and `bibliography-test`;
+# BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
 #
 # Run `make help` for the target list.
 

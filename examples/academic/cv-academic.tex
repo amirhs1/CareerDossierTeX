@@ -1,7 +1,8 @@
 % examples/academic/cv-academic.tex
 %
-% Supported v0.2 academic-CV example. It deliberately has no bibliography
-% package: bibliography support remains optional and is introduced separately.
+% Supported v0.2 academic-CV example with dependency-free manual publications.
+% It deliberately has no bibliography package; the external BibLaTeX/Biber
+% integration remains optional and is demonstrated separately.
 
 \documentclass[fontsize=11pt, density=standard]{careerdossier-cv}
 \input{examples/profiles/profile-academic.tex}
@@ -44,5 +45,18 @@
 ]
   Designed accessible assessments and supported a diverse cohort of students.
 \end{CDossierEntry}
+
+\CDossierSection{Selected Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace and Grace Hopper},
+    title   = {Reliable Analytical Engines for Reproducible Research},
+    venue   = {Journal of Example Computing},
+    date    = {2026},
+    doi     = {10.9999/jec.2026.101},
+    url     = {https://example.invalid/articles/reliable-engines},
+    note    = {Fictional example publication}
+  }
+\end{CDossierPublications}
 
 \end{document}
