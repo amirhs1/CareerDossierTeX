@@ -2,7 +2,7 @@
 
 A reusable XeLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.1.1 — Metadata and Build Corrections` is the current release.  
+> **Status:** `v0.2.0 — Academic Dossier` is the current release.
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
 > [`docs/MIGRATION.md`](docs/MIGRATION.md).
@@ -13,25 +13,24 @@ CareerDossierTeX separates personal information from document content and presen
 
 ### Support matrix
 
-| Capability | Current `v0.1.1` release | `v0.2.0` development branch |
+| Capability | `v0.2.0` support | Notes |
 |---|---|---|
-| Industry résumé | Supported | Supported, unchanged |
-| Industry cover letter | Supported | Supported, unchanged |
-| Academic CV | Not supported | Implemented |
-| Academic cover letter | Not supported | Implemented with `family=academic` |
-| Manual publication lists | Not supported | Implemented without BibLaTeX or Biber |
-| External bibliography | Not supported | Optional fixed BibLaTeX/Biber profile |
-| Shared profile metadata | Supported | Adds optional `orcid`; retains `scholar` |
-| Language | English | English |
-| Engine | XeLaTeX | XeLaTeX |
-| Paper size | US Letter | US Letter |
-| Theme | Monochrome | Monochrome |
-| Continuous integration | Industry examples and accumulated suites | Adds academic examples and Biber coverage |
+| Industry résumé | Supported | Existing `v0.1.x` behavior remains compatible |
+| Industry cover letter | Supported | `family=industry` remains the default |
+| Academic CV | Supported | Multi-page layout with running headers and folios |
+| Academic cover letter | Supported | Select with `family=academic` |
+| Manual publication lists | Supported | No BibLaTeX or Biber required |
+| External bibliography | Optional | Fixed BibLaTeX/Biber profile |
+| Shared profile metadata | Supported | Includes optional Scholar and ORCID fields |
+| Language | English | Farsi, bilingual, and RTL support is deferred |
+| Engine | XeLaTeX | pdfLaTeX and LuaLaTeX are unsupported |
+| Paper size | US Letter | A4 is unsupported |
+| Theme | Monochrome | Color themes, font presets, and icons are unsupported |
+| Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The academic interfaces are implemented and tested but remain unreleased until
-`v0.2.0` is tagged. Statement classes, A4 paper, color themes, font presets,
-icons, and alternate bibliography styles belong to later milestone work. Farsi,
-bilingual, and right-to-left support is deferred and unscheduled.
+Statement classes, A4 paper, color themes, font presets, icons, and alternate
+bibliography styles belong to later milestone work. Farsi, bilingual, and
+right-to-left support is deferred and unscheduled.
 
 ## Requirements
 
@@ -139,7 +138,7 @@ See the complete example in:
 examples/industry/letter-industry.tex
 ```
 
-### 4. Create an academic CV (`v0.2.0` development)
+### 4. Create an academic CV
 
 The academic CV reuses the shared profile, section, entry, and list interfaces.
 It also provides a dependency-free manual publication list:
@@ -182,7 +181,7 @@ It also provides a dependency-free manual publication list:
 The complete no-BibLaTeX example is
 [`examples/academic/cv-academic.tex`](examples/academic/cv-academic.tex).
 
-### 5. Opt in to BibLaTeX and Biber (`v0.2.0` development)
+### 5. Opt in to BibLaTeX and Biber
 
 ```latex
 \documentclass{careerdossier-cv}
@@ -205,7 +204,7 @@ This optional package uses the fixed `backend=biber`, `style=numeric`, and
 and its fictional
 [`publications.bib`](examples/academic/publications.bib).
 
-### 6. Create an academic cover letter (`v0.2.0` development)
+### 6. Create an academic cover letter
 
 ```latex
 \documentclass[family=academic]{careerdossier-letter}
@@ -312,7 +311,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.1.1 — Metadata and Build Corrections
+v0.2.0 — Academic Dossier
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -322,6 +321,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | Version | Goal |
 |---|---|
 | `v0.1.0` | English industry résumé and cover letter |
+| `v0.1.1` | Metadata and build corrections |
 | `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
 | `v0.4.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |

@@ -9,8 +9,9 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.1.1` is released. The next release,
-> `v0.2.0 — Academic Dossier`, is in development.
+> **Current status:** `v0.2.0 — Academic Dossier` is released. With
+> `v0.3.0` deferred and unscheduled, the next planned release is
+> `v0.4.0 — Statements and Customization`.
 
 ## Release overview
 
@@ -18,7 +19,7 @@ test pass at the end of a milestone.
 |---|---|---|
 | `v0.1.0` | English industry résumé and cover letter | Released |
 | `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
-| `v0.2.0` | Academic CV, academic letter, and bibliography support | In development |
+| `v0.2.0` | Academic CV, academic letter, and bibliography support | Released |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Deferred — unscheduled** |
 | `v0.4.0` | Statement classes and broader customization | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
@@ -103,7 +104,7 @@ Publish the smallest useful CareerDossierTeX release.
 
 Extend the shared foundation to academic applications.
 
-### Development deliverables
+### Included
 
 - `careerdossier-cv.cls`;
 - academic cover-letter family;
@@ -118,9 +119,7 @@ Extend the shared foundation to academic applications.
 - user, contributor, API, architecture, migration, roadmap, and changelog
   documentation matched to implemented behavior.
 
-These interfaces are implemented and tested on the development branch. They do
-not become released behavior until the release issue is completed and the
-`v0.2.0` tag is published.
+These interfaces are released in `v0.2.0`.
 
 ### Release criteria
 

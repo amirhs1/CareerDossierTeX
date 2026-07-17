@@ -2,12 +2,12 @@
 
 ## Status
 
-`v0.1.1` is the current release. No released public command, key, class option,
+`v0.2.0` is the current release. No released public command, key, class option,
 or default has yet been renamed or removed.
 
 The pre-release prototypes inventoried below are **not** a published API. They are
-recorded here so that the released industry implementation and the in-development
-`v0.2.0` academic implementation can preserve the strongest existing design
+recorded here so that the released industry and `v0.2.0` academic implementations
+can preserve the strongest existing design
 while deliberately diverging where the supported scope (XeLaTeX, English, US
 Letter, monochrome, extraction-conscious) requires.
 
@@ -140,13 +140,13 @@ released-API rename log; released renames use the entry format below.
 | Merriweather / Barlow Condensed / Liberation Mono | TeX Gyre Termes (body) / TeX Gyre Heros (headings) | Redistributable TeX Live fonts; mono reserved |
 | Paul Tol colours, coloured links | Monochrome theme tokens, black links | Colour carries no meaning in Phase 1 |
 
-## Academic prototype → `v0.2.0` development API mapping
+## Academic prototype → `v0.2.0` public API mapping
 
 This table is the compatibility analysis for the accepted academic API contract
 in [`docs/API.md`](API.md). The left-hand interfaces were private prototypes and
 do not receive deprecation aliases.
 
-| Prototype interface | `v0.2.0` development interface | Notes |
+| Prototype interface | `v0.2.0` interface | Notes |
 |---|---|---|
 | `\documentclass{cv-v1}` / `cv-v2-no_website-no_color` | `\documentclass{careerdossier-cv}` | One supported, monochrome academic class; `fontsize` and `density` use the established option syntax |
 | `\Profile[fullname=…, scholar=…, address=…]` | `\CDossierSetup{name=…, scholar=…, orcid=…, location=…}` + `\MakeCDossierHeader` | Shared with industry documents; icons and `update` are not restored |

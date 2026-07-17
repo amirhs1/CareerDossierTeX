@@ -53,7 +53,7 @@ The exact package-loading order may differ when implementation requires it, but 
 ## Phase 2 module graph
 
 The academic CV class, optional bibliography integration, and academic letter
-family are implemented on the development branch. These additions do not
+family were released in `v0.2.0`. These additions do not
 change the Phase 1 dependency direction:
 
 ```text
@@ -321,7 +321,7 @@ Responsibilities:
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
 
-### `careerdossier-cv.cls` (Phase 2, implemented on the development branch)
+### `careerdossier-cv.cls` (Phase 2, released in `v0.2.0`)
 
 Owns academic-CV document behavior.
 

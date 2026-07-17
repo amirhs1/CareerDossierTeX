@@ -6,14 +6,15 @@
 package is built toward. It is **not** documentation of shipped behavior; only
 `docs/API.md` and the compiled examples describe what is currently supported.
 **Primary engine:** XeLaTeX
-**Current scope (Phase 1, `v0.1.0`):** one English industry résumé and one industry
-cover letter, US Letter, monochrome. Later phases extend the same principles to
-academic CVs, reference lists, and statements — see `docs/ROADMAP.md`.
+**Current scope (`v0.2.0`):** English industry résumé, industry and academic
+cover-letter families, academic CV, and optional publication support; US Letter,
+monochrome, and XeLaTeX. Later phases may extend the same principles to statements
+and broader customization — see `docs/ROADMAP.md`.
 **Maintainer:** Amir Sadeghi
-**Last reviewed:** 2026-07-13
+**Last reviewed:** 2026-07-17
 
-> **Scope banner.** Throughout this guide, material tagged **(Phase 1)** is in
-> scope for `v0.1.0`. Material tagged **(planned — vX.Y.Z)** describes future work
+> **Scope banner.** Material tagged **(Phase 1)** records the released `v0.1.x`
+> foundation. Material tagged **(planned — vX.Y.Z)** describes future work
 > and must not be implemented or documented as if it were current. When this guide
 > and the repository's `docs/` disagree on names, module boundaries, or scope, the
 > repository documentation is authoritative and this guide should be corrected to
@@ -27,8 +28,8 @@ the package's real product is not merely a visually correct PDF. It is a PDF who
 visible page, text layer, reading order, Unicode mapping, and semantic structure
 agree.
 
-Use these rules as the default design contract. Phase 1 realizes the résumé and
-cover-letter subset; the rest guides later phases.
+Use these rules as the default design contract. `v0.2.0` realizes the industry
+and academic dossier subset; the rest guides later phases.
 
 1. Make the default output single-column, linear, text-first, and restrained.
 2. Put all essential information in the document body, not in headers, footers,
@@ -235,8 +236,9 @@ not use a two-cell table merely to push the date right.
 
 ### 3.5 Headers, footers, and page numbers
 
-For a one- or two-page résumé, prefer no running header. For a long CV **(planned
-— v0.2.0)**, a simple surname and page number can help humans, but it must not be
+For a one- or two-page résumé, prefer no running header. For a long CV
+**(supported in v0.2.0)**, a simple name-derived header and page number can help
+humans, but they must not be
 the only appearance of the name or other essential data. Use standard page-style
 mechanisms so tagging code can treat running material as artifacts, and inspect
 the resulting structure.
@@ -457,9 +459,9 @@ All document types should provide:
 Do not define layout-only interfaces such as `\LeftColumn`, `\RightColumn`, or
 `\SkillBar`. Define semantic interfaces. In Phase 1 the semantic primitive is the
 `CDossierEntry` environment (with `CDossierItemize` for bullets) and
-`\CDossierSection` for headings. Future document types may add semantic entry
-kinds — for example a publication or reference entry **(planned — v0.2.0+)** —
-built on the same shared components, not duplicated per class.
+`\CDossierSection` for headings. The `v0.2.0` academic CV adds a semantic manual
+publication list on the same shared foundation; future document types may add
+other entry kinds, such as references, without duplicating components per class.
 
 ### 5.2 Résumé **(Phase 1)**
 
@@ -481,7 +483,7 @@ Long lists of presentations, publications, projects, or certifications should
 remain ordinary vertical lists. A compact table may look attractive, but a
 sequential list is safer and usually easier to maintain.
 
-### 5.4 Academic CV **(planned — v0.2.0)**
+### 5.4 Academic CV **(supported in v0.2.0)**
 
 Academic readers often value structured publication and research sections, but the
 PDF may still pass through a central HR platform. Keep:
@@ -493,9 +495,9 @@ PDF may still pass through a central HR platform. Keep:
 - author emphasis as font weight, not a custom glyph or colour alone; and
 - page breaks between entries rather than inside an entry where practical.
 
-If `biblatex` is supported **(planned — v0.2.0)**, test the exact bibliography
-style and every field type used. A bibliography package update can change
-punctuation and extraction.
+When using the optional `careerdossier-biblatex` integration, test the fixed
+bibliography profile and every field type used. A bibliography package update
+can change punctuation and extraction.
 
 ### 5.5 Cover letter **(Phase 1)**
 
@@ -669,7 +671,7 @@ for the exact release output.
 ### 8.1 Module layout (matches the repository)
 
 CareerDossierTeX is modular. Keep classes thin and put reusable behaviour in the
-shared packages. The Phase 1 modules are:
+shared packages. The `v0.2.0` module set is:
 
 ```text
 careerdossier-base.sty        metadata, shared keys, required-field validation; no layout
@@ -677,15 +679,15 @@ careerdossier-typography.sty  XeLaTeX check, fontspec, portable fonts, semantic 
 careerdossier-theme.sty       monochrome semantic colour/rule/link tokens
 careerdossier-components.sty  identity block, contact line, link wrappers, entry primitives
 careerdossier-resume.cls      Letter geometry, sections, entries, compact lists
-careerdossier-letter.cls      industry-letter geometry, recipient block, salutation/closing
+careerdossier-letter.cls      industry/academic letter geometry and prose structure
+careerdossier-cv.cls          academic CV layout and manual publications
+careerdossier-biblatex.sty    optional fixed BibLaTeX/Biber profile
 ```
 
 Do not place margins in `careerdossier-base`, and do not duplicate contact-line
 logic inside both classes.
 
-Later phases extend this set without duplicating the class hierarchy:
-`careerdossier-cv.cls` and `careerdossier-biblatex.sty` **(planned — v0.2.0)**;
-`careerdossier-statement.cls` **(planned — v0.4.0)**. Multilingual and RTL
+`careerdossier-statement.cls` is **(planned — v0.4.0)**. Multilingual and RTL
 support is **deferred and unscheduled** (see `docs/ROADMAP.md`); should it ever
 return, it would extend the existing typography and component modules — and
 introduce a label abstraction — rather than add language-specific classes.
