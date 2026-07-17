@@ -1,0 +1,186 @@
+%% careerdossier-biblatex.sty
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the files listed in manifest.txt.
+%%
+%% careerdossier-biblatex is the opt-in boundary around BibLaTeX and Biber. It
+%% owns the fixed academic bibliography profile and preferred-author emphasis;
+%% CV geometry, manual publications, and resource selection remain elsewhere.
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplPackage {careerdossier-biblatex} {2026-07-17} {0.2.0}
+  {CareerDossierTeX optional BibLaTeX and Biber integration}
+
+\msg_new:nnnn { careerdossier-biblatex } { missing-dependency }
+  {
+    The~optional~dependency~'biblatex'~was~not~found;~install~BibLaTeX~and~
+    Biber~or~use~CDossierPublications.
+  }
+  {
+    Install~BibLaTeX~and~Biber,~then~build~with~latexmk;~or~omit~
+    \c_backslash_str usepackage\c_left_brace_str careerdossier-biblatex\c_right_brace_str
+    ,~then~use~CDossierPublications~for~manual~entries.
+  }
+\file_if_exist:nF { biblatex.sty }
+  { \msg_fatal:nn { careerdossier-biblatex } { missing-dependency } }
+
+\RequirePackage { careerdossier-theme }
+\RequirePackage
+  [
+    backend    = biber ,
+    style      = numeric ,
+    sorting    = ydnt ,
+    hyperref   = true ,
+    giveninits = true ,
+  ]
+  { biblatex }
+
+%% The fixed v0.2 profile keeps numbering visually compact and preserves the
+%% prototype's readable separation without changing ordinary document lists.
+\setlength { \bibitemsep } { 6pt }
+\DeclareFieldFormat { labelnumberwidth } { \mkbibbold {#1) } }
+
+%% Show only the strongest public identifier: DOI, then e-print, then URL.
+\renewbibmacro* { doi+eprint+url }
+  {
+    \iffieldundef { doi }
+      {
+        \iffieldundef { eprint }
+          { \usebibmacro { url+urldate } }
+          { \usebibmacro { eprint } }
+      }
+      { \printfield { doi } }
+    \newunit \newblock
+  }
+
+%% Use the CV's semantic section command for the bibliography heading when the
+%% package is loaded with careerdossier-cv. Other document classes retain
+%% BibLaTeX's own default heading and no unrelated heading is redefined.
+\cs_if_exist:NT \CDossierSection
+  { \defbibheading { bibliography } [ \refname ] { \CDossierSection {#1} } }
+
+%% ---------------------------------------------------------------------------
+%% Preferred-author emphasis.
+%%
+%% Store repeatable exact family/given pairs. BibLaTeX exposes the complete
+%% parsed name parts while formatting both full names and initials, so matching
+%% those parts avoids the prototype's slash parsing and pgffor dependency.
+%% ---------------------------------------------------------------------------
+\seq_new:N  \g__cdossier_biblatex_highlight_authors_seq
+\tl_new:N   \l__cdossier_biblatex_highlight_family_tl
+\tl_new:N   \l__cdossier_biblatex_highlight_given_tl
+\bool_new:N \l__cdossier_biblatex_highlight_bool
+
+\msg_new:nnnn { careerdossier-biblatex } { missing-highlight-key }
+  { \c_backslash_str CDossierHighlightAuthor~requires~a~nonblank~'#1'~key. }
+  {
+    Declare~an~exact~BibLaTeX-parsed~name,~for~example: \\
+    \c_backslash_str CDossierHighlightAuthor
+    \c_left_brace_str family~=~Sadeghi,~given~=~Amir\c_right_brace_str .
+  }
+\msg_new:nnnn { careerdossier-biblatex } { unknown-highlight-key }
+  { Unknown~\c_backslash_str CDossierHighlightAuthor~key~'#1'. }
+  { The~supported~keys~are:~family,~given. }
+
+\keys_define:nn { cdossier / biblatex / highlight }
+  {
+    family  .tl_set:N = \l__cdossier_biblatex_highlight_family_tl ,
+    given   .tl_set:N = \l__cdossier_biblatex_highlight_given_tl ,
+    unknown .code:n =
+      {
+        \msg_error:nnx { careerdossier-biblatex }
+          { unknown-highlight-key } { \l_keys_key_str }
+      } ,
+  }
+
+\NewDocumentCommand \CDossierHighlightAuthor { m }
+  {
+    \tl_clear:N \l__cdossier_biblatex_highlight_family_tl
+    \tl_clear:N \l__cdossier_biblatex_highlight_given_tl
+    \keys_set:nn { cdossier / biblatex / highlight } {#1}
+    \tl_trim_spaces:N \l__cdossier_biblatex_highlight_family_tl
+    \tl_trim_spaces:N \l__cdossier_biblatex_highlight_given_tl
+    \tl_if_blank:VT \l__cdossier_biblatex_highlight_family_tl
+      {
+        \msg_error:nnn { careerdossier-biblatex }
+          { missing-highlight-key } { family }
+      }
+    \tl_if_blank:VT \l__cdossier_biblatex_highlight_given_tl
+      {
+        \msg_error:nnn { careerdossier-biblatex }
+          { missing-highlight-key } { given }
+      }
+    \bool_lazy_and:nnT
+      { ! \tl_if_blank_p:V \l__cdossier_biblatex_highlight_family_tl }
+      { ! \tl_if_blank_p:V \l__cdossier_biblatex_highlight_given_tl }
+      {
+        \seq_gput_right:Nx \g__cdossier_biblatex_highlight_authors_seq
+          {
+            { \exp_not:V \l__cdossier_biblatex_highlight_family_tl }
+            { \exp_not:V \l__cdossier_biblatex_highlight_given_tl }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__cdossier_biblatex_highlight_candidate:nn #1#2
+  {
+    \str_if_eq:eeT { \namepartfamily } {#1}
+      {
+        \str_if_eq:eeT { \namepartgiven } {#2}
+          {
+            \bool_set_true:N \l__cdossier_biblatex_highlight_bool
+            \seq_map_break:
+          }
+      }
+  }
+
+\prg_new_protected_conditional:Npnn \__cdossier_biblatex_highlight_if: { T , F , TF }
+  {
+    \bool_set_false:N \l__cdossier_biblatex_highlight_bool
+    \seq_map_inline:Nn \g__cdossier_biblatex_highlight_authors_seq
+      { \__cdossier_biblatex_highlight_candidate:nn ##1 }
+    \bool_if:NTF \l__cdossier_biblatex_highlight_bool
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+%% Wrap the name-part formatters, but bold only while BibLaTeX is rendering a
+%% bibliography. Numeric citations therefore retain their ordinary formatting,
+%% including author names produced by \textcite outside a bibliography.
+\cs_new_eq:NN \__cdossier_biblatex_saved_family:n \mkbibnamefamily
+\cs_new_eq:NN \__cdossier_biblatex_saved_given:n  \mkbibnamegiven
+
+\renewcommand* \mkbibnamefamily [1]
+  {
+    \iftoggle { blx@bibliography }
+      {
+        \__cdossier_biblatex_highlight_if:TF
+          { \mkbibbold { \__cdossier_biblatex_saved_family:n {#1} } }
+          { \__cdossier_biblatex_saved_family:n {#1} }
+      }
+      { \__cdossier_biblatex_saved_family:n {#1} }
+  }
+\renewcommand* \mkbibnamegiven [1]
+  {
+    \iftoggle { blx@bibliography }
+      {
+        \__cdossier_biblatex_highlight_if:TF
+          { \mkbibbold { \__cdossier_biblatex_saved_given:n {#1} } }
+          { \__cdossier_biblatex_saved_given:n {#1} }
+      }
+      { \__cdossier_biblatex_saved_given:n {#1} }
+  }
+
+\endinput

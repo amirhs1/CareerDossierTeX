@@ -1,0 +1,62 @@
+% biblatex-profile.lvt — optional integration profile and author matching.
+\input{regression-test}
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{careerdossier-biblatex}
+
+\CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
+\CDossierHighlightAuthor{family={Lovelace}, given={A.}}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestBibName #1#2
+  {
+    \cs_set:Npn \namepartfamily {#1}
+    \cs_set:Npn \namepartgiven  {#2}
+    \__cdossier_biblatex_highlight_if:TF
+      { \TYPE{ [#1/#2]=highlight } }
+      { \TYPE{ [#1/#2]=ordinary } }
+  }
+\cs_new_protected:Npn \cdossiertestBibFormatting #1
+  {
+    \group_begin:
+      \cs_set_protected:Npn \mkbibbold ##1 { \TYPE{ bold-applied } ##1 }
+      \cs_set:Npn \namepartfamily { Lovelace }
+      \cs_set:Npn \namepartgiven  { Ada }
+      \str_if_eq:nnTF {#1} { bibliography }
+        { \toggletrue  { blx@bibliography } }
+        { \togglefalse { blx@bibliography } }
+      \mkbibnamefamily { Lovelace }
+      \TYPE{ #1-formatting-complete }
+    \group_end:
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{exact-full-name-matches}{
+  \cdossiertestBibName{Lovelace}{Ada}
+}
+
+\TEST{declared-initial-variant-matches}{
+  \cdossiertestBibName{Lovelace}{A.}
+}
+
+\TEST{partial-name-does-not-match}{
+  \cdossiertestBibName{Lovelace}{Augusta Ada}
+}
+
+\TEST{different-family-does-not-match}{
+  \cdossiertestBibName{Hopper}{Grace}
+}
+
+\TEST{bibliography-name-is-emphasized}{
+  \cdossiertestBibFormatting{bibliography}
+}
+
+\TEST{citation-name-is-not-emphasized}{
+  \cdossiertestBibFormatting{citation}
+}
+
+\END
+\end{document}

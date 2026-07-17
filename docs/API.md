@@ -29,8 +29,8 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Résumé class | `careerdossier-resume` | Unchanged |
 | CV class | Not supported | `careerdossier-cv` implemented on the development branch |
 | Letter class | `careerdossier-letter`, industry family | Academic family |
-| Bibliography | Not supported | Optional `careerdossier-biblatex` |
-| Manual publications | Not supported | Planned |
+| Bibliography | Not supported | Optional `careerdossier-biblatex` implemented on the development branch |
+| Manual publications | Not supported | Implemented in `careerdossier-cv` on the development branch |
 | RTL or bilingual layout | Not supported | Unchanged |
 
 ## Loading the classes
@@ -428,10 +428,10 @@ Their visual definitions may evolve before `v1.0.0`.
 ## `v0.2.0` academic API contract
 
 This section does not describe released behavior. The academic CV, its ORCID
-profile field, and the academic letter family are implemented on the development
-branch. Manual publications and the optional BibLaTeX integration remain
-planned. The implementation preserves the existing résumé and industry-letter
-interface unless an incompatibility is separately approved and documented.
+profile field, manual publications, optional BibLaTeX integration, and the
+academic letter family are implemented on the development branch. The
+implementation preserves the existing résumé and industry-letter interface
+unless an incompatibility is separately approved and documented.
 
 ### Academic CV class
 
@@ -510,7 +510,7 @@ when blank and must not leave separators, blank lines, or icon-only content.
 The CV derives `/Title` as `Curriculum Vitae – <name>`, `/Author` from `name`,
 and `/Lang` as `en`, subject to the existing `\hypersetup` precedence rule.
 
-### Manual publication entries (planned)
+### Manual publication entries
 
 Manual publications require no bibliography package or Biber run:
 
@@ -543,9 +543,12 @@ counter on entry. `\CDossierPublication` is valid only inside that environment.
 
 Missing optional values must collapse cleanly. When both `doi` and `url` are
 present, DOI is the displayed link and URL is the fallback; `v0.2.0` does not
-offer a style option for changing that precedence.
+offer a style option for changing that precedence. Each entry renders in this
+order: authors, italic title, the comma-joined present `venue`/`date` values,
+`note`, and the preferred visible identifier. Sentence punctuation is emitted
+only around present groups, so absent optional fields leave no stray separators.
 
-### Optional BibLaTeX and Biber integration (planned)
+### Optional BibLaTeX and Biber integration
 
 The CV class does not load `biblatex`. Opt in explicitly:
 

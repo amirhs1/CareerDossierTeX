@@ -23,15 +23,23 @@ CareerDossierTeX separates personal information from document content and presen
 | Paper size | US Letter |
 | Theme | Monochrome |
 | Local build | `latexmk` |
-| Continuous integration | Regression, extraction, smoke, and layout suites plus the industry and academic-CV example builds |
+| Continuous integration | Regression, extraction, smoke, and layout suites plus all supported example builds |
 
-The academic CV is implemented on the development branch for the unreleased v0.2.0 milestone. Bibliography integration, academic letters, statement classes, A4 paper, and additional themes belong to later milestone work. Farsi, bilingual, and right-to-left support is deferred and unscheduled.
+The academic CV, academic-letter family, dependency-free manual publications,
+and optional BibLaTeX/Biber integration are implemented on the development
+branch for the unreleased v0.2.0 milestone. Statement classes, A4 paper, and
+additional themes belong to later milestone work. Farsi, bilingual, and
+right-to-left support is deferred and unscheduled.
 
 ## Requirements
 
 - XeLaTeX
 - `latexmk`
 - A reasonably complete TeX Live or MiKTeX installation
+
+BibLaTeX and Biber are optional and are needed only by documents that load
+`careerdossier-biblatex`. Manual publication lists and CVs without an external
+bibliography do not require them.
 
 CareerDossierTeX is not intended to compile with pdfLaTeX in `v0.1.0`.
 
@@ -139,6 +147,10 @@ latexmk -xelatex -interaction=nonstopmode -halt-on-error \
 
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   examples/industry/letter-industry.tex
+
+# Optional BibLaTeX/Biber example; latexmk runs Biber automatically.
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  examples/academic/cv-bibliography.tex
 ```
 
 Both examples may also be built with the repository `Makefile`:
@@ -165,7 +177,7 @@ but examples do not replace focused regression, smoke, error-path, extraction,
 or layout-stress tests.
 
 Run everything CI runs — the regression, extraction, smoke, and layout suites
-plus both example builds — with:
+plus every supported example build — with:
 
 ```bash
 make check

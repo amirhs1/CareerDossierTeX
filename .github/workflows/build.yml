@@ -58,6 +58,10 @@ jobs:
             echo "## l3build"
             l3build --version 2>&1 | head -4 || echo "l3build: unavailable"
             echo
+            echo "## BibLaTeX / Biber"
+            kpsewhich biblatex.sty || echo "biblatex: NOT-FOUND"
+            biber --version 2>&1 | head -2 || echo "biber: unavailable"
+            echo
             echo "## default fonts"
             for f in texgyretermes-regular.otf texgyreheros-regular.otf; do
               echo "$f -> $(kpsewhich "$f" || echo NOT-FOUND)"
@@ -171,12 +175,10 @@ jobs:
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      - name: Build the academic CV example
-        run: >-
-          latexmk -xelatex -interaction=nonstopmode -halt-on-error
-          examples/academic/cv-academic.tex
+      - name: Build the academic CV examples
+        run: make bibliography-test academic-cv academic-bibliography
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
-      - name: Upload academic CV PDF and log
+      - name: Upload academic CV PDFs and logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -184,6 +186,13 @@ jobs:
           path: |
             cv-academic.pdf
             cv-academic.log
+            cv-bibliography.pdf
+            cv-bibliography.log
+            cv-bibliography.blg
+            tests/bibliography/*.pdf
+            tests/bibliography/*.log
+            tests/bibliography/*.blg
+            tests/bibliography/*.diff
           if-no-files-found: warn
 
   academic-letter:
