@@ -50,6 +50,33 @@ careerdossier-letter.cls
 
 The exact package-loading order may differ when implementation requires it, but dependency direction should remain one-way. Shared packages must not depend on the résumé or letter classes.
 
+## Phase 2 target module graph
+
+The academic release adds one document class and one optional integration
+package without changing the Phase 1 dependency direction:
+
+```text
+careerdossier-cv.cls
+        │
+        ├── careerdossier-components.sty
+        ├── careerdossier-typography.sty
+        ├── careerdossier-theme.sty
+        └── careerdossier-base.sty
+
+careerdossier-biblatex.sty  ──optional──▶  biblatex / Biber
+        │
+        └── semantic typography and theme roles
+
+careerdossier-letter.cls
+        └── family=industry|academic
+```
+
+`careerdossier-cv.cls` must not load `careerdossier-biblatex.sty` or `biblatex`.
+That separation is the architectural enforcement for the supported no-BibLaTeX
+CV path. The integration package may be loaded by a CV document, but neither it
+nor the external bibliography toolchain becomes a dependency of the shared
+profile or the other document classes.
+
 ## Data flow
 
 ```text
@@ -278,7 +305,7 @@ The résumé class may call shared components, but reusable contact or identity 
 
 ### `careerdossier-letter.cls`
 
-Owns industry cover-letter behavior.
+Owns industry and academic cover-letter behavior.
 
 Responsibilities:
 
@@ -288,9 +315,59 @@ Responsibilities:
 - render an optional subject;
 - render salutation and closing;
 - reuse the shared sender identity;
+- process `family=industry|academic` while preserving `industry` as the default;
 - support one-page and multi-page letters without résumé-specific compression.
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
+
+### `careerdossier-cv.cls` (Phase 2)
+
+Owns academic-CV document behavior.
+
+Responsibilities:
+
+- set US Letter CV geometry;
+- process the documented `fontsize` and `density` options;
+- render the first-page identity in the body;
+- provide a simple running header after the first page and page numbers on all
+  pages without making contact details running-only content;
+- reuse the generic section, entry, and item-list interfaces;
+- own the manual-publication list and its source-order numbering;
+- keep entries together across page breaks where practical without boxing an
+  entire long entry; and
+- preserve logical source and extraction order.
+
+The CV class must not own shared metadata, contact-link normalization,
+bibliography formatting, or font selection. A kernel page style is preferred to
+reviving the prototypes' `fancyhdr`/`lastpage` dependency solely for
+`Page n of m`; `v0.2.0` requires a page number, not a total-page count.
+
+### `careerdossier-biblatex.sty` (Phase 2, optional)
+
+Owns the supported BibLaTeX interoperability profile.
+
+Responsibilities:
+
+- load `biblatex` only when the user opts into this package;
+- configure the fixed numeric, Biber-backed, year-descending profile documented
+  in `docs/API.md`;
+- expose repeatable author-highlighting declarations;
+- implement DOI, then e-print, then URL display precedence;
+- reuse semantic monochrome typography and link tokens; and
+- report an actionable optional-dependency error when BibLaTeX is unavailable.
+
+It must not:
+
+- be loaded by `careerdossier-cv.cls`;
+- change the generic entry, list, section, or page-layout APIs;
+- make Biber necessary for manual publications or a CV without publications;
+- offer undocumented citation-style pass-through options; or
+- infer an author's bibliographic identity from the display-oriented `name`
+  profile field.
+
+Standard BibLaTeX commands continue to own resource selection, `\nocite`, and
+bibliography printing. CareerDossierTeX owns only the dossier-specific profile
+and author-emphasis extension.
 
 ## Public versus internal API
 
@@ -358,7 +435,10 @@ Key families should be separated by responsibility, for example:
 cdossier/profile
 cdossier/letter
 cdossier/resume
+cdossier/cv
 cdossier/entry
+cdossier/publication
+cdossier/biblatex
 ```
 
 Avoid one global key family that mixes profile fields, typography, page geometry, and future language settings.
@@ -756,9 +836,11 @@ careerdossier-cv.cls
 careerdossier-biblatex.sty
 ```
 
-The CV class may reuse profile, typography, theme, and components while owning multi-page academic layout.
-
-Bibliography support must remain optional.
+The CV class reuses profile, typography, theme, and components while owning
+multi-page academic layout and the no-BibLaTeX manual-publication path. The
+letter class gains its academic family without a duplicate class. Bibliography
+support remains an explicit optional package so a CV without BibLaTeX still
+builds.
 
 ### `v0.3.0` — deferred, unscheduled
 
