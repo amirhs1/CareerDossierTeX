@@ -52,9 +52,9 @@ The exact package-loading order may differ when implementation requires it, but 
 
 ## Phase 2 module graph
 
-The academic CV class is implemented on the development branch; the optional
-bibliography integration and academic letter additions remain planned. These
-additions do not change the Phase 1 dependency direction:
+The academic CV class, optional bibliography integration, and academic letter
+family are implemented on the development branch. These additions do not
+change the Phase 1 dependency direction:
 
 ```text
 careerdossier-cv.cls
@@ -725,7 +725,9 @@ All automated test material belongs under `tests/`:
   and fixed bugs;
 - `tests/smoke/` — supported document builds and required failure paths;
 - `tests/extraction/` — expected text, Unicode mapping, and reading order;
-- `tests/layout/` — long fields, multi-page content, and page-break stress.
+- `tests/layout/` — long fields, multi-page content, and page-break stress; and
+- `tests/bibliography/` — Biber-backed sorting and rendered identifier
+  precedence.
 
 User examples remain under `examples/`. CI should build them, but they are not a
 substitute for focused tests. A milestone release reruns the accumulated suite;

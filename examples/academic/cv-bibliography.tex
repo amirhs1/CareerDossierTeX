@@ -1,0 +1,27 @@
+% examples/academic/cv-bibliography.tex
+%
+% Supported v0.2 academic-CV example with the optional BibLaTeX/Biber
+% integration. Build with latexmk so Biber runs automatically:
+%
+%   latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+%     examples/academic/cv-bibliography.tex
+
+\documentclass[fontsize=11pt, density=standard]{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+
+\input{examples/profiles/profile-academic.tex}
+\addbibresource{examples/academic/publications.bib}
+
+\CDossierHighlightAuthor{
+  family = {Lovelace},
+  given  = {Ada}
+}
+
+\begin{document}
+
+\MakeCDossierHeader
+
+\nocite{*}
+\printbibliography[title={Selected Publications}]
+
+\end{document}

@@ -1,0 +1,13 @@
+% cv-biblatex-missing-dependency.tex — actionable optional-dependency failure.
+% The CV class is already loaded before this focused test substitutes the one
+% file-existence conditional used by the integration package. Package lookup
+% itself still succeeds; only its explicit BibLaTeX availability check is made
+% to take the missing-dependency branch.
+\documentclass{careerdossier-cv}
+\ExplSyntaxOn
+\cs_set_protected:Npn \file_if_exist:nF #1#2 {#2}
+\ExplSyntaxOff
+\usepackage{careerdossier-biblatex}
+\begin{document}
+This line must never render.
+\end{document}

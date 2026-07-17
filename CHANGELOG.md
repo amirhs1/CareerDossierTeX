@@ -29,6 +29,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   letter metadata, optional recipient handling, and public commands are shared
   unchanged. Academic letters derive the PDF title `Academic Cover Letter –
   <name>` and carry a print-oriented footer with the name and `Page n of N`.
+- Dependency-free manual publication lists through `CDossierPublications` and
+  `\CDossierPublication`, with source-order numbering, clean optional-field
+  punctuation, and DOI-over-URL link precedence.
+- Optional `careerdossier-biblatex` integration with the fixed numeric,
+  Biber-backed, year-descending academic profile; repeatable exact author-name
+  highlighting; DOI → e-print → URL precedence; an actionable missing-package
+  diagnostic; and a fictional Biber example built by `latexmk`, `make`, and CI.
 
 ## [0.1.1] - 2026-07-17
 

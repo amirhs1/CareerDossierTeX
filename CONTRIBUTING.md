@@ -292,14 +292,15 @@ means depends on what the module owns, so match the test type to the concern:
 - **Logic-bearing modules** — `careerdossier-base.sty` (metadata, field
   presence, separator logic) and the non-visual parts of
   `careerdossier-typography.sty` (engine checks,
-  role dispatch) — carry behavior that can be asserted directly. Write a focused
-  `l3build` regression test (`.lvt` source with a saved `.tlg` baseline) per
+  role dispatch) and `careerdossier-biblatex.sty` (author matching and fixed
+  profile behavior) — carry behavior that can be asserted directly. Write a
+  focused `l3build` regression test (`.lvt` source with a saved `.tlg` baseline) per
   module as the behavior is added, in the same rhythm as writing a `test_*.py`
   beside each Python module. This is where a pre-implementation failing test is
   usually practical and most valuable.
-- **Layout classes** — `careerdossier-resume.cls` and
-  `careerdossier-letter.cls` — own page geometry and visual result, which no
-  log diff fully captures. Cover them with smoke tests (compiles clean, expected
+- **Layout classes** — `careerdossier-resume.cls`,
+  `careerdossier-letter.cls`, and `careerdossier-cv.cls` — own page geometry and
+  visual result, which no log diff fully captures. Cover them with smoke tests (compiles clean, expected
   diagnostics), extraction tests (text present and in logical order), and a small
   set of reviewed reference PDFs. Final layout correctness stays a human visual
   check. Do not force brittle per-line-break or per-metric assertions onto a
@@ -401,6 +402,17 @@ and inside `\TEST{name}{...}` use `\TYPE{...}` to record the behavior in the log
 Catcodes cannot be switched inside an already-tokenized `\TEST` body, so any
 expl3 or `@`-bearing name must be reached through a helper defined earlier under
 `\ExplSyntaxOn`, or via `\use:c`.
+
+### BibLaTeX/Biber fixture
+
+The optional integration has a focused multi-pass fixture that runs Biber,
+rejects Biber warnings/errors, and diffs extracted output to pin `ydnt` ordering
+and DOI → e-print → URL precedence:
+
+    make bibliography-test     # or: tests/bibliography/run.sh
+
+The ordinary academic CV smoke/example path remains separate and must continue
+to compile without loading BibLaTeX or invoking Biber.
 
 ### Log inspection
 
@@ -677,8 +689,8 @@ change what runs, which would surface as an unexplained failure or an output
 shift that looks like our bug.
 
 The `toolchain` job records the TeX Live release, XeTeX, `xdvipdfmx`,
-`fontspec`, `l3build`, and default-font paths that a run actually used, and
-uploads them as the `toolchain-record` artifact. Read that artifact to learn
+`fontspec`, `l3build`, BibLaTeX/Biber, and default-font paths that a run actually
+used, and uploads them as the `toolchain-record` artifact. Read that artifact to learn
 which release a digest resolves to.
 
 ### Bumping the pinned TeX Live image

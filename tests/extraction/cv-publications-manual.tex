@@ -1,0 +1,35 @@
+% cv-publications-manual.tex — source order, optional punctuation, and links.
+\documentclass{careerdossier-cv}
+\CDossierSetup{name={Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace and Grace Hopper},
+    title   = {Reliable Analytical Engines},
+    venue   = {Journal of Example Computing},
+    date    = {2026},
+    doi     = {10.9999/example.2026.1},
+    url     = {example.invalid/fallback-must-not-print},
+    note    = {Peer reviewed}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {A Source-Order Publication},
+    date    = {2025},
+    url     = {example.invalid/source-order}
+  }
+  \CDossierPublication{
+    authors = {Grace Hopper},
+    title   = {A Minimal Publication}
+  }
+\end{CDossierPublications}
+\CDossierSection{Selected Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {Numbering Restarts at One}
+  }
+\end{CDossierPublications}
+\end{document}

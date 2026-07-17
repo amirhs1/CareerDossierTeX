@@ -1,0 +1,10 @@
+% cv-bibliography.tex — Biber sorting and identifier-precedence fixture.
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{publications.bib}
+\CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
+\CDossierSetup{name={Ada Lovelace}}
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}

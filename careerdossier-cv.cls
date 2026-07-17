@@ -17,9 +17,10 @@
 %%
 %% careerdossier-cv owns the v0.2 academic-CV vertical slice: Letter geometry,
 %% density, multi-page flow, running headers, page numbers, and CV-local
-%% section/entry/list spacing. Shared profile, links, and typography remain in
-%% the corresponding shared modules. Bibliography support is intentionally not
-%% loaded here; a CV without publications must build without BibLaTeX or Biber.
+%% section/entry/list spacing, including the dependency-free manual-publication
+%% list. Shared profile, links, typography, and BibLaTeX formatting remain in
+%% their corresponding modules. BibLaTeX is intentionally not loaded here; a
+%% CV without an external bibliography must build without BibLaTeX or Biber.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-cv} {2026-07-17} {0.2.0}
@@ -212,5 +213,180 @@
       ]
   }
   { \end { itemize } }
+
+%% ---------------------------------------------------------------------------
+%% Manual publications.
+%%
+%% This source-order list belongs to the CV class because it is ordinary CV
+%% content, not bibliography-database interoperability. It deliberately uses no
+%% BibLaTeX command, so users can maintain a small publication list without
+%% installing BibLaTeX or running Biber.
+%% ---------------------------------------------------------------------------
+\bool_new:N \l__cdossier_cv_publications_active_bool
+\tl_new:N   \l__cdossier_cv_publication_authors_tl
+\tl_new:N   \l__cdossier_cv_publication_title_tl
+\tl_new:N   \l__cdossier_cv_publication_venue_tl
+\tl_new:N   \l__cdossier_cv_publication_date_tl
+\tl_new:N   \l__cdossier_cv_publication_doi_tl
+\tl_new:N   \l__cdossier_cv_publication_url_tl
+\tl_new:N   \l__cdossier_cv_publication_note_tl
+\tl_new:N   \l__cdossier_cv_publication_target_tl
+\str_new:N  \l__cdossier_cv_publication_target_str
+\seq_new:N  \l__cdossier_cv_publication_details_seq
+
+\msg_new:nnnn { careerdossier-cv } { publication-outside-list }
+  { \c_backslash_str CDossierPublication~may~only~be~used~inside~CDossierPublications. }
+  {
+    Wrap~publication~entries~in~
+    \c_backslash_str begin\c_left_brace_str CDossierPublications\c_right_brace_str
+    ~...~
+    \c_backslash_str end\c_left_brace_str CDossierPublications\c_right_brace_str .
+  }
+\msg_new:nnnn { careerdossier-cv } { publication-missing-field }
+  { A~manual~publication~is~missing~its~required~'#1'~field. }
+  {
+    Every~\c_backslash_str CDossierPublication~needs~nonblank~'authors'~and~
+    'title'~keys.
+  }
+\msg_new:nnnn { careerdossier-cv } { unknown-publication-key }
+  { Unknown~\c_backslash_str CDossierPublication~key~'#1'. }
+  { The~supported~keys~are:~authors,~title,~venue,~date,~doi,~url,~note. }
+
+\keys_define:nn { cdossier / publication }
+  {
+    authors .tl_set:N = \l__cdossier_cv_publication_authors_tl ,
+    title   .tl_set:N = \l__cdossier_cv_publication_title_tl ,
+    venue   .tl_set:N = \l__cdossier_cv_publication_venue_tl ,
+    date    .tl_set:N = \l__cdossier_cv_publication_date_tl ,
+    doi     .tl_set:N = \l__cdossier_cv_publication_doi_tl ,
+    url     .tl_set:N = \l__cdossier_cv_publication_url_tl ,
+    note    .tl_set:N = \l__cdossier_cv_publication_note_tl ,
+    unknown .code:n =
+      { \msg_error:nnx { careerdossier-cv } { unknown-publication-key } { \l_keys_key_str } } ,
+  }
+
+\cs_new_protected:Npn \__cdossier_cv_publication_clear:
+  {
+    \tl_clear:N \l__cdossier_cv_publication_authors_tl
+    \tl_clear:N \l__cdossier_cv_publication_title_tl
+    \tl_clear:N \l__cdossier_cv_publication_venue_tl
+    \tl_clear:N \l__cdossier_cv_publication_date_tl
+    \tl_clear:N \l__cdossier_cv_publication_doi_tl
+    \tl_clear:N \l__cdossier_cv_publication_url_tl
+    \tl_clear:N \l__cdossier_cv_publication_note_tl
+  }
+
+\cs_new_protected:Npn \__cdossier_cv_publication_trim:
+  {
+    \tl_trim_spaces:N \l__cdossier_cv_publication_authors_tl
+    \tl_trim_spaces:N \l__cdossier_cv_publication_title_tl
+    \tl_trim_spaces:N \l__cdossier_cv_publication_venue_tl
+    \tl_trim_spaces:N \l__cdossier_cv_publication_date_tl
+    \tl_trim_spaces:N \l__cdossier_cv_publication_doi_tl
+    \tl_trim_spaces:N \l__cdossier_cv_publication_url_tl
+    \tl_trim_spaces:N \l__cdossier_cv_publication_note_tl
+  }
+
+%% Normalize a DOI or fallback URL target while leaving the displayed value
+%% unchanged. A DOI may be a bare identifier, doi.org path, or complete URL.
+\cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
+  {
+    \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
+    \str_set:NV \l__cdossier_cv_publication_target_str
+      \l__cdossier_cv_publication_target_tl
+    \str_if_in:NnF \l__cdossier_cv_publication_target_str { :// }
+      {
+        \str_if_eq:nnTF {#1} { DOI }
+          {
+            \str_if_in:NnTF \l__cdossier_cv_publication_target_str { doi.org/ }
+              { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https:// } }
+              { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https://doi.org/ } }
+          }
+          { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https:// } }
+      }
+    \cs_if_exist:NTF \href
+      {
+        \href { \l__cdossier_cv_publication_target_tl }
+          { #1:\nobreakspace \nolinkurl {#2} }
+      }
+      { #1:\nobreakspace #2 }
+  }
+
+\cs_new_protected:Npn \__cdossier_cv_publication_render:
+  {
+    \item
+    \tl_use:N \l__cdossier_cv_publication_authors_tl .\space
+    \emph { \tl_use:N \l__cdossier_cv_publication_title_tl } .
+    \seq_clear:N \l__cdossier_cv_publication_details_seq
+    \tl_if_blank:VF \l__cdossier_cv_publication_venue_tl
+      {
+        \seq_put_right:NV \l__cdossier_cv_publication_details_seq
+          \l__cdossier_cv_publication_venue_tl
+      }
+    \tl_if_blank:VF \l__cdossier_cv_publication_date_tl
+      {
+        \seq_put_right:NV \l__cdossier_cv_publication_details_seq
+          \l__cdossier_cv_publication_date_tl
+      }
+    \seq_if_empty:NF \l__cdossier_cv_publication_details_seq
+      { \space \seq_use:Nn \l__cdossier_cv_publication_details_seq { ,~ } . }
+    \tl_if_blank:VF \l__cdossier_cv_publication_note_tl
+      { \space \tl_use:N \l__cdossier_cv_publication_note_tl . }
+    %% DOI wins when both identifiers are present; URL is the fallback.
+    \tl_if_blank:VTF \l__cdossier_cv_publication_doi_tl
+      {
+        \tl_if_blank:VF \l__cdossier_cv_publication_url_tl
+          {
+            \space
+            \exp_args:NnV \__cdossier_cv_publication_link:nn { URL }
+              \l__cdossier_cv_publication_url_tl
+          }
+      }
+      {
+        \space
+        \exp_args:NnV \__cdossier_cv_publication_link:nn { DOI }
+          \l__cdossier_cv_publication_doi_tl
+      }
+  }
+
+\NewDocumentEnvironment { CDossierPublications } { }
+  {
+    \bool_set_true:N \l__cdossier_cv_publications_active_bool
+    \begin { enumerate }
+      [
+        label      = \textbf { \arabic*) } ,
+        leftmargin = * ,
+        labelsep   = 0.6em ,
+        topsep     = \l__cdossier_cv_itemtop_skip ,
+        itemsep    = \l__cdossier_cv_itemsep_skip ,
+        parsep     = 0pt ,
+      ]
+  }
+  {
+    \end { enumerate }
+    \bool_set_false:N \l__cdossier_cv_publications_active_bool
+  }
+
+\NewDocumentCommand \CDossierPublication { m }
+  {
+    \bool_if:NTF \l__cdossier_cv_publications_active_bool
+      {
+        \__cdossier_cv_publication_clear:
+        \keys_set:nn { cdossier / publication } {#1}
+        \__cdossier_cv_publication_trim:
+        \tl_if_blank:VT \l__cdossier_cv_publication_authors_tl
+          {
+            \msg_error:nnn { careerdossier-cv }
+              { publication-missing-field } { authors }
+          }
+        \tl_if_blank:VT \l__cdossier_cv_publication_title_tl
+          {
+            \msg_error:nnn { careerdossier-cv }
+              { publication-missing-field } { title }
+          }
+        \__cdossier_cv_publication_render:
+      }
+      { \msg_error:nn { careerdossier-cv } { publication-outside-list } }
+  }
 
 \endinput
