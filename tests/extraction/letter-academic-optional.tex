@@ -1,0 +1,11 @@
+% Academic family extraction and optional recipient-field fixture.
+\documentclass[family=academic]{careerdossier-letter}
+\CDossierSetup{name = {Ada Lovelace}, headline = {Researcher in Analytical Computing}, email = {ada@example.com}, scholar = {scholar.google.com/citations?user=ada}}
+\CDossierLetterSetup{date = {17 July 2026}, recipient-name = {Professor Grace Hopper}, recipient-organization = {Example University}, salutation = {Dear Professor Hopper,}}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Assistant Professor position.
+
+\MakeCDossierClosing
+\end{document}

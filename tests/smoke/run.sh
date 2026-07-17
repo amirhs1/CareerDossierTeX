@@ -45,6 +45,8 @@ cases=(
   "cv-unknown-option fail|Unknown class option 'paper'"
   "cv-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "letter-valid pass"
+  "letter-academic-valid pass"
+  "letter-bad-family fail|only accepts predefined values"
   "letter-no-subject pass"
   "letter-missing-name fail|required profile field 'name' is not"
   "letter-unknown-option fail|Unknown class option 'paper'"
