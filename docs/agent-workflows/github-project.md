@@ -121,6 +121,7 @@ Use only labels already defined by `scripts/setup-labels.sh`.
 | Typography implementation | `type:feature`, `area:typography` |
 | GitHub Actions change | `type:ci`, `area:build` |
 | Theme restructuring without behavior change | `type:refactor`, `area:theme` |
+| Claude Code / Codex agent tooling or sandbox config | `type:ci`, `area:agents` |
 
 A PR may have several area labels but should normally have exactly one primary
 type label.

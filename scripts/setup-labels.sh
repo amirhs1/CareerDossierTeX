@@ -53,6 +53,7 @@ upsert_label "area:theme" "Colors, rules, visual tokens, or theme options" "d4c5
 upsert_label "area:components" "Shared document parts such as headers, contact lines, and entries" "d4c5f9"
 upsert_label "area:build" "Local builds, Makefile, latexmk, artifacts, or build scripts" "f9d0c4"
 upsert_label "area:documentation" "README, API docs, architecture docs, roadmap, changelog, or migration notes" "0075ca"
+upsert_label "area:agents" "Claude Code, Codex, or other AI-agent tooling, sandbox, or workflow configuration" "ededed"
 
 # ------------------------------------------------------------
 # State and contributor labels
