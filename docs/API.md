@@ -2,31 +2,37 @@
 
 ## Status
 
-This document defines the public interface for:
+This document records two API layers:
 
 ```text
-v0.1.0 — English Industry Dossier
+Current: v0.1.1 — English Industry Dossier plus maintenance corrections
+Planned contract: v0.2.0 — Academic Dossier
 ```
 
-Every command and option below is implemented, exercised by the supported
-examples, and covered by the committed test suites. Before `v1.0.0` the
-interface may still change between minor versions; such changes are recorded in
-[`../CHANGELOG.md`](../CHANGELOG.md) and [`MIGRATION.md`](MIGRATION.md).
+Sections that are not explicitly marked as planned describe implemented behavior
+exercised by the supported examples and committed test suites. The marked
+`v0.2.0` section is the accepted implementation contract for issues #44--#46;
+it must not be presented as shipped behavior until those issues land. Before
+`v1.0.0` the interface may still change between minor versions; such changes are
+recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
+[`MIGRATION.md`](MIGRATION.md).
 
 The API is intentionally small. Internal helper commands are not public merely because they are technically accessible.
 
 ## Supported configuration
 
-| Setting | `v0.1.0` support |
-|---|---|
-| Engine | XeLaTeX only |
-| Language | English |
-| Paper | US Letter |
-| Theme | Monochrome |
-| Résumé class | `careerdossier-resume` |
-| Letter class | `careerdossier-letter` |
-| Bibliography | Not supported |
-| RTL or bilingual layout | Not supported |
+| Setting | Current support | Planned `v0.2.0` addition |
+|---|---|---|
+| Engine | XeLaTeX only | Unchanged |
+| Language | English | Unchanged |
+| Paper | US Letter | Unchanged |
+| Theme | Monochrome | Unchanged |
+| Résumé class | `careerdossier-resume` | Unchanged |
+| CV class | Not supported | `careerdossier-cv` |
+| Letter class | `careerdossier-letter`, industry family | Academic family |
+| Bibliography | Not supported | Optional `careerdossier-biblatex` |
+| Manual publications | Not supported | Built into the CV class |
+| RTL or bilingual layout | Not supported | Unchanged |
 
 ## Loading the classes
 
@@ -418,6 +424,220 @@ The typography package may expose semantic style commands for internal and advan
 These commands describe meaning rather than a particular font family, weight, or size.
 
 Their visual definitions may evolve before `v1.0.0`.
+
+## `v0.2.0` academic API contract (planned, not yet implemented)
+
+This section is normative for the `v0.2.0` implementation issues, but it does
+not describe currently shipped behavior. The implementation must preserve the
+existing résumé and industry-letter interface unless an incompatibility is
+separately approved and documented.
+
+### Academic CV class
+
+Load the academic CV with:
+
+```latex
+\documentclass[
+  fontsize=11pt,
+  density=standard
+]{careerdossier-cv}
+```
+
+The class accepts the same value sets as the résumé class:
+
+| Option | Accepted values | CV default |
+|---|---|---|
+| `fontsize` | `10pt`, `11pt` | `11pt` |
+| `density` | `compact`, `standard` | `standard` |
+
+US Letter paper, English, and the monochrome theme remain fixed. Unsupported
+options or values must produce an actionable class error rather than being
+ignored.
+
+The first page renders the ordinary dossier header in the document body. Page
+numbers appear on every page, and pages after the first receive a simple running
+header derived from `name`; contact information must not exist only in running
+material. The running header and page number are fixed CV behavior in `v0.2.0`,
+not new user-configurable style options.
+
+The CV reuses the existing public content interface:
+
+```latex
+\MakeCDossierHeader
+\CDossierSection{Academic Appointments}
+
+\begin{CDossierEntry}[
+  title        = {Assistant Professor},
+  organization = {Example University},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Research and teaching summary.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+```
+
+Education, appointments, research, teaching, grants, awards, presentations, and
+service use `CDossierEntry`; `v0.2.0` does not add one command per section type.
+This keeps content semantic without reviving the prototype-only
+`\EducationItem`, `\GrantItem`, or `\PresentationItem` interfaces.
+
+### Academic profile metadata
+
+The shared profile gains one key:
+
+| Key | Required | Purpose |
+|---|---:|---|
+| `orcid` | No | ORCID identifier or profile URL |
+
+`scholar` remains the existing optional Google Scholar key. A CV may use both:
+
+```latex
+\CDossierSetup{
+  name    = {Amir Sadeghi},
+  scholar = {https://scholar.google.com/citations?user=example},
+  orcid   = {0000-0002-1825-0097}
+}
+```
+
+ORCID must be displayed as ordinary text with a descriptive `ORCID:` label and
+a web link. A bare identifier is normalized to an `https://orcid.org/` target;
+a complete URL is used as supplied. Scholar and ORCID are omitted independently
+when blank and must not leave separators, blank lines, or icon-only content.
+
+The CV derives `/Title` as `Curriculum Vitae – <name>`, `/Author` from `name`,
+and `/Lang` as `en`, subject to the existing `\hypersetup` precedence rule.
+
+### Manual publication entries
+
+Manual publications require no bibliography package or Biber run:
+
+```latex
+\CDossierSection{Publications}
+
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Amir Sadeghi and Jane Example},
+    title   = {A Demonstration Article},
+    venue   = {Journal of Examples},
+    date    = {2026},
+    doi     = {10.9999/example.2026.1}
+  }
+\end{CDossierPublications}
+```
+
+`CDossierPublications` creates a numbered list in source order and resets its
+counter on entry. `\CDossierPublication` is valid only inside that environment.
+
+| Key | Required | Purpose |
+|---|---:|---|
+| `authors` | Yes | Display-order author list |
+| `title` | Yes | Publication title |
+| `venue` | No | Journal, book, conference, or publisher |
+| `date` | No | Year or display date |
+| `doi` | No | DOI value or complete DOI URL |
+| `url` | No | Fallback public URL |
+| `note` | No | Short status or contribution note |
+
+Missing optional values must collapse cleanly. When both `doi` and `url` are
+present, DOI is the displayed link and URL is the fallback; `v0.2.0` does not
+offer a style option for changing that precedence.
+
+### Optional BibLaTeX and Biber integration
+
+The CV class does not load `biblatex`. Opt in explicitly:
+
+```latex
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+
+\addbibresource{publications.bib}
+\CDossierHighlightAuthor{
+  family = {Sadeghi},
+  given  = {Amir}
+}
+
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}
+```
+
+The integration package loads and configures `biblatex`; standard BibLaTeX
+commands remain the public resource-selection and printing interface. Its one
+supported `v0.2.0` profile is fixed:
+
+```text
+backend=biber
+style=numeric
+sorting=ydnt
+```
+
+Entries are numbered, sorted year-descending/name/title, and show at most one
+preferred public identifier in this order: DOI, e-print, URL. The package uses
+monochrome link styling and must not redefine unrelated document lists or
+headings globally.
+
+`\CDossierHighlightAuthor` may be repeated for spelling or initial variants.
+It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and
+does not alter citations. Both keys are required; an incomplete declaration
+must produce an actionable package error.
+
+Loading `careerdossier-biblatex` when `biblatex` is unavailable must report the
+missing optional dependency and explain that the user may either install
+BibLaTeX/Biber or use `CDossierPublications`. A CV that does not load the
+integration package must build without `biblatex` or Biber.
+
+### Academic cover-letter family
+
+The academic family extends the existing class:
+
+```latex
+\documentclass[family=academic]{careerdossier-letter}
+```
+
+`family` accepts `industry` and `academic`; its default remains `industry`, so
+existing documents are unchanged. The academic family reuses
+`\CDossierLetterSetup`, `\MakeCDossierLetterhead`, and
+`\MakeCDossierClosing`, including the current recipient, salutation, subject,
+closing, and sender-metadata behavior. Optional recipient and academic profile
+fields collapse independently.
+
+The family may change letter-owned spacing and derives `/Title` as
+`Academic Cover Letter – <name>`. It does not introduce new recipient keys or
+change the industry family's defaults. Unknown family values must produce an
+actionable class error.
+
+### Explicitly unsupported in `v0.2.0`
+
+The academic release does not support:
+
+- pdfLaTeX or LuaLaTeX;
+- Farsi, bilingual, or RTL documents;
+- A4 paper;
+- color themes, font presets, icons, or bundled fonts;
+- statement classes;
+- alternate bibliography or citation styles;
+- automatic import from ORCID, Scholar, DOI services, or external APIs; or
+- a PDF/UA or broad ATS-compatibility claim.
+
+### Compatibility with `v0.1.x`
+
+The `v0.2.0` additions are intentionally additive:
+
+- `careerdossier-resume` keeps its options, defaults, commands, and no-folio
+  behavior;
+- `careerdossier-letter` defaults to `family=industry` and retains its existing
+  setup keys and English defaults;
+- `orcid` is an optional shared-profile key, and existing profiles need no edit;
+- the CV reuses the existing generic section, entry, and list interfaces; and
+- bibliography behavior is activated only by loading
+  `careerdossier-biblatex`.
+
+Any implementation that requires a different public command, default, or
+compatibility outcome must update this contract and `MIGRATION.md` with the
+design decision before the behavior is merged.
 
 ## Colors and theme tokens
 

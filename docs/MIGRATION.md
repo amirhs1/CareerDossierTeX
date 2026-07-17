@@ -2,13 +2,14 @@
 
 ## Status
 
-No `CareerDossierTeX` release has been published yet, so no public command, key,
-class option, or default has been renamed or removed.
+`v0.1.1` is the current release. No released public command, key, class option,
+or default has yet been renamed or removed.
 
 The pre-release prototypes inventoried below are **not** a published API. They are
-recorded here so that the `v0.1.0` implementation can preserve the strongest
-existing design while deliberately diverging from it where the Phase 1 scope
-(XeLaTeX, English, US Letter, monochrome, ATS-conscious) requires.
+recorded here so that the released industry implementation and the planned
+`v0.2.0` academic implementation can preserve the strongest existing design
+while deliberately diverging where the supported scope (XeLaTeX, English, US
+Letter, monochrome, extraction-conscious) requires.
 
 ## Purpose
 
@@ -32,7 +33,7 @@ preserving the strongest existing implementations before refactoring.
 |---|---|---|---|
 | Résumé | `resume_modern.cls` | `resume_legacy.cls` | Phase 1 (`v0.1.0`) |
 | Industry cover letter | `cover_letter_no_website_black_white-underlined_links.cls` | — | Phase 1 (`v0.1.0`) |
-| Academic CV | `cv-v2-no_website-no_color.cls` (monochrome) | `cv-v1.cls` (colour) | Deferred to `v0.2.0` |
+| Academic CV | `cv-v2-no_website-no_color.cls` (monochrome) | `cv-v1.cls` (colour) | Phase 2 (`v0.2.0`) |
 
 Notes:
 
@@ -81,10 +82,10 @@ disposition:
 | `pifont` | most | Drop — decorative symbols |
 | `multicol` | most | Drop — no multi-column body |
 | `tabularx` | `resume_modern` | Drop — no table layout for fields |
-| `fancyhdr`, `lastpage` | all | Drop for résumé default — no running header/footer |
-| `etaremune` | all | Defer — reverse-numbered lists are academic |
-| `biblatex` + `biber` | all | Defer to `v0.2.0` — bibliography |
-| `pgffor` | all | Defer — supports the biblatex name-bolding macro |
+| `fancyhdr`, `lastpage` | all | Do not revive for `v0.2.0`; CV uses a class-owned kernel page style and does not promise total-page counts |
+| `etaremune` | all | Drop — academic entries and manual publications retain explicit source order |
+| `biblatex` + `biber` | all | Keep only behind optional `careerdossier-biblatex`; never a CV-class dependency |
+| `pgffor` | all | Drop — author matching belongs in the optional integration package without a general loop dependency |
 | `polyglossia`, `datetime2` | letter | Drop — `v0.1.0` is English-only; the letter date is a plain `date` key |
 | `graphicx` | `resume_modern` | Drop from default — no images |
 
@@ -138,6 +139,28 @@ released-API rename log; released renames use the entry format below.
 | `[11pt,letterpaper,compact]` | `[fontsize=11pt, density=compact]` | `paper`/`language`/`theme` fixed in `v0.1.0` |
 | Merriweather / Barlow Condensed / Liberation Mono | TeX Gyre Termes (body) / TeX Gyre Heros (headings) | Redistributable TeX Live fonts; mono reserved |
 | Paul Tol colours, coloured links | Monochrome theme tokens, black links | Colour carries no meaning in Phase 1 |
+
+## Academic prototype → planned `v0.2.0` public API mapping
+
+This table is the compatibility analysis for the accepted academic API contract
+in [`docs/API.md`](API.md). The left-hand interfaces were private prototypes and
+do not receive deprecation aliases.
+
+| Prototype interface | Planned `v0.2.0` interface | Notes |
+|---|---|---|
+| `\documentclass{cv-v1}` / `cv-v2-no_website-no_color` | `\documentclass{careerdossier-cv}` | One supported, monochrome academic class; `fontsize` and `density` use the established option syntax |
+| `\Profile[fullname=…, scholar=…, address=…]` | `\CDossierSetup{name=…, scholar=…, orcid=…, location=…}` + `\MakeCDossierHeader` | Shared with industry documents; icons and `update` are not restored |
+| `\EducationItem`, `\ExperienceItem`, `\CertificateItem`, `\TeachingExperienceItem`, `\ProjectItem`, `\GrantItem`, `\PresentationItem` | `CDossierEntry[…]` (+ `CDossierItemize`) | One extensible semantic entry replaces per-section commands; grant amounts and presentation modes may be content or entry-body text |
+| Manually maintained publication prose | `CDossierPublications` + `\CDossierPublication{…}` | Numbered source-order list; no BibLaTeX/Biber dependency |
+| Class-level unconditional `\RequirePackage{biblatex}` | Explicit `\usepackage{careerdossier-biblatex}` | Opt-in boundary guarantees that an ordinary CV builds without BibLaTeX |
+| `\mynames{family/given,…}` | Repeatable `\CDossierHighlightAuthor{family={…}, given={…}}` | Named keys replace slash parsing and reversed duplicate spellings |
+| Prototype `\addbibresource`, `\nocite`, `\printbibliography` | Same standard BibLaTeX commands | CareerDossierTeX configures one supported profile instead of wrapping resource selection |
+| `style=numeric, backend=biber, sorting=ydnt` | Fixed optional integration profile | Preserved from the maintainer's academic reference |
+| Global `doi+eprint+url` override | Integration-local DOI → e-print → URL precedence | Must not affect documents that do not load the integration package |
+| `Page n of m` via `fancyhdr`/`lastpage` | Running name header after page one plus `Page n` | Meets the milestone requirement without a total-page dependency or extra reference pass |
+| `family=industry` fixed in the letter prototype | `family=industry|academic`, default `industry` | Additive; existing industry letters remain unchanged |
+| Bundled Merriweather / Barlow Condensed / Liberation fonts | Existing TeX Gyre semantic typography roles | No new font assets or font presets in `v0.2.0` |
+| Font Awesome icons and coloured links | Visible text labels and monochrome links | Scholar, ORCID, DOI, and contact meaning remains present without icons or colour |
 
 ## Entry format
 
