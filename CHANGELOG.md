@@ -8,6 +8,23 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- `careerdossier-cv`: the unreleased English academic-CV class. It provides US
+  Letter, monochrome, multi-page CV layout with `fontsize` (`10pt` or `11pt`;
+  default `11pt`) and `density` (`compact` or `standard`; default `standard`).
+  The first page uses the shared dossier header; subsequent pages carry a
+  name-derived running header, and every page has a `Page n` folio. The class
+  uses the existing section, entry, and list interface and does not load
+  BibLaTeX or require Biber.
+- Optional shared-profile `orcid` metadata. It renders as descriptive visible
+  text and a link; bare identifiers resolve through `https://orcid.org/` while
+  complete URLs retain their scheme. Academic profiles can therefore be shared
+  with the existing résumé without leaving stray contact separators.
+- A supported academic-CV example, shared academic profile, CV smoke and
+  extraction fixtures, and long-field/two-page layout checks. CI and `make`
+  now build the academic-CV example.
+
 ## [0.1.1] - 2026-07-17
 
 ### Added

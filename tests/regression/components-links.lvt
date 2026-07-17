@@ -3,8 +3,9 @@
 % The visible contact text is checked by the extraction fixtures; pdftotext
 % cannot see a link's href target, so the target normalization is checked here
 % instead. Covers: web profiles gain an https:// scheme only when none is
-% present, an existing scheme is preserved, email becomes a mailto: target, and
-% the link wrapper degrades to plain visible text when hyperref is absent.
+% present, an existing scheme is preserved, email becomes a mailto: target,
+% ORCID identifiers gain their canonical resolver URL, and the link wrapper
+% degrades to plain visible text when hyperref is absent.
 %
 % Each helper is defined under \ExplSyntaxOn so the private names tokenize
 % correctly; catcodes cannot be switched inside a \TEST body. A field is cleared
@@ -29,6 +30,13 @@
     \__cdossier_components_mail:n { email }
     \TYPE{ [\l__cdossier_components_url_tl] }
   }
+\cs_new_protected:Npn \cdossiertestOrcidTarget #1
+  {
+    \CDossierSetup{ orcid = {} }
+    \CDossierSetup{ orcid = {#1} }
+    \__cdossier_components_orcid:
+    \TYPE{ [\l__cdossier_components_url_tl] }
+  }
 \cs_new_protected:Npn \cdossiertestHrefBranch
   {
     \cs_if_exist:NTF \href
@@ -50,6 +58,14 @@
 
 \TEST{email-becomes-mailto-target}{
   \cdossiertestMailTarget{ada@example.com}
+}
+
+\TEST{orcid-identifier-gains-canonical-resolver-target}{
+  \cdossiertestOrcidTarget{0000-0002-1825-0097}
+}
+
+\TEST{orcid-url-preserves-existing-scheme}{
+  \cdossiertestOrcidTarget{https://orcid.org/0000-0002-1825-0097}
 }
 
 \TEST{link-degrades-without-hyperref}{

@@ -1,0 +1,56 @@
+% cv-two-page.tex — long academic CV stress fixture. It must span pages, retain
+% logical entry order, and expose the class's running-header and folio behavior.
+\documentclass[fontsize=11pt, density=standard]{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Researcher in Analytical Computing},
+  email    = {ada.lovelace@example.com},
+  location = {Toronto, Ontario, Canada},
+  scholar  = {scholar.google.com/citations?user=ada-lovelace},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Academic Appointments}
+\begin{CDossierEntry}[title = {Associate Professor of Computational Mathematics}, organization = {Example University}, location = {Toronto, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Lead a research program on numerically stable models for coupled nonlinear systems and reproducible computational methods.
+    \item Supervise graduate researchers, coordinate collaborations, and maintain open course materials for advanced scientific-computing instruction.
+    \item Develop validation practices that connect research code, methods papers, datasets, and durable technical documentation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Postdoctoral Fellow}, organization = {Institute for Applied Analysis}, location = {Waterloo, ON}, dates = {2021--2024}]
+  \begin{CDossierItemize}
+    \item Built reduced-order models and simulation workflows for multi-scale physical systems with explicit uncertainty analysis.
+    \item Published reproducible computational studies and organized seminars connecting applied mathematics, physics, and software engineering.
+    \item Mentored students through research design, code review, and clear academic writing.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\CDossierSection{Education}
+\begin{CDossierEntry}[title = {Ph.D. in Computational Science}, organization = {Example University}, location = {Toronto, ON}, dates = {2016--2021}]
+  Dissertation: Reliable numerical methods for coupled nonlinear waves.
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {M.Sc. in Applied Mathematics}, organization = {Example University}, location = {Ottawa, ON}, dates = {2014--2016}]
+  Thesis: Finite-difference simulations of two-dimensional phase interfaces.
+\end{CDossierEntry}
+\CDossierSection{Teaching}
+\begin{CDossierEntry}[title = {Sessional Instructor}, organization = {MATH 2410: Differential Equations}, location = {Example University}, dates = {Winter 2025}]
+  \begin{CDossierItemize}
+    \item Designed accessible assessments, published worked examples, and supported a cohort of students with varied mathematical backgrounds.
+    \item Coordinated teaching assistants and used structured feedback to refine lecture sequencing and practice materials.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Teaching Assistant}, organization = {Department of Mathematics and Statistics}, location = {Example University}, dates = {2016--2021}]
+  \begin{CDossierItemize}
+    \item Supported thirteen courses across calculus, differential equations, numerical analysis, physics, and introductory programming.
+    \item Facilitated tutorials, office hours, and individualized feedback while maintaining consistent grading standards.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\CDossierSection{Grants and Service}
+\begin{CDossierEntry}[title = {Postdoctoral Research Fellowship}, organization = {Example Research Council}, location = {Canada}, dates = {2024--2026}]
+  Award supporting research on reliable reduced-order modelling and training activities for early-career researchers.
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Graduate Student Representative}, organization = {Departmental Curriculum Committee}, location = {Example University}, dates = {2019--2021}]
+  Represented graduate students in curriculum review, mentoring, and outreach planning.
+\end{CDossierEntry}
+\end{document}

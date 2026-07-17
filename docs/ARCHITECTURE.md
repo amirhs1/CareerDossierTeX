@@ -50,10 +50,11 @@ careerdossier-letter.cls
 
 The exact package-loading order may differ when implementation requires it, but dependency direction should remain one-way. Shared packages must not depend on the résumé or letter classes.
 
-## Phase 2 target module graph
+## Phase 2 module graph
 
-The academic release adds one document class and one optional integration
-package without changing the Phase 1 dependency direction:
+The academic CV class is implemented on the development branch; the optional
+bibliography integration and academic letter additions remain planned. These
+additions do not change the Phase 1 dependency direction:
 
 ```text
 careerdossier-cv.cls
@@ -320,7 +321,7 @@ Responsibilities:
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
 
-### `careerdossier-cv.cls` (Phase 2)
+### `careerdossier-cv.cls` (Phase 2, implemented on the development branch)
 
 Owns academic-CV document behavior.
 

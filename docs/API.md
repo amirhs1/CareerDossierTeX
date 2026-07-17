@@ -5,14 +5,13 @@
 This document records two API layers:
 
 ```text
-Current: v0.1.1 — English Industry Dossier plus maintenance corrections
-Planned contract: v0.2.0 — Academic Dossier
+Released: v0.1.1 — English Industry Dossier plus maintenance corrections
+Development: selected v0.2.0 Academic Dossier behavior (not yet released)
 ```
 
-Sections that are not explicitly marked as planned describe implemented behavior
-exercised by the supported examples and committed test suites. The marked
-`v0.2.0` section is the accepted implementation contract for issues #44--#46;
-it must not be presented as shipped behavior until those issues land. Before
+Sections that are not explicitly marked as planned describe released behavior.
+The `v0.2.0` section distinguishes development behavior from the remaining
+planned work; neither is shipped until the release is tagged. Before
 `v1.0.0` the interface may still change between minor versions; such changes are
 recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
 [`MIGRATION.md`](MIGRATION.md).
@@ -21,17 +20,17 @@ The API is intentionally small. Internal helper commands are not public merely b
 
 ## Supported configuration
 
-| Setting | Current support | Planned `v0.2.0` addition |
+| Setting | Released support | `v0.2.0` development / planned addition |
 |---|---|---|
 | Engine | XeLaTeX only | Unchanged |
 | Language | English | Unchanged |
 | Paper | US Letter | Unchanged |
 | Theme | Monochrome | Unchanged |
 | Résumé class | `careerdossier-resume` | Unchanged |
-| CV class | Not supported | `careerdossier-cv` |
+| CV class | Not supported | `careerdossier-cv` implemented on the development branch |
 | Letter class | `careerdossier-letter`, industry family | Academic family |
 | Bibliography | Not supported | Optional `careerdossier-biblatex` |
-| Manual publications | Not supported | Built into the CV class |
+| Manual publications | Not supported | Planned |
 | RTL or bilingual layout | Not supported | Unchanged |
 
 ## Loading the classes
@@ -167,6 +166,7 @@ This command stores profile metadata for use by both document classes.
 | `linkedin` | No | LinkedIn URL or profile path |
 | `github` | No | GitHub URL or profile path |
 | `scholar` | No | Google Scholar profile URL or identifier |
+| `orcid` | No | ORCID identifier or profile URL |
 
 Whitespace-only values should be treated as missing.
 
@@ -425,12 +425,14 @@ These commands describe meaning rather than a particular font family, weight, or
 
 Their visual definitions may evolve before `v1.0.0`.
 
-## `v0.2.0` academic API contract (planned, not yet implemented)
+## `v0.2.0` academic API contract
 
-This section is normative for the `v0.2.0` implementation issues, but it does
-not describe currently shipped behavior. The implementation must preserve the
-existing résumé and industry-letter interface unless an incompatibility is
-separately approved and documented.
+This section does not describe released behavior. The academic CV and its ORCID
+profile field are implemented and covered by the supported development example
+and tests. Manual publications, the optional BibLaTeX integration, and the
+academic letter remain planned. The implementation must preserve the existing
+résumé and industry-letter interface unless an incompatibility is separately
+approved and documented.
 
 ### Academic CV class
 
@@ -509,7 +511,7 @@ when blank and must not leave separators, blank lines, or icon-only content.
 The CV derives `/Title` as `Curriculum Vitae – <name>`, `/Author` from `name`,
 and `/Lang` as `en`, subject to the existing `\hypersetup` precedence rule.
 
-### Manual publication entries
+### Manual publication entries (planned)
 
 Manual publications require no bibliography package or Biber run:
 
@@ -544,7 +546,7 @@ Missing optional values must collapse cleanly. When both `doi` and `url` are
 present, DOI is the displayed link and URL is the fallback; `v0.2.0` does not
 offer a style option for changing that precedence.
 
-### Optional BibLaTeX and Biber integration
+### Optional BibLaTeX and Biber integration (planned)
 
 The CV class does not load `biblatex`. Opt in explicitly:
 

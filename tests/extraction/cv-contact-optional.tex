@@ -1,0 +1,19 @@
+% cv-contact-optional.tex — academic contact output and reading order.
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Researcher in Analytical Computing},
+  email    = {ada@example.com},
+  scholar  = {scholar.google.com/citations?user=ada},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research}
+\begin{CDossierEntry}[title = {Research Fellow}, organization = {Example Institute}, location = {Toronto, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Developed reproducible computational methods.
+    \item Supervised student research projects.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

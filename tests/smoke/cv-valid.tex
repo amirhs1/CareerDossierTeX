@@ -1,0 +1,23 @@
+% cv-valid.tex — a supported academic CV with Scholar and ORCID must build.
+\documentclass[fontsize=11pt, density=standard]{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Researcher in Analytical Computing},
+  email    = {ada@example.com},
+  scholar  = {scholar.google.com/citations?user=ada},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Academic Appointments}
+\begin{CDossierEntry}[
+  title        = {Research Fellow},
+  organization = {Example Institute},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Developed reproducible methods for scientific computing.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

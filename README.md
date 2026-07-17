@@ -23,9 +23,9 @@ CareerDossierTeX separates personal information from document content and presen
 | Paper size | US Letter |
 | Theme | Monochrome |
 | Local build | `latexmk` |
-| Continuous integration | Regression, extraction, smoke, and layout suites plus both example builds |
+| Continuous integration | Regression, extraction, smoke, and layout suites plus the industry and academic-CV example builds |
 
-The academic CV, bibliography integration, statement classes, A4 paper, and additional themes belong to later releases. Farsi, bilingual, and right-to-left support is deferred and unscheduled.
+The academic CV is implemented on the development branch for the unreleased v0.2.0 milestone. Bibliography integration, academic letters, statement classes, A4 paper, and additional themes belong to later milestone work. Farsi, bilingual, and right-to-left support is deferred and unscheduled.
 
 ## Requirements
 

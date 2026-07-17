@@ -36,7 +36,7 @@
 %% duplicated separators can appear.
 %% ---------------------------------------------------------------------------
 \clist_const:Nn \c__cdossier_components_contactorder_clist
-  { email , phone , location , website , linkedin , github , scholar }
+  { email , phone , location , website , linkedin , github , scholar , orcid }
 
 \tl_new:N   \l__cdossier_components_disp_tl
 \tl_new:N   \l__cdossier_components_url_tl
@@ -80,6 +80,28 @@
     \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
   }
 
+%% ORCID: unlike an ordinary web-profile value, a bare ORCID identifier has a
+%% documented canonical destination. Keep the identifier visible with a text
+%% label, so its meaning does not depend on a colour, icon, or link annotation.
+\cs_new_protected:Npn \__cdossier_components_orcid:
+  {
+    \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue { orcid } }
+    \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
+    \str_set:NV \l__cdossier_components_scheme_str \l__cdossier_components_url_tl
+    \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
+      {
+        \str_if_in:NnTF \l__cdossier_components_scheme_str { orcid.org/ }
+          { \tl_put_left:Nn \l__cdossier_components_url_tl { https:// } }
+          { \tl_put_left:Nn \l__cdossier_components_url_tl { https://orcid.org/ } }
+      }
+    \cs_if_exist:NTF \href
+      {
+        \href { \l__cdossier_components_url_tl }
+          { ORCID:\nobreakspace \nolinkurl { \l__cdossier_components_disp_tl } }
+      }
+      { ORCID:\nobreakspace \l__cdossier_components_disp_tl }
+  }
+
 %% Render one contact field: link the web-facing fields, print the rest as text.
 \cs_new_protected:Npn \__cdossier_components_render:n #1
   {
@@ -90,6 +112,7 @@
         { linkedin } { \__cdossier_components_web:n  { linkedin } }
         { github }   { \__cdossier_components_web:n  { github }   }
         { scholar }  { \__cdossier_components_web:n  { scholar }  }
+        { orcid }    { \__cdossier_components_orcid:              }
       }
       { \CDossierPrintField {#1} }
   }

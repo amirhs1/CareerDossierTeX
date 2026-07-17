@@ -19,7 +19,7 @@
 \cs_set_protected:Npn \__cdossier_components_render:n #1 { \TYPE{<#1>} }
 \cs_new_protected:Npn \cdossiertestClearContacts
   {
-    \clist_map_inline:nn { email , phone , location , website , linkedin , github , scholar }
+    \clist_map_inline:nn { email , phone , location , website , linkedin , github , scholar , orcid }
       { \CDossierSetup{ ##1 = {} } }
   }
 \cs_new_protected:Npn \cdossiertestContactLine { \__cdossier_components_contactline: }
@@ -56,6 +56,14 @@
   \cdossiertestClearContacts
   \cdossiertestContactLine
   \TYPE{[end]}
+}
+
+% Academic identifiers follow Scholar and retain the same no-stray-separator
+% invariant when they are the only fields at the end of the contact order.
+\TEST{academic-identifiers-join-cleanly}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ scholar = {scholar.example/a}, orcid = {0000-0002-1825-0097} }
+  \cdossiertestContactLine
 }
 
 \END

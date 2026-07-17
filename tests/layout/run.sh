@@ -2,11 +2,12 @@
 # run.sh — CareerDossierTeX layout-stress runner (Phase 1)
 #
 # Compiles each layout fixture with XeLaTeX and asserts the page-level
-# properties that a résumé must keep under stress:
+# properties that a document class must keep under stress:
 #
 #   - it compiles with exit 0;
 #   - it produces no overfull boxes (long URLs break; long headings wrap);
-#   - no page number is emitted (the default page style is empty);
+#   - the résumé emits no page number, while the academic CV emits a folio on
+#     every page and a running header after page one;
 #   - a fixture named *two-page* actually spans at least two pages.
 #
 # Final visual correctness (spacing, balance, typographic detail) remains a
@@ -46,22 +47,44 @@ for tex in *.tex; do
   pages="${pages:-0}"
   echo "  pages: $pages"
 
-  # The empty page style must print no folio. A centered page number would be
-  # the last text line of a page and equal that page's ordinal; check each page
-  # for exactly that, which years and other stray digits do not satisfy.
+  # The résumé's empty page style must print no folio. The CV instead requires
+  # a visible `Page N` folio on every page and an identity-derived running
+  # header from page two onwards. Check the extracted text rather than exact
+  # page coordinates so the test guards behavior without freezing layout.
   if command -v pdftotext >/dev/null 2>&1; then
-    folio=0
-    for (( n = 1; n <= pages; n++ )); do
-      last="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
-              | sed '/^\f/d' | awk 'NF{ line = $0 } END{ print line }' \
-              | tr -d '[:space:]')"
-      [ "$last" = "$n" ] && folio=1
-    done
-    if [ "$folio" -ne 0 ]; then
-      echo "  UNEXPECTED page-number folio"; fail=1
-    else
-      echo "  no page-number folios"
-    fi
+    case "$base" in
+      cv-*)
+        cv_fail=0
+        for (( n = 1; n <= pages; n++ )); do
+          page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
+          if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n"; then
+            echo "  MISSING CV FOLIO: Page $n"; cv_fail=1
+          fi
+          if [ "$n" -gt 1 ] && { ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace" || ! printf '%s\n' "$page_text" | grep -Fq "Curriculum"; }; then
+            echo "  MISSING CV RUNNING HEADER on page $n"; cv_fail=1
+          fi
+        done
+        if [ "$cv_fail" -ne 0 ]; then
+          fail=1
+        else
+          echo "  CV folios and running headers present"
+        fi
+        ;;
+      *)
+        folio=0
+        for (( n = 1; n <= pages; n++ )); do
+          last="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
+                  | sed '/^\f/d' | awk 'NF{ line = $0 } END{ print line }' \
+                  | tr -d '[:space:]')"
+          [ "$last" = "$n" ] && folio=1
+        done
+        if [ "$folio" -ne 0 ]; then
+          echo "  UNEXPECTED page-number folio"; fail=1
+        else
+          echo "  no page-number folios"
+        fi
+        ;;
+    esac
   else
     echo "  (pdftotext absent: skipped folio check)"
   fi

@@ -13,12 +13,13 @@ LATEXMK       := latexmk -xelatex -interaction=nonstopmode -halt-on-error
 LATEXMK_CLEAN := latexmk -C
 RESUME        := examples/industry/resume-english.tex
 LETTER        := examples/industry/letter-industry.tex
+ACADEMIC_CV   := examples/academic/cv-academic.tex
 
 # `make` with no target builds both supported examples, which is what README.md
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter check test regression smoke layout extract-test clean
+.PHONY: help examples resume letter academic-cv check test regression smoke layout extract-test clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -27,13 +28,16 @@ help: ## List the available targets
 	  | awk -F'|' '{printf "  %-14s %s\n", $$1, $$2}'
 	@printf '\n'
 
-examples: resume letter ## Build both supported examples (default)
+examples: resume letter academic-cv ## Build every supported example (default)
 
 resume: ## Build the résumé example
 	$(LATEXMK) $(RESUME)
 
 letter: ## Build the cover-letter example
 	$(LATEXMK) $(LETTER)
+
+academic-cv: ## Build the academic CV example
+	$(LATEXMK) $(ACADEMIC_CV)
 
 check: regression extract-test smoke layout examples ## Run every suite CI runs
 	@printf '\nAll suites passed.\n'
@@ -54,6 +58,7 @@ extract-test: ## Text-extraction round-trip against committed baselines
 
 clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@$(LATEXMK_CLEAN) $(RESUME) $(LETTER) >/dev/null 2>&1
+	-@$(LATEXMK_CLEAN) $(ACADEMIC_CV) >/dev/null 2>&1
 	-@l3build clean >/dev/null 2>&1
 	@rm -rf build
 	@rm -f tests/*/*.aux tests/*/*.log tests/*/*.out tests/*/*.pdf \

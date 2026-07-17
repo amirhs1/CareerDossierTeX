@@ -1,0 +1,16 @@
+% cv-long-fields.tex — optional academic links must wrap without overfull boxes.
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  email    = {ada.lovelace.research-and-teaching@example-university.example},
+  location = {Toronto, Ontario, Canada},
+  scholar  = {scholar.google.com/citations?user=an-exceptionally-long-academic-profile-identifier-with-many-words},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research}
+\begin{CDossierEntry}[title = {A deliberately long academic appointment title that must wrap without clipping}, organization = {Centre for Reliable and Reproducible Scientific Computing}, location = {Toronto, Ontario, Canada}, dates = {2024--Present}]
+  Long-field stress fixture.
+\end{CDossierEntry}
+\end{document}
