@@ -29,6 +29,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   letter metadata, optional recipient handling, and public commands are shared
   unchanged. Academic letters derive the PDF title `Academic Cover Letter –
   <name>` and carry a print-oriented footer with the name and `Page n of N`.
+  A supported academic-letter example and its smoke, extraction, and layout
+  coverage build through `make` and CI.
 - Dependency-free manual publication lists through `CDossierPublications` and
   `\CDossierPublication`, with source-order numbering, clean optional-field
   punctuation, and DOI-over-URL link precedence.
@@ -36,6 +38,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   Biber-backed, year-descending academic profile; repeatable exact author-name
   highlighting; DOI → e-print → URL precedence; an actionable missing-package
   diagnostic; and a fictional Biber example built by `latexmk`, `make`, and CI.
+
+### Changed
+
+- The supported no-BibLaTeX academic-CV example now demonstrates manual
+  publications. README, API, roadmap, contributor requirements, and build
+  guidance now distinguish released `v0.1.1` behavior from implemented but
+  unreleased `v0.2.0` support, map every academic interface to a complete
+  example, document the Biber verification path, and state the release's
+  explicit non-goals.
 
 ## [0.1.1] - 2026-07-17
 

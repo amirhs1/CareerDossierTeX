@@ -9,15 +9,16 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.1.0` is released. The next planned release is
-> `v0.2.0 — Academic Dossier`.
+> **Current status:** `v0.1.1` is released. The next release,
+> `v0.2.0 — Academic Dossier`, is in development.
 
 ## Release overview
 
 | Version | Release goal | Status |
 |---|---|---|
 | `v0.1.0` | English industry résumé and cover letter | Released |
-| `v0.2.0` | Academic CV, academic letter, and bibliography support | Planned |
+| `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
+| `v0.2.0` | Academic CV, academic letter, and bibliography support | In development |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Deferred — unscheduled** |
 | `v0.4.0` | Statement classes and broader customization | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
@@ -102,7 +103,7 @@ Publish the smallest useful CareerDossierTeX release.
 
 Extend the shared foundation to academic applications.
 
-### Planned deliverables
+### Development deliverables
 
 - `careerdossier-cv.cls`;
 - academic cover-letter family;
@@ -112,7 +113,14 @@ Extend the shared foundation to academic applications.
 - multi-page CV support;
 - running headers and page numbers;
 - Scholar and ORCID fields;
-- long-entry and page-break tests added with the academic features they cover.
+- long-entry and page-break tests added with the academic features they cover;
+- supported no-BibLaTeX CV, Biber-backed CV, and academic-letter examples; and
+- user, contributor, API, architecture, migration, roadmap, and changelog
+  documentation matched to implemented behavior.
+
+These interfaces are implemented and tested on the development branch. They do
+not become released behavior until the release issue is completed and the
+`v0.2.0` tag is published.
 
 ### Release criteria
 
@@ -120,7 +128,22 @@ Extend the shared foundation to academic applications.
 - bibliography support remains optional;
 - a CV without `biblatex` still builds;
 - a Biber example builds through `latexmk`;
-- academic and industry documents reuse the same profile.
+- academic and industry documents reuse the same profile;
+- every supported example builds locally and in CI;
+- the accumulated regression, extraction, smoke, layout, and bibliography
+  suites pass; and
+- README and API documentation match the tagged behavior.
+
+### Explicit non-goals
+
+- pdfLaTeX or LuaLaTeX;
+- Farsi, bilingual, or RTL documents;
+- A4 paper;
+- color themes, font presets, icons, or bundled fonts;
+- statement classes;
+- alternate bibliography or citation styles;
+- automatic import from ORCID, Scholar, DOI services, or external APIs; and
+- PDF/UA or broad ATS-conformance claims.
 
 ## `v0.3.0 — Farsi and Bilingual Support` **(deferred — unscheduled)**
 

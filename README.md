@@ -11,25 +11,27 @@ A reusable XeLaTeX toolkit for producing consistent career documents from shared
 
 CareerDossierTeX separates personal information from document content and presentation. A shared profile file can be reused across a résumé and matching cover letter, helping keep names, contact details, links, and visual styling consistent.
 
-### `v0.1.0` scope
+### Support matrix
 
-| Capability | Status |
-|---|---|
-| Industry résumé | Supported |
-| Industry cover letter | Supported |
-| Shared profile metadata and components | Supported |
-| Language | English |
-| Engine | XeLaTeX |
-| Paper size | US Letter |
-| Theme | Monochrome |
-| Local build | `latexmk` |
-| Continuous integration | Regression, extraction, smoke, and layout suites plus all supported example builds |
+| Capability | Current `v0.1.1` release | `v0.2.0` development branch |
+|---|---|---|
+| Industry résumé | Supported | Supported, unchanged |
+| Industry cover letter | Supported | Supported, unchanged |
+| Academic CV | Not supported | Implemented |
+| Academic cover letter | Not supported | Implemented with `family=academic` |
+| Manual publication lists | Not supported | Implemented without BibLaTeX or Biber |
+| External bibliography | Not supported | Optional fixed BibLaTeX/Biber profile |
+| Shared profile metadata | Supported | Adds optional `orcid`; retains `scholar` |
+| Language | English | English |
+| Engine | XeLaTeX | XeLaTeX |
+| Paper size | US Letter | US Letter |
+| Theme | Monochrome | Monochrome |
+| Continuous integration | Industry examples and accumulated suites | Adds academic examples and Biber coverage |
 
-The academic CV, academic-letter family, dependency-free manual publications,
-and optional BibLaTeX/Biber integration are implemented on the development
-branch for the unreleased v0.2.0 milestone. Statement classes, A4 paper, and
-additional themes belong to later milestone work. Farsi, bilingual, and
-right-to-left support is deferred and unscheduled.
+The academic interfaces are implemented and tested but remain unreleased until
+`v0.2.0` is tagged. Statement classes, A4 paper, color themes, font presets,
+icons, and alternate bibliography styles belong to later milestone work. Farsi,
+bilingual, and right-to-left support is deferred and unscheduled.
 
 ## Requirements
 
@@ -41,7 +43,7 @@ BibLaTeX and Biber are optional and are needed only by documents that load
 `careerdossier-biblatex`. Manual publication lists and CVs without an external
 bibliography do not require them.
 
-CareerDossierTeX is not intended to compile with pdfLaTeX in `v0.1.0`.
+CareerDossierTeX does not support pdfLaTeX or LuaLaTeX.
 
 ## Quick start
 
@@ -137,6 +139,94 @@ See the complete example in:
 examples/industry/letter-industry.tex
 ```
 
+### 4. Create an academic CV (`v0.2.0` development)
+
+The academic CV reuses the shared profile, section, entry, and list interfaces.
+It also provides a dependency-free manual publication list:
+
+```latex
+\documentclass[fontsize=11pt, density=standard]{careerdossier-cv}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Researcher in Analytical Computing},
+  scholar  = {scholar.google.com/citations?user=ada-example},
+  orcid    = {0000-0002-1825-0097}
+}
+
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Academic Appointments}
+\begin{CDossierEntry}[
+  title        = {Research Fellow},
+  organization = {Example Institute},
+  dates        = {2024--Present}
+]
+  Research and teaching summary.
+\end{CDossierEntry}
+
+\CDossierSection{Selected Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace and Grace Hopper},
+    title   = {Reliable Analytical Engines},
+    venue   = {Journal of Example Computing},
+    date    = {2026},
+    doi     = {10.9999/example.2026.1}
+  }
+\end{CDossierPublications}
+\end{document}
+```
+
+The complete no-BibLaTeX example is
+[`examples/academic/cv-academic.tex`](examples/academic/cv-academic.tex).
+
+### 5. Opt in to BibLaTeX and Biber (`v0.2.0` development)
+
+```latex
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+
+\input{examples/profiles/profile-academic.tex}
+\addbibresource{publications.bib}
+\CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
+
+\begin{document}
+\MakeCDossierHeader
+\nocite{*}
+\printbibliography[title={Selected Publications}]
+\end{document}
+```
+
+This optional package uses the fixed `backend=biber`, `style=numeric`, and
+`sorting=ydnt` profile. See
+[`examples/academic/cv-bibliography.tex`](examples/academic/cv-bibliography.tex)
+and its fictional
+[`publications.bib`](examples/academic/publications.bib).
+
+### 6. Create an academic cover letter (`v0.2.0` development)
+
+```latex
+\documentclass[family=academic]{careerdossier-letter}
+\input{examples/profiles/profile-academic.tex}
+
+\CDossierLetterSetup{
+  recipient-name         = {Professor Grace Hopper},
+  recipient-organization = {Example University},
+  subject                = {Application for Assistant Professor},
+  salutation             = {Dear Professor Hopper,}
+}
+
+\begin{document}
+\MakeCDossierLetterhead
+I am writing to apply for the Assistant Professor position.
+\MakeCDossierClosing
+\end{document}
+```
+
+See [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.tex).
+
 ## Build
 
 Compile the supported examples with XeLaTeX:
@@ -148,12 +238,18 @@ latexmk -xelatex -interaction=nonstopmode -halt-on-error \
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   examples/industry/letter-industry.tex
 
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  examples/academic/cv-academic.tex
+
 # Optional BibLaTeX/Biber example; latexmk runs Biber automatically.
 latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   examples/academic/cv-bibliography.tex
+
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  examples/academic/letter-academic.tex
 ```
 
-Both examples may also be built with the repository `Makefile`:
+All five examples may also be built with the repository `Makefile`:
 
 ```bash
 make
@@ -184,11 +280,14 @@ make check
 ```
 
 Individual suites are available as `make regression`, `make extract-test`,
-`make smoke`, and `make layout`; `make clean` removes the generated files
-afterwards. Each target runs the same command as the matching CI job.
+`make smoke`, `make layout`, and `make bibliography-test`; `make clean` removes
+the generated files afterwards. Each target runs the same command as the
+matching CI job.
 
 The full suite requires `l3build` and `pdftotext` (Poppler) in addition to
-XeLaTeX and `latexmk`.
+XeLaTeX and `latexmk`. Because `make check` exercises the optional bibliography
+profile, it also requires BibLaTeX and Biber. Ordinary résumé, letter, and
+no-BibLaTeX CV builds do not.
 
 Release preparation reruns the accumulated suite. It is a final verification
 gate, not the stage where feature tests are first created. See
