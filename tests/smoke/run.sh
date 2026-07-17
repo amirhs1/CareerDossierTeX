@@ -69,6 +69,15 @@ for entry in "${cases[@]}"; do
       if [ "$rc" -ne 0 ]; then
         echo "  EXPECTED PASS but compile failed (see $base.log)"; fail=1; continue
       fi
+      # Academic-letter footers include the total page count, which is resolved
+      # by the label written on the first XeLaTeX pass.
+      if [[ "$base" = letter-academic-* ]]; then
+        xelatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1
+        rc=$?
+        if [ "$rc" -ne 0 ]; then
+          echo "  EXPECTED PASS but footer rerun failed (see $base.log)"; fail=1; continue
+        fi
+      fi
       unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' "$base.log" \
                     | grep -viE "$allow" || true)"
       if [ -n "$unexpected" ]; then

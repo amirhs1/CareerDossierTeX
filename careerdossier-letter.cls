@@ -83,21 +83,20 @@
 
 %% Industry letters retain the v0.1 empty page style. Academic letters use a
 %% print-oriented footer: identity at left and the current/total page count at
-%% right. The end-of-document label is kernel-only, so no total-page package is
-%% required; normal XeLaTeX workflows rerun to resolve it.
+%% right. The LaTeX kernel persists the last absolute page in the auxiliary
+%% file, avoiding an additional total-page package and resolving on a rerun.
 \makeatletter
 \def\ps@cdossieracademicletter{%
   \let\@mkboth\@gobbletwo
   \def\@oddhead{}%
   \let\@evenhead\@oddhead
-  \def\@oddfoot{\footnotesize\sffamily\CDossierFieldValue{name}\hfil Page~\thepage\space of~\pageref{cdossier-letter-last-page}}%
+  \def\@oddfoot{\footnotesize\sffamily\CDossierFieldValue{name}\hfil Page~\thepage\space of~\@abspage@last}%
   \let\@evenfoot\@oddfoot
 }
 \makeatother
 \str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
   {
     \pagestyle { cdossieracademicletter }
-    \AtEndDocument { \label { cdossier-letter-last-page } }
   }
   { \pagestyle { empty } }
 
