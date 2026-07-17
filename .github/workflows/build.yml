@@ -51,10 +51,12 @@ jobs:
             echo
             echo "## fontspec"
             kpsewhich fontspec.sty
-            grep -m1 'ProvidesExplPackage' "$(kpsewhich fontspec.sty)" || true
+            # fontspec declares {date}{version} on the line after
+            # \ProvidesExplPackage, so -A1 is required to capture the version.
+            grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich fontspec.sty)" || true
             echo
             echo "## l3build"
-            l3build --version 2>&1 | head -2 || echo "l3build: unavailable"
+            l3build --version 2>&1 | head -4 || echo "l3build: unavailable"
             echo
             echo "## default fonts"
             for f in texgyretermes-regular.otf texgyreheros-regular.otf; do
