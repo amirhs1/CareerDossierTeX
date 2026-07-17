@@ -21,6 +21,7 @@
     ]
   },
   "sandbox": {
-    "enabled": true
+    "enabled": true,
+    "excludedCommands": ["gh", "gh *"]
   }
 }
