@@ -141,11 +141,13 @@ latexmk -xelatex -interaction=nonstopmode -halt-on-error \
   examples/industry/letter-industry.tex
 ```
 
-When the repository `Makefile` is available, both examples may also be built with:
+Both examples may also be built with the repository `Makefile`:
 
 ```bash
 make
 ```
+
+Run `make help` for the full target list.
 
 A configuration is supported only after its examples compile locally and in GitHub Actions.
 
@@ -162,13 +164,19 @@ by purpose. Files under `examples/` teach users and may also be compiled by CI,
 but examples do not replace focused regression, smoke, error-path, extraction,
 or layout-stress tests.
 
-Run the currently available extraction suite with:
+Run everything CI runs — the regression, extraction, smoke, and layout suites
+plus both example builds — with:
 
 ```bash
-make extract-test
+make check
 ```
 
-This suite requires `pdftotext` from Poppler in addition to XeLaTeX.
+Individual suites are available as `make regression`, `make extract-test`,
+`make smoke`, and `make layout`; `make clean` removes the generated files
+afterwards. Each target runs the same command as the matching CI job.
+
+The full suite requires `l3build` and `pdftotext` (Poppler) in addition to
+XeLaTeX and `latexmk`.
 
 Release preparation reruns the accumulated suite. It is a final verification
 gate, not the stage where feature tests are first created. See

@@ -186,31 +186,39 @@ Each commit should represent one coherent change. Avoid combining unrelated API,
 
 ## Local builds
 
-Build the résumé example:
-
-```bash
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
-  examples/industry/resume-english.tex
-```
-
-Build the cover-letter example:
-
-```bash
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
-  examples/industry/letter-industry.tex
-```
-
-When available, build the supported examples through the repository `Makefile`:
+Build both supported examples:
 
 ```bash
 make
 ```
 
-Clean generated files:
+Run every suite CI runs — regression, extraction, smoke, and layout, plus both
+example builds:
 
 ```bash
-latexmk -C examples/industry/resume-english.tex
-latexmk -C examples/industry/letter-industry.tex
+make check
+```
+
+Clean generated files afterwards:
+
+```bash
+make clean
+```
+
+Run `make help` for the full target list. Every target runs the same command as
+the matching job in `.github/workflows/build.yml`, so a local check and a CI
+check cannot silently diverge. If you change a command in one place, change it
+in the other.
+
+The underlying invocation, if you prefer to run it directly or need to build a
+single document:
+
+```bash
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  examples/industry/resume-english.tex
+
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  examples/industry/letter-industry.tex
 ```
 
 Do not state that a build passes unless you have run it or CI has run it successfully.
@@ -328,7 +336,7 @@ Beyond eyeballing reading order, run the automated extraction fixture, which
 compiles a torture document and diffs its `pdftotext` output against a committed
 baseline:
 
-    tests/extraction/run.sh
+    make extract-test          # or: tests/extraction/run.sh
 
 It fails on any character, spacing, ordering, or Unicode-mapping change, and on
 any non-allowlisted XeLaTeX warning. Regenerate the baseline **only** when a
@@ -347,7 +355,7 @@ The logic-bearing packages are covered by an `l3build` regression suite. Each
 log is diffed against a committed `.tlg` baseline. Run the whole suite from the
 repository root:
 
-    l3build check
+    make regression            # or: l3build check
 
 Run a single test by name (without the `.lvt` extension):
 
