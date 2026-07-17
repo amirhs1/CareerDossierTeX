@@ -427,12 +427,11 @@ Their visual definitions may evolve before `v1.0.0`.
 
 ## `v0.2.0` academic API contract
 
-This section does not describe released behavior. The academic CV and its ORCID
-profile field are implemented and covered by the supported development example
-and tests. Manual publications, the optional BibLaTeX integration, and the
-academic letter remain planned. The implementation must preserve the existing
-résumé and industry-letter interface unless an incompatibility is separately
-approved and documented.
+This section does not describe released behavior. The academic CV, its ORCID
+profile field, and the academic letter family are implemented on the development
+branch. Manual publications and the optional BibLaTeX integration remain
+planned. The implementation preserves the existing résumé and industry-letter
+interface unless an incompatibility is separately approved and documented.
 
 ### Academic CV class
 
@@ -607,9 +606,10 @@ closing, and sender-metadata behavior. Optional recipient and academic profile
 fields collapse independently.
 
 The family may change letter-owned spacing and derives `/Title` as
-`Academic Cover Letter – <name>`. It does not introduce new recipient keys or
-change the industry family's defaults. Unknown family values must produce an
-actionable class error.
+`Academic Cover Letter – <name>`. Each academic-letter page has a print-oriented
+footer: `name` at left and `Page n of N` at right. It does not introduce new
+recipient keys or change the industry family's defaults. Unknown family values
+must produce an actionable class error.
 
 ### Explicitly unsupported in `v0.2.0`
 

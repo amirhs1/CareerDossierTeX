@@ -15,7 +15,8 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-letter owns the v0.1.0 English industry cover-letter geometry
+%% careerdossier-letter owns the English industry and academic cover-letter
+%% families: US Letter geometry, the letter-specific metadata keys,
 %% and prose structure: US Letter margins, the letter-specific metadata keys,
 %% the collapsing recipient block, and the letterhead and closing commands.
 %% Shared identity and contact logic (the centered sender block, contact line,
@@ -24,26 +25,31 @@
 %% that material and adds the letter body around it.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-letter} {2026-07-17} {0.1.1}
-  {CareerDossierTeX English industry cover-letter class}
+\ProvidesExplClass {careerdossier-letter} {2026-07-17} {0.2.0}
+  {CareerDossierTeX English cover-letter class}
 
 %% ---------------------------------------------------------------------------
-%% Class options. The industry letter has no user-facing options in v0.1.0:
-%% family, paper, language, and theme are all fixed. Any option is rejected
+%% Class options. `family` is additive in v0.2.0; the existing industry family
+%% remains the default. Paper, language, and theme are fixed. Any option is rejected
 %% with an actionable message rather than silently ignored.
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
+\tl_new:N \l__cdossier_letter_family_tl
+\tl_set:Nn \l__cdossier_letter_family_tl { industry }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
-    careerdossier-letter~takes~no~class~options~in~v0.1.0.~Family~(industry),~
-    paper~(letter),~language~(english),~and~theme~(monochrome)~are~fixed~and~
-    cannot~be~set~here.
+    The~supported~option~is~'family'~(industry,~academic).~Paper,~language,~
+    and~theme~are~fixed~and~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / letter }
   {
+    family .choices:nn =
+      { industry , academic }
+      { \tl_set_eq:NN \l__cdossier_letter_family_tl \l_keys_choice_tl } ,
+    family .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
@@ -66,14 +72,33 @@
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a résumé built off the same profile. The title
 %% itself is assembled in careerdossier-components, which owns identity.
-\__cdossier_components_doctype:n { Cover~Letter }
+\str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
+  { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
+  { \__cdossier_components_doctype:n { Cover~Letter } }
 
 %% US Letter with conventional one-inch business-letter margins.
-\geometry { letterpaper , margin = 1in }
+\str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
+  { \geometry { letterpaper , top = 0.9in , bottom = 0.9in , left = 1in , right = 1in } }
+  { \geometry { letterpaper , margin = 1in } }
 
-%% No page numbers: a two-page cover letter carries identity in its letterhead,
-%% not a folio. Users who want page numbers can restore a page style themselves.
-\pagestyle { empty }
+%% Industry letters retain the v0.1 empty page style. Academic letters use a
+%% print-oriented footer: identity at left and the current/total page count at
+%% right. The LaTeX kernel persists the last absolute page in the auxiliary
+%% file, avoiding an additional total-page package and resolving on a rerun.
+\makeatletter
+\def\ps@cdossieracademicletter{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddhead{}%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{\footnotesize\sffamily\CDossierFieldValue{name}\hfil Page~\thepage\space of~\@abspage@last}%
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+\str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
+  {
+    \pagestyle { cdossieracademicletter }
+  }
+  { \pagestyle { empty } }
 
 %% Block format: no paragraph indentation, paragraphs separated by vertical
 %% space. \emergencystretch keeps justified prose from producing overfull boxes

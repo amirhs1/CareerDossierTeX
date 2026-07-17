@@ -36,6 +36,9 @@ for tex in *.tex; do
 
   xelatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.log" 2>&1 || {
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue; }
+  # Resolve end-of-document labels such as the academic-letter total-page footer.
+  xelatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.log" 2>&1 || {
+    echo "  RERUN FAILED (see $base.log)"; fail=1; continue; }
 
   # Normalize: drop form-feeds and trailing blank lines, keep meaningful text.
   # The trailing-blank trim uses awk, not a sed label/branch loop, because the

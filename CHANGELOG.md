@@ -24,6 +24,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 - A supported academic-CV example, shared academic profile, CV smoke and
   extraction fixtures, and long-field/two-page layout checks. CI and `make`
   now build the academic-CV example.
+- `careerdossier-letter` now accepts `family=academic` for the unreleased
+  academic cover-letter family. `industry` remains the default and existing
+  letter metadata, optional recipient handling, and public commands are shared
+  unchanged. Academic letters derive the PDF title `Academic Cover Letter –
+  <name>` and carry a print-oriented footer with the name and `Page n of N`.
 
 ## [0.1.1] - 2026-07-17
 

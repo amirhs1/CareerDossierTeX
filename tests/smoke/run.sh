@@ -45,6 +45,8 @@ cases=(
   "cv-unknown-option fail|Unknown class option 'paper'"
   "cv-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "letter-valid pass"
+  "letter-academic-valid pass"
+  "letter-bad-family fail|only accepts predefined values"
   "letter-no-subject pass"
   "letter-missing-name fail|required profile field 'name' is not"
   "letter-unknown-option fail|Unknown class option 'paper'"
@@ -66,6 +68,15 @@ for entry in "${cases[@]}"; do
     pass)
       if [ "$rc" -ne 0 ]; then
         echo "  EXPECTED PASS but compile failed (see $base.log)"; fail=1; continue
+      fi
+      # Academic-letter footers include the total page count, which is resolved
+      # by the label written on the first XeLaTeX pass.
+      if [[ "$base" = letter-academic-* ]]; then
+        xelatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1
+        rc=$?
+        if [ "$rc" -ne 0 ]; then
+          echo "  EXPECTED PASS but footer rerun failed (see $base.log)"; fail=1; continue
+        fi
       fi
       unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' "$base.log" \
                     | grep -viE "$allow" || true)"

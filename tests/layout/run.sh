@@ -31,6 +31,9 @@ for tex in *.tex; do
   if ! xelatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1; then
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue
   fi
+  if ! xelatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1; then
+    echo "  RERUN FAILED (see $base.log)"; fail=1; continue
+  fi
 
   # No overfull boxes.
   overfull="$(grep -cE 'Overfull \\hbox' "$base.log" || true)"
@@ -69,6 +72,19 @@ for tex in *.tex; do
         else
           echo "  CV folios and running headers present"
         fi
+        ;;
+      letter-academic-*)
+        letter_fail=0
+        for (( n = 1; n <= pages; n++ )); do
+          page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
+          if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n of $pages"; then
+            echo "  MISSING ACADEMIC-LETTER FOLIO: Page $n of $pages"; letter_fail=1
+          fi
+          if ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace"; then
+            echo "  MISSING ACADEMIC-LETTER FOOTER NAME on page $n"; letter_fail=1
+          fi
+        done
+        if [ "$letter_fail" -ne 0 ]; then fail=1; else echo "  academic-letter footers present"; fi
         ;;
       *)
         folio=0

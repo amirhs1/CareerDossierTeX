@@ -1,0 +1,23 @@
+% Supported v0.2 academic-letter example.
+\documentclass[family=academic]{careerdossier-letter}
+\input{examples/profiles/profile-academic.tex}
+\CDossierLetterSetup{
+  recipient-name = {Professor Grace Hopper},
+  recipient-title = {Chair, Department of Computational Science},
+  recipient-organization = {Example University},
+  recipient-address = {100 College Avenue\\Toronto, Ontario},
+  subject = {Application for Assistant Professor of Computational Science},
+  salutation = {Dear Professor Hopper,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Assistant Professor position in Computational
+Science. My research combines reliable numerical methods, reproducible software,
+and open teaching materials for interdisciplinary scientific work.
+
+I would welcome the opportunity to contribute to your department's research,
+teaching, and student mentorship.
+
+\MakeCDossierClosing
+\end{document}
