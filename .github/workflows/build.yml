@@ -175,6 +175,8 @@ jobs:
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Install poppler-utils
+        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Build the academic CV examples
         run: make bibliography-test academic-cv academic-bibliography
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
