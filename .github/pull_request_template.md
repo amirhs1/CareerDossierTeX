@@ -6,6 +6,12 @@ Explain the change and its purpose.
 
 Closes #
 
+## AI assistance
+
+State `None`, or name each AI tool that materially shaped the contribution and
+briefly describe its role. If a commit has an AI co-author trailer, repeat that
+identity and email here. Do not include prompts, secrets, or personal data.
+
 ## Changes
 
 -

@@ -10,6 +10,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `AI-POLICY.md` and contribution guidance for disclosed, human-reviewed AI
+  assistance; accurate non-duplicated commit attribution; prompt-injection
+  handling; and licensing, provenance, privacy, and verification duties. Claude
+  Code project settings now deny built-in read and edit access to declared
+  private paths and enable sandbox enforcement for Bash when supported.
 - PDF document metadata derived from the shared profile, applied automatically
   at `\begin{document}` by `careerdossier-components`. A résumé now carries
   `/Title` `Résumé – <name>`, a cover letter `Cover Letter – <name>`, both carry
