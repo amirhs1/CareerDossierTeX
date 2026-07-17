@@ -629,9 +629,40 @@ The Phase 1 workflow should:
 - run every committed automated suite under `tests/` that applies to Phase 1;
 - compile both supported examples;
 - fail when compilation fails;
-- upload PDFs and logs as artifacts.
+- upload PDFs and logs as artifacts;
+- pin every container and third-party action to an immutable reference.
 
 Do not require a status check in branch protection until that check has completed successfully at least once.
+
+### Pinned dependencies
+
+Every third-party action is pinned to a full commit SHA and the TeX Live
+container to an image digest, each with a comment naming the release it came
+from. A mutable tag such as `:latest` or `@v4` lets an upstream retag silently
+change what runs, which would surface as an unexplained failure or an output
+shift that looks like our bug.
+
+The `toolchain` job records the TeX Live release, XeTeX, `xdvipdfmx`,
+`fontspec`, `l3build`, and default-font paths that a run actually used, and
+uploads them as the `toolchain-record` artifact. Read that artifact to learn
+which release a digest resolves to.
+
+### Bumping the pinned TeX Live image
+
+1. Resolve the new digest:
+
+   ```bash
+   docker buildx imagetools inspect texlive/texlive:latest --format '{{.Manifest.Digest}}'
+   ```
+
+2. Replace the digest in every `container:` line in
+   `.github/workflows/build.yml` and update the date comment at the top.
+3. Push the branch and read the `toolchain-record` artifact to confirm the
+   TeX Live release the digest resolved to; record it in the PR.
+4. Inspect the full suite. A bump is expected to be behavior-neutral. If a
+   `.tlg` baseline or an extraction reference changes, that is a finding to
+   investigate and report — never regenerate a baseline merely to turn the
+   suite green (see "Baselines are load-bearing").
 
 ## Release contributions
 

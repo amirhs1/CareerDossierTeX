@@ -1,5 +1,20 @@
 name: build
 
+# Pinned dependencies.
+#
+# Every third-party action is pinned to a full commit SHA and every container to
+# an immutable digest, so a run is reproducible and an upstream retag cannot
+# change what executes here. Each pin carries the human-readable release it came
+# from; update the comment whenever the pin moves.
+#
+# To bump the TeX Live image, see CONTRIBUTING.md ("Bumping the pinned TeX Live
+# image"). The `toolchain` job records the exact versions a run used; read its
+# artifact to learn which TeX Live release a digest resolves to.
+#
+#   texlive/texlive        digest below == :latest as published 2026-07-12
+#   actions/checkout       v4.3.1
+#   actions/upload-artifact v7.0.1
+
 on:
   push:
     branches: [main]
@@ -10,11 +25,57 @@ permissions:
   contents: read
 
 jobs:
+  toolchain:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # docs/guides/ats-extraction.md section 10 ("Reproducibility") requires the
+      # tested toolchain to be recorded alongside the output it produced.
+      - name: Record toolchain versions
+        run: |
+          {
+            echo "# CareerDossierTeX toolchain record"
+            echo "date-utc: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "commit:   ${GITHUB_SHA}"
+            echo
+            echo "## TeX Live"
+            tlmgr --version 2>&1 || echo "tlmgr: unavailable"
+            echo
+            echo "## XeTeX / format"
+            xelatex --version 2>&1 | head -3
+            echo
+            echo "## xdvipdfmx"
+            xdvipdfmx --version 2>&1 | head -2
+            echo
+            echo "## fontspec"
+            kpsewhich fontspec.sty
+            grep -m1 'ProvidesExplPackage' "$(kpsewhich fontspec.sty)" || true
+            echo
+            echo "## l3build"
+            l3build --version 2>&1 | head -2 || echo "l3build: unavailable"
+            echo
+            echo "## default fonts"
+            for f in texgyretermes-regular.otf texgyreheros-regular.otf; do
+              echo "$f -> $(kpsewhich "$f" || echo NOT-FOUND)"
+            done
+          } | tee toolchain.txt
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload toolchain record
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: toolchain-record
+          path: toolchain.txt
+          if-no-files-found: warn
+
   regression:
     runs-on: ubuntu-latest
-    container: texlive/texlive:latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Module regression suite (l3build check on XeTeX)
         run: l3build check
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
@@ -28,13 +89,15 @@ jobs:
 
   extraction:
     runs-on: ubuntu-latest
-    container: texlive/texlive:latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Install poppler-utils
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Extraction round-trip
         run: tests/extraction/run.sh
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload extraction PDFs and logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -48,9 +111,10 @@ jobs:
 
   resume:
     runs-on: ubuntu-latest
-    container: texlive/texlive:latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Install poppler-utils
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Smoke tests (supported builds and required failures)
@@ -61,6 +125,7 @@ jobs:
         run: >-
           latexmk -xelatex -interaction=nonstopmode -halt-on-error
           examples/industry/resume-english.tex
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload résumé PDFs and logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -79,13 +144,15 @@ jobs:
 
   letter:
     runs-on: ubuntu-latest
-    container: texlive/texlive:latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build the cover-letter example
         run: >-
           latexmk -xelatex -interaction=nonstopmode -halt-on-error
           examples/industry/letter-industry.tex
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload cover-letter PDF and log
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
