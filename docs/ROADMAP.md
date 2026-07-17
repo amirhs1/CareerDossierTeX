@@ -18,7 +18,7 @@ test pass at the end of a milestone.
 |---|---|---|
 | `v0.1.0` | English industry résumé and cover letter | Released |
 | `v0.2.0` | Academic CV, academic letter, and bibliography support | Planned |
-| `v0.3.0` | Farsi, bilingual, and right-to-left support | Planned |
+| `v0.3.0` | Farsi, bilingual, and right-to-left support | **Deferred — unscheduled** |
 | `v0.4.0` | Statement classes and broader customization | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
@@ -122,13 +122,24 @@ Extend the shared foundation to academic applications.
 - a Biber example builds through `latexmk`;
 - academic and industry documents reuse the same profile.
 
-## `v0.3.0 — Farsi and Bilingual Support`
+## `v0.3.0 — Farsi and Bilingual Support` **(deferred — unscheduled)**
+
+> **Status:** deferred on 2026-07-16. The milestone is closed and the release is
+> not scheduled. CareerDossierTeX is English-only, and no language-abstraction
+> module exists (see `docs/ARCHITECTURE.md`). This section is retained as a
+> design record, not as committed scope — nothing here may be implemented or
+> documented as current.
+>
+> **Consequence to remember if this is revived:** mature RTL support via `bidi`
+> is the main reason the project is XeLaTeX-only. With multilingual work
+> deferred, that constraint is no longer load-bearing — see the engine note
+> under `v0.4.0`.
 
 ### Goal
 
 Add multilingual and mixed-direction documents without duplicating the class system.
 
-### Planned deliverables
+### Deliverables if revived
 
 - `language=english|farsi|bilingual`;
 - `main-language=english|farsi`;

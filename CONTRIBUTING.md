@@ -263,8 +263,8 @@ Test-as-you-go is not one uniform activity. What "the smallest relevant test"
 means depends on what the module owns, so match the test type to the concern:
 
 - **Logic-bearing modules** — `careerdossier-base.sty` (metadata, field
-  presence, separator logic), `careerdossier-i18n.sty` (label selection),
-  and the non-visual parts of `careerdossier-typography.sty` (engine checks,
+  presence, separator logic) and the non-visual parts of
+  `careerdossier-typography.sty` (engine checks,
   role dispatch) — carry behavior that can be asserted directly. Write a focused
   `l3build` regression test (`.lvt` source with a saved `.tlg` baseline) per
   module as the behavior is added, in the same rhythm as writing a `test_*.py`
@@ -428,7 +428,6 @@ Do not use private commands in examples or documentation.
 Place code according to ownership:
 
 - metadata and validation → `careerdossier-base.sty`;
-- labels and language abstraction → `careerdossier-i18n.sty`;
 - fonts and semantic text roles → `careerdossier-typography.sty`;
 - colors and visual tokens → `careerdossier-theme.sty`;
 - reusable rendered pieces → `careerdossier-components.sty`;

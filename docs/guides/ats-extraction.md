@@ -311,7 +311,7 @@ Include multilingual fixtures with:
 - precomposed and decomposed accents;
 - Latin Extended letters;
 - right-to-left and non-Latin scripts that the package claims to support
-  **(planned — v0.3.0)**;
+  **(deferred — unscheduled; the package claims none today)**;
 - apostrophes, quotation marks, percent signs, plus signs, ampersands, slashes,
   and parentheses;
 - phone numbers and international prefixes;
@@ -360,7 +360,7 @@ installed `fontspec` version.
 Important qualifications:
 
 - Do not disable required shaping indiscriminately. Required ligatures and shaping
-  can be essential for Arabic and other scripts **(planned — v0.3.0)**.
+  can be essential for Arabic and other scripts **(deferred — unscheduled)**.
 - Disabling substitutions can slightly change metrics, kerning, line breaks, and
   page breaks.
 - A font that passes with one feature set has not been tested with another.
@@ -673,7 +673,6 @@ shared packages. The Phase 1 modules are:
 
 ```text
 careerdossier-base.sty        metadata, shared keys, required-field validation; no layout
-careerdossier-i18n.sty        English labels and a small language abstraction
 careerdossier-typography.sty  XeLaTeX check, fontspec, portable fonts, semantic text roles
 careerdossier-theme.sty       monochrome semantic colour/rule/link tokens
 careerdossier-components.sty  identity block, contact line, link wrappers, entry primitives
@@ -686,9 +685,10 @@ logic inside both classes.
 
 Later phases extend this set without duplicating the class hierarchy:
 `careerdossier-cv.cls` and `careerdossier-biblatex.sty` **(planned — v0.2.0)**;
-`careerdossier-statement.cls` **(planned — v0.4.0)**; multilingual support by
-extending the existing i18n, typography, and component modules **(planned —
-v0.3.0)**, not by adding language-specific classes.
+`careerdossier-statement.cls` **(planned — v0.4.0)**. Multilingual and RTL
+support is **deferred and unscheduled** (see `docs/ROADMAP.md`); should it ever
+return, it would extend the existing typography and component modules — and
+introduce a label abstraction — rather than add language-specific classes.
 
 ### 8.2 Build on a stable base class
 
@@ -820,7 +820,6 @@ Phase 1 layout (as in `docs/ARCHITECTURE.md`):
 ```text
 CareerDossierTeX/
 ├── careerdossier-base.sty
-├── careerdossier-i18n.sty
 ├── careerdossier-typography.sty
 ├── careerdossier-theme.sty
 ├── careerdossier-components.sty

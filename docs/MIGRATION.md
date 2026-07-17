@@ -85,7 +85,7 @@ disposition:
 | `etaremune` | all | Defer — reverse-numbered lists are academic |
 | `biblatex` + `biber` | all | Defer to `v0.2.0` — bibliography |
 | `pgffor` | all | Defer — supports the biblatex name-bolding macro |
-| `polyglossia`, `datetime2` | letter | Defer — language/date via `careerdossier-i18n` |
+| `polyglossia`, `datetime2` | letter | Drop — `v0.1.0` is English-only; the letter date is a plain `date` key |
 | `graphicx` | `resume_modern` | Drop from default — no images |
 
 ### Duplicated implementation

@@ -25,7 +25,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Local build | `latexmk` |
 | Continuous integration | Regression, extraction, smoke, and layout suites plus both example builds |
 
-The academic CV, bibliography integration, Farsi, bilingual layouts, statement classes, A4 paper, and additional themes belong to later releases.
+The academic CV, bibliography integration, statement classes, A4 paper, and additional themes belong to later releases. Farsi, bilingual, and right-to-left support is deferred and unscheduled.
 
 ## Requirements
 
@@ -211,9 +211,11 @@ Source archives and selected example PDFs are available through GitHub Releases.
 |---|---|
 | `v0.1.0` | English industry résumé and cover letter |
 | `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
-| `v0.3.0` | Farsi, bilingual, and right-to-left support |
 | `v0.4.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |
+
+Farsi, bilingual, and right-to-left support (`v0.3.0`) is deferred and
+unscheduled. CareerDossierTeX is English-only.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for release boundaries and non-goals.
 
