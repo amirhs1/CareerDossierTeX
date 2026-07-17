@@ -242,6 +242,7 @@ area:theme
 area:components
 area:build
 area:documentation
+area:agents
 ```
 
 ### State and contributor labels
