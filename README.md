@@ -2,7 +2,7 @@
 
 A reusable XeLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.1.0 — English Industry Dossier` is the current release.  
+> **Status:** `v0.1.1 — Metadata and Build Corrections` is the current release.  
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
 > [`docs/MIGRATION.md`](docs/MIGRATION.md).
@@ -201,7 +201,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.1.0 — English Industry Dossier
+v0.1.1 — Metadata and Build Corrections
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
