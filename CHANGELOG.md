@@ -8,6 +8,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-07-17
+
 ### Added
 
 - `AI-POLICY.md` and contribution guidance for disclosed, human-reviewed AI
@@ -26,6 +28,24 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   order relative to `\CDossierSetup`; fields left alone are still derived. When
   `name` is absent, `/Title` and `/Author` are omitted rather than raising a
   second error. See `docs/API.md`, "PDF document metadata".
+
+### Changed
+
+- The LPPL Work is now defined in one place by `manifest.txt`; each source
+  file's licence notice refers to the manifest instead of naming itself as a
+  separate Work. The licence (LPPL 1.3c), maintenance status, and maintainer are
+  unchanged. `latexmkrc` was removed and its references dropped, since the
+  supported build already passes `-xelatex` explicitly.
+- `make` now builds both supported examples, and the test suites are exposed as
+  Make targets (`make check`, `regression`, `smoke`, `layout`, `extract-test`,
+  `clean`) that mirror the CI commands. The README build instruction is
+  corrected accordingly.
+
+### Fixed
+
+- CI now pins the TeX Live container to an image digest and every GitHub Action
+  to a commit SHA, and records the resolved toolchain versions as an artifact,
+  so a run is reproducible and an upstream retag cannot change what executes.
 
 ## [0.1.0] - 2026-07-15
 
@@ -102,5 +122,6 @@ in a monochrome theme.
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.1.0
