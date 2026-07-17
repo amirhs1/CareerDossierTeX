@@ -164,3 +164,24 @@ jobs:
             letter-industry.pdf
             letter-industry.log
           if-no-files-found: warn
+
+  cv:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Build the academic CV example
+        run: >-
+          latexmk -xelatex -interaction=nonstopmode -halt-on-error
+          examples/academic/cv-academic.tex
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload academic CV PDF and log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: academic-cv-artifacts
+          path: |
+            cv-academic.pdf
+            cv-academic.log
+          if-no-files-found: warn

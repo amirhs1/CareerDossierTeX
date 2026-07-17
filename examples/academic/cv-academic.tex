@@ -1,0 +1,48 @@
+% examples/academic/cv-academic.tex
+%
+% Supported v0.2 academic-CV example. It deliberately has no bibliography
+% package: bibliography support remains optional and is introduced separately.
+
+\documentclass[fontsize=11pt, density=standard]{careerdossier-cv}
+\input{examples/profiles/profile-academic.tex}
+
+\begin{document}
+
+\MakeCDossierHeader
+
+\CDossierSection{Academic Appointments}
+\begin{CDossierEntry}[
+  title        = {Research Fellow},
+  organization = {Example Institute for Analytical Computing},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Develop reproducible methods for scientific computing and data-driven
+          modelling.
+    \item Supervise student research projects and maintain open teaching
+          materials.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Education}
+\begin{CDossierEntry}[
+  title        = {Ph.D. in Computational Science},
+  organization = {Example University},
+  location     = {Toronto, Ontario},
+  dates        = {2018--2024}
+]
+  Dissertation: Reliable numerical methods for coupled nonlinear systems.
+\end{CDossierEntry}
+
+\CDossierSection{Teaching}
+\begin{CDossierEntry}[
+  title        = {Sessional Instructor},
+  organization = {MATH 2410: Differential Equations},
+  location     = {Example University},
+  dates        = {Winter 2025}
+]
+  Designed accessible assessments and supported a diverse cohort of students.
+\end{CDossierEntry}
+
+\end{document}

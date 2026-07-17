@@ -27,3 +27,9 @@ TEST 5: re-setting-a-field-warns-and-overwrites
 Package careerdossier-base Warning: Profile field 'name' was already set; overwriting with the new value.
 [Grace Hopper]
 ============================================================
+============================================================
+TEST 6: orcid-is-a-trimmed-shared-profile-field
+============================================================
+orcid-present
+[0000-0002-1825-0097]
+============================================================

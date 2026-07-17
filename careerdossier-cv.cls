@@ -1,0 +1,216 @@
+%% careerdossier-cv.cls
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the files listed in manifest.txt.
+%%
+%% careerdossier-cv owns the v0.2 academic-CV vertical slice: Letter geometry,
+%% density, multi-page flow, running headers, page numbers, and CV-local
+%% section/entry/list spacing. Shared profile, links, and typography remain in
+%% the corresponding shared modules. Bibliography support is intentionally not
+%% loaded here; a CV without publications must build without BibLaTeX or Biber.
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplClass {careerdossier-cv} {2026-07-17} {0.2.0}
+  {CareerDossierTeX English academic CV class}
+
+\RequirePackage { l3keys2e }
+
+\tl_new:N \l__cdossier_cv_fontsize_tl
+\tl_set:Nn \l__cdossier_cv_fontsize_tl { 11pt }
+\tl_new:N \l__cdossier_cv_density_tl
+\tl_set:Nn \l__cdossier_cv_density_tl { standard }
+
+\msg_new:nnnn { careerdossier-cv } { unknown-option }
+  { Unknown~class~option~'#1'~for~careerdossier-cv. }
+  {
+    Supported~options~are~'fontsize'~(10pt,~11pt)~and~
+    'density'~(compact,~standard).~Paper,~language,~and~theme~are~fixed~
+    in~v0.2.0~and~cannot~be~set~here.
+  }
+
+\keys_define:nn { cdossier / cv }
+  {
+    fontsize .choices:nn =
+      { 10pt , 11pt }
+      { \tl_set_eq:NN \l__cdossier_cv_fontsize_tl \l_keys_choice_tl } ,
+    fontsize .value_required:n = true ,
+    density  .choices:nn =
+      { compact , standard }
+      { \tl_set_eq:NN \l__cdossier_cv_density_tl \l_keys_choice_tl } ,
+    density  .value_required:n = true ,
+    unknown  .code:n =
+      { \msg_error:nnx { careerdossier-cv } { unknown-option } { \l_keys_key_str } } ,
+  }
+\ProcessKeysOptions { cdossier / cv }
+
+\use:x
+  {
+    \exp_not:N \LoadClass
+      [ \l__cdossier_cv_fontsize_tl , letterpaper ]
+      { article }
+  }
+
+\RequirePackage { careerdossier-components }
+\RequirePackage { geometry }
+\RequirePackage { enumitem }
+\RequirePackage { hyperref }
+
+\__cdossier_components_doctype:n { Curriculum\c_space_tl Vitae }
+
+\geometry
+  {
+    letterpaper ,
+    top    = 0.72in ,
+    bottom = 0.72in ,
+    left   = 0.78in ,
+    right  = 0.78in ,
+  }
+
+\setlength { \parindent } { 0pt }
+\setlength { \parskip }   { 0pt plus 1pt }
+
+%% A minimal kernel page style supplies a human-readable header after page one
+%% and a folio on every page. The first page has no running header because the
+%% body header already carries the person's full identity and contact details.
+\makeatletter
+\def\ps@cdossiercv{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddhead{\hfil{\sffamily\small\CDossierFieldValue{name}\enspace--\enspace Curriculum\space Vitae}\hfil}%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage}\hfil}%
+  \let\@evenfoot\@oddfoot
+}
+\def\ps@cdossiercvfirst{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddhead{}%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage}\hfil}%
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+\pagestyle { cdossiercv }
+\AtBeginDocument { \thispagestyle { cdossiercvfirst } }
+
+\bool_new:N \l__cdossier_cv_compact_bool
+\str_if_eq:VnTF \l__cdossier_cv_density_tl { compact }
+  { \bool_set_true:N \l__cdossier_cv_compact_bool }
+  { \bool_set_false:N \l__cdossier_cv_compact_bool }
+
+\skip_new:N \l__cdossier_cv_sectionabove_skip
+\skip_new:N \l__cdossier_cv_sectiongap_skip
+\skip_new:N \l__cdossier_cv_sectionbelow_skip
+\skip_new:N \l__cdossier_cv_entryabove_skip
+\skip_new:N \l__cdossier_cv_entrygap_skip
+\skip_new:N \l__cdossier_cv_entrybelow_skip
+\skip_new:N \l__cdossier_cv_itemsep_skip
+\skip_new:N \l__cdossier_cv_itemtop_skip
+\dim_new:N  \l__cdossier_cv_rule_dim
+\dim_set:Nn \l__cdossier_cv_rule_dim { 0.4pt }
+
+\bool_if:NTF \l__cdossier_cv_compact_bool
+  {
+    \skip_set:Nn \l__cdossier_cv_sectionabove_skip { 9pt plus 2pt minus 1pt }
+    \skip_set:Nn \l__cdossier_cv_sectiongap_skip   { 2pt }
+    \skip_set:Nn \l__cdossier_cv_sectionbelow_skip { 4pt plus 1pt }
+    \skip_set:Nn \l__cdossier_cv_entryabove_skip   { 4pt plus 1pt }
+    \skip_set:Nn \l__cdossier_cv_entrygap_skip     { 1pt }
+    \skip_set:Nn \l__cdossier_cv_entrybelow_skip   { 4pt plus 1pt }
+    \skip_set:Nn \l__cdossier_cv_itemsep_skip      { 1pt }
+    \skip_set:Nn \l__cdossier_cv_itemtop_skip      { 1pt }
+  }
+  {
+    \skip_set:Nn \l__cdossier_cv_sectionabove_skip { 14pt plus 3pt minus 2pt }
+    \skip_set:Nn \l__cdossier_cv_sectiongap_skip   { 3pt }
+    \skip_set:Nn \l__cdossier_cv_sectionbelow_skip { 7pt plus 2pt }
+    \skip_set:Nn \l__cdossier_cv_entryabove_skip   { 8pt plus 2pt }
+    \skip_set:Nn \l__cdossier_cv_entrygap_skip     { 2pt }
+    \skip_set:Nn \l__cdossier_cv_entrybelow_skip   { 6pt plus 2pt }
+    \skip_set:Nn \l__cdossier_cv_itemsep_skip      { 3pt }
+    \skip_set:Nn \l__cdossier_cv_itemtop_skip      { 2pt }
+  }
+
+\NewDocumentCommand \CDossierSection { m }
+  {
+    \par
+    \addvspace { \l__cdossier_cv_sectionabove_skip }
+    \noindent { \CDossierSectionStyle \large #1 }
+    \par \nobreak
+    \vspace { \l__cdossier_cv_sectiongap_skip }
+    \noindent { \CDossierRuleColor \rule { \linewidth } { \l__cdossier_cv_rule_dim } }
+    \par \nobreak
+    \vspace { \l__cdossier_cv_sectionbelow_skip }
+  }
+
+\tl_new:N \l__cdossier_cv_entry_title_tl
+\tl_new:N \l__cdossier_cv_entry_org_tl
+\tl_new:N \l__cdossier_cv_entry_loc_tl
+\tl_new:N \l__cdossier_cv_entry_dates_tl
+
+\msg_new:nnnn { careerdossier-cv } { unknown-entry-key }
+  { Unknown~CDossierEntry~key~'#1'. }
+  { The~supported~keys~are:~title,~organization,~location,~dates. }
+\msg_new:nnnn { careerdossier-cv } { entry-missing-title }
+  { A~CDossierEntry~is~missing~its~required~'title'. }
+  { Add~a~title,~for~example:~\c_backslash_str begin\c_left_brace_str CDossierEntry\c_right_brace_str [title~=~Research~Fellow]. }
+
+\keys_define:nn { cdossier / cv / entry }
+  {
+    title        .tl_set:N = \l__cdossier_cv_entry_title_tl ,
+    organization .tl_set:N = \l__cdossier_cv_entry_org_tl ,
+    location     .tl_set:N = \l__cdossier_cv_entry_loc_tl ,
+    dates        .tl_set:N = \l__cdossier_cv_entry_dates_tl ,
+    unknown      .code:n =
+      { \msg_error:nnx { careerdossier-cv } { unknown-entry-key } { \l_keys_key_str } } ,
+  }
+
+\NewDocumentEnvironment { CDossierEntry } { O{} }
+  {
+    \tl_clear:N \l__cdossier_cv_entry_title_tl
+    \tl_clear:N \l__cdossier_cv_entry_org_tl
+    \tl_clear:N \l__cdossier_cv_entry_loc_tl
+    \tl_clear:N \l__cdossier_cv_entry_dates_tl
+    \keys_set:nn { cdossier / cv / entry } {#1}
+    \tl_if_blank:VT \l__cdossier_cv_entry_title_tl
+      { \msg_error:nn { careerdossier-cv } { entry-missing-title } }
+    \par
+    \addvspace { \l__cdossier_cv_entryabove_skip }
+    \__cdossier_components_entryhead:VVVV
+      \l__cdossier_cv_entry_title_tl
+      \l__cdossier_cv_entry_org_tl
+      \l__cdossier_cv_entry_loc_tl
+      \l__cdossier_cv_entry_dates_tl
+    \nobreak
+    \vspace { \l__cdossier_cv_entrygap_skip }
+  }
+  {
+    \par
+    \addvspace { \l__cdossier_cv_entrybelow_skip }
+  }
+
+\NewDocumentEnvironment { CDossierItemize } { }
+  {
+    \begin { itemize }
+      [
+        leftmargin = 1.4em ,
+        labelsep   = 0.5em ,
+        topsep     = \l__cdossier_cv_itemtop_skip ,
+        itemsep    = \l__cdossier_cv_itemsep_skip ,
+        parsep     = 0pt ,
+        label      = \textbullet ,
+      ]
+  }
+  { \end { itemize } }
+
+\endinput

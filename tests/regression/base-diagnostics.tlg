@@ -7,7 +7,7 @@ TEST 1: unknown-setup-key-errors
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The supported keys are: name, headline, email, phone, location, website, linkedin, github, scholar.
+The supported keys are: name, headline, email, phone, location, website, linkedin, github, scholar, orcid.
 ============================================================
 ============================================================
 TEST 2: unknown-field-in-print-errors
@@ -16,7 +16,7 @@ TEST 2: unknown-field-in-print-errors
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The supported fields are: name, headline, email, phone, location, website, linkedin, github, scholar.
+The supported fields are: name, headline, email, phone, location, website, linkedin, github, scholar, orcid.
 ============================================================
 ============================================================
 TEST 3: unknown-field-in-conditional-errors
@@ -25,7 +25,7 @@ TEST 3: unknown-field-in-conditional-errors
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The supported fields are: name, headline, email, phone, location, website, linkedin, github, scholar.
+The supported fields are: name, headline, email, phone, location, website, linkedin, github, scholar, orcid.
 false-branch
 ============================================================
 ============================================================

@@ -35,4 +35,10 @@
   \TYPE{[\CDossierFieldValue{name}]}
 }
 
+\TEST{orcid-is-a-trimmed-shared-profile-field}{
+  \CDossierSetup{ orcid = { 0000-0002-1825-0097 } }
+  \CDossierIfFieldTF{orcid}{\TYPE{orcid-present}}{\TYPE{orcid-absent}}
+  \TYPE{[\CDossierFieldValue{orcid}]}
+}
+
 \END

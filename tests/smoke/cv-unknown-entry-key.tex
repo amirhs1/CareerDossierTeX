@@ -1,0 +1,9 @@
+% cv-unknown-entry-key.tex — CV entry keys must reject unsupported aliases.
+\documentclass{careerdossier-cv}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\begin{CDossierEntry}[title = {Research Fellow}, employer = {Example Institute}]
+  Invalid entry key fixture.
+\end{CDossierEntry}
+\end{document}
