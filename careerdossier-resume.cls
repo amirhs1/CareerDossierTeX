@@ -13,7 +13,7 @@
 %% This work has the LPPL maintenance status `maintained'.
 %% The Current Maintainer of this work is Amir Sadeghi.
 %%
-%% This work consists of the file careerdossier-resume.cls.
+%% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-resume owns résumé-specific page behaviour for the v0.1.0
 %% English industry dossier: US Letter geometry, the two supported class

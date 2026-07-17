@@ -1,0 +1,53 @@
+CareerDossierTeX — manifest
+===========================
+
+This file records the set of files constituting the Work under the LaTeX
+Project Public License (LPPL), version 1.3c or, at your option, any later
+version. Each source file's licence notice refers to this manifest rather than
+naming itself, so the Work is defined in exactly one place.
+
+    Copyright (C) 2026 Amir Sadeghi.
+    LPPL maintenance status: `maintained'.
+    Current Maintainer: Amir Sadeghi.
+
+Update this file whenever a file is added to or removed from the Work, in the
+same change (see CONTRIBUTING.md, "Licensing contributions", and AGENTS.md).
+
+
+The Work
+--------
+
+manifest.txt                  this file; defines the Work
+careerdossier-base.sty        shared profile metadata, keys, and validation
+careerdossier-typography.sty  XeLaTeX engine guard, fonts, semantic text roles
+careerdossier-theme.sty       monochrome semantic colour, rule, and link tokens
+careerdossier-components.sty  shared identity block, contact line, entry primitives
+careerdossier-resume.cls      English industry résumé class
+careerdossier-letter.cls      English industry cover-letter class
+
+
+Distributed with the Work
+-------------------------
+
+These files accompany the Work and are covered by the same licence, but are not
+part of the Work for the purposes of the LPPL's filename and maintenance
+conditions.
+
+LICENSE                       the LPPL v1.3c licence text (kept unmodified)
+README.md                     overview, supported behaviour, licence, and version
+CHANGELOG.md                  user-visible changes per release
+CONTRIBUTING.md               contribution, test, and release workflow
+AGENTS.md                     operating contract for coding agents
+build.lua                     l3build configuration for the regression suite
+Makefile                      local build and test entry points
+docs/                         API, architecture, roadmap, migration, design guidance
+examples/                     user-facing example documents
+tests/                        regression, smoke, layout, and extraction fixtures
+
+
+Not distributed
+---------------
+
+Generated PDFs and LaTeX build artifacts are not tracked; see .gitignore.
+Documents produced with CareerDossierTeX are not required to use the LPPL
+merely because they were created with these classes.
