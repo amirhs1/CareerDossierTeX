@@ -13,7 +13,7 @@
 %% This work has the LPPL maintenance status `maintained'.
 %% The Current Maintainer of this work is Amir Sadeghi.
 %%
-%% This work consists of the file careerdossier-letter.cls.
+%% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-letter owns the v0.1.0 English industry cover-letter geometry
 %% and prose structure: US Letter margins, the letter-specific metadata keys,

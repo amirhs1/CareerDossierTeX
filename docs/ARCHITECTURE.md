@@ -517,8 +517,9 @@ CareerDossierTeX/
 │   ├── workflows/
 │   │   └── build.yml
 │   └── pull_request_template.md
-├── latexmkrc
+├── build.lua
 ├── Makefile
+├── manifest.txt
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
