@@ -606,9 +606,10 @@ closing, and sender-metadata behavior. Optional recipient and academic profile
 fields collapse independently.
 
 The family may change letter-owned spacing and derives `/Title` as
-`Academic Cover Letter – <name>`. It does not introduce new recipient keys or
-change the industry family's defaults. Unknown family values must produce an
-actionable class error.
+`Academic Cover Letter – <name>`. Each academic-letter page has a print-oriented
+footer: `name` at left and `Page n of N` at right. It does not introduce new
+recipient keys or change the industry family's defaults. Unknown family values
+must produce an actionable class error.
 
 ### Explicitly unsupported in `v0.2.0`
 

@@ -81,9 +81,25 @@
   { \geometry { letterpaper , top = 0.9in , bottom = 0.9in , left = 1in , right = 1in } }
   { \geometry { letterpaper , margin = 1in } }
 
-%% No page numbers: a two-page cover letter carries identity in its letterhead,
-%% not a folio. Users who want page numbers can restore a page style themselves.
-\pagestyle { empty }
+%% Industry letters retain the v0.1 empty page style. Academic letters use a
+%% print-oriented footer: identity at left and the current/total page count at
+%% right. The end-of-document label is kernel-only, so no total-page package is
+%% required; normal XeLaTeX workflows rerun to resolve it.
+\makeatletter
+\def\ps@cdossieracademicletter{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddhead{}%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{\footnotesize\sffamily\CDossierFieldValue{name}\hfil Page~\thepage\space of~\pageref{cdossier-letter-last-page}}%
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+\str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
+  {
+    \pagestyle { cdossieracademicletter }
+    \AtEndDocument { \label { cdossier-letter-last-page } }
+  }
+  { \pagestyle { empty } }
 
 %% Block format: no paragraph indentation, paragraphs separated by vertical
 %% space. \emergencystretch keeps justified prose from producing overfull boxes

@@ -28,7 +28,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   academic cover-letter family. `industry` remains the default and existing
   letter metadata, optional recipient handling, and public commands are shared
   unchanged. Academic letters derive the PDF title `Academic Cover Letter –
-  <name>`.
+  <name>` and carry a print-oriented footer with the name and `Page n of N`.
 
 ## [0.1.1] - 2026-07-17
 
