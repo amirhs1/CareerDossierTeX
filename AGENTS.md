@@ -78,7 +78,6 @@ focused issue and current repository structure rather than creating the entire
 target architecture incidentally.
 
 - `careerdossier-base.sty` — metadata, shared keys, and validation; no layout
-- `careerdossier-i18n.sty` — English labels and language abstraction
 - `careerdossier-typography.sty` — engine checks, fonts, semantic text roles
 - `careerdossier-theme.sty` — semantic monochrome visual tokens
 - `careerdossier-components.sty` — shared rendered components; no page geometry
@@ -129,8 +128,8 @@ implementation and committed in the same PR. A separate test-only issue is for
 test infrastructure, cross-cutting coverage, or explicit legacy test debt—not a
 place to postpone acceptance tests already required by a feature.
 
-Match the test to the module. Logic-bearing modules (`careerdossier-base.sty`,
-`careerdossier-i18n.sty`, and the non-visual parts of
+Match the test to the module. Logic-bearing modules (`careerdossier-base.sty`
+and the non-visual parts of
 `careerdossier-typography.sty`) take a focused `l3build` regression test
 (`.lvt` source, saved `.tlg` baseline) per module. Layout classes
 (`careerdossier-resume.cls`, `careerdossier-letter.cls`) take smoke, extraction,

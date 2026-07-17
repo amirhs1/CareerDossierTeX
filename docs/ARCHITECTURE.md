@@ -124,16 +124,29 @@ It must not define:
 
 This package is analogous to a small data model or configuration module. It stores values and enforces basic rules but does not decide how a document page looks.
 
-### Future `careerdossier-i18n.sty` (v0.3.0 target)
+### English strings and the absence of a language module
 
-`v0.1.0` does not ship a language-abstraction module or a `\CDossierLabel`
-command. Its English letter defaults (`Dear Hiring Manager,` and `Sincerely,`)
-are defined inline in `careerdossier-letter.cls`.
+CareerDossierTeX is English-only and has no language-abstraction module and no
+`\CDossierLabel` command. This is a settled design decision, not a gap: Farsi,
+bilingual, and RTL support is deferred and unscheduled (see `docs/ROADMAP.md`),
+and a label indirection layer earns its keep only once a second language exists.
 
-The planned `careerdossier-i18n.sty` module belongs to the v0.3.0 Farsi and
-bilingual release. It should centralize label lookup, provide translation tables
-and direction helpers, and allow future language support without duplicating
-document classes.
+The letter's English defaults (`Dear Hiring Manager,` and `Sincerely,`) are
+therefore defined inline in `careerdossier-letter.cls`, which owns letter prose
+structure. They are defaults, not fixed strings — `\CDossierLetterSetup` exposes
+`salutation` and `closing` keys, so a user overrides them per document without
+any language machinery:
+
+```latex
+\CDossierLetterSetup{
+  salutation = {Dear Dr. Chen,},
+  closing    = {Best regards,}
+}
+```
+
+If multilingual support is ever revived, the label table belongs in a new shared
+module rather than in either class, so the classes are not duplicated per
+language.
 
 ### `careerdossier-typography.sty`
 
@@ -721,9 +734,12 @@ The CV class may reuse profile, typography, theme, and components while owning m
 
 Bibliography support must remain optional.
 
-### `v0.3.0`
+### `v0.3.0` — deferred, unscheduled
 
-Extend the existing i18n, typography, component, résumé, CV, and letter modules. Do not duplicate the class hierarchy by language.
+Farsi, bilingual, and RTL support is not scheduled (see `docs/ROADMAP.md`). If it
+is revived, extend the existing typography, component, résumé, CV, and letter
+modules and add a shared label module. Do not duplicate the class hierarchy by
+language.
 
 ### `v0.4.0`
 
