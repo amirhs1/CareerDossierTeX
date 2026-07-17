@@ -81,6 +81,11 @@
 \RequirePackage { enumitem }
 \RequirePackage { hyperref }
 
+%% Declare the document type so the shared PDF-metadata code can title this
+%% document distinctly from a letter built off the same profile. The title
+%% itself is assembled in careerdossier-components, which owns identity.
+\__cdossier_components_doctype:n { Résumé }
+
 %% US Letter geometry with compact but comfortable résumé margins.
 \geometry
   {
