@@ -8,6 +8,20 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- PDF document metadata derived from the shared profile, applied automatically
+  at `\begin{document}` by `careerdossier-components`. A résumé now carries
+  `/Title` `Résumé – <name>`, a cover letter `Cover Letter – <name>`, both carry
+  `/Author` `<name>`, and both declare `/Lang` `en`. Previously the classes set
+  no PDF metadata at all, so viewers and file managers showed the filename
+  instead of a title, and the document declared no language. The document type is
+  part of the title so a résumé and a letter built from one profile stay
+  distinguishable. Any field set with `\hypersetup` is left untouched, in either
+  order relative to `\CDossierSetup`; fields left alone are still derived. When
+  `name` is absent, `/Title` and `/Author` are omitted rather than raising a
+  second error. See `docs/API.md`, "PDF document metadata".
+
 ## [0.1.0] - 2026-07-15
 
 First tagged release: an English industry résumé and a matching industry cover

@@ -215,7 +215,32 @@ Responsibilities:
 - hyperlink wrappers;
 - common entry-heading primitives;
 - date and location primitives;
-- shared letterhead pieces that do not impose full page geometry.
+- shared letterhead pieces that do not impose full page geometry;
+- PDF document metadata derived from the profile.
+
+#### Why PDF metadata lives here
+
+`/Title`, `/Author`, and `/Lang` are derived from profile data this module
+already owns, and both classes need them identically, so putting them in either
+class would duplicate the logic and duplicate it again for every class added
+later. The classes contribute only the one thing they own that components cannot
+know: what kind of document they produce, declared through
+`\__cdossier_components_doctype:n`, so a résumé and a letter built from one
+profile do not receive identical titles.
+
+Two constraints shape the implementation:
+
+- **Timing.** The values cannot be applied when the class loads `hyperref`,
+  because `\CDossierSetup` has not run yet and the profile is still empty. They
+  are applied at `\begin{document}` instead.
+- **Precedence.** Because they are applied late, a blind write would silently
+  discard a user's own `\hypersetup` — including the one the ATS guide's own
+  template places *before* `\CDossierSetup`. Each field is therefore written
+  only when the document has not already set it.
+
+This module does not load `hyperref` (the classes own it), so the entry point is
+guarded and the package still loads without it, matching how the link wrappers
+already degrade.
 
 A critical invariant is:
 

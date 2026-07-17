@@ -1141,7 +1141,9 @@ the release archive from the handwritten source; there is no need to migrate to
 ```tex
 \documentclass[fontsize=11pt]{careerdossier-resume}
 
-% Document-level PDF metadata (language/pdflang are set by the class):
+% Optional. pdftitle, pdfauthor, and pdflang are derived from the profile
+% automatically; set them only to override the derived values. A \hypersetup
+% anywhere in the preamble wins, before or after \CDossierSetup.
 \hypersetup{
   pdftitle  = {Résumé — Zoë Dvořák},
   pdfauthor = {Zoë Dvořák}

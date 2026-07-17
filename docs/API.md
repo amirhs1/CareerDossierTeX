@@ -208,6 +208,51 @@ Optional fields must not produce empty separators or blank lines.
 
 The recipient block must collapse cleanly when one or more optional fields are absent.
 
+## PDF document metadata
+
+Both classes derive the PDF's document metadata from the shared profile. Nothing
+needs to be called; the values are applied automatically at `\begin{document}`.
+
+| PDF field | Derived from | Résumé value | Letter value |
+|---|---|---|---|
+| `/Title` | `name` | `Résumé – <name>` | `Cover Letter – <name>` |
+| `/Author` | `name` | `<name>` | `<name>` |
+| `/Lang` | fixed | `en` | `en` |
+
+The document type is part of the title so that a résumé and a cover letter built
+from one profile are distinguishable in a viewer's tab bar, in document
+properties, and in a file manager.
+
+When `name` is absent, `/Title` and `/Author` are left unset. `\MakeCDossierHeader`
+and `\MakeCDossierLetterhead` already error on a missing `name`; metadata does not
+add a second diagnostic.
+
+`/Lang` is `en` because `v0.1.0` is English-only. There is no language key.
+
+### Overriding the derived metadata
+
+Set any field yourself with `\hypersetup` and it is used unchanged:
+
+```latex
+\documentclass{careerdossier-resume}
+
+\hypersetup{
+  pdftitle  = {Ada Lovelace — Data Scientist, Analytical Engine Division},
+  pdfauthor = {A. Lovelace},
+  pdflang   = {en-GB}
+}
+
+\CDossierSetup{ name = {Ada Lovelace} }
+```
+
+A field you set is never overwritten, and the order does not matter — the
+`\hypersetup` may appear before or after `\CDossierSetup`. Fields you do not set
+are still derived, so overriding `pdftitle` alone leaves `/Author` and `/Lang`
+in place.
+
+Other `hyperref` metadata (`pdfsubject`, `pdfkeywords`, …) is untouched; set it
+with `\hypersetup` as usual.
+
 ## Public commands
 
 ### `\MakeCDossierHeader`

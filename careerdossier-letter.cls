@@ -63,6 +63,11 @@
 \RequirePackage { geometry }
 \RequirePackage { hyperref }
 
+%% Declare the document type so the shared PDF-metadata code can title this
+%% document distinctly from a résumé built off the same profile. The title
+%% itself is assembled in careerdossier-components, which owns identity.
+\__cdossier_components_doctype:n { Cover~Letter }
+
 %% US Letter with conventional one-inch business-letter margins.
 \geometry { letterpaper , margin = 1in }
 

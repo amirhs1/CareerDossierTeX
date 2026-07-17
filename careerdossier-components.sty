@@ -168,3 +168,99 @@
       }
   }
 \cs_generate_variant:Nn \__cdossier_components_entryhead:nnnn { VVVV }
+
+%% ---------------------------------------------------------------------------
+%% PDF document metadata.
+%%
+%% A PDF with no /Title shows its filename in viewer tab bars and document
+%% properties, and /Lang is the document's natural-language declaration. Both
+%% are derivable from the profile this module already owns, so they are set
+%% here rather than duplicated in every class.
+%%
+%% Timing: the values are applied at \begin{document}. They cannot be applied
+%% earlier, because the class loads hyperref while the profile is still empty --
+%% \CDossierSetup does not run until the preamble.
+%%
+%% Precedence: each field is written only when the document has not already set
+%% it, so a user's own \hypersetup wins wherever it appears in the preamble.
+%% That matters because the documented template in docs/guides/ats-extraction.md
+%% places \hypersetup *before* \CDossierSetup; a blind write here would silently
+%% discard it.
+%%
+%% hyperref is not loaded by this module (the classes own it), so every entry
+%% point is guarded and the package still loads without it.
+%% ---------------------------------------------------------------------------
+\tl_new:N \l__cdossier_components_doctype_tl
+\tl_new:N \l__cdossier_components_pdfname_tl
+
+%% Declare the kind of document being produced. The owning class calls this, so
+%% a resume and a letter built from one profile do not receive identical PDF
+%% titles. Absent or blank, the title falls back to the name alone.
+\cs_new_protected:Npn \__cdossier_components_doctype:n #1
+  { \tl_set:Nn \l__cdossier_components_doctype_tl {#1} }
+
+%% Has the document already supplied this hyperref metadata field?
+%%
+%% This reads hyperref's internals, so the observed states are spelled out
+%% rather than assumed. On a fresh hyperref, \@pdftitle and \@pdfauthor are
+%% defined and empty, while \@pdflang is \relax. expl3 reports a \relax-meaning
+%% control sequence as *not existing*, so the \relax and never-defined cases
+%% collapse into the same branch -- and both mean the document has not supplied
+%% a value. Only a defined, non-empty value counts as user-supplied.
+%%
+%% Getting this backwards is silent: the field simply never reaches the PDF, and
+%% no log records it. tests/regression/components-pdfmeta.lvt pins all three
+%% states.
+%%
+%% Emptiness is tested through the macro's expansion rather than with
+%% \tl_if_empty:c, which compares meaning against \c_empty_tl and therefore
+%% reports an empty \long macro as non-empty. hyperref's fields happen to be
+%% non-long today, so \tl_if_empty:c would work by luck; expanding first does
+%% not depend on that.
+%%
+%% These names are read, never redefined.
+\prg_new_protected_conditional:Npnn \__cdossier_components_hyp_if_unset:n #1
+  { T , TF }
+  {
+    \cs_if_exist:cTF {#1}
+      {
+        \exp_args:Ne \tl_if_empty:nTF { \use:c {#1} }
+          { \prg_return_true: }
+          { \prg_return_false: }
+      }
+      { \prg_return_true: }
+  }
+
+%% Build "Doctype -- Name", or just "Name" when the class declared no doctype.
+\cs_new_protected:Npn \__cdossier_components_pdftitle:
+  {
+    \tl_set:Nx \l__cdossier_components_pdfname_tl { \CDossierFieldValue { name } }
+    \tl_if_blank:VF \l__cdossier_components_doctype_tl
+      {
+        \tl_put_left:Nx \l__cdossier_components_pdfname_tl
+          { \l__cdossier_components_doctype_tl \c_space_tl -- \c_space_tl }
+      }
+  }
+
+%% Apply the derived metadata. Only ever called when hyperref is present.
+\cs_new_protected:Npn \__cdossier_components_pdfmeta:
+  {
+    \CDossierIfFieldTF { name }
+      {
+        \__cdossier_components_hyp_if_unset:nT { @pdftitle }
+          {
+            \__cdossier_components_pdftitle:
+            \hypersetup { pdftitle = { \l__cdossier_components_pdfname_tl } }
+          }
+        \__cdossier_components_hyp_if_unset:nT { @pdfauthor }
+          { \hypersetup { pdfauthor = { \CDossierFieldValue { name } } } }
+      }
+      { }
+    %% v0.1.0 is English-only (see docs/ARCHITECTURE.md); there is no language
+    %% key to route this through yet.
+    \__cdossier_components_hyp_if_unset:nT { @pdflang }
+      { \hypersetup { pdflang = en } }
+  }
+
+\AddToHook { begindocument }
+  { \cs_if_exist:NT \hypersetup { \__cdossier_components_pdfmeta: } }

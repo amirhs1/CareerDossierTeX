@@ -1,0 +1,103 @@
+% components-pdfmeta.lvt — careerdossier-components PDF metadata construction.
+%
+% Two things are checked here, neither of which any other suite can see.
+%
+% 1. The "has the document already set this?" test. The module derives
+%    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
+%    value the document supplied itself. hyperref leaves an unset \@pdftitle and
+%    \@pdfauthor defined-but-empty, and an unset \@pdflang as \relax. Those two
+%    states must both read as "unset", and only a non-empty value as
+%    "user-supplied".
+%
+%    This case is worth pinning because getting it wrong is *silent*: expl3
+%    reports a \relax-meaning control sequence as not existing, so treating the
+%    non-existent branch as "already set" makes the field vanish from the PDF
+%    with nothing in the log. The control sequences below stand in for
+%    hyperref's, so the conditional is exercised without loading hyperref.
+%
+% 2. The title join. The owning class declares a document type so a résumé and a
+%    cover letter built from one profile do not receive identical titles; with no
+%    doctype the title is the bare name.
+%
+% Whether the values actually reach the PDF catalog and info dictionary is a
+% property of the built document, not of this log, and is covered by the smoke
+% fixtures.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+% Stand-ins for hyperref's internals, in each state the real ones can be in.
+% \@pdflang unset is \relax; \@pdftitle unset is a plain (non-long) empty macro,
+% which is what \cs_set_nopar:cpn reproduces. The \long empty is included
+% deliberately: hyperref's fields are not \long today, but an emptiness test
+% that depends on that would be correct only by luck, and would fail silently.
+\cs_set_eq:cN      { cdossiertestrelax } \relax
+\cs_set_nopar:cpn  { cdossiertestempty } { }
+\cs_set:cpn        { cdossiertestlongempty } { }
+\cs_set_nopar:cpn  { cdossiertestfull  } { Already~Set~By~User }
+
+\cs_new_protected:Npn \cdossiertestVerdict #1
+  {
+    \__cdossier_components_hyp_if_unset:nTF {#1}
+      { \TYPE{ #1 ~ -> ~ unset } }
+      { \TYPE{ #1 ~ -> ~ user-supplied } }
+  }
+
+\cs_new_protected:Npn \cdossiertestTitle
+  {
+    \__cdossier_components_pdftitle:
+    \TYPE{ [\l__cdossier_components_pdfname_tl] }
+  }
+\cs_new_protected:Npn \cdossiertestSetDoctype #1
+  { \__cdossier_components_doctype:n {#1} }
+\cs_new_protected:Npn \cdossiertestClearDoctype
+  { \tl_clear:N \l__cdossier_components_doctype_tl }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+% An unset \@pdflang is \relax. expl3 reports \relax as non-existent, so this is
+% the case that must not be mistaken for "the user set it".
+\TEST{relax-field-reads-as-unset}{
+  \cdossiertestVerdict{cdossiertestrelax}
+}
+
+% An unset \@pdftitle/\@pdfauthor is defined but empty.
+\TEST{empty-field-reads-as-unset}{
+  \cdossiertestVerdict{cdossiertestempty}
+}
+
+% The same, but \long. \tl_if_empty:N compares meaning against \c_empty_tl,
+% which is not \long, so it would call this one non-empty and silently refuse to
+% write the field. The test pins the expansion-based check that does not care.
+\TEST{long-empty-field-also-reads-as-unset}{
+  \cdossiertestVerdict{cdossiertestlongempty}
+}
+
+% A field the document set must be left alone.
+\TEST{non-empty-field-reads-as-user-supplied}{
+  \cdossiertestVerdict{cdossiertestfull}
+}
+
+% A name hyperref never defined: nothing to preserve, so treat it as unset.
+\TEST{undefined-field-reads-as-unset}{
+  \cdossiertestVerdict{cdossiertestneverdefined}
+}
+
+% With a doctype declared, the title distinguishes the document from a sibling
+% built off the same profile.
+\TEST{title-joins-doctype-and-name}{
+  \CDossierSetup{ name = {Ada Lovelace} }
+  \cdossiertestSetDoctype{Testdoc}
+  \cdossiertestTitle
+}
+
+% With no doctype, the title is the bare name and carries no stray separator.
+\TEST{title-without-doctype-is-bare-name}{
+  \cdossiertestClearDoctype
+  \cdossiertestTitle
+}
+
+\END
