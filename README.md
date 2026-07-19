@@ -22,7 +22,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar and ORCID fields |
-| Language | English | Farsi, bilingual, and RTL support is deferred |
+| Language | English | Farsi, bilingual, and RTL support is dropped |
 | Engine | XeLaTeX | pdfLaTeX and LuaLaTeX are unsupported |
 | Paper size | US Letter | A4 is unsupported |
 | Theme | Monochrome | Color themes, font presets, and icons are unsupported |
@@ -30,7 +30,7 @@ CareerDossierTeX separates personal information from document content and presen
 
 Statement classes, A4 paper, color themes, font presets, icons, and alternate
 bibliography styles belong to later milestone work. Farsi, bilingual, and
-right-to-left support is deferred and unscheduled.
+right-to-left support is dropped; CareerDossierTeX is English-only.
 
 ## Requirements
 
@@ -326,8 +326,8 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.4.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |
 
-Farsi, bilingual, and right-to-left support (`v0.3.0`) is deferred and
-unscheduled. CareerDossierTeX is English-only.
+Farsi, bilingual, and right-to-left support (`v0.3.0`) is dropped.
+CareerDossierTeX is English-only.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for release boundaries and non-goals.
 

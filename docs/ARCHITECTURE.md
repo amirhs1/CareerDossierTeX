@@ -156,8 +156,8 @@ This package is analogous to a small data model or configuration module. It stor
 
 CareerDossierTeX is English-only and has no language-abstraction module and no
 `\CDossierLabel` command. This is a settled design decision, not a gap: Farsi,
-bilingual, and RTL support is deferred and unscheduled (see `docs/ROADMAP.md`),
-and a label indirection layer earns its keep only once a second language exists.
+bilingual, and RTL support is dropped (see `docs/ROADMAP.md`), and a label
+indirection layer earns its keep only once a second language exists.
 
 The letter's English defaults (`Dear Hiring Manager,` and `Sincerely,`) are
 therefore defined inline in `careerdossier-letter.cls`, which owns letter prose
@@ -465,9 +465,12 @@ This is one place where LaTeX differs from ordinary object-oriented code: groupi
 - no separate English-specific classes;
 - user-provided content remains the user's responsibility.
 
-### Phase 3
+### Dropped design sketch: Farsi and bilingual support
 
-Add:
+> **Status:** dropped 2026-07-16, not scheduled (see `docs/ROADMAP.md`). Kept
+> as a design record only — none of this is implemented or committed scope.
+
+If Farsi/bilingual support is ever revived:
 
 ```text
 language=english|farsi|bilingual
@@ -845,12 +848,12 @@ letter class gains its academic family without a duplicate class. Bibliography
 support remains an explicit optional package so a CV without BibLaTeX still
 builds.
 
-### `v0.3.0` — deferred, unscheduled
+### `v0.3.0` — dropped, 2026-07-16
 
-Farsi, bilingual, and RTL support is not scheduled (see `docs/ROADMAP.md`). If it
-is revived, extend the existing typography, component, résumé, CV, and letter
-modules and add a shared label module. Do not duplicate the class hierarchy by
-language.
+Farsi, bilingual, and RTL support is dropped, not scheduled (see
+`docs/ROADMAP.md`). If it is ever revived, extend the existing typography,
+component, résumé, CV, and letter modules and add a shared label module. Do
+not duplicate the class hierarchy by language.
 
 ### `v0.4.0`
 
