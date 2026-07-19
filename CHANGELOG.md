@@ -8,6 +8,38 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Fixed
+
+- Text extracted from CareerDossierTeX PDFs no longer merges adjacent words in
+  PDFKit-based consumers — macOS Preview, Quick Look, Spotlight, Safari's PDF
+  viewer, and ordinary copy/paste. `careerdossier-typography` had enabled
+  `\XeTeXgenerateactualtext`, which wraps each word in its own `/ActualText`
+  span with no space between spans; consumers that trust `/ActualText` over
+  glyph geometry read `Research& Development` for `Research & Development`.
+  The setting is now off. Rendered pages are unchanged, and Poppler
+  (`pdftotext`) output is unchanged for the résumé, letter, and CV fixtures.
+  This addresses the text layer only and is not a tagging, PDF/UA, WCAG, or
+  ATS-conformance claim. ([#72])
+
+  One extraction change is visible with the optional BibLaTeX integration.
+  BibLaTeX sets its `doi` and `url` labels as lowercase text rendered in small
+  capitals; `/ActualText` used to report the lowercase source, so extraction
+  read `doi:` and `url:`. Without it, extraction reads the glyphs actually shown
+  and reports `DOI:` and `URL:`. The visible page is identical, and the
+  extracted form now matches both the printed capitalization and the
+  conventional acronym, but Poppler-based tooling that matched the lowercase
+  labels will need updating.
+
+### Changed
+
+- The extraction fixture suite now gates on three checks instead of one: the
+  Poppler baseline, the absence of `/ActualText` spans in the PDF, and — on
+  macOS — an Apple PDFKit baseline extracted through `PDFDocument.string`.
+  Fixtures build uncompressed so the `/ActualText` check needs no tool beyond
+  `grep`. The PDFKit check is skipped with a notice on other platforms.
+
+[#72]: https://github.com/amirhs1/CareerDossierTeX/issues/72
+
 ## [0.2.0] - 2026-07-17
 
 ### Added

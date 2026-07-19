@@ -187,7 +187,7 @@ Responsibilities:
 - select portable default fonts;
 - define semantic styles such as name, headline, section, entry title, body, and muted text;
 - provide extension points for future font presets.
-- set `\XeTeXgenerateactualtext=1`;
+- leave `\XeTeXgenerateactualtext` disabled (see the ATS guide, section 4.5);
 - apply the Latin ligature-suppression and lining-numbers defaults;
 - resolve the default font deliberately (fontconfig family name, or an explicit
   `Path=`), not by bare file name — bare-file-name loading of the tex-gyre OTFs
@@ -584,8 +584,8 @@ The generated PDF's text layer is a first-class deliverable, owned jointly by
 classes (reading order). The policy, with rationale and tests, lives in
 [`docs/guides/ats-extraction.md`](guides/ats-extraction.md). In summary:
 
-- compile with XeLaTeX and set `\XeTeXgenerateactualtext=1` in the typography
-  module, early;
+- compile with XeLaTeX and leave `\XeTeXgenerateactualtext` disabled: its
+  per-word `/ActualText` spans make PDFKit-class consumers merge adjacent words;
 - disable common/contextual/discretionary/historic ligatures in the Latin
   default so `ffi`/`ffl` sequences extract as separate letters;
 - treat each font file, version, and OpenType-feature combination as testable

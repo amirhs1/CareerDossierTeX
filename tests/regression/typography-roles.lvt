@@ -41,7 +41,10 @@
 \TEST{body-is-serif-regular}{    \cdossiertestRole{\CDossierBodyStyle}       }
 \TEST{muted-is-serif-italic}{    \cdossiertestRole{\CDossierMutedStyle}      }
 
-\TEST{actual-text-enabled-for-extraction}{
+% Issue #72: \XeTeXgenerateactualtext must stay OFF. Its per-word /ActualText
+% spans carry no interword space, so PDFKit-class consumers (Preview, Quick
+% Look, Spotlight, Safari, macOS copy/paste) merge adjacent words. Expect 0.
+\TEST{actual-text-disabled-for-extraction}{
   \cdossiertestActualText
 }
 

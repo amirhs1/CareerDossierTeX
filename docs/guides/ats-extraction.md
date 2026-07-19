@@ -38,8 +38,9 @@ and academic dossier subset; the rest guides later phases.
    through position, colour, or graphics.
 4. Compile with XeLaTeX, load fonts through `fontspec`, and treat every font file
    and OpenType feature combination as testable code.
-5. Enable XeTeX's `/ActualText` generation, but do not regard it as a universal
-   fix. Some PDF consumers ignore or mishandle `/ActualText`.
+5. Do **not** enable XeTeX's `/ActualText` generation. Consumers disagree on how
+   to honour `/ActualText`, and under XeTeX it actively merges adjacent words in
+   PDFKit-based consumers such as macOS Preview and Spotlight (section 4.5).
 6. Keep source text in logical reading order. Visual placement must never require
    the parser to reconstruct the intended order.
 7. Run automated round-trip extraction tests and manual copy-and-paste tests after
@@ -333,8 +334,8 @@ code point.
 The Inter 4.1 regression demonstrates the failure clearly: under XeLaTeX,
 contextual (`calt`) and tabular-figure (`tnum`) alternates for `(`, `)`, and `+`
 could extract as PUA characters, while Inter 3.19 extracted correctly. Enabling
-`\XeTeXgenerateactualtext=1` fixed Poppler extraction but not every PDF consumer
-(macOS Preview did not reliably honour it).
+`\XeTeXgenerateactualtext=1` fixed Poppler extraction but not every PDF consumer,
+and it introduces a worse defect of its own — see section 4.5.
 
 For a Latin-script default, begin conservatively:
 
@@ -374,21 +375,58 @@ Important qualifications:
 
 ### 4.5 `/ActualText`, `ToUnicode`, and their limits
 
-Set this early for XeLaTeX output (in `careerdossier-typography.sty`):
+**Do not enable `\XeTeXgenerateactualtext` under XeLaTeX.** This package
+deliberately leaves it off, and `tests/extraction/run.sh` fails if it returns.
 
-```tex
-\XeTeXgenerateactualtext=1
+XeTeX's reference describes the setting as adding `/ActualText` for better
+copy/paste and search, and it is a real defence against shaped-glyph mapping
+problems. But under XeTeX it wraps **every word** in its own marked-content
+sequence:
+
+```
+/Span << /ActualText (Research) >> BDC ... EMC
+/Span << /ActualText (&) >> BDC ... EMC
 ```
 
-XeTeX's reference describes this as adding `/ActualText` for better copy/paste and
-search. It is a valuable defence against shaped-glyph mapping problems. It is not
-sufficient evidence by itself because:
+with no space token between adjacent spans. The interword space exists only as
+glyph geometry. A consumer therefore gets a different answer depending on which
+layer it trusts:
 
-- PDF consumers vary in whether and how they honour `/ActualText`;
+| Consumer | Strategy | Result |
+|---|---|---|
+| Poppler (`pdftotext`), MuPDF | Falls back to glyph positions | `Research & Development` |
+| Apple PDFKit (`PDFDocument.string`) | Concatenates `/ActualText` | `Research& Development` |
+
+PDFKit is not a niche consumer: it is the framework behind **Preview, Quick Look,
+Spotlight indexing, Safari's built-in PDF viewer, and ordinary macOS
+copy/paste**. A résumé that a recruiter pastes out of Preview loses a space at
+most word boundaries — exactly the text an ATS then tokenizes.
+
+The failure is invisible to a Poppler-only regression, which is why this shipped
+in `v0.2.0` (issue #72). Measured against `tests/extraction/extraction-torture.tex`,
+removing the setting changed Poppler output by **zero bytes** while fixing every
+PDFKit merge, so nothing was traded away.
+
+For this package the loss is small in any case: section 4.4's policy already
+disables every optional ligature and alternate, which is the main scenario
+`/ActualText` protects against.
+
+More generally, `/ActualText` and `ToUnicode` are not sufficient evidence by
+themselves because:
+
+- PDF consumers vary in whether and how they honour `/ActualText` — and, as
+  above, honouring it can be *worse* than ignoring it;
 - a PDF may contain multiple fonts with different mappings;
 - a `ToUnicode` CMap can exist but be incomplete or wrong;
 - correct character mapping does not establish reading order; and
 - an `/ActualText` string can itself be wrong.
+
+The lesson generalizes past this one setting: **extraction correctness is
+consumer-specific, so test more than one consumer.** The fixture runner gates on
+Poppler, on the absence of `/ActualText`, and — on macOS — on PDFKit itself.
+
+None of this is a tagging, PDF/UA, WCAG, or ATS-conformance claim. It concerns
+the text layer only; see sections 7 and 8.
 
 Never search a decompressed PDF for the word `ToUnicode` and call the document
 validated. Use `pdffonts` for a quick inventory, inspect suspicious mappings when
@@ -408,7 +446,7 @@ loading:
     {Compile with xelatex, not pdflatex or lualatex.}
 \fi
 
-\XeTeXgenerateactualtext=1
+% \XeTeXgenerateactualtext is deliberately omitted; see section 4.5.
 \RequirePackage{fontspec}
 
 \defaultfontfeatures+{
@@ -1112,7 +1150,7 @@ the release archive from the handwritten source; there is no need to migrate to
 - use real headings, lists, text, and URLs;
 - use reproducible TeX-distributed OpenType defaults and declare font faces
   explicitly;
-- enable `\XeTeXgenerateactualtext=1`;
+- leave `\XeTeXgenerateactualtext` disabled (section 4.5);
 - disable risky optional substitutions in the Latin default;
 - test every font/feature combination and compare extraction with known source
   text;
@@ -1198,7 +1236,7 @@ C++, Python, SQL, data modelling, technical writing
 % but dependency direction stays one-way (shared packages never depend on classes).
 \RequirePackage{careerdossier-base}        % metadata, keys, validation
 \RequirePackage{careerdossier-typography}  % XeLaTeX check, fontspec,
-                                           % \XeTeXgenerateactualtext=1, semantic roles
+                                           % semantic roles
 \RequirePackage{careerdossier-theme}       % monochrome tokens
 \RequirePackage{careerdossier-components}  % identity block, contact line, entry primitives
 
@@ -1238,13 +1276,16 @@ suite. Do not freeze this illustrative order as policy without integration tests
 - [ ] Wrong engines fail early with a useful message.
 - [ ] Default fonts are reproducible and legally distributable.
 - [ ] Upright, bold, italic, and bold italic are explicit.
-- [ ] `\XeTeXgenerateactualtext=1` is enabled.
+- [ ] `\XeTeXgenerateactualtext` is **not** enabled (section 4.5).
 - [ ] Ligature and alternate-feature policy is documented.
 - [ ] Font versions are recorded and all meaningful fonts are embedded.
 
 ### Extraction
 
 - [ ] Ground-truth text round-trips through Poppler.
+- [ ] Ground-truth text round-trips through a second, non-Poppler consumer
+      (PDFKit on macOS), because Poppler recovers spacing that others do not.
+- [ ] The output contains no `/ActualText` spans (section 4.5).
 - [ ] Default and `-layout` extraction have been inspected.
 - [ ] Punctuation, accents, symbols, URLs, and ligature sequences pass.
 - [ ] Ordered-block assertions pass.

@@ -1,0 +1,11 @@
+Ada Lovelace
+Data Scientist
+ada@example.com | Toronto, ON | github.com/ada
+14 July 2026
+Hiring Manager
+Example Organization
+Dear Hiring Manager,
+I am writing to apply for the Data Scientist position. My work combines reproducible analytical pipelines
+and accessible public-facing services.
+Sincerely,
+Ada Lovelace
