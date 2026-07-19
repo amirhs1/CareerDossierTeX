@@ -593,9 +593,10 @@ invoke the experimental tagging path:
 ```
 
 `pdflang` records the PDF's natural language; it does not configure hyphenation or
-script support. Language and `pdflang` should be routed through the i18n layer or
-a class `language` option rather than hard-coded, so multilingual phases can extend
-them. A TeX Live 2026 test for this guide found that even a language-only
+script support. CareerDossierTeX is English-only and multilingual support is
+dropped (see `docs/ROADMAP.md`), so hard-coding `pdflang = en` here is correct
+and does not need a language-abstraction layer. A TeX Live 2026 test for this
+guide found that even a language-only
 `\DocumentMetadata{language=en}` call activated tagging infrastructure and produced
 XeTeX's interword-space warning, which makes it inappropriate for the quiet default
 until the implementation changes. **(Verify at release: this test result was
@@ -688,9 +689,9 @@ Do not place margins in `careerdossier-base`, and do not duplicate contact-line
 logic inside both classes.
 
 `careerdossier-statement.cls` is **(planned — v0.4.0)**. Multilingual and RTL
-support is **deferred and unscheduled** (see `docs/ROADMAP.md`); should it ever
-return, it would extend the existing typography and component modules — and
-introduce a label abstraction — rather than add language-specific classes.
+support is **dropped** (see `docs/ROADMAP.md`); should it ever return, it would
+extend the existing typography and component modules — and introduce a label
+abstraction — rather than add language-specific classes.
 
 ### 8.2 Build on a stable base class
 
@@ -1195,16 +1196,16 @@ C++, Python, SQL, data modelling, technical writing
 
 % Shared foundation. Load order may be adjusted as implementation requires,
 % but dependency direction stays one-way (shared packages never depend on classes).
-\RequirePackage{careerdossier-base}        % metadata, keys, validation (loads i18n)
+\RequirePackage{careerdossier-base}        % metadata, keys, validation
 \RequirePackage{careerdossier-typography}  % XeLaTeX check, fontspec,
                                            % \XeTeXgenerateactualtext=1, semantic roles
 \RequirePackage{careerdossier-theme}       % monochrome tokens
 \RequirePackage{careerdossier-components}  % identity block, contact line, entry primitives
 
 \RequirePackage{hyperref}
-\hypersetup{ unicode = true }
-% pdflang / document language are routed through the i18n layer or a class
-% `language` option, not hard-coded, so later multilingual phases can extend them.
+\hypersetup{ unicode = true, pdflang = en }
+% English-only; multilingual support is dropped (docs/ROADMAP.md), so pdflang
+% is hard-coded rather than routed through a language-abstraction layer.
 
 % Résumé geometry, section spacing, and margins belong HERE (module ownership),
 % not in careerdossier-base. Build entries from the shared semantic primitives —

@@ -9,8 +9,8 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.2.0 — Academic Dossier` is released. With
-> `v0.3.0` deferred and unscheduled, the next planned release is
+> **Current status:** `v0.2.0 — Academic Dossier` is released. `v0.3.0` is
+> dropped, so the next planned release is
 > `v0.4.0 — Statements and Customization`.
 
 ## Release overview
@@ -20,7 +20,7 @@ test pass at the end of a milestone.
 | `v0.1.0` | English industry résumé and cover letter | Released |
 | `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
 | `v0.2.0` | Academic CV, academic letter, and bibliography support | Released |
-| `v0.3.0` | Farsi, bilingual, and right-to-left support | **Deferred — unscheduled** |
+| `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.4.0` | Statement classes and broader customization | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
@@ -144,18 +144,18 @@ These interfaces are released in `v0.2.0`.
 - automatic import from ORCID, Scholar, DOI services, or external APIs; and
 - PDF/UA or broad ATS-conformance claims.
 
-## `v0.3.0 — Farsi and Bilingual Support` **(deferred — unscheduled)**
+## `v0.3.0 — Farsi and Bilingual Support` **(dropped — 2026-07-16)**
 
-> **Status:** deferred on 2026-07-16. The milestone is closed and the release is
-> not scheduled. CareerDossierTeX is English-only, and no language-abstraction
+> **Status:** dropped on 2026-07-16. The milestone is closed and the release is
+> not planned. CareerDossierTeX is English-only, and no language-abstraction
 > module exists (see `docs/ARCHITECTURE.md`). This section is retained as a
 > design record, not as committed scope — nothing here may be implemented or
 > documented as current.
 >
-> **Consequence to remember if this is revived:** mature RTL support via `bidi`
-> is the main reason the project is XeLaTeX-only. With multilingual work
-> deferred, that constraint is no longer load-bearing — see the engine note
-> under `v0.4.0`.
+> **Consequence:** mature RTL support via `bidi` was the main reason the
+> project stayed XeLaTeX-only. With multilingual work dropped, that constraint
+> no longer applies, which removes the structural argument against evaluating
+> a LuaLaTeX migration.
 
 ### Goal
 
