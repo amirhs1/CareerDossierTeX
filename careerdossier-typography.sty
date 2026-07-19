@@ -35,10 +35,21 @@
   { \msg_fatal:nn { careerdossier-typography } { engine } }
 
 %% ---------------------------------------------------------------------------
-%% Better copy/paste and search for shaped glyphs. Not a universal fix, but a
-%% cheap and worthwhile default (see the ATS guide, section 4.5).
+%% \XeTeXgenerateactualtext is deliberately NOT enabled.
+%%
+%% It wraps every word in its own /Span << /ActualText (word) >> BDC ... EMC
+%% sequence with no space token between adjacent spans. Consumers that treat
+%% /ActualText as authoritative and concatenate the strings — Apple PDFKit, and
+%% so Preview, Quick Look, Spotlight, Safari, and ordinary macOS copy/paste —
+%% lose the interword space and merge adjacent words ("Research& Development").
+%% Poppler and MuPDF fall back to glyph geometry and are unaffected, which is
+%% why a Poppler-only gate never caught it.
+%%
+%% Its protective value here is small: this package disables every optional
+%% ligature and alternate below, which is the main case /ActualText guards
+%% against. See the ATS guide, section 4.5, and tests/extraction/run.sh, which
+%% fails if the setting returns.
 %% ---------------------------------------------------------------------------
-\XeTeXgenerateactualtext = 1 \scan_stop:
 
 %% ---------------------------------------------------------------------------
 %% Fonts. Conservative Latin defaults: disable optional ligature and alternate

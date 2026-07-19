@@ -1,8 +1,8 @@
 Publications
 
-1) A. Lovelace and G. Hopper. “Newest DOI Publication”. In: Journal of Examples (2026). doi: 10.9999/example.
+1) A. Lovelace and G. Hopper. “Newest DOI Publication”. In: Journal of Examples (2026). DOI: 10.9999/example.
 newest.
 2) A. Turing and A. Lovelace. “Middle Eprint Publication”. In: Archive of Examples (2025). arXiv: 2501.01234.
-3) A. Lovelace. Oldest URL Publication. Example Press, 2024. url: https://example.invalid/visible-url.
+3) A. Lovelace. Oldest URL Publication. Example Press, 2024. URL: https://example.invalid/visible-url.
 
 Page 1

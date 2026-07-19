@@ -53,7 +53,9 @@ Development requires:
 - `latexmk`;
 - a sufficiently complete TeX Live or MiKTeX installation;
 - `pdftotext` from Poppler when running extraction, layout, or bibliography
-  checks; and
+  checks;
+- macOS with `osascript` to run the extraction suite's Apple PDFKit check; it is
+  skipped elsewhere, so run the suite on macOS at least once before release; and
 - BibLaTeX and Biber when running the optional bibliography example or the full
   `make check` suite.
 
@@ -365,16 +367,31 @@ Inspect the output for logical reading order.
 ### Extraction round-trip test
 
 Beyond eyeballing reading order, run the automated extraction fixture, which
-compiles a torture document and diffs its `pdftotext` output against a committed
-baseline:
+compiles a torture document and checks its text layer three ways:
 
     make extract-test          # or: tests/extraction/run.sh
 
+1. **Poppler** — diffs `pdftotext` output against the committed
+   `*.expected.txt` baseline.
+2. **`/ActualText`** — fails if the PDF contains any `/ActualText` span. Poppler
+   recovers interword spacing from glyph geometry and so cannot see the issue
+   #72 defect; this check runs everywhere, including Linux CI.
+3. **Apple PDFKit** — on macOS, diffs `PDFDocument.string` output against the
+   committed `*.pdfkit.txt` baseline. This is the consumer path behind Preview,
+   Quick Look, Spotlight, Safari, and copy/paste. It is skipped with a notice on
+   other platforms, so **run the suite on macOS before release**.
+
+PDFKit and Poppler impose different line structure on multi-column layout, so
+each keeps its own baseline; do not expect the two to match.
+
 It fails on any character, spacing, ordering, or Unicode-mapping change, and on
-any non-allowlisted XeLaTeX warning. Regenerate the baseline **only** when a
-change to output is intended and reviewed:
+any non-allowlisted XeLaTeX warning. Regenerate baselines **only** when a change
+to output is intended and reviewed:
 
     tests/extraction/run.sh --update
+
+On Linux this refreshes only the Poppler baselines. Regenerate the PDFKit
+baselines on macOS, and review both diffs before committing.
 
 Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in

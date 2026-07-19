@@ -9,7 +9,9 @@
 %
 % Policy under test (mirror of careerdossier-typography.sty):
 %   - XeLaTeX engine (fixture errors out under other engines)
-%   - \XeTeXgenerateactualtext=1
+%   - \XeTeXgenerateactualtext NOT enabled (see issue #72: per-word /ActualText
+%     spans carry no interword space, so PDFKit-class consumers merge adjacent
+%     words; the "interword spacing" block below is the explicit regression)
 %   - common / contextual / discretionary / historic ligatures OFF
 %   - lining numbers
 %   - TeX Gyre Heros, all four faces declared explicitly
@@ -30,8 +32,6 @@
 \ifXeTeX\else
   \errmessage{extraction-torture.tex requires XeLaTeX}%
 \fi
-
-\XeTeXgenerateactualtext=1
 
 \usepackage{fontspec}
 \defaultfontfeatures+{
@@ -69,5 +69,18 @@ email@example.org +1 416 555 0199
 \textbf{Senior Research \& Development Engineer}
 
 \textit{January 2023 -- Present}
+
+% Interword spacing (issue #72). Every line below merged under
+% \XeTeXgenerateactualtext=1 when read through Apple PDFKit. Keep them: they are
+% the assertion that per-word /ActualText spans have not returned.
+Built a reproducible analytical workflow used across teams.
+
+I moved analyses into a shared reporting pipeline.
+
+Led a migration to a governed reporting service. I designed the interface.
+
+ada@example.com | Toronto, ON | github.com/ada
+
+Page 1 of 1
 
 \end{document}
