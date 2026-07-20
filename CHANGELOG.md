@@ -41,6 +41,24 @@ Preview`. The release is not published; see issue [#82].
   This changes rendered CV output. Documents are unaffected apart from the
   folio text; no class, option, key, or command changed. ([#77])
 
+- The academic cover letter now shares `careerdossier-cv`'s page furniture, so
+  the two multi-page academic documents read as one family. From page two it
+  carries a centered running header — `<name> — Cover Letter`, matching the CV's
+  `<name> — Curriculum Vitae` — and its folio is now a centered `Page N of M`
+  that no longer repeats the name. Page one has no running header, as in the CV,
+  because the letterhead already carries identity. ([#98])
+
+  The name is not lost: it already appears in the letterhead and the signature
+  block, so on a single-page letter the old footer was a third occurrence.
+
+  The running header is a layout artifact — it does not enter the structure tree
+  and screen readers do not announce it, verified by comparing the tagged
+  structure tree before and after the change. `family=industry` is unaffected
+  and keeps its `v0.1` empty page style.
+
+  This changes rendered academic-letter output. No class, option, key, or
+  command changed.
+
 - Default fonts now resolve by file name through `luaotfload` (`texgyretermes`
   and `texgyreheros` with explicit faces) instead of by fontconfig family name.
   The build no longer depends on OS-installed fonts. Documents that override
@@ -117,6 +135,7 @@ Preview`. The release is not published; see issue [#82].
 [#76]: https://github.com/amirhs1/CareerDossierTeX/issues/76
 [#77]: https://github.com/amirhs1/CareerDossierTeX/issues/77
 [#82]: https://github.com/amirhs1/CareerDossierTeX/issues/82
+[#98]: https://github.com/amirhs1/CareerDossierTeX/issues/98
 
 ## [0.2.1] - 2026-07-19
 
