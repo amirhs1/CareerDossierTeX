@@ -1,0 +1,72 @@
+% letter-academic-two-page.tex — layout stress: an academic letter with enough
+% prose to span two pages.
+%
+% This is the only fixture that can exercise the academic letter's running
+% header, which appears from page two onwards. letter-academic-long.tex stresses
+% long recipient fields but fits on one page, and letter-two-page.tex is an
+% industry letter, whose empty page style has no furniture at all — so without
+% this fixture the running-header assertion in run.sh would never execute.
+%
+% Verifies that the page break falls inside the body, that page two carries the
+% `<name> -- Cover Letter` running header, and that every page carries a
+% centered `Page N of M` folio matching careerdossier-cv.
+\documentclass[family=academic]{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Researcher in Analytical Computing},
+  email    = {ada.lovelace@example.com},
+  location = {Toronto, Ontario, Canada},
+  scholar  = {scholar.google.com/citations?user=ada-lovelace}
+}
+\CDossierLetterSetup{
+  date                   = {17 July 2026},
+  recipient-name         = {Professor Grace Hopper},
+  recipient-title        = {Chair of Computational Science},
+  recipient-organization = {Example University},
+  recipient-address      = {100 Academic Avenue\\Toronto, Ontario M5S 1A1},
+  subject                = {Application for the Assistant Professor Position},
+  salutation             = {Dear Professor Hopper,}
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Assistant Professor position in Computational
+Science. My research connects reliable numerical methods, reproducible software,
+and accessible teaching materials for interdisciplinary scientific work.
+
+My recent work has focused on creating computational methods that can be
+understood, tested, and reused by collaborators across mathematics, engineering,
+and data science. I develop clear research software, publish durable technical
+documentation, and involve students in the full process from modelling through
+validation and communication.
+
+Reproducibility is the organizing principle of my research programme. Every
+result I publish is accompanied by the software, data preparation steps, and
+environment description needed to regenerate it from source. This practice began
+as a personal discipline and has become a collaborative one: my students learn to
+treat an unreproducible result as an incomplete result, and reviewers of my work
+can inspect the computational path from raw input to published figure.
+
+My teaching follows the same commitment. I have designed and delivered courses in
+numerical analysis, scientific computing, and statistical methods, each built
+around the idea that students should be able to reconstruct every result they are
+shown. Course materials are versioned, openly licensed, and written so that a
+student returning to them years later can still run the examples. I have
+supervised undergraduate and graduate projects spanning method development,
+software engineering practice, and the communication of quantitative results to
+non-specialist audiences.
+
+Beyond research and teaching, I have contributed to the maintenance of open
+research software used across several institutions, served on programme
+committees for conferences concerned with reproducible computational science, and
+organized workshops introducing early-career researchers to version control,
+automated testing, and durable documentation practices.
+
+I would welcome the opportunity to contribute to your department's research,
+teaching, and student mentorship. I am especially interested in building courses
+that connect theoretical foundations with transparent computational practice, and
+in collaborating with colleagues whose scientific questions would benefit from
+carefully engineered numerical methods.
+
+\MakeCDossierClosing
+\end{document}
