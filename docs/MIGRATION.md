@@ -31,8 +31,12 @@ There is no compatibility mode and no option to bypass the guard. Stay on
 ### What does not change
 
 Classes, class options, profile keys, public commands, environments, paper size,
-theme, and page design are unchanged. An existing document that does not contain
+and theme are unchanged. An existing document that does not contain
 XeTeX-specific preamble code needs no edit beyond the build command.
+
+Two exceptions to "page design is unchanged": the academic CV's folio and the
+academic letter's running header and footer both changed, so those two documents
+render slightly differently. Neither needs a source edit. See step 5.
 
 ### 1. Change the build command
 
@@ -101,7 +105,60 @@ LuaHBTeX's line breaking is not byte-identical to XeTeX's. Page breaks can shift
 by a line in long documents. Review multi-page CVs and two-page résumés after
 upgrading rather than assuming identical pagination.
 
-### 5. Optional: enable tagged structure
+### 5. Review the academic CV and letter page furniture
+
+`v0.4.0` changes the running headers and folios of two documents so that a CV
+and an academic cover letter sent together look like one set. **No source edit
+is required** — this is rendered output only, and no class, option, key, or
+command changed.
+
+Affects `careerdossier-cv` and `careerdossier-letter` with `family=academic`.
+The industry letter and the résumé are **unaffected**: the industry letter keeps
+its `v0.1` empty page style, and the résumé still prints no folio.
+
+| | Before (`v0.2.x`) | After (`v0.4.0`) |
+| --- | --- | --- |
+| CV folio | `Page 2` | `Page 2 of 2` |
+| CV running header (page 2+) | `Name — Curriculum Vitae` | unchanged |
+| Academic letter running header | *none* | `Name — Cover Letter` from page 2 |
+| Academic letter folio | `Name` at left, `Page 2 of 2` at right | centered `Page 2 of 2` |
+
+Reasons, in short: a bare `Page 2` cannot tell a reader holding a loose sheet
+whether the document ended, and the two classes previously disagreed on every
+aspect of their page furniture. The letter adopted the CV's pattern rather than
+the reverse, because a running header naming the person and document type on
+continuation pages is the stronger convention for both academic CVs and formal
+multi-page correspondence.
+
+The academic letter's name has moved, not disappeared: it is in the running
+header from page two, and the letterhead and signature block already carried it
+on page one. On a single-page letter the old footer was a third occurrence.
+
+**What to check after upgrading:**
+
+- Multi-page academic CVs and letters, to confirm the new furniture looks right
+  with your own name and content lengths. A long name in the running header is
+  the case most worth a glance.
+- Any tooling that parsed your PDFs' footer text.
+
+  A **CV** footer extracted as `Page 1` and now extracts as `Page 1 of 2`.
+
+  An **academic letter** footer used to contain the name as well as the folio,
+  and now contains only `Page 1 of 2`. How that name appeared in extracted text
+  varied with the extractor, the name's length, and the resulting gap: some
+  fixtures extracted `Ada Lovelace Page 1 of 1` as a single line, others put the
+  name on its own line above the folio. Either way the name is no longer in the
+  footer, so a script keying on it will need updating.
+
+  This is the same class of breakage as the `doi:` → `DOI:` extraction change in
+  `v0.2.1`.
+
+If you enable tagged structure (step 6), both the running header and the folio
+are marked as layout artifacts, so screen readers skip them rather than reading
+page furniture into the document's prose. Untagged output is unaffected, since
+it carries no structure tree either way.
+
+### 6. Optional: enable tagged structure
 
 `v0.4.0` adds opt-in tagged semantic structure. It is off by default and
 requires no migration. To try it, add `\DocumentMetadata` before
