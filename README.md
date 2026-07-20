@@ -259,12 +259,21 @@ academic letter. Those fixtures assert that a structure tree exists and check
 heading, list, link, and artifact structure plus text extraction and
 tagged-versus-untagged geometry.
 
-It is **not** a PDF/UA, WCAG, ATS, or general accessibility conformance claim,
-and it is not validated for arbitrary user documents. Independent validator and
-screen-reader verification is tracked in
-[issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77) and has not
-been completed; until it is, treat tagged output as unverified beyond the
-repository's own fixtures.
+Those four profiles were independently verified: each passes the **veraPDF**
+PDF/UA-2 validator, their text extraction agrees across **Poppler, MuPDF, and
+Apple PDFKit**, and a **macOS VoiceOver** reading-order pass confirmed that
+headings, lists, and links are announced correctly while decorative rules and
+repeated page furniture stay silent. Recorded results and the exact toolchain
+are in
+[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md) §7.1–7.2.
+
+That verification covers **those four fixtures only**. It is **not** a PDF/UA,
+WCAG, ATS, or general accessibility conformance claim, it does not extend to
+arbitrary user documents, and it is not a reason to enable tagging by default. A
+document with different content, packages, or graphics is unverified until it is
+itself verified. No Windows screen-reader check has been performed — NVDA
+coverage is tracked in
+[issue #96](https://github.com/amirhs1/CareerDossierTeX/issues/96).
 
 ## Build
 
