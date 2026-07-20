@@ -420,6 +420,12 @@ closing `GATES NOT RUN` summary. A green run on a partial environment is
 therefore *not* evidence that everything passed — read the summary. Only
 LuaLaTeX and Poppler are hard requirements.
 
+The MuPDF baselines are compared with blank lines removed. `mutool`'s blank-line
+placement inside a two-column entry header differs between its macOS and Debian
+builds, so pinning it would assert a property of the extractor rather than of
+the PDF. Line content and line order are still fully asserted, and the Poppler
+baseline continues to pin exact spacing.
+
 Baselines regenerate the same way as the extraction suite, and with the same
 discipline — only for an intended, reviewed output change:
 

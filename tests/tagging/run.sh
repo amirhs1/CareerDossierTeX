@@ -100,6 +100,23 @@ normalize() {
                             for (i = 1; i <= last; i++) print line[i] }'
 }
 
+# MuPDF additionally drops blank lines.
+#
+# mutool's blank-line placement inside a two-column entry header is version and
+# platform dependent: 1.24.9 on macOS emits one between the dates and the
+# organization, while the build in Debian's mupdf-tools does not. Word sequence,
+# Unicode, and order are identical either way — that difference was the only one
+# between local and CI output when this suite first ran on Linux.
+#
+# MuPDF's job in this matrix is to be an independent opinion on reading order,
+# so pinning its exact vertical whitespace would assert a property of the
+# extractor build rather than of the PDF. Line content and line order stay fully
+# asserted; only empty lines are dropped. Poppler's baseline keeps its blank
+# lines and continues to pin exact spacing.
+normalize_mupdf() {
+  normalize | grep -v '^[[:space:]]*$'
+}
+
 record_failure() {
   echo "  FAIL: $1"
   fail=1
@@ -234,7 +251,7 @@ check_extraction() {
     "$work/$base.poppler.got"
 
   if [ "$have_mutool" -eq 1 ]; then
-    mutool draw -F txt -o - "$work/$base.pdf" 2>/dev/null | normalize \
+    mutool draw -F txt -o - "$work/$base.pdf" 2>/dev/null | normalize_mupdf \
       >"$work/$base.mupdf.got"
     check_one_extractor "$base" MuPDF "$here/$base.mupdf.txt" \
       "$work/$base.mupdf.got"

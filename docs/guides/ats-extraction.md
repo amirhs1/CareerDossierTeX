@@ -754,7 +754,10 @@ Toolchain that produced this result, as recorded by
 Three extractors are used rather than one because Poppler, MuPDF, and PDFKit
 each linearize the two-column entry header differently. Each therefore keeps its
 own committed baseline (`*.expected.txt`, `*.mupdf.txt`, `*.pdfkit.txt`); a
-shared baseline would only record whichever library ran last. Agreement across
+shared baseline would only record whichever library ran last. The MuPDF baseline
+is compared with blank lines removed, because `mutool`'s vertical whitespace
+inside that header differs between its macOS and Debian builds — a property of
+the extractor, not of the PDF. Line content and order remain fully asserted. Agreement across
 three independent implementations is what supports the claim that reading order
 is a property of the PDF rather than of one library's heuristics.
 
