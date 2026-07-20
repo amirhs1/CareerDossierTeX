@@ -39,7 +39,7 @@ Examples:
 [docs] Inventory current résumé and cover-letter implementations
 [docs] Define the v0.1 public API
 [core] Implement metadata storage and validation
-[theme] Implement XeLaTeX typography and monochrome tokens
+[theme] Implement LuaLaTeX typography and monochrome tokens
 [components] Implement shared header and contact line
 [resume] Implement the English résumé class
 [letter] Implement the English industry cover-letter class
@@ -97,7 +97,7 @@ feat/shared-foundation
 feat/resume-class
 feat/industry-letter
 test/regression-harness
-ci/xelatex-build
+ci/lualatex-build
 docs/v0.1-release
 release/v0.1.0
 ```
@@ -129,7 +129,7 @@ feat(resume): add dossier entry environment
 feat(letter): add recipient address block
 fix(components): omit separators for empty fields
 test(resume): add long URL stress example
-ci(build): compile industry examples with XeLaTeX
+ci(build): compile industry examples with LuaLaTeX
 refactor(theme): centralize monochrome color tokens
 release: prepare v0.1.0
 ```
@@ -195,7 +195,7 @@ feat(core): add shared metadata foundation
 feat(resume): implement English résumé class
 feat(letter): implement industry cover-letter class
 test(build): establish Phase 1 regression harness
-ci(build): compile Phase 1 examples with XeLaTeX
+ci(build): compile Phase 1 examples with LuaLaTeX
 release: prepare v0.1.0
 ```
 
@@ -366,7 +366,7 @@ Rules:
 [docs] Inventory current résumé and cover-letter implementations
 [docs] Define the v0.1 public API
 [core] Implement metadata storage and validation
-[theme] Implement XeLaTeX typography and monochrome tokens
+[theme] Implement LuaLaTeX typography and monochrome tokens
 [components] Implement shared header and contact line
 [resume] Implement the English résumé class
 [letter] Implement the English industry cover-letter class
@@ -385,7 +385,7 @@ feat/shared-foundation
 feat/resume-class
 feat/industry-letter
 test/regression-harness
-ci/xelatex-build
+ci/lualatex-build
 docs/v0.1-release
 release/v0.1.0
 ```
@@ -399,7 +399,7 @@ feat(core): add shared metadata foundation
 feat(resume): implement English résumé class
 feat(letter): implement industry cover-letter class
 test(build): establish Phase 1 regression harness
-ci(build): compile Phase 1 examples with XeLaTeX
+ci(build): compile Phase 1 examples with LuaLaTeX
 docs(release): prepare v0.1.0 documentation
 release: prepare v0.1.0
 ```

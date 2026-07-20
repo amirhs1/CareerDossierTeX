@@ -2,14 +2,118 @@
 
 ## Status
 
-`v0.2.0` is the current release. No released public command, key, class option,
-or default has yet been renamed or removed.
+`v0.2.1` is the current published release. `v0.4.0` is in preparation on `main`
+and **changes the supported engine from XeLaTeX to LuaLaTeX** — see
+[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
+
+No released public command, key, class option, or default has been renamed or
+removed. The `v0.4.0` break is in the toolchain, not the document API.
 
 The pre-release prototypes inventoried below are **not** a published API. They are
 recorded here so that the released industry and `v0.2.0` academic implementations
 can preserve the strongest existing design
-while deliberately diverging where the supported scope (XeLaTeX, English, US
+while deliberately diverging where the supported scope (LuaLaTeX, English, US
 Letter, monochrome, extraction-conscious) requires.
+
+## Upgrading to `v0.4.0`: XeLaTeX → LuaLaTeX
+
+`v0.4.0` makes LuaLaTeX the sole supported engine. XeLaTeX and pdfLaTeX now stop
+with a fatal error from `careerdossier-typography`:
+
+```text
+CareerDossierTeX requires LuaLaTeX.
+Compile with lualatex, not xelatex or pdflatex.
+```
+
+There is no compatibility mode and no option to bypass the guard. Stay on
+`v0.2.1` if you cannot move to LuaLaTeX.
+
+### What does not change
+
+Classes, class options, profile keys, public commands, environments, paper size,
+theme, and page design are unchanged. An existing document that does not contain
+XeTeX-specific preamble code needs no edit beyond the build command.
+
+### 1. Change the build command
+
+Before:
+
+```bash
+latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+  examples/industry/resume-english.tex
+```
+
+After:
+
+```bash
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
+  examples/industry/resume-english.tex
+```
+
+Update editor and CI configuration too. In TeXShop, TeXworks, VS Code
+(LaTeX Workshop), or Overleaf, select LuaLaTeX as the typesetting engine. A
+stale `latexmkrc`, `.vscode/settings.json`, or CI workflow still passing
+`-xelatex` is the most common cause of the engine error after upgrading.
+
+Reason: LuaHBTeX writes real interword spaces into the PDF text layer and
+supports the LaTeX kernel tagging pipeline. XeTeX supports neither, which capped
+both extraction reliability (see `v0.2.1` and issue #72) and tagged output.
+
+### 2. Remove XeTeX-only preamble code
+
+`\XeTeXgenerateactualtext` and other `\XeTeX…` primitives do not exist under
+LuaTeX and raise "undefined control sequence".
+
+Before:
+
+```latex
+\XeTeXgenerateactualtext=1
+```
+
+After:
+
+```latex
+% Delete it. CareerDossierTeX never enabled this from v0.2.1 onward, and
+% LuaHBTeX does not need it: interword spaces are real in the text layer.
+```
+
+Guards of the form `\ifXeTeX … \fi` should be deleted or inverted to
+`\ifLuaTeX`. `iftex` still provides both.
+
+Reason: the primitive is engine-specific. Under XeTeX it also wrapped every word
+in its own `/ActualText` span, which made PDFKit-based readers merge adjacent
+words — the bug fixed in `v0.2.1`.
+
+### 3. Check fonts if you overrode them
+
+CareerDossierTeX resolves TeX Gyre Termes and TeX Gyre Heros **by file name**
+through `luaotfload`, so the default build does not depend on OS-installed
+fonts. Documents that called `\setmainfont` with a system font *name* that
+resolved through fontconfig under XeLaTeX may resolve differently under
+`luaotfload`.
+
+If you override fonts, recompile and check the log for font substitutions and
+missing glyphs before trusting the output.
+
+### 4. Re-check pagination
+
+LuaHBTeX's line breaking is not byte-identical to XeTeX's. Page breaks can shift
+by a line in long documents. Review multi-page CVs and two-page résumés after
+upgrading rather than assuming identical pagination.
+
+### 5. Optional: enable tagged structure
+
+`v0.4.0` adds opt-in tagged semantic structure. It is off by default and
+requires no migration. To try it, add `\DocumentMetadata` before
+`\documentclass`:
+
+```latex
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-resume}
+```
+
+Tagged output is a tested preview for the four fixture profiles only and carries
+no PDF/UA, WCAG, or ATS conformance claim. See [`API.md`](API.md) for scope.
 
 ## Purpose
 
@@ -183,4 +287,7 @@ After:
 Reason: <why the change was necessary>
 ```
 
-No released-API entries exist yet.
+No released public command, key, or option has been renamed or removed, so no
+entry in this format exists yet. The `v0.4.0` engine change is a toolchain
+break rather than an API rename and is documented in
+[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above.

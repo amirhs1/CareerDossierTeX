@@ -2,7 +2,7 @@
 
 ## Product direction
 
-CareerDossierTeX is a reusable XeLaTeX toolkit for creating consistent career documents from shared profile data.
+CareerDossierTeX is a reusable LuaLaTeX toolkit for creating consistent career documents from shared profile data.
 
 The project follows incremental releases. Each implementation issue should
 produce one complete, documented, and tested vertical slice. Tests are added
@@ -185,6 +185,51 @@ Extend existing classes:
 ```
 
 Do not create separate language-specific classes unless a future document model is genuinely different.
+
+## `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`
+
+### Goal
+
+Replace XeLaTeX with LuaLaTeX as the sole supported engine, preserving the
+English public API and visual design, and add a validated opt-in tagged-PDF path
+for the named fixture profiles.
+
+This is a **breaking toolchain change**. Documents keep their classes, options,
+keys, and commands; the build command changes from `latexmk -xelatex` to
+`latexmk -lualatex`, and XeTeX-specific preamble code stops working.
+
+### Included
+
+- LuaLaTeX-only engine guard; XeLaTeX and pdfLaTeX fail early with an actionable
+  diagnostic;
+- removal of the XeTeX-only `\XeTeXgenerateactualtext` primitive;
+- portable font resolution through `luaotfload` on macOS and pinned Linux CI;
+- re-baselined visual layout and extraction against `v0.2.0`;
+- `Makefile`, `l3build`, test runners, and CI migrated to LuaLaTeX;
+- opt-in `\DocumentMetadata{tagging=on}` semantic structure covering headings,
+  lists, links, and layout artifacts;
+- validation of the four named fixtures with an independent validator and
+  screen-reader reading-order checks;
+- migration notes, canonical documentation, and release preparation.
+
+### Explicit non-goals
+
+- Farsi, bilingual, or RTL support (dropped);
+- tagging enabled by default;
+- any broad PDF/UA, WCAG, or ATS conformance claim for arbitrary user documents;
+- public API, paper-size, or theme changes.
+
+### Release criteria
+
+- every supported example compiles locally and in CI under LuaLaTeX;
+- XeLaTeX and pdfLaTeX produce a clear, tested engine error;
+- layout and extraction are reviewed against `v0.2.0` rather than silently
+  re-baselined;
+- untagged output is unchanged when tagging is not enabled;
+- tagged fixtures pass structure, extraction, and artifact checks, and the
+  validator and screen-reader results are recorded with tool versions;
+- `docs/MIGRATION.md` gives XeTeX-preamble users an actionable upgrade path;
+- documentation claims no more than the fixtures actually verify.
 
 ## `v0.5.0 — Statements and Customization`
 

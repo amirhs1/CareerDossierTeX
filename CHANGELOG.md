@@ -8,6 +8,67 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+These entries are prepared for `v0.4.0 — LuaLaTeX Transition and Tagged-PDF
+Preview`. The release is not published; see issue [#82].
+
+### Changed
+
+- **BREAKING (toolchain): LuaLaTeX replaces XeLaTeX as the sole supported
+  engine.** Build commands change from `latexmk -xelatex` to
+  `latexmk -lualatex`, and XeLaTeX or pdfLaTeX now stop with a fatal error from
+  `careerdossier-typography` naming LuaLaTeX. There is no compatibility mode.
+
+  No class, class option, profile key, public command, or environment changed.
+  Paper size, monochrome theme, and page design are unchanged. A document
+  without XeTeX-specific preamble code needs no edit beyond the build command.
+  `docs/MIGRATION.md` gives the upgrade path, including editor and CI settings,
+  `\XeTeXgenerateactualtext` removal, font-override checks, and pagination
+  review. ([#75], [#76])
+
+  LuaHBTeX writes real interword spaces into the text layer and supports the
+  LaTeX kernel tagging pipeline; XeTeX supports neither. That limitation capped
+  extraction reliability (see `0.2.1`) and blocked tagged output entirely.
+
+- Default fonts now resolve by file name through `luaotfload` (`texgyretermes`
+  and `texgyreheros` with explicit faces) instead of by fontconfig family name.
+  The build no longer depends on OS-installed fonts. Documents that override
+  fonts with a system font name should recheck their logs for substitutions.
+
+- The `Makefile`, `l3build` configuration, test runners, and CI workflow all
+  build with LuaLaTeX. `make tagging` is a new suite and is included in
+  `make check`. ([#76])
+
+### Added
+
+- Opt-in tagged semantic structure under LuaLaTeX, enabled per document with
+  `\DocumentMetadata{lang=en, tagging=on}` before `\documentclass`. Section
+  headings, lists, paragraphs, and links are exposed as structure; decorative
+  rules, contact separators, and running page furniture are marked as layout
+  artifacts. ([#28])
+
+  Tagging is **off by default** and introduces no class option or public
+  command — the interface is the LaTeX kernel's. Documents that do not enable it
+  produce byte-identical output to the untagged path.
+
+  This is a tested preview for four fixture profiles (industry résumé, industry
+  letter, academic CV, academic letter). Fixtures assert that a structure tree
+  exists and check heading, list, link, and artifact classification, text
+  extraction, and tagged-versus-untagged geometry. It is **not** a PDF/UA, WCAG,
+  ATS, or general accessibility conformance claim, and it is not validated for
+  arbitrary user documents. Independent validator and screen-reader verification
+  is tracked in [#77] and is not complete.
+
+### Removed
+
+- `\XeTeXgenerateactualtext` handling, along with the rest of the XeTeX-specific
+  code path. The primitive does not exist under LuaTeX. ([#75])
+
+[#28]: https://github.com/amirhs1/CareerDossierTeX/issues/28
+[#75]: https://github.com/amirhs1/CareerDossierTeX/issues/75
+[#76]: https://github.com/amirhs1/CareerDossierTeX/issues/76
+[#77]: https://github.com/amirhs1/CareerDossierTeX/issues/77
+[#82]: https://github.com/amirhs1/CareerDossierTeX/issues/82
+
 ## [0.2.1] - 2026-07-19
 
 ### Fixed

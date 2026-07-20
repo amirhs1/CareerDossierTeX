@@ -1,8 +1,13 @@
 # CareerDossierTeX
 
-A reusable XeLaTeX toolkit for producing consistent career documents from shared profile data.
+A reusable LuaLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.2.1 — Extraction Correction` is the current release.
+> **Status:** `v0.2.1 — Extraction Correction` is the current published release.
+> The `main` branch is preparing `v0.4.0 — LuaLaTeX Transition and Tagged-PDF
+> Preview`, which **replaces XeLaTeX with LuaLaTeX as the sole supported
+> engine**. This is a breaking toolchain change; see
+> [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
+>
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
 > [`docs/MIGRATION.md`](docs/MIGRATION.md).
@@ -13,7 +18,7 @@ CareerDossierTeX separates personal information from document content and presen
 
 ### Support matrix
 
-| Capability | `v0.2.0` support | Notes |
+| Capability | `v0.4.0` support | Notes |
 |---|---|---|
 | Industry résumé | Supported | Existing `v0.1.x` behavior remains compatible |
 | Industry cover letter | Supported | `family=industry` remains the default |
@@ -23,7 +28,8 @@ CareerDossierTeX separates personal information from document content and presen
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar and ORCID fields |
 | Language | English | Farsi, bilingual, and RTL support is dropped |
-| Engine | XeLaTeX | pdfLaTeX and LuaLaTeX are unsupported |
+| Engine | LuaLaTeX | XeLaTeX and pdfLaTeX are unsupported and error early |
+| Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
 | Paper size | US Letter | A4 is unsupported |
 | Theme | Monochrome | Color themes, font presets, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
@@ -34,15 +40,20 @@ right-to-left support is dropped; CareerDossierTeX is English-only.
 
 ## Requirements
 
-- XeLaTeX
+- LuaLaTeX (LuaHBTeX)
 - `latexmk`
 - A reasonably complete TeX Live or MiKTeX installation
+
+Fonts are resolved by file name through `luaotfload`, so the build does not
+depend on OS-installed fonts.
 
 BibLaTeX and Biber are optional and are needed only by documents that load
 `careerdossier-biblatex`. Manual publication lists and CVs without an external
 bibliography do not require them.
 
-CareerDossierTeX does not support pdfLaTeX or LuaLaTeX.
+CareerDossierTeX does not support XeLaTeX or pdfLaTeX. Compiling with either
+stops with an actionable error naming LuaLaTeX. Users upgrading from `v0.2.x`
+should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 ## Quick start
 
@@ -226,25 +237,54 @@ I am writing to apply for the Assistant Professor position.
 
 See [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.tex).
 
+## Tagged PDF (opt-in preview)
+
+CareerDossierTeX can emit tagged semantic structure under LuaLaTeX. It is **off
+by default**. Opt in with `\DocumentMetadata` before `\documentclass`:
+
+```latex
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass[fontsize=10pt, density=compact]{careerdossier-resume}
+```
+
+When tagging is on, section headings, lists, paragraphs, and links are exposed
+as structure, while decorative rules, contact separators, and running page
+furniture are marked as layout artifacts. No public command or class option
+changes, and documents that do not enable tagging produce byte-identical output
+to the untagged path.
+
+**What is and is not claimed.** This is a tested preview for the four profiles
+covered by fixtures — industry résumé, industry letter, academic CV, and
+academic letter. Those fixtures assert that a structure tree exists and check
+heading, list, link, and artifact structure plus text extraction and
+tagged-versus-untagged geometry.
+
+It is **not** a PDF/UA, WCAG, ATS, or general accessibility conformance claim,
+and it is not validated for arbitrary user documents. Independent validator and
+screen-reader verification is tracked in
+[issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77) and has not
+been completed; until it is, treat tagged output as unverified beyond the
+repository's own fixtures.
+
 ## Build
 
-Compile the supported examples with XeLaTeX:
+Compile the supported examples with LuaLaTeX:
 
 ```bash
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/industry/resume-english.tex
 
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/industry/letter-industry.tex
 
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/academic/cv-academic.tex
 
 # Optional BibLaTeX/Biber example; latexmk runs Biber automatically.
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/academic/cv-bibliography.tex
 
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/academic/letter-academic.tex
 ```
 
@@ -279,12 +319,12 @@ make check
 ```
 
 Individual suites are available as `make regression`, `make extract-test`,
-`make smoke`, `make layout`, and `make bibliography-test`; `make clean` removes
-the generated files afterwards. Each target runs the same command as the
-matching CI job.
+`make smoke`, `make layout`, `make bibliography-test`, and `make tagging`;
+`make clean` removes the generated files afterwards. Each target runs the same
+command as the matching CI job.
 
 The full suite requires `l3build` and `pdftotext` (Poppler) in addition to
-XeLaTeX and `latexmk`. Because `make check` exercises the optional bibliography
+LuaLaTeX and `latexmk`. Because `make check` exercises the optional bibliography
 profile, it also requires BibLaTeX and Biber. Ordinary résumé, letter, and
 no-BibLaTeX CV builds do not.
 
@@ -324,6 +364,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.1.1` | Metadata and build corrections |
 | `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
 | `v0.2.1` | Extraction correction |
+| `v0.4.0` | LuaLaTeX transition and tagged-PDF preview (in preparation) |
 | `v0.5.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |
 

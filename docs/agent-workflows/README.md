@@ -53,7 +53,7 @@ CareerDossierTeX/
 - **`.claude/skills/open-draft-pr/SKILL.md`** — the Claude equivalent, kept nearly
   identical to the Codex skill.
 - **`.claude/rules/latex.md`** — a Claude path-scoped rule. It loads only for
-  LaTeX paths via `paths:` frontmatter and holds the detailed XeLaTeX, module
+  LaTeX paths via `paths:` frontmatter and holds the detailed LuaLaTeX, module
   ownership, optional-field, log-inspection, and accessibility-claim rules. Codex
   has no equivalent `paths`-glob rules directory, so the concise LaTeX invariants
   also live in `AGENTS.md`.

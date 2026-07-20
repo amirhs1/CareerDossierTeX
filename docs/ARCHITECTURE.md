@@ -2,7 +2,7 @@
 
 ## Purpose
 
-CareerDossierTeX is a modular XeLaTeX toolkit for producing related career documents from shared profile data.
+CareerDossierTeX is a modular LuaLaTeX toolkit for producing related career documents from shared profile data.
 
 The architecture separates:
 
@@ -182,17 +182,21 @@ Owns engine checks and semantic text roles.
 
 Responsibilities:
 
-- require XeLaTeX;
+- require LuaLaTeX and fail fatally under any other engine;
 - load `fontspec`;
 - select portable default fonts;
 - define semantic styles such as name, headline, section, entry title, body, and muted text;
 - provide extension points for future font presets.
-- leave `\XeTeXgenerateactualtext` disabled (see the ATS guide, section 4.5);
 - apply the Latin ligature-suppression and lining-numbers defaults;
-- resolve the default font deliberately (fontconfig family name, or an explicit
-  `Path=`), not by bare file name — bare-file-name loading of the tex-gyre OTFs
-  is not resolved by fontspec on stock XeLaTeX;
+- resolve the default fonts by file name through `luaotfload` (for example
+  `texgyretermes` with `Extension = .otf` and explicit face suffixes), so the
+  build depends on the TeX Live font tree rather than on OS-installed fonts;
 - record the tested font version for reproducibility.
+
+The XeTeX-only `\XeTeXgenerateactualtext` primitive is gone with the engine.
+LuaHBTeX emits real interword spaces in the text layer, so no per-word
+`/ActualText` workaround is needed or available; see the ATS guide, section 4.5,
+for the history.
 
 Typography commands should express meaning:
 
@@ -584,8 +588,9 @@ The generated PDF's text layer is a first-class deliverable, owned jointly by
 classes (reading order). The policy, with rationale and tests, lives in
 [`docs/guides/ats-extraction.md`](guides/ats-extraction.md). In summary:
 
-- compile with XeLaTeX and leave `\XeTeXgenerateactualtext` disabled: its
-  per-word `/ActualText` spans make PDFKit-class consumers merge adjacent words;
+- compile with LuaLaTeX: LuaHBTeX writes real interword spaces, so extraction
+  does not depend on per-word `/ActualText` spans (the XeTeX workaround that
+  made PDFKit-class consumers merge adjacent words);
 - disable common/contextual/discretionary/historic ligatures in the Latin
   default so `ffi`/`ffl` sequences extract as separate letters;
 - treat each font file, version, and OpenType-feature combination as testable
@@ -595,11 +600,22 @@ classes (reading order). The policy, with rationale and tests, lives in
 
 ### Tagged PDF (status)
 
-Tagged PDF is not claimed for the XeLaTeX build in Phase 1. Current XeTeX does not
-support real interword spaces in the tagging pipeline, so no PDF/UA conformance is
-asserted. The classes stay tagging-compatible; the limitation is documented rather
-than silently ignored. See the guide's tagging section before adding any
-tagging-related dependency.
+The XeTeX interword-space limitation that previously blocked tagging no longer
+applies: LuaLaTeX supports the kernel tagging pipeline. As of `v0.4.0` the
+classes emit tagged semantic structure when a document opts in with
+`\DocumentMetadata{tagging=on}`.
+
+Ownership: `careerdossier-typography` owns the engine check and the tagging
+helpers; the classes own reading order and decide which page furniture is a
+layout artifact. Tagging is off by default, and the untagged path must stay
+byte-identical when tagging code changes — the fixtures under `tests/tagging/`
+assert this.
+
+No PDF/UA or WCAG conformance is asserted. Fixture coverage checks that a
+structure tree exists and that headings, lists, links, and artifacts are
+classified as intended for four named profiles; independent validator and
+screen-reader verification is tracked separately and is not complete. See the
+guide's tagging section before adding any tagging-related dependency.
 
 ## Repository layout
 
@@ -682,10 +698,10 @@ source files
 focused tests under tests/
     │
     ▼
-latexmk -xelatex / l3build / suite runner
+latexmk -lualatex / l3build / suite runner
     │
     ▼
-XeLaTeX passes
+LuaLaTeX passes
     │
     ▼
 PDF and log
@@ -698,7 +714,7 @@ PDF and log
 The Phase 1 CI pipeline should:
 
 1. check out the repository;
-2. provide a tested XeLaTeX environment;
+2. provide a tested LuaLaTeX environment;
 3. run the committed regression, smoke, layout, and extraction tests that exist;
 4. build the résumé example;
 5. build the letter example;
