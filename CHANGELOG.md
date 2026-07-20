@@ -8,6 +8,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-07-19
+
 ### Fixed
 
 - Text extracted from CareerDossierTeX PDFs no longer merges adjacent words in
@@ -195,7 +197,8 @@ in a monochrome theme.
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.1.0
