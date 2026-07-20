@@ -1,0 +1,24 @@
+\documentclass[family=academic]{careerdossier-letter}
+\CDossierSetup{
+  name={Tagged Academic Letter},
+  email={academic-letter@example.test},
+  phone={+1 555 0103}
+}
+\CDossierLetterSetup{
+  date={July 20, 2026},
+  recipient-name={Jordan Reader},
+  recipient-organization={Example University},
+  subject={Application for Faculty Role},
+  salutation={Dear Jordan Reader,}
+}
+\begin{document}
+\MakeCDossierLetterhead
+The first academic-letter paragraph appears on page one before the page break.
+
+This page also contains a meaningful
+\href{https://example.test/academic-letter}{academic-letter link}.
+\newpage
+The second academic-letter paragraph appears on page two after the repeated
+footer from page one and before the closing.
+\MakeCDossierClosing
+\end{document}

@@ -85,3 +85,46 @@
 \NewDocumentCommand \CDossierEntryTitleStyle { } { \rmfamily \bfseries }
 \NewDocumentCommand \CDossierBodyStyle       { } { \rmfamily \normalfont }
 \NewDocumentCommand \CDossierMutedStyle      { } { \rmfamily \itshape }
+
+%% ---------------------------------------------------------------------------
+%% Optional tagged-PDF helpers.  \DocumentMetadata{tagging=on} must be placed
+%% before \documentclass, so these interfaces are deliberately dormant for an
+%% ordinary build: the kernel's inactive tagging branch renders only its input.
+%% They use the supported kernel/tagpdf interfaces only.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_typography_artifact:nn #1#2
+  {
+    \tag_if_active:TF
+      {
+        \tag_mc_artifact_group_begin:n {#1}
+        #2
+        \tag_mc_artifact_group_end:
+      }
+      { #2 }
+  }
+\cs_new_protected:Npn \__cdossier_typography_layout_artifact:n #1
+  { \__cdossier_typography_artifact:nn { layout } {#1} }
+
+%% Render a display heading with the class-provided visual formatting.  The
+%% tagged branch temporarily disables automatic paragraph tagging so the line
+%% becomes a heading structure directly, rather than a heading nested inside a
+%% paragraph.  All commands used here are public kernel/tagpdf interfaces.
+\cs_new_protected:Npn \__cdossier_typography_heading:n #1
+  {
+    \tag_if_active:TF
+      {
+        \UseTaggingSocket { para/off }
+        \noindent
+        \tag_struct_begin:n { tag = \UseStructureName { sec/1/title } }
+        \tag_mc_begin:n { }
+        #1
+        \tag_mc_end:
+        \tag_struct_end:
+        \par \nobreak
+        \UseTaggingSocket { para/restore }
+      }
+      {
+        \noindent #1
+        \par \nobreak
+      }
+  }

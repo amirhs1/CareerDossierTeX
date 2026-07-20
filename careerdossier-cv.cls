@@ -146,10 +146,11 @@
   {
     \par
     \addvspace { \l__cdossier_cv_sectionabove_skip }
-    \noindent { \CDossierSectionStyle \large #1 }
-    \par \nobreak
+    \__cdossier_typography_heading:n
+      { { \CDossierSectionStyle \large #1 } }
     \vspace { \l__cdossier_cv_sectiongap_skip }
-    \noindent { \CDossierRuleColor \rule { \linewidth } { \l__cdossier_cv_rule_dim } }
+    \noindent { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
+      { \rule { \linewidth } { \l__cdossier_cv_rule_dim } } }
     \par \nobreak
     \vspace { \l__cdossier_cv_sectionbelow_skip }
   }
