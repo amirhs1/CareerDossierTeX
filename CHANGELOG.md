@@ -29,6 +29,18 @@ Preview`. The release is not published; see issue [#82].
   LaTeX kernel tagging pipeline; XeTeX supports neither. That limitation capped
   extraction reliability (see `0.2.1`) and blocked tagged output entirely.
 
+- The academic CV folio now reads `Page N of M`, matching
+  `careerdossier-letter`. It previously read `Page N`, which cannot tell a
+  reader holding page two whether the document ended — the case that matters
+  most for the printed and separated pages a multi-page CV produces. The total
+  comes from the LaTeX kernel's last absolute page already recorded in the
+  auxiliary file, so no total-page package is added and the value resolves on
+  the second pass. Single-page CVs now read `Page 1 of 1`, as single-page
+  academic letters already did.
+
+  This changes rendered CV output. Documents are unaffected apart from the
+  folio text; no class, option, key, or command changed. ([#77])
+
 - Default fonts now resolve by file name through `luaotfload` (`texgyretermes`
   and `texgyreheros` with explicit faces) instead of by fontconfig family name.
   The build no longer depends on OS-installed fonts. Documents that override

@@ -5,4 +5,4 @@ newest.
 2) A. Turing and A. Lovelace. “Middle Eprint Publication”. In: Archive of Examples (2025). arXiv: 2501.01234.
 3) A. Lovelace. Oldest URL Publication. Example Press, 2024. url: https://example.invalid/visible-url.
 
-Page 1
+Page 1 of 1

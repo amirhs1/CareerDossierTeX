@@ -85,19 +85,26 @@
 %% A minimal kernel page style supplies a human-readable header after page one
 %% and a folio on every page. The first page has no running header because the
 %% body header already carries the person's full identity and contact details.
+%%
+%% The folio reads "Page N of M", matching careerdossier-letter. A bare "Page N"
+%% cannot tell a reader holding page two whether the document ended, which
+%% matters most for the printed and separated pages a multi-page CV produces.
+%% As in the letter class, the total comes from the LaTeX kernel's last absolute
+%% page recorded in the auxiliary file, so no total-page package is required and
+%% the value resolves on the second pass.
 \makeatletter
 \def\ps@cdossiercv{%
   \let\@mkboth\@gobbletwo
   \def\@oddhead{\hfil{\sffamily\small\CDossierFieldValue{name}\enspace--\enspace Curriculum\space Vitae}\hfil}%
   \let\@evenhead\@oddhead
-  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage}\hfil}%
+  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage\space of~\@abspage@last}\hfil}%
   \let\@evenfoot\@oddfoot
 }
 \def\ps@cdossiercvfirst{%
   \let\@mkboth\@gobbletwo
   \def\@oddhead{}%
   \let\@evenhead\@oddhead
-  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage}\hfil}%
+  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage\space of~\@abspage@last}\hfil}%
   \let\@evenfoot\@oddfoot
 }
 \makeatother
