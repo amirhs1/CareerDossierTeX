@@ -1,11 +1,11 @@
 # Makefile — CareerDossierTeX
 #
-# Every target here runs the command CI runs in .github/workflows/build.yml, so
-# a local check and a CI check cannot silently diverge. When you change a
-# command in one place, change it in the other.
+# Build and test commands live here so local workflows and CI can invoke the
+# same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything; l3build for `regression`;
-# pdftotext (Poppler) for `layout`, `extract-test`, and `bibliography-test`;
+# pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`, and
+# `tagging`;
 # BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
 #
 # Run `make help` for the target list.
@@ -22,7 +22,7 @@ ACADEMIC_LETTER := examples/academic/letter-academic.tex
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter check test regression smoke layout extract-test bibliography-test clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter check test regression smoke layout extract-test bibliography-test tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -48,7 +48,7 @@ academic-bibliography: ## Build the optional BibLaTeX/Biber CV example
 academic-letter: ## Build the academic letter example
 	$(LATEXMK) $(ACADEMIC_LETTER)
 
-check: regression extract-test smoke layout bibliography-test examples ## Run every suite CI runs
+check: regression extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
 
 test: check ## Alias for check
@@ -67,6 +67,9 @@ extract-test: ## Text-extraction round-trip against committed baselines
 
 bibliography-test: ## Biber sorting and identifier-precedence fixture
 	tests/bibliography/run.sh
+
+tagging: ## Opt-in tagged-PDF structure fixtures
+	tests/tagging/run.sh
 
 clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@$(LATEXMK_CLEAN) $(RESUME) $(LETTER) >/dev/null 2>&1

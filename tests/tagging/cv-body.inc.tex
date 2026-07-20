@@ -1,0 +1,35 @@
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name={Tagged Academic CV},
+  headline={Research Engineer},
+  email={cv@example.test},
+  phone={+1 555 0101},
+  website={example.test/cv}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research Experience}
+\begin{CDossierEntry}[
+  title={Researcher},
+  organization={Example University},
+  location={Toronto},
+  dates={2023--2026}
+]
+\begin{CDossierItemize}
+  \item First CV achievement in source order.
+  \item Second CV achievement with a meaningful
+        \href{https://example.test/research}{research link}.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\newpage
+\CDossierSection{Teaching Experience}
+\begin{CDossierEntry}[
+  title={Instructor},
+  organization={Example University},
+  dates={2025}
+]
+\begin{CDossierItemize}
+  \item Second-page CV content after the running header.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
