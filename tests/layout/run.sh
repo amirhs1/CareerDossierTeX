@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run.sh — CareerDossierTeX layout-stress runner (Phase 1)
 #
-# Compiles each layout fixture with XeLaTeX and asserts the page-level
+# Compiles each layout fixture with LuaLaTeX and asserts the page-level
 # properties that a document class must keep under stress:
 #
 #   - it compiles with exit 0;
@@ -14,7 +14,7 @@
 # human review of the rendered PDF; this runner guards the properties a machine
 # can check reliably without freezing an unsettled design.
 #
-# Requirements: xelatex, pdftotext (poppler) for the page-number check.
+# Requirements: lualatex, pdftotext (poppler) for the page-number check.
 # Run from anywhere; the repository root is placed on TEXINPUTS.
 set -uo pipefail
 
@@ -28,10 +28,10 @@ for tex in *.tex; do
   base="${tex%.tex}"
   echo "== $tex =="
 
-  if ! xelatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1; then
+  if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1; then
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue
   fi
-  if ! xelatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1; then
+  if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1; then
     echo "  RERUN FAILED (see $base.log)"; fail=1; continue
   fi
 

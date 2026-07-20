@@ -25,7 +25,7 @@
 %% that material and adds the letter body around it.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-letter} {2026-07-19} {0.2.1}
+\ProvidesExplClass {careerdossier-letter} {2026-07-20} {0.4.0}
   {CareerDossierTeX English cover-letter class}
 
 %% ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@
 
 %% ---------------------------------------------------------------------------
 %% Shared modules. careerdossier-components pulls in base (profile metadata and
-%% required-field validation), typography (the XeLaTeX guard and fonts), and
+%% required-field validation), typography (the LuaLaTeX guard and fonts), and
 %% theme; geometry and hyperref complete the page and link machinery. hyperref
 %% loads last so the theme's print-safe link hook applies regardless of order.
 %% ---------------------------------------------------------------------------

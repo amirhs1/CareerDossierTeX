@@ -15,7 +15,7 @@ update=0
 [ "${1:-}" = "--update" ] && update=1
 
 echo "== $base.tex (latexmk + Biber) =="
-if ! latexmk -xelatex -interaction=nonstopmode -halt-on-error "$base.tex" > "$base.stdout" 2>&1; then
+if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error "$base.tex" > "$base.stdout" 2>&1; then
   echo "  BUILD FAILED (see $base.log and $base.blg)"
   exit 1
 fi

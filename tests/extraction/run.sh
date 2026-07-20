@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run.sh — CareerDossierTeX extraction fixture runner (Phase 1)
 #
-# Compiles each *.tex fixture in this directory with XeLaTeX and gates it on
+# Compiles each *.tex fixture in this directory with LuaLaTeX and gates it on
 # three checks:
 #
 #   1. Poppler (pdftotext) extraction vs. the committed *.expected.txt baseline.
@@ -19,10 +19,10 @@
 # it. PDFKit and Poppler impose different line structure on multi-column layout,
 # so each keeps its own baseline rather than sharing one.
 #
-# It also scans the XeLaTeX log for warnings, treating a small, explicit
+# It also scans the LuaLaTeX log for warnings, treating a small, explicit
 # allowlist of known-benign messages as acceptable and failing on anything else.
 #
-# Requirements: xelatex, pdftotext (poppler). PDFKit check additionally needs
+# Requirements: lualatex, pdftotext (poppler). PDFKit check additionally needs
 # macOS + osascript. Run from anywhere.
 # Regenerate baselines intentionally with:  ./run.sh --update
 # On Linux, --update refreshes only the Poppler baselines; regenerate the PDFKit
@@ -39,10 +39,9 @@ update=0; [ "${1:-}" = "--update" ] && update=1
 fail=0
 
 # Build uncompressed so /ActualText is greppable in the PDF without needing
-# qpdf, mutool, or a Python zlib helper that CI images may not carry. Keeps the
-# -q -E defaults xelatex normally passes to xdvipdfmx; -z0 only drops
-# compression, which does not affect extracted text.
-driver='xdvipdfmx -z0 -q -E'
+# qpdf, mutool, or a Python zlib helper that CI images may not carry. LuaHBTeX
+# exposes both compression controls directly; changing them does not affect
+# rendered or extracted text.
 
 # PDFKit is macOS-only. Probe once rather than per fixture.
 pdfkit=0
@@ -77,12 +76,13 @@ for tex in *.tex; do
     echo "  MISSING baseline $exp (run with --update to create)"; fail=1; continue
   fi
 
-  xelatex -halt-on-error -interaction=nonstopmode -output-driver="$driver" \
-    "$tex" > "$base.log" 2>&1 || {
+  lua_input="\\pdfvariable compresslevel=0 \\pdfvariable objcompresslevel=0 \\input{$tex}"
+  lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
+    "$lua_input" > "$base.stdout" 2>&1 || {
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue; }
   # Resolve end-of-document labels such as the academic-letter total-page footer.
-  xelatex -halt-on-error -interaction=nonstopmode -output-driver="$driver" \
-    "$tex" >> "$base.log" 2>&1 || {
+  lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
+    "$lua_input" >> "$base.stdout" 2>&1 || {
     echo "  RERUN FAILED (see $base.log)"; fail=1; continue; }
 
   got="$(pdftotext -enc UTF-8 "$base.pdf" - | normalize)"
@@ -113,7 +113,7 @@ for tex in *.tex; do
     echo "  /ActualText PRESENT ($n spans) — see issue #72."
     echo "    PDFKit-class consumers (Preview, Spotlight, Safari, copy/paste)"
     echo "    will merge adjacent words. Do not re-enable"
-    echo "    \\XeTeXgenerateactualtext in careerdossier-typography.sty."
+    echo "    engine-specific ActualText generation in careerdossier-typography.sty."
     fail=1
   else
     echo "  no /ActualText spans"

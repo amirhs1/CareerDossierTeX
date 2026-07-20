@@ -15,40 +15,29 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-typography owns the XeLaTeX engine check, fontspec loading,
+%% careerdossier-typography owns the LuaLaTeX engine check, fontspec loading,
 %% the portable default fonts, and the semantic text roles. It carries no
 %% colour (see careerdossier-theme) and no page geometry (see the classes).
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplPackage {careerdossier-typography} {2026-07-19} {0.2.1}
-  {CareerDossierTeX XeLaTeX engine guard, portable fonts, and semantic text roles}
+\ProvidesExplPackage {careerdossier-typography} {2026-07-20} {0.4.0}
+  {CareerDossierTeX LuaLaTeX engine guard, portable fonts, and semantic text roles}
 
 %% ---------------------------------------------------------------------------
-%% Engine guard: XeLaTeX only. Fail early and clearly.
+%% Engine guard: LuaLaTeX only. Fail early and clearly.
 %% ---------------------------------------------------------------------------
 \msg_new:nnn { careerdossier-typography } { engine }
   {
-    CareerDossierTeX~requires~XeLaTeX. \\
-    Compile~with~xelatex,~not~pdflatex~or~lualatex.
+    CareerDossierTeX~requires~LuaLaTeX. \\
+    Compile~with~lualatex,~not~xelatex~or~pdflatex.
   }
-\sys_if_engine_xetex:F
+\sys_if_engine_luatex:F
   { \msg_fatal:nn { careerdossier-typography } { engine } }
 
 %% ---------------------------------------------------------------------------
-%% \XeTeXgenerateactualtext is deliberately NOT enabled.
-%%
-%% It wraps every word in its own /Span << /ActualText (word) >> BDC ... EMC
-%% sequence with no space token between adjacent spans. Consumers that treat
-%% /ActualText as authoritative and concatenate the strings — Apple PDFKit, and
-%% so Preview, Quick Look, Spotlight, Safari, and ordinary macOS copy/paste —
-%% lose the interword space and merge adjacent words ("Research& Development").
-%% Poppler and MuPDF fall back to glyph geometry and are unaffected, which is
-%% why a Poppler-only gate never caught it.
-%%
-%% Its protective value here is small: this package disables every optional
-%% ligature and alternate below, which is the main case /ActualText guards
-%% against. See the ATS guide, section 4.5, and tests/extraction/run.sh, which
-%% fails if the setting returns.
+%% LuaHBTeX emits real interword spaces in the PDF text layer, so this package
+%% needs no engine-specific ActualText workaround. Optional ligatures and
+%% alternates remain disabled below to keep glyph-to-Unicode mapping simple.
 %% ---------------------------------------------------------------------------
 
 %% ---------------------------------------------------------------------------
@@ -64,8 +53,9 @@
     Numbers   = Lining ,
   }
 
-%% Portable, freely redistributable TeX Live fonts, loaded by file name so the
-%% build does not depend on OS-installed fonts. All four faces are explicit.
+%% Portable, freely redistributable TeX Live fonts, resolved by file name
+%% through luaotfload so the build does not depend on OS-installed fonts. All
+%% four faces are explicit.
 %%   body / serif : TeX Gyre Termes (Times-like)
 %%   headings / sans : TeX Gyre Heros (Helvetica-like)
 \setmainfont { texgyretermes }

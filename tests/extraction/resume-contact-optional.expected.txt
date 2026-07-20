@@ -1,5 +1,6 @@
 Ada Lovelace
 Data Scientist
+
 ada@example.com | Toronto, ON | github.com/ada
 
 Experience

@@ -4,13 +4,13 @@
 # a local check and a CI check cannot silently diverge. When you change a
 # command in one place, change it in the other.
 #
-# Requirements: XeLaTeX and latexmk for everything; l3build for `regression`;
+# Requirements: LuaLaTeX and latexmk for everything; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, and `bibliography-test`;
 # BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
 #
 # Run `make help` for the target list.
 
-LATEXMK       := latexmk -xelatex -interaction=nonstopmode -halt-on-error
+LATEXMK       := latexmk -lualatex -interaction=nonstopmode -halt-on-error
 LATEXMK_CLEAN := latexmk -C
 RESUME        := examples/industry/resume-english.tex
 LETTER        := examples/industry/letter-industry.tex
@@ -53,7 +53,7 @@ check: regression extract-test smoke layout bibliography-test examples ## Run ev
 
 test: check ## Alias for check
 
-regression: ## Module regression suite (l3build check on XeTeX)
+regression: ## Module regression suite (l3build check on LuaTeX)
 	l3build check
 
 smoke: ## Supported builds and required failures
