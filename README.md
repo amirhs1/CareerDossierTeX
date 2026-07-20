@@ -23,7 +23,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Industry résumé | Supported | Existing `v0.1.x` behavior remains compatible |
 | Industry cover letter | Supported | `family=industry` remains the default |
 | Academic CV | Supported | Multi-page layout with running headers and folios |
-| Academic cover letter | Supported | Select with `family=academic` |
+| Academic cover letter | Supported | Select with `family=academic`; shares the CV's running headers and folios |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar and ORCID fields |

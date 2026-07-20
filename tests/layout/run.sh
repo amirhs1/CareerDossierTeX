@@ -76,17 +76,29 @@ for tex in *.tex; do
         fi
         ;;
       letter-academic-*)
+        # The academic letter shares the CV's page furniture: a centered folio on
+        # every page and an identity-derived running header from page two
+        # onwards. Page one has none because the letterhead already carries
+        # identity, so this asserts the header only where it should appear —
+        # checking it on page one would pass on the letterhead and prove nothing.
         letter_fail=0
         for (( n = 1; n <= pages; n++ )); do
           page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
           if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n of $pages"; then
             echo "  MISSING ACADEMIC-LETTER FOLIO: Page $n of $pages"; letter_fail=1
           fi
-          if ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace"; then
-            echo "  MISSING ACADEMIC-LETTER FOOTER NAME on page $n"; letter_fail=1
+          # Match the two halves separately rather than the whole string: the
+          # separator renders as an en dash, and pinning that exact byte would
+          # make the test about text encoding rather than about the header.
+          if [ "$n" -gt 1 ] && { ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace" || ! printf '%s\n' "$page_text" | grep -Fq "Cover Letter"; }; then
+            echo "  MISSING ACADEMIC-LETTER RUNNING HEADER on page $n"; letter_fail=1
           fi
         done
-        if [ "$letter_fail" -ne 0 ]; then fail=1; else echo "  academic-letter footers present"; fi
+        if [ "$letter_fail" -ne 0 ]; then
+          fail=1
+        else
+          echo "  academic-letter folios and running headers present"
+        fi
         ;;
       *)
         folio=0
