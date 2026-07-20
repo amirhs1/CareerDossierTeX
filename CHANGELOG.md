@@ -39,7 +39,7 @@ Preview`. The release is not published; see issue [#82].
   academic letters already did.
 
   This changes rendered CV output. Documents are unaffected apart from the
-  folio text; no class, option, key, or command changed. ([#77])
+  folio text; no class, option, key, or command changed. ([#91])
 
 - The academic cover letter now shares `careerdossier-cv`'s page furniture, so
   the two multi-page academic documents read as one family. From page two it
@@ -92,8 +92,9 @@ Preview`. The release is not published; see issue [#82].
   exists and check heading, list, link, and artifact classification, text
   extraction, and tagged-versus-untagged geometry. It is **not** a PDF/UA, WCAG,
   ATS, or general accessibility conformance claim, and it is not validated for
-  arbitrary user documents. Independent validator verification is now recorded
-  below; screen-reader verification is tracked in [#77] and is not complete.
+  arbitrary user documents. Independent validator and macOS screen-reader
+  verification are recorded below; NVDA on Windows is tracked in [#96] and has
+  not been performed.
 
 - PDF/UA-2 validation and a three-extractor round-trip for the four tagged
   fixture profiles. Each profile gains a `-ua2.tex` variant that shares the
@@ -112,10 +113,13 @@ Preview`. The release is not published; see issue [#82].
   unavailable, and the runner's closing summary names every gate that did not
   run, so a partial local environment cannot be mistaken for a full pass.
 
-  **Screen-reader review remains outstanding.** The VoiceOver (macOS) and NVDA
-  (Windows) reading-order checklists are documented in section 7.2 but have not
-  been performed. `v0.4.0` must not claim a reviewed reading order until at
-  least the macOS pass is recorded.
+  **Screen-reader review: macOS done, Windows outstanding.** A VoiceOver pass on
+  macOS 15.7.5 confirmed correct reading order across all four profiles, with
+  every artifact-suppression check passing — the CV running header and folio and
+  the academic letter's repeated footer are silent, and the contact line is
+  announced as one coherent run. Results are recorded in section 7.2. NVDA on
+  Windows has **not** been performed; it is a platform limitation tracked in
+  [#96], and the release claims no Windows screen-reader result.
 
 - A tagged-BibLaTeX feasibility fixture, recorded separately and deliberately
   non-blocking, since tagging support in BibLaTeX and Biber is upstream work.
@@ -136,6 +140,8 @@ Preview`. The release is not published; see issue [#82].
 [#77]: https://github.com/amirhs1/CareerDossierTeX/issues/77
 [#82]: https://github.com/amirhs1/CareerDossierTeX/issues/82
 [#98]: https://github.com/amirhs1/CareerDossierTeX/issues/98
+[#91]: https://github.com/amirhs1/CareerDossierTeX/issues/91
+[#96]: https://github.com/amirhs1/CareerDossierTeX/issues/96
 
 ## [0.2.1] - 2026-07-19
 

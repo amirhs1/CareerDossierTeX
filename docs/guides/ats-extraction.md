@@ -818,7 +818,12 @@ Windows runner, so the NVDA pass is platform-deferred rather than complete. The
 checklist is identical to the VoiceOver one, read with NVDA in Adobe Acrobat
 Reader (browse mode, `↓` through the document). Anyone on Windows can run it and
 record the result here; until then the release must not claim a Windows
-screen-reader result.
+screen-reader result. Tracked in
+[issue #96](https://github.com/amirhs1/CareerDossierTeX/issues/96).
+
+VoiceOver and NVDA differ in how they consume the structure tree, so the macOS
+result above is evidence rather than proof. One screen reader passing does not
+establish that both will.
 
 ### 7.3 Tagged BibLaTeX: feasibility and limitations
 
