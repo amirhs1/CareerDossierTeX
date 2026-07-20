@@ -1,0 +1,34 @@
+% biblatex-ua2.tex — tagged-BibLaTeX feasibility fixture (issue #77).
+%
+% Recorded SEPARATELY from the four named profiles. Tagging support in BibLaTeX
+% and Biber is upstream territory, so a veraPDF failure here does not block the
+% résumé, industry letter, academic CV, or academic letter unless the cause is
+% CareerDossierTeX's own code. Its purpose is to record what tagged BibLaTeX
+% output currently looks like, not to gate the release.
+%
+% Reuses tests/bibliography/publications.bib; the runner puts that directory on
+% BIBINPUTS. Needs Biber, so the runner drives it with latexmk rather than the
+% two-pass LuaLaTeX loop the other fixtures use.
+%
+% \MakeCDossierHeader is required, not decorative: on the first pass the
+% bibliography is still empty, and a document whose only content is
+% \printbibliography renders zero pages. The PDF-management backend treats that
+% as a fatal "no pages of output" error, which aborts the build before Biber
+% ever runs. The header guarantees page one exists on every pass.
+\DocumentMetadata{lang=en,tagging=on,pdfstandard=ua-2}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{publications.bib}
+\CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
+\CDossierSetup{
+  name={Ada Lovelace},
+  headline={Analytical Engine Programmer},
+  email={cv-biblatex@example.test}
+}
+\begin{document}
+\MakeCDossierHeader
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}

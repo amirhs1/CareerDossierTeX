@@ -1,0 +1,30 @@
+Tagged Academic Letter
+
+academic-letter@example.test | +1 555 0103
+
+July 20, 2026
+
+Jordan Reader
+Example University
+
+Application for Faculty Role
+
+Dear Jordan Reader,
+
+The first academic-letter paragraph appears on page one before the page break.
+
+This page also contains a meaningful academic-letter link.
+
+Tagged Academic Letter
+Page 1 of 2
+
+
+The second academic-letter paragraph appears on page two after the repeated footer from page one and before 
+the closing.
+
+Sincerely,
+
+Tagged Academic Letter
+
+Tagged Academic Letter
+Page 2 of 2

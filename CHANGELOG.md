@@ -38,6 +38,13 @@ Preview`. The release is not published; see issue [#82].
   build with LuaLaTeX. `make tagging` is a new suite and is included in
   `make check`. ([#76])
 
+- CI gained a `tagging` job running the tagged-PDF suite on every push and pull
+  request, installing `mupdf-tools` alongside `poppler-utils` so both
+  command-line extractors run there. veraPDF is not installed in CI yet — that
+  is a new third-party binary needing an approved immutable pin, so PDF/UA-2
+  validation currently runs locally only and the job reports that gate as not
+  run. ([#77])
+
 ### Added
 
 - Opt-in tagged semantic structure under LuaLaTeX, enabled per document with
@@ -55,8 +62,38 @@ Preview`. The release is not published; see issue [#82].
   exists and check heading, list, link, and artifact classification, text
   extraction, and tagged-versus-untagged geometry. It is **not** a PDF/UA, WCAG,
   ATS, or general accessibility conformance claim, and it is not validated for
-  arbitrary user documents. Independent validator and screen-reader verification
-  is tracked in [#77] and is not complete.
+  arbitrary user documents. Independent validator verification is now recorded
+  below; screen-reader verification is tracked in [#77] and is not complete.
+
+- PDF/UA-2 validation and a three-extractor round-trip for the four tagged
+  fixture profiles. Each profile gains a `-ua2.tex` variant that shares the
+  tagged fixture's body and adds `pdfstandard=ua-2`; `make tagging` builds it,
+  validates it with veraPDF, and compares Poppler, MuPDF, and Apple PDFKit
+  extraction against committed per-extractor baselines. The run also writes a
+  toolchain record, because a validation result is only meaningful alongside the
+  versions that produced it. ([#77])
+
+  All four profiles pass veraPDF `ua2`, and all three extractors agree with
+  their baselines. Reports are retained as CI artifacts, never committed.
+  Sections 7.1–7.3 of `docs/guides/ats-extraction.md` record the results, the
+  exact toolchain, and what the result does and does not license.
+
+  veraPDF, MuPDF, Biber, and PDFKit gates skip with a notice when the tool is
+  unavailable, and the runner's closing summary names every gate that did not
+  run, so a partial local environment cannot be mistaken for a full pass.
+
+  **Screen-reader review remains outstanding.** The VoiceOver (macOS) and NVDA
+  (Windows) reading-order checklists are documented in section 7.2 but have not
+  been performed. `v0.4.0` must not claim a reviewed reading order until at
+  least the macOS pass is recorded.
+
+- A tagged-BibLaTeX feasibility fixture, recorded separately and deliberately
+  non-blocking, since tagging support in BibLaTeX and Biber is upstream work.
+  It currently builds and passes veraPDF `ua2` with genuine list structure per
+  entry. Limitations — Biber and a multi-pass build, and the fact that a
+  bibliography-only document renders zero pages and fails to build — are
+  documented in section 7.3. Tagged BibLaTeX is **not** a supported `v0.4.0`
+  feature. ([#77])
 
 ### Removed
 

@@ -8,6 +8,12 @@
 # `tagging`;
 # BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
 #
+# `tagging` additionally uses veraPDF (PDF/UA-2 validation), mutool (MuPDF
+# extraction), Biber (the BibLaTeX feasibility fixture), and PDFKit via
+# osascript on macOS. Each of those gates skips with a notice when the tool is
+# absent, and the runner reports which gates did not run — so `make tagging`
+# succeeding locally does not by itself mean every gate was exercised.
+#
 # Run `make help` for the target list.
 
 LATEXMK       := latexmk -lualatex -interaction=nonstopmode -halt-on-error
@@ -78,6 +84,7 @@ clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@$(LATEXMK_CLEAN) $(ACADEMIC_LETTER) >/dev/null 2>&1
 	-@l3build clean >/dev/null 2>&1
 	@rm -rf build
+	@rm -rf tests/tagging/reports
 	@rm -f tests/*/*.aux tests/*/*.log tests/*/*.out tests/*/*.pdf \
 	       tests/*/*.xdv tests/*/*.fls tests/*/*.fdb_latexmk \
 	       tests/*/*.bbl tests/*/*.bcf tests/*/*.blg tests/*/*.run.xml \

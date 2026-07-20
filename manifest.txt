@@ -44,7 +44,8 @@ build.lua                     l3build configuration for the regression suite
 Makefile                      local build and test entry points
 docs/                         API, architecture, roadmap, migration, design guidance
 examples/                     user-facing example documents
-tests/                        regression, smoke, layout, and extraction fixtures
+tests/                        regression, smoke, layout, extraction, bibliography,
+                              and tagged-PDF fixtures
 
 
 Not distributed
