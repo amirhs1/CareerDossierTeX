@@ -11,8 +11,8 @@ test pass at the end of a milestone.
 
 > **Current status:** `v0.2.1 — Extraction Correction` is released. `v0.3.0` is
 > dropped. The next planned release is
-> `v0.2.2 — LuaLaTeX Transition and Tagged-PDF Preview`, followed by
-> `v0.4.0 — Statements and Customization`.
+> `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`, followed by
+> `v0.5.0 — Statements and Customization`.
 
 ## Release overview
 
@@ -22,9 +22,9 @@ test pass at the end of a milestone.
 | `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
 | `v0.2.0` | Academic CV, academic letter, and bibliography support | Released |
 | `v0.2.1` | PDFKit text-extraction correction | Released |
-| `v0.2.2` | LuaLaTeX transition and opt-in tagged-PDF preview | Planned |
+| `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Planned |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
-| `v0.4.0` | Statement classes and broader customization | Planned |
+| `v0.5.0` | Statement classes and broader customization | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
 Repository milestones are tracked on the GitHub milestones page:
@@ -186,7 +186,7 @@ Extend existing classes:
 
 Do not create separate language-specific classes unless a future document model is genuinely different.
 
-## `v0.4.0 — Statements and Customization`
+## `v0.5.0 — Statements and Customization`
 
 ### Goal
 
@@ -254,8 +254,12 @@ The live issue and Project metadata now follow the continuous-testing policy:
   [issue #10](https://github.com/amirhs1/CareerDossierTeX/issues/10). Résumé and
   letter tests remain owned by their feature issues rather than this debt item.
 - CTAN packaging via `l3build ctan`; decide handwritten vs `.dtx` — `v1.0.0`.
-- Revisit tagged PDF / PDF-UA once XeTeX supports real interword spaces —
-  `v0.4.0`.
+- Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
+  LuaLaTeX transition supersedes that precondition, and opt-in tagged structure
+  is now in-scope for `v0.4.0` via
+  [issue #28](https://github.com/amirhs1/CareerDossierTeX/issues/28), with
+  validation in [issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77).
+  No PDF/UA conformance is claimed.
 
 ## Scope-control rule
 

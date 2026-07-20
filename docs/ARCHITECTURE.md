@@ -855,7 +855,7 @@ Farsi, bilingual, and RTL support is dropped, not scheduled (see
 component, résumé, CV, and letter modules and add a shared label module. Do
 not duplicate the class hierarchy by language.
 
-### `v0.4.0`
+### `v0.5.0`
 
 Add statement documents, A4 paper, additional themes, and font presets through documented extension points.
 

@@ -557,7 +557,7 @@ A scanned signature may be decorative, but the typed name must remain present as
 text. If a signature image is included, it must not interrupt reading order or
 replace the name.
 
-### 5.6 Statements — research, teaching, diversity **(planned — v0.4.0)**
+### 5.6 Statements — research, teaching, diversity **(planned — v0.5.0)**
 
 These are closer to short articles:
 
@@ -726,7 +726,7 @@ careerdossier-biblatex.sty    optional fixed BibLaTeX/Biber profile
 Do not place margins in `careerdossier-base`, and do not duplicate contact-line
 logic inside both classes.
 
-`careerdossier-statement.cls` is **(planned — v0.4.0)**. Multilingual and RTL
+`careerdossier-statement.cls` is **(planned — v0.5.0)**. Multilingual and RTL
 support is **dropped** (see `docs/ROADMAP.md`); should it ever return, it would
 extend the existing typography and component modules — and introduce a label
 abstraction — rather than add language-specific classes.
