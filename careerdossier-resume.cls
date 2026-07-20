@@ -22,7 +22,7 @@
 %% class only arranges it on the page.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-resume} {2026-07-19} {0.2.1}
+\ProvidesExplClass {careerdossier-resume} {2026-07-20} {0.4.0}
   {CareerDossierTeX English industry résumé class}
 
 %% ---------------------------------------------------------------------------
@@ -72,7 +72,7 @@
 
 %% ---------------------------------------------------------------------------
 %% Shared modules. careerdossier-components pulls in base, typography (the
-%% XeLaTeX engine guard and fonts), and theme; geometry, enumitem, and hyperref
+%% LuaLaTeX engine guard and fonts), and theme; geometry, enumitem, and hyperref
 %% complete the page and link machinery. hyperref loads last so the theme's
 %% print-safe link hook applies regardless of order.
 %% ---------------------------------------------------------------------------

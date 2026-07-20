@@ -25,10 +25,10 @@ installfiles  = { "careerdossier-*.sty", "careerdossier-*.cls" }
 -- testfiles/ directory is introduced.
 testfiledir = "tests/regression"
 
--- Phase 1 is XeLaTeX-only, so the suite is checked on XeTeX with the LaTeX
--- format and nothing else.
-checkengines = { "xetex" }
-stdengine    = "xetex"
+-- CareerDossierTeX is LuaLaTeX-only from v0.4.0, so the suite is checked on
+-- LuaTeX with the LaTeX format and nothing else.
+checkengines = { "luatex" }
+stdengine    = "luatex"
 checkformat  = "latex"
 
 -- These tests assert token lists and diagnostics, not multi-pass references, so

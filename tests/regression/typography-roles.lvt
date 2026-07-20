@@ -2,8 +2,8 @@
 %
 % Fonts and geometry are a visual concern checked by the layout and extraction
 % runners; what is stable here is the *intent* of each semantic role: which font
-% class (serif/sans), weight, and shape it selects, plus the ATS actual-text
-% setting the module turns on. Family is compared against the NFSS defaults
+% class (serif/sans), weight, and shape it selects, plus the required engine
+% contract. Family is compared against the NFSS defaults
 % rather than a fontspec-generated name, so the assertion does not break when
 % font internals change.
 \input{regression-test}
@@ -27,8 +27,12 @@
       \TYPE{ series = \use:c { f@series } , ~ shape = \use:c { f@shape } }
     \group_end:
   }
-\cs_new_protected:Npn \cdossiertestActualText
-  { \TYPE{ actualtext = \int_use:N \XeTeXgenerateactualtext } }
+\cs_new_protected:Npn \cdossiertestEngine
+  {
+    \sys_if_engine_luatex:TF
+      { \TYPE{ engine = luatex } }
+      { \TYPE{ engine = other } }
+  }
 \ExplSyntaxOff
 
 \begin{document}
@@ -41,11 +45,9 @@
 \TEST{body-is-serif-regular}{    \cdossiertestRole{\CDossierBodyStyle}       }
 \TEST{muted-is-serif-italic}{    \cdossiertestRole{\CDossierMutedStyle}      }
 
-% Issue #72: \XeTeXgenerateactualtext must stay OFF. Its per-word /ActualText
-% spans carry no interword space, so PDFKit-class consumers (Preview, Quick
-% Look, Spotlight, Safari, macOS copy/paste) merge adjacent words. Expect 0.
-\TEST{actual-text-disabled-for-extraction}{
-  \cdossiertestActualText
+% Issue #75: the regression harness and typography package must use LuaTeX.
+\TEST{lualatex-engine-contract}{
+  \cdossiertestEngine
 }
 
 \END
