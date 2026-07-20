@@ -51,8 +51,10 @@ for tex in *.tex; do
   echo "  pages: $pages"
 
   # The résumé's empty page style must print no folio. The CV instead requires
-  # a visible `Page N` folio on every page and an identity-derived running
-  # header from page two onwards. Check the extracted text rather than exact
+  # a visible `Page N of M` folio on every page and an identity-derived running
+  # header from page two onwards. The folio carries the total, matching
+  # careerdossier-letter: a bare `Page N` cannot tell a reader holding page two
+  # whether the document ended. Check the extracted text rather than exact
   # page coordinates so the test guards behavior without freezing layout.
   if command -v pdftotext >/dev/null 2>&1; then
     case "$base" in
@@ -60,8 +62,8 @@ for tex in *.tex; do
         cv_fail=0
         for (( n = 1; n <= pages; n++ )); do
           page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
-          if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n"; then
-            echo "  MISSING CV FOLIO: Page $n"; cv_fail=1
+          if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n of $pages"; then
+            echo "  MISSING CV FOLIO: Page $n of $pages"; cv_fail=1
           fi
           if [ "$n" -gt 1 ] && { ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace" || ! printf '%s\n' "$page_text" | grep -Fq "Curriculum"; }; then
             echo "  MISSING CV RUNNING HEADER on page $n"; cv_fail=1
