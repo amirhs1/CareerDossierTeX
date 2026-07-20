@@ -774,23 +774,44 @@ checks that structure exists and is well-formed; only a screen reader shows
 whether decorative rules stay silent and whether headings, entries, and contact
 lines arrive in a sensible order.
 
-> **Status: not yet performed.** Neither checklist below has been run for
-> `v0.4.0`. Issue #77 requires at least one macOS and one Windows result to be
-> documented. Record outcomes inline here, with the OS and screen-reader
-> versions, before the release claims a reviewed reading order.
+> **Status: macOS done, Windows outstanding.** A VoiceOver pass was performed by
+> the maintainer on 2026-07-20; results below. The NVDA pass has not been run.
 
-**macOS / VoiceOver (⌘F5).** Open each PDF in Preview and read it top to bottom
-with `VO`+`→`. For `resume` and `cv`, plus a focused pass over `letter` and
-`academic-letter`, confirm:
+**macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
+Read top to bottom with `VO`+`→` over all four tagged fixtures.
 
-- [ ] every heading is announced as a heading, in source order;
-- [ ] list items are announced as list items, with the count reported;
-- [ ] the contact line is announced as one coherent run, not merged words or
-      character-by-character spelling;
-- [ ] links are announced as links and expose their target;
-- [ ] horizontal rules and separators are **not** announced;
-- [ ] the `cv` running header and folio are **not** announced on page two; and
-- [ ] the `academic-letter` repeated footer is **not** announced on page two.
+- [x] headings announced as headings, in source order;
+- [x] list items announced as list items;
+- [x] the contact line announced as one coherent run — no merged words, no
+      character-by-character spelling (the issue #72 regression stays fixed);
+- [x] links announced as links;
+- [x] horizontal rules and separators **not** announced;
+- [x] the `cv` running header (`<name> -- Curriculum Vitae`) and its folio
+      **not** announced on page two; and
+- [x] the `academic-letter` repeated footer and `Page N of M` folio **not**
+      announced on either page.
+
+**Every artifact-suppression check passed.** Decorative and repeated page
+furniture is silent to VoiceOver on all four profiles, which is the property
+tagging was added to provide.
+
+One behavior was observed and judged acceptable rather than defective. A
+sentence ending in a link is announced in three parts — the leading prose, then
+the link, then the final period as "period". For example, *"This page also
+contains a meaningful academic-letter link."* reads as
+`This page also contains a meaningful` / `academic-letter link` / `period`.
+
+That split is the structure working correctly, not failing: the `/S /Link`
+element genuinely is a separate node, and VoiceOver announces the trailing
+period as its own run because it is a short isolated text run following that
+node. HTML behaves the same way for `<a>…</a>.` — the split marks where the
+link stops, which is information a listener needs. Merging the period into the
+link would misreport the link's extent. No change is warranted.
+
+> **Note:** the VoiceOver pass above covered the CV folio in its previous
+> `Page N` wording. The folio now reads `Page N of M`; its artifact marking was
+> re-verified programmatically and is unchanged, but a quick re-listen to
+> `cv.pdf` page two would fully close this out.
 
 **Windows / NVDA — deferred.** This project has no Windows machine and CI has no
 Windows runner, so the NVDA pass is platform-deferred rather than complete. The

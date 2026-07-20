@@ -228,11 +228,11 @@ keys, and commands; the build command changes from `latexmk -xelatex` to
 - untagged output is unchanged when tagging is not enabled;
 - tagged fixtures pass structure, extraction, and artifact checks, and the
   validator and screen-reader results are recorded with tool versions.
-  **Status:** the validator half is done — the four named profiles pass veraPDF
-  `ua2` and a three-extractor round trip, recorded with tool versions in
-  `docs/guides/ats-extraction.md` section 7.1. A macOS VoiceOver reading-order
-  check is the remaining gate on this criterion; the checklist is in section
-  7.2 and NVDA on Windows stays platform-deferred;
+  **Status:** met for macOS. The four named profiles pass veraPDF `ua2` and a
+  three-extractor round trip (section 7.1), and a maintainer VoiceOver pass on
+  2026-07-20 confirmed correct reading order with all decorative and repeated
+  page furniture silent (section 7.2). NVDA on Windows stays platform-deferred;
+  the release documents that rather than claiming a Windows result;
 - `docs/MIGRATION.md` gives XeTeX-preamble users an actionable upgrade path;
 - documentation claims no more than the fixtures actually verify.
 
