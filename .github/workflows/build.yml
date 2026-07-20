@@ -43,17 +43,23 @@ jobs:
             echo "## TeX Live"
             tlmgr --version 2>&1 || echo "tlmgr: unavailable"
             echo
-            echo "## XeTeX / format"
-            xelatex --version 2>&1 | head -3
-            echo
-            echo "## xdvipdfmx"
-            xdvipdfmx --version 2>&1 | head -2
+            echo "## LuaHBTeX / LuaLaTeX format"
+            lualatex --version 2>&1 | head -3
+            echo "format: $(kpsewhich --engine=luahbtex --format=fmt lualatex.fmt || echo NOT-FOUND)"
             echo
             echo "## fontspec"
             kpsewhich fontspec.sty
             # fontspec declares {date}{version} on the line after
             # \ProvidesExplPackage, so -A1 is required to capture the version.
             grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich fontspec.sty)" || true
+            echo
+            echo "## PDF management"
+            kpsewhich pdfmanagement-testphase.sty || echo "pdfmanagement-testphase: NOT-FOUND"
+            grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich pdfmanagement-testphase.sty)" || true
+            echo
+            echo "## tagpdf (used once tagged fixtures are added)"
+            kpsewhich tagpdf.sty || echo "tagpdf: NOT-FOUND"
+            grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich tagpdf.sty)" || true
             echo
             echo "## l3build"
             l3build --version 2>&1 | head -4 || echo "l3build: unavailable"
@@ -82,7 +88,7 @@ jobs:
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      - name: Module regression suite (l3build check on XeTeX)
+      - name: Module regression suite (l3build check on LuaTeX)
         run: l3build check
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload regression logs
@@ -129,7 +135,7 @@ jobs:
         run: tests/layout/run.sh
       - name: Build the résumé example
         run: >-
-          latexmk -xelatex -interaction=nonstopmode -halt-on-error
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error
           examples/industry/resume-english.tex
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload résumé PDFs and logs
@@ -156,7 +162,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build the cover-letter example
         run: >-
-          latexmk -xelatex -interaction=nonstopmode -halt-on-error
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error
           examples/industry/letter-industry.tex
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload cover-letter PDF and log
@@ -205,7 +211,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build the academic letter example
         run: >-
-          latexmk -xelatex -interaction=nonstopmode -halt-on-error
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error
           examples/academic/letter-academic.tex
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload academic letter PDF and log

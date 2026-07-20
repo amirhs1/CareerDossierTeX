@@ -1,5 +1,5 @@
 % extraction-torture.tex
-% Standalone XeLaTeX extraction fixture for CareerDossierTeX.
+% Standalone LuaLaTeX extraction fixture for CareerDossierTeX.
 %
 % Purpose
 %   Prove that the package's default typography policy produces a PDF whose
@@ -8,29 +8,25 @@
 %   it can run before the classes exist.
 %
 % Policy under test (mirror of careerdossier-typography.sty):
-%   - XeLaTeX engine (fixture errors out under other engines)
-%   - \XeTeXgenerateactualtext NOT enabled (see issue #72: per-word /ActualText
-%     spans carry no interword space, so PDFKit-class consumers merge adjacent
+%   - LuaLaTeX engine (fixture errors out under other engines)
+%   - no per-word /ActualText generation (see issue #72: those spans carry no
+%     interword space, so PDFKit-class consumers merge adjacent
 %     words; the "interword spacing" block below is the explicit regression)
 %   - common / contextual / discretionary / historic ligatures OFF
 %   - lining numbers
 %   - TeX Gyre Heros, all four faces declared explicitly
 %
 % Font loading note
-%   The guide recommends loading the default face by file name for
-%   reproducibility. On stock XeLaTeX (TeX Live 2023) bare-file-name loading of
-%   the tex-gyre OTFs is NOT resolved by fontspec ("cannot be found"), while the
-%   fontconfig family name is. This fixture therefore loads by family name with
-%   explicit per-face files. careerdossier-typography.sty should resolve this
-%   deliberately (family name, or an explicit Path=), not assume bare file names.
+%   The fixture mirrors the package's family-name lookup with explicit face
+%   files. LuaLaTeX resolves those names through luaotfload.
 %
-% Compile: xelatex -halt-on-error -interaction=nonstopmode extraction-torture.tex
+% Compile: lualatex -halt-on-error -interaction=nonstopmode extraction-torture.tex
 % Extract: pdftotext -enc UTF-8 extraction-torture.pdf -
 \documentclass[11pt]{article}
 
 \usepackage{iftex}
-\ifXeTeX\else
-  \errmessage{extraction-torture.tex requires XeLaTeX}%
+\ifLuaTeX\else
+  \errmessage{extraction-torture.tex requires LuaLaTeX}%
 \fi
 
 \usepackage{fontspec}
@@ -71,7 +67,7 @@ email@example.org +1 416 555 0199
 \textit{January 2023 -- Present}
 
 % Interword spacing (issue #72). Every line below merged under
-% \XeTeXgenerateactualtext=1 when read through Apple PDFKit. Keep them: they are
+% per-word /ActualText was enabled when read through Apple PDFKit. Keep them:
 % the assertion that per-word /ActualText spans have not returned.
 Built a reproducible analytical workflow used across teams.
 

@@ -28,7 +28,7 @@ identity and email here. Do not include prompts, secrets, or personal data.
 
 - [ ] Focused tests were added or updated under `tests/` with behavior changes
 - [ ] Expected pre-fix failure was confirmed, or the reason it could not be was documented
-- [ ] Compiled affected examples with `latexmk -xelatex`
+- [ ] Compiled affected examples with `latexmk -lualatex`
 - [ ] GitHub Actions passes
 - [ ] Relevant logs inspected
 - [ ] No unexpected overfull boxes

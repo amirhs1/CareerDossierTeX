@@ -27,7 +27,7 @@ Describe what should happen.
 ## Compile command
 
 ```bash
-latexmk -xelatex -interaction=nonstopmode -halt-on-error example.tex
+latexmk -lualatex -interaction=nonstopmode -halt-on-error example.tex
 ```
 
 ## Relevant log excerpt
@@ -40,7 +40,7 @@ Paste the smallest useful log excerpt.
 
 - Operating system:
 - TeX distribution and year:
-- XeLaTeX version:
+- LuaLaTeX version:
 - CareerDossierTeX version or commit:
 
 ## Regression information
