@@ -2,7 +2,7 @@
 
 A reusable XeLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.2.0 — Academic Dossier` is the current release.
+> **Status:** `v0.2.1 — Extraction Correction` is the current release.
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
 > [`docs/MIGRATION.md`](docs/MIGRATION.md).
@@ -311,7 +311,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.2.0 — Academic Dossier
+v0.2.1 — Extraction Correction
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -323,6 +323,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.1.0` | English industry résumé and cover letter |
 | `v0.1.1` | Metadata and build corrections |
 | `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
+| `v0.2.1` | Extraction correction |
 | `v0.4.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |
 
