@@ -324,7 +324,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.1.1` | Metadata and build corrections |
 | `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
 | `v0.2.1` | Extraction correction |
-| `v0.4.0` | Statement classes and broader customization |
+| `v0.5.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |
 
 Farsi, bilingual, and right-to-left support (`v0.3.0`) is dropped.
