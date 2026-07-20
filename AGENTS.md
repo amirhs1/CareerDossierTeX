@@ -6,7 +6,7 @@ skills referenced below.
 
 ## Repository purpose
 
-`CareerDossierTeX` is a reusable XeLaTeX toolkit for producing consistent career
+`CareerDossierTeX` is a reusable LuaLaTeX toolkit for producing consistent career
 documents from shared profile data.
 
 - Maintainer: Amir Sadeghi
@@ -49,8 +49,8 @@ on it. When it is removed, update remaining references in the same change.
 
 ## Non-negotiable rules
 
-1. **XeLaTeX scope:** use XeLaTeX for the active Phase 1 scope. Unsupported
-   engines must receive a clear error.
+1. **LuaLaTeX scope:** LuaLaTeX is the sole supported engine. XeLaTeX and
+   pdfLaTeX must receive a clear error.
 2. **Verification honesty:** never claim a build, test, CI run, visual check,
    accessibility check, or metadata update passed unless it actually ran in this
    session or the maintainer supplied the result.
@@ -147,7 +147,7 @@ tracked debt rather than committing tests no runner can execute.
 When the documented example exists, the baseline form is:
 
 ```bash
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/industry/resume-english.tex
 ```
 
@@ -162,6 +162,7 @@ Cover the relevant parts of this matrix:
 - text extraction and logical reading order
 - unsupported-engine error
 - both classes after changes to shared packages
+- tagged and untagged output after changes to tagging or shared packages
 
 Inspect logs for errors, undefined control sequences, emergency stops, overfull
 boxes, missing glyphs, font substitutions, and unresolved references. For layout

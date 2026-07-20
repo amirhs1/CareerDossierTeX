@@ -17,12 +17,13 @@ The API is intentionally small. Internal helper commands are not public merely b
 
 ## Supported configuration
 
-| Setting | `v0.2.0` support |
+| Setting | `v0.4.0` support |
 |---|---|
-| Engine | XeLaTeX only |
+| Engine | LuaLaTeX only |
 | Language | English |
 | Paper | US Letter |
 | Theme | Monochrome |
+| Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
 | Letter class | `careerdossier-letter`, industry and academic families |
@@ -57,6 +58,39 @@ Do not depend on repository-specific paths such as:
 ```latex
 \documentclass{classes/careerdossier-resume}
 ```
+
+## Engine
+
+LuaLaTeX is the sole supported engine as of `v0.4.0`. `careerdossier-typography`
+performs the check and raises a fatal error naming LuaLaTeX under any other
+engine. XeLaTeX and pdfLaTeX are unsupported; there is no compatibility mode and
+no option to bypass the guard.
+
+## Tagged structure (opt-in)
+
+Tagged output is opt-in and off by default. It is enabled with the LaTeX kernel's
+`\DocumentMetadata`, which must appear **before** `\documentclass`:
+
+```latex
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-resume}
+```
+
+This introduces no CareerDossierTeX class option and no public command. The
+tagging interface is the kernel's, not this package's, and is not covered by the
+stability policy below.
+
+When tagging is active the classes expose section headings, lists, paragraphs,
+and links as structure, and mark decorative rules, contact separators, and
+running page furniture as layout artifacts. When it is not active, output is
+unchanged from the untagged path.
+
+Tagged output is a tested preview for the four fixture profiles (industry
+résumé, industry letter, academic CV, academic letter). It is not a PDF/UA,
+WCAG, ATS, or general accessibility conformance claim. See
+[`../README.md`](../README.md) and
+[`guides/ats-extraction.md`](guides/ats-extraction.md) for the scope of what has
+actually been verified.
 
 ## Résumé class
 
@@ -632,7 +666,7 @@ must produce an actionable class error.
 
 The academic release does not support:
 
-- pdfLaTeX or LuaLaTeX;
+- XeLaTeX or pdfLaTeX (as of `v0.4.0`; `v0.2.x` was XeLaTeX-only);
 - Farsi, bilingual, or RTL documents;
 - A4 paper;
 - color themes, font presets, icons, or bundled fonts;

@@ -2,7 +2,7 @@
 
 Thank you for helping improve CareerDossierTeX.
 
-This project uses focused issues, short-lived branches, pull requests, repeatable XeLaTeX builds, and incremental releases. The goal is not process for its own sake; the goal is a repository whose behavior and history remain understandable.
+This project uses focused issues, short-lived branches, pull requests, repeatable LuaLaTeX builds, and incremental releases. The goal is not process for its own sake; the goal is a repository whose behavior and history remain understandable.
 
 ## Before contributing
 
@@ -49,7 +49,7 @@ line-by-line review. Open or claim a focused issue first for substantial work.
 Development requires:
 
 - Git;
-- XeLaTeX;
+- LuaLaTeX (LuaHBTeX);
 - `latexmk`;
 - a sufficiently complete TeX Live or MiKTeX installation;
 - `pdftotext` from Poppler when running extraction, layout, or bibliography
@@ -60,7 +60,8 @@ Development requires:
   `make check` suite.
 
 The ordinary résumé, letter, and no-BibLaTeX CV paths do not require BibLaTeX or
-Biber. CareerDossierTeX is XeLaTeX-only.
+Biber. CareerDossierTeX is LuaLaTeX-only; XeLaTeX and pdfLaTeX fail with an
+actionable engine error.
 
 ## Issue workflow
 
@@ -89,7 +90,7 @@ Include:
 - the smallest useful log excerpt;
 - operating system;
 - TeX distribution and version;
-- XeLaTeX version;
+- LuaLaTeX (LuaHBTeX) version;
 - CareerDossierTeX version or commit;
 - whether the behavior worked in an earlier release.
 
@@ -137,7 +138,7 @@ feat/resume-class
 feat/industry-letter
 fix/contact-separators
 test/regression-harness
-ci/xelatex-build
+ci/lualatex-build
 release/v0.1.0
 ```
 
@@ -198,7 +199,7 @@ feat(resume): add dossier entry environment
 feat(letter): add recipient address block
 fix(components): omit separators for empty fields
 test(resume): add long URL stress example
-ci(build): compile industry examples with XeLaTeX
+ci(build): compile industry examples with LuaLaTeX
 refactor(theme): centralize monochrome color tokens
 ```
 
@@ -225,8 +226,9 @@ Build every supported example:
 make
 ```
 
-Run every suite CI runs — regression, extraction, smoke, layout, and the focused
-BibLaTeX/Biber fixture — plus all supported example builds:
+Run every suite CI runs — regression, extraction, smoke, layout, the focused
+BibLaTeX/Biber fixture, and the tagged-structure fixtures — plus all supported
+example builds:
 
 ```bash
 make check
@@ -247,10 +249,10 @@ The underlying invocation, if you prefer to run it directly or need to build a
 single document:
 
 ```bash
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/industry/resume-english.tex
 
-latexmk -xelatex -interaction=nonstopmode -halt-on-error \
+latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/industry/letter-industry.tex
 ```
 
@@ -385,7 +387,7 @@ PDFKit and Poppler impose different line structure on multi-column layout, so
 each keeps its own baseline; do not expect the two to match.
 
 It fails on any character, spacing, ordering, or Unicode-mapping change, and on
-any non-allowlisted XeLaTeX warning. Regenerate baselines **only** when a change
+any non-allowlisted LuaLaTeX warning. Regenerate baselines **only** when a change
 to output is intended and reviewed:
 
     tests/extraction/run.sh --update
@@ -400,7 +402,7 @@ Rationale and the full method are in
 ### Module regression suite (l3build)
 
 The logic-bearing packages are covered by an `l3build` regression suite. Each
-`.lvt` source under `tests/regression/` is compiled on XeTeX and its filtered
+`.lvt` source under `tests/regression/` is compiled on LuaTeX and its filtered
 log is diffed against a committed `.tlg` baseline. Run the whole suite from the
 repository root:
 
@@ -410,14 +412,14 @@ Run a single test by name (without the `.lvt` extension):
 
     l3build check base-diagnostics
 
-A failing check writes the difference to `build/test/<name>.xetex.diff`; read it
+A failing check writes the difference to `build/test/<name>.luatex.diff`; read it
 to see the intended baseline versus the actual log. When an output change is
 intended and understood, re-save the baseline, then review the diff before
 committing it (see "Baselines are load-bearing" above):
 
     l3build save base-diagnostics
 
-The harness is configured in `build.lua` (`tests/regression/`, XeTeX, LaTeX
+The harness is configured in `build.lua` (`tests/regression/`, LuaTeX, LaTeX
 format). Writing a test: `\input{regression-test}`, load the package under test,
 and inside `\TEST{name}{...}` use `\TYPE{...}` to record the behavior in the log.
 Catcodes cannot be switched inside an already-tokenized `\TEST` body, so any
@@ -523,9 +525,10 @@ Do not generate every separator first and attempt to remove empty ones later.
 
 ### Engine support
 
-Phase 1 is XeLaTeX-only. Unsupported engines should receive a clear package or class error.
+CareerDossierTeX is LuaLaTeX-only as of `v0.4.0`. Unsupported engines receive a
+clear package or class error; `careerdossier-typography` owns the guard.
 
-Do not add partial pdfLaTeX or LuaLaTeX support without defining, documenting, and testing it.
+Do not add partial XeLaTeX or pdfLaTeX support without defining, documenting, and testing it.
 
 ## Documentation requirements
 
@@ -710,9 +713,10 @@ from. A mutable tag such as `:latest` or `@v4` lets an upstream retag silently
 change what runs, which would surface as an unexplained failure or an output
 shift that looks like our bug.
 
-The `toolchain` job records the TeX Live release, XeTeX, `xdvipdfmx`,
-`fontspec`, `l3build`, BibLaTeX/Biber, and default-font paths that a run actually
-used, and uploads them as the `toolchain-record` artifact. Read that artifact to learn
+The `toolchain` job records the TeX Live release, LuaHBTeX and the `lualatex`
+format, `fontspec`, `pdfmanagement-testphase`, `tagpdf`, `l3build`,
+BibLaTeX/Biber, and default-font paths that a run actually used, and uploads them
+as the `toolchain-record` artifact. Read that artifact to learn
 which release a digest resolves to.
 
 ### Bumping the pinned TeX Live image

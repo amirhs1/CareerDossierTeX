@@ -1,17 +1,20 @@
-# Engineering ATS-friendly career documents with XeLaTeX
+# Engineering ATS-friendly career documents with LuaLaTeX
 
 ## A design and reference guide for CareerDossierTeX
 
 **Status:** Design and reference material — describes the engineering contract the
 package is built toward. It is **not** documentation of shipped behavior; only
 `docs/API.md` and the compiled examples describe what is currently supported.
-**Primary engine:** XeLaTeX
-**Current scope (`v0.2.0`):** English industry résumé, industry and academic
+**Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
+sections that discuss XeTeX behavior are retained as rationale and history, and
+are marked as such.
+**Current scope (`v0.4.0`):** English industry résumé, industry and academic
 cover-letter families, academic CV, and optional publication support; US Letter,
-monochrome, and XeLaTeX. Later phases may extend the same principles to statements
-and broader customization — see `docs/ROADMAP.md`.
+monochrome, and LuaLaTeX, plus opt-in tagged structure. Later phases may extend
+the same principles to statements and broader customization — see
+`docs/ROADMAP.md`.
 **Maintainer:** Amir Sadeghi
-**Last reviewed:** 2026-07-17
+**Last reviewed:** 2026-07-20
 
 > **Scope banner.** Material tagged **(Phase 1)** records the released `v0.1.x`
 > foundation. Material tagged **(planned — vX.Y.Z)** describes future work
@@ -36,18 +39,19 @@ and academic dossier subset; the rest guides later phases.
    pictures, icons, text boxes, overlays, or sidebars.
 3. Use conventional section names and real text. Do not communicate meaning only
    through position, colour, or graphics.
-4. Compile with XeLaTeX, load fonts through `fontspec`, and treat every font file
+4. Compile with LuaLaTeX, load fonts through `fontspec`, and treat every font file
    and OpenType feature combination as testable code.
-5. Do **not** enable XeTeX's `/ActualText` generation. Consumers disagree on how
-   to honour `/ActualText`, and under XeTeX it actively merges adjacent words in
-   PDFKit-based consumers such as macOS Preview and Spotlight (section 4.5).
+5. Do **not** add per-word `/ActualText` spans. Consumers disagree on how to
+   honour `/ActualText`; LuaHBTeX writes real interword spaces, so nothing of the
+   kind is needed (section 4.5).
 6. Keep source text in logical reading order. Visual placement must never require
    the parser to reconstruct the intended order.
 7. Run automated round-trip extraction tests and manual copy-and-paste tests after
    changes to layout, fonts, symbols, dependencies, or the TeX distribution.
 8. Keep ATS compatibility, PDF accessibility, and visual quality as separate
    release gates. They overlap, but passing one does not prove the others. In
-   particular, current XeTeX tagging has an interword-space limitation.
+   particular, tagged structure is opt-in and validated only for named fixtures
+   (section 7).
 9. Follow the employer's requested file type. A sound PDF cannot satisfy a portal
    that requires DOCX.
 10. Never claim that a template is "ATS-proof" or "guaranteed." Say that it is
@@ -131,7 +135,7 @@ release work:
   formatting, font sizing, spacing, page layout, lengths, boxes, and rules:
   <https://ctan.org/pkg/lshort-english>.
 - **`fontspec`** manual (2.9g, 2025-09-29) for OpenType feature selection under
-  XeLaTeX: <https://ctan.org/pkg/fontspec>.
+  LuaLaTeX: <https://ctan.org/pkg/fontspec>.
 - Historical tutorials on class inheritance and semantic commands (Peter Flynn,
   *Rolling your own Document Class*, 2007; Jim Hefferon, *Minutes in Less Than
   Hours*) remain useful for concepts, but their implementation techniques are
@@ -263,7 +267,7 @@ owns the concern — margins and section spacing belong in the class, not in
 `careerdossier-base`. Do not scatter unexplained numeric dimensions through the
 implementation.
 
-## 4. Typography and font engineering under XeLaTeX
+## 4. Typography and font engineering under LuaLaTeX
 
 Engine detection, `fontspec` loading, portable font selection, and semantic text
 roles are owned by `careerdossier-typography.sty`. The examples below illustrate
@@ -271,14 +275,14 @@ the policy; in the implementation they live in that module.
 
 ### 4.1 Font choice is a build dependency
 
-With XeLaTeX, `fontspec` makes system and OpenType fonts easy to use, but the
-output depends on:
+With LuaLaTeX, `fontspec` makes OpenType fonts easy to use through `luaotfload`,
+but the output depends on:
 
 - the exact font files and versions;
 - the selected upright, bold, italic, and bold-italic faces;
 - the renderer and script/language settings;
 - enabled OpenType substitutions;
-- XeTeX and `xdvipdfmx` versions; and
+- LuaHBTeX and `luaotfload` versions; and
 - how a PDF consumer interprets `ToUnicode` and `/ActualText`.
 
 Do not describe a font as ATS-safe based on its family name alone.
@@ -307,7 +311,7 @@ they are widely distributed in TeX systems and can be tested reproducibly.
 
 Use UTF-8 source and actual Unicode characters for names and languages. Do not
 require users to spell `Zoë`, `José`, `Łukasz`, or `İpek` with legacy accent
-macros merely to accommodate an old engine. XeLaTeX is the package baseline.
+macros merely to accommodate an old engine. LuaLaTeX is the package baseline.
 
 Include multilingual fixtures with:
 
@@ -335,7 +339,9 @@ The Inter 4.1 regression demonstrates the failure clearly: under XeLaTeX,
 contextual (`calt`) and tabular-figure (`tnum`) alternates for `(`, `)`, and `+`
 could extract as PUA characters, while Inter 3.19 extracted correctly. Enabling
 `\XeTeXgenerateactualtext=1` fixed Poppler extraction but not every PDF consumer,
-and it introduces a worse defect of its own — see section 4.5.
+and introduced a worse defect of its own — see section 4.5. The engine has since
+changed, but the underlying lesson has not: a font version and feature
+combination is a build dependency that must be tested, not assumed.
 
 For a Latin-script default, begin conservatively:
 
@@ -357,7 +363,7 @@ that these OpenType selectors are disabled with the `...Off` variants — so
 `CommonOff`, `ContextualOff`, `DiscretionaryOff`, and `HistoricOff` are correct for
 OpenType fonts. Note that `NoCommon`, `NoContextual`, etc. are the **AAT (legacy
 macOS)** convention, not merely an older spelling; because this package uses
-OpenType faces under XeLaTeX, use the `...Off` form and verify against the
+OpenType faces under LuaLaTeX, use the `...Off` form and verify against the
 installed `fontspec` version.
 
 Important qualifications:
@@ -375,12 +381,18 @@ Important qualifications:
 
 ### 4.5 `/ActualText`, `ToUnicode`, and their limits
 
-**Do not enable `\XeTeXgenerateactualtext` under XeLaTeX.** This package
-deliberately leaves it off, and `tests/extraction/run.sh` fails if it returns.
+**Do not introduce per-word `/ActualText` spans.** Under LuaLaTeX the question is
+moot — LuaHBTeX writes real interword spaces into the text layer, and the
+XeTeX-only `\XeTeXgenerateactualtext` primitive does not exist. The extraction
+runner still fails if `/ActualText` spans reappear by any route.
 
-XeTeX's reference describes the setting as adding `/ActualText` for better
-copy/paste and search, and it is a real defence against shaped-glyph mapping
-problems. But under XeTeX it wraps **every word** in its own marked-content
+The rest of this section is the **history** that produced that rule. It is
+retained because the reasoning still governs how extraction is tested, and
+because it explains the `v0.2.1` release.
+
+XeTeX's reference described the setting as adding `/ActualText` for better
+copy/paste and search, and it was a real defence against shaped-glyph mapping
+problems. But under XeTeX it wrapped **every word** in its own marked-content
 sequence:
 
 ```
@@ -388,9 +400,9 @@ sequence:
 /Span << /ActualText (&) >> BDC ... EMC
 ```
 
-with no space token between adjacent spans. The interword space exists only as
-glyph geometry. A consumer therefore gets a different answer depending on which
-layer it trusts:
+with no space token between adjacent spans. The interword space existed only as
+glyph geometry. A consumer therefore got a different answer depending on which
+layer it trusted:
 
 | Consumer | Strategy | Result |
 |---|---|---|
@@ -402,10 +414,12 @@ Spotlight indexing, Safari's built-in PDF viewer, and ordinary macOS
 copy/paste**. A résumé that a recruiter pastes out of Preview loses a space at
 most word boundaries — exactly the text an ATS then tokenizes.
 
-The failure is invisible to a Poppler-only regression, which is why this shipped
+The failure was invisible to a Poppler-only regression, which is why it shipped
 in `v0.2.0` (issue #72). Measured against `tests/extraction/extraction-torture.tex`,
 removing the setting changed Poppler output by **zero bytes** while fixing every
-PDFKit merge, so nothing was traded away.
+PDFKit merge, so nothing was traded away. The `v0.4.0` move to LuaLaTeX removed
+the primitive along with the rest of the XeTeX code path; this class of defect
+is now structurally impossible rather than merely disabled.
 
 For this package the loss is small in any case: section 4.4's policy already
 disables every optional ligature and alternate, which is the main scenario
@@ -439,14 +453,14 @@ belongs in `careerdossier-typography.sty`, which owns the engine check and font
 loading:
 
 ```tex
-\RequirePackage{iftex}
-\ifXeTeX\else
-  \PackageError{careerdossier-typography}
-    {This package requires XeLaTeX}
-    {Compile with xelatex, not pdflatex or lualatex.}
-\fi
+% expl3 form; the shipped guard uses \sys_if_engine_luatex:F with \msg_fatal:nn.
+\sys_if_engine_luatex:F
+  { \msg_fatal:nn { careerdossier-typography } { engine } }
+% Message text: "CareerDossierTeX requires LuaLaTeX.
+%                Compile with lualatex, not xelatex or pdflatex."
 
-% \XeTeXgenerateactualtext is deliberately omitted; see section 4.5.
+% No /ActualText workaround is needed: LuaHBTeX writes real interword
+% spaces. See section 4.5.
 \RequirePackage{fontspec}
 
 \defaultfontfeatures+{
@@ -454,11 +468,14 @@ loading:
   Numbers=Lining
 }
 
-\setmainfont{texgyreheros-regular.otf}[
-  UprightFont    = texgyreheros-regular.otf,
-  BoldFont       = texgyreheros-bold.otf,
-  ItalicFont     = texgyreheros-italic.otf,
-  BoldItalicFont = texgyreheros-bolditalic.otf
+% Resolved by file name through luaotfload, so the build does not depend on
+% OS-installed fonts.
+\setmainfont{texgyreheros}[
+  Extension      = .otf,
+  UprightFont    = *-regular,
+  BoldFont       = *-bold,
+  ItalicFont     = *-italic,
+  BoldItalicFont = *-bolditalic
 ]
 ```
 
@@ -474,7 +491,7 @@ A font profile is releasable only if:
 - all used fonts are embedded and subset as expected;
 - punctuation, digits, symbols, accents, ligature sequences, URLs, and email
   addresses round-trip correctly;
-- the profile passes with the current supported XeTeX toolchain on each CI
+- the profile passes with the current supported LuaHBTeX toolchain on each CI
   platform;
 - text copies correctly in at least two independent PDF engines; and
 - changes in font version trigger a fresh baseline review.
@@ -619,8 +636,8 @@ different consumers infer line structure differently.
 Tagged PDF is worth supporting because it provides a structure tree and can
 improve reuse and accessibility. It is not an ATS guarantee.
 
-For the default output, set ordinary PDF metadata through `hyperref` and do not
-invoke the experimental tagging path:
+For the default (untagged) output, set ordinary PDF metadata through `hyperref`
+and do not invoke the tagging path:
 
 ```tex
 \documentclass{careerdossier-resume}
@@ -633,30 +650,24 @@ invoke the experimental tagging path:
 `pdflang` records the PDF's natural language; it does not configure hyphenation or
 script support. CareerDossierTeX is English-only and multilingual support is
 dropped (see `docs/ROADMAP.md`), so hard-coding `pdflang = en` here is correct
-and does not need a language-abstraction layer. A TeX Live 2026 test for this
-guide found that even a language-only
-`\DocumentMetadata{language=en}` call activated tagging infrastructure and produced
-XeTeX's interword-space warning, which makes it inappropriate for the quiet default
-until the implementation changes. **(Verify at release: this test result was
-observed on TeX Live 2026 and has not been independently reproduced in this
-document; re-run it against your CI image.)**
+and does not need a language-abstraction layer.
 
-Maintain a separate experimental tagging fixture:
+Opt in to tagged structure with `\DocumentMetadata` before `\documentclass`:
 
 ```tex
 \DocumentMetadata{
-  language = en,
-  tagging  = on
+  lang    = en,
+  tagging = on
 }
 \documentclass{careerdossier-resume}
 ```
 
-The experimental fixture's placement has an architectural consequence: a class
-cannot retroactively place `\DocumentMetadata` before its own loading. The
-distributed tagging example must demonstrate it, and the documentation must explain
-it. The class should remain as compatible with tagging as XeLaTeX permits and
-should test whether its dependencies are compatible, but it should not pretend that
-an internal late call is equivalent.
+This placement has an architectural consequence: a class cannot retroactively
+place `\DocumentMetadata` before its own loading. Tagging is therefore a document
+decision, not a class option, and the documentation must say so rather than
+pretending an internal late call is equivalent. `tests/tagging/` keeps paired
+tagged and untagged fixtures for all four profiles so that the untagged path is
+proven unchanged whenever tagging code moves.
 
 As of the June 2026 LaTeX release, tagged-PDF work remains active and kernel
 behaviour continues to change when `\DocumentMetadata` is used. The LaTeX Project
@@ -667,26 +678,29 @@ and reports ongoing changes in
 both before adding or updating dependencies. **(Verify at release: confirm the
 current LaTeX News issue number and its tagging notes.)**
 
-There is a material XeLaTeX limitation. The current `tagpdf` code states that only
-pdfLaTeX and LuaLaTeX have some support for real interword spaces; XeTeX emits the
-warning `engine/output mode xetex doesn't support the interword spaces`. A TeX Live
-2026 fixture compiled for this guide reproduced that warning; MuPDF recovered the
-visible spaces, while a PDFPlumber-based extraction merged some adjacent words.
-That is evidence that geometry-based consumers compensate differently, not evidence
-of a universally sound tagged text stream. See the current
+The engine limitation that previously blocked this work is gone. `tagpdf` states
+that only pdfLaTeX and LuaLaTeX have real interword-space support; XeTeX emitted
+`engine/output mode xetex doesn't support the interword spaces`, and a TeX Live
+2026 fixture compiled for this guide reproduced it (MuPDF recovered the visible
+spaces while a PDFPlumber-based extraction merged some adjacent words — evidence
+that geometry-based consumers compensate differently, not evidence of a sound
+tagged text stream). Moving to LuaLaTeX in `v0.4.0` removed that constraint. See
+the current
 [`tagpdf` implementation documentation](https://mirrors.ctan.org/macros/latex/contrib/tagpdf/tagpdf-code.pdf).
 
 Therefore:
 
-- do not enable `tagging=on` by default until the XeTeX limitation is resolved and
-  the result passes the supported extractor matrix;
-- keep the class tagging-compatible and keep a tagging test profile so improvements
-  can be adopted promptly;
-- document the known warning rather than silently allowlisting it;
-- do not claim PDF/UA conformance from the XeLaTeX build while real interword
-  spaces are unsupported; and
-- if strict PDF/UA conformance is an application requirement, state that the
-  current XeLaTeX-only scope may be unsuitable.
+- keep `tagging=on` **opt-in**, not the default, until validated output is broader
+  than the named fixtures;
+- keep paired tagged/untagged fixtures so an opt-out document's output is provably
+  unaffected;
+- run the supported extractor matrix against tagged output, not only untagged;
+- claim no PDF/UA or WCAG conformance without a validator run and manual
+  inspection of the exact release output — as of this revision neither has been
+  completed, and both are tracked in
+  [issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77); and
+- if strict PDF/UA conformance is an application requirement, state plainly that
+  the current preview scope may be unsuitable.
 
 Package-author rules:
 
@@ -714,7 +728,7 @@ shared packages. The `v0.2.0` module set is:
 
 ```text
 careerdossier-base.sty        metadata, shared keys, required-field validation; no layout
-careerdossier-typography.sty  XeLaTeX check, fontspec, portable fonts, semantic text roles
+careerdossier-typography.sty  LuaLaTeX check, fontspec, portable fonts, semantic text roles
 careerdossier-theme.sty       monochrome semantic colour/rule/link tokens
 careerdossier-components.sty  identity block, contact line, link wrappers, entry primitives
 careerdossier-resume.cls      Letter geometry, sections, entries, compact lists
@@ -915,18 +929,19 @@ source.
 ### Supported command
 
 ```sh
-xelatex -file-line-error -halt-on-error -interaction=nonstopmode document.tex
+lualatex -file-line-error -halt-on-error -interaction=nonstopmode document.tex
 ```
 
-Use `latexmk -xelatex` for examples that need multiple runs. Do not hide required
+Use `latexmk -lualatex` for examples that need multiple runs. Do not hide required
 shell escape, external converters, or non-TeX tools; the core should not need shell
 escape.
 
 ### Reproducibility
 
-Record in CI artifacts: XeTeX version; LaTeX format date; `fontspec` version;
-`xdvipdfmx` version; font file names and hashes or package versions; operating
-system; and extraction-tool versions. Avoid system-font-only defaults, because two
+Record in CI artifacts: LuaHBTeX version; LaTeX format date; `fontspec` version;
+`luaotfload` version; `tagpdf` and `pdfmanagement-testphase` versions; font file
+names and hashes or package versions; operating system; and extraction-tool
+versions. Avoid system-font-only defaults, because two
 users with the same family name can have different font files.
 
 ### Warnings as engineering signals
@@ -960,17 +975,17 @@ defer their creation.
 
 When `l3build` is adopted, configure it to use `tests/regression/` rather than a
 top-level `testfiles/` directory. Verify the exact variable names against the
-current manual; current manuals use engine names such as `xetex` for checks and
+current manual; current manuals use engine names such as `luatex` for checks and
 an executable name for documentation typesetting:
 
 ```lua
 module = "careerdossier"
 testfiledir = "tests/regression"
 
-checkengines = {"xetex"}
-stdengine    = "xetex"
+checkengines = {"luatex"}
+stdengine    = "luatex"
 checkformat  = "latex"
-typesetexe   = "xelatex"
+typesetexe   = "lualatex"
 
 checkruns   = 2
 typesetruns = 3
@@ -1057,7 +1072,7 @@ treat that vendor-specific limit as universal, and re-check the current figure.
 ## 12. CI and release gates
 
 Phase 1 CI runs every applicable committed suite under `tests/`, compiles both
-supported examples on pushes and pull requests, installs a XeLaTeX-capable TeX
+supported examples on pushes and pull requests, installs a LuaLaTeX-capable TeX
 environment, uploads PDFs and logs as artifacts, and fails when tests or
 compilation fail. Do not require a new status check in branch protection until
 it has passed at least once.
@@ -1150,7 +1165,7 @@ the release archive from the handwritten source; there is no need to migrate to
 - use real headings, lists, text, and URLs;
 - use reproducible TeX-distributed OpenType defaults and declare font faces
   explicitly;
-- leave `\XeTeXgenerateactualtext` disabled (section 4.5);
+- do not introduce per-word `/ActualText` spans (section 4.5);
 - disable risky optional substitutions in the Latin default;
 - test every font/feature combination and compare extraction with known source
   text;
@@ -1235,7 +1250,7 @@ C++, Python, SQL, data modelling, technical writing
 % Shared foundation. Load order may be adjusted as implementation requires,
 % but dependency direction stays one-way (shared packages never depend on classes).
 \RequirePackage{careerdossier-base}        % metadata, keys, validation
-\RequirePackage{careerdossier-typography}  % XeLaTeX check, fontspec,
+\RequirePackage{careerdossier-typography}  % LuaLaTeX check, fontspec,
                                            % semantic roles
 \RequirePackage{careerdossier-theme}       % monochrome tokens
 \RequirePackage{careerdossier-components}  % identity block, contact line, entry primitives
@@ -1271,12 +1286,12 @@ suite. Do not freeze this illustrative order as policy without integration tests
 - [ ] No icon, table, graphic, or colour carries unique meaning.
 - [ ] No hidden or mismatched text exists.
 
-### XeLaTeX and fonts
+### LuaLaTeX and fonts
 
 - [ ] Wrong engines fail early with a useful message.
 - [ ] Default fonts are reproducible and legally distributable.
 - [ ] Upright, bold, italic, and bold italic are explicit.
-- [ ] `\XeTeXgenerateactualtext` is **not** enabled (section 4.5).
+- [ ] No per-word `/ActualText` spans are present (section 4.5).
 - [ ] Ligature and alternate-feature policy is documented.
 - [ ] Font versions are recorded and all meaningful fonts are embedded.
 
@@ -1294,11 +1309,12 @@ suite. Do not freeze this illustrative order as policy without integration tests
 
 ### Accessibility and rendering
 
-- [ ] The default `hyperref` metadata route and the separate experimental
+- [ ] The default `hyperref` metadata route and the separate opt-in
       `\DocumentMetadata` tagging route are documented.
-- [ ] The current XeTeX interword-space limitation and warning are documented.
-- [ ] No PDF/UA claim is made for XeLaTeX while the interword-space limitation
-      remains.
+- [ ] Tagged fixtures pass structure, artifact, and extraction checks, and the
+      untagged path is unchanged.
+- [ ] No PDF/UA or WCAG claim is made beyond what a validator run and manual
+      inspection actually covered, and the fixtures that were validated are named.
 - [ ] Rendered pages have no clipping, overlap, missing glyphs, or bad page breaks,
       and output is legible in grayscale and at high zoom.
 
@@ -1322,8 +1338,8 @@ suite. Do not freeze this illustrative order as policy without integration tests
 
 ## 18. Ongoing maintenance rule
 
-ATS parsing, PDF consumers, LaTeX's tagged-PDF implementation, `fontspec`, XeTeX,
-fonts, and CTAN rules all change. Treat this guide as a maintained compatibility
+ATS parsing, PDF consumers, LaTeX's tagged-PDF implementation, `fontspec`,
+LuaHBTeX, fonts, and CTAN rules all change. Treat this guide as a maintained compatibility
 document. At least once per release cycle:
 
 1. read the latest LaTeX News;
