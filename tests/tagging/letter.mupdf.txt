@@ -1,0 +1,11 @@
+Tagged Industry Letter
+letter@example.test | +1 555 0102
+July 20, 2026
+Casey Reader
+Example Company
+Application for Engineering Role
+Dear Casey Reader,
+The first industry-letter paragraph precedes the second in source order.
+The second industry-letter paragraph contains a meaningful letter link.
+Sincerely,
+Tagged Industry Letter

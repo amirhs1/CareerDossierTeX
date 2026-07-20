@@ -121,6 +121,41 @@ jobs:
             tests/extraction/*.diff
           if-no-files-found: warn
 
+  tagging:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # poppler-utils matches the extraction job. mupdf-tools supplies mutool,
+      # the second independent extractor: Poppler and MuPDF linearize the
+      # two-column entry header differently, so agreement between them is what
+      # makes "reading order is preserved" a claim about the PDF rather than
+      # about one library's heuristics.
+      - name: Install poppler-utils and mupdf-tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends poppler-utils mupdf-tools
+      # veraPDF is deliberately NOT installed here yet. The tagged fixtures are
+      # validated against PDF/UA-2 locally (see docs/guides/ats-extraction.md
+      # section 7.1); adding veraPDF to CI is a new third-party binary that
+      # needs an approved immutable pin and checksum, tracked separately. The
+      # runner skips that gate with a notice and names it in its closing
+      # summary, so a CI pass here is not mistaken for a validated one.
+      #
+      # The PDFKit gate likewise cannot run on Linux; it is covered locally on
+      # macOS and by the committed *.pdfkit.txt baselines.
+      - name: Tagged-PDF structure, extraction, and geometry fixtures
+        run: tests/tagging/run.sh
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload tagging reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: tagging-reports
+          path: tests/tagging/reports/
+          if-no-files-found: warn
+
   resume:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373

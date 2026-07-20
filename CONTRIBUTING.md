@@ -399,6 +399,47 @@ Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
 [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md).
 
+### Tagged-PDF suite
+
+Opt-in tagged output has its own suite covering four profiles — industry
+résumé, industry letter, academic CV, academic letter:
+
+    make tagging               # or: tests/tagging/run.sh
+
+Each profile has three fixtures sharing one body include: `<name>.tex`
+(`tagging=on`), `<name>-untagged.tex`, and `<name>-ua2.tex` (adds
+`pdfstandard=ua-2`). The runner checks structure-tree classification, marks on
+decorative and repeated content, tagged-versus-untagged word geometry, a
+three-extractor round trip (Poppler, MuPDF, PDFKit), and PDF/UA-2 validation
+with veraPDF. It also writes a toolchain record, since a validation result
+means little without the versions that produced it.
+
+**Optional gates skip rather than fail.** veraPDF, MuPDF, Biber, and PDFKit are
+each probed once; when a tool is missing that gate is skipped and named in the
+closing `GATES NOT RUN` summary. A green run on a partial environment is
+therefore *not* evidence that everything passed — read the summary. Only
+LuaLaTeX and Poppler are hard requirements.
+
+The MuPDF baselines are compared with blank lines removed. `mutool`'s blank-line
+placement inside a two-column entry header differs between its macOS and Debian
+builds, so pinning it would assert a property of the extractor rather than of
+the PDF. Line content and line order are still fully asserted, and the Poppler
+baseline continues to pin exact spacing.
+
+Baselines regenerate the same way as the extraction suite, and with the same
+discipline — only for an intended, reviewed output change:
+
+    tests/tagging/run.sh --update
+
+veraPDF reports and the toolchain record land in `tests/tagging/reports/`, which
+is gitignored: they are evidence retained per run and uploaded as CI artifacts,
+never committed.
+
+Recorded validation results, the outstanding VoiceOver and NVDA reading-order
+checklists, and the tagged-BibLaTeX limitations are in sections 7.1–7.3 of
+[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md). Screen-reader
+review is manual by nature and is not automated by this suite.
+
 ### Module regression suite (l3build)
 
 The logic-bearing packages are covered by an `l3build` regression suite. Each

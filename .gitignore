@@ -79,7 +79,13 @@ Thumbs.db
 # Compiled PDFs, logs, aux, and out files are already ignored globally above;
 # these cover the remaining per-runner scratch files under tests/.
 *.stdout
-tests/extraction/*.diff
+# Every runner writes *.diff scratch files next to its fixtures, not just the
+# extraction one.
+tests/*/*.diff
+
+# veraPDF reports and the toolchain record from tests/tagging/run.sh. These are
+# evidence retained as CI artifacts and reviewed per run, not committed files.
+tests/tagging/reports/
 
 # l3build writes its check sandbox and diffs here; the .tlg baselines under
 # tests/regression/ are source and are not ignored.

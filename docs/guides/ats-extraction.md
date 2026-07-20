@@ -696,8 +696,9 @@ Therefore:
   unaffected;
 - run the supported extractor matrix against tagged output, not only untagged;
 - claim no PDF/UA or WCAG conformance without a validator run and manual
-  inspection of the exact release output — as of this revision neither has been
-  completed, and both are tracked in
+  inspection of the exact release output — the validator half is now done for
+  four named fixtures and recorded in section 7.1, the manual screen-reader half
+  is tracked in section 7.2 and
   [issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77); and
 - if strict PDF/UA conformance is an application requirement, state plainly that
   the current preview scope may be unsuitable.
@@ -718,6 +719,115 @@ Package-author rules:
 
 Do not advertise PDF/UA conformance until a validator and manual inspection pass
 for the exact release output.
+
+### 7.1 Recorded validation results **(v0.4.0)**
+
+`tests/tagging/run.sh` builds each profile twice — once as `<name>.tex`
+(`tagging=on`) and once as `<name>-ua2.tex`, which adds `pdfstandard=ua-2` over
+the same body include — then validates the UA-2 variant with veraPDF and runs a
+three-extractor matrix over the tagged variant. Reports land in
+`tests/tagging/reports/` and are retained as CI artifacts, never committed.
+
+Results recorded 2026-07-20 on macOS 15.7.5:
+
+| Fixture | Profile | veraPDF `ua2` | Poppler | MuPDF | PDFKit |
+| --- | --- | --- | --- | --- | --- |
+| `resume` | industry résumé | PASS | match | match | match |
+| `cv` | academic CV, two pages | PASS | match | match | match |
+| `letter` | industry letter | PASS | match | match | match |
+| `academic-letter` | academic letter, two pages | PASS | match | match | match |
+
+Toolchain that produced this result, as recorded by
+`tests/tagging/reports/toolchain.txt`:
+
+| Component | Version |
+| --- | --- |
+| OS | macOS 15.7.5 (Darwin 24.6.0) |
+| Engine | LuaHBTeX 1.24.0 (TeX Live 2026) |
+| `pdfmanagement-testphase` | 0.97c (2026-05-26) |
+| `tagpdf` | 1.0c (2026-05-17) |
+| veraPDF | 1.30.0 (Homebrew formula 1.30.2) |
+| Poppler `pdftotext` | 26.07.0 |
+| MuPDF `mutool` | 1.24.9 |
+| Biber | 2.21 |
+
+Three extractors are used rather than one because Poppler, MuPDF, and PDFKit
+each linearize the two-column entry header differently. Each therefore keeps its
+own committed baseline (`*.expected.txt`, `*.mupdf.txt`, `*.pdfkit.txt`); a
+shared baseline would only record whichever library ran last. The MuPDF baseline
+is compared with blank lines removed, because `mutool`'s vertical whitespace
+inside that header differs between its macOS and Debian builds — a property of
+the extractor, not of the PDF. Line content and order remain fully asserted. Agreement across
+three independent implementations is what supports the claim that reading order
+is a property of the PDF rather than of one library's heuristics.
+
+**What this does and does not license.** These four named artifacts passed a
+PDF/UA-2 validator. That is not a PDF/UA, WCAG, accessibility, or ATS
+conformance claim for arbitrary user documents, and it does not make `tagging=on`
+safe to enable by default. A user document with different content, packages, or
+graphics is unvalidated until it is itself validated.
+
+### 7.2 Screen-reader reading-order checks
+
+Automated validation cannot confirm that a document *reads* correctly. veraPDF
+checks that structure exists and is well-formed; only a screen reader shows
+whether decorative rules stay silent and whether headings, entries, and contact
+lines arrive in a sensible order.
+
+> **Status: not yet performed.** Neither checklist below has been run for
+> `v0.4.0`. Issue #77 requires at least one macOS and one Windows result to be
+> documented. Record outcomes inline here, with the OS and screen-reader
+> versions, before the release claims a reviewed reading order.
+
+**macOS / VoiceOver (⌘F5).** Open each PDF in Preview and read it top to bottom
+with `VO`+`→`. For `resume` and `cv`, plus a focused pass over `letter` and
+`academic-letter`, confirm:
+
+- [ ] every heading is announced as a heading, in source order;
+- [ ] list items are announced as list items, with the count reported;
+- [ ] the contact line is announced as one coherent run, not merged words or
+      character-by-character spelling;
+- [ ] links are announced as links and expose their target;
+- [ ] horizontal rules and separators are **not** announced;
+- [ ] the `cv` running header and folio are **not** announced on page two; and
+- [ ] the `academic-letter` repeated footer is **not** announced on page two.
+
+**Windows / NVDA — deferred.** This project has no Windows machine and CI has no
+Windows runner, so the NVDA pass is platform-deferred rather than complete. The
+checklist is identical to the VoiceOver one, read with NVDA in Adobe Acrobat
+Reader (browse mode, `↓` through the document). Anyone on Windows can run it and
+record the result here; until then the release must not claim a Windows
+screen-reader result.
+
+### 7.3 Tagged BibLaTeX: feasibility and limitations
+
+`tests/tagging/biblatex-ua2.tex` records how tagged BibLaTeX output currently
+behaves. It is deliberately **non-blocking**: tagging support inside BibLaTeX
+and Biber is upstream work, so a failure there does not gate the four named
+profiles unless the cause is CareerDossierTeX's own code.
+
+Recorded 2026-07-20, the fixture builds and **passes** veraPDF `ua2`, and the
+bibliography carries real structure rather than flat paragraphs — `/S /list`
+with `/item`, `/itemlabel`, and `/itembody` per entry, `/S /Link` with `/URI`
+for identifiers, and `/S /section` for the list heading. The runner writes the
+observed role counts to `tests/tagging/reports/biblatex-ua2-structure.txt` so
+this claim stays tied to output rather than assumption.
+
+Known limitations, all observed rather than assumed:
+
+- **Biber is required, and the build is multi-pass.** The runner drives this
+  fixture with `latexmk` instead of the two-pass LuaLaTeX loop the other
+  fixtures use.
+- **A bibliography-only document fails to build.** On the first pass the
+  bibliography is still empty; a document whose only content is
+  `\printbibliography` renders zero pages, and the PDF-management backend
+  treats that as a fatal `no pages of output` error before Biber ever runs. Any
+  tagged BibLaTeX document needs page-one content — a header is sufficient.
+- **`tagpdf` emits a `unicode-math` advisory** under this configuration. It is
+  benign and allowlisted in both the tagging and extraction runners.
+
+This result is recorded, not advertised. Tagged BibLaTeX is not a supported
+feature of `v0.4.0`; it is a feasibility measurement for a later phase.
 
 ## 8. Class and package architecture
 
@@ -1061,6 +1171,10 @@ artifacts; run the appropriate veraPDF profile if claiming a standard; and perfo
 at least one screen-reader reading-order check. Do not let accessibility tests
 replace text-extraction tests.
 
+`tests/tagging/run.sh` (`make tagging`) automates every part of that except the
+screen-reader pass, which stays manual by nature. Recorded results and the
+outstanding VoiceOver/NVDA checklists are in sections 7.1 and 7.2.
+
 ### 11.9 Real portal acceptance
 
 When a portal previews parsed fields, inspect and correct name, email, phone, job
@@ -1313,6 +1427,11 @@ suite. Do not freeze this illustrative order as policy without integration tests
       `\DocumentMetadata` tagging route are documented.
 - [ ] Tagged fixtures pass structure, artifact, and extraction checks, and the
       untagged path is unchanged.
+- [ ] The four UA-2 fixture variants pass veraPDF, and the reports and toolchain
+      record from that run were reviewed (section 7.1).
+- [ ] At least one macOS and one Windows screen-reader reading-order check is
+      recorded, or the release explicitly states which one is outstanding
+      (section 7.2).
 - [ ] No PDF/UA or WCAG claim is made beyond what a validator run and manual
       inspection actually covered, and the fixtures that were validated are named.
 - [ ] Rendered pages have no clipping, overlap, missing glyphs, or bad page breaks,

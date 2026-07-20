@@ -1,0 +1,18 @@
+Tagged Academic CV
+Research Engineer
+cv@example.test | +1 555 0101 | example.test/cv
+Research Experience
+Researcher
+2023–2026
+Example University
+Toronto
+• First CV achievement in source order.
+• Second CV achievement with a meaningful research link.
+Page 1
+Tagged Academic CV – Curriculum Vitae
+Teaching Experience
+Instructor
+2025
+Example University
+• Second-page CV content after the running header.
+Page 2
