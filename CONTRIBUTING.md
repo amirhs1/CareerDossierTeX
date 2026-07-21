@@ -609,6 +609,9 @@ Update documentation in the same pull request as the related behavior.
 - a bug is fixed;
 - a breaking change is introduced.
 
+For entry format, house style, and how `CHANGELOG.md` relates to GitHub
+Release notes, see `docs/agent-workflows/release-notes.md`.
+
 ## Proposing public API changes
 
 Before implementing a significant public API change:
@@ -789,7 +792,11 @@ Release preparation should verify:
 - `README.md` reflects current support;
 - `API.md` matches implementation;
 - `CHANGELOG.md` is updated;
+- GitHub Release notes are drafted;
 - `LICENSE` and `manifest.txt` remain accurate;
 - the working tree is clean.
+
+See `docs/agent-workflows/release-notes.md` for CHANGELOG and release-note
+format, house style, and the LaTeX-package compatibility checklist.
 
 Tagging and publishing a release should occur only after the release-preparation pull request is merged.
