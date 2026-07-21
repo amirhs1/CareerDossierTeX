@@ -5,7 +5,7 @@
 This document records the released public interface:
 
 ```text
-Released: v0.2.0 — Academic Dossier
+Released: v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.

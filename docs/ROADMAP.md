@@ -9,9 +9,8 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.2.1 — Extraction Correction` is released. `v0.3.0` is
-> dropped. The next planned release is
-> `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`, followed by
+> **Current status:** `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview` is
+> released. `v0.3.0` is dropped. The next planned release is
 > `v0.5.0 — Statements and Customization`.
 
 ## Release overview
@@ -22,7 +21,7 @@ test pass at the end of a milestone.
 | `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
 | `v0.2.0` | Academic CV, academic letter, and bibliography support | Released |
 | `v0.2.1` | PDFKit text-extraction correction | Released |
-| `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Planned |
+| `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Released |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.5.0` | Statement classes and broader customization | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |

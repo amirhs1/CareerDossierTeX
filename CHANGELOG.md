@@ -8,8 +8,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
-These entries are prepared for `v0.4.0 — LuaLaTeX Transition and Tagged-PDF
-Preview`. The release is not published; see issue [#82].
+## [0.4.0] - 2026-07-20
+
+**LuaLaTeX Transition and Tagged-PDF Preview.** A breaking toolchain change:
+LuaLaTeX replaces XeLaTeX as the sole supported engine. The English public API
+and visual design are preserved, apart from the academic CV and letter page
+furniture noted below. Adds an opt-in tagged-PDF path validated for four named
+fixtures. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 
 ### Changed
 
