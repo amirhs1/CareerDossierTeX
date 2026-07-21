@@ -18,12 +18,17 @@ CareerDossierTeX/
 ├── CLAUDE.md                                 # Claude Code adapter: @AGENTS.md + Claude-only notes
 ├── docs/agent-workflows/
 │   ├── README.md                             # this map
-│   └── github-project.md                     # draft-PR + Project metadata workflow (+ gh commands)
-├── .agents/skills/open-draft-pr/SKILL.md     # Codex draft-PR skill
+│   ├── github-project.md                     # draft-PR + Project metadata workflow (+ gh commands)
+│   └── release-notes.md                      # CHANGELOG + GitHub Release workflow (+ gh commands)
+├── .agents/skills/
+│   ├── open-draft-pr/SKILL.md                # Codex draft-PR skill
+│   └── release-notes/SKILL.md                # Codex CHANGELOG/release-notes skill
 └── .claude/
     ├── rules/latex.md                        # Claude path-scoped LaTeX rules (*.tex/*.sty/*.cls)
     ├── settings.json                         # shared permissions and sandbox settings
-    └── skills/open-draft-pr/SKILL.md         # Claude draft-PR skill
+    └── skills/
+        ├── open-draft-pr/SKILL.md            # Claude draft-PR skill
+        └── release-notes/SKILL.md            # Claude CHANGELOG/release-notes skill
 ```
 
 ## Files
@@ -39,7 +44,8 @@ CareerDossierTeX/
 - **`CLAUDE.md`** — a small Claude adapter. It imports `AGENTS.md` with
   `@AGENTS.md` (Claude Code reads `CLAUDE.md`, not `AGENTS.md`) and adds only
   Claude-specific guidance for `CLAUDE.local.md`, `.claude/rules/`,
-  `.claude/skills/`, permissions/enforcement, attribution, and the draft-PR skill.
+  `.claude/skills/`, permissions/enforcement, attribution, and the draft-PR and
+  release-notes skills.
 - **`.claude/settings.json`** — shared Claude Code permission and sandbox
   settings. It denies access to repository paths declared private and extends
   those restrictions to sandboxed Bash processes when supported.
@@ -47,11 +53,19 @@ CareerDossierTeX/
   shared by both agents: authority boundary, PR-body sections, labels, milestone,
   Project membership, Status/Phase/Priority/Size rules, status transitions,
   approval boundaries, verification, and a `gh` command appendix.
+- **`docs/agent-workflows/release-notes.md`** — neutral, human-readable workflow
+  shared by both agents for `CHANGELOG.md` entries and GitHub Release notes:
+  the CHANGELOG-vs-Release authority boundary, house style, the LaTeX-package
+  compatibility checklist, verification, and a `gh` command appendix.
 - **`.agents/skills/open-draft-pr/SKILL.md`** — Codex task adapter for opening or
   updating a draft PR. Codex scans `.agents/skills/` from the working directory
   up to the repository root.
+- **`.agents/skills/release-notes/SKILL.md`** — Codex task adapter for writing
+  CHANGELOG entries and drafting release notes.
 - **`.claude/skills/open-draft-pr/SKILL.md`** — the Claude equivalent, kept nearly
   identical to the Codex skill.
+- **`.claude/skills/release-notes/SKILL.md`** — the Claude equivalent of the
+  release-notes skill, kept nearly identical to the Codex skill.
 - **`.claude/rules/latex.md`** — a Claude path-scoped rule. It loads only for
   LaTeX paths via `paths:` frontmatter and holds the detailed LuaLaTeX, module
   ownership, optional-field, log-inspection, and accessibility-claim rules. Codex

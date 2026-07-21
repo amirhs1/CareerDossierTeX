@@ -39,3 +39,10 @@ For an authorized draft PR, follow `.claude/skills/open-draft-pr/SKILL.md`, whic
 loads `docs/agent-workflows/github-project.md`. If GitHub Projects access is
 unavailable, set all supported ordinary PR metadata and report exactly which
 Project fields remain unset.
+
+## Release notes
+
+For a `CHANGELOG.md` entry or GitHub Release notes, follow
+`.claude/skills/release-notes/SKILL.md`, which loads
+`docs/agent-workflows/release-notes.md`. Never tag or publish a release
+without the maintainer's explicit authorization for that exact release.

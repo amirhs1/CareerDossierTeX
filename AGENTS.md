@@ -267,6 +267,10 @@ Update only the docs affected by behavior:
 - incompatible public changes → `docs/MIGRATION.md`
 - user-visible changes → `CHANGELOG.md`
 
+Follow `docs/agent-workflows/release-notes.md` (via the current tool's
+`release-notes` skill) for `CHANGELOG.md` house style and for drafting GitHub
+Release notes; tagging and publishing a release stay maintainer-only.
+
 Keep `LICENSE` unchanged. Add the required project copyright, license,
 maintenance-status, and maintainer notice to new `.cls` and `.sty` files. Update
 `manifest.txt` when the LPPL Work file set changes. Verify third-party licenses.
