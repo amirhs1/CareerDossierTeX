@@ -2,11 +2,11 @@
 
 A reusable LuaLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.2.1 — Extraction Correction` is the current published release.
-> The `main` branch is preparing `v0.4.0 — LuaLaTeX Transition and Tagged-PDF
-> Preview`, which **replaces XeLaTeX with LuaLaTeX as the sole supported
-> engine**. This is a breaking toolchain change; see
-> [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
+> **Status:** `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview` is the
+> current published release. It **replaces XeLaTeX with LuaLaTeX as the sole
+> supported engine**. This is a breaking toolchain change; users upgrading from
+> `v0.2.x` should see [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade
+> path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -360,7 +360,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.2.1 — Extraction Correction
+v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -373,7 +373,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.1.1` | Metadata and build corrections |
 | `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
 | `v0.2.1` | Extraction correction |
-| `v0.4.0` | LuaLaTeX transition and tagged-PDF preview (in preparation) |
+| `v0.4.0` | LuaLaTeX transition and tagged-PDF preview |
 | `v0.5.0` | Statement classes and broader customization |
 | `v1.0.0` | Stable and documented public API |
 

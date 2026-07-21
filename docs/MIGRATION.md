@@ -2,12 +2,14 @@
 
 ## Status
 
-`v0.2.1` is the current published release. `v0.4.0` is in preparation on `main`
-and **changes the supported engine from XeLaTeX to LuaLaTeX** — see
+`v0.4.0` is the current published release. It **changes the supported engine
+from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
 
 No released public command, key, class option, or default has been renamed or
-removed. The `v0.4.0` break is in the toolchain, not the document API.
+removed. The `v0.4.0` break is in the toolchain, not the document API. Two
+documents do render differently — the academic CV's folio and the academic
+letter's page furniture — and neither requires a source edit; see step 5.
 
 The pre-release prototypes inventoried below are **not** a published API. They are
 recorded here so that the released industry and `v0.2.0` academic implementations
