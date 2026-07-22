@@ -203,9 +203,12 @@ check_structure() {
   grep -qa '/Artifact<</Type /Layout>> BDC' "$pdf" \
     || record_failure "$base has no Layout artifact"
 
-  if [ "$base" = resume ] || [ "$base" = cv ]; then
+  if [ "$base" = resume ] || [ "$base" = cv ] || [ "$base" = statement ]; then
     grep -qa '/S /section' "$pdf" || record_failure "$base has no semantic section heading"
     grep -Fqa '/section [/H1' "$pdf" || record_failure "$base section is not role-mapped to H1"
+  fi
+
+  if [ "$base" = resume ] || [ "$base" = cv ]; then
     grep -qa '/S /itemize' "$pdf" || record_failure "$base has no semantic list"
     grep -qa '/S /item ' "$pdf" || record_failure "$base has no semantic list item"
     grep -qa '/S /itembody' "$pdf" || record_failure "$base has no semantic list-item body"
@@ -219,6 +222,11 @@ check_structure() {
   if [ "$base" = academic-letter ]; then
     grep -qa '/Artifact BMC' "$pdf" \
       || record_failure "academic-letter repeated footer is not an artifact"
+  fi
+
+  if [ "$base" = statement ]; then
+    grep -qa '/Artifact BMC' "$pdf" \
+      || record_failure "statement running header/folio are not artifacts"
   fi
 }
 
@@ -346,7 +354,7 @@ check_biblatex_feasibility() {
 
 record_toolchain
 
-for base in resume cv letter academic-letter; do
+for base in resume cv letter academic-letter statement; do
   echo "== $base =="
   compile_fixture "$base.tex" "$base" || continue
   compile_fixture "$base-untagged.tex" "$base-untagged" || continue

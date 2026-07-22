@@ -258,3 +258,32 @@ jobs:
             letter-academic.pdf
             letter-academic.log
           if-no-files-found: warn
+
+  statement:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Build all six statement examples
+        run: make statements
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload statement PDFs and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: statement-artifacts
+          path: |
+            research-statement.pdf
+            research-statement.log
+            teaching-statement.pdf
+            teaching-statement.log
+            teaching-philosophy-statement.pdf
+            teaching-philosophy-statement.log
+            diversity-statement.pdf
+            diversity-statement.log
+            artist-statement.pdf
+            artist-statement.log
+            statement-of-purpose.pdf
+            statement-of-purpose.log
+          if-no-files-found: warn

@@ -23,6 +23,9 @@
       { \CDossierSetup{ ##1 = {} } }
   }
 \cs_new_protected:Npn \cdossiertestContactLine { \__cdossier_components_contactline: }
+\clist_const:Nn \c_cdossiertest_statement_contacts_clist { email , website , orcid }
+\cs_new_protected:Npn \cdossiertestFilteredContactLine
+  { \__cdossier_components_contactline:N \c_cdossiertest_statement_contacts_clist }
 \ExplSyntaxOff
 
 \begin{document}
@@ -64,6 +67,17 @@
   \cdossiertestClearContacts
   \CDossierSetup{ scholar = {scholar.example/a}, orcid = {0000-0002-1825-0097} }
   \cdossiertestContactLine
+}
+
+% A class may select a document-specific subset without duplicating link or
+% separator logic. Fields outside the supplied list must remain unrendered.
+\TEST{filtered-contact-list-renders-only-selected-fields}{
+  \cdossiertestClearContacts
+  \CDossierSetup{
+    email = {a@b.co}, phone = {+1 000}, website = {example.test},
+    github = {github.com/a}, orcid = {0000-0002-1825-0097}
+  }
+  \cdossiertestFilteredContactLine
 }
 
 \END

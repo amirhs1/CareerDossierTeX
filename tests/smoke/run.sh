@@ -87,6 +87,21 @@ cases=(
   "letter-missing-name fail|required profile field 'name' is not"
   "letter-unknown-option fail|Unknown class option 'paper'"
   "letter-unknown-meta-key fail|Unknown \CDossierLetterSetup key"
+  "statement-research-valid pass"
+  "statement-teaching-valid pass"
+  "statement-teaching-philosophy-valid pass"
+  "statement-diversity-valid pass"
+  "statement-artist-valid pass"
+  "statement-purpose-valid pass"
+  "statement-missing-type fail|required class option 'type' is"
+  "statement-empty-type fail|The key 'cdossier/statement/type' requires a value"
+  "statement-bad-type fail|Unknown statement type 'grant'"
+  "statement-unknown-option fail|Unknown class option 'paper'"
+  "statement-unknown-meta-key fail|Unknown \CDossierStatementSetup key"
+  "statement-missing-name fail|required profile field 'name' is not"
+  "statement-missing-email fail|required profile field 'email' is not"
+  "statement-research-missing-affiliation fail|required profile field 'affiliation'"
+  "statement-artist-missing-website fail|required profile field 'website'"
 )
 
 for entry in "${cases[@]}"; do
@@ -107,7 +122,7 @@ for entry in "${cases[@]}"; do
       fi
       # Academic-letter footers include the total page count, which is resolved
       # by the label written on the first LuaLaTeX pass.
-      if [[ "$base" = letter-academic-* ]]; then
+      if [[ "$base" = letter-academic-* || "$base" = statement-* ]]; then
         lualatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1
         rc=$?
         if [ "$rc" -ne 0 ]; then

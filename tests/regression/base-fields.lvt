@@ -41,4 +41,10 @@
   \TYPE{[\CDossierFieldValue{orcid}]}
 }
 
+\TEST{affiliation-is-a-trimmed-shared-profile-field}{
+  \CDossierSetup{ affiliation = { Example University } }
+  \CDossierIfFieldTF{affiliation}{\TYPE{affiliation-present}}{\TYPE{affiliation-absent}}
+  \TYPE{[\CDossierFieldValue{affiliation}]}
+}
+
 \END

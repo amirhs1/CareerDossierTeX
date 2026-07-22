@@ -100,6 +100,31 @@ for tex in *.tex; do
           echo "  academic-letter folios and running headers present"
         fi
         ;;
+      statement-*)
+        # Statements use the academic-letter folio model but identify
+        # continuation pages with the independently configurable short title.
+        # The fixture's short title is deliberately different from its page-one
+        # display title, so this also proves the running header is absent on page
+        # one rather than accidentally matching meaningful body content.
+        statement_fail=0
+        for (( n = 1; n <= pages; n++ )); do
+          page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
+          if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n of $pages"; then
+            echo "  MISSING STATEMENT FOLIO: Page $n of $pages"; statement_fail=1
+          fi
+          if [ "$n" -eq 1 ] && printf '%s\n' "$page_text" | grep -Fq "Computational Reliability"; then
+            echo "  UNEXPECTED STATEMENT RUNNING HEADER on page 1"; statement_fail=1
+          fi
+          if [ "$n" -gt 1 ] && { ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace" || ! printf '%s\n' "$page_text" | grep -Fq "Computational Reliability"; }; then
+            echo "  MISSING STATEMENT RUNNING HEADER on page $n"; statement_fail=1
+          fi
+        done
+        if [ "$statement_fail" -ne 0 ]; then
+          fail=1
+        else
+          echo "  statement folios and running headers present"
+        fi
+        ;;
       *)
         folio=0
         for (( n = 1; n <= pages; n++ )); do

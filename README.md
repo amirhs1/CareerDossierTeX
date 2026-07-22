@@ -24,9 +24,10 @@ CareerDossierTeX separates personal information from document content and presen
 | Industry cover letter | Supported | `family=industry` remains the default |
 | Academic CV | Supported | Multi-page layout with running headers and folios |
 | Academic cover letter | Supported | Select with `family=academic`; shares the CV's running headers and folios |
+| Six statement types | Upcoming `v0.5.0` | Implemented in repository source; research, teaching, teaching philosophy, diversity, artist, and purpose |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
-| Shared profile metadata | Supported | Includes optional Scholar and ORCID fields |
+| Shared profile metadata | Supported | Includes optional Scholar, ORCID, and affiliation fields |
 | Language | English | Farsi, bilingual, and RTL support is dropped |
 | Engine | LuaLaTeX | XeLaTeX and pdfLaTeX are unsupported and error early |
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
@@ -34,10 +35,10 @@ CareerDossierTeX separates personal information from document content and presen
 | Theme | Monochrome | Color themes, font presets, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The six-type statement class, A4 paper, and font presets belong to `v0.5.0`
-milestone work. Color themes, icons, and alternate bibliography styles remain
-later work. Farsi, bilingual, and right-to-left support is dropped;
-CareerDossierTeX is English-only.
+The six-type statement class is implemented for the upcoming `v0.5.0` release.
+A4 paper and font presets remain `v0.5.0` milestone work. Color themes, icons,
+and alternate bibliography styles remain later work. Farsi, bilingual, and
+right-to-left support is dropped; CareerDossierTeX is English-only.
 
 ## Requirements
 
@@ -238,6 +239,32 @@ I am writing to apply for the Assistant Professor position.
 
 See [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.tex).
 
+### 7. Create a statement
+
+Use one class and select the statement model with the required `type` option:
+
+```latex
+\documentclass[type=research]{careerdossier-statement}
+\input{examples/profiles/profile-academic.tex}
+
+\CDossierStatementSetup{
+  subtitle            = {Reliable scientific computing},
+  application-context = {Application for Assistant Professor},
+  application-id      = {APP-2026-0042}
+}
+
+\begin{document}
+\MakeCDossierStatementHeader
+\section*{Research Vision}
+My research develops reliable methods for computational inquiry.
+\end{document}
+```
+
+Research statements require profile `affiliation`; artist statements require
+profile `website`; every type requires `name` and `email`. Complete two-page
+examples for all six types live in
+[`examples/statements/`](examples/statements/).
+
 ## Tagged PDF (opt-in preview)
 
 CareerDossierTeX can emit tagged semantic structure under LuaLaTeX. It is **off
@@ -254,21 +281,22 @@ furniture are marked as layout artifacts. No public command or class option
 changes, and documents that do not enable tagging produce byte-identical output
 to the untagged path.
 
-**What is and is not claimed.** This is a tested preview for the four profiles
-covered by fixtures — industry résumé, industry letter, academic CV, and
-academic letter. Those fixtures assert that a structure tree exists and check
-heading, list, link, and artifact structure plus text extraction and
-tagged-versus-untagged geometry.
+**What is and is not claimed.** This is a tested preview for five profiles
+covered by fixtures — industry résumé, industry letter, academic CV, academic
+letter, and statement. Those fixtures assert that a structure tree exists and
+check heading, link, and artifact structure plus text extraction and
+tagged-versus-untagged geometry; list checks apply to the résumé and CV.
 
-Those four profiles were independently verified: each passes the **veraPDF**
+Those five profiles were independently verified: each passes the **veraPDF**
 PDF/UA-2 validator, their text extraction agrees across **Poppler, MuPDF, and
-Apple PDFKit**, and a **macOS VoiceOver** reading-order pass confirmed that
-headings, lists, and links are announced correctly while decorative rules and
-repeated page furniture stay silent. Recorded results and the exact toolchain
-are in
+Apple PDFKit**. A **macOS VoiceOver** reading-order pass covered the four
+`v0.4.0` profiles and confirmed that headings, lists, and links are announced
+correctly while decorative rules and repeated page furniture stay silent; the
+statement fixture has not received a screen-reader pass. Recorded results and
+the exact toolchain are in
 [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md) §7.1–7.2.
 
-That verification covers **those four fixtures only**. It is **not** a PDF/UA,
+That automated verification covers **those five fixtures only**. It is **not** a PDF/UA,
 WCAG, ATS, or general accessibility conformance claim, it does not extend to
 arbitrary user documents, and it is not a reason to enable tagging by default. A
 document with different content, packages, or graphics is unverified until it is
@@ -296,9 +324,12 @@ latexmk -lualatex -interaction=nonstopmode -halt-on-error \
 
 latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/academic/letter-academic.tex
+
+# Build all six statement examples through the repository target.
+make statements
 ```
 
-All five examples may also be built with the repository `Makefile`:
+All eleven examples may also be built with the repository `Makefile`:
 
 ```bash
 make

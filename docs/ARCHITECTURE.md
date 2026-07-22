@@ -78,10 +78,9 @@ CV path. The integration package may be loaded by a CV document, but neither it
 nor the external bibliography toolchain becomes a dependency of the shared
 profile or the other document classes.
 
-## Planned `v0.5.0` statement module graph
+## `v0.5.0` statement module graph
 
-Issue #103 approves one statement class with six type values. Implementation
-remains pending in issue #104:
+One statement class implements the six type values approved in issue #103:
 
 ```text
 careerdossier-statement.cls
@@ -348,7 +347,7 @@ Responsibilities:
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
 
-### `careerdossier-statement.cls` (planned for `v0.5.0`)
+### `careerdossier-statement.cls` (`v0.5.0`)
 
 Owns the shared statement document model approved in issue #103.
 
@@ -370,10 +369,9 @@ Responsibilities:
   type-specific narrative schema.
 
 The class owns the choice of which shared profile fields are relevant to each
-statement type, but it must not duplicate contact-link rendering. If issue #104
-needs a filtered contact-line primitive, that primitive belongs privately in
-`careerdossier-components.sty` because link normalization and separator
-insertion are shared component concerns.
+statement type. Its filtered contact line delegates privately to
+`careerdossier-components.sty`, where shared link normalization and
+separator insertion remain owned.
 
 Current `affiliation` is reusable identity data and therefore extends the
 shared profile in `careerdossier-base.sty`; the statement class decides when it
@@ -674,10 +672,12 @@ byte-identical when tagging code changes — the fixtures under `tests/tagging/`
 assert this.
 
 No PDF/UA or WCAG conformance is asserted. Fixture coverage checks that a
-structure tree exists and that headings, lists, links, and artifacts are
-classified as intended for four named profiles; independent validator and
-screen-reader verification is tracked separately and is not complete. See the
-guide's tagging section before adding any tagging-related dependency.
+structure tree exists and that headings, links, and artifacts are classified as
+intended for five named profiles, with list checks on the résumé and CV. All
+five automated fixtures have independent validator and three-extractor results;
+the four `v0.4.0` profiles also have a macOS VoiceOver pass, while the statement
+fixture and Windows/NVDA remain screen-reader-unverified. See the guide's
+tagging section before adding any tagging-related dependency.
 
 ## Repository layout
 

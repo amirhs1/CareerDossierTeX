@@ -1,0 +1,94 @@
+% Supported v0.5 statement-of-purpose example.
+\documentclass[type=purpose]{careerdossier-statement}
+\input{examples/profiles/profile-academic.tex}
+\CDossierStatementSetup{
+  subtitle={Preparation and goals in computational science},
+  application-context={Application to the MSc in Computational Science},
+  application-id={12345678}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+
+\section*{Purpose and Motivation}
+
+I am applying to the MSc in Computational Science at Example University to
+develop the mathematical and research foundations needed to build reliable
+scientific software. My experience has shown me that computational work is most
+useful when a result can be explained, tested, and reproduced by someone beyond
+the original project. I want advanced training that connects numerical methods,
+software design, and the interpretation of evidence rather than treating them
+as separate technical skills.
+
+This goal emerged while I was working on small data-analysis projects in which
+apparently minor choices produced materially different conclusions. A change in
+missing-data handling, a default tolerance, or an undocumented software version
+could alter an output without making the source of the change visible. I became
+interested not only in obtaining an answer, but in understanding which parts of
+the process made that answer defensible.
+
+\section*{Academic Preparation}
+
+My undergraduate work in mathematics gave me a foundation in analysis, linear
+algebra, probability, and differential equations. Courses in numerical analysis
+were especially influential because they joined theoretical questions about
+error and convergence with practical questions about representation and finite
+resources. I learned to evaluate an algorithm through both proof and experiment,
+and to distinguish a method's mathematical properties from the behaviour of a
+particular implementation.
+
+Alongside this coursework, I developed proficiency in programming through
+projects that required data preparation, simulation, visualization, and written
+interpretation. I began using version control and automated tests after a result
+could not be reproduced from an earlier project directory. Rebuilding that work
+made the value of explicit environments and small verification cases immediate.
+These practices now shape how I approach every computational assignment.
+
+My capstone project examined adaptive approximation for a model with spatially
+varying parameters. I was responsible for implementing the solver, constructing
+reference cases, and explaining the relationship between estimated and observed
+error. The initial implementation produced plausible figures but failed on a
+boundary case. Tracing that failure led me to redesign the tests and to document
+the assumptions connecting the model and code. The final project was stronger
+because the unexpected result became part of the analysis rather than something
+to hide.
+
+\section*{Relevant Experience and Growth}
+
+As a peer tutor, I have supported students in introductory programming and
+calculus. Explaining the same idea through diagrams, algebra, and executable
+examples helped me recognize the difference between performing a procedure and
+understanding why it works. Tutoring also taught me to listen for the reasoning
+behind an error before offering a correction. I expect this experience to
+support both collaborative coursework and future teaching-assistant duties.
+
+I have also contributed documentation and tests to a small open-source
+scientific project. Working with code written by several people required me to
+read design decisions from incomplete records, ask focused questions, and make
+changes that did not disrupt existing users. This experience strengthened my
+interest in research software as a scholarly object whose quality affects the
+credibility and reach of scientific work.
+
+\section*{Programme Fit and Goals}
+
+Example University's programme is a strong fit because it combines advanced
+numerical study with interdisciplinary research and an explicit emphasis on
+reproducible computation. I am particularly interested in courses on numerical
+linear algebra, uncertainty quantification, and research-software engineering.
+The opportunity to work with faculty and students across applied mathematics
+and domain sciences would let me test methods against questions that cannot be
+understood from a single disciplinary perspective.
+
+During the degree, I hope to investigate verification strategies for pipelines
+that combine simulation and data-driven components. My near-term goal is to
+develop a thesis project with a clear mathematical question, an open reference
+implementation, and an evaluation design that makes limitations visible. After
+the MSc, I intend to continue in research or research-software work where I can
+help interdisciplinary teams produce computational evidence that others can
+inspect and reuse.
+
+I would bring careful preparation, experience learning from failure, and a
+commitment to shared technical practice. The programme would give me the depth
+and mentorship to turn those habits into a coherent research direction and to
+contribute more responsibly to computational science.
+
+\end{document}
