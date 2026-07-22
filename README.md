@@ -24,7 +24,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Industry cover letter | Supported | `family=industry` remains the default |
 | Academic CV | Supported | Multi-page layout with running headers and folios |
 | Academic cover letter | Supported | Select with `family=academic`; shares the CV's running headers and folios |
-| Six statement types | Upcoming `v0.5.0` | Implemented in repository source; research, teaching, teaching philosophy, diversity, artist, and purpose |
+| Statement documents | Upcoming `v0.5.0` | Implemented in repository source; the default general-interest type plus research, teaching, teaching philosophy, diversity, artist, and purpose |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar, ORCID, and affiliation fields |
@@ -35,7 +35,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Theme | Monochrome | Color themes, font presets, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The six-type statement class and opt-in A4 paper are implemented for the
+The statement class and opt-in A4 paper are implemented for the
 upcoming `v0.5.0` release. Font presets remain `v0.5.0` milestone work. Color
 themes, icons, and alternate bibliography styles remain later work. Farsi,
 bilingual, and right-to-left support is dropped; CareerDossierTeX is
@@ -247,7 +247,8 @@ See [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.
 
 ### 7. Create a statement
 
-Use one class and select the statement model with the required `type` option:
+Use one class. Omit `type` for a general-interest statement, or select an
+explicit type when its title and validation contract fit the document:
 
 ```latex
 \documentclass[type=research]{careerdossier-statement}
@@ -266,9 +267,9 @@ My research develops reliable methods for computational inquiry.
 \end{document}
 ```
 
-Research statements require profile `affiliation`; artist statements require
-profile `website`; every type requires `name` and `email`. Complete two-page
-examples for all six types live in
+General-interest statements require only `name` and `email`. Research statements
+also require profile `affiliation`; artist statements also require profile
+`website`. Complete two-page examples for all six explicit types live in
 [`examples/statements/`](examples/statements/).
 
 ## Tagged PDF (opt-in preview)
@@ -331,7 +332,7 @@ latexmk -lualatex -interaction=nonstopmode -halt-on-error \
 latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/academic/letter-academic.tex
 
-# Build all six statement examples through the repository target.
+# Build all six explicit-type statement examples through the repository target.
 make statements
 ```
 
