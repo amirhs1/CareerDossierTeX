@@ -34,13 +34,15 @@
 \tl_set:Nn \l__cdossier_cv_density_tl { standard }
 \tl_new:N \l__cdossier_cv_paper_tl
 \tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper }
+\tl_new:N \l__cdossier_cv_bodyfont_tl
+\tl_set:Nn \l__cdossier_cv_bodyfont_tl { serif }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-cv. }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt),~
-    'density'~(compact,~standard),~and~'paper'~(letter,~a4).~Language~and~
-    theme~cannot~be~set~here.
+    'density'~(compact,~standard),~'paper'~(letter,~a4),~and~
+    'bodyfont'~(serif,~sans).~Language~and~theme~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / cv }
@@ -63,10 +65,17 @@
           }
       } ,
     paper .value_required:n = true ,
+    bodyfont .choices:nn =
+      { serif , sans }
+      { \tl_set_eq:NN \l__cdossier_cv_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-cv } { unknown-option } { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / cv }
+
+\str_if_eq:VnT \l__cdossier_cv_bodyfont_tl { sans }
+  { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
 
 \use:x
   {

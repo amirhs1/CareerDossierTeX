@@ -10,6 +10,17 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- Added a consistent `bodyfont=serif|sans` class option to the résumé, CV,
+  industry and academic letters, and statement documents. `serif` remains the
+  default and preserves the existing TeX Gyre Termes body with TeX Gyre Heros
+  headings; `sans` uses TeX Gyre Heros for both body and headings without
+  changing sizes, spacing, geometry, semantic roles, or page furniture. Both
+  families resolve through exact TeX Live files, provide explicit upright,
+  bold, italic, and bold-italic faces, and were tested at version 2.004 under
+  the GUST Font License. Focused regression, smoke, extraction, and tagged-build
+  fixtures cover selection and invalid values. Existing optional-field and
+  separator behavior is unchanged. ([#119])
+
 - Added opt-in A4 paper to the résumé, industry and academic letters, academic
   CV, and the statement class through one consistent
   `paper=letter|a4` class option. US Letter remains the default, and both paper
@@ -46,6 +57,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
 [#105]: https://github.com/amirhs1/CareerDossierTeX/issues/105
 [#117]: https://github.com/amirhs1/CareerDossierTeX/issues/117
+[#119]: https://github.com/amirhs1/CareerDossierTeX/issues/119
 
 ## [0.4.0] - 2026-07-20
 

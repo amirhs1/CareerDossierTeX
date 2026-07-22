@@ -32,8 +32,10 @@
 \RequirePackage { l3keys2e }
 \tl_new:N   \l__cdossier_statement_type_tl
 \tl_new:N   \l__cdossier_statement_paper_tl
+\tl_new:N   \l__cdossier_statement_bodyfont_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { general-interest }
 \tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
+\tl_set:Nn  \l__cdossier_statement_bodyfont_tl { serif }
 
 \msg_new:nnnn { careerdossier-statement } { unknown-type }
   { Unknown~statement~type~'#1'. }
@@ -46,8 +48,9 @@
   { Unknown~class~option~'#1'~for~careerdossier-statement. }
   {
     Supported~options~are~'type'~(general-interest,~research,~teaching,~
-    teaching-philosophy,~diversity,~artist,~purpose)~and~'paper'~(letter,~a4).~Language,~theme,~
-    and~font~presets~cannot~be~set~here.
+    teaching-philosophy,~diversity,~artist,~purpose),~'paper'~(letter,~a4),~and~
+    'bodyfont'~(serif,~sans).~Language,~theme,~and~named~font~combinations~
+    cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / statement }
@@ -79,11 +82,18 @@
           }
       } ,
     paper .value_required:n = true ,
+    bodyfont .choices:nn =
+      { serif , sans }
+      { \tl_set_eq:NN \l__cdossier_statement_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-statement } { unknown-option }
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / statement }
+
+\str_if_eq:VnT \l__cdossier_statement_bodyfont_tl { sans }
+  { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
 
 \use:x
   {
