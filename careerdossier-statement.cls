@@ -16,7 +16,7 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-statement owns the shared English statement document model:
-%% US Letter geometry, statement-scoped metadata, type-specific validation,
+%% Letter/A4 geometry, statement-scoped metadata, type-specific validation,
 %% the first-page identity block, and continuation-page furniture. Shared
 %% profile storage and link/separator rendering remain in the base and
 %% components modules.
@@ -33,6 +33,8 @@
 \RequirePackage { l3keys2e }
 \tl_new:N   \l__cdossier_statement_type_tl
 \bool_new:N \l__cdossier_statement_type_seen_bool
+\tl_new:N   \l__cdossier_statement_paper_tl
+\tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
 
 \msg_new:nnnn { careerdossier-statement } { missing-type }
   { The~required~class~option~'type'~is~missing. }
@@ -52,8 +54,9 @@
 \msg_new:nnnn { careerdossier-statement } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-statement. }
   {
-    The~only~supported~option~is~'type'.~Paper,~language,~theme,~and~font~
-    presets~cannot~be~set~here.
+    Supported~options~are~'type'~(research,~teaching,~teaching-philosophy,~
+    diversity,~artist,~purpose)~and~'paper'~(letter,~a4).~Language,~theme,~
+    and~font~presets~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / statement }
@@ -65,7 +68,8 @@
           {
             { research }            { \tl_set:Nn \l__cdossier_statement_type_tl { research } }
             { teaching }            { \tl_set:Nn \l__cdossier_statement_type_tl { teaching } }
-            { teaching-philosophy } { \tl_set:Nn \l__cdossier_statement_type_tl { teaching-philosophy } }
+            { teaching-philosophy }
+              { \tl_set:Nn \l__cdossier_statement_type_tl { teaching-philosophy } }
             { diversity }           { \tl_set:Nn \l__cdossier_statement_type_tl { diversity } }
             { artist }              { \tl_set:Nn \l__cdossier_statement_type_tl { artist } }
             { purpose }             { \tl_set:Nn \l__cdossier_statement_type_tl { purpose } }
@@ -73,6 +77,16 @@
           { \msg_error:nnn { careerdossier-statement } { unknown-type } {#1} }
       } ,
     type .value_required:n = true ,
+    paper .choices:nn =
+      { letter , a4 }
+      {
+        \str_case:Vn \l_keys_choice_tl
+          {
+            { letter } { \tl_set:Nn \l__cdossier_statement_paper_tl { letterpaper } }
+            { a4 }     { \tl_set:Nn \l__cdossier_statement_paper_tl { a4paper } }
+          }
+      } ,
+    paper .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-statement } { unknown-option }
           { \l_keys_key_str } } ,
@@ -81,14 +95,26 @@
 \bool_if:NF \l__cdossier_statement_type_seen_bool
   { \msg_error:nn { careerdossier-statement } { missing-type } }
 
-\LoadClass [ 11pt , letterpaper ] { article }
+\use:x
+  {
+    \exp_not:N \LoadClass
+      [ 11pt , \l__cdossier_statement_paper_tl ]
+      { article }
+  }
 
 \RequirePackage { careerdossier-components }
 \RequirePackage { geometry }
 \RequirePackage { hyperref }
 
 %% Academic-letter geometry and prose rhythm are the initial statement design.
-\geometry { letterpaper , top = 0.9in , bottom = 0.9in , left = 1in , right = 1in }
+\use:x
+  {
+    \exp_not:N \geometry
+      {
+        \l__cdossier_statement_paper_tl ,
+        top = 0.9in , bottom = 0.9in , left = 1in , right = 1in
+      }
+  }
 \setlength { \parindent }        { 0pt }
 \setlength { \parskip }          { 1ex plus 0.4ex minus 0.1ex }
 \setlength { \emergencystretch } { 2em }

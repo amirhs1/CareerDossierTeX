@@ -10,6 +10,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- Added opt-in A4 paper to the résumé, industry and academic letters, academic
+  CV, and all six statement types through one consistent
+  `paper=letter|a4` class option. US Letter remains the default, and both paper
+  sizes keep each class's established physical margins, typography, spacing,
+  and page-furniture design. A4 layout fixtures verify the media box, long-form
+  wrapping, multi-page flow, folios, and continuation headers across every
+  document family. Existing optional-field and separator behavior is
+  unchanged. ([#105])
+
 - Added `careerdossier-statement`, one LuaLaTeX class for research, teaching,
   teaching-philosophy, diversity, artist, and statement-of-purpose documents.
   A required `type` option selects the default full and running titles plus the
@@ -27,6 +36,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   are unchanged. ([#104])
 
 [#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
+[#105]: https://github.com/amirhs1/CareerDossierTeX/issues/105
 
 ## [0.4.0] - 2026-07-20
 

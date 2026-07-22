@@ -16,8 +16,9 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-letter owns the English industry and academic cover-letter
-%% families: US Letter geometry, the letter-specific metadata keys,
-%% and prose structure: US Letter margins, the letter-specific metadata keys,
+%% families: Letter/A4 geometry, the letter-specific metadata keys,
+%% and prose structure: fixed physical margins, the letter-specific metadata
+%% keys,
 %% the collapsing recipient block, and the letterhead and closing commands.
 %% Shared identity and contact logic (the centered sender block, contact line,
 %% link wrappers) and the required-`name' validation live in
@@ -25,23 +26,24 @@
 %% that material and adds the letter body around it.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-letter} {2026-07-20} {0.4.0}
+\ProvidesExplClass {careerdossier-letter} {2026-07-22} {0.5.0}
   {CareerDossierTeX English cover-letter class}
 
 %% ---------------------------------------------------------------------------
-%% Class options. `family` is additive in v0.2.0; the existing industry family
-%% remains the default. Paper, language, and theme are fixed. Any option is rejected
-%% with an actionable message rather than silently ignored.
+%% Class options. The existing industry family and Letter paper remain the
+%% defaults. Any unsupported option is rejected with an actionable message.
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
 \tl_new:N \l__cdossier_letter_family_tl
 \tl_set:Nn \l__cdossier_letter_family_tl { industry }
+\tl_new:N \l__cdossier_letter_paper_tl
+\tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
-    The~supported~option~is~'family'~(industry,~academic).~Paper,~language,~
-    and~theme~are~fixed~and~cannot~be~set~here.
+    Supported~options~are~'family'~(industry,~academic)~and~
+    'paper'~(letter,~a4).~Language~and~theme~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / letter }
@@ -50,6 +52,16 @@
       { industry , academic }
       { \tl_set_eq:NN \l__cdossier_letter_family_tl \l_keys_choice_tl } ,
     family .value_required:n = true ,
+    paper .choices:nn =
+      { letter , a4 }
+      {
+        \str_case:Vn \l_keys_choice_tl
+          {
+            { letter } { \tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper } }
+            { a4 }     { \tl_set:Nn \l__cdossier_letter_paper_tl { a4paper } }
+          }
+      } ,
+    paper .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
@@ -57,7 +69,12 @@
 \ProcessKeysOptions { cdossier / letter }
 
 %% A prose letter reads best at a slightly larger body size than the résumé.
-\LoadClass [ 11pt , letterpaper ] { article }
+\use:x
+  {
+    \exp_not:N \LoadClass
+      [ 11pt , \l__cdossier_letter_paper_tl ]
+      { article }
+  }
 
 %% ---------------------------------------------------------------------------
 %% Shared modules. careerdossier-components pulls in base (profile metadata and
@@ -76,10 +93,22 @@
   { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
   { \__cdossier_components_doctype:n { Cover~Letter } }
 
-%% US Letter with conventional one-inch business-letter margins.
+%% Keep the established physical margins on both supported paper sizes.
 \str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
-  { \geometry { letterpaper , top = 0.9in , bottom = 0.9in , left = 1in , right = 1in } }
-  { \geometry { letterpaper , margin = 1in } }
+  {
+    \use:x
+      {
+        \exp_not:N \geometry
+          {
+            \l__cdossier_letter_paper_tl ,
+            top = 0.9in , bottom = 0.9in , left = 1in , right = 1in
+          }
+      }
+  }
+  {
+    \use:x
+      { \exp_not:N \geometry { \l__cdossier_letter_paper_tl , margin = 1in } }
+  }
 
 %% Industry letters retain the v0.1 empty page style.
 %%
