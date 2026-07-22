@@ -226,9 +226,9 @@ Build every supported example:
 make
 ```
 
-Run every suite CI runs — regression, extraction, smoke, layout, the focused
-BibLaTeX/Biber fixture, and the tagged-structure fixtures — plus all supported
-example builds:
+Run every suite CI runs — regression, theme-color validation, extraction,
+smoke, layout, the focused BibLaTeX/Biber fixture, and the tagged-structure
+fixtures — plus all supported example builds:
 
 ```bash
 make check
@@ -439,6 +439,18 @@ Recorded validation results, the outstanding VoiceOver and NVDA reading-order
 checklists, and the tagged-BibLaTeX limitations are in sections 7.1–7.3 of
 [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md). Screen-reader
 review is manual by nature and is not automated by this suite.
+
+### Theme color validation
+
+The link-theme palette has a dependency-free Lua check for contrast against
+white, grayscale output, and full-severity protanopia, deuteranopia, and
+tritanopia simulations:
+
+    make theme-test            # or: tests/theme/run.sh
+
+The check reads the palette from `careerdossier-theme.sty`, verifies the
+reviewed fixed values, and fails if any result falls below 4.5:1. It is a
+focused palette-review aid, not a broad accessibility-conformance claim.
 
 ### Module regression suite (l3build)
 

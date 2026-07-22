@@ -23,7 +23,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Language | English |
 | Paper | US Letter; A4 implemented for upcoming `v0.5.0` |
 | Body font | Serif; opt-in sans implemented for upcoming `v0.5.0` |
-| Theme | Monochrome |
+| Theme | Monochrome; opt-in accent and print themes implemented for upcoming `v0.5.0` |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
@@ -109,7 +109,8 @@ actually been verified.
   fontsize=10pt,
   density=compact,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  theme=monochrome
 ]{careerdossier-resume}
 ```
 
@@ -180,13 +181,54 @@ size, semantic typography roles, spacing, geometry, or page furniture.
 Unsupported values produce an actionable class error. Arbitrary font names and
 per-role font selection are not supported.
 
+#### `theme` and `accent` (upcoming `v0.5.0`)
+
+Every CareerDossierTeX document class accepts:
+
+```text
+theme=monochrome
+theme=accent
+theme=print
+```
+
+`monochrome` is the default. It preserves black link text and adds a thin black
+PDF-annotation underline so links remain identifiable without color.
+`accent` changes link text only; body text, headings, rules, spacing, and page
+geometry remain unchanged. `print` renders black links without color, border,
+or underline.
+
+The `accent` theme also accepts one fixed named link color:
+
+```text
+accent=navy
+accent=teal
+accent=magenta
+```
+
+`navy` is the default. The `accent` value is accepted with every theme so class
+option order does not matter, but it affects output only when `theme=accent`.
+Arbitrary colors and per-field or per-role color keys are not supported.
+
+| Accent | Hex value | Contrast on white | Lowest simulated CVD contrast |
+|---|---:|---:|---:|
+| `navy` | `#1B365D` | 12.12:1 | 11.48:1 |
+| `teal` | `#005A5A` | 8.05:1 | 7.47:1 |
+| `magenta` | `#8A1C5A` | 8.77:1 | 7.84:1 |
+
+The recorded checks use the WCAG relative-luminance calculation against white
+plus deterministic full-severity protanopia, deuteranopia, and tritanopia
+simulation. Grayscale preserves the listed base contrast. This is a focused
+palette review, not a WCAG, PDF/UA, or broad accessibility-conformance claim.
+Visible URLs, identifiers, and descriptive labels remain present; authors of
+custom `\href` links should likewise use link text that identifies its
+destination rather than relying on color alone.
+
 ### Fixed settings
 
-The following remain fixed and are not accepted as user options:
+The following remains fixed and is not accepted as a user option:
 
 ```text
 language=english
-theme=monochrome
 ```
 
 It is better to reject or omit an unsupported option than silently ignore it.
@@ -196,17 +238,16 @@ It is better to reject or omit an unsupported option than silently ignore it.
 ### Class declaration
 
 ```latex
-\documentclass[family=industry, paper=letter, bodyfont=serif]{careerdossier-letter}
+\documentclass[family=industry, paper=letter, bodyfont=serif, theme=monochrome]{careerdossier-letter}
 ```
 
 `family` accepts `industry` and `academic`; the default is `industry`. `paper`
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
-uses the shared `serif|sans` contract above and defaults to `serif`. The
-following settings remain fixed:
+uses the shared `serif|sans` contract above and defaults to `serif`. `theme` and
+`accent` use the shared contracts above. The following setting remains fixed:
 
 ```text
 language=english
-theme=monochrome
 ```
 
 ## Shared profile metadata
@@ -531,7 +572,8 @@ Load the academic CV with:
   fontsize=11pt,
   density=standard,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  theme=monochrome
 ]{careerdossier-cv}
 ```
 
@@ -543,9 +585,11 @@ The class accepts the same value sets as the résumé class:
 | `density` | `compact`, `standard` | `standard` |
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
+| `theme` | `monochrome`, `accent`, `print` | `monochrome` |
+| `accent` | `navy`, `teal`, `magenta` | `navy` |
 
-English and the monochrome theme remain fixed. Unsupported options or values
-must produce an actionable class error rather than being ignored.
+English remains fixed. Unsupported options or values must produce an actionable
+class error rather than being ignored.
 
 The first page renders the ordinary dossier header in the document body. Page
 numbers appear on every page, and pages after the first receive a simple running
@@ -748,10 +792,10 @@ design decision before the behavior is merged.
 ### Class and statement types
 
 All statement documents use one class with an optional `type` option and the
-shared optional `paper` and `bodyfont` settings:
+shared optional `paper`, `bodyfont`, `theme`, and `accent` settings:
 
 ```latex
-\documentclass[type=research, paper=letter, bodyfont=serif]{careerdossier-statement}
+\documentclass[type=research, paper=letter, bodyfont=serif, theme=monochrome]{careerdossier-statement}
 ```
 
 When `type` is omitted, the class selects `general-interest`; it requires no
@@ -777,11 +821,13 @@ duplicating geometry and page behavior across statement document models.
 
 The initial statement release starts from the academic cover-letter design:
 
-- LuaLaTeX, English, and monochrome output;
+- LuaLaTeX and English output;
 - `paper=letter|a4`, defaulting to US Letter and preserving the academic
   letter's physical margins on A4;
 - `bodyfont=serif|sans`, defaulting to the current TeX Gyre Termes body and
   retaining TeX Gyre Heros headings in both modes;
+- the shared `theme=monochrome|accent|print` and
+  `accent=navy|teal|magenta` link-only appearance contract;
 - 11 pt body text;
 - academic-letter margins and prose paragraph rhythm;
 - a centered identity block in the body on page one;
@@ -792,7 +838,7 @@ The initial statement release starts from the academic cover-letter design:
 Page furniture is class-owned and not user-configurable. The statement class
 uses the same paper and body-font options and defaults as the résumé, CV, and
 letter classes. Named or per-role font combinations remain future design work
-in issue #120. Color themes and icons are deferred from `v0.5.0`.
+in issue #120. Icons remain deferred.
 
 ### Statement metadata
 
@@ -1027,7 +1073,7 @@ The six complete two-page examples provide the visual review surface.
 
 ## Colors and theme tokens
 
-The monochrome theme may expose semantic tokens:
+All themes expose the same semantic tokens:
 
 ```latex
 \CDossierPrimaryColor
@@ -1037,7 +1083,9 @@ The monochrome theme may expose semantic tokens:
 \CDossierLinkColor
 ```
 
-Users should not rely on the underlying color names or values as stable API before `v1.0.0`.
+Only `\CDossierLinkColor` varies under the `accent` theme. The other tokens
+retain the established monochrome palette. Users should not rely on the
+underlying internal color names as stable API before `v1.0.0`.
 
 ## Errors and warnings
 

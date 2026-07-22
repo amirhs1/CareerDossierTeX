@@ -33,12 +33,12 @@ CareerDossierTeX separates personal information from document content and presen
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
 | Paper size | US Letter; A4 upcoming in `v0.5.0` | `paper=letter` remains the default; repository source also accepts `paper=a4` |
 | Body font | Serif; sans upcoming in `v0.5.0` | `bodyfont=serif` remains the default; repository source also accepts `bodyfont=sans` |
-| Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
+| Theme | Monochrome; accent and print upcoming in `v0.5.0` | `monochrome` underlines black links; `accent` colors links only; `print` leaves black links undecorated |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The statement class, opt-in A4 paper, and opt-in sans body font are implemented
-for the upcoming `v0.5.0` release. Color themes, named font combinations, icons,
-and alternate bibliography styles remain later work. Farsi, bilingual, and
+The statement class, opt-in A4 paper, opt-in sans body font, and link-only themes
+are implemented for the upcoming `v0.5.0` release. Named font combinations,
+icons, and alternate bibliography styles remain later work. Farsi, bilingual, and
 right-to-left support is dropped; CareerDossierTeX is English-only.
 
 ## Requirements
@@ -86,7 +86,8 @@ Optional fields may be omitted. Contact separators should adjust automatically w
   fontsize=10pt,
   density=compact,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  theme=monochrome
 ]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}
@@ -367,8 +368,8 @@ plus every supported example build — with:
 make check
 ```
 
-Individual suites are available as `make regression`, `make extract-test`,
-`make smoke`, `make layout`, `make bibliography-test`, and `make tagging`;
+Individual suites are available as `make regression`, `make theme-test`,
+`make extract-test`, `make smoke`, `make layout`, `make bibliography-test`, and `make tagging`;
 `make clean` removes the generated files afterwards. Each target runs the same
 command as the matching CI job.
 

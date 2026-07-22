@@ -1,0 +1,19 @@
+% theme-accent-magenta.lvt — named dark-magenta link accent.
+\input{regression-test}
+\documentclass{article}
+\usepackage[theme=accent,accent=magenta]{careerdossier-theme}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestColor #1
+  {
+    \extractcolorspec{#1}\l_tmpa_tl
+    \TYPE{ #1 = \l_tmpa_tl }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+\TEST{magenta-link-accent}{
+  \cdossiertestColor{cdossier-link}
+}
+\END

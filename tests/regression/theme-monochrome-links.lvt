@@ -1,0 +1,18 @@
+% theme-monochrome-links.lvt — default black underlined link presentation.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-theme}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_hypersetup:n #1
+  { \TYPE{ hypersetup = #1 } }
+\cs_set_eq:NN \hypersetup \cdossiertest_hypersetup:n
+\cs_set_protected:Npn \urlstyle #1 { \TYPE{ urlstyle = #1 } }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+\TEST{monochrome-link-presentation}{
+  \UseHook{package/hyperref/after}
+}
+\END

@@ -20,7 +20,7 @@ The Work
 manifest.txt                  this file; defines the Work
 careerdossier-base.sty        shared profile metadata, keys, and validation
 careerdossier-typography.sty  LuaLaTeX engine guard, fonts, semantic text roles
-careerdossier-theme.sty       monochrome semantic colour, rule, and link tokens
+careerdossier-theme.sty       semantic colour, rule, and link-theme tokens
 careerdossier-components.sty  shared identity block, contact line, entry primitives
 careerdossier-resume.cls      English industry résumé class
 careerdossier-letter.cls      English industry cover-letter class
@@ -46,7 +46,7 @@ Makefile                      local build and test entry points
 docs/                         API, architecture, roadmap, migration, design guidance
 examples/                     user-facing example documents
 tests/                        regression, smoke, layout, extraction, bibliography,
-                              and tagged-PDF fixtures
+                              theme-validation, and tagged-PDF fixtures
 
 
 Not distributed

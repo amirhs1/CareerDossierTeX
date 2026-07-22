@@ -34,7 +34,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout extract-test bibliography-test tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout extract-test bibliography-test tagging theme-test clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -63,7 +63,7 @@ academic-letter: ## Build the academic letter example
 statements: ## Build all six statement examples
 	$(LATEXMK) $(STATEMENTS)
 
-check: regression extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
+check: regression theme-test extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
 
 test: check ## Alias for check
@@ -85,6 +85,9 @@ bibliography-test: ## Biber sorting and identifier-precedence fixture
 
 tagging: ## Opt-in tagged-PDF structure fixtures
 	tests/tagging/run.sh
+
+theme-test: ## Link-theme contrast, grayscale, and color-vision-deficiency checks
+	tests/theme/run.sh
 
 clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@$(LATEXMK_CLEAN) $(RESUME) $(LETTER) >/dev/null 2>&1

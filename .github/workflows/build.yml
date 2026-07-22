@@ -90,6 +90,8 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Module regression suite (l3build check on LuaTeX)
         run: l3build check
+      - name: Link-theme contrast and color-vision-deficiency checks
+        run: make theme-test
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload regression logs
         if: always()

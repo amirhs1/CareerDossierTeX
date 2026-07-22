@@ -248,11 +248,14 @@ Support additional application documents and broader visual configuration.
   `artist`, and `purpose` types;
 - A4 paper;
 - a cross-class `bodyfont=serif|sans` option with the current serif default;
+- cross-class `theme=monochrome|accent|print` link presentation with fixed
+  `accent=navy|teal|magenta` choices and monochrome remaining the default;
 - additional stress tests and documentation.
 
-The maintainer deferred color themes, named or per-role font combinations,
-optional icons, and the Windows/NVDA reading-order check on 2026-07-22. Their
-future milestone remains undecided; they are not release blockers for
+The maintainer initially deferred color themes on 2026-07-22, then restored the
+narrow link-only theme scope to `v0.5.0`. Named or per-role font combinations,
+optional icons, and the Windows/NVDA reading-order check remain deferred; their
+future milestone remains undecided and they are not release blockers for
 `v0.5.0`.
 
 ## `v1.0.0 — Stable Public API`

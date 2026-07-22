@@ -243,11 +243,11 @@ Owns visual tokens that are not page geometry.
 
 Responsibilities:
 
-- monochrome colors;
+- monochrome semantic colors;
 - rule colors and thicknesses;
-- link appearance;
+- class-selected monochrome, accent, and print link appearance;
 - print-safe contrast;
-- future theme extension points.
+- fixed named link accents without per-field color configuration.
 
 The theme package should use semantic tokens such as:
 
@@ -581,9 +581,16 @@ Typography should be controlled through semantic roles rather than repeated font
 
 ## Theme strategy
 
-Phase 1 includes one monochrome theme.
+Phase 1 includes one monochrome theme. The `v0.5.0` extension keeps that theme
+as the default and adds link-only `accent` and `print` variants. Classes parse
+the public `theme` and `accent` choices and forward them to
+`careerdossier-theme`; components continue to request semantic roles and do not
+know which preset is active.
 
-Future themes should replace semantic tokens rather than rewrite components. Components ask for a meaning such as "muted text" or "rule color"; the active theme provides the value.
+Themes replace semantic tokens rather than rewrite components. Components ask
+for a meaning such as "muted text" or "link color"; the active theme provides
+the value. The initial color extension changes only the link token and hyperlink
+presentation. Typography, rules, and layout remain unchanged.
 
 Page geometry is not a theme responsibility.
 
@@ -944,9 +951,9 @@ not duplicate the class hierarchy by language.
 ### `v0.5.0`
 
 Add one statement class with a general-interest default and six explicit types,
-A4 paper, and an opt-in sans body family through documented extension points.
-Color themes, named font combinations, and optional icons were deferred by the
-maintainer on 2026-07-22.
+A4 paper, an opt-in sans body family, and link-only monochrome, accent, and print
+themes through documented extension points. Named font combinations and
+optional icons remain deferred.
 
 ### `v1.0.0`
 

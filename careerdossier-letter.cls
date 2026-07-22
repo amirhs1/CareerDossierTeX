@@ -40,13 +40,18 @@
 \tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper }
 \tl_new:N \l__cdossier_letter_bodyfont_tl
 \tl_set:Nn \l__cdossier_letter_bodyfont_tl { serif }
+\tl_new:N \l__cdossier_letter_theme_tl
+\tl_set:Nn \l__cdossier_letter_theme_tl { monochrome }
+\tl_new:N \l__cdossier_letter_accent_tl
+\tl_set:Nn \l__cdossier_letter_accent_tl { navy }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
     Supported~options~are~'family'~(industry,~academic)~and~
-    'paper'~(letter,~a4)~and~'bodyfont'~(serif,~sans).~Language~and~theme~
-    cannot~be~set~here.
+    'paper'~(letter,~a4),~'bodyfont'~(serif,~sans),~
+    'theme'~(monochrome,~accent,~print),~and~
+    'accent'~(navy,~teal,~magenta).~Language~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / letter }
@@ -69,6 +74,14 @@
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_letter_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
+    theme .choices:nn =
+      { monochrome , accent , print }
+      { \tl_set_eq:NN \l__cdossier_letter_theme_tl \l_keys_choice_tl } ,
+    theme .value_required:n = true ,
+    accent .choices:nn =
+      { navy , teal , magenta }
+      { \tl_set_eq:NN \l__cdossier_letter_accent_tl \l_keys_choice_tl } ,
+    accent .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
@@ -77,6 +90,12 @@
 
 \str_if_eq:VnT \l__cdossier_letter_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      { theme = \l__cdossier_letter_theme_tl , accent = \l__cdossier_letter_accent_tl }
+      { careerdossier-theme }
+  }
 
 %% A prose letter reads best at a slightly larger body size than the résumé.
 \use:x

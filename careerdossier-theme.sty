@@ -15,15 +15,44 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-theme owns the Phase 1 monochrome semantic colour, rule, and
-%% link tokens. Colour never carries meaning by itself; these tokens exist so
-%% components and classes do not hard-code colours.
+%% careerdossier-theme owns the semantic colour, rule, and link tokens. Colour
+%% never carries meaning by itself; these tokens exist so components and
+%% classes do not hard-code colours.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplPackage {careerdossier-theme} {2026-07-20} {0.4.0}
-  {CareerDossierTeX monochrome semantic colour, rule, and link tokens}
+\ProvidesExplPackage {careerdossier-theme} {2026-07-22} {0.5.0}
+  {CareerDossierTeX semantic colour, rule, and link themes}
 
+\RequirePackage { l3keys2e }
 \RequirePackage { xcolor }
+
+\tl_new:N \l__cdossier_theme_name_tl
+\tl_new:N \l__cdossier_theme_accent_tl
+\tl_set:Nn \l__cdossier_theme_name_tl { monochrome }
+\tl_set:Nn \l__cdossier_theme_accent_tl { navy }
+
+\msg_new:nnnn { careerdossier-theme } { unknown-option }
+  { Unknown~package~option~'#1'~for~careerdossier-theme. }
+  {
+    Supported~options~are~'theme'~(monochrome,~accent,~print)~and~
+    'accent'~(navy,~teal,~magenta).
+  }
+
+\keys_define:nn { cdossier / theme }
+  {
+    theme .choices:nn =
+      { monochrome , accent , print }
+      { \tl_set_eq:NN \l__cdossier_theme_name_tl \l_keys_choice_tl } ,
+    theme .value_required:n = true ,
+    accent .choices:nn =
+      { navy , teal , magenta }
+      { \tl_set_eq:NN \l__cdossier_theme_accent_tl \l_keys_choice_tl } ,
+    accent .value_required:n = true ,
+    unknown .code:n =
+      { \msg_error:nnx { careerdossier-theme } { unknown-option }
+          { \l_keys_key_str } } ,
+  }
+\ProcessKeysOptions { cdossier / theme }
 
 %% ---------------------------------------------------------------------------
 %% Monochrome palette. Body text is black; the muted grey is dark enough to
@@ -36,6 +65,24 @@
 \definecolor { cdossier-rule }    { gray } { 0 }
 \definecolor { cdossier-link }    { gray } { 0 }
 
+%% Dark link accents measured against white. They are intentionally darker
+%% than xcolor's base cyan and magenta, which are not suitable normal-text
+%% defaults on white. All non-link semantic colours retain the monochrome
+%% palette in every theme.
+\definecolor { cdossier-accent-navy }   { HTML } { 1B365D }
+\definecolor { cdossier-accent-teal }   { HTML } { 005A5A }
+\definecolor { cdossier-accent-magenta }{ HTML } { 8A1C5A }
+
+\str_if_eq:VnT \l__cdossier_theme_name_tl { accent }
+  {
+    \str_case:Vn \l__cdossier_theme_accent_tl
+      {
+        { navy }    { \colorlet { cdossier-link } { cdossier-accent-navy } }
+        { teal }    { \colorlet { cdossier-link } { cdossier-accent-teal } }
+        { magenta } { \colorlet { cdossier-link } { cdossier-accent-magenta } }
+      }
+  }
+
 %% ---------------------------------------------------------------------------
 %% Public semantic colour tokens, usable as grouped switches:
 %%   {\CDossierMutedColor secondary text}
@@ -47,15 +94,49 @@
 \NewDocumentCommand \CDossierLinkColor    { } { \color { cdossier-link }    }
 
 %% ---------------------------------------------------------------------------
-%% Print-safe links. When hyperref is present, links are coloured black and
-%% drawn without borders, so they read as ordinary text on paper and in
-%% grayscale while the visible URL or identifier still stands on its own.
+%% Link appearance is the only difference between themes:
+%% - monochrome: black text with a thin black PDF-annotation underline;
+%% - accent: dark coloured text without a border; and
+%% - print: black text without a border or underline.
+%%
+%% Visible URLs, identifiers, and descriptive labels remain present, so colour
+%% is not the only carrier of link meaning. The print theme deliberately removes
+%% screen-only affordances from a non-interactive paper copy.
 %% \urlstyle{same} keeps \url/\nolinkurl text in the surrounding font instead of
 %% typewriter, so breakable contact URLs do not switch to a monospace face.
 %% The hook applies whenever hyperref loads, regardless of load order.
 %% ---------------------------------------------------------------------------
 \AddToHook { package/hyperref/after }
   {
-    \hypersetup { colorlinks = true , allcolors = cdossier-link }
+    \str_case:Vn \l__cdossier_theme_name_tl
+      {
+        { monochrome }
+          {
+            \hypersetup
+              {
+                colorlinks = false ,
+                allbordercolors = cdossier-link ,
+                pdfborderstyle = { /S/U/W~0.6 }
+              }
+          }
+        { accent }
+          {
+            \hypersetup
+              {
+                colorlinks = true ,
+                allcolors = cdossier-link ,
+                pdfborder = { 0~0~0 }
+              }
+          }
+        { print }
+          {
+            \hypersetup
+              {
+                colorlinks = true ,
+                allcolors = cdossier-link ,
+                pdfborder = { 0~0~0 }
+              }
+          }
+      }
     \urlstyle { same }
   }

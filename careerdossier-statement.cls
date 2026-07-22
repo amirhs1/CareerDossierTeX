@@ -33,9 +33,13 @@
 \tl_new:N   \l__cdossier_statement_type_tl
 \tl_new:N   \l__cdossier_statement_paper_tl
 \tl_new:N   \l__cdossier_statement_bodyfont_tl
+\tl_new:N   \l__cdossier_statement_theme_tl
+\tl_new:N   \l__cdossier_statement_accent_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { general-interest }
 \tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
 \tl_set:Nn  \l__cdossier_statement_bodyfont_tl { serif }
+\tl_set:Nn  \l__cdossier_statement_theme_tl { monochrome }
+\tl_set:Nn  \l__cdossier_statement_accent_tl { navy }
 
 \msg_new:nnnn { careerdossier-statement } { unknown-type }
   { Unknown~statement~type~'#1'. }
@@ -49,7 +53,8 @@
   {
     Supported~options~are~'type'~(general-interest,~research,~teaching,~
     teaching-philosophy,~diversity,~artist,~purpose),~'paper'~(letter,~a4),~and~
-    'bodyfont'~(serif,~sans).~Language,~theme,~and~named~font~combinations~
+    'bodyfont'~(serif,~sans),~'theme'~(monochrome,~accent,~print),~and~
+    'accent'~(navy,~teal,~magenta).~Language~and~named~font~combinations~
     cannot~be~set~here.
   }
 
@@ -86,6 +91,14 @@
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_statement_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
+    theme .choices:nn =
+      { monochrome , accent , print }
+      { \tl_set_eq:NN \l__cdossier_statement_theme_tl \l_keys_choice_tl } ,
+    theme .value_required:n = true ,
+    accent .choices:nn =
+      { navy , teal , magenta }
+      { \tl_set_eq:NN \l__cdossier_statement_accent_tl \l_keys_choice_tl } ,
+    accent .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-statement } { unknown-option }
           { \l_keys_key_str } } ,
@@ -94,6 +107,12 @@
 
 \str_if_eq:VnT \l__cdossier_statement_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      { theme = \l__cdossier_statement_theme_tl , accent = \l__cdossier_statement_accent_tl }
+      { careerdossier-theme }
+  }
 
 \use:x
   {
