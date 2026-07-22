@@ -14,7 +14,8 @@
 # human review of the rendered PDF; this runner guards the properties a machine
 # can check reliably without freezing an unsettled design.
 #
-# Requirements: lualatex, pdftotext (poppler) for the page-number check.
+# Requirements: lualatex, pdftotext (poppler) for the page-number check, and
+# pdfinfo (poppler) for A4 media-box verification.
 # Run from anywhere; the repository root is placed on TEXINPUTS.
 set -uo pipefail
 
@@ -49,6 +50,33 @@ for tex in *.tex; do
            | grep -oE '\(([0-9]+) page' | grep -oE '[0-9]+' | tail -1)"
   pages="${pages:-0}"
   echo "  pages: $pages"
+
+  # Every *-a4-* wrapper must produce an actual ISO A4 media box. This catches
+  # a class accepting the public option but silently retaining Letter paper.
+  case "$base" in
+    *-a4-*)
+      if ! command -v pdfinfo >/dev/null 2>&1; then
+        echo "  pdfinfo absent: cannot verify A4 media box"; fail=1
+      elif ! pdfinfo -f 1 -l 1 "$base.pdf" | grep -Eq '^Page( +[0-9]+)? size:.*\(A4\)$'; then
+        echo "  WRONG PAPER SIZE: expected A4"
+        pdfinfo -f 1 -l 1 "$base.pdf" | grep -E '^Page( +[0-9]+)? size:' | sed 's/^/    /'
+        fail=1
+      else
+        echo "  A4 media box confirmed"
+      fi
+      ;;
+    *)
+      if ! command -v pdfinfo >/dev/null 2>&1; then
+        echo "  pdfinfo absent: cannot verify default Letter media box"; fail=1
+      elif ! pdfinfo -f 1 -l 1 "$base.pdf" | grep -Eq '^Page( +[0-9]+)? size:.*\(letter\)$'; then
+        echo "  WRONG DEFAULT PAPER SIZE: expected Letter"
+        pdfinfo -f 1 -l 1 "$base.pdf" | grep -E '^Page( +[0-9]+)? size:' | sed 's/^/    /'
+        fail=1
+      else
+        echo "  default Letter media box confirmed"
+      fi
+      ;;
+  esac
 
   # The résumé's empty page style must print no folio. The CV instead requires
   # a visible `Page N of M` folio on every page and an identity-derived running

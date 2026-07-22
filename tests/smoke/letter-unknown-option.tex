@@ -1,7 +1,5 @@
-% letter-unknown-option.tex — smoke fixture: a fixed setting offered as a class
-% option (here paper) must be rejected as an unknown class option (expected
-% failure).
-\documentclass[paper=a4]{careerdossier-letter}
+% letter-unknown-option.tex — unsupported class options must fail clearly.
+\documentclass[format=a4]{careerdossier-letter}
 \CDossierSetup{name = {Ada Lovelace}}
 \begin{document}
 \MakeCDossierLetterhead

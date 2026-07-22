@@ -319,8 +319,8 @@ Owns résumé-specific document behavior.
 Responsibilities:
 
 - load an appropriate base class;
-- set US Letter geometry;
-- process supported class options;
+- set Letter or A4 geometry while preserving the established physical margins;
+- process `fontsize`, `density`, and `paper` class options;
 - control compact or standard density;
 - disable page numbers by default;
 - define résumé section spacing;
@@ -336,13 +336,14 @@ Owns industry and academic cover-letter behavior.
 
 Responsibilities:
 
-- set letter geometry;
+- set Letter or A4 geometry for both letter families;
 - define prose-friendly paragraph and page-breaking behavior;
 - render date and recipient blocks;
 - render an optional subject;
 - render salutation and closing;
 - reuse the shared sender identity;
 - process `family=industry|academic` while preserving `industry` as the default;
+- process `paper=letter|a4` while preserving Letter as the default;
 - support one-page and multi-page letters without résumé-specific compression.
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
@@ -362,7 +363,7 @@ Responsibilities:
 - keep the full meaningful title in the page-one body and PDF metadata while a
   separately bounded running title identifies continuation pages;
 - reuse component-owned link normalization and separator-safe contact output;
-- start from the academic letter's US-Letter geometry, typography, prose
+- start from the academic letter's geometry, typography, prose
   rhythm, continuation header, and `Page N of M` folio;
 - keep running page furniture out of tagged structure; and
 - allow ordinary prose and standard LaTeX sectioning without imposing a
@@ -381,9 +382,10 @@ The shared profile is intentionally allowed to contain fields such as
 `linkedin`, `github`, or `location` that a statement does not render; this is
 normal cross-document reuse and must not generate warnings.
 
-A4 and font-preset support remain cross-class concerns owned by issues #105 and
-#107. The statement class consumes those shared contracts when they land; it
-must not introduce statement-only option names or fallback behavior.
+Paper size and font presets are cross-class concerns: every class implements the
+same `paper=letter|a4` contract from issue #105, and Letter remains the default.
+The statement class must not introduce statement-only option names or fallback
+behavior. Font presets remain owned by issue #107.
 
 ### `careerdossier-cv.cls` (Phase 2, released in `v0.2.0`)
 
@@ -391,8 +393,8 @@ Owns academic-CV document behavior.
 
 Responsibilities:
 
-- set US Letter CV geometry;
-- process the documented `fontsize` and `density` options;
+- set Letter or A4 CV geometry while preserving the established physical margins;
+- process the documented `fontsize`, `density`, and `paper` options;
 - render the first-page identity in the body;
 - provide a simple running header after the first page and page numbers on all
   pages without making contact details running-only content;

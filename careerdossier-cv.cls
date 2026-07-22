@@ -15,7 +15,7 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-cv owns the v0.2 academic-CV vertical slice: Letter geometry,
+%% careerdossier-cv owns the academic-CV vertical slice: Letter/A4 geometry,
 %% density, multi-page flow, running headers, page numbers, and CV-local
 %% section/entry/list spacing, including the dependency-free manual-publication
 %% list. Shared profile, links, typography, and BibLaTeX formatting remain in
@@ -23,7 +23,7 @@
 %% CV without an external bibliography must build without BibLaTeX or Biber.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-cv} {2026-07-20} {0.4.0}
+\ProvidesExplClass {careerdossier-cv} {2026-07-22} {0.5.0}
   {CareerDossierTeX English academic CV class}
 
 \RequirePackage { l3keys2e }
@@ -32,13 +32,15 @@
 \tl_set:Nn \l__cdossier_cv_fontsize_tl { 11pt }
 \tl_new:N \l__cdossier_cv_density_tl
 \tl_set:Nn \l__cdossier_cv_density_tl { standard }
+\tl_new:N \l__cdossier_cv_paper_tl
+\tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-cv. }
   {
-    Supported~options~are~'fontsize'~(10pt,~11pt)~and~
-    'density'~(compact,~standard).~Paper,~language,~and~theme~are~fixed~
-    in~v0.2.0~and~cannot~be~set~here.
+    Supported~options~are~'fontsize'~(10pt,~11pt),~
+    'density'~(compact,~standard),~and~'paper'~(letter,~a4).~Language~and~
+    theme~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / cv }
@@ -51,6 +53,16 @@
       { compact , standard }
       { \tl_set_eq:NN \l__cdossier_cv_density_tl \l_keys_choice_tl } ,
     density  .value_required:n = true ,
+    paper .choices:nn =
+      { letter , a4 }
+      {
+        \str_case:Vn \l_keys_choice_tl
+          {
+            { letter } { \tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper } }
+            { a4 }     { \tl_set:Nn \l__cdossier_cv_paper_tl { a4paper } }
+          }
+      } ,
+    paper .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-cv } { unknown-option } { \l_keys_key_str } } ,
   }
@@ -59,7 +71,7 @@
 \use:x
   {
     \exp_not:N \LoadClass
-      [ \l__cdossier_cv_fontsize_tl , letterpaper ]
+      [ \l__cdossier_cv_fontsize_tl , \l__cdossier_cv_paper_tl ]
       { article }
   }
 
@@ -70,17 +82,26 @@
 
 \__cdossier_components_doctype:n { Curriculum\c_space_tl Vitae }
 
-\geometry
+\use:x
   {
-    letterpaper ,
-    top    = 0.72in ,
-    bottom = 0.72in ,
-    left   = 0.78in ,
-    right  = 0.78in ,
+    \exp_not:N \geometry
+      {
+        \l__cdossier_cv_paper_tl ,
+        top    = 0.72in ,
+        bottom = 0.72in ,
+        left   = 0.78in ,
+        right  = 0.78in ,
+      }
   }
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { 0pt plus 1pt }
+
+%% A4's narrower text block needs a little extra paragraph flexibility for
+%% prose-heavy CV entries. Letter output retains its established line-breaking
+%% behavior; this does not alter margins, type size, or page furniture.
+\str_if_eq:VnT \l__cdossier_cv_paper_tl { a4paper }
+  { \setlength { \emergencystretch } { 2em } }
 
 %% A minimal kernel page style supplies a human-readable header after page one
 %% and a folio on every page. The first page has no running header because the

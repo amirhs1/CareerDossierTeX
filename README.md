@@ -31,14 +31,15 @@ CareerDossierTeX separates personal information from document content and presen
 | Language | English | Farsi, bilingual, and RTL support is dropped |
 | Engine | LuaLaTeX | XeLaTeX and pdfLaTeX are unsupported and error early |
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
-| Paper size | US Letter | A4 is unsupported |
+| Paper size | US Letter; A4 upcoming in `v0.5.0` | `paper=letter` remains the default; repository source also accepts `paper=a4` |
 | Theme | Monochrome | Color themes, font presets, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The six-type statement class is implemented for the upcoming `v0.5.0` release.
-A4 paper and font presets remain `v0.5.0` milestone work. Color themes, icons,
-and alternate bibliography styles remain later work. Farsi, bilingual, and
-right-to-left support is dropped; CareerDossierTeX is English-only.
+The six-type statement class and opt-in A4 paper are implemented for the
+upcoming `v0.5.0` release. Font presets remain `v0.5.0` milestone work. Color
+themes, icons, and alternate bibliography styles remain later work. Farsi,
+bilingual, and right-to-left support is dropped; CareerDossierTeX is
+English-only.
 
 ## Requirements
 
@@ -83,7 +84,8 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 ```latex
 \documentclass[
   fontsize=10pt,
-  density=compact
+  density=compact,
+  paper=letter
 ]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}
@@ -108,6 +110,10 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 
 \end{document}
 ```
+
+Every document class accepts `paper=letter|a4`. US Letter remains the default;
+select A4 explicitly with `paper=a4`. Each class keeps its established physical
+margins, so pagination may change with the taller, slightly narrower A4 page.
 
 See the complete example in:
 

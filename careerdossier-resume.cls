@@ -16,19 +16,18 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-resume owns résumé-specific page behaviour for the v0.1.0
-%% English industry dossier: US Letter geometry, the two supported class
-%% options, disabled page numbers, and the section, entry, and list structures.
+%% English industry dossier: Letter/A4 geometry, class options, disabled page
+%% numbers, and the section, entry, and list structures.
 %% Reusable identity and contact logic lives in careerdossier-components; this
 %% class only arranges it on the page.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-resume} {2026-07-20} {0.4.0}
+\ProvidesExplClass {careerdossier-resume} {2026-07-22} {0.5.0}
   {CareerDossierTeX English industry résumé class}
 
 %% ---------------------------------------------------------------------------
-%% Class options (l3keys). Only fontsize and density are user-facing; paper,
-%% language, and theme are fixed in v0.1.0. Unsupported keys and choice values
-%% are rejected with an actionable message rather than silently ignored.
+%% Class options (l3keys). Unsupported keys and choice values are rejected with
+%% an actionable message rather than silently ignored.
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
 
@@ -36,13 +35,15 @@
 \tl_set:Nn \l__cdossier_resume_fontsize_tl { 10pt }
 \tl_new:N \l__cdossier_resume_density_tl
 \tl_set:Nn \l__cdossier_resume_density_tl { compact }
+\tl_new:N \l__cdossier_resume_paper_tl
+\tl_set:Nn \l__cdossier_resume_paper_tl { letterpaper }
 
 \msg_new:nnnn { careerdossier-resume } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-resume. }
   {
-    Supported~options~are~'fontsize'~(10pt,~11pt)~and~
-    'density'~(compact,~standard).~Paper,~language,~and~theme~are~fixed~
-    in~v0.1.0~and~cannot~be~set~here.
+    Supported~options~are~'fontsize'~(10pt,~11pt),~
+    'density'~(compact,~standard),~and~'paper'~(letter,~a4).~Language~and~
+    theme~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / resume }
@@ -55,18 +56,28 @@
       { compact , standard }
       { \tl_set_eq:NN \l__cdossier_resume_density_tl \l_keys_choice_tl } ,
     density  .value_required:n = true ,
+    paper .choices:nn =
+      { letter , a4 }
+      {
+        \str_case:Vn \l_keys_choice_tl
+          {
+            { letter } { \tl_set:Nn \l__cdossier_resume_paper_tl { letterpaper } }
+            { a4 }     { \tl_set:Nn \l__cdossier_resume_paper_tl { a4paper } }
+          }
+      } ,
+    paper .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-resume } { unknown-option }
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / resume }
 
-%% Load a minimal base class with the resolved body size and fixed paper. The
-%% font size tl is expanded so article sees a literal option such as `10pt'.
+%% Load a minimal base class with the resolved body size and paper. The token
+%% lists are expanded so article sees literal options such as `10pt,a4paper'.
 \use:x
   {
     \exp_not:N \LoadClass
-      [ \l__cdossier_resume_fontsize_tl , letterpaper ]
+      [ \l__cdossier_resume_fontsize_tl , \l__cdossier_resume_paper_tl ]
       { article }
   }
 
@@ -86,14 +97,17 @@
 %% itself is assembled in careerdossier-components, which owns identity.
 \__cdossier_components_doctype:n { Résumé }
 
-%% US Letter geometry with compact but comfortable résumé margins.
-\geometry
+%% Keep the established physical margins on both supported paper sizes.
+\use:x
   {
-    letterpaper ,
-    top    = 0.5in ,
-    bottom = 0.6in ,
-    left   = 0.6in ,
-    right  = 0.6in ,
+    \exp_not:N \geometry
+      {
+        \l__cdossier_resume_paper_tl ,
+        top    = 0.5in ,
+        bottom = 0.6in ,
+        left   = 0.6in ,
+        right  = 0.6in ,
+      }
   }
 
 %% No page numbers by default: an industry résumé header carries identity, not

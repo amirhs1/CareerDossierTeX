@@ -21,12 +21,13 @@ The API is intentionally small. Internal helper commands are not public merely b
 |---|---|
 | Engine | LuaLaTeX only |
 | Language | English |
-| Paper | US Letter |
+| Paper | US Letter; A4 implemented for upcoming `v0.5.0` |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
 | Letter class | `careerdossier-letter`, industry and academic families |
+| Statement class | Six types implemented for upcoming `v0.5.0` |
 | Bibliography | Optional `careerdossier-biblatex` |
 | Manual publications | `CDossierPublications` in `careerdossier-cv` |
 | RTL or bilingual layout | Not supported |
@@ -51,6 +52,12 @@ or:
 
 ```latex
 \documentclass{careerdossier-cv}
+```
+
+or, from the upcoming `v0.5.0` source:
+
+```latex
+\documentclass[type=research]{careerdossier-statement}
 ```
 
 Do not depend on repository-specific paths such as:
@@ -99,7 +106,8 @@ actually been verified.
 ```latex
 \documentclass[
   fontsize=10pt,
-  density=compact
+  density=compact,
+  paper=letter
 ]{careerdossier-resume}
 ```
 
@@ -139,12 +147,26 @@ compact
 
 `compact` reduces vertical spacing for short industry résumés. `standard` provides more breathing room.
 
-### Fixed settings
+#### `paper` (upcoming `v0.5.0`)
 
-The following remain fixed in `v0.2.0` and are not accepted as user options:
+Every CareerDossierTeX document class accepts:
 
 ```text
-paper=letter
+letter
+a4
+```
+
+The default is `letter`, preserving existing output. `a4` selects an ISO A4
+media box while retaining the class's established physical margins, font size,
+spacing, and page-furniture design. Because A4 is slightly narrower and taller
+than US Letter, line and page breaks may change. Unsupported values produce an
+actionable class error.
+
+### Fixed settings
+
+The following remain fixed and are not accepted as user options:
+
+```text
 language=english
 theme=monochrome
 ```
@@ -156,14 +178,14 @@ It is better to reject or omit an unsupported option than silently ignore it.
 ### Class declaration
 
 ```latex
-\documentclass[family=industry]{careerdossier-letter}
+\documentclass[family=industry, paper=letter]{careerdossier-letter}
 ```
 
-`family` accepts `industry` and `academic`; the default is `industry`. The
+`family` accepts `industry` and `academic`; the default is `industry`. `paper`
+uses the shared `letter|a4` contract above and defaults to `letter`. The
 following settings remain fixed:
 
 ```text
-paper=letter
 language=english
 theme=monochrome
 ```
@@ -488,7 +510,8 @@ Load the academic CV with:
 ```latex
 \documentclass[
   fontsize=11pt,
-  density=standard
+  density=standard,
+  paper=letter
 ]{careerdossier-cv}
 ```
 
@@ -498,10 +521,10 @@ The class accepts the same value sets as the résumé class:
 |---|---|---|
 | `fontsize` | `10pt`, `11pt` | `11pt` |
 | `density` | `compact`, `standard` | `standard` |
+| `paper` | `letter`, `a4` | `letter` |
 
-US Letter paper, English, and the monochrome theme remain fixed. Unsupported
-options or values must produce an actionable class error rather than being
-ignored.
+English and the monochrome theme remain fixed. Unsupported options or values
+must produce an actionable class error rather than being ignored.
 
 The first page renders the ordinary dossier header in the document body. Page
 numbers appear on every page, and pages after the first receive a simple running
@@ -662,9 +685,9 @@ footer: `name` at left and `Page n of N` at right. It does not introduce new
 recipient keys or change the industry family's defaults. Unknown family values
 must produce an actionable class error.
 
-### Explicitly unsupported in `v0.2.0`
+### Historical exclusions in `v0.2.0`
 
-The academic release does not support:
+The `v0.2.0` academic release did not support:
 
 - XeLaTeX or pdfLaTeX (as of `v0.4.0`; `v0.2.x` was XeLaTeX-only);
 - Farsi, bilingual, or RTL documents;
@@ -674,6 +697,9 @@ The academic release does not support:
 - alternate bibliography or citation styles;
 - automatic import from ORCID, Scholar, DOI services, or external APIs; or
 - a PDF/UA or broad ATS-compatibility claim.
+
+A4 paper and statement classes are implemented in repository source for the
+upcoming `v0.5.0`; this historical list describes the scope of `v0.2.0` only.
 
 ### Compatibility with `v0.1.x`
 
@@ -700,10 +726,11 @@ design decision before the behavior is merged.
 
 ### Class and statement types
 
-All statement documents use one class with a required `type` option:
+All statement documents use one class with a required `type` option and the
+shared optional `paper` setting:
 
 ```latex
-\documentclass[type=research]{careerdossier-statement}
+\documentclass[type=research, paper=letter]{careerdossier-statement}
 ```
 
 There is no default type. Omitting `type`, supplying it without a value, or
@@ -724,11 +751,13 @@ contract. It does not generate or enforce content sections. Six separate
 classes would duplicate geometry and page behavior without representing six
 different document models.
 
-### Fixed statement layout
+### Statement layout
 
 The initial statement release starts from the academic cover-letter design:
 
-- LuaLaTeX, English, monochrome, and US Letter paper;
+- LuaLaTeX, English, and monochrome output;
+- `paper=letter|a4`, defaulting to US Letter and preserving the academic
+  letter's physical margins on A4;
 - 11 pt body text using the current TeX Gyre Termes/Heros typography;
 - academic-letter margins and prose paragraph rhythm;
 - a centered identity block in the body on page one;
@@ -736,10 +765,10 @@ The initial statement release starts from the academic cover-letter design:
 - a centered `<name> -- <running title>` header from page two; and
 - a centered `Page N of M` folio on every page.
 
-Page furniture is class-owned, not user-configurable in issue #104. A4 and
-font presets must arrive through the cross-class contracts designed in issues
-#105 and #107; the statement class must not invent private alternatives for
-them. Color themes and icons are deferred from `v0.5.0`.
+Page furniture is class-owned and not user-configurable. The statement class
+uses the same paper option and defaults as the résumé, CV, and letter classes;
+font presets remain cross-class work in issue #107. Color themes and icons are
+deferred from `v0.5.0`.
 
 ### Statement metadata
 
