@@ -692,6 +692,287 @@ Any implementation that requires a different public command, default, or
 compatibility outcome must update this contract and `MIGRATION.md` with the
 design decision before the behavior is merged.
 
+## Proposed `v0.5.0` statement API (not implemented)
+
+> **Status:** approved design for issue #103. This section is a proposal for
+> `v0.5.0`, not released behavior. The class, commands, keys, examples, and
+> diagnostics below do not become supported until issue #104 implements and
+> tests them.
+
+### Class and statement types
+
+All statement documents use one class with a required `type` option:
+
+```latex
+\documentclass[type=research]{careerdossier-statement}
+```
+
+There is no default type. Omitting `type`, supplying it without a value, or
+using an unsupported value must produce an actionable class error. The six
+accepted values, page-one titles, and continuation-header titles are:
+
+| `type` value | Default title | Default running title |
+|---|---|---|
+| `research` | `Research Statement` | `Research Statement` |
+| `teaching` | `Teaching Statement` | `Teaching Statement` |
+| `teaching-philosophy` | `Statement of Teaching Philosophy` | `Teaching Philosophy` |
+| `diversity` | `Statement of Contributions to Equity, Diversity, Inclusion, and Accessibility` | `EDIA Statement` |
+| `artist` | `Artist Statement` | `Artist Statement` |
+| `purpose` | `Statement of Purpose` | `Statement of Purpose` |
+
+The type selects a title, continuation-page identification, and required-field
+contract. It does not generate or enforce content sections. Six separate
+classes would duplicate geometry and page behavior without representing six
+different document models.
+
+### Fixed statement layout
+
+The initial statement release starts from the academic cover-letter design:
+
+- LuaLaTeX, English, monochrome, and US Letter paper;
+- 11 pt body text using the current TeX Gyre Termes/Heros typography;
+- academic-letter margins and prose paragraph rhythm;
+- a centered identity block in the body on page one;
+- no running header on page one;
+- a centered `<name> -- <running title>` header from page two; and
+- a centered `Page N of M` folio on every page.
+
+Page furniture is class-owned, not user-configurable in issue #104. A4 and
+font presets must arrive through the cross-class contracts designed in issues
+#105 and #107; the statement class must not invent private alternatives for
+them. Color themes and icons are deferred from `v0.5.0`.
+
+### Statement metadata
+
+Document-specific values use a separate setup command:
+
+```latex
+\CDossierStatementSetup{
+  title               = {Research Statement},
+  running-title       = {Research Statement},
+  subtitle            = {Reliable scientific computing},
+  application-context = {Application for Assistant Professor of Computational Science},
+  application-id      = {APP-2026-0042}
+}
+```
+
+| Key | Required | Default or behavior |
+|---|---:|---|
+| `title` | No | Default selected by `type`; a nonblank value overrides it |
+| `running-title` | No | Short default selected by `type`; a nonblank value overrides it independently of `title` |
+| `subtitle` | No | One short line beneath the title; omitted when blank |
+| `application-context` | No | Separate contextual line; omitted when blank |
+| `application-id` | No | Rendered as labelled text with application context; omitted when blank |
+
+These values describe one statement, so they do not become shared
+`\CDossierSetup` profile keys. Whitespace-only values count as absent. Repeated
+setup calls follow the existing metadata convention: later values overwrite
+earlier values and may warn consistently with the other setup commands.
+
+Current affiliation is reusable identity data, not application-specific state,
+so `v0.5.0` proposes one additive shared-profile key:
+
+| Profile key | Required | Purpose |
+|---|---:|---|
+| `affiliation` | For `research` statements only | Current institution, organization, studio, or independent-practice description |
+
+Other statement types may display `affiliation` when present. Existing profiles
+remain valid because no released class requires or displays this new field.
+
+### Required profile fields and displayed contacts
+
+Every statement requires the shared `name` and `email` profile fields. The
+header validates the following additional type-specific requirements and
+renders only the listed optional contacts:
+
+| Type | Additional required field | Optional displayed fields |
+|---|---|---|
+| `research` | profile `affiliation` | `phone`, `website`, `scholar`, `orcid` |
+| `teaching` | None | `phone`, `website`, `affiliation` |
+| `teaching-philosophy` | None | `phone`, `website`, `affiliation` |
+| `diversity` | None | `phone`, `website`, `affiliation` |
+| `artist` | profile `website` | `phone`, `affiliation` |
+| `purpose` | None | `phone`, `website`, `affiliation` |
+
+For `artist`, `website` may identify a personal site, portfolio, Instagram
+profile, or comparable public presence; it remains the existing web-link field
+rather than a new platform-specific key. Shared `headline`, `location`,
+`linkedin`, and `github` values remain available to other dossier documents but
+are not displayed by the statement header. Their presence must not trigger a
+warning because a shared profile is expected to contain fields for multiple
+document types.
+
+### First-page identity order
+
+`\MakeCDossierStatementHeader` validates the active type and emits present
+items in this fixed logical order:
+
+1. profile `name`;
+2. selected statement title;
+3. optional one-line `subtitle`;
+4. optional or required profile `affiliation`;
+5. optional `application-context`, followed by labelled `application-id` when
+   both are present;
+6. required `email`, followed by the active type's present optional contacts.
+
+Application context is not a second subtitle, and it is not mixed into the
+contact list. Each optional line owns its spacing, so an absent value leaves no
+blank line. Contact and context separators are inserted only between present
+items and are layout artifacts in tagged output. The selected page-one `title`
+drives PDF document metadata; the shorter `running-title` exists only for page
+furniture and does not replace the full title in meaningful content.
+
+### Author content and headings
+
+The class introduces no command for research aims, teaching themes, EDI
+commitments, artistic methods, or statement-of-purpose paragraphs. Authors
+write ordinary prose and may choose standard LaTeX `\section*` and
+`\subsection*` headings when the application and content benefit from them.
+The class does not force headings, a page count, or a type-specific narrative
+schema.
+
+The six canonical examples will use the maintainer-supplied templates and
+research reports to demonstrate recognizable structures. Each example should
+naturally span two pages under the default design so continuation furniture is
+visible; examples must not use `\newpage` merely to manufacture a second page.
+
+The planned example sources are:
+
+| Type | Source path |
+|---|---|
+| `research` | `examples/statements/research-statement.tex` |
+| `teaching` | `examples/statements/teaching-statement.tex` |
+| `teaching-philosophy` | `examples/statements/teaching-philosophy-statement.tex` |
+| `diversity` | `examples/statements/diversity-statement.tex` |
+| `artist` | `examples/statements/artist-statement.tex` |
+| `purpose` | `examples/statements/statement-of-purpose.tex` |
+
+### Tagged structure
+
+Tagged statements use the existing opt-in kernel interface:
+
+```latex
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass[type=research]{careerdossier-statement}
+```
+
+The first-page title, ordinary paragraphs, standard section headings, and links
+remain meaningful structure in source order. Running headers, folios, and
+contact separators are layout artifacts. This design extends the academic
+letter's approach; it does not establish PDF/UA, WCAG, or general ATS
+conformance for arbitrary statements.
+
+### Minimal examples by type
+
+Research requires affiliation:
+
+```latex
+\documentclass[type=research]{careerdossier-statement}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.com},
+  affiliation={Example University}, orcid={0000-0002-1825-0097}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+My research develops reliable methods for computational inquiry.
+\end{document}
+```
+
+Teaching may add an optional affiliation:
+
+```latex
+\documentclass[type=teaching]{careerdossier-statement}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.com},
+  affiliation={Example University}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+My teaching connects transparent reasoning with purposeful practice.
+\end{document}
+```
+
+Teaching philosophy has a distinct title and type but the same metadata
+contract as teaching:
+
+```latex
+\documentclass[type=teaching-philosophy]{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}}
+\begin{document}
+\MakeCDossierStatementHeader
+I understand learning as an active and reflective process.
+\end{document}
+```
+
+Diversity may identify the application separately from the subtitle:
+
+```latex
+\documentclass[type=diversity]{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}}
+\CDossierStatementSetup{application-context={Application to Example University}}
+\begin{document}
+\MakeCDossierStatementHeader
+Inclusive academic practice requires transparent expectations and feedback.
+\end{document}
+```
+
+Artist requires a web presence:
+
+```latex
+\documentclass[type=artist]{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}, website={portfolio.example.com}}
+\begin{document}
+\MakeCDossierStatementHeader
+My practice examines the relationship between material and computation.
+\end{document}
+```
+
+Purpose may carry both application context and an ID:
+
+```latex
+\documentclass[type=purpose]{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}}
+\CDossierStatementSetup{
+  application-context = {Application to the MSc in Computational Science},
+  application-id      = {12345678}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+I seek advanced study in reliable scientific computing.
+\end{document}
+```
+
+### Compatibility analysis
+
+The proposal is additive. It introduces a new class, one optional shared
+`affiliation` profile key, one new class-scoped setup command, and one new
+rendering command. It does not change the options, output, or defaults of the
+résumé, CV, or letter classes. Existing shared profiles remain valid without
+editing; statement-specific required fields are checked only when
+`\MakeCDossierStatementHeader` is used.
+
+Because no statement API has been released, the six type names and setup keys
+need no migration or deprecation path. Any later implementation change that
+alters this approved syntax must update this section and issue #103 before it is
+merged.
+
+### Implementation acceptance criteria
+
+- all six type values build under LuaLaTeX and select the documented title;
+- missing `type`, unknown options, and unknown setup keys fail clearly;
+- missing `name` or `email`, missing research `affiliation`, and missing artist
+  `website` each produce the intended actionable diagnostic;
+- every optional metadata combination collapses without blank lines or stray
+  separators;
+- continuation headers use the selected or overridden short running title and
+  begin on page two, while `Page N of M` appears on every page;
+- untagged and opt-in tagged fixtures preserve equivalent visible text and
+  layout, with continuation furniture absent from the structure tree;
+- all six two-page examples compile, extract in logical order, and receive a
+  recorded visual review; and
+- API, architecture, roadmap, manifest, README, and changelog updates accompany
+  the implementation where their source-of-truth responsibilities apply.
+
 ## Colors and theme tokens
 
 The monochrome theme may expose semantic tokens:

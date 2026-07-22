@@ -78,6 +78,29 @@ CV path. The integration package may be loaded by a CV document, but neither it
 nor the external bibliography toolchain becomes a dependency of the shared
 profile or the other document classes.
 
+## Planned `v0.5.0` statement module graph
+
+Issue #103 approves one statement class with six type values. Implementation
+remains pending in issue #104:
+
+```text
+careerdossier-statement.cls
+        │
+        ├── careerdossier-components.sty
+        ├── careerdossier-typography.sty
+        ├── careerdossier-theme.sty
+        └── careerdossier-base.sty
+
+careerdossier-statement.cls
+        └── type=research|teaching|teaching-philosophy|diversity|artist|purpose
+```
+
+The six types share geometry and a prose document model. Type selection changes
+the default title, continuation-page identification, displayed contact set, and
+required-field contract; it does not justify six duplicate classes or six
+hard-coded narrative schemas. Shared packages remain independent of the new
+class.
+
 ## Data flow
 
 ```text
@@ -324,6 +347,45 @@ Responsibilities:
 - support one-page and multi-page letters without résumé-specific compression.
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
+
+### `careerdossier-statement.cls` (planned for `v0.5.0`)
+
+Owns the shared statement document model approved in issue #103.
+
+Responsibilities:
+
+- require one of the six documented `type` values and select its default title;
+- store statement-scoped title, running-title, subtitle, application-context,
+  and application-ID metadata;
+- validate `name` and `email` for every type, research affiliation, and artist
+  website at the point the statement header renders;
+- arrange the centered first-page identity block in logical source order;
+- keep the full meaningful title in the page-one body and PDF metadata while a
+  separately bounded running title identifies continuation pages;
+- reuse component-owned link normalization and separator-safe contact output;
+- start from the academic letter's US-Letter geometry, typography, prose
+  rhythm, continuation header, and `Page N of M` folio;
+- keep running page furniture out of tagged structure; and
+- allow ordinary prose and standard LaTeX sectioning without imposing a
+  type-specific narrative schema.
+
+The class owns the choice of which shared profile fields are relevant to each
+statement type, but it must not duplicate contact-link rendering. If issue #104
+needs a filtered contact-line primitive, that primitive belongs privately in
+`careerdossier-components.sty` because link normalization and separator
+insertion are shared component concerns.
+
+Current `affiliation` is reusable identity data and therefore extends the
+shared profile in `careerdossier-base.sty`; the statement class decides when it
+is required or displayed. In contrast, `application-context` and
+`application-id` describe one application document and remain class-scoped.
+The shared profile is intentionally allowed to contain fields such as
+`linkedin`, `github`, or `location` that a statement does not render; this is
+normal cross-document reuse and must not generate warnings.
+
+A4 and font-preset support remain cross-class concerns owned by issues #105 and
+#107. The statement class consumes those shared contracts when they land; it
+must not introduce statement-only option names or fallback behavior.
 
 ### `careerdossier-cv.cls` (Phase 2, released in `v0.2.0`)
 
@@ -873,7 +935,9 @@ not duplicate the class hierarchy by language.
 
 ### `v0.5.0`
 
-Add statement documents, A4 paper, additional themes, and font presets through documented extension points.
+Add one six-type statement class, A4 paper, and font presets through documented
+extension points. Color themes and optional icons were deferred by the
+maintainer on 2026-07-22.
 
 ### `v1.0.0`
 

@@ -244,12 +244,15 @@ Support additional application documents and broader visual configuration.
 ### Planned deliverables
 
 - `careerdossier-statement.cls`;
-- research, teaching, diversity, artist, and general statements;
+- one class with `research`, `teaching`, `teaching-philosophy`, `diversity`,
+  `artist`, and `purpose` types;
 - A4 paper;
-- additional print and color themes;
 - font presets;
-- optional icons;
 - additional stress tests and documentation.
+
+The maintainer deferred color themes, optional icons, and the Windows/NVDA
+reading-order check on 2026-07-22. Their future milestone remains undecided;
+they are not release blockers for `v0.5.0`.
 
 ## `v1.0.0 — Stable Public API`
 

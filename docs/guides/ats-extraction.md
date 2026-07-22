@@ -574,15 +574,17 @@ A scanned signature may be decorative, but the typed name must remain present as
 text. If a signature image is included, it must not interrupt reading order or
 replace the name.
 
-### 5.6 Statements — research, teaching, diversity **(planned — v0.5.0)**
+### 5.6 Statements — six types **(planned — v0.5.0)**
 
-These are closer to short articles:
+One planned class covers research, teaching, teaching-philosophy, diversity,
+artist, and statement-of-purpose documents. These are closer to short articles:
 
 - use ordinary paragraphs and semantic headings;
 - avoid magazine-style columns;
 - keep citations and footnotes sparse and extractable;
 - use figures only when essential, with text alternatives when tagging is enabled;
-- avoid putting the title or applicant name only in a header; and
+- keep the title, applicant name, and required identity fields in the page-one
+  body rather than only in running furniture; and
 - test page transitions and paragraph spacing in extracted text.
 
 ### 5.7 Reference list **(planned — later phase)**
