@@ -54,8 +54,10 @@ echo
 
 # Warnings tolerated in a "pass" build. Kept short and justified; mirrors the
 # extraction runner. hyperref/geometry are expected loads; the ...Off ligature
-# notices come from fonts without those OpenType tables.
-allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOff|rerun|Reading font info|geometry|hyperref|fancyhdr'
+# notices come from fonts without those OpenType tables. The tagpdf math-font
+# notice is expected for the focused tagged text fixture, which contains no
+# mathematics and intentionally loads neither Unicode-math package.
+allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOff|Neither unicode-math nor lua-unicode-math|rerun|Reading font info|geometry|hyperref|fancyhdr'
 
 # Fixture expectations: "<basename> <pass|fail> [expected log substring]".
 # The substring is matched against the log with whitespace flattened, so it may
@@ -63,17 +65,22 @@ allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOf
 cases=(
   "resume-valid pass"
   "resume-standard-density pass"
+  "resume-sans-body pass"
+  "resume-sans-body-tagged pass"
   "resume-missing-name fail|required profile field 'name' is not"
   "resume-bad-fontsize fail|accepts only a fixed set of"
   "resume-bad-paper fail|accepts only a fixed set of"
+  "resume-bad-bodyfont fail|accepts only a fixed set of"
   "resume-unknown-option fail|Unknown class option 'format'"
   "resume-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "resume-shared-profile pass"
   "cv-valid pass"
+  "cv-sans-body pass"
   "cv-shared-profile pass"
   "cv-missing-name fail|required profile field 'name' is not"
   "cv-bad-fontsize fail|accepts only a fixed set of"
   "cv-bad-paper fail|accepts only a fixed set of"
+  "cv-bad-bodyfont fail|accepts only a fixed set of"
   "cv-unknown-option fail|Unknown class option 'format'"
   "cv-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "cv-publications-valid pass"
@@ -84,8 +91,10 @@ cases=(
   "cv-biblatex-missing-dependency fail|optional dependency"
   "letter-valid pass"
   "letter-academic-valid pass"
+  "letter-sans-body pass"
   "letter-bad-family fail|accepts only a fixed set of"
   "letter-bad-paper fail|accepts only a fixed set of"
+  "letter-bad-bodyfont fail|accepts only a fixed set of"
   "letter-no-subject pass"
   "letter-missing-name fail|required profile field 'name' is not"
   "letter-unknown-option fail|Unknown class option 'format'"
@@ -97,9 +106,11 @@ cases=(
   "statement-artist-valid pass"
   "statement-purpose-valid pass"
   "statement-default-valid pass"
+  "statement-sans-body pass"
   "statement-empty-type fail|The key 'cdossier/statement/type' requires a value"
   "statement-bad-type fail|Unknown statement type 'grant'"
   "statement-bad-paper fail|accepts only a fixed set of"
+  "statement-bad-bodyfont fail|accepts only a fixed set of"
   "statement-unknown-option fail|Unknown class option 'format'"
   "statement-unknown-meta-key fail|Unknown \CDossierStatementSetup key"
   "statement-missing-name fail|required profile field 'name' is not"

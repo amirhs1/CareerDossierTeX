@@ -22,6 +22,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Engine | LuaLaTeX only |
 | Language | English |
 | Paper | US Letter; A4 implemented for upcoming `v0.5.0` |
+| Body font | Serif; opt-in sans implemented for upcoming `v0.5.0` |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
@@ -107,7 +108,8 @@ actually been verified.
 \documentclass[
   fontsize=10pt,
   density=compact,
-  paper=letter
+  paper=letter,
+  bodyfont=serif
 ]{careerdossier-resume}
 ```
 
@@ -162,6 +164,22 @@ spacing, and page-furniture design. Because A4 is slightly narrower and taller
 than US Letter, line and page breaks may change. Unsupported values produce an
 actionable class error.
 
+#### `bodyfont` (upcoming `v0.5.0`)
+
+Every CareerDossierTeX document class accepts:
+
+```text
+serif
+sans
+```
+
+The default is `serif`, preserving the existing TeX Gyre Termes body and TeX
+Gyre Heros headings. `sans` selects TeX Gyre Heros for the ordinary document
+body while headings remain TeX Gyre Heros. The option does not change font
+size, semantic typography roles, spacing, geometry, or page furniture.
+Unsupported values produce an actionable class error. Arbitrary font names and
+per-role font selection are not supported.
+
 ### Fixed settings
 
 The following remain fixed and are not accepted as user options:
@@ -178,11 +196,12 @@ It is better to reject or omit an unsupported option than silently ignore it.
 ### Class declaration
 
 ```latex
-\documentclass[family=industry, paper=letter]{careerdossier-letter}
+\documentclass[family=industry, paper=letter, bodyfont=serif]{careerdossier-letter}
 ```
 
 `family` accepts `industry` and `academic`; the default is `industry`. `paper`
-uses the shared `letter|a4` contract above and defaults to `letter`. The
+uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
+uses the shared `serif|sans` contract above and defaults to `serif`. The
 following settings remain fixed:
 
 ```text
@@ -511,7 +530,8 @@ Load the academic CV with:
 \documentclass[
   fontsize=11pt,
   density=standard,
-  paper=letter
+  paper=letter,
+  bodyfont=serif
 ]{careerdossier-cv}
 ```
 
@@ -522,6 +542,7 @@ The class accepts the same value sets as the résumé class:
 | `fontsize` | `10pt`, `11pt` | `11pt` |
 | `density` | `compact`, `standard` | `standard` |
 | `paper` | `letter`, `a4` | `letter` |
+| `bodyfont` | `serif`, `sans` | `serif` |
 
 English and the monochrome theme remain fixed. Unsupported options or values
 must produce an actionable class error rather than being ignored.
@@ -727,10 +748,10 @@ design decision before the behavior is merged.
 ### Class and statement types
 
 All statement documents use one class with an optional `type` option and the
-shared optional `paper` setting:
+shared optional `paper` and `bodyfont` settings:
 
 ```latex
-\documentclass[type=research, paper=letter]{careerdossier-statement}
+\documentclass[type=research, paper=letter, bodyfont=serif]{careerdossier-statement}
 ```
 
 When `type` is omitted, the class selects `general-interest`; it requires no
@@ -759,7 +780,9 @@ The initial statement release starts from the academic cover-letter design:
 - LuaLaTeX, English, and monochrome output;
 - `paper=letter|a4`, defaulting to US Letter and preserving the academic
   letter's physical margins on A4;
-- 11 pt body text using the current TeX Gyre Termes/Heros typography;
+- `bodyfont=serif|sans`, defaulting to the current TeX Gyre Termes body and
+  retaining TeX Gyre Heros headings in both modes;
+- 11 pt body text;
 - academic-letter margins and prose paragraph rhythm;
 - a centered identity block in the body on page one;
 - no running header on page one;
@@ -767,9 +790,9 @@ The initial statement release starts from the academic cover-letter design:
 - a centered `Page N of M` folio on every page.
 
 Page furniture is class-owned and not user-configurable. The statement class
-uses the same paper option and defaults as the résumé, CV, and letter classes;
-font presets remain cross-class work in issue #107. Color themes and icons are
-deferred from `v0.5.0`.
+uses the same paper and body-font options and defaults as the résumé, CV, and
+letter classes. Named or per-role font combinations remain future design work
+in issue #120. Color themes and icons are deferred from `v0.5.0`.
 
 ### Statement metadata
 

@@ -247,12 +247,13 @@ Support additional application documents and broader visual configuration.
 - one class with `research`, `teaching`, `teaching-philosophy`, `diversity`,
   `artist`, and `purpose` types;
 - A4 paper;
-- font presets;
+- a cross-class `bodyfont=serif|sans` option with the current serif default;
 - additional stress tests and documentation.
 
-The maintainer deferred color themes, optional icons, and the Windows/NVDA
-reading-order check on 2026-07-22. Their future milestone remains undecided;
-they are not release blockers for `v0.5.0`.
+The maintainer deferred color themes, named or per-role font combinations,
+optional icons, and the Windows/NVDA reading-order check on 2026-07-22. Their
+future milestone remains undecided; they are not release blockers for
+`v0.5.0`.
 
 ## `v1.0.0 — Stable Public API`
 

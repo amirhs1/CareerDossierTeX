@@ -20,7 +20,7 @@
 %% colour (see careerdossier-theme) and no page geometry (see the classes).
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplPackage {careerdossier-typography} {2026-07-20} {0.4.0}
+\ProvidesExplPackage {careerdossier-typography} {2026-07-22} {0.5.0}
   {CareerDossierTeX LuaLaTeX engine guard, portable fonts, and semantic text roles}
 
 %% ---------------------------------------------------------------------------
@@ -33,6 +33,33 @@
   }
 \sys_if_engine_luatex:F
   { \msg_fatal:nn { careerdossier-typography } { engine } }
+
+%% ---------------------------------------------------------------------------
+%% Package option forwarded by every public document class.  The classes own
+%% their public option surfaces and reject unsupported values; this package
+%% owns the resulting font selection.  Direct package users receive the same
+%% validation contract.
+%% ---------------------------------------------------------------------------
+\RequirePackage { l3keys2e }
+
+\tl_new:N \l__cdossier_typography_bodyfont_tl
+\tl_set:Nn \l__cdossier_typography_bodyfont_tl { serif }
+
+\msg_new:nnnn { careerdossier-typography } { unknown-option }
+  { Unknown~package~option~'#1'~for~careerdossier-typography. }
+  { Supported~options~are~'bodyfont'~(serif,~sans). }
+
+\keys_define:nn { cdossier / typography }
+  {
+    bodyfont .choices:nn =
+      { serif , sans }
+      { \tl_set_eq:NN \l__cdossier_typography_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont .value_required:n = true ,
+    unknown .code:n =
+      { \msg_error:nnx { careerdossier-typography } { unknown-option }
+          { \l_keys_key_str } } ,
+  }
+\ProcessKeysPackageOptions { cdossier / typography }
 
 %% ---------------------------------------------------------------------------
 %% LuaHBTeX emits real interword spaces in the PDF text layer, so this package
@@ -56,16 +83,9 @@
 %% Portable, freely redistributable TeX Live fonts, resolved by file name
 %% through luaotfload so the build does not depend on OS-installed fonts. All
 %% four faces are explicit.
-%%   body / serif : TeX Gyre Termes (Times-like)
-%%   headings / sans : TeX Gyre Heros (Helvetica-like)
-\setmainfont { texgyretermes }
-  [
-    Extension      = .otf ,
-    UprightFont    = *-regular ,
-    BoldFont       = *-bold ,
-    ItalicFont     = *-italic ,
-    BoldItalicFont = *-bolditalic ,
-  ]
+%%   body / serif : TeX Gyre Termes (Times-like, default)
+%%   body / sans  : TeX Gyre Heros (Helvetica-like, opt-in)
+%%   headings     : TeX Gyre Heros in both modes
 \setsansfont { texgyreheros }
   [
     Extension      = .otf ,
@@ -74,6 +94,27 @@
     ItalicFont     = *-italic ,
     BoldItalicFont = *-bolditalic ,
   ]
+\str_if_eq:VnTF \l__cdossier_typography_bodyfont_tl { sans }
+  {
+    \setmainfont { texgyreheros }
+      [
+        Extension      = .otf ,
+        UprightFont    = *-regular ,
+        BoldFont       = *-bold ,
+        ItalicFont     = *-italic ,
+        BoldItalicFont = *-bolditalic ,
+      ]
+  }
+  {
+    \setmainfont { texgyretermes }
+      [
+        Extension      = .otf ,
+        UprightFont    = *-regular ,
+        BoldFont       = *-bold ,
+        ItalicFont     = *-italic ,
+        BoldItalicFont = *-bolditalic ,
+      ]
+  }
 
 %% ---------------------------------------------------------------------------
 %% Semantic text roles. These describe meaning, not a fixed size; the classes

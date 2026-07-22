@@ -1,0 +1,28 @@
+% typography-bodyfont.lvt — opt-in sans body-font selection and dispatch.
+\input{regression-test}
+\documentclass{article}
+\usepackage[bodyfont=sans]{careerdossier-typography}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestBodyFont
+  {
+    \TYPE{ choice = \tl_use:N \l__cdossier_typography_bodyfont_tl }
+    \group_begin:
+      \rmfamily
+      \TYPE{ main = \fontname\font }
+    \group_end:
+    \group_begin:
+      \sffamily
+      \TYPE{ sans = \fontname\font }
+    \group_end:
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{sans-body-selection}{
+  \cdossiertestBodyFont
+}
+
+\END

@@ -309,6 +309,13 @@ TeX Gyre Heros and TeX Gyre Termes are reasonable portable starting points for
 sans and serif profiles. They are not magically ATS-safe; they are useful because
 they are widely distributed in TeX systems and can be tested reproducibly.
 
+For the upcoming `v0.5.0`, every class exposes only
+`bodyfont=serif|sans`. The default `serif` mode keeps TeX Gyre Termes for body
+text and TeX Gyre Heros for headings; `sans` uses TeX Gyre Heros for both. Both
+families are resolved by exact TeX Live file name with all four common faces
+declared explicitly. Arbitrary installed fonts and per-role font selection are
+not part of this interface.
+
 ### 4.3 Prefer literal Unicode source
 
 Use UTF-8 source and actual Unicode characters for names and languages. Do not
@@ -1333,7 +1340,7 @@ the release archive from the handwritten source; there is no need to migrate to
 - patch the output routine when supported hooks exist;
 - hide keywords or make `/ActualText` disagree with visible content;
 - treat an online ATS score as proof;
-- present future features (A4 paper, font presets, CTAN packaging, or a
+- present future features (named font combinations, CTAN packaging, or a
   consolidated profile interface) as if they were current.
 
 ## 16. Minimal reference template and class skeleton

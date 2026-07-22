@@ -32,14 +32,14 @@ CareerDossierTeX separates personal information from document content and presen
 | Engine | LuaLaTeX | XeLaTeX and pdfLaTeX are unsupported and error early |
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
 | Paper size | US Letter; A4 upcoming in `v0.5.0` | `paper=letter` remains the default; repository source also accepts `paper=a4` |
-| Theme | Monochrome | Color themes, font presets, and icons are unsupported |
+| Body font | Serif; sans upcoming in `v0.5.0` | `bodyfont=serif` remains the default; repository source also accepts `bodyfont=sans` |
+| Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The statement class and opt-in A4 paper are implemented for the
-upcoming `v0.5.0` release. Font presets remain `v0.5.0` milestone work. Color
-themes, icons, and alternate bibliography styles remain later work. Farsi,
-bilingual, and right-to-left support is dropped; CareerDossierTeX is
-English-only.
+The statement class, opt-in A4 paper, and opt-in sans body font are implemented
+for the upcoming `v0.5.0` release. Color themes, named font combinations, icons,
+and alternate bibliography styles remain later work. Farsi, bilingual, and
+right-to-left support is dropped; CareerDossierTeX is English-only.
 
 ## Requirements
 
@@ -85,7 +85,8 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 \documentclass[
   fontsize=10pt,
   density=compact,
-  paper=letter
+  paper=letter,
+  bodyfont=serif
 ]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}

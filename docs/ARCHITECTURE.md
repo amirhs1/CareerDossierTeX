@@ -208,9 +208,10 @@ Responsibilities:
 
 - require LuaLaTeX and fail fatally under any other engine;
 - load `fontspec`;
-- select portable default fonts;
+- select the portable default fonts and the opt-in sans body family;
 - define semantic styles such as name, headline, section, entry title, body, and muted text;
-- provide extension points for future font presets.
+- own the cross-class `bodyfont=serif|sans` selection forwarded by each class;
+- provide extension points for future named font combinations;
 - apply the Latin ligature-suppression and lining-numbers defaults;
 - resolve the default fonts by file name through `luaotfload` (for example
   `texgyretermes` with `Extension = .otf` and explicit face suffixes), so the
@@ -384,10 +385,13 @@ The shared profile is intentionally allowed to contain fields such as
 `linkedin`, `github`, or `location` that a statement does not render; this is
 normal cross-document reuse and must not generate warnings.
 
-Paper size and font presets are cross-class concerns: every class implements the
-same `paper=letter|a4` contract from issue #105, and Letter remains the default.
+Paper size and body-font selection are cross-class concerns: every class
+implements the same `paper=letter|a4` contract from issue #105 and
+`bodyfont=serif|sans` contract from issue #119; Letter and serif remain the
+defaults.
 The statement class must not introduce statement-only option names or fallback
-behavior. Font presets remain owned by issue #107.
+behavior. Broader named or per-role font combinations remain design work in
+issue #120.
 
 ### `careerdossier-cv.cls` (Phase 2, released in `v0.2.0`)
 
@@ -940,8 +944,8 @@ not duplicate the class hierarchy by language.
 ### `v0.5.0`
 
 Add one statement class with a general-interest default and six explicit types,
-A4 paper, and font presets through documented
-extension points. Color themes and optional icons were deferred by the
+A4 paper, and an opt-in sans body family through documented extension points.
+Color themes, named font combinations, and optional icons were deferred by the
 maintainer on 2026-07-22.
 
 ### `v1.0.0`

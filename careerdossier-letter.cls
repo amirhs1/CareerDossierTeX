@@ -38,12 +38,15 @@
 \tl_set:Nn \l__cdossier_letter_family_tl { industry }
 \tl_new:N \l__cdossier_letter_paper_tl
 \tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper }
+\tl_new:N \l__cdossier_letter_bodyfont_tl
+\tl_set:Nn \l__cdossier_letter_bodyfont_tl { serif }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
     Supported~options~are~'family'~(industry,~academic)~and~
-    'paper'~(letter,~a4).~Language~and~theme~cannot~be~set~here.
+    'paper'~(letter,~a4)~and~'bodyfont'~(serif,~sans).~Language~and~theme~
+    cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / letter }
@@ -62,11 +65,18 @@
           }
       } ,
     paper .value_required:n = true ,
+    bodyfont .choices:nn =
+      { serif , sans }
+      { \tl_set_eq:NN \l__cdossier_letter_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / letter }
+
+\str_if_eq:VnT \l__cdossier_letter_bodyfont_tl { sans }
+  { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
 
 %% A prose letter reads best at a slightly larger body size than the résumé.
 \use:x
