@@ -34,9 +34,10 @@ CareerDossierTeX separates personal information from document content and presen
 | Theme | Monochrome | Color themes, font presets, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-Statement classes, A4 paper, color themes, font presets, icons, and alternate
-bibliography styles belong to later milestone work. Farsi, bilingual, and
-right-to-left support is dropped; CareerDossierTeX is English-only.
+The six-type statement class, A4 paper, and font presets belong to `v0.5.0`
+milestone work. Color themes, icons, and alternate bibliography styles remain
+later work. Farsi, bilingual, and right-to-left support is dropped;
+CareerDossierTeX is English-only.
 
 ## Requirements
 
