@@ -23,12 +23,18 @@ LETTER        := examples/industry/letter-industry.tex
 ACADEMIC_CV   := examples/academic/cv-academic.tex
 ACADEMIC_BIBLIOGRAPHY := examples/academic/cv-bibliography.tex
 ACADEMIC_LETTER := examples/academic/letter-academic.tex
+STATEMENTS := examples/statements/research-statement.tex \
+              examples/statements/teaching-statement.tex \
+              examples/statements/teaching-philosophy-statement.tex \
+              examples/statements/diversity-statement.tex \
+              examples/statements/artist-statement.tex \
+              examples/statements/statement-of-purpose.tex
 
 # `make` with no target builds every supported example, which is what README.md
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter check test regression smoke layout extract-test bibliography-test tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout extract-test bibliography-test tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -37,7 +43,7 @@ help: ## List the available targets
 	  | awk -F'|' '{printf "  %-14s %s\n", $$1, $$2}'
 	@printf '\n'
 
-examples: resume letter academic-cv academic-bibliography academic-letter ## Build every supported example (default)
+examples: resume letter academic-cv academic-bibliography academic-letter statements ## Build every supported example (default)
 
 resume: ## Build the résumé example
 	$(LATEXMK) $(RESUME)
@@ -53,6 +59,9 @@ academic-bibliography: ## Build the optional BibLaTeX/Biber CV example
 
 academic-letter: ## Build the academic letter example
 	$(LATEXMK) $(ACADEMIC_LETTER)
+
+statements: ## Build all six statement examples
+	$(LATEXMK) $(STATEMENTS)
 
 check: regression extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
@@ -82,6 +91,7 @@ clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@$(LATEXMK_CLEAN) $(ACADEMIC_CV) >/dev/null 2>&1
 	-@$(LATEXMK_CLEAN) $(ACADEMIC_BIBLIOGRAPHY) >/dev/null 2>&1
 	-@$(LATEXMK_CLEAN) $(ACADEMIC_LETTER) >/dev/null 2>&1
+	-@$(LATEXMK_CLEAN) $(STATEMENTS) >/dev/null 2>&1
 	-@l3build clean >/dev/null 2>&1
 	@rm -rf build
 	@rm -rf tests/tagging/reports

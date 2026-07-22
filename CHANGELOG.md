@@ -8,6 +8,26 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- Added `careerdossier-statement`, one LuaLaTeX class for research, teaching,
+  teaching-philosophy, diversity, artist, and statement-of-purpose documents.
+  A required `type` option selects the default full and running titles plus the
+  relevant contact and validation contract; `\CDossierStatementSetup` adds
+  optional subtitle, application-context, and application-ID metadata. The
+  centered first-page identity block uses the academic-letter typography,
+  margins, and prose rhythm, while continuation pages carry a short running
+  title and every page carries `Page N of M`. Six two-page examples and focused
+  smoke, layout, extraction, and tagged-PDF fixtures cover the new interface.
+
+  The additive shared-profile `affiliation` key is required for research
+  statements and optional elsewhere; artist statements require the existing
+  `website` field. Optional metadata and contacts collapse without blank lines
+  or stray separators. Existing résumé, CV, and letter interfaces and defaults
+  are unchanged. ([#104])
+
+[#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
+
 ## [0.4.0] - 2026-07-20
 
 **LuaLaTeX Transition and Tagged-PDF Preview.** A breaking toolchain change:

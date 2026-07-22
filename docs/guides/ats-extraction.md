@@ -8,13 +8,14 @@ package is built toward. It is **not** documentation of shipped behavior; only
 **Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
 sections that discuss XeTeX behavior are retained as rationale and history, and
 are marked as such.
-**Current scope (`v0.4.0`):** English industry résumé, industry and academic
+**Current published scope (`v0.4.0`):** English industry résumé, industry and academic
 cover-letter families, academic CV, and optional publication support; US Letter,
 monochrome, and LuaLaTeX, plus opt-in tagged structure. Later phases may extend
-the same principles to statements and broader customization — see
-`docs/ROADMAP.md`.
+the same principles to broader customization. The repository source also
+implements the six statement types for the upcoming `v0.5.0` release — see
+`docs/API.md` and `docs/ROADMAP.md`.
 **Maintainer:** Amir Sadeghi
-**Last reviewed:** 2026-07-20
+**Last reviewed:** 2026-07-22
 
 > **Scope banner.** Material tagged **(Phase 1)** records the released `v0.1.x`
 > foundation. Material tagged **(planned — vX.Y.Z)** describes future work
@@ -574,9 +575,9 @@ A scanned signature may be decorative, but the typed name must remain present as
 text. If a signature image is included, it must not interrupt reading order or
 replace the name.
 
-### 5.6 Statements — six types **(planned — v0.5.0)**
+### 5.6 Statements — six types **(v0.5.0)**
 
-One planned class covers research, teaching, teaching-philosophy, diversity,
+One class covers research, teaching, teaching-philosophy, diversity,
 artist, and statement-of-purpose documents. These are closer to short articles:
 
 - use ordinary paragraphs and semantic headings;
@@ -668,7 +669,7 @@ This placement has an architectural consequence: a class cannot retroactively
 place `\DocumentMetadata` before its own loading. Tagging is therefore a document
 decision, not a class option, and the documentation must say so rather than
 pretending an internal late call is equivalent. `tests/tagging/` keeps paired
-tagged and untagged fixtures for all four profiles so that the untagged path is
+tagged and untagged fixtures for all five profiles so that the untagged path is
 proven unchanged whenever tagging code moves.
 
 As of the June 2026 LaTeX release, tagged-PDF work remains active and kernel
@@ -699,7 +700,7 @@ Therefore:
 - run the supported extractor matrix against tagged output, not only untagged;
 - claim no PDF/UA or WCAG conformance without a validator run and manual
   inspection of the exact release output — the validator half is now done for
-  four named fixtures and recorded in section 7.1, the manual screen-reader half
+  five named fixtures and recorded in section 7.1, the manual screen-reader half
   is tracked in section 7.2 and
   [issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77); and
 - if strict PDF/UA conformance is an application requirement, state plainly that
@@ -722,7 +723,7 @@ Package-author rules:
 Do not advertise PDF/UA conformance until a validator and manual inspection pass
 for the exact release output.
 
-### 7.1 Recorded validation results **(v0.4.0)**
+### 7.1 Recorded validation results **(v0.4.0 plus the `v0.5.0` statement fixture)**
 
 `tests/tagging/run.sh` builds each profile twice — once as `<name>.tex`
 (`tagging=on`) and once as `<name>-ua2.tex`, which adds `pdfstandard=ua-2` over
@@ -730,7 +731,7 @@ the same body include — then validates the UA-2 variant with veraPDF and runs 
 three-extractor matrix over the tagged variant. Reports land in
 `tests/tagging/reports/` and are retained as CI artifacts, never committed.
 
-Results recorded 2026-07-20 on macOS 15.7.5:
+Results recorded 2026-07-22 on macOS 15.7.5:
 
 | Fixture | Profile | veraPDF `ua2` | Poppler | MuPDF | PDFKit |
 | --- | --- | --- | --- | --- | --- |
@@ -738,6 +739,7 @@ Results recorded 2026-07-20 on macOS 15.7.5:
 | `cv` | academic CV, two pages | PASS | match | match | match |
 | `letter` | industry letter | PASS | match | match | match |
 | `academic-letter` | academic letter, two pages | PASS | match | match | match |
+| `statement` | research statement, two pages | PASS | match | match | match |
 
 Toolchain that produced this result, as recorded by
 `tests/tagging/reports/toolchain.txt`:
@@ -750,7 +752,7 @@ Toolchain that produced this result, as recorded by
 | `tagpdf` | 1.0c (2026-05-17) |
 | veraPDF | 1.30.0 (Homebrew formula 1.30.2) |
 | Poppler `pdftotext` | 26.07.0 |
-| MuPDF `mutool` | 1.24.9 |
+| MuPDF `mutool` | 1.28.0 |
 | Biber | 2.21 |
 
 Three extractors are used rather than one because Poppler, MuPDF, and PDFKit
@@ -763,7 +765,7 @@ the extractor, not of the PDF. Line content and order remain fully asserted. Agr
 three independent implementations is what supports the claim that reading order
 is a property of the PDF rather than of one library's heuristics.
 
-**What this does and does not license.** These four named artifacts passed a
+**What this does and does not license.** These five named artifacts passed a
 PDF/UA-2 validator. That is not a PDF/UA, WCAG, accessibility, or ATS
 conformance claim for arbitrary user documents, and it does not make `tagging=on`
 safe to enable by default. A user document with different content, packages, or
@@ -831,7 +833,7 @@ establish that both will.
 
 `tests/tagging/biblatex-ua2.tex` records how tagged BibLaTeX output currently
 behaves. It is deliberately **non-blocking**: tagging support inside BibLaTeX
-and Biber is upstream work, so a failure there does not gate the four named
+and Biber is upstream work, so a failure there does not gate the five named
 profiles unless the cause is CareerDossierTeX's own code.
 
 Recorded 2026-07-20, the fixture builds and **passes** veraPDF `ua2`, and the
@@ -878,7 +880,7 @@ careerdossier-biblatex.sty    optional fixed BibLaTeX/Biber profile
 Do not place margins in `careerdossier-base`, and do not duplicate contact-line
 logic inside both classes.
 
-`careerdossier-statement.cls` is **(planned — v0.5.0)**. Multilingual and RTL
+`careerdossier-statement.cls` is part of **v0.5.0**. Multilingual and RTL
 support is **dropped** (see `docs/ROADMAP.md`); should it ever return, it would
 extend the existing typography and component modules — and introduce a label
 abstraction — rather than add language-specific classes.
@@ -1329,8 +1331,8 @@ the release archive from the handwritten source; there is no need to migrate to
 - patch the output routine when supported hooks exist;
 - hide keywords or make `/ActualText` disagree with visible content;
 - treat an online ATS score as proof;
-- present planned features (CV, statements, `biblatex`, CTAN packaging, a `profile`
-  key) as if they were current.
+- present future features (A4 paper, font presets, CTAN packaging, or a
+  consolidated profile interface) as if they were current.
 
 ## 16. Minimal reference template and class skeleton
 

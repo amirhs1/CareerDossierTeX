@@ -87,6 +87,26 @@ for tex in *.tex; do
 
   got="$(pdftotext -enc UTF-8 "$base.pdf" - | normalize)"
 
+  # The statement class derives PDF identity from the full page-one title, not
+  # the abbreviated running title. Pin both fields on the focused statement
+  # fixture; pdfinfo ships with the same Poppler dependency as pdftotext.
+  case "$base" in
+    statement-*)
+      pdf_title="$(pdfinfo "$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
+      pdf_author="$(pdfinfo "$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
+      if [ "$pdf_title" != "Teaching Statement – Ada Lovelace" ]; then
+        echo "  WRONG PDF TITLE: $pdf_title"; fail=1
+      else
+        echo "  PDF title uses the full statement title"
+      fi
+      if [ "$pdf_author" != "Ada Lovelace" ]; then
+        echo "  WRONG PDF AUTHOR: $pdf_author"; fail=1
+      else
+        echo "  PDF author uses the profile name"
+      fi
+      ;;
+  esac
+
   if [ "$update" -eq 1 ]; then
     printf '%s\n' "$got" > "$exp"; echo "  baseline updated: $exp"
     if [ "$pdfkit" -eq 1 ]; then

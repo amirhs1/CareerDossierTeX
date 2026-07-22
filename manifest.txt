@@ -25,6 +25,7 @@ careerdossier-components.sty  shared identity block, contact line, entry primiti
 careerdossier-resume.cls      English industry résumé class
 careerdossier-letter.cls      English industry cover-letter class
 careerdossier-cv.cls          English academic CV class
+careerdossier-statement.cls   English six-type statement class
 careerdossier-biblatex.sty    optional BibLaTeX and Biber integration
 
 

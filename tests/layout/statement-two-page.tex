@@ -1,0 +1,89 @@
+% statement-two-page.tex — layout stress for the statement continuation header,
+% Page N of M folio, ordinary headings, and natural prose page breaking.
+\documentclass[type=research]{careerdossier-statement}
+\CDossierSetup{
+  name={Ada Lovelace},
+  email={ada.lovelace@example.com},
+  phone={+1 416 555 0142},
+  website={example.com/ada},
+  affiliation={Example University},
+  scholar={scholar.google.com/citations?user=ada-example},
+  orcid={0000-0002-1825-0097}
+}
+\CDossierStatementSetup{
+  running-title={Computational Reliability},
+  subtitle={Transparent methods for trustworthy scientific computing},
+  application-context={Application for Assistant Professor of Computational Science},
+  application-id={APP-2026-0042}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+
+\section*{Research Vision}
+
+My research asks how computational results can remain understandable,
+reproducible, and useful after the immediate project that produced them has
+ended. I develop numerical methods and research-software practices that expose
+their assumptions, preserve the path from evidence to conclusion, and allow
+scientists from neighbouring fields to test and extend the work.
+
+The central premise is that reliability is not a final verification step. It is
+an organizing principle for model design, implementation, documentation, and
+communication. A method is most valuable when its mathematical guarantees, its
+software realization, and its limits can be inspected together.
+
+\section*{Prior and Current Contributions}
+
+My first line of work develops adaptive algorithms whose error estimates remain
+meaningful when data quality and computational resources vary. I combine
+analysis with executable experiments, using small reference implementations to
+make each theoretical claim testable. This approach has helped collaborators
+distinguish uncertainty arising from a physical model from error introduced by
+discretization or implementation choices.
+
+A second line of work concerns durable computational records. I design workflows
+that connect source data, environment descriptions, tests, and figures without
+requiring readers to reconstruct an undocumented sequence of manual steps. In
+collaborative projects, these records have supported method comparison,
+onboarding, and independent replication. They also provide students with a
+concrete model of research accountability: a result is incomplete until another
+person can understand how it was produced.
+
+These projects share a practical commitment to accessibility across expertise.
+I write software interfaces and technical explanations for readers who know the
+scientific question but may not know the implementation language or numerical
+method. This requires choosing meaningful defaults, naming uncertainty clearly,
+and separating essential decisions from incidental technical detail.
+
+\section*{Future Research Programme}
+
+The next phase of my programme has three connected aims. First, I will develop
+verification methods for computational pipelines that combine learned and
+mechanistic models. The goal is to identify which guarantees can be preserved,
+which assumptions must be measured empirically, and how uncertainty should be
+reported when components change over time.
+
+Second, I will study reproducibility as a property of research infrastructure
+rather than an after-the-fact archive. This work will test lightweight ways to
+record environments, data transformations, and validation decisions during
+ordinary scientific practice. The expected outputs include open reference
+implementations, reusable evaluation datasets, and guidance that small research
+groups can adopt without a dedicated engineering team.
+
+Third, I will build teaching and mentorship into the research programme.
+Students will participate in paired analysis and implementation reviews, learn
+to design tests from mathematical claims, and publish documentation for readers
+outside the immediate project. This structure gives students ownership of
+substantive questions while making the standards of reliable work explicit.
+
+\section*{Institutional Fit and Trajectory}
+
+Example University's strengths in computational science, applied mathematics,
+and open research create a productive setting for this agenda. I would seek
+collaborations with researchers whose domain questions stress current methods,
+and I would contribute shared software and training that make those
+collaborations easier to sustain. Over the next five years, I aim to establish a
+research group known for connecting rigorous numerical reasoning with tools and
+practices that other scientists can genuinely reuse.
+
+\end{document}

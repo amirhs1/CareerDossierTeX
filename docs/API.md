@@ -692,12 +692,11 @@ Any implementation that requires a different public command, default, or
 compatibility outcome must update this contract and `MIGRATION.md` with the
 design decision before the behavior is merged.
 
-## Proposed `v0.5.0` statement API (not implemented)
+## `v0.5.0` statement API
 
-> **Status:** approved design for issue #103. This section is a proposal for
-> `v0.5.0`, not released behavior. The class, commands, keys, examples, and
-> diagnostics below do not become supported until issue #104 implements and
-> tests them.
+> **Status:** implemented for the upcoming `v0.5.0` release. The current
+> published release remains `v0.4.0`; these interfaces are available from the
+> repository source and become released behavior with `v0.5.0`.
 
 ### Class and statement types
 
@@ -770,7 +769,7 @@ setup calls follow the existing metadata convention: later values overwrite
 earlier values and may warn consistently with the other setup commands.
 
 Current affiliation is reusable identity data, not application-specific state,
-so `v0.5.0` proposes one additive shared-profile key:
+so `v0.5.0` adds one shared-profile key:
 
 | Profile key | Required | Purpose |
 |---|---:|---|
@@ -831,12 +830,11 @@ write ordinary prose and may choose standard LaTeX `\section*` and
 The class does not force headings, a page count, or a type-specific narrative
 schema.
 
-The six canonical examples will use the maintainer-supplied templates and
-research reports to demonstrate recognizable structures. Each example should
-naturally span two pages under the default design so continuation furniture is
-visible; examples must not use `\newpage` merely to manufacture a second page.
+The six canonical examples use the maintainer-supplied research reports to
+demonstrate recognizable structures. Each example naturally spans two pages
+under the default design so continuation furniture is visible.
 
-The planned example sources are:
+The example sources are:
 
 | Type | Source path |
 |---|---|
@@ -944,34 +942,22 @@ I seek advanced study in reliable scientific computing.
 
 ### Compatibility analysis
 
-The proposal is additive. It introduces a new class, one optional shared
+The implementation is additive. It introduces a new class, one optional shared
 `affiliation` profile key, one new class-scoped setup command, and one new
 rendering command. It does not change the options, output, or defaults of the
 résumé, CV, or letter classes. Existing shared profiles remain valid without
 editing; statement-specific required fields are checked only when
 `\MakeCDossierStatementHeader` is used.
 
-Because no statement API has been released, the six type names and setup keys
-need no migration or deprecation path. Any later implementation change that
-alters this approved syntax must update this section and issue #103 before it is
-merged.
+Because no earlier statement API was released, the six type names and setup
+keys need no migration or deprecation path.
 
-### Implementation acceptance criteria
+### Verification coverage
 
-- all six type values build under LuaLaTeX and select the documented title;
-- missing `type`, unknown options, and unknown setup keys fail clearly;
-- missing `name` or `email`, missing research `affiliation`, and missing artist
-  `website` each produce the intended actionable diagnostic;
-- every optional metadata combination collapses without blank lines or stray
-  separators;
-- continuation headers use the selected or overridden short running title and
-  begin on page two, while `Page N of M` appears on every page;
-- untagged and opt-in tagged fixtures preserve equivalent visible text and
-  layout, with continuation furniture absent from the structure tree;
-- all six two-page examples compile, extract in logical order, and receive a
-  recorded visual review; and
-- API, architecture, roadmap, manifest, README, and changelog updates accompany
-  the implementation where their source-of-truth responsibilities apply.
+The committed smoke, layout, extraction, and tagging fixtures cover all six
+types, required and invalid inputs, optional-field collapse, continuation page
+furniture, PDF metadata, source-order extraction, and tagged/untagged output.
+The six complete two-page examples provide the visual review surface.
 
 ## Colors and theme tokens
 

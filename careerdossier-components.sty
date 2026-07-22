@@ -118,11 +118,13 @@
       { \CDossierPrintField {#1} }
   }
 
-%% Build the contact line from the present fields, in order.
-\cs_new_protected:Npn \__cdossier_components_contactline:
+%% Build a contact line from a caller-supplied ordered field list. This keeps
+%% link normalization and separator insertion component-owned while allowing a
+%% document class to display only the contacts relevant to its document model.
+\cs_new_protected:Npn \__cdossier_components_contactline:N #1
   {
     \bool_set_false:N \l__cdossier_components_printed_bool
-    \clist_map_inline:Nn \c__cdossier_components_contactorder_clist
+    \clist_map_inline:Nn #1
       {
         \CDossierIfFieldTF {##1}
           {
@@ -133,6 +135,14 @@
           }
           { }
       }
+  }
+
+%% Default identity contact line used by the released résumé, CV, and letter
+%% classes. Its order and output remain unchanged.
+\cs_new_protected:Npn \__cdossier_components_contactline:
+  {
+    \__cdossier_components_contactline:N
+      \c__cdossier_components_contactorder_clist
   }
 
 %% ---------------------------------------------------------------------------
