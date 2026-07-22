@@ -96,7 +96,7 @@ cases=(
   "statement-diversity-valid pass"
   "statement-artist-valid pass"
   "statement-purpose-valid pass"
-  "statement-missing-type fail|required class option 'type' is"
+  "statement-default-valid pass"
   "statement-empty-type fail|The key 'cdossier/statement/type' requires a value"
   "statement-bad-type fail|Unknown statement type 'grant'"
   "statement-bad-paper fail|accepts only a fixed set of"

@@ -26,36 +26,27 @@
   {CareerDossierTeX English statement class}
 
 %% ---------------------------------------------------------------------------
-%% Required statement type. There is deliberately no default: silently
-%% choosing a narrative contract would make a mistyped or omitted option look
-%% valid while selecting the wrong required fields and title.
+%% Statement type. General-interest is the default so authors can create a
+%% statement without opting into a type-specific validation contract.
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
 \tl_new:N   \l__cdossier_statement_type_tl
-\bool_new:N \l__cdossier_statement_type_seen_bool
 \tl_new:N   \l__cdossier_statement_paper_tl
+\tl_set:Nn  \l__cdossier_statement_type_tl { general-interest }
 \tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
-
-\msg_new:nnnn { careerdossier-statement } { missing-type }
-  { The~required~class~option~'type'~is~missing. }
-  {
-    Use~\c_backslash_str documentclass[type=research]
-    \c_left_brace_str careerdossier-statement\c_right_brace_str .~The~accepted~
-    types~are:~research,~teaching,~teaching-philosophy,~diversity,~artist,~purpose.
-  }
 
 \msg_new:nnnn { careerdossier-statement } { unknown-type }
   { Unknown~statement~type~'#1'. }
   {
-    The~accepted~types~are:~research,~teaching,~teaching-philosophy,~
-    diversity,~artist,~purpose.
+    The~accepted~types~are:~general-interest,~research,~teaching,~
+    teaching-philosophy,~diversity,~artist,~purpose.
   }
 
 \msg_new:nnnn { careerdossier-statement } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-statement. }
   {
-    Supported~options~are~'type'~(research,~teaching,~teaching-philosophy,~
-    diversity,~artist,~purpose)~and~'paper'~(letter,~a4).~Language,~theme,~
+    Supported~options~are~'type'~(general-interest,~research,~teaching,~
+    teaching-philosophy,~diversity,~artist,~purpose)~and~'paper'~(letter,~a4).~Language,~theme,~
     and~font~presets~cannot~be~set~here.
   }
 
@@ -63,9 +54,10 @@
   {
     type .code:n =
       {
-        \bool_set_true:N \l__cdossier_statement_type_seen_bool
         \str_case:nnF {#1}
           {
+            { general-interest }
+              { \tl_set:Nn \l__cdossier_statement_type_tl { general-interest } }
             { research }            { \tl_set:Nn \l__cdossier_statement_type_tl { research } }
             { teaching }            { \tl_set:Nn \l__cdossier_statement_type_tl { teaching } }
             { teaching-philosophy }
@@ -92,8 +84,6 @@
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / statement }
-\bool_if:NF \l__cdossier_statement_type_seen_bool
-  { \msg_error:nn { careerdossier-statement } { missing-type } }
 
 \use:x
   {
@@ -132,6 +122,15 @@
   {
     \str_case:VnF \l__cdossier_statement_type_tl
       {
+        { general-interest }
+          {
+            \tl_set:Nn \l__cdossier_statement_default_title_tl
+              { General~Interest~Statement }
+            \tl_set:Nn \l__cdossier_statement_default_running_title_tl
+              { General~Interest~Statement }
+            \clist_set:Nn \l__cdossier_statement_contacts_clist
+              { email , phone , website }
+          }
         { research }
           {
             \tl_set:Nn \l__cdossier_statement_default_title_tl { Research~Statement }

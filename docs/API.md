@@ -27,7 +27,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
 | Letter class | `careerdossier-letter`, industry and academic families |
-| Statement class | Six types implemented for upcoming `v0.5.0` |
+| Statement class | Default general-interest type plus six explicit types implemented for upcoming `v0.5.0` |
 | Bibliography | Optional `careerdossier-biblatex` |
 | Manual publications | `CDossierPublications` in `careerdossier-cv` |
 | RTL or bilingual layout | Not supported |
@@ -726,19 +726,21 @@ design decision before the behavior is merged.
 
 ### Class and statement types
 
-All statement documents use one class with a required `type` option and the
+All statement documents use one class with an optional `type` option and the
 shared optional `paper` setting:
 
 ```latex
 \documentclass[type=research, paper=letter]{careerdossier-statement}
 ```
 
-There is no default type. Omitting `type`, supplying it without a value, or
-using an unsupported value must produce an actionable class error. The six
-accepted values, page-one titles, and continuation-header titles are:
+When `type` is omitted, the class selects `general-interest`; it requires no
+profile fields beyond `name` and `email`. Supplying `type` without a value or
+using an unsupported value produces an actionable class error. The accepted
+values, page-one titles, and continuation-header titles are:
 
 | `type` value | Default title | Default running title |
 |---|---|---|
+| `general-interest` (default) | `General Interest Statement` | `General Interest Statement` |
 | `research` | `Research Statement` | `Research Statement` |
 | `teaching` | `Teaching Statement` | `Teaching Statement` |
 | `teaching-philosophy` | `Statement of Teaching Philosophy` | `Teaching Philosophy` |
@@ -747,9 +749,8 @@ accepted values, page-one titles, and continuation-header titles are:
 | `purpose` | `Statement of Purpose` | `Statement of Purpose` |
 
 The type selects a title, continuation-page identification, and required-field
-contract. It does not generate or enforce content sections. Six separate
-classes would duplicate geometry and page behavior without representing six
-different document models.
+contract. It does not generate or enforce content sections. One class avoids
+duplicating geometry and page behavior across statement document models.
 
 ### Statement layout
 
@@ -786,8 +787,8 @@ Document-specific values use a separate setup command:
 
 | Key | Required | Default or behavior |
 |---|---:|---|
-| `title` | No | Default selected by `type`; a nonblank value overrides it |
-| `running-title` | No | Short default selected by `type`; a nonblank value overrides it independently of `title` |
+| `title` | No | Default selected by the explicit or default `type`; a nonblank value overrides it |
+| `running-title` | No | Short default selected by the explicit or default `type`; a nonblank value overrides it independently of `title` |
 | `subtitle` | No | One short line beneath the title; omitted when blank |
 | `application-context` | No | Separate contextual line; omitted when blank |
 | `application-id` | No | Rendered as labelled text with application context; omitted when blank |
@@ -815,6 +816,7 @@ renders only the listed optional contacts:
 
 | Type | Additional required field | Optional displayed fields |
 |---|---|---|
+| `general-interest` (default) | None | `phone`, `website`, `affiliation` |
 | `research` | profile `affiliation` | `phone`, `website`, `scholar`, `orcid` |
 | `teaching` | None | `phone`, `website`, `affiliation` |
 | `teaching-philosophy` | None | `phone`, `website`, `affiliation` |
@@ -859,7 +861,7 @@ write ordinary prose and may choose standard LaTeX `\section*` and
 The class does not force headings, a page count, or a type-specific narrative
 schema.
 
-The six canonical examples use the maintainer-supplied research reports to
+The six canonical typed examples use the maintainer-supplied research reports to
 demonstrate recognizable structures. Each example naturally spans two pages
 under the default design so continuation furniture is visible.
 
@@ -890,6 +892,18 @@ letter's approach; it does not establish PDF/UA, WCAG, or general ATS
 conformance for arbitrary statements.
 
 ### Minimal examples by type
+
+General-interest is the default and needs only the shared `name` and `email`
+fields:
+
+```latex
+\documentclass{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}}
+\begin{document}
+\MakeCDossierStatementHeader
+This statement introduces work and interests without a type-specific contract.
+\end{document}
+```
 
 Research requires affiliation:
 
@@ -978,7 +992,7 @@ résumé, CV, or letter classes. Existing shared profiles remain valid without
 editing; statement-specific required fields are checked only when
 `\MakeCDossierStatementHeader` is used.
 
-Because no earlier statement API was released, the six type names and setup
+Because no earlier statement API was released, the statement type names and setup
 keys need no migration or deprecation path.
 
 ### Verification coverage

@@ -11,7 +11,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Added
 
 - Added opt-in A4 paper to the résumé, industry and academic letters, academic
-  CV, and all six statement types through one consistent
+  CV, and the statement class through one consistent
   `paper=letter|a4` class option. US Letter remains the default, and both paper
   sizes keep each class's established physical margins, typography, spacing,
   and page-furniture design. A4 layout fixtures verify the media box, long-form
@@ -19,10 +19,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   document family. Existing optional-field and separator behavior is
   unchanged. ([#105])
 
-- Added `careerdossier-statement`, one LuaLaTeX class for research, teaching,
-  teaching-philosophy, diversity, artist, and statement-of-purpose documents.
-  A required `type` option selects the default full and running titles plus the
-  relevant contact and validation contract; `\CDossierStatementSetup` adds
+- Added `careerdossier-statement`, one LuaLaTeX class with a default
+  general-interest type plus research, teaching, teaching-philosophy, diversity,
+  artist, and statement-of-purpose documents. The optional `type` option
+  selects the default full and running titles plus the relevant contact and
+  validation contract; `\CDossierStatementSetup` adds
   optional subtitle, application-context, and application-ID metadata. The
   centered first-page identity block uses the academic-letter typography,
   margins, and prose rhythm, while continuation pages carry a short running
@@ -35,8 +36,16 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   or stray separators. Existing résumé, CV, and letter interfaces and defaults
   are unchanged. ([#104])
 
+### Fixed
+
+- Statements now default to `type=general-interest` when `type` is omitted.
+  The default title and continuation header read `General Interest Statement`,
+  and this general contract requires only `name` and `email`. Explicit statement
+  types and their existing validation remain unchanged. ([#117])
+
 [#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
 [#105]: https://github.com/amirhs1/CareerDossierTeX/issues/105
+[#117]: https://github.com/amirhs1/CareerDossierTeX/issues/117
 
 ## [0.4.0] - 2026-07-20
 

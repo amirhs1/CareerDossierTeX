@@ -12,7 +12,8 @@ are marked as such.
 cover-letter families, academic CV, and optional publication support; US Letter,
 monochrome, and LuaLaTeX, plus opt-in tagged structure. Later phases may extend
 the same principles to broader customization. The repository source also
-implements the six statement types for the upcoming `v0.5.0` release — see
+implements a default general-interest statement and six explicit statement
+types for the upcoming `v0.5.0` release — see
 `docs/API.md` and `docs/ROADMAP.md`.
 **Maintainer:** Amir Sadeghi
 **Last reviewed:** 2026-07-22
@@ -575,10 +576,11 @@ A scanned signature may be decorative, but the typed name must remain present as
 text. If a signature image is included, it must not interrupt reading order or
 replace the name.
 
-### 5.6 Statements — six types **(v0.5.0)**
+### 5.6 Statements — default general-interest plus six explicit types **(v0.5.0)**
 
-One class covers research, teaching, teaching-philosophy, diversity,
-artist, and statement-of-purpose documents. These are closer to short articles:
+One class defaults to a general-interest statement and also covers research,
+teaching, teaching-philosophy, diversity, artist, and statement-of-purpose
+documents. These are closer to short articles:
 
 - use ordinary paragraphs and semantic headings;
 - avoid magazine-style columns;
