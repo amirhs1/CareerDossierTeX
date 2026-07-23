@@ -42,6 +42,45 @@
 \tl_new:N   \l__cdossier_components_url_tl
 \str_new:N  \l__cdossier_components_scheme_str
 \bool_new:N \l__cdossier_components_printed_bool
+\tl_new:N   \l__cdossier_components_label_tl
+
+%% Opt-in contact-field labels (issue #95). A screen reader announces the email
+%% and website as links, but a phone number is read as bare digits with nothing
+%% conveying what it is; plain extraction and ATS parsers see no link
+%% annotations at all. A visible text label is the one mechanism that works in
+%% every consumer, including untagged output, so it is the primary fix.
+%%
+%% Only the fields whose nature the value itself does not convey are labelled:
+%% email, phone, and website. The linkedin, github, and scholar values begin
+%% with their service's domain, orcid always carries its own label (below), and
+%% a location value is a place name. Labels are fixed English strings; the
+%% project is English-only (docs/ARCHITECTURE.md).
+\prop_const_from_keyval:Nn \c__cdossier_components_labels_prop
+  {
+    email   = Email ,
+    phone   = Phone ,
+    website = Website ,
+  }
+
+%% Leaf: typeset one label word tied to the value that follows. A label is
+%% meaningful content, never a layout artifact: it must reach the structure
+%% tree and the extracted text, unlike the separators below.
+\cs_new_protected:Npn \__cdossier_components_labeltext:n #1
+  { #1:\nobreakspace }
+\cs_generate_variant:Nn \__cdossier_components_labeltext:n { V }
+
+%% Emit the label for a field, only when labels are enabled and the field has
+%% one. Called from the per-field renderer, so an absent field can never leave
+%% an orphan label.
+\cs_new_protected:Npn \__cdossier_components_label:n #1
+  {
+    \bool_if:NT \g__cdossier_base_contactlabels_bool
+      {
+        \prop_get:NnNT \c__cdossier_components_labels_prop {#1}
+          \l__cdossier_components_label_tl
+          { \__cdossier_components_labeltext:V \l__cdossier_components_label_tl }
+      }
+  }
 
 %% Separator between present contact items: a spaced vertical bar.
 \cs_new_protected:Npn \__cdossier_components_sep:
@@ -103,9 +142,11 @@
       { ORCID:\nobreakspace \l__cdossier_components_disp_tl }
   }
 
-%% Render one contact field: link the web-facing fields, print the rest as text.
+%% Render one contact field: an optional identifying label, then the value —
+%% linked for the web-facing fields, plain text for the rest.
 \cs_new_protected:Npn \__cdossier_components_render:n #1
   {
+    \__cdossier_components_label:n {#1}
     \str_case:nnF {#1}
       {
         { email }    { \__cdossier_components_mail:n { email }    }

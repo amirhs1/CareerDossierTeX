@@ -248,6 +248,57 @@ remain compatible with the released industry classes.
 
 Whitespace-only values should be treated as missing.
 
+### Contact-field labels (`contact-labels`)
+
+```latex
+\CDossierSetup{ contact-labels = true }   % default: false
+```
+
+`contact-labels` is an option key, not a profile field: it holds no value to
+print and cannot be read back with `\CDossierPrintField`. Introduced in
+`v0.5.0`.
+
+When enabled, the contact line prefixes a short identifying label to the
+fields whose nature the value itself does not convey:
+
+| Field | Rendered as |
+|---|---|
+| `email` | `Email: ada@example.com` |
+| `phone` | `Phone: +1 555 0100` |
+| `website` | `Website: example.test/resume` |
+
+The remaining fields stay unlabelled by design: `linkedin`, `github`, and
+`scholar` values begin with their service's domain, `orcid` always carries its
+own `ORCID:` label, and a `location` value is a place name. Labels are fixed
+English strings; the project is English-only.
+
+**Accessibility rationale.** In the default rendering, a screen reader
+announces the email and the website as links, so their nature is conveyed —
+but the phone number is announced as bare digits with nothing indicating what
+it is. Sighted readers infer all three from format and position; that
+inference is exactly what a screen-reader user does not get. A visible text
+label is the one mechanism that works in every consumer — screen readers,
+plain `pdftotext` extraction, and ATS parsers — including the default untagged
+output, which is why it is the primary fix rather than a tag-level attribute.
+
+Behavioral guarantees:
+
+- The default rendering is unchanged; the feature is strictly opt-in.
+- The key applies to every class's contact line, including document-specific
+  subsets such as the statement classes'.
+- An absent field leaves no orphan label and no stray separator.
+- Labels are content, not layout artifacts: they reach the structure tree and
+  the extracted text. Separators remain artifacts.
+- `contact-labels` alone means `true`; the value must be a boolean.
+
+The labelled and unlabelled renderings each have a committed extraction
+baseline (`tests/extraction/resume-contact-labels.tex` and
+`tests/extraction/resume-contact-optional.tex`). Verified so far: the labels
+survive Poppler and PDFKit plain-text extraction with clean separators. The
+label text is expected to be announced by screen readers because it is
+ordinary visible content, but a VoiceOver pass over the labelled form is the
+confirming check; no broader accessibility claim is made.
+
 ### Required-field validation
 
 The `name` field is required before rendering a dossier header or letterhead.
@@ -354,6 +405,8 @@ Expected behavior:
 - renders available contact fields;
 - inserts separators only between rendered fields;
 - creates links for supported contact fields;
+- prefixes `Email:`, `Phone:`, and `Website:` text labels when
+  `contact-labels = true` (see “Contact-field labels”);
 - does not add page numbers.
 
 ### `\MakeCDossierLetterhead`

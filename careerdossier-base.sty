@@ -41,6 +41,14 @@
 \tl_new:N   \l__cdossier_base_value_tl
 \tl_new:N   \l__cdossier_base_get_tl
 
+%% Contact-label preference (issue #95). Off by default so released documents
+%% render unchanged; when enabled, careerdossier-components prefixes a short
+%% text label to contact fields whose nature the value itself does not convey.
+%% The preference is stored here because base owns the \CDossierSetup key
+%% surface; all rendering stays in the components module. Global, like the
+%% profile fields it travels with.
+\bool_new:N \g__cdossier_base_contactlabels_bool
+
 %% ---------------------------------------------------------------------------
 %% Messages.
 %% ---------------------------------------------------------------------------
@@ -65,7 +73,11 @@
 
 \msg_new:nnnn { careerdossier-base } { unknown-key }
   { Unknown~\c_backslash_str CDossierSetup~key~'#1'. }
-  { The~supported~keys~are:~\clist_use:Nn \c__cdossier_base_fields_clist { ,~ } . }
+  {
+    The~supported~keys~are:~
+    \clist_use:Nn \c__cdossier_base_fields_clist { ,~ } ,~
+    and~the~option~key~contact-labels.
+  }
 
 \msg_new:nnn { careerdossier-base } { overwrite }
   { Profile~field~'#1'~was~already~set;~overwriting~with~the~new~value. }
@@ -138,6 +150,11 @@
     orcid    .code:n = { \__cdossier_base_store:nn { orcid }    {#1} } ,
     affiliation .code:n =
       { \__cdossier_base_store:nn { affiliation } {#1} } ,
+    %% Not a profile field: a rendering preference consumed by the components
+    %% module. `contact-labels` alone means true; the value is validated by
+    %% l3keys' boolean handling.
+    contact-labels .bool_gset:N = \g__cdossier_base_contactlabels_bool ,
+    contact-labels .default:n   = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-base } { unknown-key } { \l_keys_key_str } } ,
   }

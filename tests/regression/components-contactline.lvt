@@ -5,18 +5,24 @@
 % visible line is checked by the extraction fixtures; this test isolates the
 % control flow that guarantees clean separators, independently of fonts.
 %
-% The two leaf operations are stubbed to emit log markers instead of typeset
-% output: \__cdossier_components_sep: -> |, and \__cdossier_components_render:n
-% -> <field>. The real \__cdossier_components_contactline: (its presence tests
-% and separator bookkeeping) is exercised unchanged, so the marker sequence is
-% exactly the join the module would produce.
+% The leaf operations are stubbed to emit log markers instead of typeset
+% output: \__cdossier_components_sep: -> |, \__cdossier_components_render:n
+% -> <field>, and \__cdossier_components_labeltext:n -> [Label:]. The render
+% stub mirrors the real \__cdossier_components_render:n by keeping its opening
+% \__cdossier_components_label:n call, so the label gating and field-selection
+% logic (issue #95) runs unchanged. The real
+% \__cdossier_components_contactline: (its presence tests and separator
+% bookkeeping) is exercised unchanged, so the marker sequence is exactly the
+% join the module would produce.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
 
 \ExplSyntaxOn
 \cs_set_protected:Npn \__cdossier_components_sep: { \TYPE{|} }
-\cs_set_protected:Npn \__cdossier_components_render:n #1 { \TYPE{<#1>} }
+\cs_set_protected:Npn \__cdossier_components_render:n #1
+  { \__cdossier_components_label:n {#1} \TYPE{<#1>} }
+\cs_set_protected:Npn \__cdossier_components_labeltext:n #1 { \TYPE{[#1:]} }
 \cs_new_protected:Npn \cdossiertestClearContacts
   {
     \clist_map_inline:nn { email , phone , location , website , linkedin , github , scholar , orcid }
@@ -78,6 +84,58 @@
     github = {github.com/a}, orcid = {0000-0002-1825-0097}
   }
   \cdossiertestFilteredContactLine
+}
+
+% --- Contact-field labels (issue #95) ---------------------------------------
+
+% The feature is opt-in: with no contact-labels key, no label marker appears.
+% This test runs before any test enables the key, so it pins the true default.
+\TEST{labels-off-by-default}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ email = {a@b.co}, phone = {+1 000} }
+  \cdossiertestContactLine
+}
+
+% With the key enabled, the fields whose nature the value does not convey
+% (email, phone, website) gain a label directly before their value. A bare
+% `contact-labels` means true.
+\TEST{labels-identify-email-phone-website}{
+  \cdossiertestClearContacts
+  \CDossierSetup{
+    contact-labels,
+    email = {a@b.co}, phone = {+1 000}, website = {example.test}
+  }
+  \cdossiertestContactLine
+}
+
+% Self-identifying fields stay unlabelled even with labels on: profile URLs
+% begin with their service's domain, orcid carries its own permanent label, and
+% a location value is a place name.
+\TEST{labels-skip-self-identifying-fields}{
+  \cdossiertestClearContacts
+  \CDossierSetup{
+    contact-labels = true,
+    location = {Toronto}, linkedin = {linkedin.com/in/a},
+    github = {github.com/a}, orcid = {0000-0002-1825-0097}
+  }
+  \cdossiertestContactLine
+}
+
+% An absent labelled field must leave no orphan label and no stray separator:
+% phone and website are missing, so no [Phone:] or [Website:] marker may appear
+% anywhere, and the two present fields join with a single separator.
+\TEST{absent-field-leaves-no-orphan-label}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ contact-labels = true, email = {a@b.co}, location = {Toronto} }
+  \cdossiertestContactLine
+}
+
+% The key accepts false and restores the unlabelled rendering, leaving the
+% global state clean for anything that follows.
+\TEST{labels-can-be-disabled-again}{
+  \cdossiertestClearContacts
+  \CDossierSetup{ contact-labels = false, email = {a@b.co}, phone = {+1 000} }
+  \cdossiertestContactLine
 }
 
 \END
