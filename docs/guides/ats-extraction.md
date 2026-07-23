@@ -1481,7 +1481,7 @@ suite. Do not freeze this illustrative order as policy without integration tests
       `\DocumentMetadata` tagging route are documented.
 - [ ] Tagged fixtures pass structure, artifact, and extraction checks, and the
       untagged path is unchanged.
-- [ ] The four UA-2 fixture variants pass veraPDF, and the reports and toolchain
+- [ ] The five UA-2 fixture variants pass veraPDF, and the reports and toolchain
       record from that run were reviewed (section 7.1).
 - [ ] At least one macOS and one Windows screen-reader reading-order check is
       recorded, or the release explicitly states which one is outstanding
