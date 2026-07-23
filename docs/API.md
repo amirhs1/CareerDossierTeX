@@ -293,11 +293,31 @@ Behavioral guarantees:
 
 The labelled and unlabelled renderings each have a committed extraction
 baseline (`tests/extraction/resume-contact-labels.tex` and
-`tests/extraction/resume-contact-optional.tex`). Verified so far: the labels
-survive Poppler and PDFKit plain-text extraction with clean separators. The
-label text is expected to be announced by screen readers because it is
-ordinary visible content, but a VoiceOver pass over the labelled form is the
-confirming check; no broader accessibility claim is made.
+`tests/extraction/resume-contact-optional.tex`). The labels survive Poppler
+and PDFKit plain-text extraction with clean separators.
+
+**VoiceOver verification (2026-07-23).** The maintainer ran VoiceOver in
+Preview (PDFKit) over all four tagged/untagged × labelled/unlabelled
+combinations of a fixture matching this section's example. Both unlabelled
+combinations reproduce the original gap exactly: the phone number is
+announced as bare digits with nothing identifying it. Both labelled
+combinations announce "Phone" immediately before the digits, and "Email" and
+"Website" are likewise identified; confirmed independently in tagged and
+untagged output. Separator behavior is unaffected: silent in tagged output
+(artifact-marked), spoken as "vertical line" in untagged output. No broader
+accessibility claim beyond this check is made.
+
+**Decisions recorded from this review:**
+
+- **`tel:` linking the phone number** (one of the mechanisms weighed in #95)
+  remains intentionally unshipped. The visible label already conveys the
+  field's nature in every consumer this project verifies against, so a
+  `tel:` link would be redundant for that purpose, and its behavior under ATS
+  parsers was never verified. Not planned unless a new use case reopens it.
+- **Tagged output with labels enabled** was verified only ad hoc during
+  review (VoiceOver above, plus a one-off `verapdf -f ua2` pass reporting
+  `isCompliant="true"`) — it has no committed fixture with a saved baseline.
+  Tracked as non-blocking test debt in #125.
 
 ### Required-field validation
 
