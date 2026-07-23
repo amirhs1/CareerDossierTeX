@@ -28,7 +28,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
 | Letter class | `careerdossier-letter`, industry and academic families |
-| Statement class | Default general-interest type plus six explicit types implemented for upcoming `v0.5.0` |
+| Statement class | Default interest type plus six other explicit types implemented for upcoming `v0.5.0` |
 | Bibliography | Optional `careerdossier-biblatex` |
 | Manual publications | `CDossierPublications` in `careerdossier-cv` |
 | RTL or bilingual layout | Not supported |
@@ -827,14 +827,14 @@ shared optional `paper` and `bodyfont` settings:
 \documentclass[type=research, paper=letter, bodyfont=serif]{careerdossier-statement}
 ```
 
-When `type` is omitted, the class selects `general-interest`; it requires no
+When `type` is omitted, the class selects `interest`; it requires no
 profile fields beyond `name` and `email`. Supplying `type` without a value or
 using an unsupported value produces an actionable class error. The accepted
 values, page-one titles, and continuation-header titles are:
 
 | `type` value | Default title | Default running title |
 |---|---|---|
-| `general-interest` (default) | `General Interest Statement` | `General Interest Statement` |
+| `interest` (default) | `Statement of Interest` | `Statement of Interest` |
 | `research` | `Research Statement` | `Research Statement` |
 | `teaching` | `Teaching Statement` | `Teaching Statement` |
 | `teaching-philosophy` | `Statement of Teaching Philosophy` | `Teaching Philosophy` |
@@ -912,7 +912,7 @@ renders only the listed optional contacts:
 
 | Type | Additional required field | Optional displayed fields |
 |---|---|---|
-| `general-interest` (default) | None | `phone`, `website`, `affiliation` |
+| `interest` (default) | None | `phone`, `website`, `affiliation` |
 | `research` | profile `affiliation` | `phone`, `website`, `scholar`, `orcid` |
 | `teaching` | None | `phone`, `website`, `affiliation` |
 | `teaching-philosophy` | None | `phone`, `website`, `affiliation` |
@@ -1093,10 +1093,11 @@ keys need no migration or deprecation path.
 
 ### Verification coverage
 
-The committed smoke, layout, extraction, and tagging fixtures cover all six
-types, required and invalid inputs, optional-field collapse, continuation page
-furniture, PDF metadata, source-order extraction, and tagged/untagged output.
-The six complete two-page examples provide the visual review surface.
+The committed smoke, layout, extraction, and tagging fixtures cover all seven
+type values, required and invalid inputs, optional-field collapse, continuation
+page furniture, PDF metadata, source-order extraction, and tagged/untagged
+output. The six complete specialized-type two-page examples provide the visual
+review surface.
 
 ## Colors and theme tokens
 
