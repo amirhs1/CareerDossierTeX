@@ -13,15 +13,16 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 - Added consistent `theme=monochrome|accent|print` link presentation across
   the résumé, CV, industry and academic letters, and statements. Monochrome
   remains the default and presents black links with a thin underline;
-  `theme=accent` colors links only and accepts the fixed
+  `theme=accent` colors and underlines links only and accepts the fixed
   `accent=navy|teal|magenta` choices (default `navy`); `theme=print` leaves
   links black and undecorated. Body text, headings, rules, typography, geometry,
   and page furniture are unchanged. Focused regression and cross-class smoke
   fixtures cover selection, presentation, and invalid values. Recorded
   contrast, grayscale, protanopia, deuteranopia, and tritanopia checks keep
-  every link color above 4.5:1 against white; this is a focused palette review,
-  not a broad accessibility-conformance claim. Existing optional-field and
-  separator behavior is unchanged. ([#106])
+  every link color above 4.5:1 against white and every accent above 3:1 against
+  adjacent black text. This is a focused palette review, not a broad
+  accessibility-conformance claim. Existing optional-field and separator
+  behavior is unchanged. ([#106])
 
 - Added a consistent `bodyfont=serif|sans` class option to the résumé, CV,
   industry and academic letters, and statement documents. `serif` remains the

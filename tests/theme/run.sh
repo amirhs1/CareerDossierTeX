@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run.sh — verify link-theme contrast and approximate CVD rendering.
+# run.sh — verify two-sided link contrast and approximate CVD rendering.
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"

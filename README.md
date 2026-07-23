@@ -33,7 +33,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
 | Paper size | US Letter; A4 upcoming in `v0.5.0` | `paper=letter` remains the default; repository source also accepts `paper=a4` |
 | Body font | Serif; sans upcoming in `v0.5.0` | `bodyfont=serif` remains the default; repository source also accepts `bodyfont=sans` |
-| Theme | Monochrome; accent and print upcoming in `v0.5.0` | `monochrome` underlines black links; `accent` colors links only; `print` leaves black links undecorated |
+| Theme | Monochrome; accent and print upcoming in `v0.5.0` | `monochrome` underlines black links; `accent` colors and underlines links only; `print` leaves black links undecorated |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
 The statement class, opt-in A4 paper, opt-in sans body font, and link-only themes

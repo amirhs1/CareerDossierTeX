@@ -1,4 +1,4 @@
-% theme-accent-magenta.lvt — named dark-magenta link accent.
+% theme-accent-magenta.lvt — named magenta link accent.
 \input{regression-test}
 \documentclass{article}
 \usepackage[theme=accent,accent=magenta]{careerdossier-theme}

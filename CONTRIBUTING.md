@@ -442,9 +442,10 @@ review is manual by nature and is not automated by this suite.
 
 ### Theme color validation
 
-The link-theme palette has a dependency-free Lua check for contrast against
-white, grayscale output, and full-severity protanopia, deuteranopia, and
-tritanopia simulations:
+The link-theme palette has a dependency-free Lua check for at least 4.5:1
+contrast against white and, for accents, at least 3:1 against adjacent black
+text. The same thresholds cover full-severity protanopia, deuteranopia, and
+tritanopia simulations; the output also records grayscale contrast:
 
     make theme-test            # or: tests/theme/run.sh
 

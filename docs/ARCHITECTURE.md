@@ -246,7 +246,9 @@ Responsibilities:
 - monochrome semantic colors;
 - rule colors and thicknesses;
 - class-selected monochrome, accent, and print link appearance;
-- print-safe contrast;
+- link underlines for both screen-oriented themes, with no rectangular-border
+  fallback in PDF readers that do not support annotation underline styles;
+- bounded accent contrast against both the white page and adjacent black text;
 - fixed named link accents without per-field color configuration.
 
 The theme package should use semantic tokens such as:

@@ -1,4 +1,4 @@
-% theme-accent-teal.lvt — named dark-teal link accent.
+% theme-accent-teal.lvt — named teal link accent.
 \input{regression-test}
 \documentclass{article}
 \usepackage[theme=accent,accent=teal]{careerdossier-theme}

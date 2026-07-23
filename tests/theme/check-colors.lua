@@ -5,13 +5,16 @@
 -- Deficiency" (IEEE TVCG 15.6, 2009; doi:10.1109/TVCG.2009.113). This is a
 -- review aid, not a medical model or a broad accessibility-conformance claim.
 -- Every result is checked against white at the normal-text 4.5:1 floor.
+-- Accent colours are also checked against black at 3:1 so they remain
+-- distinguishable from adjacent body text. Monochrome and print deliberately
+-- use black links, so the black comparison does not apply to those presets.
 
 local theme_file = assert(arg[1], "usage: texlua check-colors.lua THEME_FILE")
 local handle = assert(io.open(theme_file, "r"))
 local source = handle:read("*a")
 handle:close()
 
-local expected = { navy = "1B365D", teal = "005A5A", magenta = "8A1C5A" }
+local expected = { navy = "006FB9", teal = "007A78", magenta = "C31E99" }
 local colors = { monochrome = { 0, 0, 0 }, print = { 0, 0, 0 } }
 
 for name, hex in pairs(expected) do
@@ -59,8 +62,12 @@ local function luminance(rgb)
   return 0.2126 * linear(rgb[1]) + 0.7152 * linear(rgb[2]) + 0.0722 * linear(rgb[3])
 end
 
-local function contrast(rgb)
+local function contrast_with_white(rgb)
   return 1.05 / (luminance(rgb) + 0.05)
+end
+
+local function contrast_with_black(rgb)
+  return (luminance(rgb) + 0.05) / 0.05
 end
 
 local function simulate(rgb, matrix)
@@ -77,19 +84,33 @@ end
 local order = { "monochrome", "print", "navy", "teal", "magenta" }
 local failed = false
 for _, name in ipairs(order) do
-  local base = contrast(colors[name])
-  io.write(string.format("%-10s base %.2f:1", name, base))
-  if base < 4.5 then failed = true end
-  for _, deficiency in ipairs({ "protanopia", "deuteranopia", "tritanopia" }) do
-    local ratio = contrast(simulate(colors[name], matrices[deficiency]))
-    io.write(string.format("  %s %.2f:1", deficiency, ratio))
-    if ratio < 4.5 then failed = true end
+  local base_white = contrast_with_white(colors[name])
+  local base_black = contrast_with_black(colors[name])
+  io.write(string.format("%-10s base white %.2f:1", name, base_white))
+  if base_white < 4.5 then failed = true end
+  if name ~= "monochrome" and name ~= "print" then
+    io.write(string.format(" black %.2f:1", base_black))
+    if base_black < 3 then failed = true end
   end
-  io.write(string.format("  grayscale %.2f:1\n", base))
+  for _, deficiency in ipairs({ "protanopia", "deuteranopia", "tritanopia" }) do
+    local simulated = simulate(colors[name], matrices[deficiency])
+    local white_ratio = contrast_with_white(simulated)
+    io.write(string.format("  %s white %.2f:1", deficiency, white_ratio))
+    if white_ratio < 4.5 then failed = true end
+    if name ~= "monochrome" and name ~= "print" then
+      local black_ratio = contrast_with_black(simulated)
+      io.write(string.format(" black %.2f:1", black_ratio))
+      if black_ratio < 3 then failed = true end
+    end
+  end
+  io.write(string.format("  grayscale-on-white %.2f:1\n", base_white))
 end
 
 if failed then
-  io.stderr:write("COLOR CHECK FAILED: a link color fell below 4.5:1 on white\n")
+  io.stderr:write(
+    "COLOR CHECK FAILED: a link color fell below 4.5:1 on white " ..
+    "or an accent fell below 3:1 against black\n"
+  )
   os.exit(1)
 end
 print("ALL THEME COLOR CHECKS PASSED")

@@ -65,13 +65,13 @@
 \definecolor { cdossier-rule }    { gray } { 0 }
 \definecolor { cdossier-link }    { gray } { 0 }
 
-%% Dark link accents measured against white. They are intentionally darker
-%% than xcolor's base cyan and magenta, which are not suitable normal-text
-%% defaults on white. All non-link semantic colours retain the monochrome
-%% palette in every theme.
-\definecolor { cdossier-accent-navy }   { HTML } { 1B365D }
-\definecolor { cdossier-accent-teal }   { HTML } { 005A5A }
-\definecolor { cdossier-accent-magenta }{ HTML } { 8A1C5A }
+%% Link accents occupy a bounded luminance range: each remains at least 4.5:1
+%% against white and 3:1 against adjacent black text, including the recorded
+%% full-severity CVD simulations. All non-link semantic colours retain the
+%% monochrome palette in every theme.
+\definecolor { cdossier-accent-navy }   { HTML } { 006FB9 }
+\definecolor { cdossier-accent-teal }   { HTML } { 007A78 }
+\definecolor { cdossier-accent-magenta }{ HTML } { C31E99 }
 
 \str_if_eq:VnT \l__cdossier_theme_name_tl { accent }
   {
@@ -96,7 +96,7 @@
 %% ---------------------------------------------------------------------------
 %% Link appearance is the only difference between themes:
 %% - monochrome: black text with a thin black PDF-annotation underline;
-%% - accent: dark coloured text without a border; and
+%% - accent: coloured text with a matching PDF-annotation underline; and
 %% - print: black text without a border or underline.
 %%
 %% Visible URLs, identifiers, and descriptive labels remain present, so colour
@@ -116,6 +116,7 @@
               {
                 colorlinks = false ,
                 allbordercolors = cdossier-link ,
+                pdfborder = { 0~0~0 } ,
                 pdfborderstyle = { /S/U/W~0.6 }
               }
           }
@@ -125,7 +126,9 @@
               {
                 colorlinks = true ,
                 allcolors = cdossier-link ,
-                pdfborder = { 0~0~0 }
+                allbordercolors = cdossier-link ,
+                pdfborder = { 0~0~0 } ,
+                pdfborderstyle = { /S/U/W~0.6 }
               }
           }
         { print }

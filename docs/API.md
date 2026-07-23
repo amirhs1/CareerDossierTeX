@@ -192,10 +192,12 @@ theme=print
 ```
 
 `monochrome` is the default. It preserves black link text and adds a thin black
-PDF-annotation underline so links remain identifiable without color.
-`accent` changes link text only; body text, headings, rules, spacing, and page
-geometry remain unchanged. `print` renders black links without color, border,
-or underline.
+PDF-annotation underline so links remain identifiable without color. `accent`
+colors links and adds a matching underline; body text, headings, rules, spacing,
+and page geometry remain unchanged. `print` renders black links without color,
+border, or underline. The underline style has a zero-width legacy border
+fallback so PDF readers that do not support annotation underlines do not draw a
+rectangle around the link.
 
 The `accent` theme also accepts one fixed named link color:
 
@@ -209,16 +211,18 @@ accent=magenta
 option order does not matter, but it affects output only when `theme=accent`.
 Arbitrary colors and per-field or per-role color keys are not supported.
 
-| Accent | Hex value | Contrast on white | Lowest simulated CVD contrast |
-|---|---:|---:|---:|
-| `navy` | `#1B365D` | 12.12:1 | 11.48:1 |
-| `teal` | `#005A5A` | 8.05:1 | 7.47:1 |
-| `magenta` | `#8A1C5A` | 8.77:1 | 7.84:1 |
+| Accent | Hex value | White contrast | Black contrast | Lowest simulated white / black contrast |
+|---|---:|---:|---:|---:|
+| `navy` | `#006FB9` | 5.28:1 | 3.97:1 | 4.65:1 / 3.66:1 |
+| `teal` | `#007A78` | 5.18:1 | 4.06:1 | 4.74:1 / 3.80:1 |
+| `magenta` | `#C31E99` | 5.29:1 | 3.97:1 | 4.61:1 / 3.11:1 |
 
 The recorded checks use the WCAG relative-luminance calculation against white
-plus deterministic full-severity protanopia, deuteranopia, and tritanopia
-simulation. Grayscale preserves the listed base contrast. This is a focused
-palette review, not a WCAG, PDF/UA, or broad accessibility-conformance claim.
+and black plus deterministic full-severity protanopia, deuteranopia, and
+tritanopia simulation. Every base and simulated accent must remain at least
+4.5:1 against white and 3:1 against black; grayscale preserves the listed base
+white contrast. This is a focused palette review, not a WCAG, PDF/UA, ATS, or
+broad accessibility-conformance claim.
 Visible URLs, identifiers, and descriptive labels remain present; authors of
 custom `\href` links should likewise use link text that identifies its
 destination rather than relying on color alone.

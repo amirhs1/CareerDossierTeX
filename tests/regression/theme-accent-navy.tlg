@@ -7,11 +7,11 @@ cdossier-text={gray}{0}
 cdossier-primary={gray}{0}
 cdossier-muted={gray}{0.3}
 cdossier-rule={gray}{0}
-cdossier-link={rgb}{0.10588,0.21176,0.36472}
+cdossier-link={rgb}{0,0.43529,0.7255}
 ============================================================
 ============================================================
 TEST 2: accent-link-presentation
 ============================================================
-hypersetup=colorlinks=true,allcolors=cdossier-link,pdfborder={0 0 0}
+hypersetup=colorlinks=true,allcolors=cdossier-link,allbordercolors=cdossier-link,pdfborder={0 0 0},pdfborderstyle={/S/U/W 0.6}
 urlstyle=same
 ============================================================
