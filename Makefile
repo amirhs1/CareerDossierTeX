@@ -5,7 +5,7 @@
 #
 # Requirements: LuaLaTeX and latexmk for everything; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`, and
-# `tagging`;
+# `tagging`; pdftoppm (Poppler) for `review-page-two`;
 # BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
 #
 # `tagging` additionally uses veraPDF (PDF/UA-2 validation), mutool (MuPDF
@@ -34,7 +34,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout extract-test bibliography-test tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout review-page-two extract-test bibliography-test tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -76,6 +76,9 @@ smoke: ## Supported builds and required failures
 
 layout: ## Layout-stress fixtures
 	tests/layout/run.sh
+
+review-page-two: ## Render five-family and all statement page-two reviews
+	tests/layout/render-page-two.sh
 
 extract-test: ## Text-extraction round-trip against committed baselines
 	tests/extraction/run.sh

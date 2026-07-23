@@ -131,19 +131,36 @@ for tex in *.tex; do
       statement-*)
         # Statements use the academic-letter folio model but identify
         # continuation pages with the independently configurable short title.
-        # The fixture's short title is deliberately different from its page-one
-        # display title, so this also proves the running header is absent on page
-        # one rather than accidentally matching meaningful body content.
+        # The research fixture deliberately overrides its short title, while the
+        # default-interest long-fields fixture exercises the class defaults.
+        statement_name="Ada Lovelace"
+        statement_display_title="Research Statement"
+        statement_running_title="Computational Reliability"
+        statement_page_one_running_count=0
+        if [ "$base" = "statement-interest-long-fields-two-page" ]; then
+          statement_name="Alexandria Catherine Montgomery-Worthington"
+          statement_display_title="Statement of Interest"
+          statement_running_title="Statement of Interest"
+          statement_page_one_running_count=1
+        fi
         statement_fail=0
         for (( n = 1; n <= pages; n++ )); do
           page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
           if ! printf '%s\n' "$page_text" | grep -Fqx "Page $n of $pages"; then
             echo "  MISSING STATEMENT FOLIO: Page $n of $pages"; statement_fail=1
           fi
-          if [ "$n" -eq 1 ] && printf '%s\n' "$page_text" | grep -Fq "Computational Reliability"; then
-            echo "  UNEXPECTED STATEMENT RUNNING HEADER on page 1"; statement_fail=1
+          if [ "$n" -eq 1 ]; then
+            if ! printf '%s\n' "$page_text" | grep -Fqx "$statement_display_title"; then
+              echo "  MISSING STATEMENT DISPLAY TITLE on page 1: $statement_display_title"
+              statement_fail=1
+            fi
+            running_count="$(printf '%s\n' "$page_text" | grep -Fc "$statement_running_title" || true)"
+            if [ "$running_count" -ne "$statement_page_one_running_count" ]; then
+              echo "  UNEXPECTED STATEMENT RUNNING-TITLE COUNT on page 1: $running_count"
+              statement_fail=1
+            fi
           fi
-          if [ "$n" -gt 1 ] && { ! printf '%s\n' "$page_text" | grep -Fq "Ada Lovelace" || ! printf '%s\n' "$page_text" | grep -Fq "Computational Reliability"; }; then
+          if [ "$n" -gt 1 ] && { ! printf '%s\n' "$page_text" | grep -Fq "$statement_name" || ! printf '%s\n' "$page_text" | grep -Fq "$statement_running_title"; }; then
             echo "  MISSING STATEMENT RUNNING HEADER on page $n"; statement_fail=1
           fi
         done

@@ -1,0 +1,67 @@
+% statement-titles.lvt — careerdossier-statement per-type title defaults.
+%
+% Each statement type carries three maintainer-chosen defaults: a full display
+% title for page one, an independently abbreviated running title for
+% continuation-page furniture, and the displayed contact set. Real documents
+% only surface the running title on page two, the canonical two-page fixture
+% overrides it, and the six examples are compiled but never asserted — so no
+% test pinned these defaults. This test asserts all seven type values at the
+% token level, independent of fonts and page breaking, without the redundant
+% per-subtype tagged fixtures that issue #102 excludes.
+\input{regression-test}
+\documentclass{careerdossier-statement}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+
+\ExplSyntaxOn
+% Re-run the class's own default selection for one type value and log the
+% three defaults it chose. Driving \__cdossier_statement_select_defaults:
+% directly exercises the same code path the class option runs; how these
+% tokens render is owned by the layout and tagging fixtures.
+\cs_new_protected:Npn \cdossiertestTypeDefaults #1
+  {
+    \tl_set:Nn \l__cdossier_statement_type_tl {#1}
+    \__cdossier_statement_select_defaults:
+    \TYPE { #1 }
+    \TYPE { ~~title:~ \tl_use:N \l__cdossier_statement_default_title_tl }
+    \TYPE { ~~running-title:~ \tl_use:N \l__cdossier_statement_default_running_title_tl }
+    \TYPE { ~~contacts:~ \clist_use:Nn \l__cdossier_statement_contacts_clist { ,~ } }
+  }
+% Log the live (not default) titles, so override behavior is observable.
+\cs_new_protected:Npn \cdossiertestLiveTitles
+  {
+    \TYPE { ~~title:~ \tl_use:N \l__cdossier_statement_title_tl }
+    \TYPE { ~~running-title:~ \tl_use:N \l__cdossier_statement_running_title_tl }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+% All seven supported type values, in the class's documented order. The
+% teaching-philosophy and diversity types are the two whose running-title
+% default deliberately differs from their display title.
+\TEST{per-type-title-and-contact-defaults}{
+  \cdossiertestTypeDefaults{interest}
+  \cdossiertestTypeDefaults{research}
+  \cdossiertestTypeDefaults{teaching}
+  \cdossiertestTypeDefaults{teaching-philosophy}
+  \cdossiertestTypeDefaults{diversity}
+  \cdossiertestTypeDefaults{artist}
+  \cdossiertestTypeDefaults{purpose}
+}
+
+% A blank public override must restore the selected type's default rather than
+% leave an empty title, and the two titles restore independently. The previous
+% test leaves `purpose` selected, so first restore the class's own load-time
+% interest selection to pin the contract against a known type.
+\TEST{blank-title-overrides-restore-type-defaults}{
+  \cdossiertestTypeDefaults{interest}
+  \CDossierStatementSetup{ title = {Custom Title}, running-title = {Custom Short} }
+  \cdossiertestLiveTitles
+  \CDossierStatementSetup{ title = {} }
+  \cdossiertestLiveTitles
+  \CDossierStatementSetup{ running-title = {} }
+  \cdossiertestLiveTitles
+}
+
+\END

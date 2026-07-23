@@ -307,16 +307,54 @@ means depends on what the module owns, so match the test type to the concern:
   beside each Python module. This is where a pre-implementation failing test is
   usually practical and most valuable.
 - **Layout classes** — `careerdossier-resume.cls`,
-  `careerdossier-letter.cls`, and `careerdossier-cv.cls` — own page geometry and
-  visual result, which no log diff fully captures. Cover them with smoke tests (compiles clean, expected
-  diagnostics), extraction tests (text present and in logical order), and a small
-  set of reviewed reference PDFs. Final layout correctness stays a human visual
-  check. Do not force brittle per-line-break or per-metric assertions onto a
-  class before its design has settled.
+  `careerdossier-letter.cls`, `careerdossier-cv.cls`, and
+  `careerdossier-statement.cls` — own page geometry and visual result, which no
+  log diff fully captures. Cover them with smoke tests (compiles clean, expected
+  diagnostics), extraction tests (text present and in logical order), and a
+  small set of reviewed reference PDFs. Final layout correctness stays a human
+  visual check. Do not force brittle per-line-break or per-metric assertions
+  onto a class before its design has settled.
 
 When a change spans both — a shared package edit that both classes render — add
 or update the unit-level regression for the shared logic *and* re-run the smoke,
 extraction, and layout coverage for both classes.
+
+### Five-family page-two visual review
+
+Build the repeatable page-two review set from the repository root:
+
+    make review-page-two
+
+The command compiles the canonical two-page résumé, industry-letter, academic
+CV, academic-letter, and research-statement fixtures. It renders page two for
+all five short-name cases, then repeats the three families with continuation
+headers (CV, academic letter, and statement) using a deliberately long name.
+It also renders page two of all six specialized statement examples (research,
+teaching, teaching philosophy, diversity, artist, and purpose) and the
+default-interest long-fields fixture. The research statement remains the sole
+representative tagged statement profile; the statement-title regression pins
+all seven display and running-title defaults without duplicating tagged tests.
+
+Review the PNGs under `build/page-two-review/` and record the result in the pull
+request:
+
+1. the CV, academic-letter, and statement running headers are centered, clear,
+   and neither clipped nor crowded in both short- and long-name renders;
+2. their `Page N of M` folios are centered, correctly numbered, and separated
+   cleanly from the body;
+3. the gap between running furniture and body text is consistent and no body
+   content overlaps either header or folio;
+4. the résumé and industry-letter page-two renders contain no running header or
+   folio;
+5. each specialized statement example uses the expected applicant name and
+   type-specific running title on page two;
+6. the default-interest long-name header shows `Statement of Interest` without
+   clipping (the layout suite separately gates its page-one contact fields on
+   overfull boxes); and
+7. links, page breaks, and body content remain visible and unclipped.
+
+The PDFs, page-two PNGs, logs, and review record are generated evidence under
+the gitignored `build/` directory. They must not be committed.
 
 ### Baselines are load-bearing
 
@@ -401,8 +439,8 @@ Rationale and the full method are in
 
 ### Tagged-PDF suite
 
-Opt-in tagged output has its own suite covering four profiles — industry
-résumé, industry letter, academic CV, academic letter:
+Opt-in tagged output has its own suite covering five profiles — industry
+résumé, industry letter, academic CV, academic letter, and research statement:
 
     make tagging               # or: tests/tagging/run.sh
 

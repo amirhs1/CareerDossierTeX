@@ -26,9 +26,10 @@
 # PDF/UA, WCAG, accessibility, or ATS conformance claim for arbitrary user
 # documents.
 #
-# Requirements: lualatex and pdftotext (Poppler) are required. veraPDF, MuPDF
-# (mutool), Biber, and PDFKit (macOS) gates are skipped with a notice when
-# unavailable, and the closing summary lists exactly which gates did not run.
+# Requirements: lualatex, pdftotext, and pdfinfo (Poppler) are required.
+# veraPDF, MuPDF (mutool), Biber, and PDFKit (macOS) gates are skipped with a
+# notice when unavailable, and the closing summary lists exactly which gates
+# did not run.
 #
 # Regenerate extraction baselines intentionally with:  ./run.sh --update
 set -uo pipefail
@@ -55,7 +56,7 @@ update=0
 fail=0
 skipped=()
 
-for command in lualatex pdftotext; do
+for command in lualatex pdftotext pdfinfo; do
   if ! command -v "$command" >/dev/null 2>&1; then
     echo "MISSING required command: $command"
     exit 1
@@ -230,6 +231,84 @@ check_structure() {
   fi
 }
 
+check_two_page_furniture() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+  local pages page_two
+
+  pages="$(pdfinfo "$pdf" | awk '/^Pages:/ { print $2 }')"
+  if [ "$pages" -ne 2 ]; then
+    record_failure \
+      "$base must have exactly two pages for continuation-furniture coverage (got $pages)"
+    return
+  fi
+
+  page_two="$(pdftotext -enc UTF-8 -f 2 -l 2 "$pdf" - | tr -d '\f')"
+  case "$base" in
+    cv)
+      printf '%s\n' "$page_two" | grep -Fq "Tagged Academic CV" \
+        || record_failure "cv page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
+        || record_failure "cv page two has no folio"
+      ;;
+    academic-letter)
+      printf '%s\n' "$page_two" | grep -Fq "Tagged Academic Letter" \
+        || record_failure "academic-letter page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
+        || record_failure "academic-letter page two has no folio"
+      ;;
+    statement)
+      printf '%s\n' "$page_two" | grep -Fq "Tagged Research Statement" \
+        || record_failure "statement page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
+        || record_failure "statement page two has no folio"
+      ;;
+    resume|letter)
+      if printf '%s\n' "$page_two" | grep -Eq '^Page 2( of 2)?$'; then
+        record_failure "$base page two unexpectedly has a folio"
+      fi
+      if printf '%s\n' "$page_two" | grep -Eq \
+          'Tagged (Industry Resume|Industry Letter).*(Résumé|Resume|Cover Letter)'; then
+        record_failure "$base page two unexpectedly has a running header"
+      fi
+      ;;
+  esac
+}
+
+check_page_two_artifact_stream() {
+  local base="$1"
+  local text_artifacts
+
+  [ "$have_mutool" -eq 1 ] || return
+
+  # A tagged page contains empty artifact wrappers even when its page style has
+  # no visible furniture. Count only Artifact BMC blocks that contain a text
+  # object before their closing EMC. On page two the positive families must
+  # have exactly two such blocks (running header and folio); the résumé and
+  # industry letter must have none.
+  text_artifacts="$(
+    mutool show "$work/$base.pdf" pages/2/Contents \
+      | awk '
+          /^\/Artifact BMC$/ { in_artifact = 1; next }
+          in_artifact && /^BT$/ { count++; in_artifact = 0; next }
+          in_artifact && /^EMC$/ { in_artifact = 0 }
+          END { print count + 0 }
+        '
+  )"
+
+  case "$base" in
+    cv|academic-letter|statement)
+      [ "$text_artifacts" -eq 2 ] \
+        || record_failure \
+          "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
+      ;;
+    resume|letter)
+      [ "$text_artifacts" -eq 0 ] \
+        || record_failure "$base page two unexpectedly contains artifact-marked text furniture"
+      ;;
+  esac
+}
+
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
 # disagree on how to linearize the two-column entry header, so each owns a
 # baseline; sharing one would only record whichever library ran last.
@@ -359,6 +438,8 @@ for base in resume cv letter academic-letter statement; do
   compile_fixture "$base.tex" "$base" || continue
   compile_fixture "$base-untagged.tex" "$base-untagged" || continue
   check_structure "$base"
+  check_two_page_furniture "$base"
+  check_page_two_artifact_stream "$base"
   check_extraction "$base"
   check_untagged "$base"
   check_visual_equivalence "$base"
