@@ -329,9 +329,11 @@ The command compiles the canonical two-page résumé, industry-letter, academic
 CV, academic-letter, and research-statement fixtures. It renders page two for
 all five short-name cases, then repeats the three families with continuation
 headers (CV, academic letter, and statement) using a deliberately long name.
-The research statement represents the statement family's shared continuation
-layout; the statement-type tests and examples separately cover the default
-`general-interest` type and the six explicit subtypes.
+It also renders page two of all six specialized statement examples (research,
+teaching, teaching philosophy, diversity, artist, and purpose) and the
+default-interest long-fields fixture. The research statement remains the sole
+representative tagged statement profile; the statement-title regression pins
+all seven display and running-title defaults without duplicating tagged tests.
 
 Review the PNGs under `build/page-two-review/` and record the result in the pull
 request:
@@ -343,8 +345,13 @@ request:
 3. the gap between running furniture and body text is consistent and no body
    content overlaps either header or folio;
 4. the résumé and industry-letter page-two renders contain no running header or
-   folio; and
-5. links, page breaks, and body content remain visible and unclipped.
+   folio;
+5. each specialized statement example uses the expected applicant name and
+   type-specific running title on page two;
+6. the default-interest long-name header shows `Statement of Interest` without
+   clipping (the layout suite separately gates its page-one contact fields on
+   overfull boxes); and
+7. links, page breaks, and body content remain visible and unclipped.
 
 The PDFs, page-two PNGs, logs, and review record are generated evidence under
 the gitignored `build/` directory. They must not be committed.

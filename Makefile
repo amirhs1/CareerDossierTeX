@@ -77,7 +77,7 @@ smoke: ## Supported builds and required failures
 layout: ## Layout-stress fixtures
 	tests/layout/run.sh
 
-review-page-two: ## Render page two for five-family visual review
+review-page-two: ## Render five-family and all statement page-two reviews
 	tests/layout/render-page-two.sh
 
 extract-test: ## Text-extraction round-trip against committed baselines

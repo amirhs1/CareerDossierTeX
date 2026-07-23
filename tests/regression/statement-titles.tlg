@@ -1,0 +1,48 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: per-type-title-and-contact-defaults
+============================================================
+interest
+ title: Statement of Interest
+ running-title: Statement of Interest
+ contacts: email, phone, website
+research
+ title: Research Statement
+ running-title: Research Statement
+ contacts: email, phone, website, scholar, orcid
+teaching
+ title: Teaching Statement
+ running-title: Teaching Statement
+ contacts: email, phone, website
+teaching-philosophy
+ title: Statement of Teaching Philosophy
+ running-title: Teaching Philosophy
+ contacts: email, phone, website
+diversity
+ title: Statement of Contributions to Equity, Diversity, Inclusion, and Accessibility
+ running-title: EDIA Statement
+ contacts: email, phone, website
+artist
+ title: Artist Statement
+ running-title: Artist Statement
+ contacts: email, phone, website
+purpose
+ title: Statement of Purpose
+ running-title: Statement of Purpose
+ contacts: email, phone, website
+============================================================
+============================================================
+TEST 2: blank-title-overrides-restore-type-defaults
+============================================================
+interest
+ title: Statement of Interest
+ running-title: Statement of Interest
+ contacts: email, phone, website
+ title: Custom Title
+ running-title: Custom Short
+ title: Statement of Interest
+ running-title: Custom Short
+ title: Statement of Interest
+ running-title: Statement of Interest
+============================================================
