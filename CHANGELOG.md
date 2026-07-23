@@ -10,12 +10,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
-- Added consistent `theme=monochrome|accent|print` link presentation across
-  the résumé, CV, industry and academic letters, and statements. Monochrome
-  remains the default and presents black links with a thin underline;
-  `theme=accent` colors and underlines links only and accepts the fixed
-  `accent=navy|teal|magenta` choices (default `navy`); `theme=print` leaves
-  links black and undecorated. Body text, headings, rules, typography, geometry,
+- Added consistent `theme=monochrome|accent` link presentation across the
+  résumé, CV, industry and academic letters, and statements. Monochrome remains
+  the default and presents black undecorated links; `theme=accent` presents
+  colored undecorated links and accepts the fixed
+  `accent=navy|teal|magenta` choices (default `navy`). An explicit accent now
+  requires `theme=accent` instead of being accepted without effect. Body text,
+  headings, rules, typography, geometry,
   and page furniture are unchanged. Focused regression and cross-class smoke
   fixtures cover selection, presentation, and invalid values. Recorded
   contrast, grayscale, protanopia, deuteranopia, and tritanopia checks keep

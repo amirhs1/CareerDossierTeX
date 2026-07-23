@@ -43,15 +43,19 @@
 \tl_set:Nn \l__cdossier_resume_theme_tl { monochrome }
 \tl_new:N \l__cdossier_resume_accent_tl
 \tl_set:Nn \l__cdossier_resume_accent_tl { navy }
+\bool_new:N \l__cdossier_resume_accent_explicit_bool
 
 \msg_new:nnnn { careerdossier-resume } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-resume. }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt),~
     'density'~(compact,~standard),~'paper'~(letter,~a4),~and~
-    'bodyfont'~(serif,~sans),~'theme'~(monochrome,~accent,~print),~and~
+    'bodyfont'~(serif,~sans),~'theme'~(monochrome,~accent),~and~
     'accent'~(navy,~teal,~magenta).~Language~cannot~be~set~here.
   }
+\msg_new:nnnn { careerdossier-resume } { accent-without-theme }
+  { The~'accent'~option~requires~'theme=accent'. }
+  { Add~'theme=accent'~or~remove~the~'accent'~option. }
 
 \keys_define:nn { cdossier / resume }
   {
@@ -78,26 +82,43 @@
       { \tl_set_eq:NN \l__cdossier_resume_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
     theme .choices:nn =
-      { monochrome , accent , print }
+      { monochrome , accent }
       { \tl_set_eq:NN \l__cdossier_resume_theme_tl \l_keys_choice_tl } ,
     theme .value_required:n = true ,
     accent .choices:nn =
       { navy , teal , magenta }
-      { \tl_set_eq:NN \l__cdossier_resume_accent_tl \l_keys_choice_tl } ,
+      {
+        \tl_set_eq:NN \l__cdossier_resume_accent_tl \l_keys_choice_tl
+        \bool_set_true:N \l__cdossier_resume_accent_explicit_bool
+      } ,
     accent .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-resume } { unknown-option }
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / resume }
+\bool_if:NT \l__cdossier_resume_accent_explicit_bool
+  {
+    \str_if_eq:VnF \l__cdossier_resume_theme_tl { accent }
+      { \msg_error:nn { careerdossier-resume } { accent-without-theme } }
+  }
 
 \str_if_eq:VnT \l__cdossier_resume_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
-      { theme = \l__cdossier_resume_theme_tl , accent = \l__cdossier_resume_accent_tl }
+      { theme = \l__cdossier_resume_theme_tl }
       { careerdossier-theme }
+  }
+\str_if_eq:VnT \l__cdossier_resume_theme_tl { accent }
+  {
+    \use:x
+      {
+        \exp_not:N \PassOptionsToPackage
+          { accent = \l__cdossier_resume_accent_tl }
+          { careerdossier-theme }
+      }
   }
 
 %% Load a minimal base class with the resolved body size and paper. The token
@@ -113,7 +134,7 @@
 %% Shared modules. careerdossier-components pulls in base, typography (the
 %% LuaLaTeX engine guard and fonts), and theme; geometry, enumitem, and hyperref
 %% complete the page and link machinery. hyperref loads last so the theme's
-%% print-safe link hook applies regardless of order.
+%% link hook applies regardless of order.
 %% ---------------------------------------------------------------------------
 \RequirePackage { careerdossier-components }
 \RequirePackage { geometry }

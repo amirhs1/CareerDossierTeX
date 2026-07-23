@@ -28,31 +28,44 @@
 
 \tl_new:N \l__cdossier_theme_name_tl
 \tl_new:N \l__cdossier_theme_accent_tl
+\bool_new:N \l__cdossier_theme_accent_explicit_bool
 \tl_set:Nn \l__cdossier_theme_name_tl { monochrome }
 \tl_set:Nn \l__cdossier_theme_accent_tl { navy }
 
 \msg_new:nnnn { careerdossier-theme } { unknown-option }
   { Unknown~package~option~'#1'~for~careerdossier-theme. }
   {
-    Supported~options~are~'theme'~(monochrome,~accent,~print)~and~
+    Supported~options~are~'theme'~(monochrome,~accent)~and~
     'accent'~(navy,~teal,~magenta).
   }
+
+\msg_new:nnnn { careerdossier-theme } { accent-without-theme }
+  { The~'accent'~option~requires~'theme=accent'. }
+  { Add~'theme=accent'~or~remove~the~'accent'~option. }
 
 \keys_define:nn { cdossier / theme }
   {
     theme .choices:nn =
-      { monochrome , accent , print }
+      { monochrome , accent }
       { \tl_set_eq:NN \l__cdossier_theme_name_tl \l_keys_choice_tl } ,
     theme .value_required:n = true ,
     accent .choices:nn =
       { navy , teal , magenta }
-      { \tl_set_eq:NN \l__cdossier_theme_accent_tl \l_keys_choice_tl } ,
+      {
+        \tl_set_eq:NN \l__cdossier_theme_accent_tl \l_keys_choice_tl
+        \bool_set_true:N \l__cdossier_theme_accent_explicit_bool
+      } ,
     accent .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-theme } { unknown-option }
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / theme }
+\bool_if:NT \l__cdossier_theme_accent_explicit_bool
+  {
+    \str_if_eq:VnF \l__cdossier_theme_name_tl { accent }
+      { \msg_error:nn { careerdossier-theme } { accent-without-theme } }
+  }
 
 %% ---------------------------------------------------------------------------
 %% Monochrome palette. Body text is black; the muted grey is dark enough to
@@ -94,60 +107,23 @@
 \NewDocumentCommand \CDossierLinkColor    { } { \color { cdossier-link }    }
 
 %% ---------------------------------------------------------------------------
-%% Link appearance is the only difference between themes:
-%% - monochrome: black text with a thin black PDF-annotation underline;
-%% - accent: coloured text with a matching PDF-annotation underline; and
-%% - print: black text without a border or underline.
+%% Link colour is the only difference between themes:
+%% - monochrome: black text without a border or underline; and
+%% - accent: coloured text without a border or underline.
 %%
 %% Visible URLs, identifiers, and descriptive labels remain present, so colour
-%% is not the only carrier of link meaning. The print theme deliberately removes
-%% screen-only affordances from a non-interactive paper copy.
+%% is not the only carrier of link meaning.
 %% \urlstyle{same} keeps \url/\nolinkurl text in the surrounding font instead of
 %% typewriter, so breakable contact URLs do not switch to a monospace face.
 %% The hook applies whenever hyperref loads, regardless of load order.
 %% ---------------------------------------------------------------------------
 \AddToHook { package/hyperref/after }
   {
-    \str_case:Vn \l__cdossier_theme_name_tl
+    \hypersetup
       {
-        { monochrome }
-          {
-            \hypersetup
-              {
-                colorlinks = false ,
-                allbordercolors = cdossier-link ,
-                pdfborder = { 0~0~0 } ,
-                pdfborderstyle = { /S/U/W~0.6 }
-              }
-          }
-        { accent }
-          {
-            \hypersetup
-              {
-                colorlinks = true ,
-                allcolors = cdossier-link ,
-                allbordercolors = cdossier-link ,
-                pdfborder = { 0~0~0 }
-              }
-            %% hyperref clears \@pdfborderstyle at begin-document time whenever
-            %% colorlinks is enabled. Restore the public setting afterwards so
-            %% accent links keep coloured text and an annotation underline.
-            \AddToHook { begindocument/end }
-              [ careerdossier-theme/accent-underline ]
-              {
-                \hypersetup
-                  { pdfborderstyle = { /S/U/W~0.6 } }
-              }
-          }
-        { print }
-          {
-            \hypersetup
-              {
-                colorlinks = true ,
-                allcolors = cdossier-link ,
-                pdfborder = { 0~0~0 }
-              }
-          }
+        colorlinks = true ,
+        allcolors = cdossier-link ,
+        pdfborder = { 0~0~0 }
       }
     \urlstyle { same }
   }

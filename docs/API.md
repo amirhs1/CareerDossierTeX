@@ -23,7 +23,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Language | English |
 | Paper | US Letter; A4 implemented for upcoming `v0.5.0` |
 | Body font | Serif; opt-in sans implemented for upcoming `v0.5.0` |
-| Theme | Monochrome; opt-in accent and print themes implemented for upcoming `v0.5.0` |
+| Theme | Monochrome; opt-in accent theme implemented for upcoming `v0.5.0` |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
@@ -188,16 +188,13 @@ Every CareerDossierTeX document class accepts:
 ```text
 theme=monochrome
 theme=accent
-theme=print
 ```
 
-`monochrome` is the default. It preserves black link text and adds a thin black
-PDF-annotation underline so links remain identifiable without color. `accent`
-colors links and adds a matching underline; body text, headings, rules, spacing,
-and page geometry remain unchanged. `print` renders black links without color,
-border, or underline. The underline style has a zero-width legacy border
-fallback so PDF readers that do not support annotation underlines do not draw a
-rectangle around the link.
+`monochrome` is the default and renders black links without a visible border or
+underline. `accent` colors links without a visible border or underline; body
+text, headings, rules, spacing, and page geometry remain unchanged. Both modes
+use the same print-safe undecorated presentation, so a separate `print` theme
+would be redundant.
 
 The `accent` theme also accepts one fixed named link color:
 
@@ -207,9 +204,18 @@ accent=teal
 accent=magenta
 ```
 
-`navy` is the default. The `accent` value is accepted with every theme so class
-option order does not matter, but it affects output only when `theme=accent`.
-Arbitrary colors and per-field or per-role color keys are not supported.
+`navy` is the default when `theme=accent`. An explicit `accent` value requires
+`theme=accent`; otherwise the class reports an actionable error instead of
+accepting an inactive option. Validation occurs after all class options are
+parsed, so `accent=teal,theme=accent` and the reverse order are equivalent.
+Arbitrary colors and per-field or per-role color keys are not part of the
+CareerDossierTeX API.
+
+The preset exists to provide a concise, cross-class, reviewed link-only color
+choice with stable defaults and automated contrast checks. Advanced authors may
+apply a later `\hypersetup` to override hyperlink presentation, but custom
+colors and styles are outside the tested preset contract and remain the
+author's responsibility.
 
 | Accent | Hex value | White contrast | Black contrast | Lowest simulated white / black contrast |
 |---|---:|---:|---:|---:|
@@ -589,7 +595,7 @@ The class accepts the same value sets as the résumé class:
 | `density` | `compact`, `standard` | `standard` |
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
-| `theme` | `monochrome`, `accent`, `print` | `monochrome` |
+| `theme` | `monochrome`, `accent` | `monochrome` |
 | `accent` | `navy`, `teal`, `magenta` | `navy` |
 
 English remains fixed. Unsupported options or values must produce an actionable
@@ -830,7 +836,7 @@ The initial statement release starts from the academic cover-letter design:
   letter's physical margins on A4;
 - `bodyfont=serif|sans`, defaulting to the current TeX Gyre Termes body and
   retaining TeX Gyre Heros headings in both modes;
-- the shared `theme=monochrome|accent|print` and
+- the shared `theme=monochrome|accent` and
   `accent=navy|teal|magenta` link-only appearance contract;
 - 11 pt body text;
 - academic-letter margins and prose paragraph rhythm;

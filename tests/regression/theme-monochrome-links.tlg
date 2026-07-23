@@ -3,6 +3,6 @@ Don't change this file in any respect.
 ============================================================
 TEST 1: monochrome-link-presentation
 ============================================================
-hypersetup=colorlinks=false,allbordercolors=cdossier-link,pdfborder={0 0 0},pdfborderstyle={/S/U/W 0.6}
+hypersetup=colorlinks=true,allcolors=cdossier-link,pdfborder={0 0 0}
 urlstyle=same
 ============================================================

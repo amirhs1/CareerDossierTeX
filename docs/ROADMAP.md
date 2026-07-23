@@ -248,7 +248,7 @@ Support additional application documents and broader visual configuration.
   `artist`, and `purpose` types;
 - A4 paper;
 - a cross-class `bodyfont=serif|sans` option with the current serif default;
-- cross-class `theme=monochrome|accent|print` link presentation with fixed
+- cross-class `theme=monochrome|accent` link presentation with fixed
   `accent=navy|teal|magenta` choices and monochrome remaining the default;
 - additional stress tests and documentation.
 

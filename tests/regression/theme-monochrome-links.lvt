@@ -1,4 +1,4 @@
-% theme-monochrome-links.lvt — default black underlined link presentation.
+% theme-monochrome-links.lvt — default black undecorated link presentation.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-theme}

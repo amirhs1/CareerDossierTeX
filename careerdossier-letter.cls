@@ -44,15 +44,19 @@
 \tl_set:Nn \l__cdossier_letter_theme_tl { monochrome }
 \tl_new:N \l__cdossier_letter_accent_tl
 \tl_set:Nn \l__cdossier_letter_accent_tl { navy }
+\bool_new:N \l__cdossier_letter_accent_explicit_bool
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
     Supported~options~are~'family'~(industry,~academic)~and~
     'paper'~(letter,~a4),~'bodyfont'~(serif,~sans),~
-    'theme'~(monochrome,~accent,~print),~and~
+    'theme'~(monochrome,~accent),~and~
     'accent'~(navy,~teal,~magenta).~Language~cannot~be~set~here.
   }
+\msg_new:nnnn { careerdossier-letter } { accent-without-theme }
+  { The~'accent'~option~requires~'theme=accent'. }
+  { Add~'theme=accent'~or~remove~the~'accent'~option. }
 
 \keys_define:nn { cdossier / letter }
   {
@@ -75,26 +79,43 @@
       { \tl_set_eq:NN \l__cdossier_letter_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
     theme .choices:nn =
-      { monochrome , accent , print }
+      { monochrome , accent }
       { \tl_set_eq:NN \l__cdossier_letter_theme_tl \l_keys_choice_tl } ,
     theme .value_required:n = true ,
     accent .choices:nn =
       { navy , teal , magenta }
-      { \tl_set_eq:NN \l__cdossier_letter_accent_tl \l_keys_choice_tl } ,
+      {
+        \tl_set_eq:NN \l__cdossier_letter_accent_tl \l_keys_choice_tl
+        \bool_set_true:N \l__cdossier_letter_accent_explicit_bool
+      } ,
     accent .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
   }
 \ProcessKeysOptions { cdossier / letter }
+\bool_if:NT \l__cdossier_letter_accent_explicit_bool
+  {
+    \str_if_eq:VnF \l__cdossier_letter_theme_tl { accent }
+      { \msg_error:nn { careerdossier-letter } { accent-without-theme } }
+  }
 
 \str_if_eq:VnT \l__cdossier_letter_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
-      { theme = \l__cdossier_letter_theme_tl , accent = \l__cdossier_letter_accent_tl }
+      { theme = \l__cdossier_letter_theme_tl }
       { careerdossier-theme }
+  }
+\str_if_eq:VnT \l__cdossier_letter_theme_tl { accent }
+  {
+    \use:x
+      {
+        \exp_not:N \PassOptionsToPackage
+          { accent = \l__cdossier_letter_accent_tl }
+          { careerdossier-theme }
+      }
   }
 
 %% A prose letter reads best at a slightly larger body size than the résumé.
@@ -109,7 +130,7 @@
 %% Shared modules. careerdossier-components pulls in base (profile metadata and
 %% required-field validation), typography (the LuaLaTeX guard and fonts), and
 %% theme; geometry and hyperref complete the page and link machinery. hyperref
-%% loads last so the theme's print-safe link hook applies regardless of order.
+%% loads last so the theme's link hook applies regardless of order.
 %% ---------------------------------------------------------------------------
 \RequirePackage { careerdossier-components }
 \RequirePackage { geometry }

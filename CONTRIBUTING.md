@@ -446,9 +446,8 @@ The link-theme palette has a Lua check for at least 4.5:1 contrast against
 white and, for accents, at least 3:1 against adjacent black text. The same
 thresholds cover full-severity protanopia, deuteranopia, and tritanopia
 simulations; the output also records grayscale contrast. PDF-level fixtures
-use MuPDF's `mutool` to assert that screen-oriented links have underline
-annotations with zero-width rectangular fallbacks and that print links have
-neither decoration:
+use MuPDF's `mutool` to assert that monochrome and accent links have zero-width
+rectangular fallbacks and no visible border style or underline:
 
     make theme-test            # or: tests/theme/run.sh
 

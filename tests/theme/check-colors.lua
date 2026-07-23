@@ -6,8 +6,8 @@
 -- review aid, not a medical model or a broad accessibility-conformance claim.
 -- Every result is checked against white at the normal-text 4.5:1 floor.
 -- Accent colours are also checked against black at 3:1 so they remain
--- distinguishable from adjacent body text. Monochrome and print deliberately
--- use black links, so the black comparison does not apply to those presets.
+-- distinguishable from adjacent body text. Monochrome deliberately uses black
+-- links, so the black comparison does not apply to that preset.
 
 local theme_file = assert(arg[1], "usage: texlua check-colors.lua THEME_FILE")
 local handle = assert(io.open(theme_file, "r"))
@@ -15,7 +15,7 @@ local source = handle:read("*a")
 handle:close()
 
 local expected = { navy = "006FB9", teal = "007A78", magenta = "C31E99" }
-local colors = { monochrome = { 0, 0, 0 }, print = { 0, 0, 0 } }
+local colors = { monochrome = { 0, 0, 0 } }
 
 for name, hex in pairs(expected) do
   local actual = source:match("cdossier%-accent%-" .. name .. "%s*}%s*{%s*HTML%s*}%s*{%s*(%x%x%x%x%x%x)%s*}")
@@ -81,14 +81,14 @@ local function simulate(rgb, matrix)
   return output
 end
 
-local order = { "monochrome", "print", "navy", "teal", "magenta" }
+local order = { "monochrome", "navy", "teal", "magenta" }
 local failed = false
 for _, name in ipairs(order) do
   local base_white = contrast_with_white(colors[name])
   local base_black = contrast_with_black(colors[name])
   io.write(string.format("%-10s base white %.2f:1", name, base_white))
   if base_white < 4.5 then failed = true end
-  if name ~= "monochrome" and name ~= "print" then
+  if name ~= "monochrome" then
     io.write(string.format(" black %.2f:1", base_black))
     if base_black < 3 then failed = true end
   end
@@ -97,7 +97,7 @@ for _, name in ipairs(order) do
     local white_ratio = contrast_with_white(simulated)
     io.write(string.format("  %s white %.2f:1", deficiency, white_ratio))
     if white_ratio < 4.5 then failed = true end
-    if name ~= "monochrome" and name ~= "print" then
+    if name ~= "monochrome" then
       local black_ratio = contrast_with_black(simulated)
       io.write(string.format(" black %.2f:1", black_ratio))
       if black_ratio < 3 then failed = true end

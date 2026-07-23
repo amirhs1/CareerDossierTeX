@@ -245,9 +245,8 @@ Responsibilities:
 
 - monochrome semantic colors;
 - rule colors and thicknesses;
-- class-selected monochrome, accent, and print link appearance;
-- link underlines for both screen-oriented themes, with no rectangular-border
-  fallback in PDF readers that do not support annotation underline styles;
+- class-selected monochrome and accent link appearance;
+- undecorated links with no visible rectangular border or underline;
 - bounded accent contrast against both the white page and adjacent black text;
 - fixed named link accents without per-field color configuration.
 
@@ -584,7 +583,7 @@ Typography should be controlled through semantic roles rather than repeated font
 ## Theme strategy
 
 Phase 1 includes one monochrome theme. The `v0.5.0` extension keeps that theme
-as the default and adds link-only `accent` and `print` variants. Classes parse
+as the default and adds a link-only `accent` variant. Classes parse
 the public `theme` and `accent` choices and forward them to
 `careerdossier-theme`; components continue to request semantic roles and do not
 know which preset is active.
@@ -953,7 +952,7 @@ not duplicate the class hierarchy by language.
 ### `v0.5.0`
 
 Add one statement class with a general-interest default and six explicit types,
-A4 paper, an opt-in sans body family, and link-only monochrome, accent, and print
+A4 paper, an opt-in sans body family, and link-only monochrome and accent
 themes through documented extension points. Named font combinations and
 optional icons remain deferred.
 

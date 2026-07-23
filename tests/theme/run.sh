@@ -12,35 +12,36 @@ trap 'rm -rf "$build_dir"' EXIT
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 export TEXMFVAR="${TEXMFVAR:-$build_dir/texmf-var}"
 
-for preset in monochrome accent print; do
+for preset in monochrome accent; do
   lualatex -halt-on-error -interaction=nonstopmode \
     -output-directory="$build_dir" "$here/link-$preset.tex" \
     > "$build_dir/link-$preset.stdout" 2>&1
 done
 
 annotation_dump="$build_dir/annotations.txt"
-for preset in monochrome accent print; do
+for preset in monochrome accent; do
   mutool show "$build_dir/link-$preset.pdf" 'pages/1/Annots/*' \
     > "$annotation_dump"
   if ! grep -qF '/Border [ 0 0 0 ]' "$annotation_dump"; then
     echo "LINK STYLE CHECK FAILED: $preset link has a rectangular fallback" >&2
     exit 1
   fi
-  case "$preset" in
-    monochrome|accent)
-      if ! grep -qF '/S /U' "$annotation_dump" ||
-         ! grep -qF '/W .6' "$annotation_dump"; then
-        echo "LINK STYLE CHECK FAILED: $preset link is not underlined" >&2
-        exit 1
-      fi
-      ;;
-    print)
-      if grep -qF '/BS' "$annotation_dump"; then
-        echo "LINK STYLE CHECK FAILED: print link has a border style" >&2
-        exit 1
-      fi
-      ;;
-  esac
+  if grep -qF '/BS' "$annotation_dump"; then
+    echo "LINK STYLE CHECK FAILED: $preset link has a border style" >&2
+    exit 1
+  fi
 done
 
-echo "ALL THEME PDF LINK STYLE CHECKS PASSED"
+if lualatex -halt-on-error -interaction=nonstopmode \
+    -output-directory="$build_dir" "$here/link-accent-without-theme.tex" \
+    > "$build_dir/link-accent-without-theme.stdout" 2>&1; then
+  echo "OPTION CHECK FAILED: inactive accent unexpectedly compiled" >&2
+  exit 1
+fi
+if ! tr '\n' ' ' < "$build_dir/link-accent-without-theme.log" | tr -s ' ' \
+    | grep -qF "'accent' option requires"; then
+  echo "OPTION CHECK FAILED: inactive accent produced the wrong diagnostic" >&2
+  exit 1
+fi
+
+echo "ALL THEME PDF LINK STYLE AND OPTION CHECKS PASSED"
