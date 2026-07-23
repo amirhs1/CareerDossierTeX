@@ -53,12 +53,13 @@ else
   echo
 fi
 
-# Strip form feeds, then trailing blank lines. The trailing-blank trim uses awk,
-# not a sed label/branch loop, because the BSD sed shipped on macOS parses
-# `{$d;N;ba}` differently from GNU sed; awk behaves identically on both, so the
-# accumulated suite runs locally and in CI.
+# Strip form-feed bytes without discarding text that follows one on the same
+# line, then trim trailing blank lines. `tr` handles the byte identically on
+# macOS and Linux; BSD and GNU sed disagree on whether `\f` is a form-feed
+# escape. The trailing-blank trim uses awk, not a sed label/branch loop, because
+# the BSD sed shipped on macOS parses `{$d;N;ba}` differently from GNU sed.
 normalize() {
-  sed '/^\f/d' | awk '{ line[NR] = $0 }
+  tr -d '\014' | awk '{ line[NR] = $0 }
                       END { last = NR
                             while (last > 0 && line[last] ~ /^[[:space:]]*$/) last--
                             for (i = 1; i <= last; i++) print line[i] }'
