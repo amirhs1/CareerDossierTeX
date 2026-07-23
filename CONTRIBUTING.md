@@ -442,15 +442,18 @@ review is manual by nature and is not automated by this suite.
 
 ### Theme color validation
 
-The link-theme palette has a dependency-free Lua check for at least 4.5:1
-contrast against white and, for accents, at least 3:1 against adjacent black
-text. The same thresholds cover full-severity protanopia, deuteranopia, and
-tritanopia simulations; the output also records grayscale contrast:
+The link-theme palette has a Lua check for at least 4.5:1 contrast against
+white and, for accents, at least 3:1 against adjacent black text. The same
+thresholds cover full-severity protanopia, deuteranopia, and tritanopia
+simulations; the output also records grayscale contrast. PDF-level fixtures
+use MuPDF's `mutool` to assert that screen-oriented links have underline
+annotations with zero-width rectangular fallbacks and that print links have
+neither decoration:
 
     make theme-test            # or: tests/theme/run.sh
 
 The check reads the palette from `careerdossier-theme.sty`, verifies the
-reviewed fixed values, and fails if any result falls below 4.5:1. It is a
+reviewed fixed values, and fails below either applicable threshold. It is a
 focused palette-review aid, not a broad accessibility-conformance claim.
 
 ### Module regression suite (l3build)

@@ -90,8 +90,6 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Module regression suite (l3build check on LuaTeX)
         run: l3build check
-      - name: Link-theme contrast and color-vision-deficiency checks
-        run: make theme-test
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload regression logs
         if: always()
@@ -138,6 +136,8 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends poppler-utils mupdf-tools
+      - name: Link-theme contrast, color-vision-deficiency, and PDF style checks
+        run: make theme-test
       # veraPDF is deliberately NOT installed here yet. The tagged fixtures are
       # validated against PDF/UA-2 locally (see docs/guides/ats-extraction.md
       # section 7.1); adding veraPDF to CI is a new third-party binary that

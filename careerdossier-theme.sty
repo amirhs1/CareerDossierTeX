@@ -127,8 +127,16 @@
                 colorlinks = true ,
                 allcolors = cdossier-link ,
                 allbordercolors = cdossier-link ,
-                pdfborder = { 0~0~0 } ,
-                pdfborderstyle = { /S/U/W~0.6 }
+                pdfborder = { 0~0~0 }
+              }
+            %% hyperref clears \@pdfborderstyle at begin-document time whenever
+            %% colorlinks is enabled. Restore the public setting afterwards so
+            %% accent links keep coloured text and an annotation underline.
+            \AddToHook { begindocument/end }
+              [ careerdossier-theme/accent-underline ]
+              {
+                \hypersetup
+                  { pdfborderstyle = { /S/U/W~0.6 } }
               }
           }
         { print }
