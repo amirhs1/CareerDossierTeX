@@ -740,7 +740,22 @@ the same body include — then validates the UA-2 variant with veraPDF and runs 
 three-extractor matrix over the tagged variant. Reports land in
 `tests/tagging/reports/` and are retained as CI artifacts, never committed.
 
-Results recorded 2026-07-22 on macOS 15.7.5:
+**CI coverage.** The always-on `tagging` job in `.github/workflows/build.yml`
+runs on every push and pull request but does not install veraPDF, so its
+veraPDF gate is skipped there (named in the runner's `GATES NOT RUN`
+summary). A separate `verapdf-scheduled` workflow
+(`.github/workflows/verapdf-scheduled.yml`) runs weekly — and on demand via
+`workflow_dispatch` — builds veraPDF from a pinned commit
+(`veraPDF-apps@7d9b5c3f709846ab83f86ca1a538b24eac2d3f72`, tag `v1.30.2`; see
+issue #94 for how the pin was chosen), and runs this same gate against the
+five named fixtures. It is intentionally not a per-PR check: building veraPDF
+from source costs several minutes, and tagging is an opt-in preview feature,
+so the maintainer agreed on 2026-07-20 that a weekly schedule is enough to
+catch upstream regressions without taxing routine work. Its reports upload as
+the `verapdf-scheduled-reports` artifact.
+
+Results recorded 2026-07-22 on macOS 15.7.5 (local run; see above for the
+separate scheduled CI run):
 
 | Fixture | Profile | veraPDF `ua2` | Poppler | MuPDF | PDFKit |
 | --- | --- | --- | --- | --- | --- |

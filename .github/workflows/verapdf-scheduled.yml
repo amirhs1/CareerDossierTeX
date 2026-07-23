@@ -1,0 +1,98 @@
+name: verapdf-scheduled
+
+# Pinned dependencies.
+#
+# Every third-party action, container, and binary is pinned to an immutable
+# reference so a run is reproducible and an upstream retag or force-push
+# cannot change what executes here. Each pin carries the human-readable
+# release it came from; update the comment whenever the pin moves.
+#
+#   texlive/texlive        digest below == :latest as published 2026-07-12 (matches build.yml)
+#   actions/checkout       v4.3.1
+#   actions/upload-artifact v7.0.1
+#   veraPDF-apps            tag v1.30.2, commit 7d9b5c3f709846ab83f86ca1a538b24eac2d3f72 (2026-05-31)
+#     verified 2026-07-20 against Homebrew's formula pin for the same version;
+#     see issue #94 for how this pin was chosen and why the commit SHA is
+#     preferred over the tag's tarball. veraPDF-apps publishes tags but no
+#     release assets, so there is no prebuilt binary to pin instead.
+
+on:
+  schedule:
+    # Weekly, Monday 06:00 UTC. Building veraPDF from source (maven + a JDK)
+    # adds several minutes this job accepts paying weekly, not on every push
+    # or pull request — tagging is an opt-in preview feature, so continuous
+    # per-PR validation is not worth that cost on every routine change. The
+    # maintainer agreed to this schedule-not-per-PR trade-off on 2026-07-20.
+    - cron: '0 6 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  verapdf:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Install build and extraction tooling
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            git maven default-jdk poppler-utils mupdf-tools
+
+      - name: Build veraPDF from the pinned commit
+        run: |
+          set -euo pipefail
+          pin=7d9b5c3f709846ab83f86ca1a538b24eac2d3f72
+
+          git init --quiet verapdf-src
+          git -C verapdf-src remote add origin \
+            https://github.com/veraPDF/veraPDF-apps.git
+          git -C verapdf-src fetch --quiet --depth 1 origin "$pin"
+          git -C verapdf-src checkout --quiet FETCH_HEAD
+
+          resolved="$(git -C verapdf-src rev-parse HEAD)"
+          if [ "$resolved" != "$pin" ]; then
+            echo "Resolved commit $resolved does not match the pinned $pin" >&2
+            exit 1
+          fi
+
+          # mvn package, not install: this build only needs the CLI
+          # executable it produces, not to publish artifacts into a local
+          # repository. Tests are skipped because this job is validating our
+          # fixtures with veraPDF, not re-validating veraPDF itself.
+          (cd verapdf-src && mvn -q -B -DskipTests clean package)
+
+          verapdf_bin="$(find verapdf-src -maxdepth 6 -type f -name verapdf \
+            -perm -u+x | head -1)"
+          if [ -z "$verapdf_bin" ]; then
+            echo "veraPDF build did not produce an executable 'verapdf' script" >&2
+            exit 1
+          fi
+          dirname "$verapdf_bin" | xargs -I{} realpath {} >> "$GITHUB_PATH"
+
+      - name: Confirm veraPDF is on PATH before running the gate
+        run: |
+          set -euo pipefail
+          # tests/tagging/run.sh treats a missing verapdf as an optional gate
+          # to skip, which is correct for the always-on "tagging" job in
+          # build.yml where the binary is never installed. This job exists
+          # specifically to run that gate, so a build failure above must stop
+          # the run here rather than silently pass as a skipped gate.
+          command -v verapdf
+          verapdf --version
+
+      - name: Tagged-PDF structure, extraction, and PDF/UA-2 validation
+        run: tests/tagging/run.sh
+
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload veraPDF and tagging reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: verapdf-scheduled-reports
+          path: tests/tagging/reports/
+          if-no-files-found: warn

@@ -478,6 +478,13 @@ checklists, and the tagged-BibLaTeX limitations are in sections 7.1–7.3 of
 [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md). Screen-reader
 review is manual by nature and is not automated by this suite.
 
+**veraPDF in CI.** The per-PR `tagging` job does not install veraPDF, so its
+veraPDF gate is always skipped there — building it from source costs several
+minutes that a per-push job should not pay. A separate weekly
+`verapdf-scheduled` workflow builds veraPDF from a pinned commit and runs the
+same gate; see "Pinned dependencies" below and
+[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md) section 7.1.
+
 ### Module regression suite (l3build)
 
 The logic-bearing packages are covered by an `l3build` regression suite. Each
@@ -800,6 +807,13 @@ format, `fontspec`, `pdfmanagement-testphase`, `tagpdf`, `l3build`,
 BibLaTeX/Biber, and default-font paths that a run actually used, and uploads them
 as the `toolchain-record` artifact. Read that artifact to learn
 which release a digest resolves to.
+
+`verapdf-scheduled.yml` additionally pins veraPDF itself to a commit SHA
+rather than a container digest or action tag, because `veraPDF/veraPDF-apps`
+publishes tags but no release binaries — there is no prebuilt artifact to pin
+by digest. The commit SHA is immutable by construction; the workflow verifies
+the checked-out commit matches the pin before building, and fails rather than
+silently building an unpinned `HEAD` if a fetch ever resolved differently.
 
 ### Bumping the pinned TeX Live image
 
