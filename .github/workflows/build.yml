@@ -136,12 +136,13 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends poppler-utils mupdf-tools
-      # veraPDF is deliberately NOT installed here yet. The tagged fixtures are
-      # validated against PDF/UA-2 locally (see docs/guides/ats-extraction.md
-      # section 7.1); adding veraPDF to CI is a new third-party binary that
-      # needs an approved immutable pin and checksum, tracked separately. The
-      # runner skips that gate with a notice and names it in its closing
-      # summary, so a CI pass here is not mistaken for a validated one.
+      # veraPDF is deliberately NOT installed here. Building it from source
+      # (maven + a JDK) adds several minutes that this per-PR job should not
+      # pay on every push; the weekly `verapdf-scheduled` workflow
+      # (.github/workflows/verapdf-scheduled.yml) builds it from a pinned
+      # commit and runs this same gate instead (issue #94). The runner skips
+      # the gate here with a notice and names it in its closing summary, so a
+      # CI pass in this job is not mistaken for a validated one.
       #
       # The PDFKit gate likewise cannot run on Linux; it is covered locally on
       # macOS and by the committed *.pdfkit.txt baselines.
