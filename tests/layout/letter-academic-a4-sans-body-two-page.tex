@@ -1,0 +1,7 @@
+% Combined-option stress: the sans body-font option layered onto the existing
+% A4 two-page academic-letter fixture, so A4, bodyfont, and the running
+% header/folio furniture are all exercised together instead of only in
+% isolation. Inherits the A4 continuation-stress paragraph already defined by
+% letter-academic-a4-two-page.tex rather than duplicating it.
+\PassOptionsToClass{bodyfont=sans}{careerdossier-letter}
+\input{letter-academic-a4-two-page.tex}
