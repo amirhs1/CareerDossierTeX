@@ -91,6 +91,21 @@ for tex in *.tex; do
   # the abbreviated running title. Pin both fields on the focused statement
   # fixture; pdfinfo ships with the same Poppler dependency as pdftotext.
   case "$base" in
+    statement-interest)
+      expected_pdf_title="Statement of Interest – Ada Lovelace"
+      pdf_title="$(pdfinfo "$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
+      pdf_author="$(pdfinfo "$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
+      if [ "$pdf_title" != "$expected_pdf_title" ]; then
+        echo "  WRONG PDF TITLE: $pdf_title"; fail=1
+      else
+        echo "  PDF title uses the full statement title"
+      fi
+      if [ "$pdf_author" != "Ada Lovelace" ]; then
+        echo "  WRONG PDF AUTHOR: $pdf_author"; fail=1
+      else
+        echo "  PDF author uses the profile name"
+      fi
+      ;;
     statement-*)
       pdf_title="$(pdfinfo "$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
       pdf_author="$(pdfinfo "$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"

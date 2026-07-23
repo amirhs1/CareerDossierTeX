@@ -24,7 +24,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Industry cover letter | Supported | `family=industry` remains the default |
 | Academic CV | Supported | Multi-page layout with running headers and folios |
 | Academic cover letter | Supported | Select with `family=academic`; shares the CV's running headers and folios |
-| Statement documents | Upcoming `v0.5.0` | Implemented in repository source; the default general-interest type plus research, teaching, teaching philosophy, diversity, artist, and purpose |
+| Statement documents | Upcoming `v0.5.0` | Implemented in repository source; the default interest type plus research, teaching, teaching philosophy, diversity, artist, and purpose |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar, ORCID, and affiliation fields |
@@ -248,7 +248,7 @@ See [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.
 
 ### 7. Create a statement
 
-Use one class. Omit `type` for a general-interest statement, or select an
+Use one class. Omit `type` for a statement of interest, or select an
 explicit type when its title and validation contract fit the document:
 
 ```latex
@@ -268,9 +268,9 @@ My research develops reliable methods for computational inquiry.
 \end{document}
 ```
 
-General-interest statements require only `name` and `email`. Research statements
+Statements of interest require only `name` and `email`. Research statements
 also require profile `affiliation`; artist statements also require profile
-`website`. Complete two-page examples for all six explicit types live in
+`website`. Complete two-page examples for all six specialized types live in
 [`examples/statements/`](examples/statements/).
 
 ## Tagged PDF (opt-in preview)
@@ -333,7 +333,7 @@ latexmk -lualatex -interaction=nonstopmode -halt-on-error \
 latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   examples/academic/letter-academic.tex
 
-# Build all six explicit-type statement examples through the repository target.
+# Build all six specialized statement examples through the repository target.
 make statements
 ```
 
