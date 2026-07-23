@@ -1,0 +1,32 @@
+% resume-contact-labels.tex — extraction fixture for opt-in contact labels
+% (issue #95).
+%
+% Purpose
+%   Prove the labelled contact line through the text layer:
+%     1. With contact-labels enabled, email and phone carry an identifying
+%        text label directly before their value, so their nature survives in
+%        every consumer — plain extraction and ATS parsers included.
+%     2. Self-identifying fields (location, github) stay unlabelled between
+%        labelled neighbours.
+%     3. website is deliberately absent: no orphan `Website:` label and no
+%        stray separator may appear where it would have been.
+%   The unlabelled default is pinned by resume-contact-optional.tex; this
+%   fixture pins the opt-in form, so both renderings have a committed baseline.
+%
+%   The committed baseline (resume-contact-labels.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-contact-labels.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[fontsize=10pt, density=compact]{careerdossier-resume}
+\CDossierSetup{
+  name           = {Ada Lovelace},
+  email          = {ada@example.com},
+  phone          = {+1 555 0100},
+  location       = {Toronto, ON},
+  github         = {github.com/ada},
+  contact-labels = true,
+}
+\begin{document}
+\MakeCDossierHeader
+\end{document}

@@ -7,7 +7,7 @@ TEST 1: unknown-setup-key-errors
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The supported keys are: name, headline, email, phone, location, website, linkedin, github, scholar, orcid, affiliation.
+The supported keys are: name, headline, email, phone, location, website, linkedin, github, scholar, orcid, affiliation, and the option key contact-labels.
 ============================================================
 ============================================================
 TEST 2: unknown-field-in-print-errors

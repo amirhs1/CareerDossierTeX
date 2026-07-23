@@ -10,6 +10,21 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- Added an opt-in `contact-labels` key to `\CDossierSetup`. When enabled, the
+  contact line prefixes `Email:`, `Phone:`, and `Website:` text labels to
+  those fields in every document class, so each field's nature is stated in
+  the visible text itself rather than left to inference from format and
+  position — the gap that motivated the change: assistive technology announces
+  the email and website as links, but a phone number is otherwise read as
+  unidentified digits. Because the label is ordinary visible text, it is
+  present in the default untagged output and verified to survive plain-text
+  extraction. The remaining contacts stay unlabelled because their values
+  identify themselves (service-domain URLs, the permanent `ORCID:` label,
+  place-name locations). The default rendering is unchanged, labels are fixed
+  English strings, and an absent field leaves no orphan label or stray
+  separator. Regression and extraction fixtures pin both the labelled and
+  unlabelled forms. ([#95])
+
 - Added a consistent `bodyfont=serif|sans` class option to the résumé, CV,
   industry and academic letters, and statement documents. `serif` remains the
   default and preserves the existing TeX Gyre Termes body with TeX Gyre Heros
@@ -54,6 +69,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   and this general contract requires only `name` and `email`. Explicit statement
   types and their existing validation remain unchanged. ([#117])
 
+[#95]: https://github.com/amirhs1/CareerDossierTeX/issues/95
 [#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
 [#105]: https://github.com/amirhs1/CareerDossierTeX/issues/105
 [#117]: https://github.com/amirhs1/CareerDossierTeX/issues/117
