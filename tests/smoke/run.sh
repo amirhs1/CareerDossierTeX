@@ -106,6 +106,8 @@ cases=(
   "statement-artist-valid pass"
   "statement-purpose-valid pass"
   "statement-default-valid pass"
+  "statement-interest-valid pass"
+  "statement-general-interest fail|'general-interest'."
   "statement-sans-body pass"
   "statement-empty-type fail|The key 'cdossier/statement/type' requires a value"
   "statement-bad-type fail|Unknown statement type 'grant'"

@@ -46,7 +46,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   unchanged. ([#105])
 
 - Added `careerdossier-statement`, one LuaLaTeX class with a default
-  general-interest type plus research, teaching, teaching-philosophy, diversity,
+  interest type plus research, teaching, teaching-philosophy, diversity,
   artist, and statement-of-purpose documents. The optional `type` option
   selects the default full and running titles plus the relevant contact and
   validation contract; `\CDossierStatementSetup` adds
@@ -64,16 +64,19 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
-- Statements now default to `type=general-interest` when `type` is omitted.
-  The default title and continuation header read `General Interest Statement`,
-  and this general contract requires only `name` and `email`. Explicit statement
-  types and their existing validation remain unchanged. ([#117])
+- Statements now default to `type=interest` when `type` is omitted. The default
+  title and continuation header read `Statement of Interest`, and this general
+  contract requires only `name` and `email`. The distinct `purpose` type remains
+  supported. The unreleased `general-interest` spelling was removed rather than
+  retained as an alias, so no released document needs migration. Other explicit
+  statement types and their validation remain unchanged. ([#117], [#128])
 
 [#95]: https://github.com/amirhs1/CareerDossierTeX/issues/95
 [#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
 [#105]: https://github.com/amirhs1/CareerDossierTeX/issues/105
 [#117]: https://github.com/amirhs1/CareerDossierTeX/issues/117
 [#119]: https://github.com/amirhs1/CareerDossierTeX/issues/119
+[#128]: https://github.com/amirhs1/CareerDossierTeX/issues/128
 
 ## [0.4.0] - 2026-07-20
 

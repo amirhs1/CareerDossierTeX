@@ -80,8 +80,8 @@ profile or the other document classes.
 
 ## `v0.5.0` statement module graph
 
-One statement class defaults to `general-interest` and implements the six
-explicit type values approved in issue #103:
+One statement class defaults to `interest` and implements six other explicit
+type values approved in issue #103:
 
 ```text
 careerdossier-statement.cls
@@ -92,11 +92,11 @@ careerdossier-statement.cls
         └── careerdossier-base.sty
 
 careerdossier-statement.cls
-        └── type=general-interest|research|teaching|teaching-philosophy|diversity|artist|purpose
+        └── type=interest|research|teaching|teaching-philosophy|diversity|artist|purpose
 ```
 
 All statement types share geometry and a prose document model. The default
-general-interest type has no extra required-field contract; an explicit type
+interest type has no extra required-field contract; another explicit type
 changes the default title, continuation-page identification, displayed contact
 set, and, where applicable, required fields. This does not justify duplicate
 classes or hard-coded narrative schemas. Shared packages remain independent of
@@ -943,7 +943,7 @@ not duplicate the class hierarchy by language.
 
 ### `v0.5.0`
 
-Add one statement class with a general-interest default and six explicit types,
+Add one statement class with an interest default and six other explicit types,
 A4 paper, and an opt-in sans body family through documented extension points.
 Color themes, named font combinations, and optional icons were deferred by the
 maintainer on 2026-07-22.
