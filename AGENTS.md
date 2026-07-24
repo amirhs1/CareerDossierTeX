@@ -44,9 +44,6 @@ Use these canonical sources when they exist:
 - `CHANGELOG.md` — user-visible changes
 - `scripts/setup-labels.sh` — allowed labels
 
-`docs/planning/` is temporary and noncanonical. Do not create new dependencies
-on it. When it is removed, update remaining references in the same change.
-
 ## Non-negotiable rules
 
 1. **LuaLaTeX scope:** LuaLaTeX is the sole supported engine. XeLaTeX and
