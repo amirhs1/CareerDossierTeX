@@ -8,6 +8,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-24
+
 ### Added
 
 - Added an opt-in `contact-labels` key to `\CDossierSetup`. When enabled, the
@@ -420,7 +422,8 @@ in a monochrome theme.
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.4.0...v0.5.0
 [0.2.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...v0.1.1
