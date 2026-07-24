@@ -62,6 +62,18 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   or stray separators. Existing résumé, CV, and letter interfaces and defaults
   are unchanged. ([#104])
 
+### Changed
+
+- PDF/UA-2 validation with veraPDF now runs in continuous integration on a
+  weekly schedule, where it previously ran only locally. A new
+  `verapdf-scheduled` workflow builds veraPDF from a pinned upstream commit and
+  runs the tagged-PDF suite's UA-2 gate against the five named fixtures,
+  retaining the reports as artifacts. The per-push `tagging` job still skips the
+  veraPDF gate — building the validator from source is too costly to run on
+  every pull request — and continues to name it in its `GATES NOT RUN` summary,
+  so a routine CI pass is still not mistaken for a validated one. No package,
+  class, option, key, command, or rendered output changed. ([#94])
+
 ### Fixed
 
 - Statements now default to `type=interest` when `type` is omitted. The default
@@ -71,6 +83,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   retained as an alias, so no released document needs migration. Other explicit
   statement types and their validation remain unchanged. ([#117], [#128])
 
+[#94]: https://github.com/amirhs1/CareerDossierTeX/issues/94
 [#95]: https://github.com/amirhs1/CareerDossierTeX/issues/95
 [#104]: https://github.com/amirhs1/CareerDossierTeX/issues/104
 [#105]: https://github.com/amirhs1/CareerDossierTeX/issues/105
