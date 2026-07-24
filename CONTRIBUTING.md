@@ -435,7 +435,7 @@ baselines on macOS, and review both diffs before committing.
 
 Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
-[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md).
+[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md).
 
 ### Tagged-PDF suite
 
@@ -475,7 +475,7 @@ never committed.
 
 Recorded validation results, the outstanding VoiceOver and NVDA reading-order
 checklists, and the tagged-BibLaTeX limitations are in sections 7.1–7.3 of
-[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md). Screen-reader
+[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md). Screen-reader
 review is manual by nature and is not automated by this suite.
 
 **veraPDF in CI.** The per-PR `tagging` job does not install veraPDF, so its
@@ -483,7 +483,7 @@ veraPDF gate is always skipped there — building it from source costs several
 minutes that a per-push job should not pay. A separate weekly
 `verapdf-scheduled` workflow builds veraPDF from a pinned commit and runs the
 same gate; see "Pinned dependencies" below and
-[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md) section 7.1.
+[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) section 7.1.
 
 ### Module regression suite (l3build)
 

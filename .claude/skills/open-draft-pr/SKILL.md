@@ -9,7 +9,7 @@ Read and follow, in order:
 
 1. `AGENTS.md`
 2. `docs/agent-workflows/github-project.md`
-3. `docs/naming_conventions.md`
+3. `docs/NAMING-CONVENTION.md`
 4. `scripts/setup-labels.sh`
 5. the focused GitHub issue and its current Project metadata
 

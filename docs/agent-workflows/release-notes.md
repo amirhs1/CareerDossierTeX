@@ -165,5 +165,5 @@ gh release create vX.Y.Z --draft --title "CareerDossierTeX vX.Y.Z — Release Na
 gh release edit vX.Y.Z --draft=false
 ```
 
-Release titles follow `docs/naming_conventions.md`:
+Release titles follow `docs/NAMING-CONVENTION.md`:
 `CareerDossierTeX vX.Y.Z — Release Name`.

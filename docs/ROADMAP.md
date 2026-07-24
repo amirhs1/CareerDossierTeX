@@ -51,7 +51,7 @@ Understand and preserve the strongest existing résumé and cover-letter impleme
 
 The project has a documented baseline against which later changes can be compared.
 
-## `v0.1.0 — English Industry Dossier`
+## Phase 1: `v0.1.0 — English Industry Dossier`
 
 ### Goal
 
@@ -100,7 +100,7 @@ Publish the smallest useful CareerDossierTeX release.
 - README and API documentation match actual behavior;
 - tag and GitHub Release `v0.1.0` are published.
 
-## `v0.2.0 — Academic Dossier`
+## Phase 2: `v0.2.0 — Academic Dossier`
 
 ### Goal
 
@@ -146,7 +146,7 @@ These interfaces are released in `v0.2.0`.
 - automatic import from ORCID, Scholar, DOI services, or external APIs; and
 - PDF/UA or broad ATS-conformance claims.
 
-## `v0.3.0 — Farsi and Bilingual Support` **(dropped — 2026-07-16)**
+## Phase 3: `v0.3.0 — Farsi and Bilingual Support` **(dropped — 2026-07-16)**
 
 > **Status:** dropped on 2026-07-16. The milestone is closed and the release is
 > not planned. CareerDossierTeX is English-only, and no language-abstraction
@@ -185,7 +185,7 @@ Extend existing classes:
 
 Do not create separate language-specific classes unless a future document model is genuinely different.
 
-## `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`
+## Phase 4: `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`
 
 ### Goal
 
@@ -235,7 +235,7 @@ keys, and commands; the build command changes from `latexmk -xelatex` to
 - `docs/MIGRATION.md` gives XeTeX-preamble users an actionable upgrade path;
 - documentation claims no more than the fixtures actually verify.
 
-## `v0.5.0 — Statements and Customization`
+## Phase 5: `v0.5.0 — Statements and Customization`
 
 ### Goal
 
@@ -255,7 +255,7 @@ optional icons, and the Windows/NVDA reading-order check on 2026-07-22. Their
 future milestone remains undecided; they are not release blockers for
 `v0.5.0`.
 
-## `v1.0.0 — Stable Public API`
+## Phase 6: `v1.0.0 — Stable Public API`
 
 ### Goal
 

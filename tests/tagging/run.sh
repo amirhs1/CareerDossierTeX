@@ -20,7 +20,7 @@
 #     alongside the versions that produced it.
 #
 # Screen-reader review (VoiceOver, NVDA) stays manual and is NOT run here; see
-# docs/guides/ats-extraction.md for the checklists and recorded results.
+# docs/ATS-EXTRACTION.md for the checklists and recorded results.
 #
 # Scope: these fixtures validate four named artifacts. Passing them is not a
 # PDF/UA, WCAG, accessibility, or ATS conformance claim for arbitrary user
