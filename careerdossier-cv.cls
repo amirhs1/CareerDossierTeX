@@ -23,7 +23,7 @@
 %% CV without an external bibliography must build without BibLaTeX or Biber.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-cv} {2026-07-22} {0.5.0}
+\ProvidesExplClass {careerdossier-cv} {2026-07-24} {0.5.0}
   {CareerDossierTeX English academic CV class}
 
 \RequirePackage { l3keys2e }

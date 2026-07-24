@@ -5,7 +5,7 @@
 This document records the released public interface:
 
 ```text
-Released: v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview
+Released: v0.5.0 — Statements and Customization
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.
@@ -17,18 +17,18 @@ The API is intentionally small. Internal helper commands are not public merely b
 
 ## Supported configuration
 
-| Setting | `v0.4.0` support |
+| Setting | `v0.5.0` support |
 |---|---|
 | Engine | LuaLaTeX only |
 | Language | English |
-| Paper | US Letter; A4 implemented for upcoming `v0.5.0` |
-| Body font | Serif; opt-in sans implemented for upcoming `v0.5.0` |
+| Paper | US Letter (default) and opt-in A4 |
+| Body font | Serif (default) and opt-in sans |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
 | CV class | `careerdossier-cv` |
 | Letter class | `careerdossier-letter`, industry and academic families |
-| Statement class | Default interest type plus six other explicit types implemented for upcoming `v0.5.0` |
+| Statement class | Default interest type plus six other explicit types |
 | Bibliography | Optional `careerdossier-biblatex` |
 | Manual publications | `CDossierPublications` in `careerdossier-cv` |
 | RTL or bilingual layout | Not supported |
@@ -55,7 +55,7 @@ or:
 \documentclass{careerdossier-cv}
 ```
 
-or, from the upcoming `v0.5.0` source:
+or:
 
 ```latex
 \documentclass[type=research]{careerdossier-statement}
@@ -149,7 +149,7 @@ compact
 
 `compact` reduces vertical spacing for short industry résumés. `standard` provides more breathing room.
 
-#### `paper` (upcoming `v0.5.0`)
+#### `paper`
 
 Every CareerDossierTeX document class accepts:
 
@@ -164,7 +164,7 @@ spacing, and page-furniture design. Because A4 is slightly narrower and taller
 than US Letter, line and page breaks may change. Unsupported values produce an
 actionable class error.
 
-#### `bodyfont` (upcoming `v0.5.0`)
+#### `bodyfont`
 
 Every CareerDossierTeX document class accepts:
 
@@ -792,8 +792,8 @@ The `v0.2.0` academic release did not support:
 - automatic import from ORCID, Scholar, DOI services, or external APIs; or
 - a PDF/UA or broad ATS-compatibility claim.
 
-A4 paper and statement classes are implemented in repository source for the
-upcoming `v0.5.0`; this historical list describes the scope of `v0.2.0` only.
+A4 paper and statement classes are supported as of `v0.5.0`; this historical
+list describes the scope of `v0.2.0` only.
 
 ### Compatibility with `v0.1.x`
 
@@ -814,9 +814,7 @@ design decision before the behavior is merged.
 
 ## `v0.5.0` statement API
 
-> **Status:** implemented for the upcoming `v0.5.0` release. The current
-> published release remains `v0.4.0`; these interfaces are available from the
-> repository source and become released behavior with `v0.5.0`.
+> **Status:** released in `v0.5.0`.
 
 ### Class and statement types
 

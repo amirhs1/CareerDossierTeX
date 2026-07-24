@@ -2,11 +2,9 @@
 
 A reusable LuaLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview` is the
-> current published release. It **replaces XeLaTeX with LuaLaTeX as the sole
-> supported engine**. This is a breaking toolchain change; users upgrading from
-> `v0.2.x` should see [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade
-> path.
+> **Status:** `v0.5.0 — Statements and Customization` is the current published
+> release. It adds statement documents, opt-in A4 paper, and an opt-in sans
+> body font while preserving the existing US Letter and serif defaults.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -18,28 +16,27 @@ CareerDossierTeX separates personal information from document content and presen
 
 ### Support matrix
 
-| Capability | `v0.4.0` support | Notes |
+| Capability | `v0.5.0` support | Notes |
 |---|---|---|
 | Industry résumé | Supported | Existing `v0.1.x` behavior remains compatible |
 | Industry cover letter | Supported | `family=industry` remains the default |
 | Academic CV | Supported | Multi-page layout with running headers and folios |
 | Academic cover letter | Supported | Select with `family=academic`; shares the CV's running headers and folios |
-| Statement documents | Upcoming `v0.5.0` | Implemented in repository source; the default interest type plus research, teaching, teaching philosophy, diversity, artist, and purpose |
+| Statement documents | Supported | Default interest type plus research, teaching, teaching philosophy, diversity, artist, and purpose |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar, ORCID, and affiliation fields |
 | Language | English | Farsi, bilingual, and RTL support is dropped |
 | Engine | LuaLaTeX | XeLaTeX and pdfLaTeX are unsupported and error early |
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
-| Paper size | US Letter; A4 upcoming in `v0.5.0` | `paper=letter` remains the default; repository source also accepts `paper=a4` |
-| Body font | Serif; sans upcoming in `v0.5.0` | `bodyfont=serif` remains the default; repository source also accepts `bodyfont=sans` |
+| Paper size | US Letter and A4 | `paper=letter` remains the default; `paper=a4` is opt-in |
+| Body font | Serif and sans | `bodyfont=serif` remains the default; `bodyfont=sans` is opt-in |
 | Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
-The statement class, opt-in A4 paper, and opt-in sans body font are implemented
-for the upcoming `v0.5.0` release. Color themes, named font combinations, icons,
-and alternate bibliography styles remain later work. Farsi, bilingual, and
-right-to-left support is dropped; CareerDossierTeX is English-only.
+Color themes, named font combinations, icons, and alternate bibliography styles
+remain later work. Farsi, bilingual, and right-to-left support is dropped;
+CareerDossierTeX is English-only.
 
 ## Requirements
 
@@ -400,7 +397,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview
+v0.5.0 — Statements and Customization
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.

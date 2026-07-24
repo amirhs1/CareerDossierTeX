@@ -2,12 +2,14 @@
 
 ## Status
 
-`v0.4.0` is the current published release. It **changes the supported engine
-from XeLaTeX to LuaLaTeX** — see
+`v0.5.0` is the current published release. `v0.4.0` **changes the supported
+engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
 
 No released public command, key, class option, or default has been renamed or
-removed. The `v0.4.0` break is in the toolchain, not the document API. Two
+removed in `v0.5.0`. Its statement class, A4 paper, sans body font, affiliation
+key, and contact labels are additive and opt-in; existing documents need no
+source edit. The `v0.4.0` break is in the toolchain, not the document API. Two
 documents do render differently — the academic CV's folio and the academic
 letter's page furniture — and neither requires a source edit; see step 5.
 

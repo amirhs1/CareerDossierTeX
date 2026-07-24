@@ -26,7 +26,7 @@
 %% that material and adds the letter body around it.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-letter} {2026-07-22} {0.5.0}
+\ProvidesExplClass {careerdossier-letter} {2026-07-24} {0.5.0}
   {CareerDossierTeX English cover-letter class}
 
 %% ---------------------------------------------------------------------------

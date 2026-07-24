@@ -8,13 +8,11 @@ package is built toward. It is **not** documentation of shipped behavior; only
 **Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
 sections that discuss XeTeX behavior are retained as rationale and history, and
 are marked as such.
-**Current published scope (`v0.4.0`):** English industry résumé, industry and academic
-cover-letter families, academic CV, and optional publication support; US Letter,
-monochrome, and LuaLaTeX, plus opt-in tagged structure. Later phases may extend
-the same principles to broader customization. The repository source also
-implements a default statement of interest and six other statement
-types for the upcoming `v0.5.0` release — see
-`docs/API.md` and `docs/ROADMAP.md`.
+**Current published scope (`v0.5.0`):** English industry résumé, industry and academic
+cover-letter families, academic CV, statement documents, and optional publication
+support; US Letter (default) and opt-in A4, monochrome, LuaLaTeX, and opt-in
+tagged structure. The statement class supports a default statement of interest
+plus six other statement types — see `docs/API.md` and `docs/ROADMAP.md`.
 **Maintainer:** Amir Sadeghi
 **Last reviewed:** 2026-07-22
 
@@ -309,7 +307,7 @@ TeX Gyre Heros and TeX Gyre Termes are reasonable portable starting points for
 sans and serif profiles. They are not magically ATS-safe; they are useful because
 they are widely distributed in TeX systems and can be tested reproducibly.
 
-For the upcoming `v0.5.0`, every class exposes only
+As of `v0.5.0`, every class exposes only
 `bodyfont=serif|sans`. The default `serif` mode keeps TeX Gyre Termes for body
 text and TeX Gyre Heros for headings; `sans` uses TeX Gyre Heros for both. Both
 families are resolved by exact TeX Live file name with all four common faces
