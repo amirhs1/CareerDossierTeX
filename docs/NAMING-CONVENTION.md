@@ -2,9 +2,7 @@
 
 This file defines the naming rules for issues, labels, branches, commits, pull requests, and releases in the `CareerDossierTeX` repository.
 
-The goal is to make the GitHub Project easy to scan and to keep the history consistent, especially while practicing a professional branch → pull request → merge workflow.
-
----
+The goal is to make the GitHub Project easy to scan and to keep the history consistent.
 
 ## 1. Core rule
 
@@ -141,7 +139,7 @@ Use these types:
 ```text
 feat      New user-facing or maintainer-facing feature
 fix       Bug fix
- docs      Documentation-only change
+docs      Documentation-only change
 test      Tests, examples, smoke tests, or regression checks
 ci        GitHub Actions or automation changes
 refactor  Code restructuring without changing public behavior
@@ -352,61 +350,7 @@ Rules:
 
 ---
 
-## 10. Recommended Phase 1 naming set
-
-### Parent issue
-
-```text
-[epic] Release v0.1.0 English industry dossier
-```
-
-### Sub-issues
-
-```text
-[docs] Inventory current résumé and cover-letter implementations
-[docs] Define the v0.1 public API
-[core] Implement metadata storage and validation
-[theme] Implement LuaLaTeX typography and monochrome tokens
-[components] Implement shared header and contact line
-[resume] Implement the English résumé class
-[letter] Implement the English industry cover-letter class
-[test] Establish the shared regression harness
-[ci] Build Phase 1 examples in GitHub Actions
-[docs] Prepare README, changelog, and release documentation
-[release] Publish v0.1.0
-```
-
-### Branches
-
-```text
-docs/current-class-inventory
-docs/v0.1-api
-feat/shared-foundation
-feat/resume-class
-feat/industry-letter
-test/regression-harness
-ci/lualatex-build
-docs/v0.1-release
-release/v0.1.0
-```
-
-### PR titles
-
-```text
-docs(inventory): record current resume and letter baseline
-docs(api): define v0.1 public API
-feat(core): add shared metadata foundation
-feat(resume): implement English résumé class
-feat(letter): implement industry cover-letter class
-test(build): establish Phase 1 regression harness
-ci(build): compile Phase 1 examples with LuaLaTeX
-docs(release): prepare v0.1.0 documentation
-release: prepare v0.1.0
-```
-
----
-
-## 11. Quick decision guide
+## 10. Quick decision guide
 
 When creating a new item, ask:
 
@@ -433,7 +377,7 @@ When creating a new item, ask:
 
 ---
 
-## 12. Golden rule
+## 11. Golden rule
 
 Keep names boring, predictable, and searchable.
 

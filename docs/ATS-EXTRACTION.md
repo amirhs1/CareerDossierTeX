@@ -887,27 +887,14 @@ feature of `v0.4.0`; it is a feasibility measurement for a later phase.
 
 ### 8.1 Module layout (matches the repository)
 
-CareerDossierTeX is modular. Keep classes thin and put reusable behaviour in the
-shared packages. The `v0.2.0` module set is:
+CareerDossierTeX is modular: keep classes thin and put reusable behaviour in the
+shared packages. `docs/ARCHITECTURE.md` is the authoritative module map and
+dependency direction; the ATS-relevant rules are that margins never live in
+`careerdossier-base` and contact-line logic is never duplicated across classes.
 
-```text
-careerdossier-base.sty        metadata, shared keys, required-field validation; no layout
-careerdossier-typography.sty  LuaLaTeX check, fontspec, portable fonts, semantic text roles
-careerdossier-theme.sty       monochrome semantic colour/rule/link tokens
-careerdossier-components.sty  identity block, contact line, link wrappers, entry primitives
-careerdossier-resume.cls      Letter geometry, sections, entries, compact lists
-careerdossier-letter.cls      industry/academic letter geometry and prose structure
-careerdossier-cv.cls          academic CV layout and manual publications
-careerdossier-biblatex.sty    optional fixed BibLaTeX/Biber profile
-```
-
-Do not place margins in `careerdossier-base`, and do not duplicate contact-line
-logic inside both classes.
-
-`careerdossier-statement.cls` is part of **v0.5.0**. Multilingual and RTL
-support is **dropped** (see `docs/ROADMAP.md`); should it ever return, it would
-extend the existing typography and component modules — and introduce a label
-abstraction — rather than add language-specific classes.
+Multilingual and RTL support is **dropped** (see `docs/ROADMAP.md`); should it
+ever return, it would extend the existing typography and component modules —
+and introduce a label abstraction — rather than add language-specific classes.
 
 ### 8.2 Build on a stable base class
 
@@ -936,36 +923,11 @@ a late, confusing font error appears.
 
 ### 8.4 Public API: semantic, small, and stable
 
-Public commands and environments use the `CDossier` prefix. The Phase 1 interface
-(see `docs/API.md` for the authoritative list) includes:
-
-```tex
-\CDossierSetup{
-  name     = {Ada Lovelace},
-  headline = {Data Scientist},
-  email    = {ada@example.org},
-  location = {Toronto, Ontario}
-}
-
-\CDossierSection{Experience}
-
-\begin{CDossierEntry}[
-  title        = {Senior Analyst},
-  organization = {Example Corporation},
-  location     = {Toronto, Ontario},
-  dates        = {January 2023 -- Present}
-]
-  \begin{CDossierItemize}
-    \item Reduced processing time by 35 percent.
-  \end{CDossierItemize}
-\end{CDossierEntry}
-```
-
-Entry metadata is passed as an optional key-value argument in `[...]`, and values
-containing commas are wrapped in braces (`location = {Toronto, Ontario}`). The
-implementation stores keys and emits them in one documented canonical order,
-regardless of the order in which users write them, and omits absent optional keys
-without leaving separators or spacing artifacts.
+Public commands and environments use the `CDossier` prefix; `docs/API.md` is the
+authoritative list with signatures, keys, and defaults. Two properties matter
+for extraction: the implementation emits stored keys in one documented canonical
+order regardless of input order, and it omits absent optional keys without
+leaving separators or spacing artifacts.
 
 Use `\NewDocumentCommand` and `\NewDocumentEnvironment` for public document
 interfaces. Use `expl3` for internal data structures and logic. Internal names use
@@ -974,26 +936,8 @@ package's internals and never expose private commands in examples or docs.
 
 ### 8.5 Options
 
-Use the kernel's current key-value option system (l3keys-based) for new code. The
-Phase 1 résumé keys are `fontsize` (`10pt`/`11pt`) and `density`
-(`compact`/`standard`); `paper=letter`, `theme=monochrome`, and `language=english`
-are fixed in `v0.1.0`. There is no `profile` key in Phase 1. Illustratively:
-
-```tex
-\DeclareKeys[careerdossier-resume]
-  {
-    density  .choice:,
-    density / compact  .code:n = { \__cdossier_resume_density_compact: },
-    density / standard .code:n = { \__cdossier_resume_density_standard: },
-    density  .initial:n = standard,
-
-    fontsize .store  = \l__cdossier_resume_fontsize_tl,
-    fontsize .initial:n = 11pt,
-  }
-\ProcessKeyOptions[careerdossier-resume]
-```
-
-Exact property names follow the installed kernel/l3keys documentation. The design
+Use the kernel's current key-value option system (l3keys-based) for new code;
+`docs/API.md` lists each class's accepted option values and defaults. The design
 rules matter more than the syntax:
 
 - documented defaults are predictable;
@@ -1032,56 +976,9 @@ requested font to an arbitrary system font.
 The repository uses a flat, handwritten `.sty`/`.cls` layout — which is fully
 acceptable for CTAN — with source at the top level and examples, docs, and CI in
 their own directories. This is the project's chosen path; a `.dtx`/`docstrip`
-workflow is an optional future consideration, not a requirement (see §14).
-
-Phase 1 layout (as in `docs/ARCHITECTURE.md`):
-
-```text
-CareerDossierTeX/
-├── careerdossier-base.sty
-├── careerdossier-typography.sty
-├── careerdossier-theme.sty
-├── careerdossier-components.sty
-├── careerdossier-resume.cls
-├── careerdossier-letter.cls
-├── examples/
-│   ├── profiles/
-│   │   └── profile-english.tex
-│   └── industry/
-│       ├── resume-english.tex
-│       └── letter-industry.tex
-├── tests/
-│   ├── regression/
-│   ├── smoke/
-│   ├── layout/
-│   └── extraction/
-│       ├── extraction-torture.tex
-│       └── extraction-torture.expected.txt
-├── docs/
-│   ├── API.md
-│   ├── ARCHITECTURE.md
-│   ├── ROADMAP.md
-│   ├── MIGRATION.md
-│   └── guides/
-│       └── ats-extraction.md
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   ├── workflows/
-│   │   └── build.yml
-│   └── pull_request_template.md
-├── build.lua
-├── Makefile
-├── manifest.txt
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-└── LICENSE
-```
-
-Later phases add `careerdossier-cv.cls` and `careerdossier-biblatex.sty`.
-Regression infrastructure is not deferred to those phases: introduce an
-`l3build` `build.lua` during Phase 1 and keep its suite under
-`tests/regression/`.
+workflow is an optional future consideration, not a requirement (see §14). See
+`docs/ARCHITECTURE.md` for the current repository layout and module set, and
+`build.lua` for the `l3build` regression configuration under `tests/regression/`.
 
 Separate: public commands from internal implementation; content semantics from
 visual details; user documentation from programmer documentation as the package
@@ -1137,28 +1034,13 @@ defer their creation.
 
 ### 11.2 `l3build` for package tests **(Phase 1 onward)**
 
-When `l3build` is adopted, configure it to use `tests/regression/` rather than a
-top-level `testfiles/` directory. Verify the exact variable names against the
-current manual; current manuals use engine names such as `luatex` for checks and
-an executable name for documentation typesetting:
-
-```lua
-module = "careerdossier"
-testfiledir = "tests/regression"
-
-checkengines = {"luatex"}
-stdengine    = "luatex"
-checkformat  = "latex"
-typesetexe   = "lualatex"
-
-checkruns   = 2
-typesetruns = 3
-```
-
-Add a regression test for every fixed bug. Inspect every newly saved `.tlg`;
-`l3build` can detect change, but it cannot decide whether the new output is
-correct. Also maintain negative tests proving that unsupported engines fail with
-the intended message.
+The regression harness is configured in `build.lua` (`tests/regression/`,
+LuaTeX, LaTeX format); `CONTRIBUTING.md` documents how to run and save its
+checks. Two disciplines are load-bearing for a text-layer-sensitive package:
+add a regression test for every fixed bug, and inspect every newly saved
+`.tlg` — `l3build` detects change but cannot decide whether the new output is
+correct. Maintain negative tests proving unsupported engines fail with the
+intended message.
 
 ### 11.3 Ground-truth extraction fixture **(Phase 1)**
 
@@ -1259,19 +1141,10 @@ that affects output.
 
 ## 13. Documentation requirements
 
-Keep documentation in sync with behaviour, in the same change. Map to the
-repository's existing files:
-
-- `docs/API.md` — every public command, environment, key, default, required field,
-  error, and warning; implemented behavior only.
-- `docs/ARCHITECTURE.md` — module boundaries and namespaces, canonical text
-  emission order, hooks, option-processing sequence, tagging assumptions, and the
-  font/extraction policy summarized from this guide.
-- `docs/ROADMAP.md` — phases, non-goals, and backlog items (including CTAN
-  packaging and the tagging revisit).
-- `docs/guides/ats-extraction.md` — this design and reference guide.
-- `README.md` — only behavior that actually works; never present planned features
-  as supported.
+Keep documentation in sync with behaviour, in the same change; `CONTRIBUTING.md`
+("Update … when") and `AGENTS.md` map each kind of change to the doc it belongs
+in. This guide owns one of those docs: the font, extraction, and tagging policy
+that `docs/ARCHITECTURE.md` summarizes from here.
 
 Keep examples fictional and realistic. Obvious placeholders such as `First Last` or
 `Company 1` can themselves be skipped by parsers, as Greenhouse's documentation

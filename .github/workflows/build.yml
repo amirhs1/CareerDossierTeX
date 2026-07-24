@@ -31,7 +31,7 @@ jobs:
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      # docs/guides/ats-extraction.md section 10 ("Reproducibility") requires the
+      # docs/ATS-EXTRACTION.md section 10 ("Reproducibility") requires the
       # tested toolchain to be recorded alongside the output it produced.
       - name: Record toolchain versions
         run: |

@@ -34,7 +34,7 @@ Use these canonical sources when they exist:
 - `README.md` — supported behavior and user-facing status
 - `AI-POLICY.md` — AI use, disclosure, attribution, security, and accountability
 - `CONTRIBUTING.md` — contribution, test, PR, CI, and release workflow
-- `docs/naming_conventions.md` — naming for GitHub objects and releases
+- `docs/NAMING-CONVENTION.md` — naming for GitHub objects and releases
 - `docs/agent-workflows/github-project.md` — draft PR and Project metadata workflow
 - `docs/agent-workflows/README.md` — map of the agent-instruction file set
 - `docs/API.md` — public API, defaults, warnings, and errors
@@ -188,7 +188,7 @@ Claude-specific path-scoped LaTeX rules live in `.claude/rules/latex.md`.
 
 ## Git and draft PR policy
 
-Use `docs/naming_conventions.md` for names.
+Use `docs/NAMING-CONVENTION.md` for names.
 
 - Never commit or push directly to `main`.
 - Keep one focused issue per meaningful branch where practical.

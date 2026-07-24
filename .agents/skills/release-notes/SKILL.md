@@ -11,7 +11,7 @@ Read and follow, in order:
 2. `docs/agent-workflows/release-notes.md`
 3. `CHANGELOG.md` — existing entries for house style, and the current
    `[Unreleased]` section
-4. `docs/naming_conventions.md` (tag, milestone, and release-title naming)
+4. `docs/NAMING-CONVENTION.md` (tag, milestone, and release-title naming)
 5. `CONTRIBUTING.md`'s "Update `CHANGELOG.md` when" and "Release
    contributions" sections
 

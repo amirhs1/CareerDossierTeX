@@ -19,7 +19,7 @@ change release scope, publish releases, or alter Project/repository configuratio
 Before setting metadata, inspect:
 
 1. the focused issue;
-2. `docs/naming_conventions.md`;
+2. `docs/NAMING-CONVENTION.md`;
 3. `scripts/setup-labels.sh`;
 4. the issue's milestone;
 5. the issue's current Project fields;
@@ -48,7 +48,7 @@ Confirm:
 - relevant tests and checks were run;
 - no generated artifacts, secrets, private data, or unrelated changes are included;
 - API, docs, design, and accessibility impacts are documented;
-- the PR title follows `docs/naming_conventions.md`.
+- the PR title follows `docs/NAMING-CONVENTION.md`.
 
 ## PR body
 
@@ -195,7 +195,7 @@ gh auth refresh -s read:project,project
 ### Repository metadata (repo scope)
 
 ```bash
-# Open a draft PR whose title follows docs/naming_conventions.md
+# Open a draft PR whose title follows docs/NAMING-CONVENTION.md
 gh pr create --draft --base main --head <branch> \
   --title "type(scope): imperative summary" --body-file <body.md>
 

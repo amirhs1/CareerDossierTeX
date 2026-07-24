@@ -97,7 +97,7 @@ Tagged output is a tested preview for the four fixture profiles (industry
 résumé, industry letter, academic CV, academic letter). It is not a PDF/UA,
 WCAG, ATS, or general accessibility conformance claim. See
 [`../README.md`](../README.md) and
-[`guides/ats-extraction.md`](guides/ats-extraction.md) for the scope of what has
+[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) for the scope of what has
 actually been verified.
 
 ## Résumé class

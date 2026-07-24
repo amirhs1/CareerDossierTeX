@@ -302,7 +302,7 @@ Apple PDFKit**. A **macOS VoiceOver** reading-order pass covered the four
 correctly while decorative rules and repeated page furniture stay silent; the
 statement fixture has not received a screen-reader pass. Recorded results and
 the exact toolchain are in
-[`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md) §7.1–7.2.
+[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) §7.1–7.2.
 
 That automated verification covers **those five fixtures only**. It is **not** a PDF/UA,
 WCAG, ATS, or general accessibility conformance claim, it does not extend to
@@ -386,7 +386,7 @@ gate, not the stage where feature tests are first created. See
 - [`docs/API.md`](docs/API.md): public commands, keys, environments, defaults, and errors
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): module boundaries and internal design
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
-- [`docs/guides/ats-extraction.md`](docs/guides/ats-extraction.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
+- [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
 - [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files

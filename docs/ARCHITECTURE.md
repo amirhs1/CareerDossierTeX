@@ -654,7 +654,7 @@ The extracted text should remain understandable and follow the visible document 
 The generated PDF's text layer is a first-class deliverable, owned jointly by
 `careerdossier-typography.sty` (how glyphs map back to characters) and the
 classes (reading order). The policy, with rationale and tests, lives in
-[`docs/guides/ats-extraction.md`](guides/ats-extraction.md). In summary:
+[`docs/ATS-EXTRACTION.md`](ATS-EXTRACTION.md). In summary:
 
 - compile with LuaLaTeX: LuaHBTeX writes real interword spaces, so extraction
   does not depend on per-word `/ActualText` spans (the XeTeX workaround that
@@ -708,10 +708,9 @@ CareerDossierTeX/
 ├── docs/
 │   ├── API.md
 │   ├── ARCHITECTURE.md
-│   ├── ROADMAP.md
+│   ├── ATS-EXTRACTION.md
 │   ├── MIGRATION.md
-│   └── guides/
-│       └── ats-extraction.md
+│   └── ROADMAP.md
 ├── tests/
 │   ├── regression/
 │   ├── smoke/
