@@ -57,6 +57,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   Existing letters may reflow and should have their pagination reviewed.
   ([#143])
 
+- **BREAKING (statement layout):** Statement headers and prose now use the
+  calibrated type and rhythm tokens. The name, full title, subtitle,
+  affiliation, application context, contacts, header gaps, and paragraph gaps
+  scale with `fontsize`; in particular, the name is no longer fixed at LaTeX's
+  24.88 pt `\Huge` size. The seven type contracts, short continuation titles,
+  PDF metadata, required fields, contact sets, and optional-field separators
+  are unchanged. Existing statements may reflow and should have their
+  pagination reviewed. ([#144])
+
 ### Removed
 
 - **BREAKING (résumé and CV options):** Removed
@@ -71,6 +80,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#141]: https://github.com/amirhs1/CareerDossierTeX/issues/141
 [#142]: https://github.com/amirhs1/CareerDossierTeX/issues/142
 [#143]: https://github.com/amirhs1/CareerDossierTeX/issues/143
+[#144]: https://github.com/amirhs1/CareerDossierTeX/issues/144
 
 ## [0.5.0] - 2026-07-24
 

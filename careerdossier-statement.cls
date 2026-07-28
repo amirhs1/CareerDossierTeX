@@ -22,7 +22,7 @@
 %% components modules.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-statement} {2026-07-24} {0.5.0}
+\ProvidesExplClass {careerdossier-statement} {2026-07-28} {0.6.0}
   {CareerDossierTeX English statement class}
 
 %% ---------------------------------------------------------------------------
@@ -130,10 +130,9 @@
 \RequirePackage { hyperref }
 \CDossierApplyBodySize
 
-%% Academic-letter prose rhythm remains the initial statement design.
 \exp_args:NV \CDossierApplyGeometry:n \l__cdossier_statement_paper_tl
 \setlength { \parindent }        { 0pt }
-\setlength { \parskip }          { 1ex plus 0.4ex minus 0.1ex }
+\setlength { \parskip }          { \CDossierProseParSkip }
 \setlength { \emergencystretch } { 2em }
 
 %% ---------------------------------------------------------------------------
@@ -308,38 +307,52 @@
 \NewDocumentCommand \MakeCDossierStatementHeader { }
   {
     \__cdossier_statement_validate:
-    \begin { center }
-      { \CDossierNameStyle \Huge \CDossierPrintField { name } \par }
-      \smallskip
+    \par
+    \addvspace { \CDossierHeaderAboveSkip }
+    \group_begin:
+      \centering
+      {
+        \CDossierNameStyle \CDossierSizeName
+        \CDossierPrintField { name } \par
+      }
+      \vspace { \CDossierHeaderNameGapSkip }
       \__cdossier_typography_heading:n
-        { \CDossierSectionStyle \Large \tl_use:N \l__cdossier_statement_title_tl }
+        {
+          \CDossierSectionStyle \CDossierSizeTitle
+          \tl_use:N \l__cdossier_statement_title_tl
+        }
       \tl_if_blank:VF \l__cdossier_statement_subtitle_tl
         {
-          \smallskip
-          { \CDossierHeadlineStyle \large
+          \vspace { \CDossierHeaderMetaGapSkip }
+          { \CDossierHeadlineStyle \CDossierSizeHeadline
             \tl_use:N \l__cdossier_statement_subtitle_tl \par }
         }
       \CDossierIfFieldTF { affiliation }
         {
-          \smallskip
-          { \CDossierBodyStyle \CDossierPrintField { affiliation } \par }
+          \vspace { \CDossierHeaderMetaGapSkip }
+          {
+            \CDossierBodyStyle \CDossierSizeBody
+            \CDossierPrintField { affiliation } \par
+          }
         }
         { }
       \bool_lazy_or:nnT
         { ! \tl_if_blank_p:V \l__cdossier_statement_context_tl }
         { ! \tl_if_blank_p:V \l__cdossier_statement_application_id_tl }
         {
-          \smallskip
-          { \CDossierMutedStyle \small \__cdossier_statement_contextline: \par }
+          \vspace { \CDossierHeaderMetaGapSkip }
+          {
+            \CDossierMutedStyle \CDossierSizeSmall
+            \__cdossier_statement_contextline: \par
+          }
         }
-      \smallskip
-      { \CDossierBodyStyle \small
+      \vspace { \CDossierHeaderMetaGapSkip }
+      { \CDossierBodyStyle \CDossierSizeSmall
         \__cdossier_components_contactline:N
           \l__cdossier_statement_contacts_clist
         \par }
-    \end { center }
-    \par
-    \addvspace { 1.5ex plus 0.5ex minus 0.2ex }
+    \group_end:
+    \addvspace { \CDossierHeaderBelowSkip }
   }
 
 \endinput

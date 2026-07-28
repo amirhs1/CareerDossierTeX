@@ -1,6 +1,17 @@
 \documentclass[type=artist]{careerdossier-statement}
-\CDossierSetup{name={Ada Lovelace}, email={ada@example.test}, website={portfolio.example.test}}
+\input{statement-header-tokens.inc}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.test}, phone={+1 555 0100},
+  website={portfolio.example.test}, affiliation={Independent Studio}
+}
+\CDossierStatementSetup{
+  subtitle={Material and computation}, application-context={Residency application},
+  application-id={APP-144}
+}
 \begin{document}
 \MakeCDossierStatementHeader
+\ExplSyntaxOn
+\__cdossier_test_statement_assert_header_sizes:
+\ExplSyntaxOff
 My practice examines the relationship between material and computation.
 \end{document}

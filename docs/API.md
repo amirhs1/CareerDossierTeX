@@ -904,7 +904,7 @@ duplicating geometry and page behavior across statement document models.
 
 ### Statement layout
 
-The initial statement release starts from the academic cover-letter design:
+The `v0.6.0` development layout uses the shared calibrated design system:
 
 - LuaLaTeX, English, and monochrome output;
 - `paper=letter|a4`, defaulting to US Letter and preserving the academic
@@ -913,7 +913,10 @@ The initial statement release starts from the academic cover-letter design:
   retaining TeX Gyre Heros headings in both modes;
 - 12 pt body text by default, with `10pt` and `11pt` available;
 - normal one-inch margins by default, with `margin=narrow` available;
-- academic-letter prose paragraph rhythm;
+- name, title, subtitle, affiliation, context, and contact sizes selected from
+  the calibrated type scale;
+- header gaps and prose paragraph rhythm derived from the selected body
+  baseline;
 - a centered identity block in the body on page one;
 - no running header on page one;
 - a centered `<name> -- <running title>` header from page two; and
@@ -921,9 +924,12 @@ The initial statement release starts from the academic cover-letter design:
 
 Page furniture is component-owned and not user-configurable. The statement
 class registers its short running title with the shared component and uses the
-same paper and body-font options and defaults as the résumé, CV, and letter
-classes. Named or per-role font combinations remain future design work in issue
-#120. Color themes and icons are deferred from `v0.5.0`.
+same type, rhythm, geometry, paper, and body-font system as the résumé, CV, and
+letter classes. The seven statement types retain independent full display and
+short running titles: the full title remains meaningful page-one content and
+PDF metadata, while the short title is used only in continuation furniture.
+Named or per-role font combinations remain future design work in issue #120.
+Color themes and icons remain unsupported.
 
 ### Statement metadata
 

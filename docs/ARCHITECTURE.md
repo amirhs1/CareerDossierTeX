@@ -386,13 +386,16 @@ The letter class should not reuse résumé geometry merely because both document
 share a header, and the family choice should not introduce family-conditional
 geometry or spacing.
 
-### `careerdossier-statement.cls` (`v0.5.0`)
+### `careerdossier-statement.cls` (`v0.5.0`, calibrated in `v0.6.0`)
 
 Owns the shared statement document model approved in issue #103.
 
 Responsibilities:
 
-- require one of the six documented `type` values and select its default title;
+- require one of the seven documented `type` values and select its default title;
+- process `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`, preserving
+  `12pt,normal` as the prose-oriented defaults;
+- select Letter or A4 paper and delegate geometry to the shared token package;
 - store statement-scoped title, running-title, subtitle, application-context,
   and application-ID metadata;
 - validate `name` and `email` for every type, research affiliation, and artist
@@ -402,7 +405,8 @@ Responsibilities:
   separately bounded running title identifies continuation pages;
 - register that short running title with the shared page-furniture component;
 - reuse component-owned link normalization and separator-safe contact output;
-- start from the academic letter's geometry, typography, and prose rhythm;
+- derive every header size and gap plus prose paragraph rhythm from the shared
+  token package;
 - keep running page furniture out of tagged structure; and
 - allow ordinary prose and standard LaTeX sectioning without imposing a
   type-specific narrative schema.

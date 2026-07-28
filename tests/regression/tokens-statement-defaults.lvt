@@ -8,6 +8,10 @@
     \TYPE{margin = \l__cdossier_tokens_margin_tl}
     \TYPE{body-size = \dim_use:N \CDossierBodySize}
     \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
+    \TYPE{prose-par-skip = \skip_use:N \CDossierProseParSkip}
+    \skip_if_eq:nnTF { \parskip } { \CDossierProseParSkip }
+      { \TYPE{paragraph-rhythm = shared} }
+      { \TYPE{paragraph-rhythm = local} }
   }
 \ExplSyntaxOff
 \begin{document}
