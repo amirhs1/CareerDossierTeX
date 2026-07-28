@@ -69,11 +69,12 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Fixed
 
 - Contact separators now disappear when the contact paragraph wraps between
-  fields, so no visual line begins or ends with `|`. URL-aware breaks, fixed
-  field and extraction order, link targets, tagged artifact treatment, and the
-  rule that missing fields leave no stray separators are preserved. A small
-  local emergency stretch handles minor pressure, and `\allowbreak` is
-  documented for exceptional unbroken plain-text values. ([#151])
+  fields, so no visual line begins or ends with `|`. Every contact item remains
+  intact on one visual line; if an item is wider than the available line, the
+  package stops with a field-specific error rather than splitting it or
+  producing knowingly overfull output. Fixed field and extraction order, link
+  targets, tagged artifact treatment, and the rule that missing fields leave
+  no stray separators are preserved. ([#151])
 
 ### Removed
 

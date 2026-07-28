@@ -1,25 +1,25 @@
 % components-contactline.lvt — careerdossier-components separator placement.
 %
-% The rendered contact line must join only the present fields, in a fixed order,
-% with a separator *between* items and never leading, trailing, or doubled. The
-% visible line is checked by the extraction fixtures; this test isolates the
-% control flow that guarantees clean separators, independently of fonts.
+% The rendered contact block must join only the present fields, in a fixed
+% order, with a separator *between* same-row items and never leading, trailing,
+% or doubled. The visible packing is checked by the layout fixtures; this test
+% isolates the field-selection and separator control flow independently of
+% fonts.
 %
 % The leaf operations are stubbed to emit log markers instead of typeset
 % output: \__cdossier_components_sep: -> |, \__cdossier_components_render:n
 % -> <field>, and \__cdossier_components_labeltext:n -> [Label:]. The render
 % stub mirrors the real \__cdossier_components_render:n by keeping its opening
 % \__cdossier_components_label:n call, so the label gating and field-selection
-% logic (issue #95) runs unchanged. The real
-% \__cdossier_components_contactline: (its presence tests and separator
-% bookkeeping) is exercised unchanged, so the marker sequence is exactly the
-% join the module would produce.
+% logic (issue #95) runs unchanged. Field markers appear when each atomic box is
+% prepared; separator markers appear when the prepared box is packed with the
+% preceding row. Their log order therefore reflects the packing algorithm, not
+% the shipped visual order (which the layout tests inspect).
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
 
 \ExplSyntaxOn
-\cs_new_eq:NN \cdossiertestOriginalSeparator \__cdossier_components_sep:
 \cs_set_protected:Npn \__cdossier_components_sep: { \TYPE{|} }
 \cs_set_protected:Npn \__cdossier_components_render:n #1
   { \__cdossier_components_label:n {#1} \TYPE{<#1>} }
@@ -33,36 +33,10 @@
 \clist_const:Nn \c_cdossiertest_statement_contacts_clist { email , website , orcid }
 \cs_new_protected:Npn \cdossiertestFilteredContactLine
   { \__cdossier_components_contactline:N \c_cdossiertest_statement_contacts_clist }
-\cs_new_protected:Npn \cdossiertestDiscretionarySeparator
-  {
-    \group_begin:
-      \cs_set_protected:Npn \discretionary ##1##2##3
-        {
-          \tl_if_blank:nTF {##1} { \TYPE{pre-break=empty} } { \TYPE{pre-break=nonempty} }
-          \tl_if_blank:nTF {##2} { \TYPE{post-break=empty} } { \TYPE{post-break=nonempty} }
-          \TYPE{no-break=begin}
-          ##3
-          \TYPE{no-break=end}
-        }
-      \cs_set_protected:Npn \__cdossier_typography_layout_artifact:n ##1
-        {
-          \TYPE{artifact=begin}
-          ##1
-          \TYPE{artifact=end}
-        }
-      \cdossiertestOriginalSeparator
-    \group_end:
-  }
 \ExplSyntaxOff
 
 \begin{document}
 \START
-
-% The boundary itself must be a discretionary with empty break branches. The
-% visible, artifact-marked bar belongs exclusively to the no-break branch.
-\TEST{separator-is-discretionary}{
-  \cdossiertestDiscretionarySeparator
-}
 
 % Gaps in the middle: present email, location, github; phone/website/linkedin/
 % scholar absent. Separators must appear only between the three present items.

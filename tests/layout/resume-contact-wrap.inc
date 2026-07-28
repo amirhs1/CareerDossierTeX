@@ -4,7 +4,7 @@
   headline = {Principal Data Scientist and Machine Learning Platform Architect},
   email    = {alexandria.montgomery.fitzgerald@a-very-long-department.example.org},
   phone    = {+1 416 555 0142},
-  location = {GreaterToronto\allowbreak{}RegionalOffice, Ontario, Canada},
+  location = {Greater Toronto Regional Office, Ontario, Canada},
   website  = {example.org/alexandria-montgomery-fitzgerald/portfolio},
   linkedin = {linkedin.com/in/alexandria-montgomery-fitzgerald},
   github   = {github.com/alexandria-montgomery-fitzgerald},

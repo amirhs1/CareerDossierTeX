@@ -1,0 +1,14 @@
+% A contact item wider than the available line must fail with a field-specific
+% diagnostic instead of splitting or producing knowingly overfull output.
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  website = {
+    example.org/this-single-contact-item-is-intentionally-far-too-wide-for-the-line/
+    this-single-contact-item-is-intentionally-far-too-wide-for-the-line/
+    this-single-contact-item-is-intentionally-far-too-wide-for-the-line
+  },
+}
+\begin{document}
+\MakeCDossierHeader
+\end{document}

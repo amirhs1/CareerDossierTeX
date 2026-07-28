@@ -338,27 +338,20 @@ and PDFKit plain-text extraction with clean separators.
 
 ### Contact-line wrapping
 
-Contact fields form a naturally wrapping, centered paragraph. A ` | ` separator
-is shown only when the adjacent fields stay on the same visual line; when TeX
-breaks between two fields, the boundary is empty on both lines. Breaks between
-complete fields are preferred, while email addresses and web-profile values
-retain the URL-aware breakpoints supplied by `\nolinkurl`.
+Contact fields form a centered block whose rows are packed greedily in the
+fixed field order. Complete fields are the only permitted contact-line units:
+email addresses, phone numbers, locations, websites, LinkedIn, GitHub, Scholar,
+and ORCID items remain intact on one visual line. A ` | ` separator is inserted
+only after two adjacent items are known to fit on the same row, so no visual
+line begins or ends with one.
 
-Phone and location values retain ordinary word-space and hyphen breakpoints.
-The package does not silently split an otherwise unbreakable plain-text word.
-For an exceptional value, insert `\allowbreak` at a semantically acceptable
-position:
-
-```latex
-\CDossierSetup{
-  location = {GreaterToronto\allowbreak{}RegionalOffice}
-}
-```
-
-The contact paragraph uses a locally scoped half-em `\emergencystretch` for
-minor spacing pressure. It does not truncate values or reduce the selected
-font size. Field order, link targets, extraction order, and missing-field
-handling are unchanged; separators remain layout artifacts in tagged output.
+The component does not truncate values or reduce the selected font size. Before
+packing, each complete item is measured against the available contact-line
+width. An item that cannot fit on an otherwise empty line raises an error
+naming the field; shorten its displayed value, select `margin=narrow`, or choose
+a smaller supported `fontsize`. Field order, link targets, extraction order,
+and missing-field handling are unchanged; separators remain layout artifacts
+in tagged output.
 
 **VoiceOver verification (2026-07-23).** The maintainer ran VoiceOver in
 Preview (PDFKit) over all four tagged/untagged × labelled/unlabelled

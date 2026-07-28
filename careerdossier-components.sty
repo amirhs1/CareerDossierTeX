@@ -45,6 +45,18 @@
 \str_new:N  \l__cdossier_components_scheme_str
 \bool_new:N \l__cdossier_components_printed_bool
 \tl_new:N   \l__cdossier_components_label_tl
+\box_new:N  \l__cdossier_components_contact_box
+\box_new:N  \l__cdossier_components_contact_line_box
+\box_new:N  \l__cdossier_components_contact_candidate_box
+\dim_new:N  \l__cdossier_components_contact_sep_dim
+
+\msg_new:nnnn { careerdossier-components } { contact-item-too-wide }
+  { Contact~field~'#1'~is~wider~than~the~available~contact-line~width. }
+  {
+    Shorten~the~displayed~value,~select~margin=narrow,~or~use~a~smaller~
+    supported~fontsize.~Contact~items~are~kept~on~one~line~and~are~not~
+    split~automatically.
+  }
 
 %% Opt-in contact-field labels (issue #95). A screen reader announces the email
 %% and website as links, but a phone number is read as bare digits with nothing
@@ -84,20 +96,12 @@
       }
   }
 
-%% Boundary between present contact items.  The bar exists only in the
-%% no-break branch: when TeX takes this discretionary, neither the previous
-%% line nor the next one receives separator material.  The artifact wrapper
-%% surrounds the discretionary because PDF marking operators are not legal
-%% inside a discretionary replacement list.
+%% Boundary between present contact items. The deterministic row packer calls
+%% this only after both adjacent atomic items are known to fit on the same row.
 \cs_new_protected:Npn \__cdossier_components_sep:
   {
     \__cdossier_typography_layout_artifact:n
-      {
-        \discretionary
-          { }
-          { }
-          { \hbox:n { ~|~ } }
-      }
+      { \hbox:n { ~|~ } }
   }
 
 %% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
@@ -173,34 +177,106 @@
       { \CDossierPrintField {#1} }
   }
 
+%% Render one complete contact item into a box.  If the item cannot fit even on
+%% an otherwise empty line, stop with a field-specific diagnostic instead of
+%% silently splitting it or producing knowingly overfull output.
+\cs_new_protected:Npn \__cdossier_components_contactitem_set:n #1
+  {
+    \hbox_set:Nn \l__cdossier_components_contact_box
+      { \__cdossier_components_render:n {#1} }
+    \dim_compare:nNnT
+      { \box_wd:N \l__cdossier_components_contact_box }
+      >
+      { \linewidth }
+      {
+        \msg_error:nnn
+          { careerdossier-components }
+          { contact-item-too-wide }
+          {#1}
+      }
+  }
+
+%% Ship one packed contact row at the full available width.  The stretch on
+%% either side centers the already-packed atomic items without introducing any
+%% breakpoints or changing their extraction order.
+\cs_new_protected:Npn \__cdossier_components_contactline_ship:
+  {
+    \noindent
+    \hbox_to_wd:nn { \linewidth }
+      {
+        \hfil
+        \box_use_drop:N \l__cdossier_components_contact_line_box
+        \hfil
+      }
+    \par
+  }
+
 %% Build a contact line from a caller-supplied ordered field list. This keeps
 %% link normalization and separator insertion component-owned while allowing a
 %% document class to display only the contacts relevant to its document model.
+%% Rows are packed greedily in fixed field order. Separators are added only
+%% after two atomic items are known to fit on the same row, so a bar can never
+%% be orphaned at either visual edge.
 \cs_new_protected:Npn \__cdossier_components_contactline:N #1
   {
     \bool_set_false:N \l__cdossier_components_printed_bool
+    \hbox_set:Nn \l__cdossier_components_contact_candidate_box { ~|~ }
+    \dim_set:Nn \l__cdossier_components_contact_sep_dim
+      { \box_wd:N \l__cdossier_components_contact_candidate_box }
     \clist_map_inline:Nn #1
       {
         \CDossierIfFieldTF {##1}
           {
-            \bool_if:NT \l__cdossier_components_printed_bool
-              { \__cdossier_components_sep: }
-            \__cdossier_components_render:n {##1}
-            \bool_set_true:N \l__cdossier_components_printed_bool
+            \__cdossier_components_contactitem_set:n {##1}
+            \bool_if:NTF \l__cdossier_components_printed_bool
+              {
+                \dim_compare:nNnTF
+                  {
+                    \box_wd:N \l__cdossier_components_contact_line_box
+                    + \l__cdossier_components_contact_sep_dim
+                    + \box_wd:N \l__cdossier_components_contact_box
+                  }
+                  >
+                  { \linewidth }
+                  {
+                    \__cdossier_components_contactline_ship:
+                    \box_set_eq_drop:NN
+                      \l__cdossier_components_contact_line_box
+                      \l__cdossier_components_contact_box
+                  }
+                  {
+                    \hbox_set:Nn
+                      \l__cdossier_components_contact_candidate_box
+                      {
+                        \box_use_drop:N
+                          \l__cdossier_components_contact_line_box
+                        \__cdossier_components_sep:
+                        \box_use_drop:N \l__cdossier_components_contact_box
+                      }
+                    \box_set_eq_drop:NN
+                      \l__cdossier_components_contact_line_box
+                      \l__cdossier_components_contact_candidate_box
+                  }
+              }
+              {
+                \box_set_eq_drop:NN
+                  \l__cdossier_components_contact_line_box
+                  \l__cdossier_components_contact_box
+                \bool_set_true:N \l__cdossier_components_printed_bool
+              }
           }
           { }
       }
+    \bool_if:NT \l__cdossier_components_printed_bool
+      { \__cdossier_components_contactline_ship: }
   }
 
-%% Typeset a complete contact paragraph.  The half-em emergency stretch is
-%% deliberately local and small: it can absorb minor spacing pressure without
-%% shrinking type or inventing breakpoints inside an unbreakable plain value.
+%% Typeset the complete contact block. Packing is deterministic, so no
+%% emergency stretch or paragraph-internal breakpoint is required.
 \cs_new_protected:Npn \__cdossier_components_contactparagraph:N #1
   {
     \group_begin:
-      \setlength { \emergencystretch } { .5em }
       \__cdossier_components_contactline:N #1
-      \par
     \group_end:
   }
 
