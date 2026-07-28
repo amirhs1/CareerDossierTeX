@@ -76,6 +76,7 @@ cases=(
   "resume-bad-bodyfont fail|accepts only a fixed set of"
   "resume-unknown-option fail|Unknown class option 'format'"
   "resume-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
+  "resume-contact-too-wide fail|is wider than the available contact-line width."
   "resume-shared-profile pass"
   "cv-valid pass"
   "cv-sans-body pass"
@@ -184,6 +185,10 @@ for entry in "${cases[@]}"; do
         flat="$(printf '%s' "$flat" \
           | sed 's/(careerdossier-resume)[[:space:]]*/ /g;
                  s/(careerdossier-cv)[[:space:]]*/ /g' | tr -s ' ')"
+      fi
+      if [ "$base" = "resume-contact-too-wide" ]; then
+        flat="$(printf '%s' "$flat" \
+          | sed 's/(careerdossier-components)[[:space:]]*/ /g' | tr -s ' ')"
       fi
       if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
         echo "  FAILED for the wrong reason: expected '$needle' in the log"; fail=1

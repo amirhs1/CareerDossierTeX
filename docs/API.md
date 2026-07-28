@@ -336,6 +336,23 @@ baseline (`tests/extraction/resume-contact-labels.tex` and
 `tests/extraction/resume-contact-optional.tex`). The labels survive Poppler
 and PDFKit plain-text extraction with clean separators.
 
+### Contact-line wrapping
+
+Contact fields form a centered block whose rows are packed greedily in the
+fixed field order. Complete fields are the only permitted contact-line units:
+email addresses, phone numbers, locations, websites, LinkedIn, GitHub, Scholar,
+and ORCID items remain intact on one visual line. A ` | ` separator is inserted
+only after two adjacent items are known to fit on the same row, so no visual
+line begins or ends with one.
+
+The component does not truncate values or reduce the selected font size. Before
+packing, each complete item is measured against the available contact-line
+width. An item that cannot fit on an otherwise empty line raises an error
+naming the field; shorten its displayed value, select `margin=narrow`, or choose
+a smaller supported `fontsize`. Field order, link targets, extraction order,
+and missing-field handling are unchanged; separators remain layout artifacts
+in tagged output.
+
 **VoiceOver verification (2026-07-23).** The maintainer ran VoiceOver in
 Preview (PDFKit) over all four tagged/untagged × labelled/unlabelled
 combinations of a fixture matching this section's example. Both unlabelled
@@ -467,7 +484,8 @@ Expected behavior:
   baseline rhythm rather than the base class's `center` environment;
 - renders `headline` only when present;
 - renders available contact fields;
-- inserts separators only between rendered fields;
+- inserts separators only between rendered fields that remain on the same
+  visual line;
 - creates links for supported contact fields;
 - prefixes `Email:`, `Phone:`, and `Website:` text labels when
   `contact-labels = true` (see “Contact-field labels”);

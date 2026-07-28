@@ -1,19 +1,20 @@
 % components-contactline.lvt — careerdossier-components separator placement.
 %
-% The rendered contact line must join only the present fields, in a fixed order,
-% with a separator *between* items and never leading, trailing, or doubled. The
-% visible line is checked by the extraction fixtures; this test isolates the
-% control flow that guarantees clean separators, independently of fonts.
+% The rendered contact block must join only the present fields, in a fixed
+% order, with a separator *between* same-row items and never leading, trailing,
+% or doubled. The visible packing is checked by the layout fixtures; this test
+% isolates the field-selection and separator control flow independently of
+% fonts.
 %
 % The leaf operations are stubbed to emit log markers instead of typeset
 % output: \__cdossier_components_sep: -> |, \__cdossier_components_render:n
 % -> <field>, and \__cdossier_components_labeltext:n -> [Label:]. The render
 % stub mirrors the real \__cdossier_components_render:n by keeping its opening
 % \__cdossier_components_label:n call, so the label gating and field-selection
-% logic (issue #95) runs unchanged. The real
-% \__cdossier_components_contactline: (its presence tests and separator
-% bookkeeping) is exercised unchanged, so the marker sequence is exactly the
-% join the module would produce.
+% logic (issue #95) runs unchanged. Field markers appear when each atomic box is
+% prepared; separator markers appear when the prepared box is packed with the
+% preceding row. Their log order therefore reflects the packing algorithm, not
+% the shipped visual order (which the layout tests inspect).
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}

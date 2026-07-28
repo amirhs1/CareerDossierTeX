@@ -132,6 +132,36 @@ for tex in *.tex; do
     else
       echo "  multi-page folios and running headers present"
     fi
+
+    case "$base" in
+      resume-contact-wrap-*)
+        contact_text="$(pdftotext -layout -enc UTF-8 "$base.pdf" - | tr -d '\f')"
+        if printf '%s\n' "$contact_text" \
+            | grep -Eq '^[[:space:]]*\||\|[[:space:]]*$'; then
+          echo "  ORPHAN CONTACT SEPARATOR"; fail=1
+        else
+          echo "  wrapped contact lines have no orphan separators"
+        fi
+        contact_item_fail=0
+        while IFS= read -r item; do
+          if ! printf '%s\n' "$contact_text" | grep -Fq "$item"; then
+            echo "  SPLIT CONTACT ITEM: $item"; fail=1; contact_item_fail=1
+          fi
+        done <<'EOF'
+alexandria.montgomery.fitzgerald@a-very-long-department.example.org
++1 416 555 0142
+Greater Toronto Regional Office, Ontario, Canada
+example.org/alexandria-montgomery-fitzgerald/portfolio
+linkedin.com/in/alexandria-montgomery-fitzgerald
+github.com/alexandria-montgomery-fitzgerald
+scholar.google.com/citations?user=AlexandriaMontgomery
+ORCID: 0000-0002-1825-0097
+EOF
+        if [ "$contact_item_fail" -eq 0 ]; then
+          echo "  every contact item remains on one visual line"
+        fi
+        ;;
+    esac
   else
     echo "  (pdftotext absent: skipped folio check)"
   fi
