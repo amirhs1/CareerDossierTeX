@@ -13,6 +13,32 @@ source edit. The `v0.4.0` break is in the toolchain, not the document API. Two
 documents do render differently — the academic CV's folio and the academic
 letter's page furniture — and neither requires a source edit; see step 5.
 
+## Upgrading to the `v0.6.0` development version
+
+The development version adds `fontsize=12pt` and
+`margin=normal|narrow` consistently across all four document classes. The
+résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
+statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
+inch and `narrow` is half an inch. These changed defaults reflow existing
+documents, so review line and page breaks after upgrading.
+
+To preserve a released class's previous body-size choice, set it explicitly in
+the document class options. The old per-class physical margins do not map
+exactly to both new presets; choose the closest preset and review the result.
+
+Users who need dimensions beyond the two supported presets may call
+`\geometry{...}` after `\documentclass`, because the classes already load the
+package through `careerdossier-tokens`:
+
+```latex
+\documentclass[margin=normal]{careerdossier-letter}
+\geometry{left=1.15in,right=1.15in,top=0.9in,bottom=0.9in}
+```
+
+Do not add another `\usepackage[...]{geometry}` call; reloading an already
+loaded package with new options can produce an option clash. Custom geometry
+bypasses the tested `normal` and `narrow` presets.
+
 ## Upgrading to `v0.4.0`: XeLaTeX → LuaLaTeX
 
 `v0.4.0` makes LuaLaTeX the sole supported engine. XeLaTeX and pdfLaTeX now stop

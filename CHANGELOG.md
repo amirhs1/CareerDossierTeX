@@ -8,6 +8,26 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- Added `careerdossier-tokens`, the shared source of truth for the 10 pt,
+  11 pt, and 12 pt type scales, baseline-derived vertical rhythm, rule and
+  flush-left list metrics, and `margin=normal|narrow` geometry presets. All
+  four classes accept the same `fontsize` and `margin` values; advanced users
+  may call `\geometry{...}` after the class for an untested custom layout
+  without reloading the package. Optional fields and separator behavior are
+  unchanged. ([#138])
+
+### Changed
+
+- **BREAKING (layout defaults):** The résumé now defaults to
+  `fontsize=11pt,margin=narrow`; the CV, letter, and statement classes default
+  to `fontsize=12pt,margin=normal`. `normal` is one inch and `narrow` is half
+  an inch. Existing documents may reflow and should have their pagination
+  reviewed after upgrading. ([#138])
+
+[#138]: https://github.com/amirhs1/CareerDossierTeX/issues/138
+
 ## [0.5.0] - 2026-07-24
 
 ### Added

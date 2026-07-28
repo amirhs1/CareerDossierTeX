@@ -115,7 +115,7 @@ normalize() {
 # asserted; only empty lines are dropped. Poppler's baseline keeps its blank
 # lines and continues to pin exact spacing.
 normalize_mupdf() {
-  normalize | grep -v '^[[:space:]]*$'
+  normalize | sed -E 's/[[:space:]]+$//' | grep -v '^[[:space:]]*$'
 }
 
 record_failure() {
@@ -361,14 +361,64 @@ check_untagged() {
 
 check_visual_equivalence() {
   local base="$1" tagged="$work/$base.bbox" plain="$work/$base-untagged.bbox"
-  # Compare every rendered word and its bounding box to one decimal point.
-  # This catches material layout movement while tolerating sub-tenth-point
-  # placement noise introduced by zero-width tagging whatsits.
-  pdftotext -bbox "$work/$base.pdf" - \
-    | grep '<word ' | sed -E 's/([0-9]+\.[0-9])[0-9]+"/\1"/g' >"$tagged"
-  pdftotext -bbox "$work/$base-untagged.pdf" - \
-    | grep '<word ' | sed -E 's/([0-9]+\.[0-9])[0-9]+"/\1"/g' >"$plain"
-  if ! diff -u "$plain" "$tagged" >"$work/$base-layout.diff"; then
+  # Compare every rendered word and its bounding box with an explicit 0.11pt
+  # tolerance. Numeric comparison is required: rounding or truncating decimal
+  # strings can turn sub-tenth-point noise across a boundary into a false
+  # one-tenth-point failure.
+  pdftotext -bbox "$work/$base.pdf" - | grep '<word ' >"$tagged"
+  pdftotext -bbox "$work/$base-untagged.pdf" - | grep '<word ' >"$plain"
+  if ! perl - "$plain" "$tagged" >"$work/$base-layout.diff" <<'PERL'
+use strict;
+use warnings;
+
+my ($plain_path, $tagged_path) = @ARGV;
+open my $plain_fh, '<', $plain_path or die "open $plain_path: $!";
+open my $tagged_fh, '<', $tagged_path or die "open $tagged_path: $!";
+my @plain = <$plain_fh>;
+my @tagged = <$tagged_fh>;
+
+if (@plain != @tagged) {
+  print "word-count mismatch: untagged=", scalar @plain,
+    " tagged=", scalar @tagged, "\n";
+  exit 1;
+}
+
+my $failed = 0;
+for my $index (0 .. $#plain) {
+  my $pattern = qr{
+    <word \s+
+    xMin="([0-9.]+)" \s+ yMin="([0-9.]+)" \s+
+    xMax="([0-9.]+)" \s+ yMax="([0-9.]+)">
+    (.*)
+    </word>
+  }x;
+  my @plain_fields = $plain[$index] =~ $pattern;
+  my @tagged_fields = $tagged[$index] =~ $pattern;
+  if (@plain_fields != 5 || @tagged_fields != 5) {
+    print "unparsed word at index $index\n";
+    $failed = 1;
+    next;
+  }
+  if ($plain_fields[4] ne $tagged_fields[4]) {
+    print "word mismatch at index $index: '$plain_fields[4]' vs ",
+      "'$tagged_fields[4]'\n";
+    $failed = 1;
+    next;
+  }
+  for my $coordinate (0 .. 3) {
+    my $delta = abs($plain_fields[$coordinate] - $tagged_fields[$coordinate]);
+    if ($delta > 0.11) {
+      printf "geometry mismatch at word %d ('%s'), coordinate %d: " .
+        "%.5f vs %.5f (delta %.5f)\n",
+        $index, $plain_fields[4], $coordinate,
+        $plain_fields[$coordinate], $tagged_fields[$coordinate], $delta;
+      $failed = 1;
+    }
+  }
+}
+exit $failed;
+PERL
+  then
     record_failure "$base tagged/untagged word geometry differs"
     sed 's/^/    /' "$work/$base-layout.diff"
   fi

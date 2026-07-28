@@ -1,0 +1,16 @@
+% tokens-statement-defaults.lvt — statement class layout-input defaults.
+\input{regression-test}
+\documentclass{careerdossier-statement}
+\ExplSyntaxOn
+\NewDocumentCommand \cdossiertestDefaults { }
+  {
+    \TYPE{fontsize = \l__cdossier_tokens_fontsize_tl}
+    \TYPE{margin = \l__cdossier_tokens_margin_tl}
+    \TYPE{body-size = \dim_use:N \CDossierBodySize}
+    \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
+  }
+\ExplSyntaxOff
+\begin{document}
+\START
+\cdossiertestDefaults
+\END

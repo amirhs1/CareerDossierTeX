@@ -1,0 +1,29 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: unknown-fontsize-errors
+============================================================
+! LaTeX Error: Key 'cdossier/tokens/fontsize' accepts only a fixed set of choices.
+For immediate help type H <return>.
+ ...
+l. ...}
+The key 'cdossier/tokens/fontsize' only accepts predefined values, and '9pt' is not one of these.
+============================================================
+============================================================
+TEST 2: unknown-margin-errors
+============================================================
+! LaTeX Error: Key 'cdossier/tokens/margin' accepts only a fixed set of choices.
+For immediate help type H <return>.
+ ...
+l. ...}
+The key 'cdossier/tokens/margin' only accepts predefined values, and 'spacious' is not one of these.
+============================================================
+============================================================
+TEST 3: unknown-package-option-errors
+============================================================
+! Package careerdossier-tokens Error: Unknown package option 'density' for careerdossier-tokens.
+For immediate help type H <return>.
+ ...
+l. ...}
+Supported options are 'fontsize' (10pt, 11pt, 12pt) and 'margin' (normal, narrow).
+============================================================

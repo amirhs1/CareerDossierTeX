@@ -1,0 +1,36 @@
+% tokens-errors.lvt — rejected careerdossier-tokens options.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-tokens}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_bad_fontsize:
+  { \keys_set:nn { cdossier / tokens } { fontsize = 9pt } }
+\cs_new_protected:Npn \cdossiertest_bad_margin:
+  { \keys_set:nn { cdossier / tokens } { margin = spacious } }
+\cs_new_protected:Npn \cdossiertest_unknown_option:
+  { \keys_set:nn { cdossier / tokens } { density = compact } }
+\NewDocumentCommand \cdossiertestBadFontsize { }
+  { \cdossiertest_bad_fontsize: }
+\NewDocumentCommand \cdossiertestBadMargin { }
+  { \cdossiertest_bad_margin: }
+\NewDocumentCommand \cdossiertestUnknownOption { }
+  { \cdossiertest_unknown_option: }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-fontsize-errors}{
+  \cdossiertestBadFontsize
+}
+
+\TEST{unknown-margin-errors}{
+  \cdossiertestBadMargin
+}
+
+\TEST{unknown-package-option-errors}{
+  \cdossiertestUnknownOption
+}
+
+\END

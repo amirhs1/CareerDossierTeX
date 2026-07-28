@@ -1,0 +1,129 @@
+% tokens-scale.lvt — calibrated type, rhythm, list, and geometry tokens.
+\input{regression-test}
+\documentclass{article}
+\usepackage{enumitem}
+\usepackage{careerdossier-tokens}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_dimension:N #1
+  { \TYPE { \token_to_str:N #1 = \dim_use:N #1 } }
+\cs_new_protected:Npn \cdossiertest_skip:N #1
+  { \TYPE { \token_to_str:N #1 = \skip_use:N #1 } }
+\cs_new_protected:Npn \cdossiertest_size:N #1
+  {
+    \group_begin:
+      #1
+      \TYPE
+        {
+          \token_to_str:N #1 =
+          \cs:w f@size \cs_end: /
+          \cs:w f@baselineskip \cs_end:
+        }
+    \group_end:
+  }
+\cs_new_protected:Npn \cdossiertest_scale:n #1
+  {
+    \keys_set:nn { cdossier / tokens } { fontsize = #1 }
+    \__cdossier_tokens_resolve:
+    \TYPE { fontsize = #1 }
+    \cdossiertest_dimension:N \CDossierBodySize
+    \cdossiertest_dimension:N \CDossierBodyLeading
+    \cdossiertest_size:N \CDossierSizeName
+    \cdossiertest_size:N \CDossierSizeTitle
+    \cdossiertest_size:N \CDossierSizeHeadline
+    \cdossiertest_size:N \CDossierSizeSection
+    \cdossiertest_size:N \CDossierSizeBody
+    \cdossiertest_size:N \CDossierSizeSmall
+    \cdossiertest_size:N \CDossierSizeFurniture
+    \cdossiertest_dimension:N \CDossierRuleThickness
+    \cdossiertest_dimension:N \CDossierListLabelSep
+    \cdossiertest_skip:N \CDossierHeaderAboveSkip
+    \cdossiertest_skip:N \CDossierHeaderNameGapSkip
+    \cdossiertest_skip:N \CDossierHeaderMetaGapSkip
+    \cdossiertest_skip:N \CDossierHeaderBelowSkip
+    \cdossiertest_skip:N \CDossierSectionAboveSkip
+    \cdossiertest_skip:N \CDossierSectionRuleSkip
+    \cdossiertest_skip:N \CDossierSectionBelowSkip
+    \cdossiertest_skip:N \CDossierEntryAboveSkip
+    \cdossiertest_skip:N \CDossierEntryGapSkip
+    \cdossiertest_skip:N \CDossierEntryBelowSkip
+    \cdossiertest_skip:N \CDossierListEdgeSkip
+    \cdossiertest_skip:N \CDossierItemSepSkip
+    \cdossiertest_skip:N \CDossierParSkip
+    \cdossiertest_skip:N \CDossierProseParSkip
+    \cdossiertest_skip:N \CDossierAfterHeaderBlockSkip
+    \cdossiertest_skip:N \CDossierBlockSkip
+    \cdossiertest_skip:N \CDossierAfterSalutationSkip
+    \cdossiertest_skip:N \CDossierSignatureSkip
+  }
+\cs_new_protected:Npn \cdossiertest_margin:n #1
+  {
+    \keys_set:nn { cdossier / tokens } { margin = #1 }
+    \__cdossier_tokens_resolve:
+    \TYPE { margin = #1;~page-margin = \dim_use:N \CDossierPageMargin }
+  }
+\cs_new_protected:Npn \cdossiertest_list:
+  {
+    \begin { itemize }
+      [
+        leftmargin = * ,
+        labelsep = \CDossierListLabelSep ,
+        topsep = \CDossierListEdgeSkip ,
+        itemsep = \CDossierItemSepSkip ,
+        parsep = 0pt ,
+        label = \textbullet ,
+      ]
+      \TYPE
+        {
+          leftmargin = \the \leftmargin ;
+          labelwidth-plus-labelsep =
+          \dim_eval:n { \labelwidth + \labelsep }
+        }
+      \item Compiles.
+    \end { itemize }
+  }
+\cs_new_protected:Npn \cdossiertest_body_catcode:
+  {
+    \int_set:Nn \l_tmpa_int { \char_value_catcode:n { `@ } }
+    \CDossierApplyBodySize
+    \TYPE
+      {
+        at-catcode-before = \int_use:N \l_tmpa_int ;
+        after = \int_eval:n { \char_value_catcode:n { `@ } }
+      }
+  }
+\NewDocumentCommand \cdossiertestScale { m }
+  { \cdossiertest_scale:n {#1} }
+\NewDocumentCommand \cdossiertestMargin { m }
+  { \cdossiertest_margin:n {#1} }
+\NewDocumentCommand \cdossiertestList { }
+  { \cdossiertest_list: }
+\NewDocumentCommand \cdossiertestBodyCatcode { }
+  { \cdossiertest_body_catcode: }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{all-type-and-rhythm-tokens}{
+  \cdossiertestScale{10pt}
+  \cdossiertestScale{11pt}
+  \cdossiertestScale{12pt}
+}
+
+\TEST{both-margin-presets}{
+  \cdossiertestMargin{normal}
+  \cdossiertestMargin{narrow}
+}
+
+\TEST{flush-left-list-metrics}{
+  \cdossiertestScale{11pt}
+  \cdossiertestList
+}
+
+\TEST{body-size-preserves-caller-catcodes}{
+  \cdossiertestScale{11pt}
+  \cdossiertestBodyCatcode
+}
+
+\END

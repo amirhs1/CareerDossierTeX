@@ -281,9 +281,9 @@ one shared, proportional design system, driven by two public inputs —
 - `fontsize` (`10pt`, `11pt`, `12pt`) and `margin` (`normal`, `narrow`) on all
   four classes; `fontsize` is new on the letter and statement classes, `12pt`
   is new everywhere;
-- per-class defaults rather than one uniform default: the résumé stays dense
-  (`10pt`, `narrow`) to preserve one-page capacity, the CV keeps `11pt` at the
-  shared `normal` margin, and the letter and statement default to `12pt` to
+- per-class defaults rather than one uniform default: the résumé stays compact
+  (`11pt`, `narrow`), while the CV, letter, and statement default to `12pt` at
+  the shared `normal` margin to
   keep prose line length within a readable range at a conventional margin;
 - one shared page-furniture design (running header from page two, `Page N of
   M` folio) across all four classes, with the folio suppressed on single-page

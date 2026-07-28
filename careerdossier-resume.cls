@@ -32,7 +32,9 @@
 \RequirePackage { l3keys2e }
 
 \tl_new:N \l__cdossier_resume_fontsize_tl
-\tl_set:Nn \l__cdossier_resume_fontsize_tl { 10pt }
+\tl_set:Nn \l__cdossier_resume_fontsize_tl { 11pt }
+\tl_new:N \l__cdossier_resume_margin_tl
+\tl_set:Nn \l__cdossier_resume_margin_tl { narrow }
 \tl_new:N \l__cdossier_resume_density_tl
 \tl_set:Nn \l__cdossier_resume_density_tl { compact }
 \tl_new:N \l__cdossier_resume_paper_tl
@@ -43,7 +45,8 @@
 \msg_new:nnnn { careerdossier-resume } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-resume. }
   {
-    Supported~options~are~'fontsize'~(10pt,~11pt),~
+    Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
+    'margin'~(normal,~narrow),~
     'density'~(compact,~standard),~'paper'~(letter,~a4),~and~
     'bodyfont'~(serif,~sans).~Language~and~theme~cannot~be~set~here.
   }
@@ -51,9 +54,13 @@
 \keys_define:nn { cdossier / resume }
   {
     fontsize .choices:nn =
-      { 10pt , 11pt }
+      { 10pt , 11pt , 12pt }
       { \tl_set_eq:NN \l__cdossier_resume_fontsize_tl \l_keys_choice_tl } ,
     fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__cdossier_resume_margin_tl \l_keys_choice_tl } ,
+    margin .value_required:n = true ,
     density  .choices:nn =
       { compact , standard }
       { \tl_set_eq:NN \l__cdossier_resume_density_tl \l_keys_choice_tl } ,
@@ -80,6 +87,15 @@
 
 \str_if_eq:VnT \l__cdossier_resume_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      {
+        fontsize = \l__cdossier_resume_fontsize_tl ,
+        margin = \l__cdossier_resume_margin_tl
+      }
+      { careerdossier-tokens }
+  }
 
 %% Load a minimal base class with the resolved body size and paper. The token
 %% lists are expanded so article sees literal options such as `10pt,a4paper'.
@@ -97,27 +113,17 @@
 %% print-safe link hook applies regardless of order.
 %% ---------------------------------------------------------------------------
 \RequirePackage { careerdossier-components }
-\RequirePackage { geometry }
+\RequirePackage { careerdossier-tokens }
 \RequirePackage { enumitem }
 \RequirePackage { hyperref }
+\CDossierApplyBodySize
 
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a letter built off the same profile. The title
 %% itself is assembled in careerdossier-components, which owns identity.
 \__cdossier_components_doctype:n { Résumé }
 
-%% Keep the established physical margins on both supported paper sizes.
-\use:x
-  {
-    \exp_not:N \geometry
-      {
-        \l__cdossier_resume_paper_tl ,
-        top    = 0.5in ,
-        bottom = 0.6in ,
-        left   = 0.6in ,
-        right  = 0.6in ,
-      }
-  }
+\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_resume_paper_tl
 
 %% No page numbers by default: an industry résumé header carries identity, not
 %% folios. Users who want them can restore a page style in their document.

@@ -38,14 +38,19 @@
 \tl_set:Nn \l__cdossier_letter_family_tl { industry }
 \tl_new:N \l__cdossier_letter_paper_tl
 \tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper }
+\tl_new:N \l__cdossier_letter_fontsize_tl
+\tl_set:Nn \l__cdossier_letter_fontsize_tl { 12pt }
+\tl_new:N \l__cdossier_letter_margin_tl
+\tl_set:Nn \l__cdossier_letter_margin_tl { normal }
 \tl_new:N \l__cdossier_letter_bodyfont_tl
 \tl_set:Nn \l__cdossier_letter_bodyfont_tl { serif }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
-    Supported~options~are~'family'~(industry,~academic)~and~
-    'paper'~(letter,~a4)~and~'bodyfont'~(serif,~sans).~Language~and~theme~
+    Supported~options~are~'family'~(industry,~academic),~
+    'fontsize'~(10pt,~11pt,~12pt),~'margin'~(normal,~narrow),~
+    'paper'~(letter,~a4),~and~'bodyfont'~(serif,~sans).~Language~and~theme~
     cannot~be~set~here.
   }
 
@@ -55,6 +60,14 @@
       { industry , academic }
       { \tl_set_eq:NN \l__cdossier_letter_family_tl \l_keys_choice_tl } ,
     family .value_required:n = true ,
+    fontsize .choices:nn =
+      { 10pt , 11pt , 12pt }
+      { \tl_set_eq:NN \l__cdossier_letter_fontsize_tl \l_keys_choice_tl } ,
+    fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__cdossier_letter_margin_tl \l_keys_choice_tl } ,
+    margin .value_required:n = true ,
     paper .choices:nn =
       { letter , a4 }
       {
@@ -77,12 +90,21 @@
 
 \str_if_eq:VnT \l__cdossier_letter_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      {
+        fontsize = \l__cdossier_letter_fontsize_tl ,
+        margin = \l__cdossier_letter_margin_tl
+      }
+      { careerdossier-tokens }
+  }
 
 %% A prose letter reads best at a slightly larger body size than the résumé.
 \use:x
   {
     \exp_not:N \LoadClass
-      [ 11pt , \l__cdossier_letter_paper_tl ]
+      [ \l__cdossier_letter_fontsize_tl , \l__cdossier_letter_paper_tl ]
       { article }
   }
 
@@ -93,8 +115,9 @@
 %% loads last so the theme's print-safe link hook applies regardless of order.
 %% ---------------------------------------------------------------------------
 \RequirePackage { careerdossier-components }
-\RequirePackage { geometry }
+\RequirePackage { careerdossier-tokens }
 \RequirePackage { hyperref }
+\CDossierApplyBodySize
 
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a résumé built off the same profile. The title
@@ -103,22 +126,7 @@
   { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
   { \__cdossier_components_doctype:n { Cover~Letter } }
 
-%% Keep the established physical margins on both supported paper sizes.
-\str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
-  {
-    \use:x
-      {
-        \exp_not:N \geometry
-          {
-            \l__cdossier_letter_paper_tl ,
-            top = 0.9in , bottom = 0.9in , left = 1in , right = 1in
-          }
-      }
-  }
-  {
-    \use:x
-      { \exp_not:N \geometry { \l__cdossier_letter_paper_tl , margin = 1in } }
-  }
+\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_letter_paper_tl
 
 %% Industry letters retain the v0.1 empty page style.
 %%

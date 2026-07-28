@@ -106,7 +106,8 @@ actually been verified.
 
 ```latex
 \documentclass[
-  fontsize=10pt,
+  fontsize=11pt,
+  margin=narrow,
   density=compact,
   paper=letter,
   bodyfont=serif
@@ -122,15 +123,36 @@ Accepted values:
 ```text
 10pt
 11pt
+12pt
 ```
 
 Default:
 
 ```text
-10pt
+11pt
 ```
 
 Any unsupported value should produce an actionable class error.
+
+#### `margin`
+
+Every CareerDossierTeX document class accepts:
+
+```text
+normal
+narrow
+```
+
+`normal` means one-inch margins and `narrow` means half-inch margins. The
+résumé defaults to `narrow`; the CV, letter, and statement classes default to
+`normal`. Unsupported values produce an actionable class error.
+
+The classes load `geometry` through `careerdossier-tokens`. An advanced user
+may call `\geometry{...}` after `\documentclass` to replace the preset with
+custom geometry. Do not load `geometry` again with package options: doing so
+can produce an option clash. A raw `\geometry` override bypasses the two tested
+CareerDossierTeX presets, so its pagination and visual result remain the
+author's responsibility.
 
 #### `density`
 
@@ -158,10 +180,10 @@ letter
 a4
 ```
 
-The default is `letter`, preserving existing output. `a4` selects an ISO A4
-media box while retaining the class's established physical margins, font size,
-spacing, and page-furniture design. Because A4 is slightly narrower and taller
-than US Letter, line and page breaks may change. Unsupported values produce an
+The default is `letter`. `a4` selects an ISO A4 media box while retaining the
+selected `normal` or `narrow` margin preset, font size, spacing, and
+page-furniture design. Because A4 is slightly narrower and taller than US
+Letter, line and page breaks may change. Unsupported values produce an
 actionable class error.
 
 #### `bodyfont`
@@ -196,12 +218,20 @@ It is better to reject or omit an unsupported option than silently ignore it.
 ### Class declaration
 
 ```latex
-\documentclass[family=industry, paper=letter, bodyfont=serif]{careerdossier-letter}
+\documentclass[
+  family=industry,
+  fontsize=12pt,
+  margin=normal,
+  paper=letter,
+  bodyfont=serif
+]{careerdossier-letter}
 ```
 
 `family` accepts `industry` and `academic`; the default is `industry`. `paper`
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
-uses the shared `serif|sans` contract above and defaults to `serif`. The
+uses the shared `serif|sans` contract above and defaults to `serif`. `fontsize`
+and `margin` use the shared contracts above and default to `12pt` and `normal`.
+The
 following settings remain fixed:
 
 ```text
@@ -601,7 +631,8 @@ Load the academic CV with:
 
 ```latex
 \documentclass[
-  fontsize=11pt,
+  fontsize=12pt,
+  margin=normal,
   density=standard,
   paper=letter,
   bodyfont=serif
@@ -612,7 +643,8 @@ The class accepts the same value sets as the résumé class:
 
 | Option | Accepted values | CV default |
 |---|---|---|
-| `fontsize` | `10pt`, `11pt` | `11pt` |
+| `fontsize` | `10pt`, `11pt`, `12pt` | `12pt` |
+| `margin` | `normal`, `narrow` | `normal` |
 | `density` | `compact`, `standard` | `standard` |
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
@@ -819,10 +851,16 @@ design decision before the behavior is merged.
 ### Class and statement types
 
 All statement documents use one class with an optional `type` option and the
-shared optional `paper` and `bodyfont` settings:
+shared `fontsize`, `margin`, `paper`, and `bodyfont` settings:
 
 ```latex
-\documentclass[type=research, paper=letter, bodyfont=serif]{careerdossier-statement}
+\documentclass[
+  type=research,
+  fontsize=12pt,
+  margin=normal,
+  paper=letter,
+  bodyfont=serif
+]{careerdossier-statement}
 ```
 
 When `type` is omitted, the class selects `interest`; it requires no
@@ -853,8 +891,9 @@ The initial statement release starts from the academic cover-letter design:
   letter's physical margins on A4;
 - `bodyfont=serif|sans`, defaulting to the current TeX Gyre Termes body and
   retaining TeX Gyre Heros headings in both modes;
-- 11 pt body text;
-- academic-letter margins and prose paragraph rhythm;
+- 12 pt body text by default, with `10pt` and `11pt` available;
+- normal one-inch margins by default, with `margin=narrow` available;
+- academic-letter prose paragraph rhythm;
 - a centered identity block in the body on page one;
 - no running header on page one;
 - a centered `<name> -- <running title>` header from page two; and
