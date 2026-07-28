@@ -352,12 +352,10 @@ Responsibilities:
 
 - load an appropriate base class;
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process `fontsize`, `margin`, `density`, and `paper` class options;
-- control compact or standard density;
+- process `fontsize`, `margin`, and `paper` class options;
 - register the `Résumé` running label and enable shared page furniture;
-- define résumé section spacing;
-- define entry layout;
-- define résumé list behavior;
+- render résumé sections, entries, and lists from the shared type, rhythm, rule,
+  and list tokens;
 - preserve logical source and extraction order.
 
 The résumé class may call shared components, but reusable contact or identity logic should not be implemented directly inside the class.

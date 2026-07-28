@@ -22,7 +22,7 @@
 %% class only arranges it on the page.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-resume} {2026-07-24} {0.5.0}
+\ProvidesExplClass {careerdossier-resume} {2026-07-28} {0.6.0}
   {CareerDossierTeX English industry résumé class}
 
 %% ---------------------------------------------------------------------------
@@ -32,22 +32,23 @@
 \RequirePackage { l3keys2e }
 
 \tl_new:N \l__cdossier_resume_fontsize_tl
-\tl_set:Nn \l__cdossier_resume_fontsize_tl { 11pt }
+\tl_set:Nn \l__cdossier_resume_fontsize_tl { 10pt }
 \tl_new:N \l__cdossier_resume_margin_tl
 \tl_set:Nn \l__cdossier_resume_margin_tl { narrow }
-\tl_new:N \l__cdossier_resume_density_tl
-\tl_set:Nn \l__cdossier_resume_density_tl { compact }
 \tl_new:N \l__cdossier_resume_paper_tl
 \tl_set:Nn \l__cdossier_resume_paper_tl { letterpaper }
 \tl_new:N \l__cdossier_resume_bodyfont_tl
 \tl_set:Nn \l__cdossier_resume_bodyfont_tl { serif }
 
 \msg_new:nnnn { careerdossier-resume } { unknown-option }
-  { Unknown~class~option~'#1'~for~careerdossier-resume. }
+  {
+    Unknown~class~option~'#1'~for~careerdossier-resume.~
+    Supported~options~are~'fontsize',~'margin',~'paper',~and~'bodyfont'.
+  }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
     'margin'~(normal,~narrow),~
-    'density'~(compact,~standard),~'paper'~(letter,~a4),~and~
+    'paper'~(letter,~a4),~and~
     'bodyfont'~(serif,~sans).~Language~and~theme~cannot~be~set~here.
   }
 
@@ -61,10 +62,6 @@
       { normal , narrow }
       { \tl_set_eq:NN \l__cdossier_resume_margin_tl \l_keys_choice_tl } ,
     margin .value_required:n = true ,
-    density  .choices:nn =
-      { compact , standard }
-      { \tl_set_eq:NN \l__cdossier_resume_density_tl \l_keys_choice_tl } ,
-    density  .value_required:n = true ,
     paper .choices:nn =
       { letter , a4 }
       {
@@ -129,50 +126,7 @@
 \MakeCDossierPageFurniture
 
 \setlength { \parindent } { 0pt }
-\setlength { \parskip }   { 0pt plus 1pt }
-
-%% ---------------------------------------------------------------------------
-%% Density-dependent vertical rhythm. compact tightens spacing for short
-%% one-page résumés; standard opens it up. All values are collected here so the
-%% two modes stay easy to compare and adjust.
-%% ---------------------------------------------------------------------------
-\bool_new:N \l__cdossier_resume_compact_bool
-\str_if_eq:VnTF \l__cdossier_resume_density_tl { compact }
-  { \bool_set_true:N  \l__cdossier_resume_compact_bool }
-  { \bool_set_false:N \l__cdossier_resume_compact_bool }
-
-\skip_new:N \l__cdossier_resume_sectionabove_skip
-\skip_new:N \l__cdossier_resume_sectiongap_skip
-\skip_new:N \l__cdossier_resume_sectionbelow_skip
-\skip_new:N \l__cdossier_resume_entryabove_skip
-\skip_new:N \l__cdossier_resume_entrygap_skip
-\skip_new:N \l__cdossier_resume_entrybelow_skip
-\skip_new:N \l__cdossier_resume_itemsep_skip
-\skip_new:N \l__cdossier_resume_itemtop_skip
-\dim_new:N  \l__cdossier_resume_rule_dim
-\dim_set:Nn \l__cdossier_resume_rule_dim { 0.4pt }
-
-\bool_if:NTF \l__cdossier_resume_compact_bool
-  {
-    \skip_set:Nn \l__cdossier_resume_sectionabove_skip { 8pt  plus 2pt minus 1pt }
-    \skip_set:Nn \l__cdossier_resume_sectiongap_skip   { 2pt }
-    \skip_set:Nn \l__cdossier_resume_sectionbelow_skip { 4pt  plus 1pt }
-    \skip_set:Nn \l__cdossier_resume_entryabove_skip   { 4pt  plus 1pt }
-    \skip_set:Nn \l__cdossier_resume_entrygap_skip     { 1pt }
-    \skip_set:Nn \l__cdossier_resume_entrybelow_skip   { 3pt  plus 1pt }
-    \skip_set:Nn \l__cdossier_resume_itemsep_skip      { 1pt }
-    \skip_set:Nn \l__cdossier_resume_itemtop_skip      { 1pt }
-  }
-  {
-    \skip_set:Nn \l__cdossier_resume_sectionabove_skip { 12pt plus 3pt minus 2pt }
-    \skip_set:Nn \l__cdossier_resume_sectiongap_skip   { 3pt }
-    \skip_set:Nn \l__cdossier_resume_sectionbelow_skip { 6pt  plus 2pt }
-    \skip_set:Nn \l__cdossier_resume_entryabove_skip   { 8pt  plus 2pt }
-    \skip_set:Nn \l__cdossier_resume_entrygap_skip     { 2pt }
-    \skip_set:Nn \l__cdossier_resume_entrybelow_skip   { 5pt  plus 2pt }
-    \skip_set:Nn \l__cdossier_resume_itemsep_skip      { 3pt }
-    \skip_set:Nn \l__cdossier_resume_itemtop_skip      { 2pt }
-  }
+\setlength { \parskip }   { \CDossierParSkip }
 
 %% ---------------------------------------------------------------------------
 %% \CDossierSection {title} -- a résumé section heading followed by a full-width
@@ -183,15 +137,15 @@
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
-    \addvspace { \l__cdossier_resume_sectionabove_skip }
+    \addvspace { \CDossierSectionAboveSkip }
     \__cdossier_typography_heading:n
-      { { \CDossierSectionStyle \large #1 } }
-    \vspace { \l__cdossier_resume_sectiongap_skip }
+      { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
+    \vspace { \CDossierSectionRuleSkip }
     \noindent
       { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
-          { \rule { \linewidth } { \l__cdossier_resume_rule_dim } } }
+          { \rule { \linewidth } { \CDossierRuleThickness } } }
     \par \nobreak
-    \vspace { \l__cdossier_resume_sectionbelow_skip }
+    \vspace { \CDossierSectionBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -239,35 +193,64 @@
     \tl_if_blank:VT \l__cdossier_resume_entry_title_tl
       { \msg_error:nn { careerdossier-resume } { entry-missing-title } }
     \par
-    \addvspace { \l__cdossier_resume_entryabove_skip }
+    \addvspace { \CDossierEntryAboveSkip }
     \__cdossier_components_entryhead:VVVV
       \l__cdossier_resume_entry_title_tl
       \l__cdossier_resume_entry_org_tl
       \l__cdossier_resume_entry_loc_tl
       \l__cdossier_resume_entry_dates_tl
     \nobreak
-    \vspace { \l__cdossier_resume_entrygap_skip }
+    \vspace { \CDossierEntryGapSkip }
   }
   {
     \par
-    \addvspace { \l__cdossier_resume_entrybelow_skip }
+    \addvspace { \CDossierEntryBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
-%% CDossierItemize -- a résumé-appropriate bullet list with tight, density-aware
-%% spacing and a modest indent. Prefer this over redefining itemize globally.
+%% CDossierItemize -- a résumé-appropriate flush-left bullet list using shared
+%% list and rhythm tokens. Prefer this over redefining itemize globally.
 %% ---------------------------------------------------------------------------
+\dim_new:N \l__cdossier_resume_label_width_dim
+
 \NewDocumentEnvironment { CDossierItemize } { }
   {
-    \begin { itemize }
-      [
-        leftmargin = 1.4em ,
-        labelsep   = 0.5em ,
-        topsep     = \l__cdossier_resume_itemtop_skip ,
-        itemsep    = \l__cdossier_resume_itemsep_skip ,
-        parsep     = 0pt ,
-        label      = \textbullet ,
-      ]
+    \tag_if_active:TF
+      {
+        %% LaTeX Lab emulates enumitem while tagging is active and parses
+        %% leftmargin as a dimension, so its interface cannot accept enumitem's
+        %% `*' calculation. Measure the fixed bullet and supply the equivalent
+        %% flush-left dimensions explicitly on that path.
+        \hbox_set:Nn \l_tmpa_box { \textbullet }
+        \dim_set:Nn \l__cdossier_resume_label_width_dim
+          { \box_wd:N \l_tmpa_box }
+        \begin { itemize }
+          [
+            leftmargin =
+              \dim_eval:n
+                {
+                  \l__cdossier_resume_label_width_dim
+                  + \CDossierListLabelSep
+                } ,
+            labelwidth = \l__cdossier_resume_label_width_dim ,
+            labelsep   = \CDossierListLabelSep ,
+            topsep     = \CDossierListEdgeSkip ,
+            itemsep    = \CDossierItemSepSkip ,
+            parsep     = 0pt ,
+            label      = \textbullet ,
+          ]
+      }
+      {
+        \begin { itemize }
+          [
+            leftmargin = * ,
+            labelsep   = \CDossierListLabelSep ,
+            topsep     = \CDossierListEdgeSkip ,
+            itemsep    = \CDossierItemSepSkip ,
+            parsep     = 0pt ,
+            label      = \textbullet ,
+          ]
+      }
   }
   { \end { itemize } }
 

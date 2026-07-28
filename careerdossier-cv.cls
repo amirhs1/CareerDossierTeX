@@ -23,7 +23,7 @@
 %% CV without an external bibliography must build without BibLaTeX or Biber.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-cv} {2026-07-24} {0.5.0}
+\ProvidesExplClass {careerdossier-cv} {2026-07-28} {0.6.0}
   {CareerDossierTeX English academic CV class}
 
 \RequirePackage { l3keys2e }
@@ -165,7 +165,7 @@
     \par
     \addvspace { \l__cdossier_cv_sectionabove_skip }
     \__cdossier_typography_heading:n
-      { { \CDossierSectionStyle \large #1 } }
+      { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
     \vspace { \l__cdossier_cv_sectiongap_skip }
     \noindent { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
       { \rule { \linewidth } { \l__cdossier_cv_rule_dim } } }

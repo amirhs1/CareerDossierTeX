@@ -177,7 +177,9 @@
           { 0.04 * \dim_to_fp:n { \CDossierBodySize } }
       }
     %% enumitem must receive a literal `leftmargin = *`; it does not expand a
-    %% macro before testing for the star. Only the label separation is a token.
+    %% macro before testing for the star. LaTeX Lab's tagged-list emulation
+    %% instead requires an explicit dimension, which the rendering class
+    %% derives from the bullet width plus this shared label separation.
     \dim_set:Nn \CDossierListLabelSep
       {
         \fp_to_dim:n
