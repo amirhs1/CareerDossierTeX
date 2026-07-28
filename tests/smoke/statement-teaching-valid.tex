@@ -1,7 +1,17 @@
 \documentclass[type=teaching]{careerdossier-statement}
-\CDossierSetup{name={Ada Lovelace}, email={ada@example.test}, affiliation={Example University}}
-\CDossierStatementSetup{subtitle={Learning through transparent practice}}
+\input{statement-header-tokens.inc}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.test}, phone={+1 555 0100},
+  website={example.test}, affiliation={Example University}
+}
+\CDossierStatementSetup{
+  subtitle={Learning through transparent practice},
+  application-context={Faculty application}, application-id={APP-144}
+}
 \begin{document}
 \MakeCDossierStatementHeader
+\ExplSyntaxOn
+\__cdossier_test_statement_assert_header_sizes:
+\ExplSyntaxOff
 My teaching connects transparent reasoning with purposeful practice.
 \end{document}

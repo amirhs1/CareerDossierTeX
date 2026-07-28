@@ -82,6 +82,15 @@ salutation, closing, and paragraph gaps now scale with `fontsize`. Existing
 letters require no source edit, but their vertical spacing and pagination may
 change and should be reviewed.
 
+Statement headers and paragraph gaps now scale from the same calibrated tokens.
+In particular, the name uses the `fontsize`-specific name step instead of
+LaTeX's fixed 24.88 pt `\Huge`, so 10 pt, 11 pt, and 12 pt statements now have
+19 pt, 21 pt, and 23 pt names respectively. The seven `type` values, their full
+display titles and short continuation titles, validation rules, contact sets,
+and optional-field behavior are unchanged. Existing statement sources require
+no edit, but their header spacing, line breaks, and pagination should be
+reviewed.
+
 ## Upgrading to `v0.4.0`: XeLaTeX → LuaLaTeX
 
 `v0.4.0` makes LuaLaTeX the sole supported engine. XeLaTeX and pdfLaTeX now stop

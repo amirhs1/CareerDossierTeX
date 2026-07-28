@@ -1,8 +1,19 @@
 % statement-interest-valid.tex — the explicit interest type uses the general
 % statement contract: name and email are sufficient.
 \documentclass[type=interest]{careerdossier-statement}
-\CDossierSetup{name={Ada Lovelace}, email={ada@example.test}}
+\input{statement-header-tokens.inc}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.test}, phone={+1 555 0100},
+  website={example.test}, affiliation={Example University}
+}
+\CDossierStatementSetup{
+  subtitle={Reliable inquiry}, application-context={Faculty application},
+  application-id={APP-144}
+}
 \begin{document}
 \MakeCDossierStatementHeader
+\ExplSyntaxOn
+\__cdossier_test_statement_assert_header_sizes:
+\ExplSyntaxOff
 My interests connect reliable computation with transparent research practice.
 \end{document}

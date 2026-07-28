@@ -1,7 +1,18 @@
 \documentclass[type=diversity]{careerdossier-statement}
-\CDossierSetup{name={Ada Lovelace}, email={ada@example.test}}
-\CDossierStatementSetup{application-context={Application to Example University}}
+\input{statement-header-tokens.inc}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.test}, phone={+1 555 0100},
+  website={example.test}, affiliation={Example University}
+}
+\CDossierStatementSetup{
+  subtitle={Inclusive academic practice},
+  application-context={Application to Example University},
+  application-id={APP-144}
+}
 \begin{document}
 \MakeCDossierStatementHeader
+\ExplSyntaxOn
+\__cdossier_test_statement_assert_header_sizes:
+\ExplSyntaxOff
 Inclusive academic practice requires transparent expectations and feedback.
 \end{document}

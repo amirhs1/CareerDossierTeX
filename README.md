@@ -22,7 +22,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Industry cover letter | Supported | `family=industry` remains the default; shared multi-page furniture applies |
 | Academic CV | Supported | Multi-page layout with running headers and folios; one-page folios are suppressed |
 | Academic cover letter | Supported | Select with `family=academic`; shares the cross-class page furniture |
-| Statement documents | Supported | Default interest type plus six specialized types; shared multi-page furniture applies |
+| Statement documents | Supported | Default interest type plus six specialized types; calibrated header/prose rhythm and shared multi-page furniture apply |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
 | Shared profile metadata | Supported | Includes optional Scholar, ORCID, and affiliation fields |
@@ -259,7 +259,11 @@ Use one class. Omit `type` for a statement of interest, or select an
 explicit type when its title and validation contract fit the document:
 
 ```latex
-\documentclass[type=research]{careerdossier-statement}
+\documentclass[
+  type=research,
+  fontsize=12pt,
+  margin=normal
+]{careerdossier-statement}
 \input{examples/profiles/profile-academic.tex}
 
 \CDossierStatementSetup{
