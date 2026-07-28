@@ -1,0 +1,12 @@
+Alexandria Katherine
+Montgomery-Fitzgerald
+Principal Data Scientist and Machine Learning Platform Architect
+alexandria.montgomery.fitzgerald@a-very-long-department.example.org | +1 416 555
+0142 | GreaterTorontoRegionalOffice, Ontario,
+Canada | example.org/alexandria-montgomery-fitzgerald/portfolio
+linkedin.com/in/alexandria-montgomery-fitzgerald | github.com/alexandria-montgomery-fitzgerald
+scholar.google.com/citations?user=AlexandriaMontgomery | ORCID: 0000-0002-1825-0097
+Experience
+Principal Data Scientist 2024–Present
+Example Research Laboratory Toronto, Ontario
+• Built a reproducible analytical workflow used across teams.

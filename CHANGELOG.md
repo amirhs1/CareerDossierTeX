@@ -66,6 +66,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   are unchanged. Existing statements may reflow and should have their
   pagination reviewed. ([#144])
 
+### Fixed
+
+- Contact separators now disappear when the contact paragraph wraps between
+  fields, so no visual line begins or ends with `|`. URL-aware breaks, fixed
+  field and extraction order, link targets, tagged artifact treatment, and the
+  rule that missing fields leave no stray separators are preserved. A small
+  local emergency stretch handles minor pressure, and `\allowbreak` is
+  documented for exceptional unbroken plain-text values. ([#151])
+
 ### Removed
 
 - **BREAKING (résumé and CV options):** Removed
@@ -81,6 +90,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#142]: https://github.com/amirhs1/CareerDossierTeX/issues/142
 [#143]: https://github.com/amirhs1/CareerDossierTeX/issues/143
 [#144]: https://github.com/amirhs1/CareerDossierTeX/issues/144
+[#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
 
 ## [0.5.0] - 2026-07-24
 

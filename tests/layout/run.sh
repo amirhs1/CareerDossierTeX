@@ -132,6 +132,17 @@ for tex in *.tex; do
     else
       echo "  multi-page folios and running headers present"
     fi
+
+    case "$base" in
+      resume-contact-wrap-*)
+        if pdftotext -enc UTF-8 "$base.pdf" - \
+            | tr -d '\f' | grep -Eq '^[[:space:]]*\||\|[[:space:]]*$'; then
+          echo "  ORPHAN CONTACT SEPARATOR"; fail=1
+        else
+          echo "  wrapped contact lines have no orphan separators"
+        fi
+        ;;
+    esac
   else
     echo "  (pdftotext absent: skipped folio check)"
   fi

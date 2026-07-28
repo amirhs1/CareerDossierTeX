@@ -84,9 +84,21 @@
       }
   }
 
-%% Separator between present contact items: a spaced vertical bar.
+%% Boundary between present contact items.  The bar exists only in the
+%% no-break branch: when TeX takes this discretionary, neither the previous
+%% line nor the next one receives separator material.  The artifact wrapper
+%% surrounds the discretionary because PDF marking operators are not legal
+%% inside a discretionary replacement list.
 \cs_new_protected:Npn \__cdossier_components_sep:
-  { \__cdossier_typography_layout_artifact:n { ~|~ } }
+  {
+    \__cdossier_typography_layout_artifact:n
+      {
+        \discretionary
+          { }
+          { }
+          { \hbox:n { ~|~ } }
+      }
+  }
 
 %% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
 %% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
@@ -180,11 +192,29 @@
       }
   }
 
+%% Typeset a complete contact paragraph.  The half-em emergency stretch is
+%% deliberately local and small: it can absorb minor spacing pressure without
+%% shrinking type or inventing breakpoints inside an unbreakable plain value.
+\cs_new_protected:Npn \__cdossier_components_contactparagraph:N #1
+  {
+    \group_begin:
+      \setlength { \emergencystretch } { .5em }
+      \__cdossier_components_contactline:N #1
+      \par
+    \group_end:
+  }
+
 %% Default identity contact line used by the released résumé, CV, and letter
 %% classes. Its order and output remain unchanged.
 \cs_new_protected:Npn \__cdossier_components_contactline:
   {
     \__cdossier_components_contactline:N
+      \c__cdossier_components_contactorder_clist
+  }
+
+\cs_new_protected:Npn \__cdossier_components_contactparagraph:
+  {
+    \__cdossier_components_contactparagraph:N
       \c__cdossier_components_contactorder_clist
   }
 
@@ -221,8 +251,7 @@
       {
         \CDossierBodyStyle
         \CDossierSizeSmall
-        \__cdossier_components_contactline:
-        \par
+        \__cdossier_components_contactparagraph:
       }
     \group_end:
     \addvspace { \CDossierHeaderBelowSkip }

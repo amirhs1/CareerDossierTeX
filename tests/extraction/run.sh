@@ -88,6 +88,15 @@ for tex in *.tex; do
 
   got="$(pdftotext -enc UTF-8 "$base.pdf" - | normalize)"
 
+  if [ "$base" = "resume-contact-wrap" ]; then
+    if printf '%s\n' "$got" \
+        | grep -Eq '^[[:space:]]*\||\|[[:space:]]*$'; then
+      echo "  ORPHAN CONTACT SEPARATOR in extracted visual line"; fail=1
+    else
+      echo "  wrapped contact lines have no orphan separators"
+    fi
+  fi
+
   # The statement class derives PDF identity from the full page-one title, not
   # the abbreviated running title. Pin both fields on the focused statement
   # fixture; pdfinfo ships with the same Poppler dependency as pdftotext.

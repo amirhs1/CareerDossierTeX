@@ -19,6 +19,7 @@
 \usepackage{careerdossier-components}
 
 \ExplSyntaxOn
+\cs_new_eq:NN \cdossiertestOriginalSeparator \__cdossier_components_sep:
 \cs_set_protected:Npn \__cdossier_components_sep: { \TYPE{|} }
 \cs_set_protected:Npn \__cdossier_components_render:n #1
   { \__cdossier_components_label:n {#1} \TYPE{<#1>} }
@@ -32,10 +33,36 @@
 \clist_const:Nn \c_cdossiertest_statement_contacts_clist { email , website , orcid }
 \cs_new_protected:Npn \cdossiertestFilteredContactLine
   { \__cdossier_components_contactline:N \c_cdossiertest_statement_contacts_clist }
+\cs_new_protected:Npn \cdossiertestDiscretionarySeparator
+  {
+    \group_begin:
+      \cs_set_protected:Npn \discretionary ##1##2##3
+        {
+          \tl_if_blank:nTF {##1} { \TYPE{pre-break=empty} } { \TYPE{pre-break=nonempty} }
+          \tl_if_blank:nTF {##2} { \TYPE{post-break=empty} } { \TYPE{post-break=nonempty} }
+          \TYPE{no-break=begin}
+          ##3
+          \TYPE{no-break=end}
+        }
+      \cs_set_protected:Npn \__cdossier_typography_layout_artifact:n ##1
+        {
+          \TYPE{artifact=begin}
+          ##1
+          \TYPE{artifact=end}
+        }
+      \cdossiertestOriginalSeparator
+    \group_end:
+  }
 \ExplSyntaxOff
 
 \begin{document}
 \START
+
+% The boundary itself must be a discretionary with empty break branches. The
+% visible, artifact-marked bar belongs exclusively to the no-break branch.
+\TEST{separator-is-discretionary}{
+  \cdossiertestDiscretionarySeparator
+}
 
 % Gaps in the middle: present email, location, github; phone/website/linkedin/
 % scholar absent. Separators must appear only between the three present items.

@@ -348,9 +348,9 @@
         }
       \vspace { \CDossierHeaderMetaGapSkip }
       { \CDossierBodyStyle \CDossierSizeSmall
-        \__cdossier_components_contactline:N
+        \__cdossier_components_contactparagraph:N
           \l__cdossier_statement_contacts_clist
-        \par }
+      }
     \group_end:
     \addvspace { \CDossierHeaderBelowSkip }
   }

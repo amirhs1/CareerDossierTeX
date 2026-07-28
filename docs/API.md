@@ -336,6 +336,30 @@ baseline (`tests/extraction/resume-contact-labels.tex` and
 `tests/extraction/resume-contact-optional.tex`). The labels survive Poppler
 and PDFKit plain-text extraction with clean separators.
 
+### Contact-line wrapping
+
+Contact fields form a naturally wrapping, centered paragraph. A ` | ` separator
+is shown only when the adjacent fields stay on the same visual line; when TeX
+breaks between two fields, the boundary is empty on both lines. Breaks between
+complete fields are preferred, while email addresses and web-profile values
+retain the URL-aware breakpoints supplied by `\nolinkurl`.
+
+Phone and location values retain ordinary word-space and hyphen breakpoints.
+The package does not silently split an otherwise unbreakable plain-text word.
+For an exceptional value, insert `\allowbreak` at a semantically acceptable
+position:
+
+```latex
+\CDossierSetup{
+  location = {GreaterToronto\allowbreak{}RegionalOffice}
+}
+```
+
+The contact paragraph uses a locally scoped half-em `\emergencystretch` for
+minor spacing pressure. It does not truncate values or reduce the selected
+font size. Field order, link targets, extraction order, and missing-field
+handling are unchanged; separators remain layout artifacts in tagged output.
+
 **VoiceOver verification (2026-07-23).** The maintainer ran VoiceOver in
 Preview (PDFKit) over all four tagged/untagged × labelled/unlabelled
 combinations of a fixture matching this section's example. Both unlabelled
@@ -467,7 +491,8 @@ Expected behavior:
   baseline rhythm rather than the base class's `center` environment;
 - renders `headline` only when present;
 - renders available contact fields;
-- inserts separators only between rendered fields;
+- inserts separators only between rendered fields that remain on the same
+  visual line;
 - creates links for supported contact fields;
 - prefixes `Email:`, `Phone:`, and `Website:` text labels when
   `contact-labels = true` (see “Contact-field labels”);

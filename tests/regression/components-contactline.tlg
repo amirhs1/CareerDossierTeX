@@ -1,7 +1,17 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: separators-only-between-present-items
+TEST 1: separator-is-discretionary
+============================================================
+artifact=begin
+pre-break=empty
+post-break=empty
+no-break=begin
+no-break=end
+artifact=end
+============================================================
+============================================================
+TEST 2: separators-only-between-present-items
 ============================================================
 <email>
 |
@@ -10,31 +20,31 @@ TEST 1: separators-only-between-present-items
 <github>
 ============================================================
 ============================================================
-TEST 2: single-field-has-no-separator
+TEST 3: single-field-has-no-separator
 ============================================================
 <location>
 ============================================================
 ============================================================
-TEST 3: no-leading-separator-when-first-absent
+TEST 4: no-leading-separator-when-first-absent
 ============================================================
 <phone>
 |
 <github>
 ============================================================
 ============================================================
-TEST 4: all-absent-emits-nothing
+TEST 5: all-absent-emits-nothing
 ============================================================
 [end]
 ============================================================
 ============================================================
-TEST 5: academic-identifiers-join-cleanly
+TEST 6: academic-identifiers-join-cleanly
 ============================================================
 <scholar>
 |
 <orcid>
 ============================================================
 ============================================================
-TEST 6: filtered-contact-list-renders-only-selected-fields
+TEST 7: filtered-contact-list-renders-only-selected-fields
 ============================================================
 <email>
 |
@@ -43,14 +53,14 @@ TEST 6: filtered-contact-list-renders-only-selected-fields
 <orcid>
 ============================================================
 ============================================================
-TEST 7: labels-off-by-default
+TEST 8: labels-off-by-default
 ============================================================
 <email>
 |
 <phone>
 ============================================================
 ============================================================
-TEST 8: labels-identify-email-phone-website
+TEST 9: labels-identify-email-phone-website
 ============================================================
 [Email:]
 <email>
@@ -62,7 +72,7 @@ TEST 8: labels-identify-email-phone-website
 <website>
 ============================================================
 ============================================================
-TEST 9: labels-skip-self-identifying-fields
+TEST 10: labels-skip-self-identifying-fields
 ============================================================
 <location>
 |
@@ -73,7 +83,7 @@ TEST 9: labels-skip-self-identifying-fields
 <orcid>
 ============================================================
 ============================================================
-TEST 10: absent-field-leaves-no-orphan-label
+TEST 11: absent-field-leaves-no-orphan-label
 ============================================================
 [Email:]
 <email>
@@ -81,7 +91,7 @@ TEST 10: absent-field-leaves-no-orphan-label
 <location>
 ============================================================
 ============================================================
-TEST 11: labels-can-be-disabled-again
+TEST 12: labels-can-be-disabled-again
 ============================================================
 <email>
 |
