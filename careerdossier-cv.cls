@@ -29,7 +29,9 @@
 \RequirePackage { l3keys2e }
 
 \tl_new:N \l__cdossier_cv_fontsize_tl
-\tl_set:Nn \l__cdossier_cv_fontsize_tl { 11pt }
+\tl_set:Nn \l__cdossier_cv_fontsize_tl { 12pt }
+\tl_new:N \l__cdossier_cv_margin_tl
+\tl_set:Nn \l__cdossier_cv_margin_tl { normal }
 \tl_new:N \l__cdossier_cv_density_tl
 \tl_set:Nn \l__cdossier_cv_density_tl { standard }
 \tl_new:N \l__cdossier_cv_paper_tl
@@ -40,7 +42,8 @@
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-cv. }
   {
-    Supported~options~are~'fontsize'~(10pt,~11pt),~
+    Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
+    'margin'~(normal,~narrow),~
     'density'~(compact,~standard),~'paper'~(letter,~a4),~and~
     'bodyfont'~(serif,~sans).~Language~and~theme~cannot~be~set~here.
   }
@@ -48,9 +51,13 @@
 \keys_define:nn { cdossier / cv }
   {
     fontsize .choices:nn =
-      { 10pt , 11pt }
+      { 10pt , 11pt , 12pt }
       { \tl_set_eq:NN \l__cdossier_cv_fontsize_tl \l_keys_choice_tl } ,
     fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__cdossier_cv_margin_tl \l_keys_choice_tl } ,
+    margin .value_required:n = true ,
     density  .choices:nn =
       { compact , standard }
       { \tl_set_eq:NN \l__cdossier_cv_density_tl \l_keys_choice_tl } ,
@@ -76,6 +83,15 @@
 
 \str_if_eq:VnT \l__cdossier_cv_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      {
+        fontsize = \l__cdossier_cv_fontsize_tl ,
+        margin = \l__cdossier_cv_margin_tl
+      }
+      { careerdossier-tokens }
+  }
 
 \use:x
   {
@@ -85,23 +101,14 @@
   }
 
 \RequirePackage { careerdossier-components }
-\RequirePackage { geometry }
+\RequirePackage { careerdossier-tokens }
 \RequirePackage { enumitem }
 \RequirePackage { hyperref }
+\CDossierApplyBodySize
 
 \__cdossier_components_doctype:n { Curriculum\c_space_tl Vitae }
 
-\use:x
-  {
-    \exp_not:N \geometry
-      {
-        \l__cdossier_cv_paper_tl ,
-        top    = 0.72in ,
-        bottom = 0.72in ,
-        left   = 0.78in ,
-        right  = 0.78in ,
-      }
-  }
+\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_cv_paper_tl
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { 0pt plus 1pt }

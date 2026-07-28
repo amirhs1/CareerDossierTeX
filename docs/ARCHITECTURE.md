@@ -9,6 +9,7 @@ The architecture separates:
 - user metadata;
 - document content;
 - reusable components;
+- calibrated layout tokens;
 - typography;
 - visual theme;
 - language labels;
@@ -35,6 +36,7 @@ This separation allows the résumé and cover letter to share identity and conta
 ```text
 careerdossier-resume.cls
         │
+        ├── careerdossier-tokens.sty
         ├── careerdossier-components.sty
         ├── careerdossier-typography.sty
         ├── careerdossier-theme.sty
@@ -42,6 +44,7 @@ careerdossier-resume.cls
 
 careerdossier-letter.cls
         │
+        ├── careerdossier-tokens.sty
         ├── careerdossier-components.sty
         ├── careerdossier-typography.sty
         ├── careerdossier-theme.sty
@@ -59,6 +62,7 @@ change the Phase 1 dependency direction:
 ```text
 careerdossier-cv.cls
         │
+        ├── careerdossier-tokens.sty
         ├── careerdossier-components.sty
         ├── careerdossier-typography.sty
         ├── careerdossier-theme.sty
@@ -86,6 +90,7 @@ type values approved in issue #103:
 ```text
 careerdossier-statement.cls
         │
+        ├── careerdossier-tokens.sty
         ├── careerdossier-components.sty
         ├── careerdossier-typography.sty
         ├── careerdossier-theme.sty
@@ -151,6 +156,22 @@ careerdossier-letter.cls
 ```
 
 ## File responsibilities
+
+### `careerdossier-tokens.sty`
+
+Owns the shared, calibrated design scale.
+
+Responsibilities:
+
+- resolve `fontsize=10pt|11pt|12pt` into the body size and complete type scale;
+- derive structural vertical rhythm from the body baseline;
+- own rule thickness and flush-left list metrics;
+- resolve `margin=normal|narrow` to one-inch or half-inch margins; and
+- provide the only shared body-size and `geometry` application primitives.
+
+It must not own colours, font files, semantic typography roles, rendered
+components, document metadata, or paper selection. The document classes choose
+their defaults and paper size, then pass those inputs into this package.
 
 ### `careerdossier-base.sty`
 
@@ -244,7 +265,7 @@ Owns visual tokens that are not page geometry.
 Responsibilities:
 
 - monochrome colors;
-- rule colors and thicknesses;
+- rule colors;
 - link appearance;
 - print-safe contrast;
 - future theme extension points.
@@ -322,8 +343,8 @@ Owns résumé-specific document behavior.
 Responsibilities:
 
 - load an appropriate base class;
-- set Letter or A4 geometry while preserving the established physical margins;
-- process `fontsize`, `density`, and `paper` class options;
+- select Letter or A4 paper and delegate geometry to the shared token package;
+- process `fontsize`, `margin`, `density`, and `paper` class options;
 - control compact or standard density;
 - disable page numbers by default;
 - define résumé section spacing;
@@ -339,7 +360,7 @@ Owns industry and academic cover-letter behavior.
 
 Responsibilities:
 
-- set Letter or A4 geometry for both letter families;
+- select Letter or A4 paper and delegate geometry to the shared token package;
 - define prose-friendly paragraph and page-breaking behavior;
 - render date and recipient blocks;
 - render an optional subject;
@@ -399,8 +420,8 @@ Owns academic-CV document behavior.
 
 Responsibilities:
 
-- set Letter or A4 CV geometry while preserving the established physical margins;
-- process the documented `fontsize`, `density`, and `paper` options;
+- select Letter or A4 paper and delegate geometry to the shared token package;
+- process the documented `fontsize`, `margin`, `density`, and `paper` options;
 - render the first-page identity in the body;
 - provide a simple running header after the first page and page numbers on all
   pages without making contact details running-only content;

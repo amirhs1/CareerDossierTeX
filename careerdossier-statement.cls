@@ -33,9 +33,13 @@
 \tl_new:N   \l__cdossier_statement_type_tl
 \tl_new:N   \l__cdossier_statement_paper_tl
 \tl_new:N   \l__cdossier_statement_bodyfont_tl
+\tl_new:N   \l__cdossier_statement_fontsize_tl
+\tl_new:N   \l__cdossier_statement_margin_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { interest }
 \tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
 \tl_set:Nn  \l__cdossier_statement_bodyfont_tl { serif }
+\tl_set:Nn  \l__cdossier_statement_fontsize_tl { 12pt }
+\tl_set:Nn  \l__cdossier_statement_margin_tl { normal }
 
 \msg_new:nnnn { careerdossier-statement } { unknown-type }
   { Unknown~statement~type~'#1'. }
@@ -48,7 +52,9 @@
   { Unknown~class~option~'#1'~for~careerdossier-statement. }
   {
     Supported~options~are~'type'~(interest,~research,~teaching,~
-    teaching-philosophy,~diversity,~artist,~purpose),~'paper'~(letter,~a4),~and~
+    teaching-philosophy,~diversity,~artist,~purpose),~
+    'fontsize'~(10pt,~11pt,~12pt),~'margin'~(normal,~narrow),~
+    'paper'~(letter,~a4),~and~
     'bodyfont'~(serif,~sans).~Language,~theme,~and~named~font~combinations~
     cannot~be~set~here.
   }
@@ -72,6 +78,14 @@
           { \msg_error:nnn { careerdossier-statement } { unknown-type } {#1} }
       } ,
     type .value_required:n = true ,
+    fontsize .choices:nn =
+      { 10pt , 11pt , 12pt }
+      { \tl_set_eq:NN \l__cdossier_statement_fontsize_tl \l_keys_choice_tl } ,
+    fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__cdossier_statement_margin_tl \l_keys_choice_tl } ,
+    margin .value_required:n = true ,
     paper .choices:nn =
       { letter , a4 }
       {
@@ -94,27 +108,30 @@
 
 \str_if_eq:VnT \l__cdossier_statement_bodyfont_tl { sans }
   { \PassOptionsToPackage { bodyfont = sans } { careerdossier-typography } }
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      {
+        fontsize = \l__cdossier_statement_fontsize_tl ,
+        margin = \l__cdossier_statement_margin_tl
+      }
+      { careerdossier-tokens }
+  }
 
 \use:x
   {
     \exp_not:N \LoadClass
-      [ 11pt , \l__cdossier_statement_paper_tl ]
+      [ \l__cdossier_statement_fontsize_tl , \l__cdossier_statement_paper_tl ]
       { article }
   }
 
 \RequirePackage { careerdossier-components }
-\RequirePackage { geometry }
+\RequirePackage { careerdossier-tokens }
 \RequirePackage { hyperref }
+\CDossierApplyBodySize
 
-%% Academic-letter geometry and prose rhythm are the initial statement design.
-\use:x
-  {
-    \exp_not:N \geometry
-      {
-        \l__cdossier_statement_paper_tl ,
-        top = 0.9in , bottom = 0.9in , left = 1in , right = 1in
-      }
-  }
+%% Academic-letter prose rhythm remains the initial statement design.
+\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_statement_paper_tl
 \setlength { \parindent }        { 0pt }
 \setlength { \parskip }          { 1ex plus 0.4ex minus 0.1ex }
 \setlength { \emergencystretch } { 2em }

@@ -90,6 +90,7 @@ cases=(
   "cv-biblatex-missing-given fail|nonblank 'given' key."
   "cv-biblatex-missing-dependency fail|optional dependency"
   "letter-valid pass"
+  "letter-custom-geometry pass"
   "letter-academic-valid pass"
   "letter-sans-body pass"
   "letter-bad-family fail|accepts only a fixed set of"

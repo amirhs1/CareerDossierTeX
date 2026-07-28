@@ -1,0 +1,237 @@
+%% careerdossier-tokens.sty
+%% Part of the CareerDossierTeX project.
+%%
+%% Copyright (C) 2026 Amir Sadeghi.
+%%
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%   https://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX version
+%% 2008 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% The Current Maintainer of this work is Amir Sadeghi.
+%%
+%% This work consists of the files listed in manifest.txt.
+%%
+%% careerdossier-tokens is the single source of truth for the calibrated type
+%% scale, baseline-derived vertical rhythm, rule and list metrics, and the two
+%% supported page-margin presets. It owns no colour, fonts, semantic roles, or
+%% rendered components.
+
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesExplPackage {careerdossier-tokens} {2026-07-28} {0.6.0}
+  {CareerDossierTeX calibrated design tokens}
+
+\RequirePackage { l3keys2e }
+\RequirePackage { geometry }
+
+\tl_new:N \l__cdossier_tokens_fontsize_tl
+\tl_set:Nn \l__cdossier_tokens_fontsize_tl { 12pt }
+\tl_new:N \l__cdossier_tokens_margin_tl
+\tl_set:Nn \l__cdossier_tokens_margin_tl { normal }
+
+\msg_new:nnnn { careerdossier-tokens } { unknown-option }
+  { Unknown~package~option~'#1'~for~careerdossier-tokens. }
+  {
+    Supported~options~are~'fontsize'~(10pt,~11pt,~12pt)~and~
+    'margin'~(normal,~narrow).
+  }
+
+\keys_define:nn { cdossier / tokens }
+  {
+    fontsize .choices:nn =
+      { 10pt , 11pt , 12pt }
+      { \tl_set_eq:NN \l__cdossier_tokens_fontsize_tl \l_keys_choice_tl } ,
+    fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__cdossier_tokens_margin_tl \l_keys_choice_tl } ,
+    margin .value_required:n = true ,
+    unknown .code:n =
+      {
+        \msg_error:nnx { careerdossier-tokens } { unknown-option }
+          { \l_keys_key_str }
+      } ,
+  }
+\ProcessKeysOptions { cdossier / tokens }
+
+%% Resolved base metrics. Keep one public token for body size and one for body
+%% leading: duplicate aliases make it unclear which value downstream modules
+%% should consume.
+\dim_new:N \CDossierBodySize
+\dim_new:N \CDossierBodyLeading
+\dim_new:N \CDossierPageMargin
+\dim_new:N \CDossierRuleThickness
+\dim_new:N \CDossierListLabelSep
+
+\skip_new:N \CDossierHeaderAboveSkip
+\skip_new:N \CDossierHeaderNameGapSkip
+\skip_new:N \CDossierHeaderMetaGapSkip
+\skip_new:N \CDossierHeaderBelowSkip
+\skip_new:N \CDossierSectionAboveSkip
+\skip_new:N \CDossierSectionRuleSkip
+\skip_new:N \CDossierSectionBelowSkip
+\skip_new:N \CDossierEntryAboveSkip
+\skip_new:N \CDossierEntryGapSkip
+\skip_new:N \CDossierEntryBelowSkip
+\skip_new:N \CDossierListEdgeSkip
+\skip_new:N \CDossierItemSepSkip
+\skip_new:N \CDossierParSkip
+\skip_new:N \CDossierProseParSkip
+\skip_new:N \CDossierAfterHeaderBlockSkip
+\skip_new:N \CDossierBlockSkip
+\skip_new:N \CDossierAfterSalutationSkip
+\skip_new:N \CDossierSignatureSkip
+
+\cs_new_eq:NN \__cdossier_tokens_article_normalsize: \normalsize
+
+\cs_new_protected:Npn \__cdossier_tokens_set_size_command:Nnn #1#2#3
+  {
+    \cs_set_protected:Npn #1
+      { \fontsize {#2} {#3} \selectfont }
+  }
+
+\cs_new_protected:Npn \__cdossier_tokens_set_skip:Nn #1#2
+  {
+    \skip_set:Nn #1
+      {
+        \fp_to_dim:n
+          { (#2) * \dim_to_fp:n { \CDossierBodyLeading } }
+      }
+  }
+
+\cs_new_protected:Npn \__cdossier_tokens_resolve:
+  {
+    \str_case:Vn \l__cdossier_tokens_fontsize_tl
+      {
+        { 10pt }
+          {
+            \dim_set:Nn \CDossierBodySize { 10pt }
+            \dim_set:Nn \CDossierBodyLeading { 12pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeName { 19pt } { 21pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeTitle { 15pt } { 17pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeHeadline { 12pt } { 14pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeSection { 11pt } { 13pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeBody { 10pt } { 12pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeSmall { 9pt } { 11pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeFurniture { 8pt } { 10pt }
+          }
+        { 11pt }
+          {
+            \dim_set:Nn \CDossierBodySize { 11pt }
+            \dim_set:Nn \CDossierBodyLeading { 13.6pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeName { 21pt } { 23pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeTitle { 16pt } { 18pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeHeadline { 13pt } { 15pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeSection { 12pt } { 14pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeBody { 11pt } { 13.6pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeSmall { 10pt } { 12pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeFurniture { 9pt } { 11pt }
+          }
+        { 12pt }
+          {
+            \dim_set:Nn \CDossierBodySize { 12pt }
+            \dim_set:Nn \CDossierBodyLeading { 14.5pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeName { 23pt } { 25pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeTitle { 18pt } { 20pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeHeadline { 14pt } { 16pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeSection { 13pt } { 15pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeBody { 12pt } { 14.5pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeSmall { 11pt } { 13pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeFurniture { 10pt } { 12pt }
+          }
+      }
+
+    \str_case:Vn \l__cdossier_tokens_margin_tl
+      {
+        { normal } { \dim_set:Nn \CDossierPageMargin { 1in } }
+        { narrow } { \dim_set:Nn \CDossierPageMargin { 0.5in } }
+      }
+
+    \dim_set:Nn \CDossierRuleThickness
+      {
+        \fp_to_dim:n
+          { 0.04 * \dim_to_fp:n { \CDossierBodySize } }
+      }
+    %% enumitem must receive a literal `leftmargin = *`; it does not expand a
+    %% macro before testing for the star. Only the label separation is a token.
+    \dim_set:Nn \CDossierListLabelSep
+      {
+        \fp_to_dim:n
+          { 0.5 * \dim_to_fp:n { \CDossierBodySize } }
+      }
+
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderAboveSkip { 0.00 }
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderNameGapSkip { 0.28 }
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderMetaGapSkip { 0.22 }
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderBelowSkip { 0.85 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionAboveSkip { 0.85 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.15 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.42 }
+    \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.12 }
+    \__cdossier_tokens_set_skip:Nn \CDossierEntryBelowSkip { 0.30 }
+    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkip { 0.10 }
+    \__cdossier_tokens_set_skip:Nn \CDossierItemSepSkip { 0.16 }
+    \__cdossier_tokens_set_skip:Nn \CDossierParSkip { 0.00 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierAfterHeaderBlockSkip { 0.95 }
+    \__cdossier_tokens_set_skip:Nn \CDossierBlockSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierAfterSalutationSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSignatureSkip { 2.20 }
+  }
+
+\__cdossier_tokens_resolve:
+
+%% Reuse article's own \normalsize setup so its display skips remain tied to
+%% the selected class option, then pin the font itself to the resolved whole
+%% point size and calibrated leading. No catcode changes occur at call time.
+\NewDocumentCommand \CDossierApplyBodySize { }
+  {
+    \str_if_eq:VnTF \l__cdossier_tokens_fontsize_tl { 11pt }
+      {
+        \cs_set_protected:Npn \normalsize
+          {
+            \__cdossier_tokens_article_normalsize:
+            \fontsize { \CDossierBodySize } { \CDossierBodyLeading } \selectfont
+          }
+      }
+      { \cs_set_eq:NN \normalsize \__cdossier_tokens_article_normalsize: }
+    \normalsize
+  }
+
+%% The paper name remains a class concern. The shared primitive is the only
+%% place that translates the public normal/narrow preset into geometry options.
+\cs_new_protected:Npn \CDossierApplyGeometry:n #1
+  {
+    \geometry
+      {
+        #1 ,
+        margin = \CDossierPageMargin
+      }
+  }
+
+\endinput
