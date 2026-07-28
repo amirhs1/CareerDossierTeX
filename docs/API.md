@@ -451,6 +451,10 @@ Renders the résumé identity block using shared profile metadata.
 Expected behavior:
 
 - validates `name`;
+- sets the name, optional headline, and contact line with the calibrated
+  `fontsize` type scale;
+- derives the gaps within and around the identity block from the shared
+  baseline rhythm rather than the base class's `center` environment;
 - renders `headline` only when present;
 - renders available contact fields;
 - inserts separators only between rendered fields;

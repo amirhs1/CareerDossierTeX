@@ -206,6 +206,14 @@
 
 \__cdossier_tokens_resolve:
 
+%% url/nolinkurl uses LaTeX's math machinery internally. The 12pt document
+%% classes therefore need an explicit math-size mapping when the identity
+%% contact line selects the calibrated 11pt small size; without one, LaTeX
+%% derives a 5.5pt scriptscript size that the standard math fonts do not
+%% provide and emits font-substitution warnings. Keep this type-scale detail
+%% here with the other literal size decisions.
+\DeclareMathSizes { 11 } { 11 } { 8 } { 6 }
+
 %% Reuse article's own \normalsize setup so its display skips remain tied to
 %% the selected class option, then pin the font itself to the resolved whole
 %% point size and calibrated leading. No catcode changes occur at call time.

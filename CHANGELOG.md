@@ -26,7 +26,14 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   an inch. Existing documents may reflow and should have their pagination
   reviewed after upgrading. ([#138])
 
+- The shared résumé, CV, and letter identity block now scales its name,
+  headline, contact text, and vertical gaps from the calibrated `fontsize`
+  tokens. Its outer spacing is project-owned rather than inherited from
+  LaTeX's `center` environment, while field order, optional-field behavior,
+  contact separators, and extracted reading order remain unchanged. ([#139])
+
 [#138]: https://github.com/amirhs1/CareerDossierTeX/issues/138
+[#139]: https://github.com/amirhs1/CareerDossierTeX/issues/139
 
 ## [0.5.0] - 2026-07-24
 
