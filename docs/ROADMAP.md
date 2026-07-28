@@ -10,8 +10,11 @@ under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
 > **Current status:** `v0.5.0 — Statements and Customization` is released.
-> `v0.3.0` is dropped. The next planned release is `v1.0.0 — Stable Public
-> API`.
+> `v0.3.0` is dropped. The next planned release is `v0.6.0 — Calibrated Type
+> Scale and Rhythm`, tracked under
+> [milestone #9](https://github.com/amirhs1/CareerDossierTeX/milestone/9) and
+> [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
+> `v1.0.0 — Stable Public API` remains planned after it.
 
 ## Release overview
 
@@ -24,6 +27,7 @@ test pass at the end of a milestone.
 | `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Released |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.5.0` | Statement classes and broader customization | Released |
+| `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
 Repository milestones are tracked on the GitHub milestones page:
@@ -255,7 +259,73 @@ optional icons, and the Windows/NVDA reading-order check on 2026-07-22. Their
 future milestone remains undecided; they are not release blockers for
 `v0.5.0`.
 
-## Phase 6: `v1.0.0 — Stable Public API`
+## Phase 6: `v0.6.0 — Calibrated Type Scale and Rhythm`
+
+### Goal
+
+Replace the mixture of per-class settings and inherited `article` defaults with
+one shared, proportional design system, driven by two public inputs —
+`fontsize` and `margin` — applied identically by every document class.
+
+### Governing rules
+
+1. Every type size is a ratio of the body size, snapped to whole points.
+2. Every vertical gap is a ratio of the body baseline.
+3. Therefore `10pt`, `11pt`, and `12pt` are one design at three scales, not
+   three differently proportioned designs.
+
+### Included
+
+- `careerdossier-tokens.sty`: the single source of truth for the type scale,
+  vertical rhythm, rule weight, list metrics, and page geometry;
+- `fontsize` (`10pt`, `11pt`, `12pt`) and `margin` (`normal`, `narrow`) on all
+  four classes; `fontsize` is new on the letter and statement classes, `12pt`
+  is new everywhere;
+- per-class defaults rather than one uniform default: the résumé stays dense
+  (`10pt`, `narrow`) to preserve one-page capacity, the CV keeps `11pt` at the
+  shared `normal` margin, and the letter and statement default to `12pt` to
+  keep prose line length within a readable range at a conventional margin;
+- one shared page-furniture design (running header from page two, `Page N of
+  M` folio) across all four classes, with the folio suppressed on single-page
+  documents;
+- a keep-together page-break policy for section headings, entry headings, and
+  bullet groups;
+- reference PDFs for every `fontsize` × `margin` combination, across all four
+  document types.
+
+### Explicit non-goals
+
+- color themes, named or per-role font combinations, and icons — still
+  deferred, undecided future milestone (see Phase 5);
+- any change to public content commands, key names, contact rendering,
+  colours, or fonts;
+- a language- or direction-abstraction option (see Phase 3).
+
+### Removed
+
+- the `density` (`compact`/`standard`) class option, replaced by the
+  calibrated, proportional rhythm derived from `fontsize`.
+
+### Release criteria
+
+- `density` appears nowhere in sources, examples, tests, or docs;
+- no literal type size or structural vertical space outside
+  `careerdossier-tokens.sty`;
+- no `\geometry` call outside the shared geometry primitive;
+- all four classes accept `fontsize` and `margin` and reject unsupported
+  values with an actionable message;
+- every type size in the output is a whole number of points;
+- bullets align with section headings, section rules, and entry titles;
+- a one-page document carries no folio; a multi-page document carries a folio
+  throughout and a running header from page two;
+- tagged builds still mark furniture and the section rule as artifacts;
+- CI builds every example at all three `fontsize` values.
+
+Tracked under
+[milestone `v0.6.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/9)
+and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
+
+## Phase 7: `v1.0.0 — Stable Public API`
 
 ### Goal
 
