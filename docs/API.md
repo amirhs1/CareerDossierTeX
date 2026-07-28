@@ -213,6 +213,28 @@ theme=monochrome
 
 It is better to reject or omit an unsupported option than silently ignore it.
 
+### Page furniture
+
+All four document classes use the same fixed page-furniture policy:
+
+- a one-page document has no running header and no folio;
+- page one of a multi-page document has only a centered `Page N of M` folio;
+- pages two and later add a centered `<name> -- <document label>` running
+  header above the body and retain the centered folio; and
+- the résumé label is `Résumé`, the CV label is `Curriculum Vitae`, both
+  letter families use `Cover Letter`, and a statement uses its independently
+  configurable short running title.
+
+Furniture uses the sans-serif furniture step of the calibrated type scale and
+the monochrome text token. It remains print-safe and is marked as a layout
+artifact when tagged PDF is active. Page furniture is not user-configurable.
+
+Single-page suppression and the `of M` total use the LaTeX kernel's last
+absolute page recorded in the auxiliary file. A first build from a clean tree
+therefore shows a provisional folio; the next run suppresses it when the
+document has only one page. `latexmk` and the repository build commands perform
+the required rerun.
+
 ## Letter class
 
 ### Class declaration
@@ -656,11 +678,10 @@ The class accepts the same value sets as the résumé class:
 English and the monochrome theme remain fixed. Unsupported options or values
 must produce an actionable class error rather than being ignored.
 
-The first page renders the ordinary dossier header in the document body. Page
-numbers appear on every page, and pages after the first receive a simple running
-header derived from `name`; contact information must not exist only in running
-material. The running header and page number are fixed CV behavior in `v0.2.0`,
-not new user-configurable style options.
+The first page renders the ordinary dossier header in the document body. A
+multi-page CV follows the shared page-furniture policy above; a one-page CV
+suppresses the former `Page 1 of 1` folio. Contact information must not exist
+only in running material.
 
 The CV reuses the existing public content interface:
 
@@ -810,10 +831,11 @@ closing, and sender-metadata behavior. Optional recipient and academic profile
 fields collapse independently.
 
 The family may change letter-owned spacing and derives `/Title` as
-`Academic Cover Letter – <name>`. Each academic-letter page has a print-oriented
-footer: `name` at left and `Page n of N` at right. It does not introduce new
-recipient keys or change the industry family's defaults. Unknown family values
-must produce an actionable class error.
+`Academic Cover Letter – <name>`. Both letter families follow the shared
+page-furniture policy: one-page output is clean, while multi-page output uses
+`Cover Letter` as its continuation label. The academic family does not
+introduce new recipient keys or change the industry family's defaults. Unknown
+family values must produce an actionable class error.
 
 ### Historical exclusions in `v0.2.0`
 
@@ -835,8 +857,7 @@ list describes the scope of `v0.2.0` only.
 
 The `v0.2.0` additions are intentionally additive:
 
-- `careerdossier-resume` keeps its options, defaults, commands, and no-folio
-  behavior;
+- `careerdossier-resume` keeps its options, defaults, and commands;
 - `careerdossier-letter` defaults to `family=industry` and retains its existing
   setup keys and English defaults;
 - `orcid` is an optional shared-profile key, and existing profiles need no edit;
@@ -901,12 +922,13 @@ The initial statement release starts from the academic cover-letter design:
 - a centered identity block in the body on page one;
 - no running header on page one;
 - a centered `<name> -- <running title>` header from page two; and
-- a centered `Page N of M` folio on every page.
+- the shared one-page suppression and multi-page continuation furniture.
 
-Page furniture is class-owned and not user-configurable. The statement class
-uses the same paper and body-font options and defaults as the résumé, CV, and
-letter classes. Named or per-role font combinations remain future design work
-in issue #120. Color themes and icons are deferred from `v0.5.0`.
+Page furniture is component-owned and not user-configurable. The statement
+class registers its short running title with the shared component and uses the
+same paper and body-font options and defaults as the résumé, CV, and letter
+classes. Named or per-role font combinations remain future design work in issue
+#120. Color themes and icons are deferred from `v0.5.0`.
 
 ### Statement metadata
 

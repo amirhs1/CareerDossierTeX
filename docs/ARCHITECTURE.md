@@ -288,6 +288,7 @@ Owns reusable rendered pieces.
 Responsibilities:
 
 - identity block, including its token-sized text and baseline-derived spacing;
+- shared page-style pair, single-page suppression, running header, and folio;
 - contact line;
 - optional-field separator handling;
 - hyperlink wrappers;
@@ -299,8 +300,9 @@ Responsibilities:
 The component layer consumes the calibrated type and spacing values from
 `careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
 base-class environments. In particular, the shared identity block owns its
-centering and vertical rhythm while leaving page geometry to the document
-classes.
+centering and vertical rhythm, and shared page furniture owns its typography
+and auxiliary-file page-count decision, while leaving page geometry and the
+document-specific running label to the document classes.
 
 #### Why PDF metadata lives here
 
@@ -352,7 +354,7 @@ Responsibilities:
 - select Letter or A4 paper and delegate geometry to the shared token package;
 - process `fontsize`, `margin`, `density`, and `paper` class options;
 - control compact or standard density;
-- disable page numbers by default;
+- register the `Résumé` running label and enable shared page furniture;
 - define résumé section spacing;
 - define entry layout;
 - define résumé list behavior;
@@ -374,6 +376,7 @@ Responsibilities:
 - reuse the shared sender identity;
 - process `family=industry|academic` while preserving `industry` as the default;
 - process `paper=letter|a4` while preserving Letter as the default;
+- register the `Cover Letter` running label and enable shared page furniture;
 - support one-page and multi-page letters without résumé-specific compression.
 
 The letter class should not reuse résumé geometry merely because both documents share a header.
@@ -392,9 +395,9 @@ Responsibilities:
 - arrange the centered first-page identity block in logical source order;
 - keep the full meaningful title in the page-one body and PDF metadata while a
   separately bounded running title identifies continuation pages;
+- register that short running title with the shared page-furniture component;
 - reuse component-owned link normalization and separator-safe contact output;
-- start from the academic letter's geometry, typography, prose
-  rhythm, continuation header, and `Page N of M` folio;
+- start from the academic letter's geometry, typography, and prose rhythm;
 - keep running page furniture out of tagged structure; and
 - allow ordinary prose and standard LaTeX sectioning without imposing a
   type-specific narrative schema.
@@ -429,8 +432,8 @@ Responsibilities:
 - select Letter or A4 paper and delegate geometry to the shared token package;
 - process the documented `fontsize`, `margin`, `density`, and `paper` options;
 - render the first-page identity in the body;
-- provide a simple running header after the first page and page numbers on all
-  pages without making contact details running-only content;
+- register the `Curriculum Vitae` running label and enable shared page
+  furniture without making contact details running-only content;
 - reuse the generic section, entry, and item-list interfaces;
 - own the manual-publication list and its source-order numbering;
 - keep entries together across page breaks where practical without boxing an

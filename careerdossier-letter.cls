@@ -128,43 +128,8 @@
 
 \exp_args:NV \CDossierApplyGeometry:n \l__cdossier_letter_paper_tl
 
-%% Industry letters retain the v0.1 empty page style.
-%%
-%% Academic letters share careerdossier-cv's page furniture so the two
-%% multi-page academic documents look like one family: a centered running header
-%% carrying identity and document type from page two onwards, and a centered
-%% "Page N of M" folio on every page.
-%%
-%% Page one has no running header in both classes for the same reason — the
-%% letterhead here, and the body header in the CV, already carry the person's
-%% full identity. Repeating it immediately above would be redundant. From page
-%% two the header is what identifies a sheet that has been printed and
-%% separated, which is also why the footer no longer duplicates the name.
-%%
-%% The total comes from the LaTeX kernel's last absolute page, persisted in the
-%% auxiliary file, so no total-page package is needed and it resolves on a rerun.
-\makeatletter
-\def\ps@cdossieracademicletter{%
-  \let\@mkboth\@gobbletwo
-  \def\@oddhead{\hfil{\sffamily\small\CDossierFieldValue{name}\enspace--\enspace Cover\space Letter}\hfil}%
-  \let\@evenhead\@oddhead
-  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage\space of~\@abspage@last}\hfil}%
-  \let\@evenfoot\@oddfoot
-}
-\def\ps@cdossieracademicletterfirst{%
-  \let\@mkboth\@gobbletwo
-  \def\@oddhead{}%
-  \let\@evenhead\@oddhead
-  \def\@oddfoot{\hfil{\sffamily\small Page~\thepage\space of~\@abspage@last}\hfil}%
-  \let\@evenfoot\@oddfoot
-}
-\makeatother
-\str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
-  {
-    \pagestyle { cdossieracademicletter }
-    \AtBeginDocument { \thispagestyle { cdossieracademicletterfirst } }
-  }
-  { \pagestyle { empty } }
+\__cdossier_components_runninglabel:n { Cover~Letter }
+\MakeCDossierPageFurniture
 
 %% Block format: no paragraph indentation, paragraphs separated by vertical
 %% space. \emergencystretch keeps justified prose from producing overfull boxes

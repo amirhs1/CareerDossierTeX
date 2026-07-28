@@ -7,5 +7,3 @@ ada@example.com | example.com/ada
 Teaching in Practice
 I use transparent examples and formative feedback to help students connect mathematical reasoning
 with computational practice.
-
-Page 1 of 1

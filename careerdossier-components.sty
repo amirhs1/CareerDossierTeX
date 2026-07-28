@@ -16,13 +16,14 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-components owns the shared rendered document parts: the
-%% identity block, the contact line, link wrappers, and separator handling.
-%% It carries no page geometry (see the classes) and no résumé- or letter-
-%% specific structure.
+%% identity block, page furniture, the contact line, link wrappers, and
+%% separator handling.
+%% It carries no page geometry (see careerdossier-tokens) and no résumé- or
+%% letter-specific structure.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-components} {2026-07-28} {0.6.0}
-  {CareerDossierTeX shared identity block, contact line, and link wrappers}
+  {CareerDossierTeX shared identity block, page furniture, contact line, and links}
 
 \RequirePackage { careerdossier-base }
 \RequirePackage { careerdossier-tokens }
@@ -225,6 +226,87 @@
       }
     \group_end:
     \addvspace { \CDossierHeaderBelowSkip }
+  }
+
+%% ---------------------------------------------------------------------------
+%% Page furniture.
+%%
+%% All document classes share one page-style pair. A multi-page document gets
+%% a centered "Page N of M" folio throughout and a centered identity label from
+%% page two. A one-page document gets no furniture. The total comes from the
+%% LaTeX kernel's last absolute page, recorded in the auxiliary file, so the
+%% single-page decision settles on the second pass. On the first clean pass the
+%% kernel supplies \maxdimen as the unknown total and the folio is provisionally
+%% shown.
+%%
+%% Page-style material is artifact-marked by the kernel's tagged-PDF shipout
+%% path. Do not wrap it in document structure here.
+%% ---------------------------------------------------------------------------
+\tl_new:N \l__cdossier_components_runninglabel_tl
+
+%% A class registers the short document label used after page one. Statement
+%% classes may pass a token-list reference so a later preamble setup command
+%% can change the value before shipout.
+\cs_new_protected:Npn \__cdossier_components_runninglabel:n #1
+  { \tl_set:Nn \l__cdossier_components_runninglabel_tl {#1} }
+
+\prg_new_conditional:Npnn \__cdossier_components_if_multipage: { T , F , TF }
+  {
+    \int_compare:nNnTF { \use:c { @abspage@last } } > { 1 }
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+\cs_new:Npn \__cdossier_components_runninghead:
+  {
+    \hfil
+    {
+      \sffamily
+      \CDossierSizeFurniture
+      \CDossierTextColor
+      \CDossierFieldValue { name }
+      \enspace -- \enspace
+      \tl_use:N \l__cdossier_components_runninglabel_tl
+    }
+    \hfil
+  }
+
+\cs_new:Npn \__cdossier_components_folio:
+  {
+    \__cdossier_components_if_multipage:T
+      {
+        \hfil
+        {
+          \sffamily
+          \CDossierSizeFurniture
+          \CDossierTextColor
+          Page~\thepage\space of~\use:c { @abspage@last }
+        }
+        \hfil
+      }
+  }
+
+\makeatletter
+\def\ps@cdossierfurniture{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddhead{\__cdossier_components_runninghead:}%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{\__cdossier_components_folio:}%
+  \let\@evenfoot\@oddfoot
+}
+\def\ps@cdossierfurniturefirst{%
+  \let\@mkboth\@gobbletwo
+  \def\@oddhead{}%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{\__cdossier_components_folio:}%
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+
+\NewDocumentCommand \MakeCDossierPageFurniture { }
+  {
+    \pagestyle { cdossierfurniture }
+    \AtBeginDocument { \thispagestyle { cdossierfurniturefirst } }
   }
 
 %% ---------------------------------------------------------------------------

@@ -7,6 +7,10 @@ Application for Engineering Role
 Dear Casey Reader,
 The first industry-letter paragraph precedes the second in source order.
 The second industry-letter paragraph contains a meaningful letter link.
-The third industry-letter paragraph appears on page two without a running header or folio.
+Page 1 of 2
+Tagged Industry Letter – Cover Letter
+The third industry-letter paragraph appears on page two after the shared running header and above
+the folio.
 Sincerely,
 Tagged Industry Letter
+Page 2 of 2

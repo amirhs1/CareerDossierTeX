@@ -215,26 +215,14 @@ check_structure() {
     grep -qa '/S /itembody' "$pdf" || record_failure "$base has no semantic list-item body"
   fi
 
-  if [ "$base" = cv ]; then
-    grep -qa '/Artifact BMC' "$pdf" \
-      || record_failure "cv running header/folio are not artifacts"
-  fi
-
-  if [ "$base" = academic-letter ]; then
-    grep -qa '/Artifact BMC' "$pdf" \
-      || record_failure "academic-letter repeated footer is not an artifact"
-  fi
-
-  if [ "$base" = statement ]; then
-    grep -qa '/Artifact BMC' "$pdf" \
-      || record_failure "statement running header/folio are not artifacts"
-  fi
+  grep -qa '/Artifact BMC' "$pdf" \
+    || record_failure "$base running header/folio are not artifacts"
 }
 
 check_two_page_furniture() {
   local base="$1"
   local pdf="$work/$base.pdf"
-  local pages page_two
+  local pages page_one page_two running_label
 
   pages="$(pdfinfo "$pdf" | awk '/^Pages:/ { print $2 }')"
   if [ "$pages" -ne 2 ]; then
@@ -243,36 +231,62 @@ check_two_page_furniture() {
     return
   fi
 
+  page_one="$(pdftotext -enc UTF-8 -f 1 -l 1 "$pdf" - | tr -d '\f')"
   page_two="$(pdftotext -enc UTF-8 -f 2 -l 2 "$pdf" - | tr -d '\f')"
+  printf '%s\n' "$page_one" | grep -Fqx "Page 1 of 2" \
+    || record_failure "$base page one has no folio"
+
   case "$base" in
     cv)
+      running_label="Curriculum Vitae"
       printf '%s\n' "$page_two" | grep -Fq "Tagged Academic CV" \
         || record_failure "cv page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
+        || record_failure "cv page two has no running label"
       printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
         || record_failure "cv page two has no folio"
       ;;
     academic-letter)
+      running_label="Cover Letter"
       printf '%s\n' "$page_two" | grep -Fq "Tagged Academic Letter" \
         || record_failure "academic-letter page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
+        || record_failure "academic-letter page two has no running label"
       printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
         || record_failure "academic-letter page two has no folio"
       ;;
     statement)
+      running_label="Research Programme"
       printf '%s\n' "$page_two" | grep -Fq "Tagged Research Statement" \
         || record_failure "statement page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
+        || record_failure "statement page two has no running label"
       printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
         || record_failure "statement page two has no folio"
       ;;
-    resume|letter)
-      if printf '%s\n' "$page_two" | grep -Eq '^Page 2( of 2)?$'; then
-        record_failure "$base page two unexpectedly has a folio"
-      fi
-      if printf '%s\n' "$page_two" | grep -Eq \
-          'Tagged (Industry Resume|Industry Letter).*(Résumé|Resume|Cover Letter)'; then
-        record_failure "$base page two unexpectedly has a running header"
-      fi
+    resume)
+      running_label="Résumé"
+      printf '%s\n' "$page_two" | grep -Fq "Tagged Industry Resume" \
+        || record_failure "resume page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
+        || record_failure "resume page two has no running label"
+      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
+        || record_failure "resume page two has no folio"
+      ;;
+    letter)
+      running_label="Cover Letter"
+      printf '%s\n' "$page_two" | grep -Fq "Tagged Industry Letter" \
+        || record_failure "letter page two has no running header"
+      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
+        || record_failure "letter page two has no running label"
+      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
+        || record_failure "letter page two has no folio"
       ;;
   esac
+
+  if printf '%s\n' "$page_one" | grep -Fq "$running_label"; then
+    record_failure "$base page one unexpectedly contains its running label"
+  fi
 }
 
 check_page_two_artifact_stream() {
@@ -283,9 +297,8 @@ check_page_two_artifact_stream() {
 
   # A tagged page contains empty artifact wrappers even when its page style has
   # no visible furniture. Count only Artifact BMC blocks that contain a text
-  # object before their closing EMC. On page two the positive families must
-  # have exactly two such blocks (running header and folio); the résumé and
-  # industry letter must have none.
+  # object before their closing EMC. Every page-two fixture must have exactly
+  # two such blocks: one running header and one folio.
   text_artifacts="$(
     mutool show "$work/$base.pdf" pages/2/Contents \
       | awk '
@@ -296,17 +309,9 @@ check_page_two_artifact_stream() {
         '
   )"
 
-  case "$base" in
-    cv|academic-letter|statement)
-      [ "$text_artifacts" -eq 2 ] \
-        || record_failure \
-          "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
-      ;;
-    resume|letter)
-      [ "$text_artifacts" -eq 0 ] \
-        || record_failure "$base page two unexpectedly contains artifact-marked text furniture"
-      ;;
-  esac
+  [ "$text_artifacts" -eq 2 ] \
+    || record_failure \
+      "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
 }
 
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
