@@ -650,7 +650,7 @@ The class accepts the same value sets as the résumé class:
 
 | Option | Accepted values | CV default |
 |---|---|---|
-| `fontsize` | `10pt`, `11pt`, `12pt` | `11pt` |
+| `fontsize` | `10pt`, `11pt`, `12pt` | `12pt` |
 | `margin` | `normal`, `narrow` | `normal` |
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
@@ -660,8 +660,8 @@ must produce an actionable class error rather than being ignored.
 
 Section, entry, rule, bullet-list, and manual-publication-list metrics derive
 from the shared calibrated tokens and scale with `fontsize`. The CV intentionally
-shares the résumé rhythm; its roomier default presentation comes from using the
-same body size with the wider `normal` margin.
+shares the résumé rhythm; its roomier default presentation comes from its
+larger default body size.
 
 The first page renders the ordinary dossier header in the document body. A
 multi-page CV follows the shared page-furniture policy above; a one-page CV

@@ -29,7 +29,7 @@
 \RequirePackage { l3keys2e }
 
 \tl_new:N \l__cdossier_cv_fontsize_tl
-\tl_set:Nn \l__cdossier_cv_fontsize_tl { 11pt }
+\tl_set:Nn \l__cdossier_cv_fontsize_tl { 12pt }
 \tl_new:N \l__cdossier_cv_margin_tl
 \tl_set:Nn \l__cdossier_cv_margin_tl { normal }
 \tl_new:N \l__cdossier_cv_paper_tl

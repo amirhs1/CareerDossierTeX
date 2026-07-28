@@ -18,9 +18,8 @@ letter's page furniture — and neither requires a source edit; see step 5.
 The development version adds `fontsize=12pt` and
 `margin=normal|narrow` consistently across all four document classes. The
 résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
-statement classes default respectively to `fontsize=11pt,margin=normal`,
-`fontsize=12pt,margin=normal`, and `fontsize=12pt,margin=normal`. `normal` is
-one inch and `narrow` is half an inch. These changed defaults reflow existing
+statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
+inch and `narrow` is half an inch. These changed defaults reflow existing
 documents, so review line and page breaks after upgrading.
 
 On US Letter paper, `margin=narrow` increases the physical text block from the
@@ -46,18 +45,17 @@ For the CV:
 
 ```latex
 % Before
-\documentclass[fontsize=11pt,density=standard]{careerdossier-cv}
+\documentclass[fontsize=12pt,density=standard]{careerdossier-cv}
 
 % After
-\documentclass[fontsize=11pt,margin=normal]{careerdossier-cv}
+\documentclass[fontsize=12pt,margin=normal]{careerdossier-cv}
 ```
 
 Passing `density` to either class now stops with that class's actionable
 unknown-option error. The CV's former roomier `standard` spacing is intentionally
 retired: the CV and résumé now share proportional rhythm, while the CV remains
-roomier by default because it uses the wider `normal` margin. The manual
-publication list's label separation also moves from `0.6em` to the shared list
-token.
+roomier by default because its body size is larger. The manual publication
+list's label separation also moves from `0.6em` to the shared list token.
 
 To preserve a released class's previous body-size choice, set it explicitly in
 the document class options. The old per-class physical margins do not map
