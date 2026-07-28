@@ -48,6 +48,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   reading order, and the CV's optional BibLaTeX boundary are unchanged.
   ([#141], [#142])
 
+- **BREAKING (letter layout):** The industry and academic letter families now
+  share the same token-derived geometry and prose rhythm. Letterhead blocks,
+  salutation spacing, paragraph gaps, and signature space scale with
+  `fontsize`; `family=academic` is label- and metadata-only rather than a
+  layout selector. Optional recipient and subject blocks still collapse
+  without stray gaps, and both families use the shared multi-page furniture.
+  Existing letters may reflow and should have their pagination reviewed.
+  ([#143])
+
 ### Removed
 
 - **BREAKING (résumé and CV options):** Removed
@@ -61,6 +70,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#140]: https://github.com/amirhs1/CareerDossierTeX/issues/140
 [#141]: https://github.com/amirhs1/CareerDossierTeX/issues/141
 [#142]: https://github.com/amirhs1/CareerDossierTeX/issues/142
+[#143]: https://github.com/amirhs1/CareerDossierTeX/issues/143
 
 ## [0.5.0] - 2026-07-24
 

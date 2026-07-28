@@ -327,25 +327,26 @@ Build the repeatable page-two review set from the repository root:
 
 The command compiles the canonical two-page résumé, industry-letter, academic
 CV, academic-letter, and research-statement fixtures. It renders page two for
-all five short-name cases, then repeats the three families with continuation
-headers (CV, academic letter, and statement) using a deliberately long name.
-It also renders page two of all six specialized statement examples (research,
-teaching, teaching philosophy, diversity, artist, and purpose) and the
-default-interest long-fields fixture. The research statement remains the sole
-representative tagged statement profile; the statement-title regression pins
-all seven display and running-title defaults without duplicating tagged tests.
+all five short-name cases, then repeats the CV, academic letter, and statement
+with a deliberately long name. It also renders page two of all six specialized
+statement examples (research, teaching, teaching philosophy, diversity, artist,
+and purpose) and the default-interest long-fields fixture. The research
+statement remains the sole representative tagged statement profile; the
+statement-title regression pins all seven display and running-title defaults
+without duplicating tagged tests.
 
 Review the PNGs under `build/page-two-review/` and record the result in the pull
 request:
 
-1. the CV, academic-letter, and statement running headers are centered, clear,
-   and neither clipped nor crowded in both short- and long-name renders;
+1. all five short-name running headers are centered, clear, and neither clipped
+   nor crowded; the CV, academic-letter, and statement long-name renders meet
+   the same requirement;
 2. their `Page N of M` folios are centered, correctly numbered, and separated
    cleanly from the body;
 3. the gap between running furniture and body text is consistent and no body
    content overlaps either header or folio;
-4. the résumé and industry-letter page-two renders contain no running header or
-   folio;
+4. the résumé and industry-letter page-two renders use the same running-header
+   and `Page N of M` policy as the other document classes;
 5. each specialized statement example uses the expected applicant name and
    type-specific running title on page two;
 6. the default-interest long-name header shows `Statement of Interest` without

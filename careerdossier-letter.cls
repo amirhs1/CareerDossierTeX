@@ -16,9 +16,8 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-letter owns the English industry and academic cover-letter
-%% families: Letter/A4 geometry, the letter-specific metadata keys,
-%% and prose structure: fixed physical margins, the letter-specific metadata
-%% keys,
+%% families: Letter/A4 geometry, class options, letter-specific metadata keys,
+%% and prose structure driven by the shared design tokens,
 %% the collapsing recipient block, and the letterhead and closing commands.
 %% Shared identity and contact logic (the centered sender block, contact line,
 %% link wrappers) and the required-`name' validation live in
@@ -26,12 +25,13 @@
 %% that material and adds the letter body around it.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-letter} {2026-07-24} {0.5.0}
+\ProvidesExplClass {careerdossier-letter} {2026-07-28} {0.6.0}
   {CareerDossierTeX English cover-letter class}
 
 %% ---------------------------------------------------------------------------
-%% Class options. The existing industry family and Letter paper remain the
-%% defaults. Any unsupported option is rejected with an actionable message.
+%% Class options. The industry family, 12pt body, normal margin, Letter paper,
+%% and serif body remain the defaults. Any unsupported option is rejected with
+%% an actionable message.
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
 \tl_new:N \l__cdossier_letter_family_tl
@@ -100,7 +100,8 @@
       { careerdossier-tokens }
   }
 
-%% A prose letter reads best at a slightly larger body size than the résumé.
+%% A prose letter reads best at a slightly larger default body size than the
+%% résumé. Explicit fontsize options remain available for all letter families.
 \use:x
   {
     \exp_not:N \LoadClass
@@ -131,25 +132,12 @@
 \__cdossier_components_runninglabel:n { Cover~Letter }
 \MakeCDossierPageFurniture
 
-%% Block format: no paragraph indentation, paragraphs separated by vertical
-%% space. \emergencystretch keeps justified prose from producing overfull boxes
-%% when a paragraph has few break points.
+%% Block format: no paragraph indentation, paragraphs separated by the shared
+%% prose token. \emergencystretch keeps justified prose from producing overfull
+%% boxes when a paragraph has few break points.
 \setlength { \parindent }       { 0pt }
-\setlength { \parskip }         { 1ex plus 0.4ex minus 0.1ex }
+\setlength { \parskip }         { \CDossierProseParSkip }
 \setlength { \emergencystretch }{ 2em }
-
-%% ---------------------------------------------------------------------------
-%% Vertical rhythm for the letterhead and closing. Collected here so the
-%% letter's structural spacing stays easy to compare and adjust.
-%% ---------------------------------------------------------------------------
-\skip_new:N \l__cdossier_letter_afterhead_skip
-\skip_new:N \l__cdossier_letter_block_skip
-\skip_new:N \l__cdossier_letter_aftersalutation_skip
-\skip_new:N \l__cdossier_letter_sigspace_skip
-\skip_set:Nn \l__cdossier_letter_afterhead_skip      { 2ex   plus 0.6ex minus 0.2ex }
-\skip_set:Nn \l__cdossier_letter_block_skip          { 1.6ex plus 0.4ex minus 0.2ex }
-\skip_set:Nn \l__cdossier_letter_aftersalutation_skip { 1ex  plus 0.3ex }
-\skip_set:Nn \l__cdossier_letter_sigspace_skip       { 2.5em }
 
 %% ---------------------------------------------------------------------------
 %% Letter metadata.
@@ -259,25 +247,25 @@
   {
     \MakeCDossierHeader
     \par
-    \addvspace { \l__cdossier_letter_afterhead_skip }
+    \addvspace { \CDossierAfterHeaderBlockSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_date_tl }
     \par
-    \addvspace { \l__cdossier_letter_block_skip }
+    \addvspace { \CDossierBlockSkip }
     \__cdossier_letter_has_recipient:T
       {
         \noindent { \CDossierBodyStyle \__cdossier_letter_recipient: }
         \par
-        \addvspace { \l__cdossier_letter_block_skip }
+        \addvspace { \CDossierBlockSkip }
       }
     \tl_if_blank:VF \l__cdossier_letter_subject_tl
       {
         \noindent { \CDossierEntryTitleStyle \tl_use:N \l__cdossier_letter_subject_tl }
         \par
-        \addvspace { \l__cdossier_letter_block_skip }
+        \addvspace { \CDossierBlockSkip }
       }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_salutation_tl }
     \par
-    \addvspace { \l__cdossier_letter_aftersalutation_skip }
+    \addvspace { \CDossierAfterSalutationSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -288,10 +276,10 @@
   {
     \__cdossier_base_require_name:N \MakeCDossierClosing
     \par
-    \addvspace { \l__cdossier_letter_block_skip }
+    \addvspace { \CDossierBlockSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
     \par
-    \vspace { \l__cdossier_letter_sigspace_skip }
+    \vspace { \CDossierSignatureSkip }
     \noindent { \CDossierBodyStyle \CDossierPrintField { name } }
     \par
   }

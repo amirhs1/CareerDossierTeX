@@ -235,8 +235,14 @@ the required rerun.
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
 uses the shared `serif|sans` contract above and defaults to `serif`. `fontsize`
 and `margin` use the shared contracts above and default to `12pt` and `normal`.
-The
-following settings remain fixed:
+
+`family` is label- and metadata-only: it selects the PDF document type while
+both values use the same geometry, calibrated type scale, prose rhythm,
+letterhead structure, and shared `Cover Letter` continuation label. Switching
+between `industry` and `academic` therefore does not select a denser or roomier
+layout.
+
+The following settings remain fixed:
 
 ```text
 language=english
@@ -481,7 +487,9 @@ Renders the cover-letter opening material:
 4. optional subject;
 5. salutation.
 
-The exact spacing belongs to the letter class, not to the shared metadata package.
+The letter class arranges these blocks using the shared
+`careerdossier-tokens` prose and block-spacing values. An absent recipient
+block or subject omits both the content and its following block skip.
 
 ### `\MakeCDossierClosing`
 
@@ -816,8 +824,9 @@ existing documents are unchanged. The academic family reuses
 closing, and sender-metadata behavior. Optional recipient and academic profile
 fields collapse independently.
 
-The family may change letter-owned spacing and derives `/Title` as
-`Academic Cover Letter – <name>`. Both letter families follow the shared
+The academic family derives `/Title` as
+`Academic Cover Letter – <name>`, but it does not change geometry, type scale,
+prose rhythm, or letterhead spacing. Both letter families follow the shared
 page-furniture policy: one-page output is clean, while multi-page output uses
 `Cover Letter` as its continuation label. The academic family does not
 introduce new recipient keys or change the industry family's defaults. Unknown

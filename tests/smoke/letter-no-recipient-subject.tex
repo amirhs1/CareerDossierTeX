@@ -1,0 +1,18 @@
+% Both optional blocks are absent. The class must proceed directly from the
+% date to the salutation without reserving either block's vertical skip.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada.lovelace@example.com},
+}
+\CDossierLetterSetup{
+  date       = {28 July 2026},
+  salutation = {Dear Hiring Committee,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Data Scientist position.
+
+\MakeCDossierClosing
+\end{document}

@@ -367,17 +367,24 @@ Owns industry and academic cover-letter behavior.
 Responsibilities:
 
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- define prose-friendly paragraph and page-breaking behavior;
+- process `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`, preserving
+  `12pt,normal` as the prose-oriented defaults;
+- derive paragraph, letterhead-block, salutation, and signature rhythm from the
+  shared token package;
+- define prose-friendly page-breaking behavior;
 - render date and recipient blocks;
 - render an optional subject;
 - render salutation and closing;
 - reuse the shared sender identity;
-- process `family=industry|academic` while preserving `industry` as the default;
+- process `family=industry|academic` as a label- and metadata-only choice while
+  preserving `industry` as the default;
 - process `paper=letter|a4` while preserving Letter as the default;
 - register the `Cover Letter` running label and enable shared page furniture;
 - support one-page and multi-page letters without résumé-specific compression.
 
-The letter class should not reuse résumé geometry merely because both documents share a header.
+The letter class should not reuse résumé geometry merely because both documents
+share a header, and the family choice should not introduce family-conditional
+geometry or spacing.
 
 ### `careerdossier-statement.cls` (`v0.5.0`)
 

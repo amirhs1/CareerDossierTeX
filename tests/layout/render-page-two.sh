@@ -2,11 +2,11 @@
 # render-page-two.sh — build the five-family and statement page-two review set.
 #
 # The canonical short-name set covers résumé, industry letter, academic CV,
-# academic letter, and the existing two-page research statement. The three
-# families with continuation headers are also rendered with a deliberately
-# long name. The set also renders all six existing specialized statement
-# examples and the default-interest long-fields fixture. PDFs and PNGs are
-# review artifacts under build/, never source.
+# academic letter, and the existing two-page research statement. The CV,
+# academic letter, and statement are also rendered with a deliberately long
+# name. The set also renders all six existing specialized statement examples
+# and the default-interest long-fields fixture. PDFs and PNGs are review
+# artifacts under build/, never source.
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
