@@ -1,0 +1,37 @@
+% cv-publication-list-tokens.tex — the dependency-free publication list must
+% use the shared label-separation and rhythm tokens.
+\documentclass{careerdossier-cv}
+\CDossierSetup{name = {Ada Lovelace}}
+\ExplSyntaxOn
+\msg_new:nnn { cdossier-test } { wrong-publication-list-token }
+  { The~CV~publication~list~does~not~use~shared~list~token~'#1'. }
+\cs_new_protected:Npn \__cdossier_test_cv_publication_tokens:
+  {
+    \dim_compare:nNnF { \labelsep } = { \CDossierListLabelSep }
+      {
+        \msg_error:nnn { cdossier-test }
+          { wrong-publication-list-token } { labelsep }
+      }
+    \skip_if_eq:nnF { \topsep } { \CDossierListEdgeSkip }
+      {
+        \msg_error:nnn { cdossier-test }
+          { wrong-publication-list-token } { topsep }
+      }
+    \skip_if_eq:nnF { \itemsep } { \CDossierItemSepSkip }
+      {
+        \msg_error:nnn { cdossier-test }
+          { wrong-publication-list-token } { itemsep }
+      }
+  }
+\ExplSyntaxOff
+\begin{document}
+\begin{CDossierPublications}
+  \ExplSyntaxOn
+  \__cdossier_test_cv_publication_tokens:
+  \ExplSyntaxOff
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {Notes on the Analytical Engine}
+  }
+\end{CDossierPublications}
+\end{document}

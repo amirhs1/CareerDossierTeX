@@ -18,8 +18,9 @@ letter's page furniture — and neither requires a source edit; see step 5.
 The development version adds `fontsize=12pt` and
 `margin=normal|narrow` consistently across all four document classes. The
 résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
-statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
-inch and `narrow` is half an inch. These changed defaults reflow existing
+statement classes default respectively to `fontsize=11pt,margin=normal`,
+`fontsize=12pt,margin=normal`, and `fontsize=12pt,margin=normal`. `normal` is
+one inch and `narrow` is half an inch. These changed defaults reflow existing
 documents, so review line and page breaks after upgrading.
 
 On US Letter paper, `margin=narrow` increases the physical text block from the
@@ -29,9 +30,9 @@ more printable area than `margin=normal`. After accounting for the change from
 is about 16.8% lower than v0.5.0, compared with about 35.1% lower for
 `fontsize=11pt,margin=normal`.
 
-The résumé no longer accepts `density=compact|standard`; its vertical rhythm is
-derived from `fontsize`. Remove the option and select the intended size and
-margin directly:
+The résumé and CV no longer accept `density=compact|standard`; their vertical
+rhythm is derived from `fontsize`. Remove the option and select the intended
+size and margin directly:
 
 ```latex
 % Before
@@ -41,9 +42,22 @@ margin directly:
 \documentclass[fontsize=11pt,margin=narrow]{careerdossier-resume}
 ```
 
-Passing `density` to the résumé now stops with the class's actionable
-unknown-option error. The CV retains `density` until its own v0.6.0 conversion
-is complete.
+For the CV:
+
+```latex
+% Before
+\documentclass[fontsize=11pt,density=standard]{careerdossier-cv}
+
+% After
+\documentclass[fontsize=11pt,margin=normal]{careerdossier-cv}
+```
+
+Passing `density` to either class now stops with that class's actionable
+unknown-option error. The CV's former roomier `standard` spacing is intentionally
+retired: the CV and résumé now share proportional rhythm, while the CV remains
+roomier by default because it uses the wider `normal` margin. The manual
+publication list's label separation also moves from `0.6em` to the shared list
+token.
 
 To preserve a released class's previous body-size choice, set it explicitly in
 the document class options. The old per-class physical margins do not map

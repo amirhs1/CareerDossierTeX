@@ -428,12 +428,14 @@ Owns academic-CV document behavior.
 Responsibilities:
 
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process the documented `fontsize`, `margin`, `density`, and `paper` options;
+- process the documented `fontsize`, `margin`, and `paper` options;
 - render the first-page identity in the body;
 - register the `Curriculum Vitae` running label and enable shared page
   furniture without making contact details running-only content;
-- reuse the generic section, entry, and item-list interfaces;
-- own the manual-publication list and its source-order numbering;
+- render the generic section, entry, and item-list interfaces from shared type,
+  rhythm, rule, and list tokens;
+- own the manual-publication list and its source-order numbering while using
+  shared list metrics;
 - keep entries together across page breaks where practical without boxing an
   entire long entry; and
 - preserve logical source and extraction order.

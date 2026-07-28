@@ -1,0 +1,38 @@
+% cv-section-leading.tex — the section paragraph must end while the calibrated
+% section size is active, so TeX contributes section leading rather than body
+% leading to the vertical list.
+\documentclass{careerdossier-cv}
+\CDossierSetup{name = {Ada Lovelace}}
+\ExplSyntaxOn
+\bool_new:N \g__cdossier_test_cv_section_par_checked_bool
+\cs_new_eq:NN \__cdossier_test_cv_saved_par: \par
+\msg_new:nnn { cdossier-test } { wrong-cv-section-leading }
+  { CV~section~paragraph~ended~at~\dim_use:N \baselineskip;~expected~14pt. }
+\cs_set_protected:Npn \__cdossier_typography_heading:n #1
+  {
+    \group_begin:
+      \cs_set_protected:Npn \par
+        {
+          \bool_if:NF \g__cdossier_test_cv_section_par_checked_bool
+            {
+              \dim_compare:nNnF { \baselineskip } = { 14pt }
+                {
+                  \msg_error:nn { cdossier-test }
+                    { wrong-cv-section-leading }
+                }
+              \bool_gset_true:N
+                \g__cdossier_test_cv_section_par_checked_bool
+            }
+          \__cdossier_test_cv_saved_par:
+        }
+      #1
+    \group_end:
+  }
+\ExplSyntaxOff
+\begin{document}
+\CDossierSection{Education}
+\ExplSyntaxOn
+\bool_if:NF \g__cdossier_test_cv_section_par_checked_bool
+  { \msg_error:nn { cdossier-test } { wrong-cv-section-leading } }
+\ExplSyntaxOff
+\end{document}

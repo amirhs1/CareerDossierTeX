@@ -21,10 +21,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Changed
 
 - **BREAKING (layout defaults):** The résumé now defaults to
-  `fontsize=11pt,margin=narrow`; the CV, letter, and statement classes default
+  `fontsize=11pt,margin=narrow`; the CV defaults to
+  `fontsize=11pt,margin=normal`; and the letter and statement classes default
   to `fontsize=12pt,margin=normal`. `normal` is one inch and `narrow` is half
   an inch. Existing documents may reflow and should have their pagination
-  reviewed after upgrading. ([#138], [#141])
+  reviewed after upgrading. ([#138], [#141], [#142])
 
 - The shared résumé, CV, and letter identity block now scales its name,
   headline, contact text, and vertical gaps from the calibrated `fontsize`
@@ -40,22 +41,27 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   Furniture uses the calibrated sans-serif size and remains a tagged layout
   artifact. ([#140])
 
-- The résumé class now derives section, entry, rule, and bullet-list metrics
-  from the calibrated type and rhythm tokens. Section headings in the résumé
-  and CV now contribute their intended section leading to the page. Existing
-  profile fields, optional-field separators, and extracted reading order are
-  unchanged. ([#141])
+- The résumé and CV classes now derive section, entry, rule, and bullet-list
+  metrics from the calibrated type and rhythm tokens. The CV's dependency-free
+  manual-publication list also uses the shared list spacing and label
+  separation. Section headings contribute their intended section leading to
+  the page. Existing profile fields, optional-field separators, extracted
+  reading order, and the CV's optional BibLaTeX boundary are unchanged.
+  ([#141], [#142])
 
 ### Removed
 
-- **BREAKING (résumé options):** Removed `density=compact|standard` from
-  `careerdossier-resume`. Résumé rhythm now scales from `fontsize`; remove the
-  old option and use `fontsize` plus `margin` to select the layout. ([#141])
+- **BREAKING (résumé and CV options):** Removed
+  `density=compact|standard` from `careerdossier-resume` and
+  `careerdossier-cv`. Their rhythm now scales from `fontsize`; remove the old
+  option and use `fontsize` plus `margin` to select the layout. ([#141],
+  [#142])
 
 [#138]: https://github.com/amirhs1/CareerDossierTeX/issues/138
 [#139]: https://github.com/amirhs1/CareerDossierTeX/issues/139
 [#140]: https://github.com/amirhs1/CareerDossierTeX/issues/140
 [#141]: https://github.com/amirhs1/CareerDossierTeX/issues/141
+[#142]: https://github.com/amirhs1/CareerDossierTeX/issues/142
 
 ## [0.5.0] - 2026-07-24
 

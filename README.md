@@ -167,7 +167,7 @@ The academic CV reuses the shared profile, section, entry, and list interfaces.
 It also provides a dependency-free manual publication list:
 
 ```latex
-\documentclass[fontsize=12pt, margin=normal, density=standard]{careerdossier-cv}
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-cv}
 
 \CDossierSetup{
   name     = {Ada Lovelace},

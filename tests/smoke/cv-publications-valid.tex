@@ -1,6 +1,16 @@
-% cv-publications-valid.tex — dependency-free manual publications.
+% cv-publications-valid.tex — dependency-free manual publications. The class
+% must not make BibLaTeX commands available as a side effect.
 \documentclass{careerdossier-cv}
 \CDossierSetup{name={Ada Lovelace}}
+\ExplSyntaxOn
+\msg_new:nnn { cdossier-test } { unexpected-biblatex-dependency }
+  { The~CV~class~unexpectedly~loaded~BibLaTeX. }
+\AtBeginDocument
+  {
+    \cs_if_exist:NT \printbibliography
+      { \msg_error:nn { cdossier-test } { unexpected-biblatex-dependency } }
+  }
+\ExplSyntaxOff
 \begin{document}
 \MakeCDossierHeader
 \CDossierSection{Publications}

@@ -80,6 +80,9 @@ cases=(
   "cv-valid pass"
   "cv-sans-body pass"
   "cv-shared-profile pass"
+  "cv-section-leading pass"
+  "cv-publication-list-tokens pass"
+  "cv-density-option fail|Supported options are 'fontsize', 'margin', 'paper', and 'bodyfont'."
   "cv-missing-name fail|required profile field 'name' is not"
   "cv-bad-fontsize fail|accepts only a fixed set of"
   "cv-bad-paper fail|accepts only a fixed set of"
@@ -163,9 +166,10 @@ for entry in "${cases[@]}"; do
         echo "  EXPECTED FAILURE but compile succeeded"; fail=1; continue
       fi
       flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ')"
-      if [ "$base" = "resume-density-option" ]; then
+      if [[ "$base" = *-density-option ]]; then
         flat="$(printf '%s' "$flat" \
-          | sed 's/(careerdossier-resume)[[:space:]]*/ /g' | tr -s ' ')"
+          | sed 's/(careerdossier-resume)[[:space:]]*/ /g;
+                 s/(careerdossier-cv)[[:space:]]*/ /g' | tr -s ' ')"
       fi
       if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
         echo "  FAILED for the wrong reason: expected '$needle' in the log"; fail=1

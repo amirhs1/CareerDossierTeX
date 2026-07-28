@@ -15,12 +15,12 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-cv owns the academic-CV vertical slice: Letter/A4 geometry,
-%% density, multi-page flow, running headers, page numbers, and CV-local
-%% section/entry/list spacing, including the dependency-free manual-publication
-%% list. Shared profile, links, typography, and BibLaTeX formatting remain in
-%% their corresponding modules. BibLaTeX is intentionally not loaded here; a
-%% CV without an external bibliography must build without BibLaTeX or Biber.
+%% careerdossier-cv owns the academic-CV vertical slice: Letter/A4 selection,
+%% multi-page flow, and the dependency-free manual-publication list. Shared
+%% geometry, page furniture, type, rhythm, rules, list metrics, profile, links,
+%% typography, and BibLaTeX formatting remain in their corresponding modules.
+%% BibLaTeX is intentionally not loaded here; a CV without an external
+%% bibliography must build without BibLaTeX or Biber.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-cv} {2026-07-28} {0.6.0}
@@ -29,22 +29,23 @@
 \RequirePackage { l3keys2e }
 
 \tl_new:N \l__cdossier_cv_fontsize_tl
-\tl_set:Nn \l__cdossier_cv_fontsize_tl { 12pt }
+\tl_set:Nn \l__cdossier_cv_fontsize_tl { 11pt }
 \tl_new:N \l__cdossier_cv_margin_tl
 \tl_set:Nn \l__cdossier_cv_margin_tl { normal }
-\tl_new:N \l__cdossier_cv_density_tl
-\tl_set:Nn \l__cdossier_cv_density_tl { standard }
 \tl_new:N \l__cdossier_cv_paper_tl
 \tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper }
 \tl_new:N \l__cdossier_cv_bodyfont_tl
 \tl_set:Nn \l__cdossier_cv_bodyfont_tl { serif }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
-  { Unknown~class~option~'#1'~for~careerdossier-cv. }
+  {
+    Unknown~class~option~'#1'~for~careerdossier-cv.~
+    Supported~options~are~'fontsize',~'margin',~'paper',~and~'bodyfont'.
+  }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
     'margin'~(normal,~narrow),~
-    'density'~(compact,~standard),~'paper'~(letter,~a4),~and~
+    'paper'~(letter,~a4),~and~
     'bodyfont'~(serif,~sans).~Language~and~theme~cannot~be~set~here.
   }
 
@@ -58,10 +59,6 @@
       { normal , narrow }
       { \tl_set_eq:NN \l__cdossier_cv_margin_tl \l_keys_choice_tl } ,
     margin .value_required:n = true ,
-    density  .choices:nn =
-      { compact , standard }
-      { \tl_set_eq:NN \l__cdossier_cv_density_tl \l_keys_choice_tl } ,
-    density  .value_required:n = true ,
     paper .choices:nn =
       { letter , a4 }
       {
@@ -111,7 +108,7 @@
 \exp_args:NV \CDossierApplyGeometry:n \l__cdossier_cv_paper_tl
 
 \setlength { \parindent } { 0pt }
-\setlength { \parskip }   { 0pt plus 1pt }
+\setlength { \parskip }   { \CDossierParSkip }
 
 %% A4's narrower text block needs a little extra paragraph flexibility for
 %% prose-heavy CV entries. Letter output retains its established line-breaking
@@ -122,55 +119,17 @@
 \__cdossier_components_runninglabel:n { Curriculum~Vitae }
 \MakeCDossierPageFurniture
 
-\bool_new:N \l__cdossier_cv_compact_bool
-\str_if_eq:VnTF \l__cdossier_cv_density_tl { compact }
-  { \bool_set_true:N \l__cdossier_cv_compact_bool }
-  { \bool_set_false:N \l__cdossier_cv_compact_bool }
-
-\skip_new:N \l__cdossier_cv_sectionabove_skip
-\skip_new:N \l__cdossier_cv_sectiongap_skip
-\skip_new:N \l__cdossier_cv_sectionbelow_skip
-\skip_new:N \l__cdossier_cv_entryabove_skip
-\skip_new:N \l__cdossier_cv_entrygap_skip
-\skip_new:N \l__cdossier_cv_entrybelow_skip
-\skip_new:N \l__cdossier_cv_itemsep_skip
-\skip_new:N \l__cdossier_cv_itemtop_skip
-\dim_new:N  \l__cdossier_cv_rule_dim
-\dim_set:Nn \l__cdossier_cv_rule_dim { 0.4pt }
-
-\bool_if:NTF \l__cdossier_cv_compact_bool
-  {
-    \skip_set:Nn \l__cdossier_cv_sectionabove_skip { 9pt plus 2pt minus 1pt }
-    \skip_set:Nn \l__cdossier_cv_sectiongap_skip   { 2pt }
-    \skip_set:Nn \l__cdossier_cv_sectionbelow_skip { 4pt plus 1pt }
-    \skip_set:Nn \l__cdossier_cv_entryabove_skip   { 4pt plus 1pt }
-    \skip_set:Nn \l__cdossier_cv_entrygap_skip     { 1pt }
-    \skip_set:Nn \l__cdossier_cv_entrybelow_skip   { 4pt plus 1pt }
-    \skip_set:Nn \l__cdossier_cv_itemsep_skip      { 1pt }
-    \skip_set:Nn \l__cdossier_cv_itemtop_skip      { 1pt }
-  }
-  {
-    \skip_set:Nn \l__cdossier_cv_sectionabove_skip { 14pt plus 3pt minus 2pt }
-    \skip_set:Nn \l__cdossier_cv_sectiongap_skip   { 3pt }
-    \skip_set:Nn \l__cdossier_cv_sectionbelow_skip { 7pt plus 2pt }
-    \skip_set:Nn \l__cdossier_cv_entryabove_skip   { 8pt plus 2pt }
-    \skip_set:Nn \l__cdossier_cv_entrygap_skip     { 2pt }
-    \skip_set:Nn \l__cdossier_cv_entrybelow_skip   { 6pt plus 2pt }
-    \skip_set:Nn \l__cdossier_cv_itemsep_skip      { 3pt }
-    \skip_set:Nn \l__cdossier_cv_itemtop_skip      { 2pt }
-  }
-
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
-    \addvspace { \l__cdossier_cv_sectionabove_skip }
+    \addvspace { \CDossierSectionAboveSkip }
     \__cdossier_typography_heading:n
       { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
-    \vspace { \l__cdossier_cv_sectiongap_skip }
+    \vspace { \CDossierSectionRuleSkip }
     \noindent { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
-      { \rule { \linewidth } { \l__cdossier_cv_rule_dim } } }
+      { \rule { \linewidth } { \CDossierRuleThickness } } }
     \par \nobreak
-    \vspace { \l__cdossier_cv_sectionbelow_skip }
+    \vspace { \CDossierSectionBelowSkip }
   }
 
 \tl_new:N \l__cdossier_cv_entry_title_tl
@@ -205,31 +164,59 @@
     \tl_if_blank:VT \l__cdossier_cv_entry_title_tl
       { \msg_error:nn { careerdossier-cv } { entry-missing-title } }
     \par
-    \addvspace { \l__cdossier_cv_entryabove_skip }
+    \addvspace { \CDossierEntryAboveSkip }
     \__cdossier_components_entryhead:VVVV
       \l__cdossier_cv_entry_title_tl
       \l__cdossier_cv_entry_org_tl
       \l__cdossier_cv_entry_loc_tl
       \l__cdossier_cv_entry_dates_tl
     \nobreak
-    \vspace { \l__cdossier_cv_entrygap_skip }
+    \vspace { \CDossierEntryGapSkip }
   }
   {
     \par
-    \addvspace { \l__cdossier_cv_entrybelow_skip }
+    \addvspace { \CDossierEntryBelowSkip }
   }
+
+\dim_new:N \l__cdossier_cv_label_width_dim
 
 \NewDocumentEnvironment { CDossierItemize } { }
   {
-    \begin { itemize }
-      [
-        leftmargin = 1.4em ,
-        labelsep   = 0.5em ,
-        topsep     = \l__cdossier_cv_itemtop_skip ,
-        itemsep    = \l__cdossier_cv_itemsep_skip ,
-        parsep     = 0pt ,
-        label      = \textbullet ,
-      ]
+    \tag_if_active:TF
+      {
+        %% LaTeX Lab's tagged-list emulation requires an explicit dimension
+        %% instead of enumitem's `*' calculation. Measure the fixed bullet so
+        %% its label box remains flush with the section and entry edge.
+        \hbox_set:Nn \l_tmpa_box { \textbullet }
+        \dim_set:Nn \l__cdossier_cv_label_width_dim
+          { \box_wd:N \l_tmpa_box }
+        \begin { itemize }
+          [
+            leftmargin =
+              \dim_eval:n
+                {
+                  \l__cdossier_cv_label_width_dim
+                  + \CDossierListLabelSep
+                } ,
+            labelwidth = \l__cdossier_cv_label_width_dim ,
+            labelsep   = \CDossierListLabelSep ,
+            topsep     = \CDossierListEdgeSkip ,
+            itemsep    = \CDossierItemSepSkip ,
+            parsep     = 0pt ,
+            label      = \textbullet ,
+          ]
+      }
+      {
+        \begin { itemize }
+          [
+            leftmargin = * ,
+            labelsep   = \CDossierListLabelSep ,
+            topsep     = \CDossierListEdgeSkip ,
+            itemsep    = \CDossierItemSepSkip ,
+            parsep     = 0pt ,
+            label      = \textbullet ,
+          ]
+      }
   }
   { \end { itemize } }
 
@@ -375,9 +362,9 @@
       [
         label      = \textbf { \arabic*) } ,
         leftmargin = * ,
-        labelsep   = 0.6em ,
-        topsep     = \l__cdossier_cv_itemtop_skip ,
-        itemsep    = \l__cdossier_cv_itemsep_skip ,
+        labelsep   = \CDossierListLabelSep ,
+        topsep     = \CDossierListEdgeSkip ,
+        itemsep    = \CDossierItemSepSkip ,
         parsep     = 0pt ,
       ]
   }
