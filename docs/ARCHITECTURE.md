@@ -287,7 +287,7 @@ Owns reusable rendered pieces.
 
 Responsibilities:
 
-- identity block;
+- identity block, including its token-sized text and baseline-derived spacing;
 - contact line;
 - optional-field separator handling;
 - hyperlink wrappers;
@@ -295,6 +295,12 @@ Responsibilities:
 - date and location primitives;
 - shared letterhead pieces that do not impose full page geometry;
 - PDF document metadata derived from the profile.
+
+The component layer consumes the calibrated type and spacing values from
+`careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
+base-class environments. In particular, the shared identity block owns its
+centering and vertical rhythm while leaving page geometry to the document
+classes.
 
 #### Why PDF metadata lives here
 

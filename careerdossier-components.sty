@@ -21,10 +21,11 @@
 %% specific structure.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplPackage {careerdossier-components} {2026-07-24} {0.5.0}
+\ProvidesExplPackage {careerdossier-components} {2026-07-28} {0.6.0}
   {CareerDossierTeX shared identity block, contact line, and link wrappers}
 
 \RequirePackage { careerdossier-base }
+\RequirePackage { careerdossier-tokens }
 \RequirePackage { careerdossier-typography }
 \RequirePackage { careerdossier-theme }
 
@@ -195,17 +196,35 @@
 \NewDocumentCommand \MakeCDossierHeader { }
   {
     \__cdossier_base_require_name:N \MakeCDossierHeader
-    \begin { center }
-      { \CDossierNameStyle \Huge \CDossierPrintField { name } \par }
+    \addvspace { \CDossierHeaderAboveSkip }
+    \group_begin:
+      \centering
+      {
+        \CDossierNameStyle
+        \CDossierSizeName
+        \CDossierPrintField { name }
+        \par
+      }
       \CDossierIfFieldTF { headline }
         {
-          \smallskip
-          { \CDossierHeadlineStyle \large \CDossierPrintField { headline } \par }
+          \addvspace { \CDossierHeaderNameGapSkip }
+          {
+            \CDossierHeadlineStyle
+            \CDossierSizeHeadline
+            \CDossierPrintField { headline }
+            \par
+          }
         }
         { }
-      \smallskip
-      { \CDossierBodyStyle \small \__cdossier_components_contactline: \par }
-    \end { center }
+      \addvspace { \CDossierHeaderMetaGapSkip }
+      {
+        \CDossierBodyStyle
+        \CDossierSizeSmall
+        \__cdossier_components_contactline:
+        \par
+      }
+    \group_end:
+    \addvspace { \CDossierHeaderBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
