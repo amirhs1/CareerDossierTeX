@@ -22,6 +22,29 @@ statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
 inch and `narrow` is half an inch. These changed defaults reflow existing
 documents, so review line and page breaks after upgrading.
 
+On US Letter paper, `margin=narrow` increases the physical text block from the
+v0.5.0 résumé's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
+more printable area than `margin=normal`. After accounting for the change from
+10pt/12pt body size and leading to 11pt/13.6pt, estimated line-and-page capacity
+is about 16.8% lower than v0.5.0, compared with about 35.1% lower for
+`fontsize=11pt,margin=normal`.
+
+The résumé no longer accepts `density=compact|standard`; its vertical rhythm is
+derived from `fontsize`. Remove the option and select the intended size and
+margin directly:
+
+```latex
+% Before
+\documentclass[fontsize=11pt,density=compact]{careerdossier-resume}
+
+% After
+\documentclass[fontsize=11pt,margin=narrow]{careerdossier-resume}
+```
+
+Passing `density` to the résumé now stops with the class's actionable
+unknown-option error. The CV retains `density` until its own v0.6.0 conversion
+is complete.
+
 To preserve a released class's previous body-size choice, set it explicitly in
 the document class options. The old per-class physical margins do not map
 exactly to both new presets; choose the closest preset and review the result.

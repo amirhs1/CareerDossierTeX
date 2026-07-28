@@ -108,7 +108,6 @@ actually been verified.
 \documentclass[
   fontsize=11pt,
   margin=narrow,
-  density=compact,
   paper=letter,
   bodyfont=serif
 ]{careerdossier-resume}
@@ -153,23 +152,6 @@ custom geometry. Do not load `geometry` again with package options: doing so
 can produce an option clash. A raw `\geometry` override bypasses the two tested
 CareerDossierTeX presets, so its pagination and visual result remain the
 author's responsibility.
-
-#### `density`
-
-Accepted values:
-
-```text
-compact
-standard
-```
-
-Default:
-
-```text
-compact
-```
-
-`compact` reduces vertical spacing for short industry résumés. `standard` provides more breathing room.
 
 #### `paper`
 

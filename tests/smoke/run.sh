@@ -64,9 +64,12 @@ allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOf
 # span the log's wrapped lines.
 cases=(
   "resume-valid pass"
-  "resume-standard-density pass"
+  "resume-12pt pass"
   "resume-sans-body pass"
   "resume-sans-body-tagged pass"
+  "resume-section-leading pass"
+  "resume-itemize-alignment pass"
+  "resume-density-option fail|Supported options are 'fontsize', 'margin', 'paper', and 'bodyfont'."
   "resume-missing-name fail|required profile field 'name' is not"
   "resume-bad-fontsize fail|accepts only a fixed set of"
   "resume-bad-paper fail|accepts only a fixed set of"
@@ -160,6 +163,10 @@ for entry in "${cases[@]}"; do
         echo "  EXPECTED FAILURE but compile succeeded"; fail=1; continue
       fi
       flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ')"
+      if [ "$base" = "resume-density-option" ]; then
+        flat="$(printf '%s' "$flat" \
+          | sed 's/(careerdossier-resume)[[:space:]]*/ /g' | tr -s ' ')"
+      fi
       if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
         echo "  FAILED for the wrong reason: expected '$needle' in the log"; fail=1
       else

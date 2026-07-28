@@ -1,0 +1,18 @@
+% resume-itemize-alignment.tex — the public list compiles and its computed
+% label box starts at the same left edge as the section rule.
+\documentclass{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\ExplSyntaxOn
+\msg_new:nnn { cdossier-test } { list-not-flush-left }
+  { The~CDossierItemize~label~box~does~not~start~at~the~section-rule~edge. }
+\ExplSyntaxOff
+\begin{document}
+\CDossierSection{Experience}
+\begin{CDossierItemize}
+  \ExplSyntaxOn
+  \dim_compare:nNnF { \leftmargin } = { \labelwidth + \labelsep }
+    { \msg_error:nn { cdossier-test } { list-not-flush-left } }
+  \ExplSyntaxOff
+  \item Compiles with a flush-left bullet.
+\end{CDossierItemize}
+\end{document}

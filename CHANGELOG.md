@@ -24,7 +24,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   `fontsize=11pt,margin=narrow`; the CV, letter, and statement classes default
   to `fontsize=12pt,margin=normal`. `normal` is one inch and `narrow` is half
   an inch. Existing documents may reflow and should have their pagination
-  reviewed after upgrading. ([#138])
+  reviewed after upgrading. ([#138], [#141])
 
 - The shared résumé, CV, and letter identity block now scales its name,
   headline, contact text, and vertical gaps from the calibrated `fontsize`
@@ -40,9 +40,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   Furniture uses the calibrated sans-serif size and remains a tagged layout
   artifact. ([#140])
 
+- The résumé class now derives section, entry, rule, and bullet-list metrics
+  from the calibrated type and rhythm tokens. Section headings in the résumé
+  and CV now contribute their intended section leading to the page. Existing
+  profile fields, optional-field separators, and extracted reading order are
+  unchanged. ([#141])
+
+### Removed
+
+- **BREAKING (résumé options):** Removed `density=compact|standard` from
+  `careerdossier-resume`. Résumé rhythm now scales from `fontsize`; remove the
+  old option and use `fontsize` plus `margin` to select the layout. ([#141])
+
 [#138]: https://github.com/amirhs1/CareerDossierTeX/issues/138
 [#139]: https://github.com/amirhs1/CareerDossierTeX/issues/139
 [#140]: https://github.com/amirhs1/CareerDossierTeX/issues/140
+[#141]: https://github.com/amirhs1/CareerDossierTeX/issues/141
 
 ## [0.5.0] - 2026-07-24
 
