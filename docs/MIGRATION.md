@@ -17,10 +17,17 @@ letter's page furniture — and neither requires a source edit; see step 5.
 
 The development version adds `fontsize=12pt` and
 `margin=normal|narrow` consistently across all four document classes. The
-résumé now defaults to `fontsize=10pt,margin=narrow`; the CV, letter, and
+résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
 statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
 inch and `narrow` is half an inch. These changed defaults reflow existing
 documents, so review line and page breaks after upgrading.
+
+On US Letter paper, `margin=narrow` increases the physical text block from the
+v0.5.0 résumé's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
+more printable area than `margin=normal`. After accounting for the change from
+10pt/12pt body size and leading to 11pt/13.6pt, estimated line-and-page capacity
+is about 16.8% lower than v0.5.0, compared with about 35.1% lower for
+`fontsize=11pt,margin=normal`.
 
 The résumé no longer accepts `density=compact|standard`; its vertical rhythm is
 derived from `fontsize`. Remove the option and select the intended size and
@@ -31,7 +38,7 @@ margin directly:
 \documentclass[fontsize=11pt,density=compact]{careerdossier-resume}
 
 % After
-\documentclass[fontsize=10pt,margin=narrow]{careerdossier-resume}
+\documentclass[fontsize=11pt,margin=narrow]{careerdossier-resume}
 ```
 
 Passing `density` to the résumé now stops with the class's actionable

@@ -7,7 +7,7 @@
 \bool_new:N \g__cdossier_test_section_par_checked_bool
 \cs_new_eq:NN \__cdossier_test_saved_par: \par
 \msg_new:nnn { cdossier-test } { wrong-section-leading }
-  { Section~paragraph~ended~at~\dim_use:N \baselineskip;~expected~13pt. }
+  { Section~paragraph~ended~at~\dim_use:N \baselineskip;~expected~14pt. }
 \cs_set_protected:Npn \__cdossier_typography_heading:n #1
   {
     \group_begin:
@@ -15,7 +15,7 @@
         {
           \bool_if:NF \g__cdossier_test_section_par_checked_bool
             {
-              \dim_compare:nNnF { \baselineskip } = { 13pt }
+              \dim_compare:nNnF { \baselineskip } = { 14pt }
                 { \msg_error:nn { cdossier-test } { wrong-section-leading } }
               \bool_gset_true:N \g__cdossier_test_section_par_checked_bool
             }

@@ -80,7 +80,7 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 
 ```latex
 \documentclass[
-  fontsize=10pt,
+  fontsize=11pt,
   margin=narrow,
   paper=letter,
   bodyfont=serif
@@ -111,11 +111,11 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 
 Every document class accepts `fontsize=10pt|11pt|12pt`,
 `margin=normal|narrow`, and `paper=letter|a4`. US Letter remains the default.
-The résumé defaults to `10pt,narrow`; the CV, letter, and statement classes
+The résumé defaults to `11pt,narrow`; the CV, letter, and statement classes
 default to `12pt,normal`. `normal` is one inch and `narrow` is half an inch.
-The résumé default preserves one-page capacity but can reach roughly 129
-characters per line in full-width prose; review long Summary paragraphs for
-readability.
+The résumé default preserves more one-page capacity than `normal` but can reach
+roughly 117 characters per line in full-width prose; review long Summary
+paragraphs for readability.
 Advanced users can call `\geometry{...}` after `\documentclass` for a custom
 layout, but should not load the already-loaded `geometry` package again.
 
@@ -283,7 +283,7 @@ by default**. Opt in with `\DocumentMetadata` before `\documentclass`:
 
 ```latex
 \DocumentMetadata{lang=en, tagging=on}
-\documentclass[fontsize=10pt, margin=narrow]{careerdossier-resume}
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
 ```
 
 When tagging is on, section headings, lists, paragraphs, and links are exposed

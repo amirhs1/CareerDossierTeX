@@ -32,7 +32,7 @@
 \RequirePackage { l3keys2e }
 
 \tl_new:N \l__cdossier_resume_fontsize_tl
-\tl_set:Nn \l__cdossier_resume_fontsize_tl { 10pt }
+\tl_set:Nn \l__cdossier_resume_fontsize_tl { 11pt }
 \tl_new:N \l__cdossier_resume_margin_tl
 \tl_set:Nn \l__cdossier_resume_margin_tl { narrow }
 \tl_new:N \l__cdossier_resume_paper_tl

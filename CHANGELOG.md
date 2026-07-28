@@ -21,7 +21,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Changed
 
 - **BREAKING (layout defaults):** The résumé now defaults to
-  `fontsize=10pt,margin=narrow`; the CV, letter, and statement classes default
+  `fontsize=11pt,margin=narrow`; the CV, letter, and statement classes default
   to `fontsize=12pt,margin=normal`. `normal` is one inch and `narrow` is half
   an inch. Existing documents may reflow and should have their pagination
   reviewed after upgrading. ([#138], [#141])

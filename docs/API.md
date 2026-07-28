@@ -106,7 +106,7 @@ actually been verified.
 
 ```latex
 \documentclass[
-  fontsize=10pt,
+  fontsize=11pt,
   margin=narrow,
   paper=letter,
   bodyfont=serif
@@ -128,7 +128,7 @@ Accepted values:
 Default:
 
 ```text
-10pt
+11pt
 ```
 
 Any unsupported value should produce an actionable class error.
