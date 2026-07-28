@@ -74,6 +74,14 @@ Do not add another `\usepackage[...]{geometry}` call; reloading an already
 loaded package with new options can produce an option clash. Custom geometry
 bypasses the tested `normal` and `narrow` presets.
 
+The industry and academic letter families now share the same geometry and
+token-derived prose rhythm. `family=academic` no longer selects the former
+family-specific spacing; it changes document-type metadata only, while both
+families use the shared `Cover Letter` continuation label. The letterhead,
+salutation, closing, and paragraph gaps now scale with `fontsize`. Existing
+letters require no source edit, but their vertical spacing and pagination may
+change and should be reviewed.
+
 ## Upgrading to `v0.4.0`: XeLaTeX → LuaLaTeX
 
 `v0.4.0` makes LuaLaTeX the sole supported engine. XeLaTeX and pdfLaTeX now stop

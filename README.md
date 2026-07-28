@@ -161,6 +161,10 @@ See the complete example in:
 examples/industry/letter-industry.tex
 ```
 
+`family=academic` changes the letter's document-type metadata, not its layout.
+Both letter families use the same selected size, margin, prose rhythm, and
+shared continuation furniture.
+
 ### 4. Create an academic CV
 
 The academic CV reuses the shared profile, section, entry, and list interfaces.

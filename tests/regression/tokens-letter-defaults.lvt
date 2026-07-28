@@ -8,6 +8,19 @@
     \TYPE{margin = \l__cdossier_tokens_margin_tl}
     \TYPE{body-size = \dim_use:N \CDossierBodySize}
     \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
+    \TYPE{prose-par-skip = \skip_use:N \CDossierProseParSkip}
+    \TYPE{after-header-block-skip =
+      \skip_use:N \CDossierAfterHeaderBlockSkip}
+    \TYPE{block-skip = \skip_use:N \CDossierBlockSkip}
+    \TYPE{after-salutation-skip =
+      \skip_use:N \CDossierAfterSalutationSkip}
+    \TYPE{signature-skip = \skip_use:N \CDossierSignatureSkip}
+    \skip_if_eq:nnTF { \parskip } { \CDossierProseParSkip }
+      { \TYPE{paragraph-rhythm = shared} }
+      { \TYPE{paragraph-rhythm = local} }
+    \cs_if_exist:NTF \l__cdossier_letter_afterhead_skip
+      { \TYPE{letter-local-skips = present} }
+      { \TYPE{letter-local-skips = absent} }
   }
 \ExplSyntaxOff
 \begin{document}
