@@ -16,8 +16,8 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-resume owns résumé-specific page behaviour for the v0.1.0
-%% English industry dossier: Letter/A4 geometry, class options, disabled page
-%% numbers, and the section, entry, and list structures.
+%% English industry dossier: Letter/A4 geometry, class options, and the
+%% section, entry, and list structures.
 %% Reusable identity and contact logic lives in careerdossier-components; this
 %% class only arranges it on the page.
 
@@ -125,9 +125,8 @@
 
 \exp_args:NV \CDossierApplyGeometry:n \l__cdossier_resume_paper_tl
 
-%% No page numbers by default: an industry résumé header carries identity, not
-%% folios. Users who want them can restore a page style in their document.
-\pagestyle { empty }
+\__cdossier_components_runninglabel:n { Résumé }
+\MakeCDossierPageFurniture
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { 0pt plus 1pt }

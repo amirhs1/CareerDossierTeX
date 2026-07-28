@@ -276,40 +276,9 @@
 \NewDocumentCommand \CDossierStatementSetup { m }
   { \keys_set:nn { cdossier / statementdata } {#1} }
 
-%% ---------------------------------------------------------------------------
-%% Continuation-page furniture: no running header on page one; a centered name
-%% and short title from page two; and a centered Page N of M folio throughout.
-%% The kernel's page-style tagging path treats this repeated furniture as an
-%% artifact, matching the academic letter.
-%% ---------------------------------------------------------------------------
-\makeatletter
-\def\ps@cdossierstatement{%
-  \let\@mkboth\@gobbletwo
-  \def\@oddhead{%
-    \hfil
-    {\sffamily\small
-      \CDossierFieldValue{name}\enspace--\enspace
-      \tl_use:N\l__cdossier_statement_running_title_tl}%
-    \hfil
-  }%
-  \let\@evenhead\@oddhead
-  \def\@oddfoot{%
-    \hfil{\sffamily\small Page~\thepage\space of~\@abspage@last}\hfil
-  }%
-  \let\@evenfoot\@oddfoot
-}
-\def\ps@cdossierstatementfirst{%
-  \let\@mkboth\@gobbletwo
-  \def\@oddhead{}%
-  \let\@evenhead\@oddhead
-  \def\@oddfoot{%
-    \hfil{\sffamily\small Page~\thepage\space of~\@abspage@last}\hfil
-  }%
-  \let\@evenfoot\@oddfoot
-}
-\makeatother
-\pagestyle { cdossierstatement }
-\AtBeginDocument { \thispagestyle { cdossierstatementfirst } }
+\__cdossier_components_runninglabel:n
+  { \tl_use:N \l__cdossier_statement_running_title_tl }
+\MakeCDossierPageFurniture
 
 %% ---------------------------------------------------------------------------
 %% Header rendering and validation.

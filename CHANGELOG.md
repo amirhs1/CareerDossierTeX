@@ -32,8 +32,17 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   LaTeX's `center` environment, while field order, optional-field behavior,
   contact separators, and extracted reading order remain unchanged. ([#139])
 
+- All four document classes now use one component-owned page-furniture design.
+  One-page documents suppress the folio entirely; multi-page documents show a
+  centered `Page N of M` throughout and a centered name/document label from
+  page two. The résumé and industry letter now gain continuation furniture,
+  while the CV, academic letter, and statement no longer print `Page 1 of 1`.
+  Furniture uses the calibrated sans-serif size and remains a tagged layout
+  artifact. ([#140])
+
 [#138]: https://github.com/amirhs1/CareerDossierTeX/issues/138
 [#139]: https://github.com/amirhs1/CareerDossierTeX/issues/139
+[#140]: https://github.com/amirhs1/CareerDossierTeX/issues/140
 
 ## [0.5.0] - 2026-07-24
 

@@ -1,0 +1,69 @@
+% components-furniture.lvt — shared page-furniture control flow.
+%
+% Rendered position and extraction are covered by the layout and tagging
+% suites. This regression isolates the component-owned decisions: the
+% auxiliary-file page total controls single-page suppression, both shared page
+% styles exist, and a class may register a live short-label token list.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+\tl_new:N \l__cdossiertest_runninglabel_tl
+
+\cs_new_protected:Npn \cdossiertestSetLastPage #1
+  { \cs_set:cpn { @abspage@last } {#1} }
+
+\cs_new_protected:Npn \cdossiertestReportPageCount
+  {
+    \__cdossier_components_if_multipage:TF
+      { \TYPE{multipage} }
+      { \TYPE{single-page} }
+  }
+
+\cs_new_protected:Npn \cdossiertestReportStyles
+  {
+    \cs_if_exist:cTF { ps@cdossierfurniture }
+      { \TYPE{main-style=defined} }
+      { \TYPE{main-style=missing} }
+    \cs_if_exist:cTF { ps@cdossierfurniturefirst }
+      { \TYPE{first-style=defined} }
+      { \TYPE{first-style=missing} }
+  }
+
+\cs_new_protected:Npn \cdossiertestReportRunningLabel
+  { \TYPE{label=\l__cdossier_components_runninglabel_tl} }
+
+\cs_new_protected:Npn \cdossiertestUpdateRunningLabel
+  {
+    \tl_set:Nn \l__cdossiertest_runninglabel_tl { First }
+    \__cdossier_components_runninglabel:n
+      { \tl_use:N \l__cdossiertest_runninglabel_tl }
+    \tl_set:Nn \l__cdossiertest_runninglabel_tl { Updated }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{one-page-total-suppresses-furniture}{
+  \cdossiertestSetLastPage{1}
+  \cdossiertestReportPageCount
+}
+
+\TEST{multi-page-total-enables-furniture}{
+  \cdossiertestSetLastPage{2}
+  \cdossiertestReportPageCount
+}
+
+\TEST{shared-page-styles-exist}{
+  \cdossiertestReportStyles
+}
+
+\TEST{running-label-remains-live-until-shipout}{
+  \cdossiertestUpdateRunningLabel
+  \cdossiertestReportRunningLabel
+}
+
+\END
+\end{document}

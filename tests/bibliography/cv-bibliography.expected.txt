@@ -13,5 +13,3 @@ arXiv: 2501.01234.
 
 A. Lovelace. Oldest URL Publication. Example Press, 2024. url: https://example.invalid/
 visible-url.
-
-Page 1 of 1
