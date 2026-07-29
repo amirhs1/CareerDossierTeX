@@ -1,0 +1,14 @@
+% resume-contact-labels.tex — tagged + labelled contact-line fixture (issue #125).
+%
+% #95/#124 shipped the opt-in contact-labels key with committed coverage for
+% untagged + labelled (tests/extraction/resume-contact-labels.tex) and for
+% tagged + unlabelled (resume.tex and its siblings here). This fixture pins the
+% remaining combination, which had only ad hoc verification.
+%
+% The contract under test is stated in careerdossier-components.sty: a contact
+% label is meaningful content that must reach the structure tree and the
+% extracted text, while the " | " separator between items is a layout artifact.
+\DocumentMetadata{lang=en,tagging=on}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{resume-contact-labels-body.inc.tex}

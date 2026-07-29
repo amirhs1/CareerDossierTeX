@@ -1,0 +1,42 @@
+% resume-contact-labels-body.inc.tex — shared body for the tagged + labelled
+% contact-line fixtures (issue #125).
+%
+% Field selection deliberately mirrors tests/extraction/resume-contact-labels.tex
+% so the tagged fixtures pin the same optional-field contract the untagged
+% extraction baseline already pins:
+%
+%   * email and phone are labelled;
+%   * location and github are self-identifying and stay unlabelled between
+%     labelled neighbours;
+%   * website is absent, so no orphan `Website:` label and no stray separator
+%     may appear where it would have been.
+%
+% Single page on purpose. A one-page document carries no folio and no running
+% header, so page one holds no page-furniture artifacts. Every text-bearing
+% artifact on the page is then a contact-line separator, which is what lets
+% check_contact_label_tagging decide label-versus-separator marking by
+% exhaustion rather than by decoding glyph codes.
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name           = {Tagged Labelled Resume},
+  headline       = {Accessibility Engineer},
+  email          = {labels@example.test},
+  phone          = {+1 555 0100},
+  location       = {Toronto, ON},
+  github         = {github.com/example},
+  contact-labels = true,
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title={Engineer},
+  organization={Example Labs},
+  location={Toronto},
+  dates={2024--2026}
+]
+\begin{CDossierItemize}
+  \item Single-page achievement, so the page carries no folio furniture.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
