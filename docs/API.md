@@ -574,6 +574,30 @@ Provides a résumé-appropriate itemized list with controlled indentation and sp
 
 Users should prefer this environment over globally redefining `itemize`.
 
+When the list crosses a page boundary it is never split so that a single item
+stands alone on either side; a list longer than a page still breaks normally.
+See "Page-break policy" below.
+
+## Page-break policy
+
+The résumé and CV classes state where a page may break rather than leaving
+every break to LaTeX's defaults:
+
+- a section heading stays with the entry it introduces;
+- an entry heading stays with its own second line and with the first line of
+  its body;
+- a bullet list is never split leaving one item alone on either side.
+
+The policy uses page-break penalties, not boxing, so material that genuinely
+does not fit still breaks: an entry or bullet list longer than a page
+paginates normally rather than overflowing. Because a list must know its own
+length before it is typeset, each list records that count in the auxiliary
+file — so a résumé or CV needs the same second LaTeX pass it already requires
+for the `Page N of M` folio. On a first clean pass the breaks are provisional.
+
+The letter and statement classes are continuous prose and keep ordinary
+`\widowpenalty` and `\clubpenalty` handling.
+
 ## Public field accessors
 
 These commands are intended mainly for advanced users and shared components.

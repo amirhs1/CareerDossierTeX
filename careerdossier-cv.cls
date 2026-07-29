@@ -119,6 +119,9 @@
 \__cdossier_components_runninglabel:n { Curriculum~Vitae }
 \MakeCDossierPageFurniture
 
+%% The keep-together penalty (issue #145) after the heading and rule keeps the
+%% title with the content that follows it, so a section heading is never
+%% stranded alone at the foot of a page.
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
@@ -128,7 +131,7 @@
     \vspace { \CDossierSectionRuleSkip }
     \noindent { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
       { \rule { \linewidth } { \CDossierRuleThickness } } }
-    \par \nobreak
+    \par \penalty \CDossierHeadingKeepPenalty
     \vspace { \CDossierSectionBelowSkip }
   }
 
@@ -170,7 +173,9 @@
       \l__cdossier_cv_entry_org_tl
       \l__cdossier_cv_entry_loc_tl
       \l__cdossier_cv_entry_dates_tl
-    \nobreak
+    %% Issue #145: keep the entry heading with the first line of its body, so
+    %% the heading cannot be stranded alone at the foot of a page.
+    \penalty \CDossierHeadingKeepPenalty
     \vspace { \CDossierEntryGapSkip }
   }
   {
@@ -178,6 +183,11 @@
     \addvspace { \CDossierEntryBelowSkip }
   }
 
+%% Issue #145: `beginpenalty' keeps the first bullet with whatever precedes the
+%% list -- here the entry heading. The inter-item boundaries are governed by
+%% the shared position-aware policy in careerdossier-components, which forbids
+%% the boundaries that would strand a single bullet and merely discourages the
+%% rest, so a list longer than a page still breaks.
 \dim_new:N \l__cdossier_cv_label_width_dim
 
 \NewDocumentEnvironment { CDossierItemize } { }
@@ -204,6 +214,7 @@
             itemsep    = \CDossierItemSepSkip ,
             parsep     = 0pt ,
             label      = \textbullet ,
+            beginpenalty = \CDossierHeadingKeepPenalty ,
           ]
       }
       {
@@ -215,10 +226,15 @@
             itemsep    = \CDossierItemSepSkip ,
             parsep     = 0pt ,
             label      = \textbullet ,
+            beginpenalty = \CDossierHeadingKeepPenalty ,
           ]
       }
+    \__cdossier_components_listpolicy_begin:
   }
-  { \end { itemize } }
+  {
+    \__cdossier_components_listpolicy_end:
+    \end { itemize }
+  }
 
 %% ---------------------------------------------------------------------------
 %% Manual publications.

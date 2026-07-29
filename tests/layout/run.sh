@@ -162,6 +162,69 @@ EOF
         fi
         ;;
     esac
+
+    # Keep-together page-break policy (issue #145). These fixtures place
+    # headings and bullet lists across a page boundary on purpose.
+    case "$base" in
+      *keeptogether*)
+        if [ "$pages" -lt 2 ]; then
+          echo "  EXPECTED a page break to exercise, got $pages page(s)"
+          fail=1
+        fi
+
+        keep_fail=0
+
+        # No list may be split leaving exactly one item on a page. The
+        # *-orphan* fixtures mark the list under test so its items can be
+        # counted apart from the filler bullets sharing the same page; the
+        # remaining fixtures hold a single list, so every bullet belongs to it.
+        case "$base" in
+          *-orphan*) item_pattern='^• Probe' ;;
+          *)         item_pattern='^•' ;;
+        esac
+        for (( n = 1; n <= pages; n++ )); do
+          items="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
+                   | sed '/^\f/d' | grep -c "$item_pattern" || true)"
+          if [ "$items" -eq 1 ]; then
+            echo "  ORPHANED BULLET: page $n carries exactly one item of the split list"
+            keep_fail=1
+          fi
+        done
+
+        # A heading must not be separated from the material it introduces.
+        # Each fixture declares its own requirements as
+        #   % KEEPTOGETHER: <text a> ||| <text b>
+        # meaning both snippets must land on the same page. This covers a
+        # section heading stranded from its first entry, an entry heading
+        # stranded from its body, and an entry heading whose own two lines
+        # would otherwise split across the break.
+        while IFS= read -r directive; do
+          [ -n "$directive" ] || continue
+          a="${directive%%|||*}"; b="${directive#*|||}"
+          a="$(printf '%s' "$a" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
+          b="$(printf '%s' "$b" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
+          page_a=0; page_b=0
+          for (( n = 1; n <= pages; n++ )); do
+            page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
+                         | sed '/^\f/d')"
+            printf '%s\n' "$page_text" | grep -Fq "$a" && page_a="$n"
+            printf '%s\n' "$page_text" | grep -Fq "$b" && page_b="$n"
+          done
+          if [ "$page_a" -eq 0 ] || [ "$page_b" -eq 0 ]; then
+            echo "  KEEPTOGETHER TEXT NOT FOUND: '$a' / '$b'"; keep_fail=1
+          elif [ "$page_a" -ne "$page_b" ]; then
+            echo "  SPLIT ACROSS PAGES ($page_a vs $page_b): '$a' / '$b'"
+            keep_fail=1
+          fi
+        done < <(sed -n 's/^% KEEPTOGETHER:[[:space:]]*//p' "$tex")
+
+        if [ "$keep_fail" -ne 0 ]; then
+          fail=1
+        else
+          echo "  no stranded heading and no orphaned bullet at any break"
+        fi
+        ;;
+    esac
   else
     echo "  (pdftotext absent: skipped folio check)"
   fi
