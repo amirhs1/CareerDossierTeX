@@ -66,13 +66,25 @@ jobs:
           # fixtures with veraPDF, not re-validating veraPDF itself.
           (cd verapdf-src && mvn -q -B -DskipTests clean package)
 
-          verapdf_bin="$(find verapdf-src -maxdepth 6 -type f -name verapdf \
-            -perm -u+x | head -1)"
-          if [ -z "$verapdf_bin" ]; then
-            echo "veraPDF build did not produce an executable 'verapdf' script" >&2
+          # The source build produces the fat CLI jar in cli/target, not a
+          # ready-to-run "verapdf" launcher script. Create a minimal wrapper
+          # here so tests/tagging/run.sh can invoke the CLI uniformly.
+          verapdf_cli_jar="$(find verapdf-src/cli/target -maxdepth 1 -type f \
+            -name 'cli-*.jar' | head -1)"
+          if [ -z "$verapdf_cli_jar" ]; then
+            echo "veraPDF build did not produce the CLI jar under cli/target" >&2
             exit 1
           fi
-          dirname "$verapdf_bin" | xargs -I{} realpath {} >> "$GITHUB_PATH"
+
+          install -d verapdf-bin
+          cat > verapdf-bin/verapdf <<'EOF'
+          #!/usr/bin/env sh
+          exec java -jar "$VERAPDF_CLI_JAR" "$@"
+          EOF
+          chmod +x verapdf-bin/verapdf
+
+          realpath verapdf-bin >> "$GITHUB_PATH"
+          echo "VERAPDF_CLI_JAR=$(realpath "$verapdf_cli_jar")" >> "$GITHUB_ENV"
 
       - name: Confirm veraPDF is on PATH before running the gate
         run: |
