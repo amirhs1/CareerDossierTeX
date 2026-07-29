@@ -84,6 +84,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- The résumé and CV section-rule spacing tokens now determine the complete
+  heading-to-rule and rule-to-content gaps. The decorative rule previously
+  occupied its own paragraph line, which added hidden baseline spacing even
+  when all three section skips were set to zero. The existing proportional
+  values, rule thickness and colour, public commands, extraction order, and
+  tagged layout-artifact treatment are unchanged. ([#164])
+
 - Contact separators now disappear when the contact paragraph wraps between
   fields, so no visual line begins or ends with `|`. Every contact item remains
   intact on one visual line; if an item is wider than the available line, the
@@ -117,6 +124,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#145]: https://github.com/amirhs1/CareerDossierTeX/issues/145
 [#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
 [#161]: https://github.com/amirhs1/CareerDossierTeX/issues/161
+[#164]: https://github.com/amirhs1/CareerDossierTeX/issues/164
 
 ## [0.5.0] - 2026-07-24
 

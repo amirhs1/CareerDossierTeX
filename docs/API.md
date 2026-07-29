@@ -601,7 +601,10 @@ This command validates that `name` exists.
 \CDossierSection{Experience}
 ```
 
-Creates a résumé section heading using the semantic section style and class-controlled spacing.
+Creates a résumé or CV section heading followed by a full-width decorative
+rule. Class-controlled spacing places the rule closer to its heading than to
+the content below; no additional paragraph line spacing is inserted around the
+rule.
 
 The argument is user-visible text. The command does not automatically translate arbitrary section titles.
 

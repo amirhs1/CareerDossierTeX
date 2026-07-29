@@ -22,7 +22,7 @@
 %% class only arranges it on the page.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-resume} {2026-07-28} {0.6.0}
+\ProvidesExplClass {careerdossier-resume} {2026-07-29} {0.6.0}
   {CareerDossierTeX English industry résumé class}
 
 %% ---------------------------------------------------------------------------
@@ -141,12 +141,7 @@
     \addvspace { \CDossierSectionAboveSkip }
     \__cdossier_typography_heading:n
       { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
-    \vspace { \CDossierSectionRuleSkip }
-    \noindent
-      { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
-          { \rule { \linewidth } { \CDossierRuleThickness } } }
-    \par \penalty \CDossierHeadingKeepPenalty
-    \vspace { \CDossierSectionBelowSkip }
+    \__cdossier_components_section_rule:
   }
 
 %% ---------------------------------------------------------------------------

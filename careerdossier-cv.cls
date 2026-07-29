@@ -23,7 +23,7 @@
 %% bibliography must build without BibLaTeX or Biber.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-cv} {2026-07-28} {0.6.0}
+\ProvidesExplClass {careerdossier-cv} {2026-07-29} {0.6.0}
   {CareerDossierTeX English academic CV class}
 
 \RequirePackage { l3keys2e }
@@ -128,11 +128,7 @@
     \addvspace { \CDossierSectionAboveSkip }
     \__cdossier_typography_heading:n
       { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
-    \vspace { \CDossierSectionRuleSkip }
-    \noindent { \CDossierRuleColor \__cdossier_typography_layout_artifact:n
-      { \rule { \linewidth } { \CDossierRuleThickness } } }
-    \par \penalty \CDossierHeadingKeepPenalty
-    \vspace { \CDossierSectionBelowSkip }
+    \__cdossier_components_section_rule:
   }
 
 \tl_new:N \l__cdossier_cv_entry_title_tl
