@@ -16,8 +16,8 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-components owns the shared rendered document parts: the
-%% identity block, page furniture, the contact line, link wrappers, and
-%% separator handling.
+%% identity block, page furniture, section rules, the contact line, link
+%% wrappers, and separator handling.
 %% It carries no page geometry (see careerdossier-tokens) and no résumé- or
 %% letter-specific structure.
 
@@ -419,6 +419,31 @@
   {
     \pagestyle { cdossierfurniture }
     \AtBeginDocument { \thispagestyle { cdossierfurniturefirst } }
+  }
+
+%% ---------------------------------------------------------------------------
+%% Section rule.
+%%
+%% Shared by the résumé and CV. The rule is a rendered component rather than a
+%% paragraph line: suppressing interline glue on both sides makes the calibrated
+%% rule skips own the complete heading-to-rule and rule-to-content gaps. The
+%% rule remains a layout artifact in tagged output, and the keep penalty still
+%% binds the complete heading/rule unit to the content that follows.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_components_section_rule:
+  {
+    \vspace { \CDossierSectionRuleSkip }
+    \nointerlineskip
+    \noindent
+      {
+        \CDossierRuleColor
+        \__cdossier_typography_layout_artifact:n
+          { \rule { \linewidth } { \CDossierRuleThickness } }
+      }
+    \par
+    \nointerlineskip
+    \penalty \CDossierHeadingKeepPenalty
+    \vspace { \CDossierSectionBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------

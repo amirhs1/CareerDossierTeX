@@ -249,7 +249,10 @@ The heading-to-rule gap (0.15) is deliberately the smallest structural gap in
 the project, and must stay unambiguously smaller than the rule-to-content gap
 (0.42) — currently about 1:2.8. A rule belongs to the heading above it; at 1:2
 it starts to read as a divider floating between two blocks. A retune may move
-both numbers, but not their order.
+both numbers, but not their order. These two tokens own the complete vertical
+space on either side of the rule: the shared component suppresses TeX's
+automatic interline glue before and after the rule rather than allowing a
+separate rule paragraph to add hidden baseline spacing.
 
 #### Derived metrics
 
@@ -426,6 +429,8 @@ Responsibilities:
 
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
+- shared CV/résumé section rule, including token-owned vertical spacing and
+  tagged layout-artifact treatment;
 - contact line;
 - optional-field separator handling;
 - hyperlink wrappers;
@@ -437,9 +442,11 @@ Responsibilities:
 The component layer consumes the calibrated type and spacing values from
 `careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
 base-class environments. In particular, the shared identity block owns its
-centering and vertical rhythm, and shared page furniture owns its typography
-and auxiliary-file page-count decision, while leaving page geometry and the
-document-specific running label to the document classes.
+centering and vertical rhythm, the shared section-rule primitive prevents
+paragraph line spacing from inflating its calibrated gaps, and shared page
+furniture owns its typography and auxiliary-file page-count decision, while
+leaving page geometry and the document-specific running label to the document
+classes.
 
 #### Why PDF metadata lives here
 
