@@ -314,6 +314,73 @@ check_page_two_artifact_stream() {
       "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
 }
 
+# Tagged + labelled contact line (issue #125).
+#
+# The contract in careerdossier-components.sty is that a contact label and an
+# unlinked contact value are meaningful content that must reach the structure
+# tree, while the " | " separator between items is a layout artifact. veraPDF
+# cannot decide this: an artifact is structurally legal, so text wrongly marked
+# as one still validates. This check is what distinguishes the two.
+#
+# It decides by exhaustion rather than by decoding glyph codes. The fixture is
+# deliberately one page, so it carries no folio and no running header and has no
+# legitimate text furniture. Separators are emitted as /Artifact<</Type /Layout>>
+# BDC, which is a different operator from the bare /Artifact BMC counted here.
+# Any text object inside a bare artifact on that page is therefore real content
+# that assistive technology has been told to skip.
+#
+# This is the regression that #158 introduced and that shipping v0.6.0 would
+# otherwise have carried: every unlinked contact item -- phone, location, and
+# every contact label -- was emitted as a bare artifact.
+check_contact_label_tagging() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+  local pages extracted text_artifacts
+
+  pages="$(pdfinfo "$pdf" | awk '/^Pages:/ { print $2 }')"
+  if [ "$pages" -ne 1 ]; then
+    record_failure \
+      "$base must stay one page so the artifact count has no page furniture in it (got $pages)"
+    return
+  fi
+
+  grep -qa 'StructTreeRoot' "$pdf" || record_failure "$base has no structure tree"
+
+  extracted="$(pdftotext -enc UTF-8 "$pdf" -)"
+  printf '%s\n' "$extracted" | grep -Fq 'Email: ' \
+    || record_failure "$base lost its Email label in extraction"
+  printf '%s\n' "$extracted" | grep -Fq 'Phone: ' \
+    || record_failure "$base lost its Phone label in extraction"
+  # website is absent from the fixture: no orphan label, no stray separator.
+  if printf '%s\n' "$extracted" | grep -Fq 'Website:'; then
+    record_failure "$base emitted an orphan Website label for an absent field"
+  fi
+  if printf '%s\n' "$extracted" | grep -Eq '\|[[:space:]]*$|^[[:space:]]*\|'; then
+    record_failure "$base has a stray separator at a contact-line edge"
+  fi
+
+  if [ "$have_mutool" -eq 1 ]; then
+    text_artifacts="$(
+      mutool show "$pdf" pages/1/Contents \
+        | awk '
+            /^\/Artifact BMC$/ { in_artifact = 1; next }
+            in_artifact && /^BT$/ { count++; in_artifact = 0; next }
+            in_artifact && /^EMC$/ { in_artifact = 0 }
+            END { print count + 0 }
+          '
+    )"
+    [ "$text_artifacts" -eq 0 ] \
+      || record_failure \
+        "$base marks $text_artifacts text run(s) as bare artifacts; contact labels and unlinked values must be content"
+  fi
+
+  # Record the roles this fixture actually produced, so the claim above is
+  # reviewable against observed output rather than assumption.
+  grep -oa '/S */[A-Za-z0-9]*' "$pdf" | sort | uniq -c | sort -rn \
+    >"$reports/$base-structure.txt"
+  echo "  RECORDED: structure roles (report: $base-structure.txt)"
+}
+
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
 # disagree on how to linearize the two-column entry header, so each owns a
 # baseline; sharing one would only record whichever library ran last.
@@ -503,6 +570,21 @@ for base in resume cv letter academic-letter statement; do
     compile_fixture "$base-ua2.tex" "$base-ua2" && validate_ua2 "$base"
   fi
 done
+
+# The labelled contact line is a one-page header fixture, so it deliberately
+# sits outside the five-document loop above: that loop asserts two-page
+# continuation furniture, which this fixture must not have. It still runs as
+# part of the ordinary suite rather than as a separate manual step.
+echo "== resume-contact-labels =="
+if compile_fixture resume-contact-labels.tex resume-contact-labels; then
+  check_contact_label_tagging resume-contact-labels
+  check_extraction resume-contact-labels
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture resume-contact-labels-ua2.tex resume-contact-labels-ua2 \
+      && validate_ua2 resume-contact-labels
+  fi
+fi
 
 if [ "$have_biber" -eq 1 ]; then
   echo
