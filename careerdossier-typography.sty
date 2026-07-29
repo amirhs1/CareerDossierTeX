@@ -20,7 +20,7 @@
 %% colour (see careerdossier-theme) and no page geometry (see the classes).
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplPackage {careerdossier-typography} {2026-07-24} {0.5.0}
+\ProvidesExplPackage {careerdossier-typography} {2026-07-29} {0.6.0}
   {CareerDossierTeX LuaLaTeX engine guard, portable fonts, and semantic text roles}
 
 %% ---------------------------------------------------------------------------
@@ -145,6 +145,30 @@
   }
 \cs_new_protected:Npn \__cdossier_typography_layout_artifact:n #1
   { \__cdossier_typography_artifact:nn { layout } {#1} }
+
+%% Mark a leaf text run as real content.
+%%
+%% Automatic paragraph tagging only reaches material typeset in the main
+%% vertical list. Text assembled inside a box that is measured before it is
+%% shipped never passes through it, so the kernel emits it under the enclosing
+%% artifact default and assistive technology is told to skip it. A hyperlink is
+%% unaffected because hyperref opens its own structure element inside the box.
+%%
+%% Wrapping the run in its own text structure restores the paragraph role such
+%% content carried before it was boxed, so a boxed value and an unboxed one
+%% reach the structure tree the same way.
+\cs_new_protected:Npn \__cdossier_typography_text_content:n #1
+  {
+    \tag_if_active:TF
+      {
+        \tag_struct_begin:n { tag = text }
+        \tag_mc_begin:n { }
+        #1
+        \tag_mc_end:
+        \tag_struct_end:
+      }
+      { #1 }
+  }
 
 %% Render a display heading with the class-provided visual formatting.  The
 %% tagged branch temporarily disables automatic paragraph tagging so the line
