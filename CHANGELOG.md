@@ -92,6 +92,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   targets, tagged artifact treatment, and the rule that missing fields leave
   no stray separators are preserved. ([#151])
 
+- In tagged output, contact labels and unlinked contact values (phone and
+  location) were emitted as layout artifacts rather than content, hiding them
+  from assistive technology even though they display normally and extract
+  normally. Introduced by the separator-wrapping fix above ([#151]) and never
+  reached a release; contact labels and unlinked values are content again.
+  ([#161])
+
 ### Removed
 
 - **BREAKING (résumé and CV options):** Removed
@@ -109,6 +116,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#144]: https://github.com/amirhs1/CareerDossierTeX/issues/144
 [#145]: https://github.com/amirhs1/CareerDossierTeX/issues/145
 [#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
+[#161]: https://github.com/amirhs1/CareerDossierTeX/issues/161
 
 ## [0.5.0] - 2026-07-24
 
