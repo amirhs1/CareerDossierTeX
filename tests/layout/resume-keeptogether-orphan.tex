@@ -1,0 +1,66 @@
+% resume-keeptogether-orphan.tex — layout stress: page-break keep-together
+% policy (issue #145), bullet-orphan case.
+%
+% The filler entry is sized so the page boundary falls inside the probe list
+% below. Every probe item begins with the marker word "Probe", so the runner
+% can count that one list's items on each side of the break independently of
+% the filler bullets sharing the page. Without the policy this list splits
+% leaving a single probe item alone on the second page (the last-item case);
+% with it, neither side of the break is left with one.
+% KEEPTOGETHER: Reporting Platform Review ||| Regional Data Cooperative
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Grace Hopper},
+  headline = {Systems Engineer},
+  email    = {grace.hopper@example.com},
+  phone    = {+1 416 555 0198},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Modernization Program}, organization = {Continental Reliability Consortium}, location = {Ottawa, ON}, dates = {2019--Present}]
+  \begin{CDossierItemize}
+    \item Directed the modernization of legacy reporting infrastructure across a dozen cooperating public-sector agencies.
+    \item Chaired the architecture review board responsible for cross-agency data-sharing standards and audit trails.
+    \item Established a shared incident-response playbook adopted across every participating agency's operations team.
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+    \item Designed models and processing pipelines that improved reliability during seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests, deployment checks, and operational dashboards that reduced production regressions.
+    \item Led technical discovery with program managers, documented trade-offs, and delivered phased modernization plans.
+    \item Built data-import services and validation tools for public reporting datasets in CSV, JSON, and XML formats.
+    \item Improved processing performance through batching, indexing, and query optimization while preserving auditability.
+    \item Created internal libraries for schema validation, error reporting, and automated documentation generation.
+    \item Implemented schema validation, duplicate detection, detailed error reports, and resumable processing.
+    \item Added administrative review tools and audit records to support corrections, approvals, and publication.
+    \item Replaced spreadsheet-driven monthly reporting with a governed pipeline and reproducible publication process.
+    \item Standardized metric definitions and introduced automated reconciliation between source and published summaries.
+    \item Maintained ingestion pipelines for weekly public-facing statistical releases across every participating region.
+    \item Wrote regression fixtures covering the reporting service's most commonly requested exports and edge cases.
+    \item Documented operational runbooks for on-call incident response and quarterly disaster-recovery exercises.
+    \item Coordinated cross-institutional review boards for archival conformance standards and long-term retention policy.
+    \item Audited automated validation suites for reproducibility across every published dataset and downstream consumer.
+    \item Presented findings on phased modernization to program stakeholders and executive sponsors twice yearly.
+    \item Negotiated service-level commitments with downstream agencies dependent on the shared reporting pipeline.
+    \item Established a rotating on-call schedule and a documented escalation matrix for production incidents.
+    \item Migrated archival storage from tape backups to a versioned, queryable object store with audit logging.
+    \item Reviewed and approved third-party data-processing agreements for compliance with retention policy.
+    \item Ran quarterly tabletop exercises simulating regional outages affecting the shared reporting infrastructure.
+    \item Filler line 1 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 2 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 3 covering additional operational reporting responsibilities and review duties.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Reporting Platform Review}, organization = {Regional Data Cooperative}, location = {Kitchener, ON}, dates = {2015--2019}]
+  \begin{CDossierItemize}
+    \item Probe entry describing the consolidation of duplicate metric definitions across reporting teams.
+    \item Probe entry describing the internal style guide for dataset documentation adopted by contributors.
+    \item Probe entry describing the internship program pairing graduates with senior modernization engineers.
+    \item Probe entry describing representation at inter-agency data-standards working groups each year.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}

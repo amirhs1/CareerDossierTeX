@@ -442,6 +442,10 @@
       { ! \tl_if_blank_p:n {#2} }
       { ! \tl_if_blank_p:n {#3} }
       {
+        %% Issue #145: the title line and the organization/location line are
+        %% one visual heading unit. Without this, the two lines could land on
+        %% opposite sides of a page break.
+        \penalty \CDossierHeadingKeepPenalty
         \noindent
         \tl_if_blank:nF {#2} { { \CDossierBodyStyle #2 } }
         \tl_if_blank:nF {#3} { \hfill { \CDossierMutedStyle #3 } }
@@ -449,6 +453,122 @@
       }
   }
 \cs_generate_variant:Nn \__cdossier_components_entryhead:nnnn { VVVV }
+
+%% ---------------------------------------------------------------------------
+%% Bullet-list page-break policy (issue #145).
+%%
+%% Shared by the entry-structured classes (résumé and CV); the continuous-prose
+%% classes keep ordinary \widowpenalty/\clubpenalty handling.
+%%
+%% A uniform inter-item penalty cannot express this policy. TeX chooses a page
+%% break by total cost, so if every inter-item boundary carries the same
+%% penalty it will still pick whichever one balances the page best -- including
+%% the boundary that strands a single bullet. The penalty therefore has to
+%% depend on the item's position in its list:
+%%
+%%   - the boundary after the first item is forbidden, so one bullet is never
+%%     left behind alone;
+%%   - the boundary before the last item is forbidden, so one bullet is never
+%%     carried over alone;
+%%   - every interior boundary is merely discouraged, so a list longer than a
+%%     page still breaks instead of overflowing.
+%%
+%% Knowing which item is last requires the list's length before the list is
+%% typeset, so each list records its own item count in the auxiliary file under
+%% a per-list serial and reads it back on the next run. This is the same
+%% two-pass arrangement the page furniture above already relies on for the
+%% total page count. On a first clean pass the count is unknown and only the
+%% first-item boundary is protected, so the breaks are provisional until the
+%% second run.
+%% ---------------------------------------------------------------------------
+\ExplSyntaxOff
+\makeatletter
+\newcommand\cdossier@setlistlen[2]{%
+  \expandafter\gdef\csname cdossier@listlen@#1\endcsname{#2}%
+}
+\newcommand\cdossier@writelistlen[2]{%
+  \protected@write\@auxout{}{\string\cdossier@setlistlen{#1}{#2}}%
+}
+\makeatother
+\ExplSyntaxOn
+
+\int_new:N \g__cdossier_components_listid_int
+\int_new:N \l__cdossier_components_itemidx_int
+\int_new:N \l__cdossier_components_itemtotal_int
+\tl_new:N  \l__cdossier_components_listkey_tl
+\cs_new_eq:NN \l__cdossier_components_saved_item \relax
+
+\msg_new:nnn { careerdossier-components } { list-rerun }
+  {
+    Bullet-list~page-break~policy~needs~another~run:~
+    rerun~LaTeX~to~settle~the~list~page~breaks.
+  }
+
+%% Choose this boundary's penalty from the item's position in its list. The
+%% kernel reads \@itempenalty inside \item, so the value must be assigned
+%% before the real \item runs rather than contributed as a separate penalty
+%% node: two adjacent penalties would give TeX the cheaper of the two as a
+%% legal breakpoint and defeat the protection.
+\cs_new_protected:Npn \__cdossier_components_itempenalty:
+  {
+    \int_compare:nNnT { \l__cdossier_components_itemidx_int } > { 1 }
+      {
+        \bool_lazy_or:nnTF
+          { \int_compare_p:nNn { \l__cdossier_components_itemidx_int } = { 2 } }
+          {
+            \bool_lazy_and_p:nn
+              { \int_compare_p:nNn
+                  { \l__cdossier_components_itemtotal_int } > { 0 } }
+              { \int_compare_p:nNn
+                  { \l__cdossier_components_itemidx_int }
+                  = { \l__cdossier_components_itemtotal_int } }
+          }
+          { \use:c { @itempenalty } = \CDossierHeadingKeepPenalty \scan_stop: }
+          { \use:c { @itempenalty } = \CDossierListOrphanPenalty \scan_stop: }
+      }
+  }
+
+\cs_new_protected:Npn \__cdossier_components_listpolicy_begin:
+  {
+    \int_gincr:N \g__cdossier_components_listid_int
+    \int_zero:N \l__cdossier_components_itemidx_int
+    \tl_set:Nx \l__cdossier_components_listkey_tl
+      { cdossier@listlen@ \int_use:N \g__cdossier_components_listid_int }
+    \int_zero:N \l__cdossier_components_itemtotal_int
+    \cs_if_exist:cT { \l__cdossier_components_listkey_tl }
+      {
+        \int_set:Nn \l__cdossier_components_itemtotal_int
+          { \use:c { \l__cdossier_components_listkey_tl } }
+      }
+    \cs_set_eq:NN \l__cdossier_components_saved_item \item
+    \cs_set_protected:Npn \item
+      {
+        \int_incr:N \l__cdossier_components_itemidx_int
+        \__cdossier_components_itempenalty:
+        \l__cdossier_components_saved_item
+      }
+  }
+
+%% Warn only when a previously recorded count disagrees with this run, which
+%% means the document changed and the page breaks have not settled. A first
+%% clean pass has nothing recorded yet and stays silent, exactly as the page
+%% furniture above does while the total page count is still unknown.
+\cs_new_protected:Npn \__cdossier_components_listpolicy_end:
+  {
+    \bool_lazy_and:nnT
+      { \int_compare_p:nNn { \l__cdossier_components_itemtotal_int } > { 0 } }
+      {
+        \int_compare_p:n
+          {
+            \l__cdossier_components_itemidx_int
+            != \l__cdossier_components_itemtotal_int
+          }
+      }
+      { \msg_warning:nn { careerdossier-components } { list-rerun } }
+    \use:c { cdossier@writelistlen }
+      { \int_use:N \g__cdossier_components_listid_int }
+      { \int_use:N \l__cdossier_components_itemidx_int }
+  }
 
 %% ---------------------------------------------------------------------------
 %% PDF document metadata.

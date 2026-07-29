@@ -66,6 +66,28 @@
 \dim_new:N \CDossierRuleThickness
 \dim_new:N \CDossierListLabelSep
 
+%% Keep-together penalties (issue #145). Entry-structured documents (résumé,
+%% CV) state their page-break policy as named, tokenised penalties rather than
+%% bare \nobreak calls, so the policy is visible and independently tunable.
+%% Continuous-prose documents (letter, statement) are unaffected and keep
+%% ordinary \widowpenalty/\clubpenalty handling.
+%%
+%% CDossierHeadingKeepPenalty is a hard \nobreak-strength value (10000). It
+%% guards the boundaries that must never be broken: a section heading and its
+%% rule, an entry heading's own two lines, and the two list boundaries that
+%% would leave a single bullet stranded. Each spans a bounded amount of
+%% material, so forbidding the break cannot overflow a page.
+%%
+%% CDossierListOrphanPenalty guards every interior list boundary and is
+%% deliberately below 10000, so a list longer than a page still breaks
+%% somewhere in its middle instead of overflowing. Together the two values
+%% mean an over-long list breaks, but never at a position that isolates one
+%% item.
+\int_new:N \CDossierHeadingKeepPenalty
+\int_set:Nn \CDossierHeadingKeepPenalty { 10000 }
+\int_new:N \CDossierListOrphanPenalty
+\int_set:Nn \CDossierListOrphanPenalty { 9997 }
+
 \skip_new:N \CDossierHeaderAboveSkip
 \skip_new:N \CDossierHeaderNameGapSkip
 \skip_new:N \CDossierHeaderMetaGapSkip

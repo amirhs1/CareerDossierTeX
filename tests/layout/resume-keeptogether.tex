@@ -1,0 +1,76 @@
+% resume-keeptogether.tex — layout stress: page-break keep-together policy
+% (issue #145). Content is sized so that, without the policy, the
+% "Certifications" section heading and its entry heading would be stranded
+% alone at the foot of page one while the entry's body moved to page two.
+% See resume-keeptogether-list.tex for the bullet-list orphan case and
+% resume-keeptogether-overflow-entry.tex for an entry that legitimately spans
+% more than one page.
+% KEEPTOGETHER: Certifications ||| Coordinated cross-institutional review boards
+% KEEPTOGETHER: Postgraduate Fellowship in Reliability Engineering ||| Standards and Accessibility Institute
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Grace Hopper},
+  headline = {Systems Engineer},
+  email    = {grace.hopper@example.com},
+  phone    = {+1 416 555 0198},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Distinguished Engineer}, organization = {Continental Reliability Consortium}, location = {Ottawa, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Directed the modernization of legacy reporting infrastructure across a dozen cooperating public-sector agencies.
+    \item Chaired the architecture review board responsible for cross-agency data-sharing standards and audit trails.
+    \item Established a shared incident-response playbook adopted across every participating agency's operations team.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Principal Engineer}, organization = {Northbridge Systems}, location = {Toronto, ON}, dates = {2022--2024}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Senior Engineer}, organization = {Civic Technology Research Group}, location = {Toronto, ON}, dates = {2019--2022}]
+  \begin{CDossierItemize}
+    \item Designed models and processing pipelines that improved reliability during seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests, deployment checks, and operational dashboards that reduced production regressions.
+    \item Led technical discovery with program managers, documented trade-offs, and delivered phased modernization plans.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Engineer}, organization = {Public Data Analytics Incorporated}, location = {Waterloo, ON}, dates = {2016--2019}]
+  \begin{CDossierItemize}
+    \item Built data-import services and validation tools for public reporting datasets in CSV, JSON, and XML formats.
+    \item Improved processing performance through batching, indexing, and query optimization while preserving auditability.
+    \item Created internal libraries for schema validation, error reporting, and automated documentation generation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Associate Engineer}, organization = {Regional Data Cooperative}, location = {Kitchener, ON}, dates = {2013--2016}]
+  \begin{CDossierItemize}
+    \item Implemented schema validation, duplicate detection, detailed error reports, and resumable processing.
+    \item Added administrative review tools and audit records to support corrections, approvals, and publication.
+    \item Replaced spreadsheet-driven monthly reporting with a governed pipeline and reproducible publication process.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Junior Engineer}, organization = {Lakeshore Analytics Group}, location = {Hamilton, ON}, dates = {2011--2013}]
+  \begin{CDossierItemize}
+    \item Maintained ingestion pipelines for weekly public-facing statistical releases.
+    \item Wrote regression fixtures covering the reporting service's most commonly requested exports.
+    \item Documented operational runbooks for on-call incident response.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Certifications}
+\begin{CDossierEntry}[title = {Postgraduate Fellowship in Reliability Engineering}, organization = {Standards and Accessibility Institute}, dates = {2026}]
+  \begin{CDossierItemize}
+    \item Coordinated cross-institutional review boards for archival conformance standards.
+    \item Audited automated validation suites for reproducibility across every published dataset.
+    \item Documented escalation paths for data-quality incidents affecting public reporting.
+    \item Mentored fellowship cohorts on contract testing and deployment checks.
+    \item Presented findings on phased modernization to program stakeholders.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}

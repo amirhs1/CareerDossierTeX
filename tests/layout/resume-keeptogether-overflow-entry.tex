@@ -1,0 +1,95 @@
+% resume-keeptogether-overflow-entry.tex — layout stress: page-break
+% keep-together policy (issue #145). A single entry's body is deliberately
+% longer than one page. The keep-together policy only binds the entry heading
+% to the first line of its body, not the whole entry, so this must still break
+% across pages like any other content rather than overflowing or forcing a
+% large gap above the break.
+% KEEPTOGETHER: Modernization Program ||| Continental Reliability Consortium
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Grace Hopper},
+  headline = {Systems Engineer},
+  email    = {grace.hopper@example.com},
+  phone    = {+1 416 555 0198},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Selected Contributions}
+\begin{CDossierEntry}[title = {Modernization Program}, organization = {Continental Reliability Consortium}, location = {Ottawa, ON}, dates = {2010--Present}]
+  \begin{CDossierItemize}
+    \item Directed the modernization of legacy reporting infrastructure across a dozen cooperating public-sector agencies.
+    \item Chaired the architecture review board responsible for cross-agency data-sharing standards and audit trails.
+    \item Established a shared incident-response playbook adopted across every participating agency's operations team.
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+    \item Designed models and processing pipelines that improved reliability during seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests, deployment checks, and operational dashboards that reduced production regressions.
+    \item Led technical discovery with program managers, documented trade-offs, and delivered phased modernization plans.
+    \item Built data-import services and validation tools for public reporting datasets in CSV, JSON, and XML formats.
+    \item Improved processing performance through batching, indexing, and query optimization while preserving auditability.
+    \item Created internal libraries for schema validation, error reporting, and automated documentation generation.
+    \item Implemented schema validation, duplicate detection, detailed error reports, and resumable processing.
+    \item Added administrative review tools and audit records to support corrections, approvals, and publication.
+    \item Replaced spreadsheet-driven monthly reporting with a governed pipeline and reproducible publication process.
+    \item Standardized metric definitions and introduced automated reconciliation between source and published summaries.
+    \item Maintained ingestion pipelines for weekly public-facing statistical releases across every participating region.
+    \item Wrote regression fixtures covering the reporting service's most commonly requested exports and edge cases.
+    \item Documented operational runbooks for on-call incident response and quarterly disaster-recovery exercises.
+    \item Coordinated cross-institutional review boards for archival conformance standards and long-term retention policy.
+    \item Audited automated validation suites for reproducibility across every published dataset and downstream consumer.
+    \item Presented findings on phased modernization to program stakeholders and executive sponsors twice yearly.
+    \item Negotiated service-level commitments with downstream agencies dependent on the shared reporting pipeline.
+    \item Established a rotating on-call schedule and a documented escalation matrix for production incidents.
+    \item Migrated archival storage from tape backups to a versioned, queryable object store with audit logging.
+    \item Reviewed and approved third-party data-processing agreements for compliance with retention policy.
+    \item Ran quarterly tabletop exercises simulating regional outages affecting the shared reporting infrastructure.
+    \item Built a self-service portal allowing program teams to request new automated reconciliation checks.
+    \item Reduced average incident resolution time through better runbook coverage and on-call training.
+    \item Consolidated duplicate metric definitions that had accumulated across a decade of ad hoc reporting requests.
+    \item Published an internal style guide for dataset documentation adopted across every contributing team.
+    \item Sponsored an internship program pairing new graduates with senior engineers on modernization workstreams.
+    \item Represented the consortium at inter-agency data-standards working groups convened twice per year.
+    \item Chaired the technical steering committee overseeing the shared reporting platform's roadmap.
+    \item Authored the reference architecture document guiding new agency onboarding to the shared platform.
+    \item Directed the modernization of legacy reporting infrastructure across a dozen cooperating public-sector agencies.
+    \item Chaired the architecture review board responsible for cross-agency data-sharing standards and audit trails.
+    \item Established a shared incident-response playbook adopted across every participating agency's operations team.
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+    \item Designed models and processing pipelines that improved reliability during seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests, deployment checks, and operational dashboards that reduced production regressions.
+    \item Led technical discovery with program managers, documented trade-offs, and delivered phased modernization plans.
+    \item Built data-import services and validation tools for public reporting datasets in CSV, JSON, and XML formats.
+    \item Improved processing performance through batching, indexing, and query optimization while preserving auditability.
+    \item Created internal libraries for schema validation, error reporting, and automated documentation generation.
+    \item Implemented schema validation, duplicate detection, detailed error reports, and resumable processing.
+    \item Added administrative review tools and audit records to support corrections, approvals, and publication.
+    \item Replaced spreadsheet-driven monthly reporting with a governed pipeline and reproducible publication process.
+    \item Standardized metric definitions and introduced automated reconciliation between source and published summaries.
+    \item Maintained ingestion pipelines for weekly public-facing statistical releases across every participating region.
+    \item Wrote regression fixtures covering the reporting service's most commonly requested exports and edge cases.
+    \item Documented operational runbooks for on-call incident response and quarterly disaster-recovery exercises.
+    \item Coordinated cross-institutional review boards for archival conformance standards and long-term retention policy.
+    \item Audited automated validation suites for reproducibility across every published dataset and downstream consumer.
+    \item Presented findings on phased modernization to program stakeholders and executive sponsors twice yearly.
+    \item Negotiated service-level commitments with downstream agencies dependent on the shared reporting pipeline.
+    \item Established a rotating on-call schedule and a documented escalation matrix for production incidents.
+    \item Migrated archival storage from tape backups to a versioned, queryable object store with audit logging.
+    \item Reviewed and approved third-party data-processing agreements for compliance with retention policy.
+    \item Ran quarterly tabletop exercises simulating regional outages affecting the shared reporting infrastructure.
+    \item Built a self-service portal allowing program teams to request new automated reconciliation checks.
+    \item Reduced average incident resolution time through better runbook coverage and on-call training.
+    \item Consolidated duplicate metric definitions that had accumulated across a decade of ad hoc reporting requests.
+    \item Published an internal style guide for dataset documentation adopted across every contributing team.
+    \item Sponsored an internship program pairing new graduates with senior engineers on modernization workstreams.
+    \item Represented the consortium at inter-agency data-standards working groups convened twice per year.
+    \item Chaired the technical steering committee overseeing the shared reporting platform's roadmap.
+    \item Authored the reference architecture document guiding new agency onboarding to the shared platform.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}

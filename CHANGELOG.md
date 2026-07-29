@@ -66,6 +66,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   are unchanged. Existing statements may reflow and should have their
   pagination reviewed. ([#144])
 
+- The résumé and CV classes now apply a stated page-break policy instead of
+  leaving every break to LaTeX's defaults. A section heading stays with the
+  entry it introduces, an entry heading stays with its own second line and
+  with the first line of its body, and a bullet list is never split so that a
+  single item stands alone on either side of a break. The letter and statement
+  classes are continuous prose and keep ordinary widow and orphan handling.
+
+  The policy uses page-break penalties rather than boxing, so material that
+  genuinely does not fit still breaks: an entry or a bullet list longer than a
+  page paginates normally instead of overflowing. Because a list must know its
+  own length before it is typeset, each list records that count in the
+  auxiliary file, so résumé and CV documents need the second LaTeX pass they
+  already require for the `Page N of M` folio. This changes pagination in
+  documents that break across pages; no class, option, key, or command
+  changed. ([#145])
+
 ### Fixed
 
 - Contact separators now disappear when the contact paragraph wraps between
@@ -91,6 +107,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#142]: https://github.com/amirhs1/CareerDossierTeX/issues/142
 [#143]: https://github.com/amirhs1/CareerDossierTeX/issues/143
 [#144]: https://github.com/amirhs1/CareerDossierTeX/issues/144
+[#145]: https://github.com/amirhs1/CareerDossierTeX/issues/145
 [#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
 
 ## [0.5.0] - 2026-07-24
