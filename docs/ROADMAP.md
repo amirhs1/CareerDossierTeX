@@ -293,6 +293,31 @@ one shared, proportional design system, driven by two public inputs —
 - reference PDFs for every `fontsize` × `margin` combination, across all four
   document types.
 
+### Agreed defaults and their measured cost
+
+Defaults are per class, not uniform, because document conventions differ.
+Characters per line are measured from extracted text of full prose lines in
+TeX Gyre Termes on US Letter:
+
+| Class | `fontsize` | `margin` | Characters per line |
+|---|---|---|---|
+| résumé | `11pt` | `narrow` | 118–127 |
+| CV | `12pt` | `normal` | 93–101 |
+| letter | `12pt` | `normal` | 93–101 |
+| statement | `12pt` | `normal` | 93–101 |
+
+The prose classes take `12pt` specifically to control measure: at `normal`,
+`11pt` yields about 102–113 characters per line, outside the conventional
+45–90 guidance, while `12pt` lands just inside it. Capping `\textwidth` from a
+target measure was considered and rejected — reaching 80 characters at `11pt`
+needs side margins near 1.68 in, which no career-services guidance endorses.
+
+**Known accepted limitation:** the résumé default is the longest measure in the
+project. It is kept for one-page capacity and is acceptable for `\hfill`-split
+entry lines and short bullets, but remains visible in a full-measure Summary
+paragraph. It is documented in `README.md` and `docs/API.md` rather than
+shipped silently.
+
 ### Explicit non-goals
 
 - color themes, named or per-role font combinations, and icons — still
@@ -308,7 +333,10 @@ one shared, proportional design system, driven by two public inputs —
 
 ### Release criteria
 
-- `density` appears nowhere in sources, examples, tests, or docs;
+- no source, example, or document offers `density` as a supported option. The
+  only permitted mentions are the removal notes in `CHANGELOG.md`,
+  `docs/MIGRATION.md`, `docs/API.md`, and this file, and the error-path
+  fixtures that assert the option is rejected;
 - no literal type size or structural vertical space outside
   `careerdossier-tokens.sty`;
 - no `\geometry` call outside the shared geometry primitive;

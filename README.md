@@ -113,11 +113,24 @@ Every document class accepts `fontsize=10pt|11pt|12pt`,
 `margin=normal|narrow`, and `paper=letter|a4`. US Letter remains the default.
 The résumé defaults to `11pt,narrow`; the CV, letter, and statement classes
 default to `12pt,normal`. `normal` is one inch and `narrow` is half an inch.
-The résumé default preserves more one-page capacity than `normal` but can reach
-roughly 117 characters per line in full-width prose; review long Summary
-paragraphs for readability.
+One `fontsize` drives every type size and every structural gap, so the three
+sizes are one design at three scales rather than three separate designs.
+
+The prose classes default to `12pt` deliberately: at a one-inch margin that is
+the only body size whose full-measure line lands near the conventional 45–90
+character range. The résumé instead keeps `11pt,narrow` to preserve one-page
+capacity, and pays for it with the longest measure in the project — roughly
+118–127 characters per line. That is fine for entry lines and short bullets,
+which never reach the full measure, but it is visible in a long Summary
+paragraph; prefer `margin=normal` or a shorter summary in that case.
+
 Advanced users can call `\geometry{...}` after `\documentclass` for a custom
 layout, but should not load the already-loaded `geometry` package again.
+
+Build every document **twice**. Single-page folio suppression and the
+`Page N of M` total both read the previous run's auxiliary file, so a first
+build from a clean tree still shows a folio on a one-page document. `latexmk`
+and the `make` targets below already rerun; a bare `lualatex` call does not.
 
 See the complete example in:
 

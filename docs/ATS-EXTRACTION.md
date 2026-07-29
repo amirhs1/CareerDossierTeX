@@ -1281,7 +1281,7 @@ C++, Python, SQL, data modelling, technical writing
 \ProvidesClass{careerdossier-resume}
   [2026-07-13 v0.1.0 ATS-conscious résumé class]
 
-% Declare and process class keys (fontsize, density) here via l3keys,
+% Declare and process class keys (fontsize, margin) here via l3keys,
 % before \LoadClass. Pass documented base-class options deliberately.
 
 \LoadClass[11pt]{article}

@@ -173,6 +173,141 @@ It must not own colours, font files, semantic typography roles, rendered
 components, document metadata, or paper selection. The document classes choose
 their defaults and paper size, then pass those inputs into this package.
 
+#### Ownership boundary
+
+Three packages are easy to confuse because all three are described as owning
+"tokens". They are separated by the question each one answers:
+
+| Package | Answers | Owns | Does not own |
+|---|---|---|---|
+| `careerdossier-tokens` | *How big, and how far apart?* | body size, type scale, vertical rhythm, rule thickness, list metrics, margin presets | any colour, any font file, any named text role |
+| `careerdossier-typography` | *In which typeface and role?* | engine guard, font loading, semantic roles such as section and muted text | the point sizes and gaps those roles are set at |
+| `careerdossier-theme` | *In which colour?* | semantic monochrome colour, rule colour, link colour | every dimension |
+
+A semantic role therefore asks `careerdossier-tokens` for its size and asks
+`careerdossier-theme` for its colour; neither of those packages knows the role
+exists.
+
+#### Dependency direction
+
+`careerdossier-tokens` sits at the bottom of the project's own graph. It
+requires only `l3keys2e` and `geometry` and loads no other CareerDossierTeX
+module, so nothing it owns can depend on fonts, colour, validation, or rendered
+output. `careerdossier-components` and all four document classes require it.
+The direction is one-way: the tokens package never learns which class loaded
+it.
+
+#### Type scale
+
+The ratio column is design intent and does not ship; the point columns ship.
+Each value is the type size over its leading. Every size is snapped to a whole
+number of points, so `10pt`, `11pt`, and `12pt` are one design at three scales
+rather than three separately tuned designs.
+
+| Role | Selector | Ratio | `10pt` | `11pt` | `12pt` |
+|---|---|---:|---:|---:|---:|
+| Name | `\CDossierSizeName` | 1.90 | 19 / 21 | 21 / 23 | 23 / 25 |
+| Statement title | `\CDossierSizeTitle` | 1.50 | 15 / 17 | 16 / 18 | 18 / 20 |
+| Headline, subtitle | `\CDossierSizeHeadline` | 1.20 | 12 / 14 | 13 / 15 | 14 / 16 |
+| Section heading | `\CDossierSizeSection` | 1.12 | 11 / 13 | 12 / 14 | 13 / 15 |
+| Entry title, body, bullets, dates | `\CDossierSizeBody` | 1.00 | 10 / 12 | 11 / 13.6 | 12 / 14.5 |
+| Contact line | `\CDossierSizeSmall` | 0.92 | 9 / 11 | 10 / 12 | 11 / 13 |
+| Running header, folio | `\CDossierSizeFurniture` | 0.85 | 8 / 10 | 9 / 11 | 10 / 12 |
+
+Body leading keeps `article`'s own values so pagination stays predictable.
+`article`'s `11pt` option actually sets 10.95 pt, so `\CDossierApplyBodySize`
+re-pins `\normalsize` to a whole 11 pt while leaving the class option honoured
+for leading and display skips.
+
+#### Vertical rhythm
+
+Every structural gap is a fraction of the body baseline, so the whole rhythm
+rescales with `fontsize` without a second tuning pass.
+
+| Token | Ratio | `10pt` | `11pt` | `12pt` |
+|---|---:|---:|---:|---:|
+| `\CDossierHeaderAboveSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
+| `\CDossierHeaderNameGapSkip` | 0.28 | 3.36 pt | 3.808 pt | 4.06 pt |
+| `\CDossierHeaderMetaGapSkip` | 0.22 | 2.64 pt | 2.992 pt | 3.19 pt |
+| `\CDossierHeaderBelowSkip` | 0.85 | 10.2 pt | 11.56 pt | 12.325 pt |
+| `\CDossierSectionAboveSkip` | 0.85 | 10.2 pt | 11.56 pt | 12.325 pt |
+| `\CDossierSectionRuleSkip` | 0.15 | 1.8 pt | 2.04 pt | 2.175 pt |
+| `\CDossierSectionBelowSkip` | 0.42 | 5.04 pt | 5.712 pt | 6.09 pt |
+| `\CDossierEntryAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierEntryGapSkip` | 0.12 | 1.44 pt | 1.632 pt | 1.74 pt |
+| `\CDossierEntryBelowSkip` | 0.30 | 3.6 pt | 4.08 pt | 4.35 pt |
+| `\CDossierListEdgeSkip` | 0.10 | 1.2 pt | 1.36 pt | 1.45 pt |
+| `\CDossierItemSepSkip` | 0.16 | 1.92 pt | 2.176 pt | 2.32 pt |
+| `\CDossierParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
+| `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierAfterHeaderBlockSkip` | 0.95 | 11.4 pt | 12.92 pt | 13.775 pt |
+| `\CDossierBlockSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierAfterSalutationSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierSignatureSkip` | 2.20 | 26.4 pt | 29.92 pt | 31.9 pt |
+
+The heading-to-rule gap (0.15) is deliberately the smallest structural gap in
+the project, and must stay unambiguously smaller than the rule-to-content gap
+(0.42) — currently about 1:2.8. A rule belongs to the heading above it; at 1:2
+it starts to read as a divider floating between two blocks. A retune may move
+both numbers, but not their order.
+
+#### Derived metrics
+
+| Token | Derivation | `10pt` | `11pt` | `12pt` |
+|---|---|---:|---:|---:|
+| `\CDossierRuleThickness` | 0.04 × body size | 0.4 pt | 0.44 pt | 0.48 pt |
+| `\CDossierListLabelSep` | 0.50 × body size | 5.0 pt | 5.5 pt | 6.0 pt |
+
+`\CDossierPageMargin` is 72.27 pt (1 in) for `margin=normal` and 36.135 pt
+(0.5 in) for `margin=narrow`, independent of `fontsize`.
+
+Every number in the three tables above is pinned by
+`tests/regression/tokens-scale.tlg`. That baseline is the assertion: regenerate
+it only for an intended design change, and review the diff.
+
+#### Measure, and why the prose classes default to 12 pt
+
+The type scale sets size; the margin preset sets measure. The two interact, so
+the per-class defaults are chosen from measured line length rather than from a
+single project-wide preference.
+
+Measured in TeX Gyre Termes on US Letter, counting characters including spaces
+on full lines of running prose:
+
+| `fontsize` | `margin` | `\textwidth` | Characters per line |
+|---|---|---:|---|
+| `10pt` | `normal` | 6.5 in | 110–120 (mean ≈ 116) |
+| `10pt` | `narrow` | 7.5 in | 130–140 (mean ≈ 136) |
+| `11pt` | `normal` | 6.5 in | 102–113 (mean ≈ 106) |
+| `11pt` | `narrow` | 7.5 in | 118–127 (mean ≈ 122) |
+| `12pt` | `normal` | 6.5 in | 93–101 (mean ≈ 97) |
+| `12pt` | `narrow` | 7.5 in | 108–117 (mean ≈ 113) |
+
+The ranges come from two different prose samples typeset at each combination
+and counted from extracted text. Character count varies with the words on the
+page, so treat these as a measured band rather than a constant.
+
+This is why the letter, statement, and CV classes default to `12pt` at
+`margin=normal` and **should not be quietly moved back to `11pt`**: 12 pt is
+the only body size that brings a full-measure paragraph at a conventional
+one-inch margin near the 45–90 range Butterick gives, and within sight of the
+45–75 Bringhurst prefers. At 11 pt the same margin yields about 106 characters
+per line, which is outside both.
+
+Capping `\textwidth` from a target measure instead of raising the body size was
+considered and rejected for this release. Reaching roughly 80 characters per
+line at 11 pt requires side margins near 1.68 in, which no career-services
+guidance endorses for an application document, and which would make the page
+look padded rather than composed.
+
+The résumé is the deliberate exception: it defaults to `11pt` at
+`margin=narrow` — about 122 characters per line, the longest measure in the
+project — because a résumé is judged on one-page capacity. That trade is
+acceptable for `\hfill`-split entry lines and short bullets, which never
+approach the full measure, but it is genuinely visible in a full-width Summary
+paragraph. It is a recorded, accepted limitation, not an oversight; see
+`docs/API.md` and `README.md`, which state it where an author will meet it.
+
 ### `careerdossier-base.sty`
 
 Owns shared state and validation.
