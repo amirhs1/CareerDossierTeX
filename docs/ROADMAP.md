@@ -293,6 +293,29 @@ one shared, proportional design system, driven by two public inputs —
 - reference PDFs for every `fontsize` × `margin` combination, across all four
   document types.
 
+### Agreed defaults and their measured cost
+
+Defaults are per class, not uniform, because document conventions differ.
+Characters per line are measured from extracted text of full prose lines in
+TeX Gyre Termes on US Letter:
+
+| Class | `fontsize` | `margin` | Characters per line |
+|---|---|---|---|
+| résumé | `11pt` | `narrow` | 118–127 |
+| CV | `12pt` | `normal` | 93–101 |
+| letter | `12pt` | `normal` | 93–101 |
+| statement | `12pt` | `normal` | 93–101 |
+
+The prose classes take `12pt` specifically to control measure: at `normal`,
+`11pt` yields about 102–113 characters per line, outside the conventional
+45–90 guidance, while `12pt` lands just inside it. Capping `\textwidth` from a
+target measure was considered and rejected — reaching 80 characters at `11pt`
+needs side margins near 1.68 in, which no career-services guidance endorses.
+
+**Known accepted limitation:** the résumé default is the longest measure in the
+project, accepted for one-page capacity rather than overlooked. It is stated
+for authors in `docs/API.md`, with the rationale in `docs/ARCHITECTURE.md`.
+
 ### Explicit non-goals
 
 - color themes, named or per-role font combinations, and icons — still
@@ -308,7 +331,19 @@ one shared, proportional design system, driven by two public inputs —
 
 ### Release criteria
 
-- `density` appears nowhere in sources, examples, tests, or docs;
+- no `.sty` or `.cls` file mentions `density`, and no file under `examples/`
+  passes it as an option — `grep -rnE 'density[[:space:]]*=' *.sty *.cls
+  examples/` returns nothing. Match on `density=`, not the bare word:
+  `examples/statements/artist-statement.tex` uses "density" as ordinary
+  English prose;
+- the résumé and CV classes reject `density=` with their actionable
+  unknown-option message, pinned by `tests/smoke/resume-density-option.tex`
+  and `tests/smoke/cv-density-option.tex` at the class layer and
+  `tests/regression/tokens-errors.lvt` at the package layer. These fixtures
+  are the enforcement of the removal and are expected to name the option;
+  mentions in `CHANGELOG.md`, `docs/MIGRATION.md`, and `docs/API.md` are
+  required by the breaking-change documentation rule. Neither is an exception
+  to be eliminated;
 - no literal type size or structural vertical space outside
   `careerdossier-tokens.sty`;
 - no `\geometry` call outside the shared geometry primitive;

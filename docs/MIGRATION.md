@@ -6,6 +6,11 @@
 engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
 
+The unreleased `v0.6.0` development version **removes the `density` option and
+changes every class's layout defaults** — see
+[Upgrading to the `v0.6.0` development version](#upgrading-to-the-v060-development-version)
+below.
+
 No released public command, key, class option, or default has been renamed or
 removed in `v0.5.0`. Its statement class, A4 paper, sans body font, affiliation
 key, and contact labels are additive and opt-in; existing documents need no
@@ -19,8 +24,27 @@ The development version adds `fontsize=12pt` and
 `margin=normal|narrow` consistently across all four document classes. The
 résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
 statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
-inch and `narrow` is half an inch. These changed defaults reflow existing
-documents, so review line and page breaks after upgrading.
+inch and `narrow` is half an inch.
+
+**Every existing document reflows.** This is not a caveat about unusual
+documents: type sizes, every structural gap, the section rule, and the list
+metrics are all newly derived from `fontsize`, and every class's default body
+size or margin has changed. A document that took two pages may now take three,
+or one. No source edit is required unless you pass `density`, but do not ship
+an upgraded document without looking at it.
+
+The measure changes too. Counting characters including spaces on full lines of
+running prose in TeX Gyre Termes on US Letter:
+
+| Class | `v0.6.0` default | Characters per line |
+|---|---|---|
+| résumé | `11pt`, `narrow` | 118–127 |
+| CV | `12pt`, `normal` | 93–101 |
+| letter | `12pt`, `normal` | 93–101 |
+| statement | `12pt`, `normal` | 93–101 |
+
+The résumé's default is the longest measure in the project, kept deliberately
+for one-page capacity; see [`API.md`](API.md) for when to override it.
 
 On US Letter paper, `margin=narrow` increases the physical text block from the
 v0.5.0 résumé's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
@@ -90,6 +114,21 @@ display titles and short continuation titles, validation rules, contact sets,
 and optional-field behavior are unchanged. Existing statement sources require
 no edit, but their header spacing, line breaks, and pagination should be
 reviewed.
+
+### Build twice, and ignore the first pass
+
+All four classes now suppress the folio on a single-page document and print
+`Page N of M` on a multi-page one. Both decisions need the document's final
+page count, which LaTeX only knows from the auxiliary file written by the
+previous run. The résumé and CV page-break policy also records list lengths
+there.
+
+A first build from a clean tree therefore shows a folio on a one-page document
+and provisional breaks, and settles on the next run. This is not a regression
+to report; it is the same second pass that cross-references and `Page N of M`
+have always needed. `latexmk` and the repository `make` targets already rerun.
+A single bare `lualatex` invocation does not — if you script your own build,
+run it twice.
 
 ## Upgrading to `v0.4.0`: XeLaTeX → LuaLaTeX
 
@@ -278,7 +317,12 @@ After:
 Reason: <why the change was necessary>
 ```
 
-No released public command, key, or option has been renamed or removed, so no
+No *released* public command, key, or option has been renamed or removed, so no
 entry in this format exists yet. The `v0.4.0` engine change is a toolchain
 break rather than an API rename and is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above.
+
+The `density` removal in the unreleased `v0.6.0` will be the first entry of
+this kind. It is documented in
+[Upgrading to the `v0.6.0` development version](#upgrading-to-the-v060-development-version)
+above and will be restated in this format when `v0.6.0` is published.

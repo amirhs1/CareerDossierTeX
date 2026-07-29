@@ -5,7 +5,8 @@
 This document records the released public interface:
 
 ```text
-Released: v0.5.0 — Statements and Customization
+Released:    v0.5.0 — Statements and Customization
+In progress: v0.6.0 — Calibrated Type Scale and Rhythm
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.
@@ -13,15 +14,37 @@ Before `v1.0.0` the interface may still change between minor versions; such
 changes are recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
 [`MIGRATION.md`](MIGRATION.md).
 
+The `v0.6.0` development version changes the layout interface. It is described
+here as current because it is implemented on `main`, but it is not yet
+released. Its interface changes are:
+
+- `fontsize` and `margin` are accepted by all four document classes;
+  `fontsize` is new on the letter and statement classes, and `12pt` is new
+  everywhere.
+- Defaults are per class, not uniform: the résumé is `11pt` at
+  `margin=narrow`; the CV, letter, and statement classes are `12pt` at
+  `margin=normal`.
+- `density=compact|standard` is **removed** from the résumé and CV classes.
+  There is no replacement key: vertical rhythm is now derived from `fontsize`.
+  Passing `density` produces the class's unknown-option error.
+- `family=academic` on the letter class is label- and metadata-only and no
+  longer selects a distinct layout.
+
+These are breaking layout changes. Existing documents compile without a source
+edit unless they pass `density`, but their line and page breaks will differ.
+See [`MIGRATION.md`](MIGRATION.md).
+
 The API is intentionally small. Internal helper commands are not public merely because they are technically accessible.
 
 ## Supported configuration
 
-| Setting | `v0.5.0` support |
+| Setting | Support |
 |---|---|
 | Engine | LuaLaTeX only |
 | Language | English |
 | Paper | US Letter (default) and opt-in A4 |
+| Body size | `fontsize=10pt\|11pt\|12pt`, per-class default |
+| Margins | `margin=normal` (1 in) or `margin=narrow` (0.5 in), per-class default |
 | Body font | Serif (default) and opt-in sans |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
@@ -133,6 +156,28 @@ Default:
 
 Any unsupported value should produce an actionable class error.
 
+`fontsize` selects one whole-point type scale for the entire document. It is
+the only input to type size; there is no per-element size option. The sizes it
+resolves to, in points, are:
+
+| Element | `10pt` | `11pt` | `12pt` |
+|---|---:|---:|---:|
+| Name | 19 | 21 | 23 |
+| Statement title | 15 | 16 | 18 |
+| Headline, subtitle | 12 | 13 | 14 |
+| Section heading | 11 | 12 | 13 |
+| Entry title, body text, bullets, dates | 10 | 11 | 12 |
+| Contact line | 9 | 10 | 11 |
+| Running header, folio | 8 | 9 | 10 |
+
+Structural vertical spacing scales with the same option, as a fixed fraction of
+the body baseline. The ratios behind both tables, and the reasoning behind the
+per-class defaults, are recorded in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
+
+`density=compact|standard` was removed in the `v0.6.0` development version and
+has no replacement; see [`MIGRATION.md`](MIGRATION.md).
+
 #### `margin`
 
 Every CareerDossierTeX document class accepts:
@@ -145,6 +190,33 @@ narrow
 `normal` means one-inch margins and `narrow` means half-inch margins. The
 résumé defaults to `narrow`; the CV, letter, and statement classes default to
 `normal`. Unsupported values produce an actionable class error.
+
+`margin` and `fontsize` together decide line length. Measured in TeX Gyre
+Termes on US Letter, full lines of running prose hold roughly:
+
+| `fontsize` | `margin` | Characters per line |
+|---|---|---|
+| `10pt` | `normal` | 110–120 |
+| `10pt` | `narrow` | 130–140 |
+| `11pt` | `normal` | 102–113 |
+| `11pt` | `narrow` | 118–127 |
+| `12pt` | `normal` | 93–101 |
+| `12pt` | `narrow` | 108–117 |
+
+The prose classes default to `12pt` at `margin=normal` because that is the only
+combination whose measure lands near the conventional 45–90 character guidance
+at a one-inch margin.
+
+**Known limitation.** The résumé's default `11pt` with `margin=narrow`
+produces the longest measure in the project — roughly 118–127 characters per
+line. It is chosen for one-page capacity and is fine for entry lines and short
+bullets, which are `\hfill`-split and never reach the full measure. It is
+visibly long in a full-width Summary paragraph. If a résumé opens with a dense
+prose summary, prefer `margin=normal`, `fontsize=12pt`, or a shorter summary.
+
+This is the canonical statement of that limitation; the reasoning behind
+accepting it is recorded in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#measure-and-why-the-prose-classes-default-to-12-pt).
 
 The classes load `geometry` through `careerdossier-tokens`. An advanced user
 may call `\geometry{...}` after `\documentclass` to replace the preset with
