@@ -301,12 +301,14 @@ guidance endorses for an application document, and which would make the page
 look padded rather than composed.
 
 The résumé is the deliberate exception: it defaults to `11pt` at
-`margin=narrow` — about 122 characters per line, the longest measure in the
-project — because a résumé is judged on one-page capacity. That trade is
-acceptable for `\hfill`-split entry lines and short bullets, which never
-approach the full measure, but it is genuinely visible in a full-width Summary
-paragraph. It is a recorded, accepted limitation, not an oversight; see
-`docs/API.md` and `README.md`, which state it where an author will meet it.
+`margin=narrow`, the longest measure in the project, because a résumé is judged
+on one-page capacity and that capacity was judged worth more than the measure.
+The trade is bounded — `\hfill`-split entry lines and short bullets never
+approach the full measure — but it is real in a full-width Summary paragraph,
+and it was accepted knowing that. Do not narrow the résumé's default measure
+without revisiting the capacity argument; it is an accepted limitation, not an
+oversight to correct. The measured figures, and the advice on when an author
+should override it, are in `docs/API.md`.
 
 ### `careerdossier-base.sty`
 

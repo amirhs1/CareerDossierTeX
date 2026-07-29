@@ -214,6 +214,10 @@ bullets, which are `\hfill`-split and never reach the full measure. It is
 visibly long in a full-width Summary paragraph. If a résumé opens with a dense
 prose summary, prefer `margin=normal`, `fontsize=12pt`, or a shorter summary.
 
+This is the canonical statement of that limitation; the reasoning behind
+accepting it is recorded in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#measure-and-why-the-prose-classes-default-to-12-pt).
+
 The classes load `geometry` through `careerdossier-tokens`. An advanced user
 may call `\geometry{...}` after `\documentclass` to replace the preset with
 custom geometry. Do not load `geometry` again with package options: doing so

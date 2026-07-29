@@ -118,11 +118,9 @@ sizes are one design at three scales rather than three separate designs.
 
 The prose classes default to `12pt` deliberately: at a one-inch margin that is
 the only body size whose full-measure line lands near the conventional 45–90
-character range. The résumé instead keeps `11pt,narrow` to preserve one-page
-capacity, and pays for it with the longest measure in the project — roughly
-118–127 characters per line. That is fine for entry lines and short bullets,
-which never reach the full measure, but it is visible in a long Summary
-paragraph; prefer `margin=normal` or a shorter summary in that case.
+character range. The résumé instead keeps `11pt,narrow` for one-page capacity,
+which runs long in full-width prose — see [`docs/API.md`](docs/API.md) for the
+measured figures and when to override it.
 
 Advanced users can call `\geometry{...}` after `\documentclass` for a custom
 layout, but should not load the already-loaded `geometry` package again.

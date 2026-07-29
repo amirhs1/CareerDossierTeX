@@ -313,10 +313,8 @@ target measure was considered and rejected — reaching 80 characters at `11pt`
 needs side margins near 1.68 in, which no career-services guidance endorses.
 
 **Known accepted limitation:** the résumé default is the longest measure in the
-project. It is kept for one-page capacity and is acceptable for `\hfill`-split
-entry lines and short bullets, but remains visible in a full-measure Summary
-paragraph. It is documented in `README.md` and `docs/API.md` rather than
-shipped silently.
+project, accepted for one-page capacity rather than overlooked. It is stated
+for authors in `docs/API.md`, with the rationale in `docs/ARCHITECTURE.md`.
 
 ### Explicit non-goals
 
