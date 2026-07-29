@@ -333,10 +333,19 @@ shipped silently.
 
 ### Release criteria
 
-- no source, example, or document offers `density` as a supported option. The
-  only permitted mentions are the removal notes in `CHANGELOG.md`,
-  `docs/MIGRATION.md`, `docs/API.md`, and this file, and the error-path
-  fixtures that assert the option is rejected;
+- no `.sty` or `.cls` file mentions `density`, and no file under `examples/`
+  passes it as an option — `grep -rnE 'density[[:space:]]*=' *.sty *.cls
+  examples/` returns nothing. Match on `density=`, not the bare word:
+  `examples/statements/artist-statement.tex` uses "density" as ordinary
+  English prose;
+- the résumé and CV classes reject `density=` with their actionable
+  unknown-option message, pinned by `tests/smoke/resume-density-option.tex`
+  and `tests/smoke/cv-density-option.tex` at the class layer and
+  `tests/regression/tokens-errors.lvt` at the package layer. These fixtures
+  are the enforcement of the removal and are expected to name the option;
+  mentions in `CHANGELOG.md`, `docs/MIGRATION.md`, and `docs/API.md` are
+  required by the breaking-change documentation rule. Neither is an exception
+  to be eliminated;
 - no literal type size or structural vertical space outside
   `careerdossier-tokens.sty`;
 - no `\geometry` call outside the shared geometry primitive;
