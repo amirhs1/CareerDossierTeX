@@ -46,9 +46,9 @@
             { absent~headline~used~a~headline~size } }
     \fi
     \dim_compare:nNnF
-      { \CDossierHeaderBelowSkip } = { \CDossierSectionAboveSkip }
+      { \CDossierHeaderBelowSkip } > { \CDossierSectionAboveSkip }
       { \msg_fatal:nnn { cdossier-test } { header-layout }
-          { header-below~and~section-above~spacing~differ } }
+          { header-below~spacing~must~exceed~section-above~spacing } }
   }
 \ExplSyntaxOff
 

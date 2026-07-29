@@ -171,8 +171,9 @@ resolves to, in points, are:
 | Running header, folio | 8 | 9 | 10 |
 
 Structural vertical spacing scales with the same option, as a fixed fraction of
-the body baseline. The ratios behind both tables, and the reasoning behind the
-per-class defaults, are recorded in
+the body baseline. The values use a one-sixteenth-line vocabulary, with zero
+reserved for deliberately collapsed spacing. The ratios behind both tables, and
+the reasoning behind the per-class defaults, are recorded in
 [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
 
 `density=compact|standard` was removed in the `v0.6.0` development version and

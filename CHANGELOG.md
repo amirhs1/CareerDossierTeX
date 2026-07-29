@@ -20,6 +20,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Changed
 
+- The shared baseline-derived spacing tokens now use a compact
+  one-sixteenth-line vocabulary. Résumé and CV entry/list grouping, statement
+  and letter block spacing, identity headers, section rules, and signature
+  space are retuned together; document commands, options, fields, and
+  extraction order are unchanged. Existing documents may reflow and should
+  have their pagination reviewed. ([#166])
+
 - **BREAKING (layout defaults):** The résumé now defaults to
   `fontsize=11pt,margin=narrow`; the CV, letter, and statement classes default
   to `fontsize=12pt,margin=normal`. `normal` is one inch and `narrow` is half
@@ -124,6 +131,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#145]: https://github.com/amirhs1/CareerDossierTeX/issues/145
 [#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
 [#161]: https://github.com/amirhs1/CareerDossierTeX/issues/161
+[#166]: https://github.com/amirhs1/CareerDossierTeX/issues/166
 [#164]: https://github.com/amirhs1/CareerDossierTeX/issues/164
 
 ## [0.5.0] - 2026-07-24

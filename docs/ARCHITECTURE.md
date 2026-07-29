@@ -221,38 +221,39 @@ for leading and display skips.
 
 #### Vertical rhythm
 
-Every structural gap is a fraction of the body baseline, so the whole rhythm
-rescales with `fontsize` without a second tuning pass.
+Every structural gap is a multiple of one sixteenth of the body baseline, so
+the whole rhythm rescales with `fontsize` without a second tuning pass while
+retaining a small, inspectable spacing vocabulary.
 
 | Token | Ratio | `10pt` | `11pt` | `12pt` |
 |---|---:|---:|---:|---:|
 | `\CDossierHeaderAboveSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
-| `\CDossierHeaderNameGapSkip` | 0.28 | 3.36 pt | 3.808 pt | 4.06 pt |
-| `\CDossierHeaderMetaGapSkip` | 0.22 | 2.64 pt | 2.992 pt | 3.19 pt |
-| `\CDossierHeaderBelowSkip` | 0.85 | 10.2 pt | 11.56 pt | 12.325 pt |
-| `\CDossierSectionAboveSkip` | 0.85 | 10.2 pt | 11.56 pt | 12.325 pt |
-| `\CDossierSectionRuleSkip` | 0.15 | 1.8 pt | 2.04 pt | 2.175 pt |
-| `\CDossierSectionBelowSkip` | 0.42 | 5.04 pt | 5.712 pt | 6.09 pt |
-| `\CDossierEntryAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierEntryGapSkip` | 0.12 | 1.44 pt | 1.632 pt | 1.74 pt |
-| `\CDossierEntryBelowSkip` | 0.30 | 3.6 pt | 4.08 pt | 4.35 pt |
-| `\CDossierListEdgeSkip` | 0.10 | 1.2 pt | 1.36 pt | 1.45 pt |
-| `\CDossierItemSepSkip` | 0.16 | 1.92 pt | 2.176 pt | 2.32 pt |
+| `\CDossierHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
+| `\CDossierHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
+| `\CDossierSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
+| `\CDossierSectionRuleSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
+| `\CDossierSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
+| `\CDossierEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
+| `\CDossierEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
+| `\CDossierListEdgeSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
+| `\CDossierItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierAfterHeaderBlockSkip` | 0.95 | 11.4 pt | 12.92 pt | 13.775 pt |
-| `\CDossierBlockSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierAfterHeaderBlockSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierAfterSalutationSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierSignatureSkip` | 2.20 | 26.4 pt | 29.92 pt | 31.9 pt |
+| `\CDossierSignatureSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
 
-The heading-to-rule gap (0.15) is deliberately the smallest structural gap in
-the project, and must stay unambiguously smaller than the rule-to-content gap
-(0.42) — currently about 1:2.8. A rule belongs to the heading above it; at 1:2
-it starts to read as a divider floating between two blocks. A retune may move
-both numbers, but not their order. These two tokens own the complete vertical
-space on either side of the rule: the shared component suppresses TeX's
-automatic interline glue before and after the rule rather than allowing a
-separate rule paragraph to add hidden baseline spacing.
+The heading-to-rule gap (0.125) is deliberately the smallest non-zero
+structural gap in the project, and must stay unambiguously smaller than the
+rule-to-content gap (0.375) — a 1:3 relationship. A rule belongs to the heading
+above it; at 1:2 it starts to read as a divider floating between two blocks. A
+retune may move both numbers, but not their order. These two tokens own the
+complete vertical space on either side of the rule: the shared component
+suppresses TeX's automatic interline glue before and after the rule rather than
+allowing a separate rule paragraph to add hidden baseline spacing.
 
 #### Derived metrics
 
