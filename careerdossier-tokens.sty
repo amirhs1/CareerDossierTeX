@@ -234,29 +234,31 @@
       }
 
     \__cdossier_tokens_set_skip:Nn \CDossierHeaderAboveSkip { 0.00 }
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderNameGapSkip { 0.28 }
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderMetaGapSkip { 0.22 }
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderBelowSkip { 0.85 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionAboveSkip { 0.85 }
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderNameGapSkip { 0.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderMetaGapSkip { 0.1875 }
+    \__cdossier_tokens_set_skip:Nn \CDossierHeaderBelowSkip { 0.8125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionAboveSkip { 0.6875 }
     %% Issue #169: measured from the section heading's baseline, not from the
     %% bottom of its line box. The value has a hard lower bound -- the heading's
     %% depth, about 0.20 line at every supported size -- because a smaller
     %% offset would draw the rule through descender ink. 0.3125 leaves 1.63 pt
     %% of clearance at 11 pt and sits between the two distances it replaces
     %% (2.28 pt under a heading without descenders, 4.80 pt under one with).
+    %% It is also the smallest sixteenth that clears the descender, so the
+    %% normalized scale keeps it rather than moving to a smaller grid step.
     \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.42 }
-    \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.12 }
-    \__cdossier_tokens_set_skip:Nn \CDossierEntryBelowSkip { 0.30 }
-    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkip { 0.10 }
-    \__cdossier_tokens_set_skip:Nn \CDossierItemSepSkip { 0.16 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.0625 }
+    \__cdossier_tokens_set_skip:Nn \CDossierEntryBelowSkip { 0.125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkip { 0.125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierItemSepSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierAfterHeaderBlockSkip { 0.95 }
-    \__cdossier_tokens_set_skip:Nn \CDossierBlockSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierAfterHeaderBlockSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierBlockSkip { 0.50 }
     \__cdossier_tokens_set_skip:Nn \CDossierAfterSalutationSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSignatureSkip { 2.20 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSignatureSkip { 2.25 }
   }
 
 \__cdossier_tokens_resolve:
