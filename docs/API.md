@@ -606,6 +606,12 @@ rule. Class-controlled spacing places the rule closer to its heading than to
 the content below; no additional paragraph line spacing is inserted around the
 rule.
 
+The gap between the rule and the section's first content is the larger of
+`\CDossierSectionBelowSkip` and whatever leading space the following block
+contributes — never their sum. A section that opens with an entry, a bullet
+list, or an ordinary paragraph therefore yields one predictable gap rather than
+three different ones.
+
 The argument is user-visible text. The command does not automatically translate arbitrary section titles.
 
 ### `CDossierEntry`

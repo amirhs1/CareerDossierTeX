@@ -443,7 +443,11 @@ The component layer consumes the calibrated type and spacing values from
 `careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
 base-class environments. In particular, the shared identity block owns its
 centering and vertical rhythm, the shared section-rule primitive prevents
-paragraph line spacing from inflating its calibrated gaps, and shared page
+paragraph line spacing from inflating its calibrated gaps and emits its
+rule-to-content gap so that LaTeX's collapsing rule applies — the gap is the
+larger of `\CDossierSectionBelowSkip` and the following block's own leading
+space, never their sum, so entry-led, list-led, and prose-led sections share
+one gap — and shared page
 furniture owns its typography and auxiliary-file page-count decision, while
 leaving page geometry and the document-specific running label to the document
 classes.

@@ -84,6 +84,18 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- The rule-to-content gap in a résumé or CV section is now the value
+  `\CDossierSectionBelowSkip` declares, whichever kind of content opens the
+  section. The gap previously depended on what followed the rule: a section
+  opening with an entry or a bullet list received that token *plus* the block's
+  own leading space, so one document could show the same boundary at up to three
+  different sizes and a section heading read as almost equidistant between the
+  block above it and the block it labels. Spacing now collapses the way LaTeX
+  composes vertical space, taking the larger of the two values rather than their
+  sum. Token values, rule thickness and colour, public commands, page geometry,
+  reading order, and tagged layout-artifact treatment are unchanged; existing
+  documents may reflow and should have their pagination reviewed. ([#168])
+
 - The résumé and CV section-rule spacing tokens now determine the complete
   heading-to-rule and rule-to-content gaps. The decorative rule previously
   occupied its own paragraph line, which added hidden baseline spacing even
@@ -125,6 +137,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
 [#161]: https://github.com/amirhs1/CareerDossierTeX/issues/161
 [#164]: https://github.com/amirhs1/CareerDossierTeX/issues/164
+[#168]: https://github.com/amirhs1/CareerDossierTeX/issues/168
 
 ## [0.5.0] - 2026-07-24
 
