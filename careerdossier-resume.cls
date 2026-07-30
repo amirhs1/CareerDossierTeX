@@ -22,7 +22,7 @@
 %% class only arranges it on the page.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-resume} {2026-07-29} {0.6.0}
+\ProvidesExplClass {careerdossier-resume} {2026-07-30} {0.6.0}
   {CareerDossierTeX English industry résumé class}
 
 %% ---------------------------------------------------------------------------

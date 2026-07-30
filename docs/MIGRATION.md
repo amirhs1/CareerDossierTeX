@@ -2,14 +2,12 @@
 
 ## Status
 
-`v0.5.0` is the current published release. `v0.4.0` **changes the supported
-engine from XeLaTeX to LuaLaTeX** — see
-[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
+`v0.6.0` is the current published release. It **removes the `density` option
+and changes every class's layout defaults** — see
+[Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
-The unreleased `v0.6.0` development version **removes the `density` option and
-changes every class's layout defaults** — see
-[Upgrading to the `v0.6.0` development version](#upgrading-to-the-v060-development-version)
-below.
+`v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
+[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
 
 No released public command, key, class option, or default has been renamed or
 removed in `v0.5.0`. Its statement class, A4 paper, sans body font, affiliation
@@ -18,9 +16,9 @@ source edit. The `v0.4.0` break is in the toolchain, not the document API. Two
 documents do render differently — the academic CV's folio and the academic
 letter's page furniture — and neither requires a source edit; see step 5.
 
-## Upgrading to the `v0.6.0` development version
+## Upgrading to `v0.6.0`
 
-The development version adds `fontsize=12pt` and
+`v0.6.0` adds `fontsize=12pt` and
 `margin=normal|narrow` consistently across all four document classes. The
 résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
 statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
@@ -329,12 +327,25 @@ After:
 Reason: <why the change was necessary>
 ```
 
-No *released* public command, key, or option has been renamed or removed, so no
-entry in this format exists yet. The `v0.4.0` engine change is a toolchain
-break rather than an API rename and is documented in
-[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above.
+The `v0.4.0` engine change is a toolchain break rather than an API rename and
+is documented in
+[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
+in this format.
 
-The `density` removal in the unreleased `v0.6.0` will be the first entry of
-this kind. It is documented in
-[Upgrading to the `v0.6.0` development version](#upgrading-to-the-v060-development-version)
-above and will be restated in this format when `v0.6.0` is published.
+## [0.6.0] - 2026-07-30
+
+### `density=compact|standard` removed from `careerdossier-resume` and `careerdossier-cv`
+
+Before:
+
+\documentclass[fontsize=11pt,density=compact]{careerdossier-resume}
+
+After:
+
+\documentclass[fontsize=11pt,margin=narrow]{careerdossier-resume}
+
+Reason: vertical rhythm is now derived entirely from `fontsize`; a separate
+density axis would have permitted combinations such as 12pt-compact that
+work against the calibrated proportional design. See
+[Upgrading to `v0.6.0`](#upgrading-to-v060) above for the full set of layout
+changes in this release.

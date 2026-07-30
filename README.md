@@ -2,9 +2,13 @@
 
 A reusable LuaLaTeX toolkit for producing consistent career documents from shared profile data.
 
-> **Status:** `v0.5.0 — Statements and Customization` is the current published
-> release. It adds statement documents, opt-in A4 paper, and an opt-in sans
-> body font while preserving the existing US Letter and serif defaults.
+> **Status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is the current
+> published release. It replaces the mixture of inherited `article` defaults
+> with one shared, proportional design system driven by `fontsize` and
+> `margin`, now accepted by all four document classes. **Breaking:** the
+> résumé and CV classes no longer accept `density`, and every class's default
+> layout changes; see [`docs/MIGRATION.md`](docs/MIGRATION.md) for the
+> upgrade path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -422,7 +426,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.5.0 — Statements and Customization
+v0.6.0 — Calibrated Type Scale and Rhythm
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -437,6 +441,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.2.1` | Extraction correction |
 | `v0.4.0` | LuaLaTeX transition and tagged-PDF preview |
 | `v0.5.0` | Statement classes and broader customization |
+| `v0.6.0` | Calibrated type scale and vertical rhythm |
 | `v1.0.0` | Stable and documented public API |
 
 Farsi, bilingual, and right-to-left support (`v0.3.0`) is dropped.

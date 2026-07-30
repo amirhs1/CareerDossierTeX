@@ -5,8 +5,7 @@
 This document records the released public interface:
 
 ```text
-Released:    v0.5.0 — Statements and Customization
-In progress: v0.6.0 — Calibrated Type Scale and Rhythm
+Released: v0.6.0 — Calibrated Type Scale and Rhythm
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.
@@ -14,9 +13,7 @@ Before `v1.0.0` the interface may still change between minor versions; such
 changes are recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
 [`MIGRATION.md`](MIGRATION.md).
 
-The `v0.6.0` development version changes the layout interface. It is described
-here as current because it is implemented on `main`, but it is not yet
-released. Its interface changes are:
+`v0.6.0` changed the layout interface. Its interface changes are:
 
 - `fontsize` and `margin` are accepted by all four document classes;
   `fontsize` is new on the letter and statement classes, and `12pt` is new
@@ -176,8 +173,8 @@ reserved for deliberately collapsed spacing. The ratios behind both tables, and
 the reasoning behind the per-class defaults, are recorded in
 [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
 
-`density=compact|standard` was removed in the `v0.6.0` development version and
-has no replacement; see [`MIGRATION.md`](MIGRATION.md).
+`density=compact|standard` was removed in `v0.6.0` and has no replacement; see
+[`MIGRATION.md`](MIGRATION.md).
 
 #### `margin`
 

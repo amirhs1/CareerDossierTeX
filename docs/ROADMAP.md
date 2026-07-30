@@ -9,12 +9,9 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.5.0 — Statements and Customization` is released.
-> `v0.3.0` is dropped. The next planned release is `v0.6.0 — Calibrated Type
-> Scale and Rhythm`, tracked under
-> [milestone #9](https://github.com/amirhs1/CareerDossierTeX/milestone/9) and
-> [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
-> `v1.0.0 — Stable Public API` remains planned after it.
+> **Current status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is released.
+> `v0.3.0` is dropped. The next planned release is `v1.0.0 — Stable Public
+> API`.
 
 ## Release overview
 
@@ -27,7 +24,7 @@ test pass at the end of a milestone.
 | `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Released |
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.5.0` | Statement classes and broader customization | Released |
-| `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Planned |
+| `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
 | `v1.0.0` | Stable, documented public API | Planned |
 
 Repository milestones are tracked on the GitHub milestones page:
