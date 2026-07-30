@@ -141,6 +141,19 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   reading order, and tagged layout-artifact treatment are unchanged; existing
   documents may reflow and should have their pagination reviewed. ([#168])
 
+- `\CDossierListEdgeSkip` now determines the complete gap between a bullet or
+  publication list and the content above it, at every body size. LaTeX added
+  3 pt of its own whenever such a list opened a new paragraph, so the real
+  gap was the token plus a constant that no token owned and that did not rescale
+  — proportionally wider at `10pt` than at `12pt`. The lists now suppress that
+  constant and the token's ratio absorbs it, so the rendered edge is materially
+  the one the calibrated rhythm already produced (3.75 pt, 4.25 pt, and 4.53 pt
+  at the three body sizes, against 4.5 pt, 4.7 pt, and 4.81 pt before) and the
+  whole of it now scales with `fontsize`. Public commands, options, fields,
+  optional-field separators, and reading order are unchanged; documents with
+  many lists may reflow slightly and should have their pagination reviewed.
+  ([#176])
+
 - The résumé and CV section-rule spacing tokens now determine the complete
   heading-to-rule and rule-to-content gaps. The decorative rule previously
   occupied its own paragraph line, which added hidden baseline spacing even
@@ -187,6 +200,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#169]: https://github.com/amirhs1/CareerDossierTeX/issues/169
 [#170]: https://github.com/amirhs1/CareerDossierTeX/issues/170
 [#171]: https://github.com/amirhs1/CareerDossierTeX/issues/171
+[#176]: https://github.com/amirhs1/CareerDossierTeX/issues/176
 
 ## [0.5.0] - 2026-07-24
 
