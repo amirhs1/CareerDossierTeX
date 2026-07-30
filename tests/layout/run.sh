@@ -8,7 +8,10 @@
 #   - it produces no overfull boxes (long URLs break; long headings wrap);
 #   - every one-page document suppresses page furniture, while every multi-page
 #     document emits a folio throughout and a running header after page one;
-#   - a fixture named *two-page* actually spans at least two pages.
+#   - a fixture named *two-page* actually spans at least two pages;
+#   - no *two-page* fixture splits a hyphenated word across a page break, and
+#     no letter or statement fixture strands a single line of a paragraph at a
+#     page boundary (issue #171, via page-break-check.awk).
 #
 # Final visual correctness (spacing, balance, typographic detail) remains a
 # human review of the rendered PDF; this runner guards the properties a machine
@@ -237,56 +240,55 @@ EOF
         echo "  spans multiple pages as intended"
       fi
 
-      # Typographic page-break quality (issue #171). Check that no hyphenated
-      # word is split across a page break. pdftotext marks page boundaries with
-      # \f; a hyphen immediately before \f indicates a word split.
+      # Typographic page-break quality (issue #171): no hyphenated word split
+      # across a page break, and no single line of a paragraph stranded at a
+      # page boundary. Both are decided from per-word coordinates rather than
+      # extracted text — see page-break-check.awk for why text-based tests
+      # fail here in both directions.
+      #
+      # The broken-word check applies to every family. The club/widow checks
+      # are enabled only for letter and statement, matching the split
+      # docs/API.md's page-break policy already draws: résumé and CV are
+      # entry-structured and governed by the structural keep-together
+      # penalties, and their entry headings and datelines end without
+      # sentence punctuation exactly as an unfinished prose line does, so a
+      # paragraph-remnant assertion is not meaningful over that content.
       if command -v pdftotext >/dev/null 2>&1; then
-        typo_fail=0
+        case "$base" in
+          letter-*|statement-*) prose=1 ;;
+          *)                    prose=0 ;;
+        esac
 
-        # Extract text with page-break markers. Look for a hyphen followed by
-        # form feed (page boundary), which indicates a hyphenated word split
-        # across pages.
-        full_text="$(pdftotext -enc UTF-8 "$base.pdf" -)"
-        if printf '%s' "$full_text" | grep -E '\-[[:space:]]*\f' >/dev/null; then
-          echo "  HYPHENATED WORD SPLIT ACROSS PAGE BREAK"
+        typo_fail=0
+        findings="$(pdftotext -bbox "$base.pdf" - \
+          | awk -v furniture="$furniture_label" -v prose="$prose" \
+              -f "$here/page-break-check.awk")"
+        if [ -n "$findings" ]; then
+          while IFS="$(printf '\t')" read -r kind pg text; do
+            [ -n "$kind" ] || continue
+            case "$kind" in
+              BROKEN)
+                echo "  HYPHENATED WORD SPLIT ACROSS PAGE BREAK: page $pg ends '$text'"
+                ;;
+              *)
+                echo "  $kind LINE: page $pg: '$text'"
+                ;;
+            esac
+          done <<EOF
+$findings
+EOF
           typo_fail=1
         fi
 
         if [ "$typo_fail" -eq 0 ]; then
-          echo "  no hyphen-split at page breaks"
+          if [ "$prose" -eq 1 ]; then
+            echo "  no hyphen-split, widow, or club line at page breaks"
+          else
+            echo "  no hyphen-split at page breaks"
+          fi
         else
           fail=1
         fi
-
-        # Widow and club single-line paragraph remnants (issue #171),
-        # letter/statement only: docs/API.md's page-break policy already
-        # distinguishes the résumé/CV families (structural keep-together
-        # penalties over bulleted entries) from letter/statement (continuous
-        # prose, ordinary \widowpenalty/\clubpenalty). A résumé/CV entry
-        # heading or dateline ends without sentence punctuation exactly like
-        # an unfinished prose line does, so the same text-based check over
-        # entry-structured content misreads normal section breaks as
-        # remnants; scoping to prose keeps the signal meaningful.
-        case "$base" in
-          letter-*|statement-*)
-            widow_fail=0
-            findings="$(pdftotext -bbox "$base.pdf" - \
-              | awk -v furniture="$furniture_label" \
-                  -f "$here/widow-club-check.awk")"
-            if [ -n "$findings" ]; then
-              while IFS=$'\t' read -r kind pg text; do
-                [ -n "$kind" ] || continue
-                echo "  $kind LINE: page $pg: '$text'"
-              done <<<"$findings"
-              widow_fail=1
-            fi
-            if [ "$widow_fail" -eq 0 ]; then
-              echo "  no widow or club line at page breaks"
-            else
-              fail=1
-            fi
-            ;;
-        esac
       else
         echo "  (pdftotext absent: skipped typographic page-break check)"
       fi
