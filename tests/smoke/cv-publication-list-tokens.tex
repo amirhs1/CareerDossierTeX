@@ -5,6 +5,11 @@
 \ExplSyntaxOn
 \msg_new:nnn { cdossier-test } { wrong-publication-list-token }
   { The~CV~publication~list~does~not~use~shared~list~token~'#1'. }
+\msg_new:nnn { cdossier-test } { unowned-publication-list-edge }
+  {
+    The~CV~publication~list~leaves~partopsep~at~\skip_use:N \partopsep ,~so~
+    CDossierListEdgeSkip~does~not~own~the~whole~list~edge.
+  }
 \cs_new_protected:Npn \__cdossier_test_cv_publication_tokens:
   {
     \dim_compare:nNnF { \labelsep } = { \CDossierListLabelSep }
@@ -22,6 +27,11 @@
         \msg_error:nnn { cdossier-test }
           { wrong-publication-list-token } { itemsep }
       }
+    %% Issue #176: `\CDossierListEdgeSkip' owns the whole list edge, so LaTeX's
+    %% unscaled `\partopsep' must not add to it when the list opens a new
+    %% paragraph.
+    \skip_if_eq:nnF { \partopsep } { 0pt }
+      { \msg_error:nn { cdossier-test } { unowned-publication-list-edge } }
   }
 \ExplSyntaxOff
 \begin{document}

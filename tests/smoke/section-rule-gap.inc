@@ -12,7 +12,6 @@
 %
 %   entry-led  -- CDossierEntry, contributing \CDossierEntryAboveSkip
 %   list-led   -- CDossierItemize, contributing \CDossierListEdgeSkip as topsep
-%                 plus LaTeX's own \partopsep
 %   prose-led  -- an ordinary paragraph, contributing nothing
 %
 % Before the fix the gap was the *sum* in the entry-led and list-led cases,
@@ -55,10 +54,6 @@
   local below = \number\dimexpr\CDossierSectionBelowSkip\relax
   local entryabove = \number\dimexpr\CDossierEntryAboveSkip\relax
   local listedge = \number\dimexpr\CDossierListEdgeSkip\relax
-  % A list opening a new paragraph also contributes LaTeX's `\partopsep', which
-  % no CDossier token owns. Include it so the expected value stays exact
-  % whatever the tokens are set to.
-  local partopsep = \number\dimexpr\partopsep\relax
 
   local function contains_rule(list)
     if not list then return false end
@@ -122,7 +117,7 @@
   end
 
   check("entry-led", \number\CDossierGapEntryBox, entryabove)
-  check("list-led", \number\CDossierGapListBox, listedge + partopsep)
+  check("list-led", \number\CDossierGapListBox, listedge)
   check("prose-led", \number\CDossierGapProseBox, 0)
 }
 

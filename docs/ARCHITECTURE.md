@@ -237,7 +237,7 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
 | `\CDossierEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
-| `\CDossierListEdgeSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
+| `\CDossierListEdgeSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
@@ -263,6 +263,22 @@ skip below the heading's depth. These two tokens own the complete vertical
 space on either side of the rule: the shared component suppresses TeX's
 automatic interline glue before and after the rule rather than allowing a
 separate rule paragraph to add hidden baseline spacing.
+
+`\CDossierListEdgeSkip` owns the complete distance from preceding content to a
+list, and the table's number is that distance. Keeping that true costs an extra
+setting: LaTeX's `\list` adds `\partopsep` on top of `topsep` whenever a list
+opens a new paragraph, and the `article` default is 3 pt plus stretch: a
+quantity no token owns and that does not rescale with `fontsize`. Every list built on the shared
+tokens therefore sets `partopsep = 0pt` alongside its `topsep` (#176).
+
+The token's ratio absorbed that 3 pt rather than discarding it, so the rendered
+edge is materially the one #166 tuned. Before #176 the real gap was 4.5 pt at
+`10pt`, 4.7 pt at `11pt`, and 4.81 pt at `12pt` — an effective ratio drifting
+from 0.375 down to 0.332 of a line as the body size grew, because only part of
+it scaled. At 0.3125 the edge is 3.75 / 4.25 / 4.53 pt and the whole of it
+scales. The ratio stays below `\CDossierSectionBelowSkip` (0.375) deliberately:
+a list edge that equalled the gap opening a section would flatten the
+distinction between entering a section and entering a list inside one.
 
 #### Derived metrics
 

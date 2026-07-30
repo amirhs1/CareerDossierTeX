@@ -185,6 +185,14 @@
 %% the shared position-aware policy in careerdossier-components, which forbids
 %% the boundaries that would strand a single bullet and merely discourages the
 %% rest, so a list longer than a page still breaks.
+%%
+%% Issue #176: `partopsep' is zeroed so `\CDossierListEdgeSkip' alone owns the
+%% distance from the preceding content to the list, as documented. LaTeX adds
+%% `\partopsep' on top of `topsep' whenever a list opens a new paragraph, and
+%% the `article' default is 3 pt plus stretch: a quantity no token owns and
+%% that does not rescale with `fontsize'. Left in place it would make the list
+%% edge both wider than the token says and proportionally wider at 10pt than
+%% at 12pt. The token's own ratio absorbs the 3 pt instead.
 \dim_new:N \l__cdossier_cv_label_width_dim
 
 \NewDocumentEnvironment { CDossierItemize } { }
@@ -210,6 +218,7 @@
             topsep     = \CDossierListEdgeSkip ,
             itemsep    = \CDossierItemSepSkip ,
             parsep     = 0pt ,
+            partopsep  = 0pt ,
             label      = \textbullet ,
             beginpenalty = \CDossierHeadingKeepPenalty ,
           ]
@@ -222,6 +231,7 @@
             topsep     = \CDossierListEdgeSkip ,
             itemsep    = \CDossierItemSepSkip ,
             parsep     = 0pt ,
+            partopsep  = 0pt ,
             label      = \textbullet ,
             beginpenalty = \CDossierHeadingKeepPenalty ,
           ]
@@ -379,6 +389,7 @@
         topsep     = \CDossierListEdgeSkip ,
         itemsep    = \CDossierItemSepSkip ,
         parsep     = 0pt ,
+        partopsep  = 0pt ,
       ]
   }
   {
