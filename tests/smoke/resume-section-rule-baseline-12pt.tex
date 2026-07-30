@@ -1,0 +1,7 @@
+% resume-section-rule-baseline-12pt.tex -- see section-rule-baseline.inc (#169).
+%
+% The baseline offset has a size-dependent lower bound: it must exceed the
+% section heading's depth. The résumé covers 12pt so a future change to the
+% calibrated leading cannot silently push the rule into descender ink.
+\documentclass[fontsize=12pt]{careerdossier-resume}
+\input{section-rule-baseline.inc}

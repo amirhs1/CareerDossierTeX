@@ -84,6 +84,19 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- The section rule in a résumé or CV now sits a fixed distance below its
+  heading's baseline, so its height no longer follows the heading's glyphs. The
+  offset was previously measured from the bottom of the heading's line box, which
+  is as deep as its deepest glyph, so the rule dropped further under a heading
+  containing a descender than under one without — 4.80 pt versus 2.28 pt at
+  11 pt, a visible swing within a single document.
+  `\CDossierSectionRuleSkip` now means baseline-to-rule and rises from `0.15` to
+  `0.3125` line, the token's smallest value on the calibrated grid that keeps the
+  rule clear of descender ink at every supported body size. Rule thickness and
+  colour, public commands, page geometry, reading order, and tagged
+  layout-artifact treatment are unchanged; existing documents may reflow and
+  should have their pagination reviewed. ([#169])
+
 - The rule-to-content gap in a résumé or CV section is now the value
   `\CDossierSectionBelowSkip` declares, whichever kind of content opens the
   section. The gap previously depended on what followed the rule: a section
@@ -138,6 +151,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#161]: https://github.com/amirhs1/CareerDossierTeX/issues/161
 [#164]: https://github.com/amirhs1/CareerDossierTeX/issues/164
 [#168]: https://github.com/amirhs1/CareerDossierTeX/issues/168
+[#169]: https://github.com/amirhs1/CareerDossierTeX/issues/169
 
 ## [0.5.0] - 2026-07-24
 
