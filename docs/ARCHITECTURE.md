@@ -234,6 +234,10 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
 | `\CDossierSectionRuleSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
+| `\CDossierProseSectionAboveSkip` | 1.50 | 18.0 pt | 20.4 pt | 21.75 pt |
+| `\CDossierProseSectionBelowSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierProseSubsectionAboveSkip` | 1.00 | 12.0 pt | 13.6 pt | 14.5 pt |
+| `\CDossierProseSubsectionBelowSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
 | `\CDossierEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
 | `\CDossierEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
@@ -279,6 +283,32 @@ it scaled. At 0.3125 the edge is 3.75 / 4.25 / 4.53 pt and the whole of it
 scales. The ratio stays below `\CDossierSectionBelowSkip` (0.375) deliberately:
 a list edge that equalled the gap opening a section would flatten the
 distinction between entering a section and entering a list inside one.
+
+The four `Prose…` heading tokens exist because the entry-structured section
+tokens above them cannot be reused in a continuous-prose class (#177). Those
+are calibrated for a ruled heading in a document whose paragraphs are separated
+by nothing at all: `\CDossierParSkip` is 0. A statement separates its
+paragraphs by `\CDossierProseParSkip` (0.50), so a heading gap has to clear
+that ratio before it separates anything — at `\CDossierSectionBelowSkip`
+(0.375) the space opening a section would be *narrower* than the space between
+two paragraphs inside it.
+
+The prose pair is therefore stated against the paragraph gap rather than
+against the ruled section: 1.50 above is three times it, 0.75 below is one and
+a half times it, and the 2:1 ratio between the two binds a heading to the text
+it introduces instead of leaving it suspended between two blocks. The
+subsection pair repeats that shape one step down (1.00 / 0.625) — still clear
+of the paragraph gap, unambiguously tighter than the section containing it.
+
+Like `\CDossierListEdgeSkip`, each of the four is the complete gap, and keeping
+that true costs a setting. A heading is a paragraph and so is the text beneath
+it, so TeX contributes `\parskip` on each side over and above the skip the
+sectioning command asks for. The statement class subtracts `\parskip` from both
+skips it passes to `\@startsection`, which is why the table's numbers are the
+gaps a reader measures. That subtraction has a floor: `\@xsect` reads a
+non-positive after-skip as a request for a run-in heading, so both below-tokens
+must stay strictly greater than `\CDossierProseParSkip` (0.50) or every
+statement heading would quietly become run-in.
 
 #### Derived metrics
 
@@ -616,9 +646,27 @@ Responsibilities:
 - reuse component-owned link normalization and separator-safe contact output;
 - derive every header size and gap plus prose paragraph rhythm from the shared
   token package;
+- restyle the two inherited unnumbered heading levels onto the shared semantic
+  heading role, type scale, and prose heading tokens, and offer
+  `\CDossierSection` and `\CDossierSubsection` as the class's own names for
+  them;
 - keep running page furniture out of tagged structure; and
 - allow ordinary prose and standard LaTeX sectioning without imposing a
   type-specific narrative schema.
+
+The heading levels are restyled rather than replaced (#177). `\@startsection`
+is where the kernel's tagging support hooks in: with tagging active, an
+unnumbered heading opens a `Sect` division enclosing the heading and the
+content it introduces, and records the heading text as that element's title. A
+heading hand-built on the shared display primitive — the mechanism the résumé
+and CV use, because their ruled heading needs it — emits a bare heading element
+with neither. Keeping the mechanism and replacing only its four visual
+arguments buys the tokens without paying for them in structure, so
+`\CDossierSection` in this class is a wrapper over the restyled `\section*`
+rather than a second renderer. A statement heading carries no decorative rule:
+the rule is entry-structured section furniture, not prose furniture. Heading
+levels below `\subsection` are not part of the calibrated design; a statement is
+not expected to need them.
 
 The class owns the choice of which shared profile fields are relevant to each
 statement type. Its filtered contact line delegates privately to

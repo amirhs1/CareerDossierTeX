@@ -115,6 +115,18 @@ and optional-field behavior are unchanged. Existing statement sources require
 no edit, but their header spacing, line breaks, and pagination should be
 reviewed.
 
+Statement headings change with them. `\section*` and `\subsection*` were
+`article`'s: `\Large` — 17.28 pt under this class's 12 pt default, outside the
+project's type scale — set in whichever family `bodyfont` selected, with
+`article`'s own display skips. They now use the shared sans heading role, the
+`\CDossierSizeSection` and `\CDossierSizeBody` steps, and the prose heading
+rhythm, so a statement heading matches the section heading in every other
+class. Existing statements need no source edit and keep working, but headings
+are smaller, sans, and more tightly bound to the text under them, so pagination
+should be reviewed. `\CDossierSection` and `\CDossierSubsection` are added as
+the class's own names for the same two levels and are the preferred spelling
+going forward.
+
 ### Build twice, and ignore the first pass
 
 All four classes now suppress the folio on a single-page document and print

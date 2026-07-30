@@ -620,6 +620,11 @@ three different ones.
 
 The argument is user-visible text. The command does not automatically translate arbitrary section titles.
 
+The statement class defines `\CDossierSection` too, and it opens a section
+there as well, but a statement is prose: the heading is set without a rule and
+on the prose heading rhythm. See "Author content and headings" for that class's
+two heading levels.
+
 ### `CDossierEntry`
 
 ```latex
@@ -1065,6 +1070,8 @@ The `v0.6.0` development layout uses the shared calibrated design system:
   the calibrated type scale;
 - header gaps and prose paragraph rhythm derived from the selected body
   baseline;
+- section and subsection headings on the same semantic heading role, type
+  scale, and baseline-derived rhythm as every other class;
 - a centered identity block in the body on page one;
 - no running header on page one;
 - a centered `<name> -- <running title>` header from page two; and
@@ -1164,10 +1171,43 @@ furniture and does not replace the full title in meaningful content.
 
 The class introduces no command for research aims, teaching themes, EDI
 commitments, artistic methods, or statement-of-purpose paragraphs. Authors
-write ordinary prose and may choose standard LaTeX `\section*` and
-`\subsection*` headings when the application and content benefit from them.
-The class does not force headings, a page count, or a type-specific narrative
-schema.
+write ordinary prose and may add headings when the application and content
+benefit from them. The class does not force headings, a page count, or a
+type-specific narrative schema.
+
+Two unnumbered heading levels are available, and each has two spellings:
+
+```latex
+\CDossierSection{Research Vision and Significance}
+\CDossierSubsection{A Narrower Theme}
+```
+
+`\CDossierSection` matches the name the résumé and CV use, so one profile's
+documents are written the same way. It is a wrapper over standard LaTeX
+`\section*`, and `\CDossierSubsection` over `\subsection*`; both spellings
+remain supported and render identically, because there is one renderer.
+
+Since `v0.6.0` the rendering is part of the calibrated design system rather
+than `article`'s heading defaults:
+
+| Property | Statement heading |
+|---|---|
+| Section size | `\CDossierSizeSection` — 11 / 12 / 13 pt |
+| Subsection size | `\CDossierSizeBody` — 10 / 11 / 12 pt |
+| Typeface | `\CDossierSectionStyle`, the sans heading role, in both `bodyfont` modes |
+| Space above | `\CDossierProseSectionAboveSkip` / `\CDossierProseSubsectionAboveSkip` |
+| Space below | `\CDossierProseSectionBelowSkip` / `\CDossierProseSubsectionBelowSkip` |
+| Decorative rule | None |
+
+Each spacing token is the complete gap, including the paragraph spacing either
+side of the heading contributes. A statement heading carries no rule: the
+full-width rule under `\CDossierSection` in the résumé and CV is
+entry-structured section furniture, and a prose document reads better without
+it.
+
+Numbered sectioning and heading levels below `\subsection` are inherited from
+`article` unchanged and are outside the calibrated design; a statement is not
+expected to use them.
 
 The six canonical typed examples use the maintainer-supplied research reports to
 demonstrate recognizable structures. Each example naturally spans two pages
@@ -1193,9 +1233,12 @@ Tagged statements use the existing opt-in kernel interface:
 \documentclass[type=research]{careerdossier-statement}
 ```
 
-The first-page title, ordinary paragraphs, standard section headings, and links
-remain meaningful structure in source order. Running headers, folios, and
-contact separators are layout artifacts. This design extends the academic
+The first-page title, ordinary paragraphs, section headings, and links remain
+meaningful structure in source order. Running headers, folios, and contact
+separators are layout artifacts. Both heading spellings go through the kernel's
+own sectioning machinery, so each opens a section division enclosing its
+heading and the content that follows, and records the heading text as that
+division's title. This design extends the academic
 letter's approach; it does not establish PDF/UA, WCAG, or general ATS
 conformance for arbitrary statements.
 

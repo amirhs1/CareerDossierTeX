@@ -1,0 +1,75 @@
+% statement-section-style.tex — statement headings use the calibrated scale.
+%
+% Issue #177. Until the sectioning commands were restyled, a statement heading
+% was `article''s: \Large — 17.28 pt at this class's 12 pt base, outside the
+% documented type scale entirely — set in whichever family `bodyfont' selected,
+% so a serif statement had serif headings while every other class used the sans
+% heading role.
+%
+% The probe runs inside the heading text, so it reports the font that actually
+% reaches the glyphs rather than what the tokens would produce if they were
+% consulted. Both levels are checked, and the expected values are read from the
+% tokens and the semantic role rather than written out, so this fixture asserts
+% that the heading *uses* the design system, and `tokens-scale.tlg' remains the
+% single place the numbers themselves are pinned.
+\documentclass{careerdossier-statement}
+\CDossierSetup{name = {Ada Lovelace}, email = {ada@example.test}}
+
+\ExplSyntaxOn
+\str_new:N \g__cdossier_test_expected_str
+\str_new:N \g__cdossier_test_found_str
+
+\msg_new:nnn { cdossier-test } { wrong-heading-font }
+  {
+    The~#1~heading~is~set~in~#3;~the~calibrated~role~and~scale~give~#2.
+  }
+
+\cs_new_protected:Npn \__cdossier_test_font:N #1
+  {
+    \str_gset:Nx #1
+      {
+        \cs:w f@family \cs_end: /
+        \cs:w f@series \cs_end: /
+        \cs:w f@size \cs_end: /
+        \cs:w f@baselineskip \cs_end:
+      }
+  }
+
+%% #1 label, #2 the size command the level is specified to use.
+\cs_new_protected:Npn \__cdossier_test_heading_font:nn #1#2
+  {
+    \group_begin:
+      \CDossierSectionStyle #2
+      \__cdossier_test_font:N \g__cdossier_test_expected_str
+    \group_end:
+    \__cdossier_test_font:N \g__cdossier_test_found_str
+    \str_if_eq:NNF \g__cdossier_test_expected_str \g__cdossier_test_found_str
+      {
+        \msg_error:nnxxx { cdossier-test } { wrong-heading-font }
+          {#1}
+          { \g__cdossier_test_expected_str }
+          { \g__cdossier_test_found_str }
+      }
+  }
+
+\NewDocumentCommand \cdossiertestSectionFont { }
+  { \__cdossier_test_heading_font:nn { section } { \CDossierSizeSection } }
+\NewDocumentCommand \cdossiertestSubsectionFont { }
+  { \__cdossier_test_heading_font:nn { subsection } { \CDossierSizeBody } }
+\ExplSyntaxOff
+
+\begin{document}
+
+\CDossierSection{\cdossiertestSectionFont Research Vision}
+
+Statement prose under a section heading.
+
+\CDossierSubsection{\cdossiertestSubsectionFont A Narrower Theme}
+
+Statement prose under a subsection heading.
+
+\section*{\cdossiertestSectionFont Prior Contributions}
+
+The unwrapped spelling must reach the same font as its wrapper.
+
+\end{document}

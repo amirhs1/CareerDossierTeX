@@ -44,6 +44,10 @@
     \cdossiertest_skip:N \CDossierSectionAboveSkip
     \cdossiertest_skip:N \CDossierSectionRuleSkip
     \cdossiertest_skip:N \CDossierSectionBelowSkip
+    \cdossiertest_skip:N \CDossierProseSectionAboveSkip
+    \cdossiertest_skip:N \CDossierProseSectionBelowSkip
+    \cdossiertest_skip:N \CDossierProseSubsectionAboveSkip
+    \cdossiertest_skip:N \CDossierProseSubsectionBelowSkip
     \cdossiertest_skip:N \CDossierEntryAboveSkip
     \cdossiertest_skip:N \CDossierEntryGapSkip
     \cdossiertest_skip:N \CDossierEntryBelowSkip

@@ -120,6 +120,10 @@
 \skip_new:N \CDossierSectionAboveSkip
 \skip_new:N \CDossierSectionRuleSkip
 \skip_new:N \CDossierSectionBelowSkip
+\skip_new:N \CDossierProseSectionAboveSkip
+\skip_new:N \CDossierProseSectionBelowSkip
+\skip_new:N \CDossierProseSubsectionAboveSkip
+\skip_new:N \CDossierProseSubsectionBelowSkip
 \skip_new:N \CDossierEntryAboveSkip
 \skip_new:N \CDossierEntryGapSkip
 \skip_new:N \CDossierEntryBelowSkip
@@ -248,6 +252,32 @@
     %% normalized scale keeps it rather than moving to a smaller grid step.
     \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.3125 }
     \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.375 }
+    %% Issue #177: the heading rhythm of a continuous-prose document -- today
+    %% the statement class, the only one with headings and prose paragraph
+    %% spacing at once. It cannot reuse the four tokens above, which are
+    %% calibrated for a ruled
+    %% heading in a document whose paragraphs are separated by nothing
+    %% (\CDossierParSkip is 0). A prose statement separates its paragraphs by
+    %% \CDossierProseParSkip (0.50), so a heading gap must first exceed that
+    %% before it separates anything at all: at 0.375 the space opening a
+    %% section would be *narrower* than the space between two paragraphs of
+    %% one section.
+    %%
+    %% The pair is therefore stated against the paragraph gap: 1.50 above is
+    %% three times it, 0.75 below is one and a half times it, and the 2:1
+    %% ratio between them binds a heading to the text it introduces rather
+    %% than leaving it floating between two blocks. The subsection pair keeps
+    %% that shape one step down (1.00 / 0.625): still clear of the paragraph
+    %% gap, but unambiguously tighter than the section it sits inside.
+    %%
+    %% Each of these four owns the complete gap, including the \parskip the
+    %% adjacent paragraph contributes; see the sectioning block in
+    %% careerdossier-statement.cls for how that is arranged and why the two
+    %% below-tokens must stay strictly greater than \CDossierProseParSkip.
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSectionAboveSkip { 1.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSectionBelowSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionAboveSkip { 1.00 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionBelowSkip { 0.625 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.0625 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryBelowSkip { 0.125 }
