@@ -84,6 +84,17 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A bullet whose text fills the line no longer inflates the spacing that follows
+  it. The space produced by the newline before `\end{CDossierItemize}` was
+  carried onto a line of its own when the final item's last line already filled
+  the measure. Nothing was visible, but the empty line hid the preceding spacing
+  from the gap that came next, so the following section heading was pushed down
+  by a whole line — 27.84 pt instead of 14.28 pt in the shipped default résumé,
+  where one bullet happens to land on the boundary. Only the last item of a list
+  was affected; entry bodies, section prose, and the letter and statement classes
+  were checked across 32 text lengths each and are not. No token value, public
+  command, option, or default changes; existing documents may reflow. ([#170])
+
 - The section rule in a résumé or CV now sits a fixed distance below its
   heading's baseline, so its height no longer follows the heading's glyphs. The
   offset was previously measured from the bottom of the heading's line box, which
@@ -152,6 +163,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#164]: https://github.com/amirhs1/CareerDossierTeX/issues/164
 [#168]: https://github.com/amirhs1/CareerDossierTeX/issues/168
 [#169]: https://github.com/amirhs1/CareerDossierTeX/issues/169
+[#170]: https://github.com/amirhs1/CareerDossierTeX/issues/170
 
 ## [0.5.0] - 2026-07-24
 

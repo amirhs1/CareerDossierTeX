@@ -618,6 +618,20 @@
 %% furniture above does while the total page count is still unknown.
 \cs_new_protected:Npn \__cdossier_components_listpolicy_end:
   {
+    %% Issue #170: discard the space that ends the final item's text before the
+    %% list closes. Readable source puts `\end{CDossierItemize}' on its own
+    %% line, and that newline is a space token at the end of the item's
+    %% paragraph. When the item's last line already fills the measure, TeX
+    %% carries that space onto a line of its own: a box with no glyphs, zero
+    %% height, and zero depth, preceded by a full `\baselineskip'. The result is
+    %% an invisible extra line that inflates the next structural gap -- 27.84 pt
+    %% instead of 14.28 pt above the following section in the default résumé.
+    %%
+    %% Only the final item is affected; an inter-item boundary discards the
+    %% space already. The guard is needed because this runs in vertical mode
+    %% when the item body ended with its own `\par', and there `\unskip' would
+    %% remove the list's own vertical spacing instead.
+    \mode_if_horizontal:T { \unskip }
     \bool_lazy_and:nnT
       { \int_compare_p:nNn { \l__cdossier_components_itemtotal_int } > { 0 } }
       {
