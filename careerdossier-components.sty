@@ -443,7 +443,14 @@
     \par
     \nointerlineskip
     \penalty \CDossierHeadingKeepPenalty
-    \vspace { \CDossierSectionBelowSkip }
+    %% Issue #168: the rule-to-content gap must be *this* token, not this token
+    %% plus whatever leading space the following block contributes. `\vspace'
+    %% cannot deliver that: `\@vspace' appends `\vskip\z@skip', so the following
+    %% block's `\addvspace' sees `\lastskip' as zero and adds instead of
+    %% collapsing. `\addvspace' leaves the skip visible, so LaTeX's usual
+    %% collapsing rule applies and the gap is the larger of the two -- never
+    %% their sum -- for entry-led, list-led, and prose-led sections alike.
+    \addvspace { \CDossierSectionBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
