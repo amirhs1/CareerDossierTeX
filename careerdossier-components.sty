@@ -429,11 +429,35 @@
 %% rule skips own the complete heading-to-rule and rule-to-content gaps. The
 %% rule remains a layout artifact in tagged output, and the keep penalty still
 %% binds the complete heading/rule unit to the content that follows.
+%%
+%% Issue #169: `\CDossierSectionRuleSkip' is measured from the heading's
+%% *baseline*, not from the bottom of its line box. A line box is as deep as its
+%% deepest glyph, so a box-relative offset dropped the rule further under
+%% `Experience' (p) than under `Education' -- 4.80 pt versus 2.28 pt at 11 pt,
+%% a visible 2.1x swing within one document. The baseline is the line the reader
+%% perceives, and it is what rules and underlines are conventionally set from,
+%% so the offset is taken from there and the token means exactly what it says.
+%%
+%% `\prevdepth' carries the heading line's depth here, because the heading
+%% primitive ends with `\par'. Subtracting it converts the token from a
+%% baseline distance into the box-relative skip TeX needs, and reading it before
+%% `\nointerlineskip' matters: that command sets `\prevdepth' to -1000pt.
+%%
+%% The token must therefore exceed the heading's depth, or the rule would be
+%% drawn through descender ink. The shared smoke regression asserts that lower
+%% bound rather than clamping it here, so an unusable value fails loudly instead
+%% of silently reverting to glyph-dependent placement.
 %% ---------------------------------------------------------------------------
+\dim_new:N \l__cdossier_components_headingdepth_dim
+
 \cs_new_protected:Npn \__cdossier_components_section_rule:
   {
-    \vspace { \CDossierSectionRuleSkip }
+    \dim_set:Nn \l__cdossier_components_headingdepth_dim { \tex_prevdepth:D }
     \nointerlineskip
+    \skip_vertical:n
+      {
+        \CDossierSectionRuleSkip - \l__cdossier_components_headingdepth_dim
+      }
     \noindent
       {
         \CDossierRuleColor
@@ -443,7 +467,14 @@
     \par
     \nointerlineskip
     \penalty \CDossierHeadingKeepPenalty
-    \vspace { \CDossierSectionBelowSkip }
+    %% Issue #168: the rule-to-content gap must be *this* token, not this token
+    %% plus whatever leading space the following block contributes. `\vspace'
+    %% cannot deliver that: `\@vspace' appends `\vskip\z@skip', so the following
+    %% block's `\addvspace' sees `\lastskip' as zero and adds instead of
+    %% collapsing. `\addvspace' leaves the skip visible, so LaTeX's usual
+    %% collapsing rule applies and the gap is the larger of the two -- never
+    %% their sum -- for entry-led, list-led, and prose-led sections alike.
+    \addvspace { \CDossierSectionBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -587,6 +618,20 @@
 %% furniture above does while the total page count is still unknown.
 \cs_new_protected:Npn \__cdossier_components_listpolicy_end:
   {
+    %% Issue #170: discard the space that ends the final item's text before the
+    %% list closes. Readable source puts `\end{CDossierItemize}' on its own
+    %% line, and that newline is a space token at the end of the item's
+    %% paragraph. When the item's last line already fills the measure, TeX
+    %% carries that space onto a line of its own: a box with no glyphs, zero
+    %% height, and zero depth, preceded by a full `\baselineskip'. The result is
+    %% an invisible extra line that inflates the next structural gap -- 27.84 pt
+    %% instead of 14.28 pt above the following section in the default résumé.
+    %%
+    %% Only the final item is affected; an inter-item boundary discards the
+    %% space already. The guard is needed because this runs in vertical mode
+    %% when the item body ended with its own `\par', and there `\unskip' would
+    %% remove the list's own vertical spacing instead.
+    \mode_if_horizontal:T { \unskip }
     \bool_lazy_and:nnT
       { \int_compare_p:nNn { \l__cdossier_components_itemtotal_int } > { 0 } }
       {

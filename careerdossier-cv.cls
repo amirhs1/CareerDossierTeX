@@ -118,6 +118,7 @@
 
 \__cdossier_components_runninglabel:n { Curriculum~Vitae }
 \MakeCDossierPageFurniture
+\CDossierApplyPageBreakPenalties
 
 %% The keep-together penalty (issue #145) after the heading and rule keeps the
 %% title with the content that follows it, so a section heading is never

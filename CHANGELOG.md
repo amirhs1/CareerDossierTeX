@@ -91,6 +91,56 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A résumé, CV, letter, or statement page break could split a hyphenated word
+  across pages or strand a single line of a paragraph alone at the foot of one
+  page or the head of the next, because `\brokenpenalty`, `\clubpenalty`, and
+  `\widowpenalty` were left at LaTeX's defaults (`100`, `150`, and `150`) while
+  the structural keep-together policy above ([#145]) covered only headings and
+  lists. All four classes now call `\CDossierApplyPageBreakPenalties`, which
+  sets these from the named tokens `\CDossierBrokenPenalty`,
+  `\CDossierClubPenalty`, and `\CDossierWidowPenalty` (`careerdossier-tokens.sty`),
+  each defaulting to `10000` — forbidding the break — because every class is
+  `\raggedbottom`, so forbidding it only removes a paragraph's first and last
+  line as break points and cannot overflow a page. No token value, public
+  command, or option is added beyond the three penalty tokens; existing
+  documents may reflow and should have their pagination reviewed. ([#171])
+
+- A bullet whose text fills the line no longer inflates the spacing that follows
+  it. The space produced by the newline before `\end{CDossierItemize}` was
+  carried onto a line of its own when the final item's last line already filled
+  the measure. Nothing was visible, but the empty line hid the preceding spacing
+  from the gap that came next, so the following section heading was pushed down
+  by a whole line — 27.84 pt instead of 14.28 pt in the shipped default résumé,
+  where one bullet happens to land on the boundary. Only the last item of a list
+  was affected; entry bodies, section prose, and the letter and statement classes
+  were checked across 32 text lengths each and are not. No token value, public
+  command, option, or default changes; existing documents may reflow. ([#170])
+
+- The section rule in a résumé or CV now sits a fixed distance below its
+  heading's baseline, so its height no longer follows the heading's glyphs. The
+  offset was previously measured from the bottom of the heading's line box, which
+  is as deep as its deepest glyph, so the rule dropped further under a heading
+  containing a descender than under one without — 4.80 pt versus 2.28 pt at
+  11 pt, a visible swing within a single document.
+  `\CDossierSectionRuleSkip` now means baseline-to-rule and rises from `0.15` to
+  `0.3125` line, the token's smallest value on the calibrated grid that keeps the
+  rule clear of descender ink at every supported body size. Rule thickness and
+  colour, public commands, page geometry, reading order, and tagged
+  layout-artifact treatment are unchanged; existing documents may reflow and
+  should have their pagination reviewed. ([#169])
+
+- The rule-to-content gap in a résumé or CV section is now the value
+  `\CDossierSectionBelowSkip` declares, whichever kind of content opens the
+  section. The gap previously depended on what followed the rule: a section
+  opening with an entry or a bullet list received that token *plus* the block's
+  own leading space, so one document could show the same boundary at up to three
+  different sizes and a section heading read as almost equidistant between the
+  block above it and the block it labels. Spacing now collapses the way LaTeX
+  composes vertical space, taking the larger of the two values rather than their
+  sum. Token values, rule thickness and colour, public commands, page geometry,
+  reading order, and tagged layout-artifact treatment are unchanged; existing
+  documents may reflow and should have their pagination reviewed. ([#168])
+
 - The résumé and CV section-rule spacing tokens now determine the complete
   heading-to-rule and rule-to-content gaps. The decorative rule previously
   occupied its own paragraph line, which added hidden baseline spacing even
@@ -131,8 +181,12 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#145]: https://github.com/amirhs1/CareerDossierTeX/issues/145
 [#151]: https://github.com/amirhs1/CareerDossierTeX/issues/151
 [#161]: https://github.com/amirhs1/CareerDossierTeX/issues/161
-[#166]: https://github.com/amirhs1/CareerDossierTeX/issues/166
 [#164]: https://github.com/amirhs1/CareerDossierTeX/issues/164
+[#166]: https://github.com/amirhs1/CareerDossierTeX/issues/166
+[#168]: https://github.com/amirhs1/CareerDossierTeX/issues/168
+[#169]: https://github.com/amirhs1/CareerDossierTeX/issues/169
+[#170]: https://github.com/amirhs1/CareerDossierTeX/issues/170
+[#171]: https://github.com/amirhs1/CareerDossierTeX/issues/171
 
 ## [0.5.0] - 2026-07-24
 

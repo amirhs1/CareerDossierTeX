@@ -607,6 +607,17 @@ rule. Class-controlled spacing places the rule closer to its heading than to
 the content below; no additional paragraph line spacing is inserted around the
 rule.
 
+The rule sits `\CDossierSectionRuleSkip` below the heading's **baseline**, not
+below the bottom of its line box, so its height does not change when the heading
+happens to contain a descender. The token consequently has a lower bound: it
+must exceed the heading's depth, or the rule would cross descender ink.
+
+The gap between the rule and the section's first content is the larger of
+`\CDossierSectionBelowSkip` and whatever leading space the following block
+contributes — never their sum. A section that opens with an entry, a bullet
+list, or an ordinary paragraph therefore yields one predictable gap rather than
+three different ones.
+
 The argument is user-visible text. The command does not automatically translate arbitrary section titles.
 
 ### `CDossierEntry`
@@ -671,8 +682,27 @@ length before it is typeset, each list records that count in the auxiliary
 file — so a résumé or CV needs the same second LaTeX pass it already requires
 for the `Page N of M` folio. On a first clean pass the breaks are provisional.
 
-The letter and statement classes are continuous prose and keep ordinary
-`\widowpenalty` and `\clubpenalty` handling.
+### Typographic page-break penalties
+
+All four classes call `\CDossierApplyPageBreakPenalties` to set `\brokenpenalty`,
+`\clubpenalty`, and `\widowpenalty` from the named tokens `\CDossierBrokenPenalty`,
+`\CDossierClubPenalty`, and `\CDossierWidowPenalty` (`careerdossier-tokens.sty`),
+so a hyphenated word is never split across a page break and no single line of a
+paragraph is stranded alone at the foot of one page (a club line) or the head of
+the next (a widow line).
+
+All three tokens default to `10000` — forbidding the break — across every
+family, not only the résumé and CV covered by the structural policy above.
+Measurement against the committed letter fixtures during development showed a
+discounted value (`4000`) for the continuous-prose classes still let a club
+line through; `10000` removed it, with zero overfull `\vbox`es across every
+two-page fixture. This is safe because all four classes are `\raggedbottom`:
+forbidding a club or widow break only closes off the first and last line of a
+paragraph as a break point, and every interior line break remains available,
+so a page can still break inside an over-long paragraph rather than overflow.
+
+The letter and statement classes otherwise remain continuous prose with no
+further structural page-break policy.
 
 ## Public field accessors
 

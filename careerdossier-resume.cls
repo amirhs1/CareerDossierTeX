@@ -127,6 +127,7 @@
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierParSkip }
+\CDossierApplyPageBreakPenalties
 
 %% ---------------------------------------------------------------------------
 %% \CDossierSection {title} -- a résumé section heading followed by a full-width

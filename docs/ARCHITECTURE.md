@@ -232,7 +232,7 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
 | `\CDossierHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
 | `\CDossierSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
-| `\CDossierSectionRuleSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
+| `\CDossierSectionRuleSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
@@ -246,14 +246,23 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierAfterSalutationSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierSignatureSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
 
-The heading-to-rule gap (0.125) is deliberately the smallest non-zero
-structural gap in the project, and must stay unambiguously smaller than the
-rule-to-content gap (0.375) — a 1:3 relationship. A rule belongs to the heading
+`\CDossierSectionRuleSkip` is the one token whose ratio is **not** a visible
+gap. Since #169 it is measured from the section heading's baseline, so it spends
+the heading's own depth — about 0.20 line at every supported size — before the
+rule is reached. Its raw 0.3125 is therefore not comparable with the other
+numbers in the table; the gap a reader sees is roughly 0.11 line (1.63 pt at
+11 pt). 0.3125 is the smallest sixteenth that clears the descender, which is why
+the normalized scale keeps it instead of stepping further down.
+
+Compared that way, the heading-to-rule gap is still deliberately the smallest
+visible structural gap in the project, and must stay unambiguously smaller than
+the rule-to-content gap (0.375) — about 1:3.1. A rule belongs to the heading
 above it; at 1:2 it starts to read as a divider floating between two blocks. A
-retune may move both numbers, but not their order. These two tokens own the
-complete vertical space on either side of the rule: the shared component
-suppresses TeX's automatic interline glue before and after the rule rather than
-allowing a separate rule paragraph to add hidden baseline spacing.
+retune may move both numbers, but not their order, and may not take the rule
+skip below the heading's depth. These two tokens own the complete vertical
+space on either side of the rule: the shared component suppresses TeX's
+automatic interline glue before and after the rule rather than allowing a
+separate rule paragraph to add hidden baseline spacing.
 
 #### Derived metrics
 
@@ -313,6 +322,30 @@ and it was accepted knowing that. Do not narrow the résumé's default measure
 without revisiting the capacity argument; it is an accepted limitation, not an
 oversight to correct. The measured figures, and the advice on when an author
 should override it, are in `docs/API.md`.
+
+#### Page-break penalties
+
+`careerdossier-tokens.sty` also owns the named typographic page-break
+penalties (issue #171): `\CDossierBrokenPenalty`, `\CDossierClubPenalty`, and
+`\CDossierWidowPenalty`, applied through `\CDossierApplyPageBreakPenalties`.
+These sit alongside the structural keep-together penalties (issue #145,
+`\CDossierHeadingKeepPenalty` and `\CDossierListOrphanPenalty`) that only the
+résumé and CV use; the typographic penalties are shared by all four classes,
+each calling `\CDossierApplyPageBreakPenalties` once in its preamble.
+
+All three default to `10000`, uniformly across families — there is no
+per-family split, despite the structural penalties being résumé/CV-specific.
+An earlier design discounted the club and widow values for the
+continuous-prose classes (letter, statement) on the theory that a page-break
+policy strict enough to survive a lone stranded line should also leave room to
+break inside a paragraph that cannot otherwise fit; measuring against the
+committed letter fixtures showed the discounted value still let a club line
+through, while the full value did not, with no overfull `\vbox` anywhere in
+the two-page corpus. `\raggedbottom` on all four classes is what makes the
+full-strength value safe: forbidding the club/widow break only removes the
+first and last line of a paragraph as legal break points, and every interior
+line break is still available, so an over-long paragraph still paginates
+rather than overflows.
 
 ### `careerdossier-base.sty`
 
@@ -440,11 +473,26 @@ Responsibilities:
 - shared letterhead pieces that do not impose full page geometry;
 - PDF document metadata derived from the profile.
 
+The component layer also owns the shared bullet-list page-break and
+trailing-space policy. Closing a list discards the space that ends its final
+item, because readable source places the closing tag on its own line and that
+newline is a space token at the end of the item's paragraph. Left in place, it is
+carried onto a line of its own whenever the item's last line already fills the
+measure — an invisible line that no `\addvspace` can see past, so the next
+structural gap silently grows by a whole line.
+
 The component layer consumes the calibrated type and spacing values from
 `careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
 base-class environments. In particular, the shared identity block owns its
 centering and vertical rhythm, the shared section-rule primitive prevents
-paragraph line spacing from inflating its calibrated gaps, and shared page
+paragraph line spacing from inflating its calibrated gaps, measures
+`\CDossierSectionRuleSkip` from the heading's baseline rather than from the
+bottom of its line box so the rule's height does not follow the heading's
+glyphs, and emits its
+rule-to-content gap so that LaTeX's collapsing rule applies — the gap is the
+larger of `\CDossierSectionBelowSkip` and the following block's own leading
+space, never their sum, so entry-led, list-led, and prose-led sections share
+one gap — and shared page
 furniture owns its typography and auxiliary-file page-count decision, while
 leaving page geometry and the document-specific running label to the document
 classes.

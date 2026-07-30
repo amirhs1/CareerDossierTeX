@@ -88,6 +88,31 @@
 \int_new:N \CDossierListOrphanPenalty
 \int_set:Nn \CDossierListOrphanPenalty { 9997 }
 
+%% Typographic page-break penalties (issue #171). These control hyphenation
+%% and paragraph-remnant breaks at page boundaries, complementing the
+%% structural keep-together penalties above.
+%%
+%% CDossierBrokenPenalty discourages splitting a hyphenated word across a
+%% page break. A value of 10000 forbids the break entirely.
+%%
+%% CDossierClubPenalty and CDossierWidowPenalty control single-line paragraph
+%% remnants at the foot (club line) or top (widow line) of a page. All four
+%% document families share the same forbidding value (10000) rather than a
+%% lower value for the continuous-prose classes: measurement against the
+%% committed letter fixtures showed a discount penalty (4000) still let a
+%% one-line paragraph remnant through, while 10000 removed it with zero
+%% overfull vboxes across every two-page fixture. This is safe because all
+%% four classes are \raggedbottom, so forbidding club/widow breaks only closes
+%% off the first and last line of a paragraph as break points — interior line
+%% breaks remain available, so a page can still break inside an over-long
+%% paragraph rather than overflow.
+\int_new:N \CDossierBrokenPenalty
+\int_set:Nn \CDossierBrokenPenalty { 10000 }
+\int_new:N \CDossierClubPenalty
+\int_set:Nn \CDossierClubPenalty { 10000 }
+\int_new:N \CDossierWidowPenalty
+\int_set:Nn \CDossierWidowPenalty { 10000 }
+
 \skip_new:N \CDossierHeaderAboveSkip
 \skip_new:N \CDossierHeaderNameGapSkip
 \skip_new:N \CDossierHeaderMetaGapSkip
@@ -213,7 +238,15 @@
     \__cdossier_tokens_set_skip:Nn \CDossierHeaderMetaGapSkip { 0.1875 }
     \__cdossier_tokens_set_skip:Nn \CDossierHeaderBelowSkip { 0.8125 }
     \__cdossier_tokens_set_skip:Nn \CDossierSectionAboveSkip { 0.6875 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.125 }
+    %% Issue #169: measured from the section heading's baseline, not from the
+    %% bottom of its line box. The value has a hard lower bound -- the heading's
+    %% depth, about 0.20 line at every supported size -- because a smaller
+    %% offset would draw the rule through descender ink. 0.3125 leaves 1.63 pt
+    %% of clearance at 11 pt and sits between the two distances it replaces
+    %% (2.28 pt under a heading without descenders, 4.80 pt under one with).
+    %% It is also the smallest sixteenth that clears the descender, so the
+    %% normalized scale keeps it rather than moving to a smaller grid step.
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.3125 }
     \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.375 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.0625 }
@@ -264,6 +297,17 @@
         #1 ,
         margin = \CDossierPageMargin
       }
+  }
+
+%% Apply the typographic page-break penalties. Each class calls this after
+%% setting up the document and optionally adjusting the penalty tokens for
+%% the document family (e.g., CDossierClubPenalty and CDossierWidowPenalty
+%% to 4000 for continuous-prose documents).
+\NewDocumentCommand \CDossierApplyPageBreakPenalties { }
+  {
+    \brokenpenalty = \CDossierBrokenPenalty
+    \clubpenalty = \CDossierClubPenalty
+    \widowpenalty = \CDossierWidowPenalty
   }
 
 \endinput
