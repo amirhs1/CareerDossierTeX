@@ -10,8 +10,8 @@ under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
 > **Current status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is released.
-> `v0.3.0` is dropped. The next planned release is `v1.0.0 — Stable Public
-> API`.
+> `v0.3.0` is dropped. The next planned release is `v0.6.1 — Page Furniture
+> Placement and Output Medium`, followed by `v1.0.0 — Stable Public API`.
 
 ## Release overview
 
@@ -25,6 +25,7 @@ test pass at the end of a milestone.
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.5.0` | Statement classes and broader customization | Released |
 | `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
+| `v0.6.1` | Page furniture placement and the `medium` output-context option | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
 Repository milestones are tracked on the GitHub milestones page:
@@ -32,6 +33,28 @@ Repository milestones are tracked on the GitHub milestones page:
 ```text
 https://github.com/amirhs1/CareerDossierTeX/milestones
 ```
+
+## Phase numbering
+
+The Project's `Phase` field is the canonical numbering; the headings below
+follow it. A dropped release does not retain a phase number, which is why
+`v0.3.0` appears here as an unnumbered section. See
+`docs/NAMING-CONVENTION.md` §10.
+
+The two forms differ deliberately — this document keys each phase to its
+version, the Project uses a short label — so they cross-walk as follows:
+
+| This document | Project `Phase` option |
+|---|---|
+| `Phase 0: inventory and baseline` | `Phase 0 — Inventory` |
+| `Phase 1: v0.1.0` | `Phase 1 — Industry` |
+| `Phase 2: v0.2.0` | `Phase 2 — Academic` |
+| `v0.3.0` **(dropped, unnumbered)** | *(none — slot reused)* |
+| `Phase 3: v0.4.0` | `Phase 3 — Engine and Accessibility` |
+| `Phase 4: v0.5.0` | `Phase 4 — Expansion` |
+| `Phase 5: v0.6.0` | `Phase 5 — Calibration` |
+| `Phase 6: v0.6.1` | `Phase 6 — Furniture and Output Medium` |
+| `Phase 7: v1.0.0` | `Phase 7 — Stable API` |
 
 ## Phase 0: inventory and baseline
 
@@ -147,13 +170,19 @@ These interfaces are released in `v0.2.0`.
 - automatic import from ORCID, Scholar, DOI services, or external APIs; and
 - PDF/UA or broad ATS-conformance claims.
 
-## Phase 3: `v0.3.0 — Farsi and Bilingual Support` **(dropped — 2026-07-16)**
+## `v0.3.0 — Farsi and Bilingual Support` **(dropped — 2026-07-16)**
 
 > **Status:** dropped on 2026-07-16. The milestone is closed and the release is
 > not planned. CareerDossierTeX is English-only, and no language-abstraction
 > module exists (see `docs/ARCHITECTURE.md`). This section is retained as a
 > design record, not as committed scope — nothing here may be implemented or
 > documented as current.
+>
+> **No phase number:** this section is deliberately unnumbered. The Project's
+> `Phase` field reused the `Phase 3` slot for the engine and accessibility work
+> that shipped as `v0.4.0`, and a dropped release does not retain a phase
+> number (see `docs/NAMING-CONVENTION.md` §10). Refer to this section by name,
+> never by number.
 >
 > **Consequence:** mature RTL support via `bidi` was the main reason the
 > project stayed XeLaTeX-only. With multilingual work dropped, that constraint
@@ -186,7 +215,7 @@ Extend existing classes:
 
 Do not create separate language-specific classes unless a future document model is genuinely different.
 
-## Phase 4: `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`
+## Phase 3: `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`
 
 ### Goal
 
@@ -236,7 +265,7 @@ keys, and commands; the build command changes from `latexmk -xelatex` to
 - `docs/MIGRATION.md` gives XeTeX-preamble users an actionable upgrade path;
 - documentation claims no more than the fixtures actually verify.
 
-## Phase 5: `v0.5.0 — Statements and Customization`
+## Phase 4: `v0.5.0 — Statements and Customization`
 
 ### Goal
 
@@ -256,7 +285,7 @@ optional icons, and the Windows/NVDA reading-order check on 2026-07-22. Their
 future milestone remains undecided; they are not release blockers for
 `v0.5.0`.
 
-## Phase 6: `v0.6.0 — Calibrated Type Scale and Rhythm`
+## Phase 5: `v0.6.0 — Calibrated Type Scale and Rhythm`
 
 ### Goal
 
@@ -316,10 +345,11 @@ for authors in `docs/API.md`, with the rationale in `docs/ARCHITECTURE.md`.
 ### Explicit non-goals
 
 - color themes, named or per-role font combinations, and icons — still
-  deferred, undecided future milestone (see Phase 5);
+  deferred, undecided future milestone (see Phase 4);
 - any change to public content commands, key names, contact rendering,
   colours, or fonts;
-- a language- or direction-abstraction option (see Phase 3).
+- a language- or direction-abstraction option (see the dropped
+  `v0.3.0 — Farsi and Bilingual Support` section).
 
 ### Removed
 
@@ -356,6 +386,71 @@ for authors in `docs/API.md`, with the rationale in `docs/ARCHITECTURE.md`.
 Tracked under
 [milestone `v0.6.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/9)
 and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
+
+## Phase 6: `v0.6.1 — Page Furniture Placement and Output Medium`
+
+### Goal
+
+Correct where page furniture sits and make it selectable by output context,
+without touching the calibrated design system released in `v0.6.0`.
+
+This is a **non-breaking patch release**. No type size, vertical-rhythm token,
+margin preset, or geometry dimension that affects the text block changes, so
+**no document reflows**. The only new public surface is one additive class
+option whose default reproduces current output exactly.
+
+### Included
+
+- furniture placement derived from the resolved margin rather than from
+  `geometry` package defaults: `headheight`, `headsep`, and `footskip` are
+  computed so that the running header is vertically centred in the top margin
+  and the `Page N of M` folio is vertically centred in the bottom margin, at
+  every `fontsize` × `margin` combination and on both `letter` and `a4`;
+- a `headheight` large enough for the furniture step of the type scale at every
+  `fontsize`, replacing the inherited fixed `12pt`;
+- a public `medium` option (`screen`, `print`) on all four document classes,
+  defaulting to `print`: `print` keeps today's behaviour (running header from
+  page two, folio throughout, both suppressed on a single-page document) and
+  `screen` emits no running header and no folio on any page. **This is a public
+  API proposal awaiting maintainer sign-off** on the option name and on whether
+  `screen` suppresses the running header as well as the folio; nothing here is
+  implemented or supported until that decision lands;
+- an actionable class error for an unsupported `medium` value, consistent with
+  `fontsize`, `margin`, `paper`, and `bodyfont`;
+- regression, smoke, and layout coverage for the resolved furniture metrics,
+  both `medium` values, and the unknown-value error;
+- this roadmap renumbering and the phase-numbering convention that prevents it
+  from drifting again.
+
+### Explicit non-goals
+
+- any change to the type scale, vertical rhythm, margin presets, or any
+  `careerdossier-tokens.sty` dimension that affects the text block;
+- colour themes. `theme=monochrome` remains fixed, and `medium` is deliberately
+  a separate axis from colour — the two must not be conflated;
+- per-class furniture customization, user-supplied header or footer content,
+  and page-numbering format options;
+- widening `medium` beyond page furniture (hyperlink colour, PDF metadata, or
+  viewer preferences) in this release.
+
+### Release criteria
+
+- header and folio are vertically centred in their margins at all six
+  `fontsize` × `margin` combinations, on Letter and A4;
+- `\textheight` and `\textwidth` are unchanged from `v0.6.0` at every
+  combination;
+- `medium=screen` suppresses furniture and `medium=print` retains current
+  behaviour, on all four document classes;
+- an unsupported `medium` value produces an actionable class error naming the
+  accepted values;
+- `make review-matrix` output is reviewed for both media;
+- the extraction, tagging, layout, and regression suites pass;
+- `docs/API.md`, `docs/ARCHITECTURE.md`, and `CHANGELOG.md` are updated;
+- tag and GitHub Release `v0.6.1` are published.
+
+Tracked under
+[milestone `v0.6.1`](https://github.com/amirhs1/CareerDossierTeX/milestone/10)
+and [epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182).
 
 ## Phase 7: `v1.0.0 — Stable Public API`
 
