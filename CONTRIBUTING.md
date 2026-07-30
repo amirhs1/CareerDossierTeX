@@ -357,6 +357,39 @@ request:
 The PDFs, page-two PNGs, logs, and review record are generated evidence under
 the gitignored `build/` directory. They must not be committed.
 
+### Size/margin reference matrix
+
+Build the `{10pt,11pt,12pt} x {normal,narrow}` reference matrix across all four
+document classes from the repository root:
+
+    make review-matrix
+
+The command compiles the canonical two-page résumé, CV, industry-letter, and
+research-statement fixtures — the same ones `review-page-two` uses — at every
+size/margin combination, 24 PDFs in total. The statement class is represented
+by a single type (research); per-type rendering differences are already
+covered by the five-family page-two review and the statement-title
+regression, so statement type does not multiply this matrix.
+
+Review the PDFs under `build/size-margin-matrix/` and record the result in the
+pull request:
+
+1. every type size in the output is a whole number of points;
+2. bullets align with section headings, section rules, and entry titles;
+3. the heading-to-rule gap is visibly smaller than the rule-to-content gap at
+   every size;
+4. gaps scale with the body size — a 12pt document does not feel cramped and a
+   10pt one does not feel loose;
+5. no overfull boxes, missing glyphs, font substitutions, or unresolved
+   references in any log — the runner flags any combination with such
+   diagnostics in `review-record.txt` rather than hiding it, but still builds
+   the remaining combinations so they can all be reviewed together; and
+6. print and grayscale behaviour, and text extraction and logical reading
+   order, are unchanged from the existing per-class coverage.
+
+The PDFs, logs, and review record are generated evidence under the gitignored
+`build/` directory. They must not be committed.
+
 ### Baselines are load-bearing
 
 A saved baseline (an `l3build` `.tlg`, or the committed extraction reference) is
@@ -397,9 +430,9 @@ Minimum smoke tests include:
 Example extraction command:
 
 ```bash
-mkdir -p build
+make resume
 
-pdftotext examples/industry/resume-english.pdf \
+pdftotext build/examples/resume-english.pdf \
   build/resume-english.txt
 ```
 

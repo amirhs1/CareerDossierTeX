@@ -941,7 +941,9 @@ Avoid layout techniques that visually position content in an order different fro
 Phase 1 acceptance checks should include:
 
 ```bash
-pdftotext examples/industry/resume-english.pdf \
+make resume
+
+pdftotext build/examples/resume-english.pdf \
   build/resume-english.txt
 ```
 
