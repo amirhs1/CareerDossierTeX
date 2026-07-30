@@ -170,9 +170,7 @@ jobs:
       - name: Layout-stress tests
         run: tests/layout/run.sh
       - name: Build the résumé example
-        run: >-
-          latexmk -lualatex -interaction=nonstopmode -halt-on-error
-          examples/industry/resume-english.tex
+        run: make resume
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload résumé PDFs and logs
         if: always()
@@ -186,8 +184,8 @@ jobs:
             tests/layout/*.pdf
             tests/layout/*.log
             tests/layout/*.stdout
-            resume-english.pdf
-            resume-english.log
+            build/examples/resume-english.pdf
+            build/examples/resume-english.log
           if-no-files-found: warn
 
   letter:
@@ -197,9 +195,7 @@ jobs:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build the cover-letter example
-        run: >-
-          latexmk -lualatex -interaction=nonstopmode -halt-on-error
-          examples/industry/letter-industry.tex
+        run: make letter
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload cover-letter PDF and log
         if: always()
@@ -207,8 +203,8 @@ jobs:
         with:
           name: letter-artifacts
           path: |
-            letter-industry.pdf
-            letter-industry.log
+            build/examples/letter-industry.pdf
+            build/examples/letter-industry.log
           if-no-files-found: warn
 
   cv:
@@ -228,11 +224,11 @@ jobs:
         with:
           name: academic-cv-artifacts
           path: |
-            cv-academic.pdf
-            cv-academic.log
-            cv-bibliography.pdf
-            cv-bibliography.log
-            cv-bibliography.blg
+            build/examples/cv-academic.pdf
+            build/examples/cv-academic.log
+            build/examples/cv-bibliography.pdf
+            build/examples/cv-bibliography.log
+            build/examples/cv-bibliography.blg
             tests/bibliography/*.pdf
             tests/bibliography/*.log
             tests/bibliography/*.blg
@@ -246,9 +242,7 @@ jobs:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build the academic letter example
-        run: >-
-          latexmk -lualatex -interaction=nonstopmode -halt-on-error
-          examples/academic/letter-academic.tex
+        run: make academic-letter
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload academic letter PDF and log
         if: always()
@@ -256,8 +250,8 @@ jobs:
         with:
           name: academic-letter-artifacts
           path: |
-            letter-academic.pdf
-            letter-academic.log
+            build/examples/letter-academic.pdf
+            build/examples/letter-academic.log
           if-no-files-found: warn
 
   statement:
@@ -275,16 +269,16 @@ jobs:
         with:
           name: statement-artifacts
           path: |
-            research-statement.pdf
-            research-statement.log
-            teaching-statement.pdf
-            teaching-statement.log
-            teaching-philosophy-statement.pdf
-            teaching-philosophy-statement.log
-            diversity-statement.pdf
-            diversity-statement.log
-            artist-statement.pdf
-            artist-statement.log
-            statement-of-purpose.pdf
-            statement-of-purpose.log
+            build/examples/research-statement.pdf
+            build/examples/research-statement.log
+            build/examples/teaching-statement.pdf
+            build/examples/teaching-statement.log
+            build/examples/teaching-philosophy-statement.pdf
+            build/examples/teaching-philosophy-statement.log
+            build/examples/diversity-statement.pdf
+            build/examples/diversity-statement.log
+            build/examples/artist-statement.pdf
+            build/examples/artist-statement.log
+            build/examples/statement-of-purpose.pdf
+            build/examples/statement-of-purpose.log
           if-no-files-found: warn

@@ -14,10 +14,17 @@
 # absent, and the runner reports which gates did not run — so `make tagging`
 # succeeding locally does not by itself mean every gate was exercised.
 #
+# `resume`, `letter`, `academic-cv`, `academic-bibliography`, `academic-letter`,
+# and `statements` write their PDFs, logs, and other latexmk output under the
+# gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
+# sources, so the source tree never picks up untracked build artifacts.
+#
 # Run `make help` for the target list.
 
-LATEXMK       := latexmk -lualatex -interaction=nonstopmode -halt-on-error
-LATEXMK_CLEAN := latexmk -C
+BUILD_DIR        := build
+EXAMPLES_BUILD_DIR := $(BUILD_DIR)/examples
+LATEXMK       := latexmk -lualatex -interaction=nonstopmode -halt-on-error \
+                 -output-directory=$(EXAMPLES_BUILD_DIR)
 RESUME        := examples/industry/resume-english.tex
 LETTER        := examples/industry/letter-industry.tex
 ACADEMIC_CV   := examples/academic/cv-academic.tex
@@ -34,7 +41,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout review-page-two extract-test bibliography-test tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout review-page-two review-matrix extract-test bibliography-test tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -45,22 +52,25 @@ help: ## List the available targets
 
 examples: resume letter academic-cv academic-bibliography academic-letter statements ## Build every supported example (default)
 
-resume: ## Build the résumé example
+$(EXAMPLES_BUILD_DIR):
+	@mkdir -p $(EXAMPLES_BUILD_DIR)
+
+resume: | $(EXAMPLES_BUILD_DIR) ## Build the résumé example
 	$(LATEXMK) $(RESUME)
 
-letter: ## Build the cover-letter example
+letter: | $(EXAMPLES_BUILD_DIR) ## Build the cover-letter example
 	$(LATEXMK) $(LETTER)
 
-academic-cv: ## Build the academic CV example
+academic-cv: | $(EXAMPLES_BUILD_DIR) ## Build the academic CV example
 	$(LATEXMK) $(ACADEMIC_CV)
 
-academic-bibliography: ## Build the optional BibLaTeX/Biber CV example
+academic-bibliography: | $(EXAMPLES_BUILD_DIR) ## Build the optional BibLaTeX/Biber CV example
 	$(LATEXMK) $(ACADEMIC_BIBLIOGRAPHY)
 
-academic-letter: ## Build the academic letter example
+academic-letter: | $(EXAMPLES_BUILD_DIR) ## Build the academic letter example
 	$(LATEXMK) $(ACADEMIC_LETTER)
 
-statements: ## Build all six statement examples
+statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 	$(LATEXMK) $(STATEMENTS)
 
 check: regression extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
@@ -80,6 +90,9 @@ layout: ## Layout-stress fixtures
 review-page-two: ## Render five-family and all statement page-two reviews
 	tests/layout/render-page-two.sh
 
+review-matrix: ## Render the 10/11/12pt x normal/narrow reference matrix (#147)
+	tests/layout/render-size-margin-matrix.sh
+
 extract-test: ## Text-extraction round-trip against committed baselines
 	tests/extraction/run.sh
 
@@ -90,13 +103,8 @@ tagging: ## Opt-in tagged-PDF structure fixtures
 	tests/tagging/run.sh
 
 clean: ## Remove generated documents, logs, and the l3build sandbox
-	-@$(LATEXMK_CLEAN) $(RESUME) $(LETTER) >/dev/null 2>&1
-	-@$(LATEXMK_CLEAN) $(ACADEMIC_CV) >/dev/null 2>&1
-	-@$(LATEXMK_CLEAN) $(ACADEMIC_BIBLIOGRAPHY) >/dev/null 2>&1
-	-@$(LATEXMK_CLEAN) $(ACADEMIC_LETTER) >/dev/null 2>&1
-	-@$(LATEXMK_CLEAN) $(STATEMENTS) >/dev/null 2>&1
 	-@l3build clean >/dev/null 2>&1
-	@rm -rf build
+	@rm -rf $(BUILD_DIR)
 	@rm -rf tests/tagging/reports
 	@rm -f tests/*/*.aux tests/*/*.log tests/*/*.out tests/*/*.pdf \
 	       tests/*/*.xdv tests/*/*.fls tests/*/*.fdb_latexmk \
