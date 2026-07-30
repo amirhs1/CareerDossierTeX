@@ -236,6 +236,60 @@ EOF
       else
         echo "  spans multiple pages as intended"
       fi
+
+      # Typographic page-break quality (issue #171). Check that no hyphenated
+      # word is split across a page break. pdftotext marks page boundaries with
+      # \f; a hyphen immediately before \f indicates a word split.
+      if command -v pdftotext >/dev/null 2>&1; then
+        typo_fail=0
+
+        # Extract text with page-break markers. Look for a hyphen followed by
+        # form feed (page boundary), which indicates a hyphenated word split
+        # across pages.
+        full_text="$(pdftotext -enc UTF-8 "$base.pdf" -)"
+        if printf '%s' "$full_text" | grep -E '\-[[:space:]]*\f' >/dev/null; then
+          echo "  HYPHENATED WORD SPLIT ACROSS PAGE BREAK"
+          typo_fail=1
+        fi
+
+        if [ "$typo_fail" -eq 0 ]; then
+          echo "  no hyphen-split at page breaks"
+        else
+          fail=1
+        fi
+
+        # Widow and club single-line paragraph remnants (issue #171),
+        # letter/statement only: docs/API.md's page-break policy already
+        # distinguishes the résumé/CV families (structural keep-together
+        # penalties over bulleted entries) from letter/statement (continuous
+        # prose, ordinary \widowpenalty/\clubpenalty). A résumé/CV entry
+        # heading or dateline ends without sentence punctuation exactly like
+        # an unfinished prose line does, so the same text-based check over
+        # entry-structured content misreads normal section breaks as
+        # remnants; scoping to prose keeps the signal meaningful.
+        case "$base" in
+          letter-*|statement-*)
+            widow_fail=0
+            findings="$(pdftotext -bbox "$base.pdf" - \
+              | awk -v furniture="$furniture_label" \
+                  -f "$here/widow-club-check.awk")"
+            if [ -n "$findings" ]; then
+              while IFS=$'\t' read -r kind pg text; do
+                [ -n "$kind" ] || continue
+                echo "  $kind LINE: page $pg: '$text'"
+              done <<<"$findings"
+              widow_fail=1
+            fi
+            if [ "$widow_fail" -eq 0 ]; then
+              echo "  no widow or club line at page breaks"
+            else
+              fail=1
+            fi
+            ;;
+        esac
+      else
+        echo "  (pdftotext absent: skipped typographic page-break check)"
+      fi
       ;;
   esac
 done

@@ -84,6 +84,20 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A résumé, CV, letter, or statement page break could split a hyphenated word
+  across pages or strand a single line of a paragraph alone at the foot of one
+  page or the head of the next, because `\brokenpenalty`, `\clubpenalty`, and
+  `\widowpenalty` were left at LaTeX's defaults (`100`, `150`, and `150`) while
+  the structural keep-together policy above ([#145]) covered only headings and
+  lists. All four classes now call `\CDossierApplyPageBreakPenalties`, which
+  sets these from the named tokens `\CDossierBrokenPenalty`,
+  `\CDossierClubPenalty`, and `\CDossierWidowPenalty` (`careerdossier-tokens.sty`),
+  each defaulting to `10000` — forbidding the break — because every class is
+  `\raggedbottom`, so forbidding it only removes a paragraph's first and last
+  line as break points and cannot overflow a page. No token value, public
+  command, or option is added beyond the three penalty tokens; existing
+  documents may reflow and should have their pagination reviewed. ([#171])
+
 - A bullet whose text fills the line no longer inflates the spacing that follows
   it. The space produced by the newline before `\end{CDossierItemize}` was
   carried onto a line of its own when the final item's last line already filled
@@ -164,6 +178,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#168]: https://github.com/amirhs1/CareerDossierTeX/issues/168
 [#169]: https://github.com/amirhs1/CareerDossierTeX/issues/169
 [#170]: https://github.com/amirhs1/CareerDossierTeX/issues/170
+[#171]: https://github.com/amirhs1/CareerDossierTeX/issues/171
 
 ## [0.5.0] - 2026-07-24
 
