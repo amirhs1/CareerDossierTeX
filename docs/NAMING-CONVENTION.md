@@ -350,7 +350,43 @@ Rules:
 
 ---
 
-## 10. Quick decision guide
+## 10. Phase numbering convention
+
+Phases group releases into stages of the product plan. They are numbered in
+exactly one place:
+
+- The Project `Phase` field is **canonical**. Its options carry a number and a
+  short label:
+
+  ```text
+  Phase 2 — Academic
+  ```
+
+- `docs/ROADMAP.md` **follows** that numbering. Its headings keep their own
+  longer form, keyed to the release version:
+
+  ```text
+  ## Phase 2: `v0.2.0 — Academic Dossier`
+  ```
+
+Rules:
+
+- The two forms differ deliberately. Only the **numbers** must agree; the
+  labels need not.
+- A dropped release **does not retain a phase number**. Its `docs/ROADMAP.md`
+  section stays as a design record but becomes an unnumbered heading, and the
+  Project may reuse the freed slot for the next phase. This is what happened to
+  `v0.3.0 — Farsi and Bilingual Support`.
+- Refer to a dropped phase by name, never by number.
+- When adding, dropping, or reordering a phase, change the Project field first,
+  then update `docs/ROADMAP.md` and its cross-walk table to match.
+- Check `git grep -nE "Phase [0-9]"` after any renumbering: references to
+  `Phase 0`, `Phase 1`, and `Phase 2` appear in several files and are stable,
+  but any higher number outside `docs/ROADMAP.md` needs review.
+
+---
+
+## 11. Quick decision guide
 
 When creating a new item, ask:
 
@@ -375,9 +411,12 @@ When creating a new item, ask:
 7. Is this workflow state?  
    Use the Project `Status` field.
 
+8. Is this a stage of the product plan?  
+   Use the Project `Phase` field, and mirror its number in `docs/ROADMAP.md`.
+
 ---
 
-## 11. Golden rule
+## 12. Golden rule
 
 Keep names boring, predictable, and searchable.
 
