@@ -1247,6 +1247,21 @@ A4 paper, and an opt-in sans body family through documented extension points.
 Color themes, named font combinations, and optional icons were deferred by the
 maintainer on 2026-07-22.
 
+### `v0.6.0`
+
+Add:
+
+```text
+careerdossier-tokens.sty
+```
+
+One calibrated design-token module becomes the single source of truth for the
+type scale, vertical rhythm, rule weight, list metrics, and page geometry
+across all four classes, replacing the mixture of per-class settings and
+inherited `article` defaults. Every type size and structural gap is now a
+ratio of the `fontsize` body size or baseline. The résumé and CV classes drop
+`density=compact|standard`, which the proportional rhythm makes redundant.
+
 ### `v1.0.0`
 
 Stabilize the public API, document deprecation policy, validate an Overleaf-ready package, and test every supported configuration.
