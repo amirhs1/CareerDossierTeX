@@ -439,6 +439,14 @@ Responsibilities:
 - shared letterhead pieces that do not impose full page geometry;
 - PDF document metadata derived from the profile.
 
+The component layer also owns the shared bullet-list page-break and
+trailing-space policy. Closing a list discards the space that ends its final
+item, because readable source places the closing tag on its own line and that
+newline is a space token at the end of the item's paragraph. Left in place, it is
+carried onto a line of its own whenever the item's last line already fills the
+measure — an invisible line that no `\addvspace` can see past, so the next
+structural gap silently grows by a whole line.
+
 The component layer consumes the calibrated type and spacing values from
 `careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
 base-class environments. In particular, the shared identity block owns its
