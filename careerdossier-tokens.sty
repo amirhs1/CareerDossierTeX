@@ -88,6 +88,31 @@
 \int_new:N \CDossierListOrphanPenalty
 \int_set:Nn \CDossierListOrphanPenalty { 9997 }
 
+%% Typographic page-break penalties (issue #171). These control hyphenation
+%% and paragraph-remnant breaks at page boundaries, complementing the
+%% structural keep-together penalties above.
+%%
+%% CDossierBrokenPenalty discourages splitting a hyphenated word across a
+%% page break. A value of 10000 forbids the break entirely.
+%%
+%% CDossierClubPenalty and CDossierWidowPenalty control single-line paragraph
+%% remnants at the foot (club line) or top (widow line) of a page. All four
+%% document families share the same forbidding value (10000) rather than a
+%% lower value for the continuous-prose classes: measurement against the
+%% committed letter fixtures showed a discount penalty (4000) still let a
+%% one-line paragraph remnant through, while 10000 removed it with zero
+%% overfull vboxes across every two-page fixture. This is safe because all
+%% four classes are \raggedbottom, so forbidding club/widow breaks only closes
+%% off the first and last line of a paragraph as break points — interior line
+%% breaks remain available, so a page can still break inside an over-long
+%% paragraph rather than overflow.
+\int_new:N \CDossierBrokenPenalty
+\int_set:Nn \CDossierBrokenPenalty { 10000 }
+\int_new:N \CDossierClubPenalty
+\int_set:Nn \CDossierClubPenalty { 10000 }
+\int_new:N \CDossierWidowPenalty
+\int_set:Nn \CDossierWidowPenalty { 10000 }
+
 \skip_new:N \CDossierHeaderAboveSkip
 \skip_new:N \CDossierHeaderNameGapSkip
 \skip_new:N \CDossierHeaderMetaGapSkip
@@ -270,6 +295,17 @@
         #1 ,
         margin = \CDossierPageMargin
       }
+  }
+
+%% Apply the typographic page-break penalties. Each class calls this after
+%% setting up the document and optionally adjusting the penalty tokens for
+%% the document family (e.g., CDossierClubPenalty and CDossierWidowPenalty
+%% to 4000 for continuous-prose documents).
+\NewDocumentCommand \CDossierApplyPageBreakPenalties { }
+  {
+    \brokenpenalty = \CDossierBrokenPenalty
+    \clubpenalty = \CDossierClubPenalty
+    \widowpenalty = \CDossierWidowPenalty
   }
 
 \endinput

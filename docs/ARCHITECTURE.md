@@ -313,6 +313,30 @@ without revisiting the capacity argument; it is an accepted limitation, not an
 oversight to correct. The measured figures, and the advice on when an author
 should override it, are in `docs/API.md`.
 
+#### Page-break penalties
+
+`careerdossier-tokens.sty` also owns the named typographic page-break
+penalties (issue #171): `\CDossierBrokenPenalty`, `\CDossierClubPenalty`, and
+`\CDossierWidowPenalty`, applied through `\CDossierApplyPageBreakPenalties`.
+These sit alongside the structural keep-together penalties (issue #145,
+`\CDossierHeadingKeepPenalty` and `\CDossierListOrphanPenalty`) that only the
+résumé and CV use; the typographic penalties are shared by all four classes,
+each calling `\CDossierApplyPageBreakPenalties` once in its preamble.
+
+All three default to `10000`, uniformly across families — there is no
+per-family split, despite the structural penalties being résumé/CV-specific.
+An earlier design discounted the club and widow values for the
+continuous-prose classes (letter, statement) on the theory that a page-break
+policy strict enough to survive a lone stranded line should also leave room to
+break inside a paragraph that cannot otherwise fit; measuring against the
+committed letter fixtures showed the discounted value still let a club line
+through, while the full value did not, with no overfull `\vbox` anywhere in
+the two-page corpus. `\raggedbottom` on all four classes is what makes the
+full-strength value safe: forbidding the club/widow break only removes the
+first and last line of a paragraph as legal break points, and every interior
+line break is still available, so an over-long paragraph still paginates
+rather than overflows.
+
 ### `careerdossier-base.sty`
 
 Owns shared state and validation.

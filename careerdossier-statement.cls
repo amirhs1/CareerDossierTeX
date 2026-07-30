@@ -135,6 +135,10 @@
 \setlength { \parskip }          { \CDossierProseParSkip }
 \setlength { \emergencystretch } { 2em }
 
+%% Typographic page-break penalties (issue #171): see careerdossier-tokens for
+%% the shared values and the reasoning for using one strength across families.
+\CDossierApplyPageBreakPenalties
+
 %% ---------------------------------------------------------------------------
 %% Type defaults and displayed contact set.
 %% ---------------------------------------------------------------------------

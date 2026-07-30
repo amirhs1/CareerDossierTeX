@@ -681,8 +681,27 @@ length before it is typeset, each list records that count in the auxiliary
 file — so a résumé or CV needs the same second LaTeX pass it already requires
 for the `Page N of M` folio. On a first clean pass the breaks are provisional.
 
-The letter and statement classes are continuous prose and keep ordinary
-`\widowpenalty` and `\clubpenalty` handling.
+### Typographic page-break penalties
+
+All four classes call `\CDossierApplyPageBreakPenalties` to set `\brokenpenalty`,
+`\clubpenalty`, and `\widowpenalty` from the named tokens `\CDossierBrokenPenalty`,
+`\CDossierClubPenalty`, and `\CDossierWidowPenalty` (`careerdossier-tokens.sty`),
+so a hyphenated word is never split across a page break and no single line of a
+paragraph is stranded alone at the foot of one page (a club line) or the head of
+the next (a widow line).
+
+All three tokens default to `10000` — forbidding the break — across every
+family, not only the résumé and CV covered by the structural policy above.
+Measurement against the committed letter fixtures during development showed a
+discounted value (`4000`) for the continuous-prose classes still let a club
+line through; `10000` removed it, with zero overfull `\vbox`es across every
+two-page fixture. This is safe because all four classes are `\raggedbottom`:
+forbidding a club or widow break only closes off the first and last line of a
+paragraph as a break point, and every interior line break remains available,
+so a page can still break inside an over-long paragraph rather than overflow.
+
+The letter and statement classes otherwise remain continuous prose with no
+further structural page-break policy.
 
 ## Public field accessors
 
