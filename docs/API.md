@@ -606,6 +606,11 @@ rule. Class-controlled spacing places the rule closer to its heading than to
 the content below; no additional paragraph line spacing is inserted around the
 rule.
 
+The rule sits `\CDossierSectionRuleSkip` below the heading's **baseline**, not
+below the bottom of its line box, so its height does not change when the heading
+happens to contain a descender. The token consequently has a lower bound: it
+must exceed the heading's depth, or the rule would cross descender ink.
+
 The gap between the rule and the section's first content is the larger of
 `\CDossierSectionBelowSkip` and whatever leading space the following block
 contributes — never their sum. A section that opens with an entry, a bullet

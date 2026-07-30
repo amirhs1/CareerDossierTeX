@@ -213,7 +213,13 @@
     \__cdossier_tokens_set_skip:Nn \CDossierHeaderMetaGapSkip { 0.22 }
     \__cdossier_tokens_set_skip:Nn \CDossierHeaderBelowSkip { 0.85 }
     \__cdossier_tokens_set_skip:Nn \CDossierSectionAboveSkip { 0.85 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.15 }
+    %% Issue #169: measured from the section heading's baseline, not from the
+    %% bottom of its line box. The value has a hard lower bound -- the heading's
+    %% depth, about 0.20 line at every supported size -- because a smaller
+    %% offset would draw the rule through descender ink. 0.3125 leaves 1.63 pt
+    %% of clearance at 11 pt and sits between the two distances it replaces
+    %% (2.28 pt under a heading without descenders, 4.80 pt under one with).
+    \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.3125 }
     \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.42 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.50 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.12 }

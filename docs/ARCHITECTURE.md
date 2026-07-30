@@ -231,7 +231,7 @@ rescales with `fontsize` without a second tuning pass.
 | `\CDossierHeaderMetaGapSkip` | 0.22 | 2.64 pt | 2.992 pt | 3.19 pt |
 | `\CDossierHeaderBelowSkip` | 0.85 | 10.2 pt | 11.56 pt | 12.325 pt |
 | `\CDossierSectionAboveSkip` | 0.85 | 10.2 pt | 11.56 pt | 12.325 pt |
-| `\CDossierSectionRuleSkip` | 0.15 | 1.8 pt | 2.04 pt | 2.175 pt |
+| `\CDossierSectionRuleSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierSectionBelowSkip` | 0.42 | 5.04 pt | 5.712 pt | 6.09 pt |
 | `\CDossierEntryAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierEntryGapSkip` | 0.12 | 1.44 pt | 1.632 pt | 1.74 pt |
@@ -443,7 +443,10 @@ The component layer consumes the calibrated type and spacing values from
 `careerdossier-tokens.sty`; it does not derive sizes or structural gaps from
 base-class environments. In particular, the shared identity block owns its
 centering and vertical rhythm, the shared section-rule primitive prevents
-paragraph line spacing from inflating its calibrated gaps and emits its
+paragraph line spacing from inflating its calibrated gaps, measures
+`\CDossierSectionRuleSkip` from the heading's baseline rather than from the
+bottom of its line box so the rule's height does not follow the heading's
+glyphs, and emits its
 rule-to-content gap so that LaTeX's collapsing rule applies — the gap is the
 larger of `\CDossierSectionBelowSkip` and the following block's own leading
 space, never their sum, so entry-led, list-led, and prose-led sections share
