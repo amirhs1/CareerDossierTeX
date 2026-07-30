@@ -137,6 +137,8 @@ cases=(
   "statement-purpose-valid pass"
   "statement-default-valid pass"
   "statement-interest-valid pass"
+  "statement-section-gap pass"
+  "statement-section-style pass"
   "statement-name-10pt pass"
   "statement-name-11pt pass"
   "statement-name-12pt pass"

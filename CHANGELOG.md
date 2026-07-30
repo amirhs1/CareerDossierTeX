@@ -18,6 +18,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   without reloading the package. Optional fields and separator behavior are
   unchanged. ([#138])
 
+- Added `\CDossierSection` and `\CDossierSubsection` to the statement class,
+  giving a statement the same heading command name the résumé and CV already
+  use, so documents built from one profile are written the same way. Each is a
+  wrapper over the standard LaTeX unnumbered heading it replaces — `\section*`
+  and `\subsection*` — which both remain supported and render identically.
+  Existing statements need no source edit. ([#177])
+
 ### Changed
 
 - The shared baseline-derived spacing tokens now use a compact
@@ -90,6 +97,29 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   changed. ([#145])
 
 ### Fixed
+
+- Statement section headings now belong to the calibrated design system. They
+  were `article`'s: `\Large` — 17.28 pt at the class's 12 pt default, outside
+  the documented type scale, where a section heading is 13 pt — set in whichever
+  family `bodyfont` selected, so a serif statement had serif headings while
+  every other class used the sans heading role, and spaced by `article`'s own
+  display skips, which left 26.15 pt above a heading and 19.67 pt below it: near
+  enough to equal that the heading read as floating between two paragraphs
+  rather than labelling the one under it. Headings now use the shared sans
+  heading role, the `\CDossierSizeSection` and `\CDossierSizeBody` steps, and
+  four new prose heading tokens — `\CDossierProseSectionAboveSkip` (1.50 line),
+  `\CDossierProseSectionBelowSkip` (0.75), and the subsection pair (1.00 and
+  0.625) — giving 21.75 pt and 10.875 pt at the same body size. Each token is
+  the complete gap, including the paragraph spacing either side of a heading
+  contributes, which the ruled section tokens could not express in a class whose
+  paragraphs are themselves separated. A statement heading carries no decorative
+  rule: that rule is entry-structured section furniture. The heading is restyled
+  through LaTeX's own sectioning machinery rather than replaced by a new one, so
+  a tagged statement keeps the section division and heading title the kernel
+  produces. Numbered sectioning and levels below `\subsection` are untouched and
+  remain outside the calibrated design. No public command, class option, key, or
+  field changes; existing statements may reflow and should have their pagination
+  reviewed. ([#177])
 
 - A résumé, CV, letter, or statement page break could split a hyphenated word
   across pages or strand a single line of a paragraph alone at the foot of one
@@ -201,6 +231,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#170]: https://github.com/amirhs1/CareerDossierTeX/issues/170
 [#171]: https://github.com/amirhs1/CareerDossierTeX/issues/171
 [#176]: https://github.com/amirhs1/CareerDossierTeX/issues/176
+[#177]: https://github.com/amirhs1/CareerDossierTeX/issues/177
 
 ## [0.5.0] - 2026-07-24
 

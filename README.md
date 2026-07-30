@@ -285,7 +285,7 @@ explicit type when its title and validation contract fit the document:
 
 \begin{document}
 \MakeCDossierStatementHeader
-\section*{Research Vision}
+\CDossierSection{Research Vision}
 My research develops reliable methods for computational inquiry.
 \end{document}
 ```

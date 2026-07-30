@@ -16,7 +16,12 @@
 \begin{document}
 \MakeCDossierStatementHeader
 
-\section*{Research Vision}
+% Both heading spellings appear here on purpose: \CDossierSection is the class's
+% own interface and \section* is the standard LaTeX one it wraps. Issue #177
+% kept the kernel's sectioning machinery precisely so that a statement heading
+% still opens a section division carrying its own title, so both spellings must
+% reach that same structure.
+\CDossierSection{Research Vision}
 
 The first statement paragraph contains a meaningful
 \href{https://example.test/statement-link}{statement link}.

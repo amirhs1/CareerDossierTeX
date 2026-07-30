@@ -140,6 +140,75 @@
 \CDossierApplyPageBreakPenalties
 
 %% ---------------------------------------------------------------------------
+%% Section headings (issue #177).
+%%
+%% A statement is continuous prose, so its headings are not the résumé's ruled
+%% section furniture: no decorative rule, and a smaller, quieter break in the
+%% text. What they are is `article''s heading defaults -- \Large (17.28 pt at a
+%% 12 pt base), the body typeface, and `article''s own display skips -- none of
+%% which belong to the calibrated design.
+%%
+%% The heading is therefore restyled rather than replaced. `\@startsection' is
+%% kept because the kernel's tagging support hooks into it: with tagging
+%% active, `\section*' opens a `Sect' division that encloses the heading *and*
+%% the content it introduces, and records the heading text as that element's
+%% title. A hand-rolled heading built on the shared display primitive emits a
+%% bare heading element with neither, so replacing the mechanism to gain the
+%% tokens would have paid for them in structure. Only the four arguments that
+%% carry visual design change here; the sectioning mechanism does not.
+%%
+%% Size and typeface come from the shared semantic role and type scale, so a
+%% statement heading is the same size as a résumé or CV section heading, and
+%% the sans heading face is used in both body-font modes. A subsection is set
+%% in the same role one step down the scale, at body size: the level is carried
+%% by size and spacing, not by a second heading typeface.
+%%
+%% Both skips are stated as the *complete* gap a reader sees, which costs an
+%% explicit subtraction. A heading is a paragraph, and so is the text under it,
+%% so TeX contributes `\parskip' on each side beyond whatever the skip asks
+%% for -- and in this class `\parskip' is a visible 0.50 line. Passing the raw
+%% token would render every gap half a line wider than the token says, which is
+%% precisely the failure #168 removed from the section rule. Subtracting
+%% `\parskip' here keeps the token's stated value and the rendered gap the same
+%% number, and the smoke fixture asserts that.
+%%
+%% The subtraction has a hard lower bound: `\@xsect' treats a non-positive
+%% after-skip as a request for a *run-in* heading, so a below-token that fell
+%% to `\parskip' would silently turn every statement heading into a run-in one.
+%% The tokens are set well clear of that, and the fixture asserts the bound
+%% rather than clamping it here, so an unusable retune fails loudly.
+%% ---------------------------------------------------------------------------
+\ExplSyntaxOff
+\makeatletter
+\renewcommand \section
+  {
+    \@startsection {section} {1} {\z@}
+      {-\dimexpr \CDossierProseSectionAboveSkip - \parskip \relax}
+      {\dimexpr \CDossierProseSectionBelowSkip - \parskip \relax}
+      {\CDossierSectionStyle \CDossierSizeSection}
+  }
+\renewcommand \subsection
+  {
+    \@startsection {subsection} {2} {\z@}
+      {-\dimexpr \CDossierProseSubsectionAboveSkip - \parskip \relax}
+      {\dimexpr \CDossierProseSubsectionBelowSkip - \parskip \relax}
+      {\CDossierSectionStyle \CDossierSizeBody}
+  }
+\makeatother
+\ExplSyntaxOn
+
+%% \CDossierSection {title} and \CDossierSubsection {title} -- the class's own
+%% names for the two calibrated heading levels, matching the résumé and CV
+%% interface so one profile's documents are written the same way. Each is a
+%% thin wrapper over the restyled unnumbered heading above rather than a second
+%% implementation: a statement numbers nothing, and one renderer means the
+%% tokens and the tagged structure cannot drift between the two spellings.
+\NewDocumentCommand \CDossierSection { m }
+  { \section* {#1} }
+\NewDocumentCommand \CDossierSubsection { m }
+  { \subsection* {#1} }
+
+%% ---------------------------------------------------------------------------
 %% Type defaults and displayed contact set.
 %% ---------------------------------------------------------------------------
 \tl_new:N \l__cdossier_statement_default_title_tl

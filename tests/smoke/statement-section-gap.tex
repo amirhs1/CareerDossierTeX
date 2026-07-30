@@ -1,0 +1,167 @@
+% statement-section-gap.tex — the prose heading tokens own their whole gap.
+%
+% Issue #177. A statement heading sits between two paragraphs, and a paragraph
+% contributes `\parskip' when it starts in vertical mode. Both the heading and
+% the text under it are paragraphs, so a heading skip passed through unadjusted
+% would render half a line wider than the token that named it — on both sides.
+%
+% The tokens are documented as the complete gap, so this fixture measures the
+% complete gap: every explicit skip between the heading's line box and its
+% neighbours, which is the `\parskip' glue plus whatever the sectioning command
+% asked for. TeX's interline glue is excluded because it is not a structural
+% gap: two consecutive body lines receive it too.
+%
+% The fixture also pins three properties the heading design depends on:
+%
+%   * `\CDossierSection' and `\section*' must measure identically — one is a
+%     wrapper over the other, and nothing may drift between the spellings;
+%   * a statement heading carries no decorative rule, unlike the résumé and CV
+%     section heading it shares its type role with; and
+%   * each below-token must stay strictly greater than `\parskip'. `\@xsect'
+%     reads a non-positive after-skip as a request for a run-in heading, so a
+%     retune that let one reach `\parskip' would silently turn every statement
+%     heading into a run-in one instead of failing.
+\documentclass{careerdossier-statement}
+\CDossierSetup{name = {Ada Lovelace}, email = {ada@example.test}}
+
+\newbox\CDossierGapSectionBox
+\newbox\CDossierGapStarBox
+\newbox\CDossierGapSubsectionBox
+
+\begin{document}
+
+\setbox\CDossierGapSectionBox=\vbox{%
+  \hsize=20em
+  \linewidth=\hsize
+  \noindent Preceding prose line.\par
+  \CDossierSection{Research Vision}
+  \noindent Following prose line.\par
+}
+
+\setbox\CDossierGapStarBox=\vbox{%
+  \hsize=20em
+  \linewidth=\hsize
+  \noindent Preceding prose line.\par
+  \section*{Research Vision}
+  \noindent Following prose line.\par
+}
+
+\setbox\CDossierGapSubsectionBox=\vbox{%
+  \hsize=20em
+  \linewidth=\hsize
+  \noindent Preceding prose line.\par
+  \CDossierSubsection{A Narrower Theme}
+  \noindent Following prose line.\par
+}
+
+\directlua{
+  local subtypes = node.subtypes("glue")
+  local sectionabove = \number\dimexpr\CDossierProseSectionAboveSkip\relax
+  local sectionbelow = \number\dimexpr\CDossierProseSectionBelowSkip\relax
+  local subsectionabove = \number\dimexpr\CDossierProseSubsectionAboveSkip\relax
+  local subsectionbelow = \number\dimexpr\CDossierProseSubsectionBelowSkip\relax
+  local parskip = \number\dimexpr\parskip\relax
+
+  local function pt(sp)
+    return tostring(math.floor(sp / 65536 * 1000 + 0.5) / 1000) .. "pt"
+  end
+
+  % Sum the explicit vertical space in each segment between line boxes, and
+  % report whether a rule node was seen anywhere in the list. Interline glue is
+  % skipped: it is TeX's line spacing, not a structural gap. Comments here must
+  % use TeX's comment character, not Lua's: this argument is tokenised by TeX
+  % first, which folds every newline into a space, so a Lua comment would
+  % swallow the remainder of the program. The segment count is tracked in a
+  % variable because Lua's length operator is a TeX parameter character.
+  local function segments(boxnumber)
+    local sums = {0}
+    local last = 1
+    local rule = false
+    for item in node.traverse(tex.box[boxnumber].list) do
+      local kind = node.type(item.id)
+      if kind == "hlist" or kind == "vlist" then
+        last = last + 1
+        sums[last] = 0
+      elseif kind == "rule" then
+        rule = true
+      elseif kind == "glue" then
+        if subtypes[item.subtype] ~= "baselineskip" then
+          sums[last] = sums[last] + item.width
+        end
+      elseif kind == "kern" then
+        sums[last] = sums[last] + item.kern
+      end
+    end
+    return sums, last, rule
+  end
+
+  local function check(label, boxnumber, above, below)
+    local sums, boxes, rule = segments(boxnumber)
+    if boxes < 4 then
+      tex.error("The " .. label .. " fixture did not produce three line boxes")
+      return
+    end
+    if rule then
+      tex.error(
+        "A statement " .. label .. " heading emitted a rule",
+        {
+          "Statement headings are prose headings and carry no decorative",
+          "rule; the ruled heading belongs to the resume and CV classes."
+        }
+      )
+    end
+    local function compare(edge, measured, expected)
+      if math.abs(measured - expected) > 655 then
+        tex.error(
+          "The " .. label .. " heading gap " .. edge .. " is not owned by its token",
+          {
+            "The token asks for " .. pt(expected) .. ", including the " .. pt(parskip),
+            "an adjacent paragraph contributes; measured " .. pt(measured) .. "."
+          }
+        )
+      end
+    end
+    compare("above", sums[2], above)
+    compare("below", sums[3], below)
+    return sums
+  end
+
+  local section = check("section", \number\CDossierGapSectionBox, sectionabove, sectionbelow)
+  local star = check("section*", \number\CDossierGapStarBox, sectionabove, sectionbelow)
+  check("subsection", \number\CDossierGapSubsectionBox, subsectionabove, subsectionbelow)
+
+  if section and star
+      and (section[2] ~= star[2] or section[3] ~= star[3]) then
+    tex.error(
+      "CDossierSection and section* do not render the same gaps",
+      {
+        "CDossierSection measured " .. pt(section[2]) .. " above and " ..
+          pt(section[3]) .. " below;",
+        "section* measured " .. pt(star[2]) .. " above and " ..
+          pt(star[3]) .. " below."
+      }
+    )
+  end
+
+  for _, entry in ipairs({
+    {"CDossierProseSectionBelowSkip", sectionbelow},
+    {"CDossierProseSubsectionBelowSkip", subsectionbelow},
+  }) do
+    if entry[2] <= parskip then
+      tex.error(
+        entry[1] .. " is not greater than the paragraph skip",
+        {
+          "It is " .. pt(entry[2]) .. " and parskip is " .. pt(parskip) .. ", so the",
+          "after-skip reaching LaTeX's @xsect would be zero or negative and",
+          "every statement heading would silently become a run-in heading."
+        }
+      )
+    end
+  end
+}
+
+\box\CDossierGapSectionBox
+\box\CDossierGapStarBox
+\box\CDossierGapSubsectionBox
+
+\end{document}
