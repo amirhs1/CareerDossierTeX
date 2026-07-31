@@ -53,7 +53,7 @@ version, the Project uses a short label — so they cross-walk as follows:
 | `Phase 3: v0.4.0` | `Phase 3 — Engine and Accessibility` |
 | `Phase 4: v0.5.0` | `Phase 4 — Expansion` |
 | `Phase 5: v0.6.0` | `Phase 5 — Calibration` |
-| `Phase 6: v0.6.1` | `Phase 6 — Furniture and Output Medium` |
+| `Phase 6: v0.6.1` | `Phase 6 — Spacing Ownership and Output Medium` |
 | `Phase 7: v1.0.0` | `Phase 7 — Stable API` |
 
 ## Phase 0: inventory and baseline
