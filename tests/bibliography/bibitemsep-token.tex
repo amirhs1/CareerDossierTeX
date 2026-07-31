@@ -1,0 +1,21 @@
+% bibitemsep-token.tex — careerdossier-biblatex must inherit the CV's
+% calibrated list-item token (issue #196) rather than carry a fixed value, so a
+% bibliography's inter-entry gap tracks the CV's own lists at every fontsize.
+% The fixture fails the build itself, so the runner only checks the exit status.
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\CDossierSetup{name = {Ada Lovelace}}
+\ExplSyntaxOn
+\msg_new:nnn { cdossier-test } { unshared-bibitemsep }
+  {
+    careerdossier-biblatex~sets~bibitemsep~to~\skip_use:N \bibitemsep ,~but~
+    the~shared~list~token~CDossierItemSepSkip~is~
+    \skip_use:N \CDossierItemSepSkip .
+  }
+\ExplSyntaxOff
+\begin{document}
+\ExplSyntaxOn
+\skip_if_eq:nnF { \bibitemsep } { \CDossierItemSepSkip }
+  { \msg_error:nn { cdossier-test } { unshared-bibitemsep } }
+\ExplSyntaxOff
+\end{document}

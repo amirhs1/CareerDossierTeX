@@ -47,9 +47,13 @@
   ]
   { biblatex }
 
-%% The fixed v0.2 profile keeps numbering visually compact and preserves the
-%% prototype's readable separation without changing ordinary document lists.
-\setlength { \bibitemsep } { 6pt }
+%% Track the CV's calibrated list-item gap so the bibliography's inter-entry
+%% spacing matches the CV's other lists at the same fontsize. Fall back to the
+%% v0.2 fixed value when no CareerDossierTeX token system is loaded (for
+%% example, careerdossier-biblatex used with a non-CareerDossierTeX class).
+\cs_if_exist:NTF \CDossierItemSepSkip
+  { \setlength { \bibitemsep } { \CDossierItemSepSkip } }
+  { \setlength { \bibitemsep } { 6pt } }
 \DeclareFieldFormat { labelnumberwidth } { \mkbibbold {#1) } }
 
 %% Show only the strongest public identifier: DOI, then e-print, then URL.
