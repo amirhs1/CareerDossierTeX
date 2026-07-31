@@ -281,6 +281,13 @@ Furniture uses the sans-serif furniture step of the calibrated type scale and
 the monochrome text token. It remains print-safe and is marked as a layout
 artifact when tagged PDF is active. Page furniture is not user-configurable.
 
+The header and the folio sit in the vertical centre of the top and bottom
+margins respectively, at every `fontsize` × `margin` combination and on both
+paper sizes. Their distance from the paper edge therefore follows the selected
+`margin` preset: about 30.6 pt at `margin=normal` and 12.6 pt at
+`margin=narrow` at the default 11 pt. This affects only where the furniture
+sits inside the margin; the text block is unchanged.
+
 Single-page suppression and the `of M` total use the LaTeX kernel's last
 absolute page recorded in the auxiliary file. A first build from a clean tree
 therefore shows a provisional folio; the next run suppresses it when the

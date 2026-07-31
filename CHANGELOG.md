@@ -8,6 +8,27 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Fixed
+
+- The running header and the `Page N of M` folio now sit in the vertical centre
+  of the top and bottom margins at every `fontsize` and `margin` combination and
+  on both paper sizes. They were positioned by `geometry`'s untouched defaults —
+  a 12 pt head box 25 pt above the text and a 30 pt foot skip, identical at all
+  six combinations — rather than by the selected preset. At `margin=narrow` that
+  left the header effectively touching the top edge of the paper and the folio
+  about 6 pt (0.09 in) from the bottom edge, inside the unprintable region of
+  most printers. Their placement is now derived from the resolved margin and the
+  furniture step of the type scale, like every other dimension in the design
+  system.
+
+  This moves only the furniture within the existing margins. `\textheight` and
+  `\textwidth` are byte-identical to `v0.6.0` at every combination, so the body
+  text does not move and pagination is unchanged; no class, option, key, or
+  command changed. Documents that print the folio close to the trim edge will
+  show it further inside the page. ([#183])
+
+[#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
+
 ## [0.6.0] - 2026-07-30
 
 ### Added

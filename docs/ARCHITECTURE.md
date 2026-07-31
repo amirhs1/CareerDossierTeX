@@ -316,9 +316,70 @@ statement heading would quietly become run-in.
 |---|---|---:|---:|---:|
 | `\CDossierRuleThickness` | 0.04 × body size | 0.4 pt | 0.44 pt | 0.48 pt |
 | `\CDossierListLabelSep` | 0.50 × body size | 5.0 pt | 5.5 pt | 6.0 pt |
+| `\CDossierFurnitureLeading` | leading of `\CDossierSizeFurniture` | 10 pt | 11 pt | 12 pt |
 
 `\CDossierPageMargin` is 72.27 pt (1 in) for `margin=normal` and 36.135 pt
 (0.5 in) for `margin=narrow`, independent of `fontsize`.
+
+#### Page-furniture placement
+
+The running header and the folio are the only components positioned by the page
+geometry rather than by the vertical rhythm, so `careerdossier-tokens` derives
+their placement inside `\CDossierApplyGeometry:n` from the resolved margin `M`
+and the furniture line height `H` (`\CDossierFurnitureLeading`):
+
+| `geometry` key | Derivation |
+|---|---|
+| `headheight` | `H` |
+| `headsep` | `M / 2 − 0.2 × H` |
+| `footskip` | `M / 2 + 0.2 × H` |
+
+Both `headsep` and `footskip` resolve to a *baseline*, not to a box edge, so
+both have to split the line box the way the kernel's own strut does: 0.7
+height, 0.3 depth. Centring a furniture line of height `H` in a margin `M`
+therefore puts its baseline `(M − H) / 2 + 0.7 H = M / 2 + 0.2 H` from the
+outer edge of that margin.
+
+`footskip` is measured from the text block's bottom — the margin's inner edge —
+so it takes that value directly. `headsep` is measured from the head box to the
+text block, so it is the mirror, `M / 2 − 0.2 H`. That the header's measurement
+also lands on a baseline is not obvious: the kernel builds the head as
+`\vbox to \headheight {\vfil <head>}` and then forces the box depth to zero
+(`\@outputpage` in `latex.ltx`), which pins the head *baseline* to the bottom
+edge of the `headheight` box. Deriving `headsep` from that box edge instead —
+`(M − H) / 2`, centring the head *box* rather than the line inside it — renders
+2.05 pt low at `11pt` and 2.77 pt low at `10pt`, measured against the ink of the
+rendered page, and breaks the mirror symmetry with the folio.
+
+Placement is deliberately derived from the nominal line box rather than from
+the ink of the particular string, so where the furniture sits does not depend on
+whether a name happens to contain a descender. The residual, measured at 300 dpi
+against the rendered ink, is under 1.5 pt: a running head with no descender
+(`Ada Lovelace – Résumé`) reads about 1.1 pt high at `11pt`, while one with a
+descender lands within 0.2 pt. The distance from the paper edge to the first ink
+is identical top and bottom in every combination.
+
+Because neither `includehead` nor `includefoot` is set, the head and foot live
+inside the margin and `\textheight`/`\textwidth` do not depend on these three
+values: the resulting text block is identical to v0.6.0 at every
+`fontsize` × `margin` × paper combination.
+
+All four gaps around the two nominal line boxes are equal at a given
+combination — the header and the folio are exact mirrors of each other:
+
+| `11pt` | `normal` (72.27 pt) | `narrow` (36.135 pt) |
+|---|---:|---:|
+| paper edge to head box | 30.635 pt | 12.5675 pt |
+| head box to text block | 30.635 pt | 12.5675 pt |
+| text block to foot box | 30.635 pt | 12.5675 pt |
+| foot box to paper edge | 30.635 pt | 12.5675 pt |
+
+Before issue #183 all three keys kept `geometry`'s defaults — 12 pt, 25 pt and
+30 pt at every combination — which left the header 1 pt above the paper edge and
+the folio about 6 pt from it at `margin=narrow`, inside most printers'
+unprintable region. The placement is pinned by
+`tests/regression/tokens-furniture-geometry.tlg`, which also asserts the text
+block did not move.
 
 Every number in the three tables above is pinned by
 `tests/regression/tokens-scale.tlg`. That baseline is the assertion: regenerate
