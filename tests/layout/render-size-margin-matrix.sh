@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-# render-size-margin-matrix.sh — build the {10pt,11pt,12pt} x {normal,narrow}
+# render-size-margin-matrix.sh — build the {normal,narrow} x {10pt,11pt,12pt}
 # reference matrix across all four document classes (issue #147).
+#
+# Each PDF is named <type>-<margin>-<fontsize>.pdf, and the margin is the outer
+# loop, so both the build order and a directory listing group every size of one
+# margin preset together — the order a reviewer compares them in (issue #195).
 #
 # Each document class is represented by its existing canonical two-page
 # fixture — résumé, CV, industry letter, research statement — so the matrix
@@ -83,9 +87,9 @@ render_class_matrix() {
   local class="$1" extra_options="$2" template="$3" prefix="$4"
   local size margin job options newline
 
-  for size in "${sizes[@]}"; do
-    for margin in "${margins[@]}"; do
-      job="${prefix}-${size}-${margin}"
+  for margin in "${margins[@]}"; do
+    for size in "${sizes[@]}"; do
+      job="${prefix}-${margin}-${size}"
       options="fontsize=${size}, margin=${margin}"
       [ -n "$extra_options" ] && options="${extra_options}, ${options}"
       # ENVIRON, not -v, carries the replacement: awk's -v assignment runs
@@ -126,7 +130,8 @@ fi
   echo "# CareerDossierTeX size/margin reference-matrix record (issue #147)"
   echo "generated-utc: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "commit: $(git -C "$root" rev-parse HEAD 2>/dev/null || echo unavailable)"
-  echo "combinations: 3 sizes x 2 margins x 4 document types = 24"
+  echo "combinations: 2 margins x 3 sizes x 4 document types = 24"
+  echo "file naming: <type>-<margin>-<fontsize>.pdf"
   echo "document types:"
   echo "  résumé   - resume-two-page.tex"
   echo "  CV       - cv-two-page.tex"

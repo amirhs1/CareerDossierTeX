@@ -90,7 +90,7 @@ layout: ## Layout-stress fixtures
 review-page-two: ## Render five-family and all statement page-two reviews
 	tests/layout/render-page-two.sh
 
-review-matrix: ## Render the 10/11/12pt x normal/narrow reference matrix (#147)
+review-matrix: ## Render the normal/narrow x 10/11/12pt reference matrix (#147)
 	tests/layout/render-size-margin-matrix.sh
 
 extract-test: ## Text-extraction round-trip against committed baselines
