@@ -8,6 +8,14 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Changed
+
+- The smoke and layout-stress suites now run as their own CI jobs instead of
+  running in sequence inside the `resume` job, so they start in parallel with
+  the rest of the workflow. Coverage and the commands themselves are unchanged;
+  their CI artifacts moved out of `resume-artifacts` into the new
+  `smoke-artifacts` and `layout-artifacts`. ([#188])
+
 ### Fixed
 
 - The running header and the `Page N of M` folio now sit in the vertical centre
@@ -28,6 +36,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   show it further inside the page. ([#183])
 
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
+[#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
 
 ## [0.6.0] - 2026-07-30
 

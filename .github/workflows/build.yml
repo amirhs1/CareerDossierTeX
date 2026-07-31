@@ -157,33 +157,74 @@ jobs:
           path: tests/tagging/reports/
           if-no-files-found: warn
 
+  # `smoke` and `layout` are their own jobs, matching `extraction` and
+  # `tagging`, because each is a whole suite of double-pass LuaLaTeX compiles
+  # rather than one example build. Running them here instead of inside `resume`
+  # lets them start in parallel with every other job; the `resume` job below is
+  # once again only as slow as the example it builds.
+  smoke:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # No poppler here: tests/smoke/run.sh only compiles and greps the engine
+      # rejection messages. It does need xelatex and pdflatex, which the image
+      # already provides, to prove the unsupported engines fail as required.
+      - name: Smoke tests (supported builds and required failures)
+        run: tests/smoke/run.sh
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload smoke PDFs and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: smoke-artifacts
+          path: |
+            tests/smoke/*.pdf
+            tests/smoke/*.log
+            tests/smoke/*.stdout
+          if-no-files-found: warn
+
+  layout:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # tests/layout/run.sh skips its folio, contact-line, and page-break checks
+      # with a notice when poppler is absent, so pdftotext and pdfinfo must be
+      # installed for this job to assert anything.
+      - name: Install poppler-utils
+        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
+      - name: Layout-stress tests
+        run: tests/layout/run.sh
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload layout PDFs and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: layout-artifacts
+          path: |
+            tests/layout/*.pdf
+            tests/layout/*.log
+            tests/layout/*.stdout
+          if-no-files-found: warn
+
   resume:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      - name: Install poppler-utils
-        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
-      - name: Smoke tests (supported builds and required failures)
-        run: tests/smoke/run.sh
-      - name: Layout-stress tests
-        run: tests/layout/run.sh
       - name: Build the résumé example
         run: make resume
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
-      - name: Upload résumé PDFs and logs
+      - name: Upload résumé PDF and log
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: resume-artifacts
           path: |
-            tests/smoke/*.pdf
-            tests/smoke/*.log
-            tests/smoke/*.stdout
-            tests/layout/*.pdf
-            tests/layout/*.log
-            tests/layout/*.stdout
             build/examples/resume-english.pdf
             build/examples/resume-english.log
           if-no-files-found: warn
