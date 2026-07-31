@@ -1,0 +1,129 @@
+% tokens-furniture-geometry.lvt — page-furniture placement (issue #183).
+%
+% Pins the three furniture dimensions \CDossierApplyGeometry:n derives from the
+% resolved margin at every fontsize x margin x paper combination, and asserts
+% that deriving them leaves the text block exactly where v0.6.0 put it.
+%
+% Every probe runs in the preamble: geometry's \geometry is a preamble-only
+% command, so the values are recorded there and only replayed in the body.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-tokens}
+
+\ExplSyntaxOn
+\tl_new:N \l__cdossiertest_log_tl
+
+\cs_new_protected:Npn \cdossiertest_record:nnn #1#2#3
+  {
+    \keys_set:nn { cdossier / tokens } { fontsize = #1 , margin = #2 }
+    \__cdossier_tokens_resolve:
+    \CDossierApplyGeometry:n {#3}
+    %% The four gaps the acceptance criterion is stated in. Both \headsep and
+    %% \footskip resolve to a baseline, so each nominal line box is bounded by
+    %% baseline - 0.7 H above and baseline + 0.3 H below. Centred means the two
+    %% gaps in each pair are equal; mirror-symmetric means above-head equals
+    %% below-foot and below-head equals above-foot.
+    \tl_put_right:Nx \l__cdossiertest_log_tl
+      {
+        \exp_not:N \TYPE
+          {
+            #1 ~ #2 ~ #3 :
+            headheight = \dim_use:N \headheight ;~
+            headsep = \dim_use:N \headsep ;~
+            footskip = \dim_use:N \footskip
+          }
+        \exp_not:N \TYPE
+          {
+            #1 ~ #2 ~ #3 :
+            above-head =
+              \dim_eval:n
+                {
+                  \fp_to_dim:n
+                    {
+                      \dim_to_fp:n { \CDossierPageMargin }
+                      - \dim_to_fp:n { \headsep }
+                      - 0.7 * \dim_to_fp:n { \CDossierFurnitureLeading }
+                    }
+                } ;~
+            below-head =
+              \dim_eval:n
+                {
+                  \fp_to_dim:n
+                    {
+                      \dim_to_fp:n { \headsep }
+                      - 0.3 * \dim_to_fp:n { \CDossierFurnitureLeading }
+                    }
+                } ;~
+            above-foot =
+              \dim_eval:n
+                {
+                  \fp_to_dim:n
+                    {
+                      \dim_to_fp:n { \footskip }
+                      - 0.7 * \dim_to_fp:n { \CDossierFurnitureLeading }
+                    }
+                } ;~
+            below-foot =
+              \dim_eval:n
+                {
+                  \fp_to_dim:n
+                    {
+                      \dim_to_fp:n { \CDossierPageMargin }
+                      - \dim_to_fp:n { \footskip }
+                      - 0.3 * \dim_to_fp:n { \CDossierFurnitureLeading }
+                    }
+                }
+          }
+        \exp_not:N \TYPE
+          {
+            #1 ~ #2 ~ #3 :
+            textheight = \dim_use:N \textheight ;~
+            textwidth = \dim_use:N \textwidth ;~
+            %% The text block's top edge: 1in + \topmargin + \headheight +
+            %% \headsep. It must stay equal to \CDossierPageMargin.
+            text-top =
+              \dim_eval:n { 1in + \topmargin + \headheight + \headsep }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \cdossiertest_matrix:n #1
+  {
+    \clist_map_inline:nn { 10pt , 11pt , 12pt }
+      {
+        \clist_map_inline:nn { normal , narrow }
+          { \cdossiertest_record:nnn { ##1 } { ####1 } {#1} }
+      }
+  }
+
+\cdossiertest_matrix:n { letterpaper }
+\cdossiertest_matrix:n { a4paper }
+
+\NewDocumentCommand \cdossiertestReplay { }
+  { \tl_use:N \l__cdossiertest_log_tl }
+\NewDocumentCommand \cdossiertestFurnitureLeading { m }
+  {
+    \keys_set:nn { cdossier / tokens } { fontsize = #1 }
+    \__cdossier_tokens_resolve:
+    \TYPE
+      {
+        fontsize = #1 ;~
+        furniture-leading = \dim_use:N \CDossierFurnitureLeading
+      }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{furniture-leading-token}{
+  \cdossiertestFurnitureLeading{10pt}
+  \cdossiertestFurnitureLeading{11pt}
+  \cdossiertestFurnitureLeading{12pt}
+}
+
+\TEST{furniture-centred-in-margins}{
+  \cdossiertestReplay
+}
+
+\END

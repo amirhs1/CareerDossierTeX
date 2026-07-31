@@ -1,0 +1,49 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: furniture-leading-token
+============================================================
+fontsize=10pt; furniture-leading=10.0pt
+fontsize=11pt; furniture-leading=11.0pt
+fontsize=12pt; furniture-leading=12.0pt
+============================================================
+============================================================
+TEST 2: furniture-centred-in-margins
+============================================================
+10pt normal letterpaper:headheight=10.0pt; headsep=34.135pt; footskip=38.135pt
+10pt normal letterpaper:above-head=31.135pt; below-head=31.135pt; above-foot=31.135pt; below-foot=31.135pt
+10pt normal letterpaper:textheight=650.43001pt; textwidth=469.75502pt; text-top=72.26999pt
+10pt narrow letterpaper:headheight=10.0pt; headsep=16.0675pt; footskip=20.0675pt
+10pt narrow letterpaper:above-head=13.06749pt; below-head=13.0675pt; above-foot=13.0675pt; below-foot=13.06749pt
+10pt narrow letterpaper:textheight=722.7pt; textwidth=542.02501pt; text-top=36.135pt
+11pt normal letterpaper:headheight=11.0pt; headsep=33.935pt; footskip=38.33499pt
+11pt normal letterpaper:above-head=30.635pt; below-head=30.635pt; above-foot=30.635pt; below-foot=30.635pt
+11pt normal letterpaper:textheight=650.43001pt; textwidth=469.75502pt; text-top=72.26999pt
+11pt narrow letterpaper:headheight=11.0pt; headsep=15.8675pt; footskip=20.2675pt
+11pt narrow letterpaper:above-head=12.5675pt; below-head=12.56749pt; above-foot=12.5675pt; below-foot=12.56749pt
+11pt narrow letterpaper:textheight=722.7pt; textwidth=542.02501pt; text-top=36.135pt
+12pt normal letterpaper:headheight=12.0pt; headsep=33.735pt; footskip=38.53499pt
+12pt normal letterpaper:above-head=30.135pt; below-head=30.135pt; above-foot=30.135pt; below-foot=30.135pt
+12pt normal letterpaper:textheight=650.43001pt; textwidth=469.75502pt; text-top=72.26999pt
+12pt narrow letterpaper:headheight=12.0pt; headsep=15.6675pt; footskip=20.4675pt
+12pt narrow letterpaper:above-head=12.0675pt; below-head=12.06749pt; above-foot=12.0675pt; below-foot=12.06749pt
+12pt narrow letterpaper:textheight=722.7pt; textwidth=542.02501pt; text-top=36.135pt
+10pt normal a4paper:headheight=10.0pt; headsep=34.135pt; footskip=38.135pt
+10pt normal a4paper:above-head=31.135pt; below-head=31.135pt; above-foot=31.135pt; below-foot=31.135pt
+10pt normal a4paper:textheight=700.50687pt; textwidth=452.9679pt; text-top=72.26999pt
+10pt narrow a4paper:headheight=10.0pt; headsep=16.0675pt; footskip=20.0675pt
+10pt narrow a4paper:above-head=13.06749pt; below-head=13.0675pt; above-foot=13.0675pt; below-foot=13.06749pt
+10pt narrow a4paper:textheight=772.77686pt; textwidth=525.23788pt; text-top=36.135pt
+11pt normal a4paper:headheight=11.0pt; headsep=33.935pt; footskip=38.33499pt
+11pt normal a4paper:above-head=30.635pt; below-head=30.635pt; above-foot=30.635pt; below-foot=30.635pt
+11pt normal a4paper:textheight=700.50687pt; textwidth=452.9679pt; text-top=72.26999pt
+11pt narrow a4paper:headheight=11.0pt; headsep=15.8675pt; footskip=20.2675pt
+11pt narrow a4paper:above-head=12.5675pt; below-head=12.56749pt; above-foot=12.5675pt; below-foot=12.56749pt
+11pt narrow a4paper:textheight=772.77686pt; textwidth=525.23788pt; text-top=36.135pt
+12pt normal a4paper:headheight=12.0pt; headsep=33.735pt; footskip=38.53499pt
+12pt normal a4paper:above-head=30.135pt; below-head=30.135pt; above-foot=30.135pt; below-foot=30.135pt
+12pt normal a4paper:textheight=700.50687pt; textwidth=452.9679pt; text-top=72.26999pt
+12pt narrow a4paper:headheight=12.0pt; headsep=15.6675pt; footskip=20.4675pt
+12pt narrow a4paper:above-head=12.0675pt; below-head=12.06749pt; above-foot=12.0675pt; below-foot=12.06749pt
+12pt narrow a4paper:textheight=772.77686pt; textwidth=525.23788pt; text-top=36.135pt
+============================================================
