@@ -971,6 +971,12 @@ preferred public identifier in this order: DOI, e-print, URL. The package uses
 monochrome link styling and must not redefine unrelated document lists or
 headings globally.
 
+The gap between bibliography entries follows the same calibrated list token as
+every other list in the CV, `\CDossierItemSepSkip`, so a `biblatex` publication
+list and a `CDossierPublications` list share one rhythm at every supported
+`fontsize`. When the package is loaded by a class that does not provide the
+token, the gap falls back to a fixed `6pt`.
+
 `\CDossierHighlightAuthor` may be repeated for spelling or initial variants.
 It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and
 does not alter citations. Both keys are required; an incomplete declaration

@@ -56,10 +56,31 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   command changed. Documents that print the folio close to the trim edge will
   show it further inside the page. ([#183])
 
+- The optional BibLaTeX integration now separates bibliography entries by the
+  CV's calibrated list-item token, `\CDossierItemSepSkip`, instead of a fixed
+  `6pt`. A publication list rendered by `careerdossier-biblatex` therefore has
+  the same inter-item gap as every other list in `careerdossier-cv` — including
+  the dependency-free `CDossierPublications` — at every supported `fontsize`,
+  rather than a wider gap that did not rescale with the type scale. ([#196])
+
+  This changes rendered output for documents that load
+  `careerdossier-biblatex`: bibliography entries move up as the gap closes, so
+  a bibliography near a page boundary may repaginate. No class, option, key,
+  command, or entry format changed, and `\CDossierItemSepSkip` keeps its
+  calibrated value. Loading the package with a class that does not provide the
+  token — any non-CareerDossierTeX class — still gets the previous `6pt`.
+
+  One extraction note: with the gap closed, `pdftotext`'s default (non-layout)
+  mode groups the entry numbers into a block ahead of the entry text in the
+  example. The rendered page and the PDF geometry are unaffected — each label
+  shares its baseline with its entry, and `pdftotext -layout` reports the
+  entries in source order.
+
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
 [#191]: https://github.com/amirhs1/CareerDossierTeX/issues/191
 [#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
+[#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
 
 ## [0.6.0] - 2026-07-30
 

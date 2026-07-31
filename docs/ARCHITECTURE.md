@@ -70,7 +70,8 @@ careerdossier-cv.cls
 
 careerdossier-biblatex.sty  ──optional──▶  biblatex / Biber
         │
-        └── semantic typography and theme roles
+        ├── semantic typography and theme roles
+        └── shared list tokens when the host class provides them
 
 careerdossier-letter.cls
         └── family=industry|academic
@@ -813,7 +814,10 @@ Responsibilities:
   in `docs/API.md`;
 - expose repeatable author-highlighting declarations;
 - implement DOI, then e-print, then URL display precedence;
-- reuse semantic monochrome typography and link tokens; and
+- reuse semantic monochrome typography and link tokens;
+- inherit the shared list-item rhythm token, `\CDossierItemSepSkip`, when the
+  host class provides it, and fall back to a fixed value when it does not, so
+  the profile never owns a competing spacing value; and
 - report an actionable optional-dependency error when BibLaTeX is unavailable.
 
 It must not:
