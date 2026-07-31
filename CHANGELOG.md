@@ -10,6 +10,27 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Changed
 
+- **BREAKING (design token):** `\CDossierListEdgeSkip` is now two tokens,
+  `\CDossierListEdgeSkipBefore` for the space above a list and
+  `\CDossierListEdgeSkipAfter` for the space below it, so the two ends of a
+  bullet or publication list can be tuned independently. LaTeX has a single
+  `topsep` and spends it at both ends, so one token could not express a
+  different value above and below. ([#191])
+
+  Both tokens keep the value the single token had, so no document reflows:
+  every list in every class renders exactly as in `v0.6.0` at every `fontsize`.
+  Retuning either ratio is deliberately left to a separate change. Only source
+  that reads or sets the old token by name needs an edit — read
+  `\CDossierListEdgeSkipBefore` wherever `\CDossierListEdgeSkip` appeared. No
+  class, option, key, command, or environment changed. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
+  One path is unaffected by the new token: under
+  `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX Lab's
+  own list implementation rather than from `\CDossierListEdgeSkipAfter`. That
+  is pre-existing behavior, not a change in this release; it is tracked as
+  ([#193]).
+
 - The smoke and layout-stress suites now run as their own CI jobs instead of
   running in sequence inside the `resume` job, so they start in parallel with
   the rest of the workflow. Coverage and the commands themselves are unchanged;
@@ -37,6 +58,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
+[#191]: https://github.com/amirhs1/CareerDossierTeX/issues/191
+[#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
 
 ## [0.6.0] - 2026-07-30
 

@@ -1,0 +1,14 @@
+% cv-publication-list-edge-gap.tex -- see list-edge-gap.inc (issues #176, #191).
+% The dependency-free publication list is a second list built on the shared
+% list-edge tokens, and it does not go through CDossierItemize, so it needs its
+% own coverage of the same both-ends contract.
+\documentclass{careerdossier-cv}
+\newcommand\CDossierListEdgeList{%
+  \begin{CDossierPublications}
+    \CDossierPublication{
+      authors = {Ada Lovelace},
+      title   = {Notes on the Analytical Engine}
+    }
+  \end{CDossierPublications}%
+}
+\input{list-edge-gap.inc}

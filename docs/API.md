@@ -670,6 +670,21 @@ Provides a résumé-appropriate itemized list with controlled indentation and sp
 
 Users should prefer this environment over globally redefining `itemize`.
 
+The space above the list is `\CDossierListEdgeSkipBefore` and the space below it
+is `\CDossierListEdgeSkipAfter` (`careerdossier-tokens.sty`). Each token is the
+complete gap at its end of the list, and both collapse with the adjacent block's
+own spacing rather than adding to it. The two replace the single
+`\CDossierListEdgeSkip` of `v0.6.0`, which LaTeX could only apply at both ends
+at once; see [`MIGRATION.md`](MIGRATION.md). Both keep that token's calibrated
+value, so a document's rendered list spacing is unchanged. The CV's
+`CDossierPublications` list uses the same pair.
+
+Under `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX
+Lab's list implementation rather than from `\CDossierListEdgeSkipAfter`; the
+space above is unaffected. A tagged build therefore spaces the area below a list
+differently from an untagged build of the same source
+([#193](https://github.com/amirhs1/CareerDossierTeX/issues/193)).
+
 When the list crosses a page boundary it is never split so that a single item
 stands alone on either side; a list longer than a page still breaks normally.
 See "Page-break policy" below.

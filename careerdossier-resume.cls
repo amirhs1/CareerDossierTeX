@@ -216,13 +216,17 @@
 %% the boundaries that would strand a single bullet and merely discourages the
 %% rest, so a list longer than a page still breaks.
 %%
-%% Issue #176: `partopsep' is zeroed so `\CDossierListEdgeSkip' alone owns the
-%% distance from the preceding content to the list, as documented. LaTeX adds
-%% `\partopsep' on top of `topsep' whenever a list opens a new paragraph, and
-%% the `article' default is 3 pt plus stretch: a quantity no token owns and
+%% Issue #176: `partopsep' is zeroed so the list-edge tokens alone own the
+%% distance between the list and the content around it, as documented. LaTeX
+%% adds `\partopsep' on top of `topsep' whenever a list opens a new paragraph,
+%% and the `article' default is 3 pt plus stretch: a quantity no token owns and
 %% that does not rescale with `fontsize'. Left in place it would make the list
 %% edge both wider than the token says and proportionally wider at 10pt than
 %% at 12pt. The token's own ratio absorbs the 3 pt instead.
+%%
+%% Issue #191: `topsep' is LaTeX's only list-edge key and applies at both ends,
+%% so `\CDossierListEdgeSkipBefore' passes through it and the shared component
+%% call below substitutes `\CDossierListEdgeSkipAfter' for the closing edge.
 %% ---------------------------------------------------------------------------
 \dim_new:N \l__cdossier_resume_label_width_dim
 
@@ -247,7 +251,7 @@
                 } ,
             labelwidth = \l__cdossier_resume_label_width_dim ,
             labelsep   = \CDossierListLabelSep ,
-            topsep     = \CDossierListEdgeSkip ,
+            topsep     = \CDossierListEdgeSkipBefore ,
             itemsep    = \CDossierItemSepSkip ,
             parsep     = 0pt ,
             partopsep  = 0pt ,
@@ -260,7 +264,7 @@
           [
             leftmargin = * ,
             labelsep   = \CDossierListLabelSep ,
-            topsep     = \CDossierListEdgeSkip ,
+            topsep     = \CDossierListEdgeSkipBefore ,
             itemsep    = \CDossierItemSepSkip ,
             parsep     = 0pt ,
             partopsep  = 0pt ,
@@ -272,6 +276,7 @@
   }
   {
     \__cdossier_components_listpolicy_end:
+    \__cdossier_components_listedge_after:
     \end { itemize }
   }
 

@@ -8,7 +8,7 @@
 \msg_new:nnn { cdossier-test } { unowned-publication-list-edge }
   {
     The~CV~publication~list~leaves~partopsep~at~\skip_use:N \partopsep ,~so~
-    CDossierListEdgeSkip~does~not~own~the~whole~list~edge.
+    CDossierListEdgeSkipBefore~does~not~own~the~whole~list~edge.
   }
 \cs_new_protected:Npn \__cdossier_test_cv_publication_tokens:
   {
@@ -17,7 +17,7 @@
         \msg_error:nnn { cdossier-test }
           { wrong-publication-list-token } { labelsep }
       }
-    \skip_if_eq:nnF { \topsep } { \CDossierListEdgeSkip }
+    \skip_if_eq:nnF { \topsep } { \CDossierListEdgeSkipBefore }
       {
         \msg_error:nnn { cdossier-test }
           { wrong-publication-list-token } { topsep }
@@ -27,9 +27,10 @@
         \msg_error:nnn { cdossier-test }
           { wrong-publication-list-token } { itemsep }
       }
-    %% Issue #176: `\CDossierListEdgeSkip' owns the whole list edge, so LaTeX's
-    %% unscaled `\partopsep' must not add to it when the list opens a new
-    %% paragraph.
+    %% Issue #176: `\CDossierListEdgeSkipBefore' owns the whole opening list
+    %% edge, so LaTeX's unscaled `\partopsep' must not add to it when the list
+    %% opens a new paragraph. The closing edge is measured in
+    %% cv-publication-list-edge-gap.tex (#191).
     \skip_if_eq:nnF { \partopsep } { 0pt }
       { \msg_error:nn { cdossier-test } { unowned-publication-list-edge } }
   }

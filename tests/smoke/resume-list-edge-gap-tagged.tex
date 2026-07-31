@@ -1,7 +1,13 @@
-% resume-list-edge-gap-tagged.tex -- see list-edge-gap.inc (issue #176). The
-% tagged build takes a separate list-key path, because LaTeX Lab's itemize
+% resume-list-edge-gap-tagged.tex -- see list-edge-gap.inc (issues #176, #191).
+% The tagged build takes a separate list-key path, because LaTeX Lab's itemize
 % emulation cannot accept enumitem's `*' leftmargin calculation, so it needs
 % its own coverage of the list-edge contract.
+%
+% The closing edge is not asserted here: LaTeX Lab replaces LaTeX's list
+% internals, and its closing spacing does not come from `\@topsepadd', so the
+% class cannot place `\CDossierListEdgeSkipAfter' there. The divergence
+% predates #191 and is tracked as #193; see list-edge-gap.inc.
 \DocumentMetadata{tagging=on}
 \documentclass{careerdossier-resume}
+\newcommand\CDossierListEdgeClosingOwned{0}
 \input{list-edge-gap.inc}
