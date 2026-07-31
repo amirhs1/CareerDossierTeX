@@ -359,7 +359,7 @@ the gitignored `build/` directory. They must not be committed.
 
 ### Size/margin reference matrix
 
-Build the `{10pt,11pt,12pt} x {normal,narrow}` reference matrix across all four
+Build the `{normal,narrow} x {10pt,11pt,12pt}` reference matrix across all four
 document classes from the repository root:
 
     make review-matrix
@@ -370,6 +370,10 @@ size/margin combination, 24 PDFs in total. The statement class is represented
 by a single type (research); per-type rendering differences are already
 covered by the five-family page-two review and the statement-title
 regression, so statement type does not multiply this matrix.
+
+Each PDF is named `<type>-<margin>-<fontsize>.pdf` (for example
+`resume-normal-11pt.pdf`), so a directory listing groups every size of one
+margin preset together.
 
 Review the PDFs under `build/size-margin-matrix/` and record the result in the
 pull request:
