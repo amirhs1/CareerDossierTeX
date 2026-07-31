@@ -387,18 +387,43 @@ Tracked under
 [milestone `v0.6.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/9)
 and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
 
-## Phase 6: `v0.6.1 — Page Furniture Placement and Output Medium`
+## Phase 6: `v0.6.1 — Page Furniture, Output Medium, and Spacing Ownership`
 
 ### Goal
 
-Correct where page furniture sits and make it selectable by output context,
-without touching the calibrated design system released in `v0.6.0`.
+Reclaim ownership of vertical placement and spacing for the calibrated design
+system released in `v0.6.0`, and make page furniture selectable by output
+context.
 
-**No document reflows.** No type size, rhythm ratio, margin preset, or
-geometry dimension that affects the text block changes value. The new public
-surface is one additive class option whose default reproduces current output
-exactly, plus one design-token rename (#191) that is source-compatible for
-every document that does not read the token by name.
+The unifying concern is not page furniture as such. In several places a
+vertical dimension is decided by a third-party default or a hard-coded constant
+rather than by the design system that is supposed to own it: `geometry`'s
+defaults place the running header and folio (#183); LaTeX's single `topsep`
+cannot express a different space above and below a list (#191);
+`careerdossier-biblatex` hard-codes the bibliography's inter-entry gap at `6pt`
+(#196); and LaTeX Lab's block default decides the space below a list on the
+tagged path (#193). Each item hands one such decision back to the token that
+should own it.
+
+**No calibrated value changes.** No type-scale step, vertical-rhythm ratio,
+margin preset, or `careerdossier-tokens.sty` dimension changes value, and
+retuning any ratio stays out of scope.
+
+Rendered output moves only where a spacing decision was never the design
+system's to begin with:
+
+| Item | Rendered effect |
+|---|---|
+| #183 | furniture moves within the existing margins; `\textheight` and `\textwidth` are unchanged |
+| #184 | defaults to `print`, reproducing current output exactly |
+| #191 | none — both tokens keep the single token's value |
+| #195 | none — generated review filenames only |
+| #196 | bibliography entries move up as the hard-coded `6pt` gap closes |
+| #193 | the tagged path's space below a list changes to match the untagged path |
+
+The new public surface is one additive class option whose default reproduces
+current output exactly, plus one design-token rename (#191) that is
+source-compatible for every document that does not read the token by name.
 
 ### Included
 
@@ -421,11 +446,19 @@ every document that does not read the token by name.
 - splitting the single list-edge token into `\CDossierListEdgeSkipBefore` and
   `\CDossierListEdgeSkipAfter`, so the space above a list and the space below
   it can be tuned independently (#191). Both keep the value the single token
-  had, so no list moves; this extends the milestone's original scope at the
-  maintainer's direction;
+  had, so no list moves;
+- the bibliography's inter-entry gap reading `\CDossierItemSepSkip` instead of
+  a hard-coded `6pt`, so a `biblatex` publication list and a
+  `CDossierPublications` list share one rhythm at every `fontsize` (#196);
+- the tagged path's closing list edge owned by `\CDossierListEdgeSkipAfter`
+  rather than LaTeX Lab's block default, so a tagged and an untagged build of
+  one source stop paginating toward different outcomes (#193). The candidate
+  fix depends on `latex-lab` testphase package internals rather than a stable
+  interface, so it targets a guarded fix that degrades cleanly if that
+  interface changes;
 - regression, smoke, and layout coverage for the resolved furniture metrics,
-  both `medium` values, the unknown-value error, and both list edges on the
-  untagged path;
+  both `medium` values, the unknown-value error, and both list edges on both
+  the untagged and tagged paths;
 - this roadmap renumbering and the phase-numbering convention that prevents it
   from drifting again.
 
@@ -442,11 +475,12 @@ every document that does not read the token by name.
   and page-numbering format options;
 - widening `medium` beyond page furniture (hyperlink colour, PDF metadata, or
   viewer preferences) in this release;
-- the tagged-PDF list closing edge (#193). Fixing it would change rendered
-  output on the tagged path — unlike everything else in this release — and the
-  candidate fix depends on `latex-lab` testphase package internals rather than
-  a stable interface. Deliberately deferred to a later, unscheduled release;
-  tracked as its own issue, not a sub-issue of this milestone's epic.
+- the extracted reading order of a bibliography's entry numbers (#199), a
+  follow-up from #196. Once the entry gap closes, the default `pdftotext`
+  heuristic groups the entry numbers ahead of the entry text. The PDF geometry
+  is correct — each label shares a baseline with its entry, and
+  `pdftotext -layout` reads in source order — and fixing it means changing
+  `biblatex` label geometry, which #196 lists as a non-goal.
 
 ### Release criteria
 
@@ -458,10 +492,15 @@ every document that does not read the token by name.
   behaviour, on all four document classes;
 - an unsupported `medium` value produces an actionable class error naming the
   accepted values;
-- `make review-matrix` output is reviewed for both media;
+- `make review-matrix` output is reviewed for both media, with PDFs named
+  `type-margin-fontsize` (#195);
 - the extraction, tagging, layout, and regression suites pass;
 - both list edges are owned by their tokens on the untagged path, with the
   rendered gap unchanged from `v0.6.0`;
+- the tagged path's closing list edge equals `\CDossierListEdgeSkipAfter`, and
+  `pdftotext -bbox` output agrees between tagged and untagged builds of every
+  supported example, or every remaining difference is explained (#193);
+- `cv-bibliography`'s inter-entry gap equals `\CDossierItemSepSkip` (#196);
 - `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
   `CHANGELOG.md` are updated;
 - tag and GitHub Release `v0.6.1` are published.
