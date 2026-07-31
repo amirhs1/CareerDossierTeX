@@ -310,7 +310,7 @@ closing spacing does not come from `\@topsepadd`, so the tagged build renders
 LaTeX Lab's own gap below a list (12 pt at the résumé default) rather than the
 token's. That divergence is not introduced by #191 — it is present with a single
 shared list-edge token too — and the tagged fixture therefore asserts the
-opening edge only.
+opening edge only. It is tracked as #193.
 
 The four `Prose…` heading tokens exist because the entry-structured section
 tokens above them cannot be reused in a continuous-prose class (#177). Those

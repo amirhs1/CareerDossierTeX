@@ -39,7 +39,8 @@
 % Whether the closing edge is asserted. A tagged build replaces LaTeX's list
 % internals with LaTeX Lab's block templates, which do not take their closing
 % spacing from `\@topsepadd', so the class cannot place the closing token there
-% and the measured gap is LaTeX Lab's own. That divergence predates #191 --
+% and the measured gap is LaTeX Lab's own. That divergence predates #191 and
+% is tracked as #193 --
 % it is present on the tagged path with a single shared list-edge token too --
 % so a fixture on that path asserts the opening edge only.
 \providecommand\CDossierListEdgeClosingOwned{1}

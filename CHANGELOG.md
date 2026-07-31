@@ -28,7 +28,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   One path is unaffected by the new token: under
   `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX Lab's
   own list implementation rather than from `\CDossierListEdgeSkipAfter`. That
-  is pre-existing behavior, not a change in this release.
+  is pre-existing behavior, not a change in this release; it is tracked as
+  ([#193]).
 
 - The smoke and layout-stress suites now run as their own CI jobs instead of
   running in sequence inside the `resume` job, so they start in parallel with
@@ -58,6 +59,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
 [#191]: https://github.com/amirhs1/CareerDossierTeX/issues/191
+[#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
 
 ## [0.6.0] - 2026-07-30
 

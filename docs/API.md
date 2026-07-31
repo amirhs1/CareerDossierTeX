@@ -681,7 +681,9 @@ value, so a document's rendered list spacing is unchanged. The CV's
 
 Under `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX
 Lab's list implementation rather than from `\CDossierListEdgeSkipAfter`; the
-space above is unaffected.
+space above is unaffected. A tagged build therefore spaces the area below a list
+differently from an untagged build of the same source
+([#193](https://github.com/amirhs1/CareerDossierTeX/issues/193)).
 
 When the list crosses a page boundary it is never split so that a single item
 stands alone on either side; a list longer than a page still breaks normally.

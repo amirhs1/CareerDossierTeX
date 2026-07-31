@@ -423,6 +423,9 @@ every document that does not read the token by name.
   it can be tuned independently (#191). Both keep the value the single token
   had, so no list moves; this extends the milestone's original scope at the
   maintainer's direction;
+- giving the closing list edge to its token on the tagged path as well (#193),
+  so a tagged build and an untagged build of one source space the area below a
+  list identically;
 - regression, smoke, and layout coverage for the resolved furniture metrics,
   both `medium` values, the unknown-value error, and both list edges;
 - this roadmap renumbering and the phase-numbering convention that prevents it
@@ -454,8 +457,8 @@ every document that does not read the token by name.
   accepted values;
 - `make review-matrix` output is reviewed for both media;
 - the extraction, tagging, layout, and regression suites pass;
-- both list edges are owned by their tokens on the untagged path, with the
-  rendered gap unchanged from `v0.6.0`;
+- both list edges are owned by their tokens, with the rendered gap unchanged
+  from `v0.6.0`;
 - `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
   `CHANGELOG.md` are updated;
 - tag and GitHub Release `v0.6.1` are published.
