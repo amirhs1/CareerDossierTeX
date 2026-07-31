@@ -6,6 +6,11 @@
 and changes every class's layout defaults** — see
 [Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
+The unreleased `v0.6.1` renames one public design token,
+`\CDossierListEdgeSkip`, and adds a second one beside it. No rendered output
+changes and no document needs an edit unless it reads or sets that token by
+name — see [`[0.6.1]`](#061---unreleased) below.
+
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
 
@@ -331,6 +336,27 @@ The `v0.4.0` engine change is a toolchain break rather than an API rename and
 is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
 in this format.
+
+## [0.6.1] - unreleased
+
+### `\CDossierListEdgeSkip` split into `\CDossierListEdgeSkipBefore` and `\CDossierListEdgeSkipAfter`
+
+Before:
+
+\CDossierListEdgeSkip
+
+After:
+
+\CDossierListEdgeSkipBefore   % the gap above a list
+\CDossierListEdgeSkipAfter    % the gap below a list
+
+Reason: LaTeX has a single `topsep` and spends it at both ends of a list, so
+one token could not give the space above a list and the space below it
+different values. Both new tokens keep the old token's calibrated value, so no
+document reflows and no example or class option changes; only source that reads
+or sets the token by name needs the edit. Read
+`\CDossierListEdgeSkipBefore` wherever the old name appeared, and set both when
+overriding the list edge as a whole.
 
 ## [0.6.0] - 2026-07-30
 

@@ -96,6 +96,7 @@ cases=(
   "cv-publication-list-tokens pass"
   "cv-itemize-trailing-glue pass"
   "cv-list-edge-gap pass"
+  "cv-publication-list-edge-gap pass"
   "cv-density-option fail|Supported options are 'fontsize', 'margin', 'paper', and 'bodyfont'."
   "cv-missing-name fail|required profile field 'name' is not"
   "cv-bad-fontsize fail|accepts only a fixed set of"

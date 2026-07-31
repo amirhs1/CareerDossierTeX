@@ -11,7 +11,8 @@
 % asserts that contract for the three content paths a section can open with:
 %
 %   entry-led  -- CDossierEntry, contributing \CDossierEntryAboveSkip
-%   list-led   -- CDossierItemize, contributing \CDossierListEdgeSkip as topsep
+%   list-led   -- CDossierItemize, contributing \CDossierListEdgeSkipBefore
+%                 as topsep
 %   prose-led  -- an ordinary paragraph, contributing nothing
 %
 % Before the fix the gap was the *sum* in the entry-led and list-led cases,
@@ -53,7 +54,7 @@
 \directlua{
   local below = \number\dimexpr\CDossierSectionBelowSkip\relax
   local entryabove = \number\dimexpr\CDossierEntryAboveSkip\relax
-  local listedge = \number\dimexpr\CDossierListEdgeSkip\relax
+  local listedge = \number\dimexpr\CDossierListEdgeSkipBefore\relax
 
   local function contains_rule(list)
     if not list then return false end

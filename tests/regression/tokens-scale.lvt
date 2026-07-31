@@ -52,7 +52,8 @@
     \cdossiertest_skip:N \CDossierEntryAboveSkip
     \cdossiertest_skip:N \CDossierEntryGapSkip
     \cdossiertest_skip:N \CDossierEntryBelowSkip
-    \cdossiertest_skip:N \CDossierListEdgeSkip
+    \cdossiertest_skip:N \CDossierListEdgeSkipBefore
+    \cdossiertest_skip:N \CDossierListEdgeSkipAfter
     \cdossiertest_skip:N \CDossierItemSepSkip
     \cdossiertest_skip:N \CDossierParSkip
     \cdossiertest_skip:N \CDossierProseParSkip
@@ -73,7 +74,7 @@
       [
         leftmargin = * ,
         labelsep = \CDossierListLabelSep ,
-        topsep = \CDossierListEdgeSkip ,
+        topsep = \CDossierListEdgeSkipBefore ,
         itemsep = \CDossierItemSepSkip ,
         parsep = 0pt ,
         label = \textbullet ,

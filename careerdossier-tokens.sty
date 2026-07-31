@@ -132,7 +132,8 @@
 \skip_new:N \CDossierEntryAboveSkip
 \skip_new:N \CDossierEntryGapSkip
 \skip_new:N \CDossierEntryBelowSkip
-\skip_new:N \CDossierListEdgeSkip
+\skip_new:N \CDossierListEdgeSkipBefore
+\skip_new:N \CDossierListEdgeSkipAfter
 \skip_new:N \CDossierItemSepSkip
 \skip_new:N \CDossierParSkip
 \skip_new:N \CDossierProseParSkip
@@ -289,7 +290,7 @@
     \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.0625 }
     \__cdossier_tokens_set_skip:Nn \CDossierEntryBelowSkip { 0.125 }
-    %% Issue #176: this token now owns the complete list edge. Until #176 the
+    %% Issue #176: these tokens own the complete list edge. Until #176 the
     %% lists also inherited LaTeX's `\partopsep' -- 3 pt plus stretch that no
     %% token owned and that did not rescale -- so the rendered edge was 4.5 pt at
     %% 10pt, 4.7 pt at 11pt, and 4.81 pt at 12pt: an effective ratio drifting
@@ -299,7 +300,16 @@
     %% the sixteenth nearest that drifting ratio that also keeps the list edge
     %% below \CDossierSectionBelowSkip (0.375); at 0.375 a list edge would read
     %% as wide as the gap that opens a section.
-    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkip { 0.3125 }
+    %%
+    %% Issue #191: the edge above a list and the edge below it are separate
+    %% tokens, because LaTeX's `\list' offers only one `topsep' for both and so
+    %% could not express a different value at the two ends. The split is a
+    %% mechanism change alone: both ratios start at the single value #176
+    %% calibrated, so the rendered edge is unchanged at every supported size.
+    %% Retuning either ratio is deliberately out of scope until specific values
+    %% are proposed against the calibrated type scale.
+    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkipBefore { 0.3125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkipAfter { 0.3125 }
     \__cdossier_tokens_set_skip:Nn \CDossierItemSepSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }

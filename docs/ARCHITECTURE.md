@@ -241,7 +241,8 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
 | `\CDossierEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
-| `\CDossierListEdgeSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierListEdgeSkipBefore` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierListEdgeSkipAfter` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
@@ -268,14 +269,15 @@ space on either side of the rule: the shared component suppresses TeX's
 automatic interline glue before and after the rule rather than allowing a
 separate rule paragraph to add hidden baseline spacing.
 
-`\CDossierListEdgeSkip` owns the complete distance from preceding content to a
-list, and the table's number is that distance. Keeping that true costs an extra
-setting: LaTeX's `\list` adds `\partopsep` on top of `topsep` whenever a list
-opens a new paragraph, and the `article` default is 3 pt plus stretch: a
-quantity no token owns and that does not rescale with `fontsize`. Every list built on the shared
-tokens therefore sets `partopsep = 0pt` alongside its `topsep` (#176).
+The two list-edge tokens own the complete distance between a list and the
+content around it, and the table's numbers are those distances. Keeping that
+true costs an extra setting: LaTeX's `\list` adds `\partopsep` on top of
+`topsep` whenever a list opens a new paragraph, and the `article` default is
+3 pt plus stretch: a quantity no token owns and that does not rescale with
+`fontsize`. Every list built on the shared tokens therefore sets
+`partopsep = 0pt` alongside its `topsep` (#176).
 
-The token's ratio absorbed that 3 pt rather than discarding it, so the rendered
+The ratio absorbed that 3 pt rather than discarding it, so the rendered
 edge is materially the one #166 tuned. Before #176 the real gap was 4.5 pt at
 `10pt`, 4.7 pt at `11pt`, and 4.81 pt at `12pt` — an effective ratio drifting
 from 0.375 down to 0.332 of a line as the body size grew, because only part of
@@ -283,6 +285,32 @@ it scaled. At 0.3125 the edge is 3.75 / 4.25 / 4.53 pt and the whole of it
 scales. The ratio stays below `\CDossierSectionBelowSkip` (0.375) deliberately:
 a list edge that equalled the gap opening a section would flatten the
 distinction between entering a section and entering a list inside one.
+
+`\CDossierListEdgeSkipBefore` and `\CDossierListEdgeSkipAfter` are two tokens
+rather than one (#191) because LaTeX offers a single `topsep` and spends it at
+both ends of a list, so one token could not express a different value above and
+below. The opening edge is `topsep`; the closing edge is `\@topsepadd`, the
+register `\@trivlist` loads from `topsep` (+ `\partopsep`) on entry and
+`\@endparenv` contributes as the list's closing `\addvspace`. Every list
+environment reassigns that register from the closing token immediately before it
+ends — the assignment is local to the list's group — which is what
+`\__cdossier_components_listedge_after:` does. Adding a separate skip after the
+list instead would not collapse with the following block's own `\addvspace` the
+way one list-owned skip does, and would reintroduce exactly the additive gap
+#168 removed after section rules.
+
+The split is a mechanism change alone: both ratios start at the single value
+#176 calibrated, so the rendered edge is unchanged at every supported size.
+Retuning either ratio is deliberately out of scope until specific values are
+proposed against the calibrated type scale.
+
+One path does not honour the closing token. Under `\DocumentMetadata{tagging=on}`
+LaTeX Lab replaces LaTeX's list internals with its own block templates, whose
+closing spacing does not come from `\@topsepadd`, so the tagged build renders
+LaTeX Lab's own gap below a list (12 pt at the résumé default) rather than the
+token's. That divergence is not introduced by #191 — it is present with a single
+shared list-edge token too — and the tagged fixture therefore asserts the
+opening edge only.
 
 The four `Prose…` heading tokens exist because the entry-structured section
 tokens above them cannot be reused in a continuous-prose class (#177). Those
@@ -300,7 +328,7 @@ it introduces instead of leaving it suspended between two blocks. The
 subsection pair repeats that shape one step down (1.00 / 0.625) — still clear
 of the paragraph gap, unambiguously tighter than the section containing it.
 
-Like `\CDossierListEdgeSkip`, each of the four is the complete gap, and keeping
+Like the list-edge tokens, each of the four is the complete gap, and keeping
 that true costs a setting. A heading is a paragraph and so is the text beneath
 it, so TeX contributes `\parskip` on each side over and above the skip the
 sectioning command asks for. The statement class subtracts `\parskip` from both

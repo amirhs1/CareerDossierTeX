@@ -394,10 +394,11 @@ and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
 Correct where page furniture sits and make it selectable by output context,
 without touching the calibrated design system released in `v0.6.0`.
 
-This is a **non-breaking patch release**. No type size, vertical-rhythm token,
-margin preset, or geometry dimension that affects the text block changes, so
-**no document reflows**. The only new public surface is one additive class
-option whose default reproduces current output exactly.
+**No document reflows.** No type size, rhythm ratio, margin preset, or
+geometry dimension that affects the text block changes value. The new public
+surface is one additive class option whose default reproduces current output
+exactly, plus one design-token rename (#191) that is source-compatible for
+every document that does not read the token by name.
 
 ### Included
 
@@ -417,15 +418,23 @@ option whose default reproduces current output exactly.
   implemented or supported until that decision lands;
 - an actionable class error for an unsupported `medium` value, consistent with
   `fontsize`, `margin`, `paper`, and `bodyfont`;
+- splitting the single list-edge token into `\CDossierListEdgeSkipBefore` and
+  `\CDossierListEdgeSkipAfter`, so the space above a list and the space below
+  it can be tuned independently (#191). Both keep the value the single token
+  had, so no list moves; this extends the milestone's original scope at the
+  maintainer's direction;
 - regression, smoke, and layout coverage for the resolved furniture metrics,
-  both `medium` values, and the unknown-value error;
+  both `medium` values, the unknown-value error, and both list edges;
 - this roadmap renumbering and the phase-numbering convention that prevents it
   from drifting again.
 
 ### Explicit non-goals
 
-- any change to the type scale, vertical rhythm, margin presets, or any
-  `careerdossier-tokens.sty` dimension that affects the text block;
+- any change to the *value* of a type-scale step, vertical-rhythm ratio, margin
+  preset, or `careerdossier-tokens.sty` dimension. The list-edge split above is
+  a mechanism change that preserves every rendered gap; retuning either
+  list-edge ratio, or any other ratio, stays out of scope until specific values
+  are proposed against the calibrated type scale;
 - colour themes. `theme=monochrome` remains fixed, and `medium` is deliberately
   a separate axis from colour — the two must not be conflated;
 - per-class furniture customization, user-supplied header or footer content,
@@ -445,7 +454,10 @@ option whose default reproduces current output exactly.
   accepted values;
 - `make review-matrix` output is reviewed for both media;
 - the extraction, tagging, layout, and regression suites pass;
-- `docs/API.md`, `docs/ARCHITECTURE.md`, and `CHANGELOG.md` are updated;
+- both list edges are owned by their tokens on the untagged path, with the
+  rendered gap unchanged from `v0.6.0`;
+- `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
+  `CHANGELOG.md` are updated;
 - tag and GitHub Release `v0.6.1` are published.
 
 Tracked under

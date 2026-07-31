@@ -567,6 +567,22 @@
     rerun~LaTeX~to~settle~the~list~page~breaks.
   }
 
+%% Issue #191: give the edge below a list its own token. LaTeX's `\list' has a
+%% single `topsep' and uses it at both ends: at the top directly, and at the
+%% bottom through `\@topsepadd', the register `\@trivlist' loads with
+%% `topsep' (+ `\partopsep') on entry and `\@endparenv' contributes as the
+%% list's closing `\addvspace'. Reassigning that register while the list is
+%% still open is therefore the point where the two edges can differ, and it is
+%% the only one: enumitem exposes no bottom-spacing key, and adding a separate
+%% skip after the list would not collapse with the following block's own
+%% `\addvspace' the way one list-owned skip does.
+%%
+%% The assignment is local to the list's group, so it cannot leak into an
+%% enclosing list, and it must run before the list ends -- each list environment
+%% calls this immediately before its `\end{itemize}' or `\end{enumerate}'.
+\cs_new_protected:Npn \__cdossier_components_listedge_after:
+  { \use:c { @topsepadd } = \CDossierListEdgeSkipAfter \scan_stop: }
+
 %% Choose this boundary's penalty from the item's position in its list. The
 %% kernel reads \@itempenalty inside \item, so the value must be assigned
 %% before the real \item runs rather than contributed as a separate penalty
