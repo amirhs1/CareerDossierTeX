@@ -35,6 +35,7 @@
     \cdossiertest_size:N \CDossierSizeBody
     \cdossiertest_size:N \CDossierSizeSmall
     \cdossiertest_size:N \CDossierSizeFurniture
+    \cdossiertest_dimension:N \CDossierFurnitureLeading
     \cdossiertest_dimension:N \CDossierRuleThickness
     \cdossiertest_dimension:N \CDossierListLabelSep
     \cdossiertest_skip:N \CDossierHeaderAboveSkip

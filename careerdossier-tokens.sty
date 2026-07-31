@@ -63,6 +63,11 @@
 \dim_new:N \CDossierBodySize
 \dim_new:N \CDossierBodyLeading
 \dim_new:N \CDossierPageMargin
+%% The leading of the furniture step of the type scale (\CDossierSizeFurniture).
+%% Page furniture is the one component positioned by the page geometry rather
+%% than by the vertical rhythm, so its line height has to be available as a
+%% dimension before any font is selected; the size commands cannot supply it.
+\dim_new:N \CDossierFurnitureLeading
 \dim_new:N \CDossierRuleThickness
 \dim_new:N \CDossierListLabelSep
 
@@ -175,6 +180,7 @@
               \CDossierSizeSmall { 9pt } { 11pt }
             \__cdossier_tokens_set_size_command:Nnn
               \CDossierSizeFurniture { 8pt } { 10pt }
+            \dim_set:Nn \CDossierFurnitureLeading { 10pt }
           }
         { 11pt }
           {
@@ -194,6 +200,7 @@
               \CDossierSizeSmall { 10pt } { 12pt }
             \__cdossier_tokens_set_size_command:Nnn
               \CDossierSizeFurniture { 9pt } { 11pt }
+            \dim_set:Nn \CDossierFurnitureLeading { 11pt }
           }
         { 12pt }
           {
@@ -213,6 +220,7 @@
               \CDossierSizeSmall { 11pt } { 13pt }
             \__cdossier_tokens_set_size_command:Nnn
               \CDossierSizeFurniture { 10pt } { 12pt }
+            \dim_set:Nn \CDossierFurnitureLeading { 12pt }
           }
       }
 
@@ -330,12 +338,72 @@
 
 %% The paper name remains a class concern. The shared primitive is the only
 %% place that translates the public normal/narrow preset into geometry options.
+%%
+%% Issue #183: the running header and the folio are placed by this module too,
+%% because their position is a function of the resolved margin. Until #183 the
+%% three furniture dimensions kept `geometry''s untouched defaults --
+%% \headheight 12pt, \headsep 25pt, \footskip 30pt -- identical at every
+%% fontsize x margin combination. At margin=narrow (0.5in = 36pt) that put the
+%% header 1pt *above* the paper edge and the folio 6pt below the text block's
+%% bottom margin edge, inside most printers' unprintable region.
+%%
+%% `margin' measures paper edge to text block, and the head and foot are not
+%% included in the text block (no `includehead'/`includefoot'), so both live
+%% inside the margin M and \textheight/\textwidth are unaffected by the three
+%% values set here.
+%%
+%% Both distances resolve to a *baseline* position, not to a box edge, so both
+%% have to account for the asymmetry of a line box. The kernel's own strut
+%% divides a line into 0.7 height and 0.3 depth; for a furniture line of height
+%% H, centring the line in a margin M puts its baseline 0.7H past the top of
+%% the centred line box, that is (M - H) / 2 + 0.7 H = M / 2 + 0.2 H from the
+%% margin's outer edge.
+%%
+%% Foot. \footskip is measured from the bottom of the text block to the foot
+%% baseline, and the text block's bottom edge is the margin's inner edge:
+%%
+%%     \footskip = M / 2 + 0.2 * H
+%%
+%% Header. \headsep is likewise measured from the head box to the text block,
+%% so it too runs from the margin's *inner* edge -- but the kernel builds the
+%% head as \vbox to \headheight {\vfil <head>} with the depth then forced to
+%% zero (see \@outputpage in latex.ltx), which pins the head *baseline* to the
+%% bottom edge of the \headheight box. \headsep is therefore the distance from
+%% the head baseline to the text block, and mirrors \footskip about the
+%% margin's midpoint:
+%%
+%%     \headsep = M / 2 - 0.2 * H
+%%
+%% Deriving \headsep from the box edge instead -- (M - \headheight) / 2, which
+%% centres the head *box* rather than the line inside it -- measures 2.05 pt
+%% low at 11pt and 2.77 pt low at 10pt against the rendered ink, and breaks the
+%% top-to-bottom mirror symmetry with the folio.
+%%
+%% \headheight does not affect where the header renders -- the baseline is
+%% \headsep above the text block whatever the box height -- but it must be tall
+%% enough to contain the furniture line, or `geometry' warns that the head box
+%% is too small and the ink can overrun the box it is nominally inside. The
+%% furniture leading is that height by construction; `geometry''s fixed 12pt is
+%% short of the 12pt line at fontsize=12pt once the line's depth is counted.
 \cs_new_protected:Npn \CDossierApplyGeometry:n #1
   {
     \geometry
       {
         #1 ,
-        margin = \CDossierPageMargin
+        margin = \CDossierPageMargin ,
+        headheight = \CDossierFurnitureLeading ,
+        headsep =
+          \fp_to_dim:n
+            {
+              \dim_to_fp:n { \CDossierPageMargin } / 2
+              - 0.2 * \dim_to_fp:n { \CDossierFurnitureLeading }
+            } ,
+        footskip =
+          \fp_to_dim:n
+            {
+              \dim_to_fp:n { \CDossierPageMargin } / 2
+              + 0.2 * \dim_to_fp:n { \CDossierFurnitureLeading }
+            }
       }
   }
 
