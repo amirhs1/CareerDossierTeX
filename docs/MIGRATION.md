@@ -6,10 +6,11 @@
 and changes every class's layout defaults** — see
 [Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
-The unreleased `v0.6.1` renames one public design token,
-`\CDossierListEdgeSkip`, and adds a second one beside it. No rendered output
-changes and no document needs an edit unless it reads or sets that token by
-name — see [`[0.6.1]`](#061---unreleased) below.
+The unreleased `v0.7.0` renames public design tokens, adds new ones beside
+them, and retunes the calibrated vertical-rhythm ratios. Renamed tokens need a
+source edit only if a document reads or sets them by name; the retune reflows
+every document — see [`[0.7.0]`](#070---unreleased) below. This release was
+numbered `v0.6.1` until 2026-08-01.
 
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
@@ -337,7 +338,7 @@ is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
 in this format.
 
-## [0.6.1] - unreleased
+## [0.7.0] - unreleased
 
 ### `\CDossierListEdgeSkip` split into `\CDossierListEdgeSkipBefore` and `\CDossierListEdgeSkipAfter`
 
