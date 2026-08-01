@@ -43,7 +43,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Body size | `fontsize=10pt\|11pt\|12pt`, per-class default |
 | Margins | `margin=normal` (1 in) or `margin=narrow` (0.5 in), per-class default |
 | Body font | Serif (default) and opt-in sans |
-| Output medium | `medium=print` (default) or `medium=screen` |
+| Output medium | `medium=screen` (default) or `medium=print` |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
@@ -131,7 +131,7 @@ actually been verified.
   margin=narrow,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=screen
 ]{careerdossier-resume}
 ```
 
@@ -265,22 +265,27 @@ print
 screen
 ```
 
-`medium` is new after `v0.6.0`.
+`medium` is new after `v0.6.0`, and **its default changes rendered output for
+every existing document.** See [`MIGRATION.md`](MIGRATION.md).
 
-The default is `print`, which is the page-furniture policy described below: a
-running header from page two and a `Page N of M` folio throughout, both
-suppressed on a one-page document. `screen` emits no running header and no
-folio on any page.
+The default is `screen`, which emits no running header and no folio on any
+page. `print` selects the page-furniture policy described below: a running
+header from page two and a `Page N of M` folio throughout, both suppressed on a
+one-page document.
 
 The same dossier is read in two contexts with different needs. On screen the
 PDF viewer already shows page position, so the folio is redundant chrome; on
 paper a loose page has no such affordance, and the folio is what keeps a
-multi-page dossier in order after it is put down.
+multi-page dossier in order after it is put down. A dossier is read on screen
+far more often than it is printed, so `screen` is the default and printing is
+the deliberate act that names its option.
 
-The option changes only whether furniture is emitted. Page geometry is
-unchanged, so the text block sits in exactly the same place under both values
-and switching `medium` cannot reflow a document. Unsupported values produce an
-actionable class error naming the accepted values.
+A document built before `v0.7.0` therefore loses its running header and folio
+unless it adds `medium=print`. Nothing else moves: `medium` changes only
+whether furniture is emitted. Page geometry is unchanged, so the text block
+sits in exactly the same place under both values and switching `medium` cannot
+reflow a document. Unsupported values produce an actionable class error naming
+the accepted values.
 
 ### Fixed settings
 
@@ -295,8 +300,9 @@ It is better to reject or omit an unsupported option than silently ignore it.
 
 ### Page furniture
 
-All four document classes use the same page-furniture policy. Under the default
-`medium=print`:
+All four document classes use the same page-furniture policy. It is opt-in:
+under the default `medium=screen` neither the running header nor the folio is
+emitted, on any page and at any page count. Under `medium=print`:
 
 - a one-page document has no running header and no folio;
 - page one of a multi-page document has only a centered `Page N of M` folio;
@@ -305,9 +311,6 @@ All four document classes use the same page-furniture policy. Under the default
 - the résumé label is `Résumé`, the CV label is `Curriculum Vitae`, both
   letter families use `Cover Letter`, and a statement uses its independently
   configurable short running title.
-
-Under `medium=screen` neither the running header nor the folio is emitted, on
-any page and at any page count.
 
 Furniture uses the sans-serif furniture step of the calibrated type scale and
 the monochrome text token. It remains print-safe and is marked as a layout
@@ -339,14 +342,14 @@ the required rerun.
   margin=normal,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=screen
 ]{careerdossier-letter}
 ```
 
 `family` accepts `industry` and `academic`; the default is `industry`. `paper`
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
 uses the shared `serif|sans` contract above and defaults to `serif`. `medium`
-uses the shared `print|screen` contract above and defaults to `print`.
+uses the shared `print|screen` contract above and defaults to `screen`.
 `fontsize` and `margin` use the shared contracts above and default to `12pt`
 and `normal`.
 
@@ -860,7 +863,7 @@ Load the academic CV with:
   margin=normal,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=screen
 ]{careerdossier-cv}
 ```
 
@@ -872,7 +875,7 @@ The class accepts the same value sets as the résumé class:
 | `margin` | `normal`, `narrow` | `normal` |
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
-| `medium` | `print`, `screen` | `print` |
+| `medium` | `print`, `screen` | `screen` |
 
 English and the monochrome theme remain fixed. Unsupported options or values
 must produce an actionable class error rather than being ignored.
@@ -1097,7 +1100,7 @@ shared `fontsize`, `margin`, `paper`, `bodyfont`, and `medium` settings:
   margin=normal,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=screen
 ]{careerdossier-statement}
 ```
 
@@ -1140,8 +1143,8 @@ The `v0.6.0` development layout uses the shared calibrated design system:
 - a centered identity block in the body on page one;
 - no running header on page one;
 - a centered `<name> -- <running title>` header from page two; and
-- the shared one-page suppression and multi-page continuation furniture under
-  the default `medium=print`, and no furniture at all under `medium=screen`.
+- no page furniture under the default `medium=screen`, and the shared one-page
+  suppression and multi-page continuation furniture under `medium=print`.
 
 Page furniture is component-owned; `medium` is the only public control over
 it, and it decides only whether furniture is emitted. The statement

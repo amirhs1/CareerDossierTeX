@@ -599,7 +599,8 @@ Responsibilities:
 
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
-- the `medium=print|screen` decision of whether any furniture is emitted;
+- the `medium=screen|print` decision of whether any furniture is emitted,
+  defaulting to `screen`;
 - shared CV/résumé section rule, including token-owned vertical spacing and
   tagged layout-artifact treatment;
 - contact line;
@@ -654,6 +655,14 @@ the (fixed) colour decision, and whether a folio is emitted is unrelated to
 colour; `medium` names the output context, which is what actually drives the
 decision. Widening it beyond page furniture is an explicit non-goal of this
 release (see [`ROADMAP.md`](ROADMAP.md)).
+
+The default is `screen`, so furniture is opt-in. A dossier is read on screen
+far more often than it is printed, so the configuration that needs no thought
+is the common one, and printing — the deliberate act — names its option. This
+changes rendered output for every document written before `v0.7.0`; see
+[`MIGRATION.md`](MIGRATION.md). Fixtures that assert furniture behaviour
+therefore name `medium=print` explicitly, in the layout, tagging, and
+extraction suites alike.
 
 #### Why PDF metadata lives here
 

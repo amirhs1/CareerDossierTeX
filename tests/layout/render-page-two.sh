@@ -63,16 +63,34 @@ compile_source_and_render() {
   echo "  rendered: $job-page-2.png"
 }
 
+# Page furniture is opt-in from v0.7.0 (issue #184), and this review set exists
+# to look at continuation pages, so `medium=print` is forced on every source it
+# renders rather than left to the source's own default. awk, not sed, keeps the
+# rewrite portable across BSD (macOS) and GNU (CI); ENVIRON, not -v, avoids
+# awk's escape processing eating the leading backslash.
+force_print_medium() {
+  local source="$1" target="$2"
+  awk '
+    /^\\documentclass/ && $0 !~ /medium=/ {
+      if ($0 ~ /^\\documentclass\[/) { sub(/\[/, "[medium=print, ") }
+      else                            { sub(/^\\documentclass/, "\\documentclass[medium=print]") }
+    }
+    { print }
+  ' "$source" >"$target"
+}
+
 compile_layout_with_name() {
   local family="$1" source="$2" variant="$3" review_name="$4"
   local job="${family}-${variant}"
-  sed "s/Ada Lovelace/$review_name/g" "$here/$source" >"$work/$job.tex"
+  sed "s/Ada Lovelace/$review_name/g" "$here/$source" >"$work/$job.raw.tex"
+  force_print_medium "$work/$job.raw.tex" "$work/$job.tex"
   compile_source_and_render "$job" "$work/$job.tex"
 }
 
 compile_repository_source() {
   local job="$1" source="$2"
-  compile_source_and_render "$job" "$root/$source"
+  force_print_medium "$root/$source" "$work/$job.tex"
+  compile_source_and_render "$job" "$work/$job.tex"
 }
 
 echo "Building canonical short-name page-two renders"

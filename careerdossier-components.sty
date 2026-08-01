@@ -40,6 +40,11 @@
 %% `medium' names that output context, which is what actually drives the
 %% decision -- unlike `theme', which names the (fixed) colour decision.
 %%
+%% The default is `screen': a dossier is read on screen far more often than it
+%% is printed, so the configuration that needs no thought should be the common
+%% one. Printing is the deliberate act, and `medium=print' is its deliberate
+%% option.
+%%
 %% Package option forwarded by every public document class. The classes own
 %% their public option surfaces and reject unsupported values; this package
 %% owns the page furniture, so it owns the resulting decision.
@@ -55,7 +60,7 @@
 \RequirePackage { l3keys2e }
 
 \bool_new:N \l__cdossier_components_furniture_bool
-\bool_set_true:N \l__cdossier_components_furniture_bool
+\bool_set_false:N \l__cdossier_components_furniture_bool
 
 \msg_new:nnnn { careerdossier-components } { unknown-option }
   { Unknown~package~option~'#1'~for~careerdossier-components. }
@@ -401,15 +406,15 @@
 %% Page furniture.
 %%
 %% All document classes share one page-style pair. Under the default
-%% `medium=print' a multi-page document gets a centered "Page N of M" folio
-%% throughout and a centered identity label from page two. A one-page document
-%% gets no furniture. The total comes from the LaTeX kernel's last absolute
-%% page, recorded in the auxiliary file, so the single-page decision settles on
-%% the second pass. On the first clean pass the kernel supplies \maxdimen as the
-%% unknown total and the folio is provisionally shown.
+%% `medium=screen' no furniture is emitted on any page and the page-style pair
+%% is never selected.
 %%
-%% Under `medium=screen' no furniture is emitted on any page and the page-style
-%% pair is never selected.
+%% Under `medium=print' a multi-page document gets a centered "Page N of M"
+%% folio throughout and a centered identity label from page two. A one-page
+%% document gets no furniture. The total comes from the LaTeX kernel's last
+%% absolute page, recorded in the auxiliary file, so the single-page decision
+%% settles on the second pass. On the first clean pass the kernel supplies
+%% \maxdimen as the unknown total and the folio is provisionally shown.
 %%
 %% Page-style material is artifact-marked by the kernel's tagged-PDF shipout
 %% path. Do not wrap it in document structure here.

@@ -81,12 +81,14 @@ for tex in *.tex; do
       ;;
   esac
 
-  # Under the default `medium=print`, shared page furniture is suppressed
-  # entirely for a one-page document, and a multi-page document carries
-  # `Page N of M` throughout and an identity-derived running header from page
-  # two onwards. Under `medium=screen` (issue #184, fixtures named
-  # `*-screen-*`) neither is emitted on any page. Check extracted text rather
-  # than exact coordinates so the test guards behavior without freezing layout.
+  # Page furniture is opt-in (issue #184). Under the default `medium=screen`
+  # nothing is emitted on any page; the `*-screen-*` fixtures pass no `medium`
+  # at all, so they pin exactly what an author gets without asking. Every other
+  # fixture opts into `medium=print`, where furniture is suppressed entirely for
+  # a one-page document and a multi-page document carries `Page N of M`
+  # throughout plus an identity-derived running header from page two onwards.
+  # Check extracted text rather than exact coordinates so the test guards
+  # behavior without freezing layout.
   if command -v pdftotext >/dev/null 2>&1; then
     case "$base" in
       *-screen-*) medium_screen=1 ;;
@@ -114,10 +116,10 @@ for tex in *.tex; do
     for (( n = 1; n <= pages; n++ )); do
       page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
 
-      # Folio. Absent on every page under `screen`; under `print` absent from a
-      # one-page document and present on every page otherwise. The `screen`
-      # assertion is not vacuous: the same fixture under `print` would emit
-      # `Page N of M` on each of its pages.
+      # Folio. Absent on every page under the `screen` default; under `print`
+      # absent from a one-page document and present on every page otherwise.
+      # The `screen` assertion is not vacuous: adding `medium=print` to the
+      # same fixture emits `Page N of M` on each of its pages.
       if [ "$medium_screen" -eq 1 ]; then
         if printf '%s\n' "$page_text" | grep -Eq 'Page [0-9]+ of [0-9]+'; then
           echo "  UNEXPECTED SCREEN FOLIO on page $n"; furniture_fail=1
@@ -153,7 +155,7 @@ for tex in *.tex; do
     if [ "$furniture_fail" -ne 0 ]; then
       fail=1
     elif [ "$medium_screen" -eq 1 ]; then
-      echo "  medium=screen: no folio or running header on any page"
+      echo "  default medium=screen: no folio or running header on any page"
     elif [ "$pages" -eq 1 ]; then
       echo "  single-page furniture suppressed"
     else

@@ -3,13 +3,14 @@
 % Rendered position and extraction are covered by the layout and tagging
 % suites. This regression isolates the component-owned decisions: the
 % auxiliary-file page total controls single-page suppression, both shared page
-% styles exist, a class may register a live short-label token list, and the
-% default output medium resolves to `print' and selects the furniture styles.
-% The `screen' half of that last decision lives in components-medium.lvt,
-% because a package can only be loaded with one set of options per document.
+% styles exist, a class may register a live short-label token list, and
+% `medium=print' selects the furniture styles. The option is named explicitly
+% here because `screen' is the default; the default resolution lives in
+% components-medium.lvt, because a package can only be loaded with one set of
+% options per document.
 \input{regression-test}
 \documentclass{article}
-\usepackage{careerdossier-components}
+\usepackage[medium=print]{careerdossier-components}
 \MakeCDossierPageFurniture
 
 \ExplSyntaxOn
@@ -89,7 +90,7 @@
   \cdossiertestReportRunningLabel
 }
 
-\TEST{default-medium-is-print-and-selects-the-furniture-styles}{
+\TEST{medium-print-selects-the-furniture-styles}{
   \cdossiertestReportMedium
   \cdossiertestReportSelectedStyle
 }

@@ -6,11 +6,13 @@
 and changes every class's layout defaults** — see
 [Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
-The unreleased `v0.7.0` renames public design tokens, adds new ones beside
-them, and retunes the calibrated vertical-rhythm ratios. Renamed tokens need a
-source edit only if a document reads or sets them by name; the retune reflows
-every document — see [`[0.7.0]`](#070---unreleased) below. This release was
-numbered `v0.6.1` until 2026-08-01.
+The unreleased `v0.7.0` **makes page furniture opt-in**: the new `medium`
+option defaults to `screen`, so a multi-page document loses its running header
+and folio unless it adds `medium=print`. It also renames public design tokens,
+adds new ones beside them, and retunes the calibrated vertical-rhythm ratios.
+Renamed tokens need a source edit only if a document reads or sets them by
+name; the retune reflows every document — see [`[0.7.0]`](#070---unreleased)
+below. This release was numbered `v0.6.1` until 2026-08-01.
 
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
@@ -339,6 +341,38 @@ is documented in
 in this format.
 
 ## [0.7.0] - unreleased
+
+### Page furniture is now opt-in: `medium` defaults to `screen`
+
+Before (`v0.6.0`): a multi-page document carried a `Page N of M` folio
+throughout and a `<name> -- <document label>` running header from page two,
+with no way to turn either off.
+
+After (`v0.7.0`): all four document classes accept `medium=screen|print` and
+default to `screen`, which emits neither.
+
+To keep `v0.6.0` output, add `medium=print`:
+
+```latex
+\documentclass[medium=print]{careerdossier-resume}
+\documentclass[fontsize=12pt, margin=normal, medium=print]{careerdossier-cv}
+\documentclass[family=academic, medium=print]{careerdossier-letter}
+\documentclass[type=research, medium=print]{careerdossier-statement}
+```
+
+Reason: a dossier is read on screen far more often than it is printed, and a
+PDF viewer already shows page position, so the folio is redundant chrome in the
+common case. Printing is the deliberate act, so it names its option.
+
+**Every existing multi-page document loses its running header and folio** on
+upgrade unless it adds `medium=print`. Nothing else changes: page geometry is
+untouched, so the text block does not move, pagination is unchanged, and no
+other command, key, environment, or default is affected. A one-page document is
+unaffected either way, because `v0.6.0` already suppressed its furniture.
+
+Check the pages you actually send to a printer. If you submit PDFs to a portal
+or an ATS, the folio was never load-bearing there; if you hand out printed
+copies, add `medium=print`.
 
 ### `\CDossierListEdgeSkip` split into `\CDossierListEdgeSkipBefore` and `\CDossierListEdgeSkipAfter`
 

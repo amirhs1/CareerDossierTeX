@@ -37,7 +37,7 @@
 \tl_new:N   \l__cdossier_statement_margin_tl
 \tl_new:N   \l__cdossier_statement_medium_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { interest }
-\tl_set:Nn  \l__cdossier_statement_medium_tl { print }
+\tl_set:Nn  \l__cdossier_statement_medium_tl { screen }
 \tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
 \tl_set:Nn  \l__cdossier_statement_bodyfont_tl { serif }
 \tl_set:Nn  \l__cdossier_statement_fontsize_tl { 12pt }

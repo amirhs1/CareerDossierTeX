@@ -22,7 +22,7 @@ TEST 4: running-label-remains-live-until-shipout
 label=Updated
 ============================================================
 ============================================================
-TEST 5: default-medium-is-print-and-selects-the-furniture-styles
+TEST 5: medium-print-selects-the-furniture-styles
 ============================================================
 medium=print
 head=furniture

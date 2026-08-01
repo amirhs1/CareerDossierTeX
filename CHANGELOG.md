@@ -10,24 +10,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
-- All four document classes accept `medium=print|screen`, controlling whether
-  page furniture is emitted. `print` is the default and keeps today's policy —
-  a running header from page two, a `Page N of M` folio throughout, and neither
-  on a one-page document. `screen` emits no running header and no folio on any
-  page. ([#184])
+- **BREAKING (rendered output):** all four document classes accept
+  `medium=screen|print`, controlling whether page furniture is emitted, and it
+  defaults to `screen` — no running header and no folio on any page. `print`
+  selects the previous policy: a running header from page two, a `Page N of M`
+  folio throughout, and neither on a one-page document. ([#184])
+
+  **Every existing multi-page document loses its running header and folio**
+  unless it adds `medium=print`. A one-page document is unaffected, because
+  `v0.6.0` already suppressed its furniture. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md) for the one-line upgrade.
 
   The same dossier is read in two contexts with different needs: a PDF viewer
   already shows page position, so the folio is redundant on screen, while a
   loose printed page has no such affordance and the folio is what keeps a
-  multi-page dossier in order.
+  multi-page dossier in order. A dossier is read on screen far more often than
+  it is printed, so `screen` is the default and printing names its option.
 
-  This is additive and changes nothing for an existing document. Under the
-  default `medium=print`, all eleven supported examples render byte-identically
-  to `v0.6.0` apart from the PDF timestamp. `medium` decides only whether
-  furniture is emitted: page geometry is untouched, so the text block sits in
-  the same place under both values and switching the option cannot reflow a
-  document. An unsupported value produces a class error naming the accepted
-  values. `medium` is a separate axis from `theme`, which remains fixed at
+  Nothing else changes. `medium` decides only whether furniture is emitted:
+  page geometry is untouched, so the text block sits in the same place under
+  both values, pagination is unchanged, and no other command, key,
+  environment, or default is affected. Adding `medium=print` reproduces the
+  previous output exactly: all eleven supported examples then render
+  byte-identically to the pre-change tree apart from the PDF timestamp. (The
+  comparison baseline is this release's own furniture placement, which #183
+  already moved within the margins — not `v0.6.0`.) An unsupported value
+  produces a class error naming the accepted values. `medium` is a separate axis from `theme`, which remains fixed at
   `monochrome`; it does not affect colour, hyperlinks, or PDF metadata.
 
 ### Changed

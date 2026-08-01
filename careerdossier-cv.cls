@@ -37,7 +37,7 @@
 \tl_new:N \l__cdossier_cv_bodyfont_tl
 \tl_set:Nn \l__cdossier_cv_bodyfont_tl { serif }
 \tl_new:N \l__cdossier_cv_medium_tl
-\tl_set:Nn \l__cdossier_cv_medium_tl { print }
+\tl_set:Nn \l__cdossier_cv_medium_tl { screen }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   {
