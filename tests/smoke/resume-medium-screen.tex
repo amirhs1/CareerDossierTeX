@@ -1,0 +1,18 @@
+% resume-medium-screen.tex — smoke fixture: medium=screen is a supported value
+% and must build cleanly (issue #184). That it removes the folio and running
+% header is asserted on rendered pages by tests/layout/resume-screen-two-page.
+\documentclass[fontsize=10pt, margin=normal, medium=screen]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Example Corp}]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

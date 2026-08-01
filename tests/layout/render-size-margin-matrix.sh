@@ -83,11 +83,6 @@ compile_and_check() {
 # under test, preserving any other class option the fixture already sets
 # (only the statement fixture's type=research). Using awk, not sed, keeps this
 # portable across BSD (macOS) and GNU (CI) tool differences.
-#
-# `medium=print` is forced (issue #184). Rewriting the line drops whatever the
-# fixture set, and this matrix exists to review furniture placement across the
-# six size/margin combinations (issue #183) — under the `screen` default there
-# would be no furniture to look at.
 render_class_matrix() {
   local class="$1" extra_options="$2" template="$3" prefix="$4"
   local size margin job options newline
@@ -95,7 +90,7 @@ render_class_matrix() {
   for margin in "${margins[@]}"; do
     for size in "${sizes[@]}"; do
       job="${prefix}-${margin}-${size}"
-      options="fontsize=${size}, margin=${margin}, medium=print"
+      options="fontsize=${size}, margin=${margin}"
       [ -n "$extra_options" ] && options="${extra_options}, ${options}"
       # ENVIRON, not -v, carries the replacement: awk's -v assignment runs
       # backslash-escape processing on its value, which silently eats the

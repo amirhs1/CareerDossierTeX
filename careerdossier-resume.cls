@@ -40,7 +40,7 @@
 \tl_new:N \l__cdossier_resume_bodyfont_tl
 \tl_set:Nn \l__cdossier_resume_bodyfont_tl { serif }
 \tl_new:N \l__cdossier_resume_medium_tl
-\tl_set:Nn \l__cdossier_resume_medium_tl { screen }
+\tl_set:Nn \l__cdossier_resume_medium_tl { print }
 
 \msg_new:nnnn { careerdossier-resume } { unknown-option }
   {

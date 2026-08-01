@@ -45,7 +45,7 @@
 \tl_new:N \l__cdossier_letter_bodyfont_tl
 \tl_set:Nn \l__cdossier_letter_bodyfont_tl { serif }
 \tl_new:N \l__cdossier_letter_medium_tl
-\tl_set:Nn \l__cdossier_letter_medium_tl { screen }
+\tl_set:Nn \l__cdossier_letter_medium_tl { print }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }

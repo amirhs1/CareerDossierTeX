@@ -1,15 +1,11 @@
-% resume-screen-two-page.tex — the default medium=screen (issue #184): a
-% multi-page résumé must carry no folio on any page and no running header on
-% page two.
-%
-% `medium` is deliberately not passed: `screen` is the default, so this fixture
-% pins what an author gets without asking for anything. The sibling *-two-page
-% fixtures opt into `medium=print` and assert the furniture-bearing half.
+% resume-screen-two-page.tex — medium=screen (issue #184): a multi-page résumé
+% must carry no folio on any page and no running header on page two.
 %
 % The page break is forced rather than produced by overflowing content: this
 % fixture asserts which furniture is emitted, not where the class chooses to
-% break, and the sibling *-two-page fixtures already stress the latter.
-\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+% break, and the sibling *-two-page fixtures already stress the latter under
+% the default medium=print.
+\documentclass[fontsize=11pt, margin=narrow, medium=screen]{careerdossier-resume}
 \CDossierSetup{
   name     = {Ada Lovelace},
   headline = {Data Scientist},

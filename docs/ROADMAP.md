@@ -429,16 +429,15 @@ design* where the ratios are retuned.
 | Item | Rendered effect |
 |---|---|
 | #183 | furniture moves within the existing margins; `\textheight` and `\textwidth` are unchanged |
-| #184 | **defaults to `screen`: every multi-page document loses its running header and folio** unless it adds `medium=print` |
+| #184 | defaults to `print`, reproducing current output exactly |
 | #191 | none — both tokens keep the single token's value |
 | #195 | none — generated review filenames only |
 | #196 | bibliography entries move up as the hard-coded `6pt` gap closes |
 | #193 | the tagged path's space below a list changes to match the untagged path |
 
-The new public surface is one class option whose default *changes* rendered
-output — page furniture becomes opt-in — plus one design-token rename (#191)
-that is source-compatible for every document that does not read the token by
-name.
+The new public surface is one additive class option whose default reproduces
+current output exactly, plus one design-token rename (#191) that is
+source-compatible for every document that does not read the token by name.
 
 ### Included
 
@@ -450,14 +449,11 @@ name.
 - a `headheight` large enough for the furniture step of the type scale at every
   `fontsize`, replacing the inherited fixed `12pt`;
 - a public `medium` option (`screen`, `print`) on all four document classes,
-  defaulting to `screen`: `screen` emits no running header and no folio on any
-  page, and `print` keeps the `v0.6.0` behaviour (running header from page two,
-  folio throughout, both suppressed on a single-page document). Both open
+  defaulting to `print`: `print` keeps today's behaviour (running header from
+  page two, folio throughout, both suppressed on a single-page document) and
+  `screen` emits no running header and no folio on any page. Both open
   questions on the proposal are settled: the option is named `medium`, and
-  `screen` suppresses the running header as well as the folio. Page furniture
-  is therefore opt-in from this release, which is a breaking change to rendered
-  output for every existing multi-page document; the issue's original
-  `print` default was overridden by the maintainer;
+  `screen` suppresses the running header as well as the folio;
 - an actionable class error for an unsupported `medium` value, rejected like
   `fontsize`, `margin`, `paper`, and `bodyfont` but naming the accepted values,
   which `l3keys`' generic choice error used by those four does not;
@@ -511,8 +507,8 @@ name.
   `fontsize` × `margin` combinations, on Letter and A4;
 - `\textheight` and `\textwidth` are unchanged from `v0.6.0` at every
   combination;
-- `medium` defaults to `screen` and suppresses furniture, and `medium=print`
-  retains `v0.6.0` behaviour, on all four document classes;
+- `medium=screen` suppresses furniture and `medium=print` retains current
+  behaviour, on all four document classes;
 - an unsupported `medium` value produces an actionable class error naming the
   accepted values;
 - `make review-matrix` output is reviewed for both media, with PDFs named
