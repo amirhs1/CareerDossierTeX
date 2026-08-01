@@ -63,10 +63,8 @@ version, the Project uses a short label — so they cross-walk as follows:
 | `Phase 4: v0.5.0` | `Phase 4 — Expansion` |
 | `Phase 5: v0.6.0` | `Phase 5 — Calibration` |
 | `Phase 6: v0.7.0` | `Phase 6 — Spacing Ownership and Output Medium` |
-| `Phase 7: v1.0.0` | `Phase 7 — Stable API` |
-
-`v0.8.0 — Examples and Templates Revision` has no `Phase` option of its own; its
-issues carry the phase of the work they revise.
+| `Phase 7: v0.8.0` | `Phase 7 — Examples and Templates` |
+| `Phase 8: v1.0.0` | `Phase 8 — Stable API` |
 
 ## Phase 0: inventory and baseline
 
@@ -532,7 +530,31 @@ Tracked under
 [milestone `v0.7.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/10)
 and [epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182).
 
-## Phase 7: `v1.0.0 — Stable Public API`
+## Phase 7: `v0.8.0 — Examples and Templates Revision`
+
+### Goal
+
+Review every example end to end against the calibrated token system, and decide
+whether a separate `templates/` folder is warranted.
+
+### Scope
+
+- review each example under `examples/` for currency against the calibrated
+  token system, consistency with the others, and whether it still demonstrates
+  its intended feature clearly;
+- add longer, more representative examples where the current fixture is too thin
+  to show real behavior, starting with `cv-bibliography` (#197);
+- correct the extracted reading order of bibliography entry numbers (#199), a
+  follow-up from #196 that `v0.7.0` lists as a non-goal because fixing it means
+  changing `biblatex` label geometry;
+- evaluate whether a `templates/` folder is warranted — ready-to-copy starting
+  points, distinct from feature-demonstration examples — and if so define its
+  scope and its relationship to `examples/`.
+
+Tracked under
+[milestone `v0.8.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/11).
+
+## Phase 8: `v1.0.0 — Stable Public API`
 
 ### Goal
 
