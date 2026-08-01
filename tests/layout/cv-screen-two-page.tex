@@ -1,0 +1,31 @@
+% cv-screen-two-page.tex — medium=screen (issue #184): a multi-page CV must
+% carry no folio on any page and no running header on page two. The page break
+% is forced; see resume-screen-two-page.tex for why.
+\documentclass[fontsize=11pt, margin=normal, medium=screen]{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Researcher in Analytical Computing},
+  email    = {ada.lovelace@example.com},
+  location = {Toronto, Ontario, Canada},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Academic Appointments}
+\begin{CDossierEntry}[title = {Associate Professor of Computational Mathematics}, organization = {Example University}, location = {Toronto, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Lead a research program on numerically stable models for coupled nonlinear systems and reproducible computational methods.
+    \item Develop validation practices that connect research code, methods papers, datasets, and durable technical documentation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\newpage
+
+\CDossierSection{Education}
+\begin{CDossierEntry}[title = {Ph.D. in Applied Mathematics}, organization = {University of Toronto}, location = {Toronto, ON}, dates = {2014--2019}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {B.Sc. in Mathematics, Honours}, organization = {University of Waterloo}, location = {Waterloo, ON}, dates = {2010--2014}]
+\end{CDossierEntry}
+
+\end{document}

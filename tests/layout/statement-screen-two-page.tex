@@ -1,0 +1,42 @@
+% statement-screen-two-page.tex — medium=screen (issue #184): a multi-page
+% statement must carry no folio on any page and no running header on page two,
+% including the independently configured short running title. The page break is
+% forced; see resume-screen-two-page.tex for why.
+\documentclass[type=research, medium=screen]{careerdossier-statement}
+\CDossierSetup{
+  name={Ada Lovelace},
+  email={ada.lovelace@example.com},
+  phone={+1 416 555 0142},
+  website={example.com/ada},
+  affiliation={Example University},
+  orcid={0000-0002-1825-0097}
+}
+\CDossierStatementSetup{
+  running-title={Computational Reliability},
+  subtitle={Transparent methods for trustworthy scientific computing},
+}
+\begin{document}
+\MakeCDossierStatementHeader
+
+\section*{Research Vision}
+
+My research asks how computational results can remain understandable and
+useful after the immediate project that produced them has ended. Scientific
+software is written under deadline pressure, yet it is read and rerun for
+years afterwards by people who were never part of the original team.
+
+I approach that question from three directions: numerical methods whose
+failure modes are legible rather than silent, tooling that records the
+provenance of every published figure, and documentation written for the
+reader who arrives without context.
+
+\newpage
+
+\section*{Current Directions}
+
+My current work extends these methods to coupled nonlinear systems, where the
+interaction between components is the part practitioners find hardest to
+reason about. The goal is not a single model but a shared vocabulary for
+describing where a model stops being trustworthy.
+
+\end{document}

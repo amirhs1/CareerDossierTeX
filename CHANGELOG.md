@@ -8,6 +8,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- All four document classes accept `medium=print|screen`, controlling whether
+  page furniture is emitted. `print` is the default and keeps today's policy —
+  a running header from page two, a `Page N of M` folio throughout, and neither
+  on a one-page document. `screen` emits no running header and no folio on any
+  page. ([#184])
+
+  The same dossier is read in two contexts with different needs: a PDF viewer
+  already shows page position, so the folio is redundant on screen, while a
+  loose printed page has no such affordance and the folio is what keeps a
+  multi-page dossier in order.
+
+  This is additive and changes nothing for an existing document. Under the
+  default `medium=print`, all eleven supported examples render byte-identically
+  to `v0.6.0` apart from the PDF timestamp. `medium` decides only whether
+  furniture is emitted: page geometry is untouched, so the text block sits in
+  the same place under both values and switching the option cannot reflow a
+  document. An unsupported value produces a class error naming the accepted
+  values. `medium` is a separate axis from `theme`, which remains fixed at
+  `monochrome`; it does not affect colour, hyperlinks, or PDF metadata.
+
 ### Changed
 
 - **BREAKING (design token):** `\CDossierListEdgeSkip` is now two tokens,
@@ -77,6 +99,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   entries in source order.
 
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
+[#184]: https://github.com/amirhs1/CareerDossierTeX/issues/184
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
 [#191]: https://github.com/amirhs1/CareerDossierTeX/issues/191
 [#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193

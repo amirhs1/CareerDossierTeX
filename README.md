@@ -35,6 +35,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
 | Paper size | US Letter and A4 | `paper=letter` remains the default; `paper=a4` is opt-in |
 | Body font | Serif and sans | `bodyfont=serif` remains the default; `bodyfont=sans` is opt-in |
+| Output medium | Print and screen | `medium=print` remains the default; `medium=screen` drops the running header and folio |
 | Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
@@ -87,7 +88,8 @@ Optional fields may be omitted. Contact separators should adjust automatically w
   fontsize=11pt,
   margin=narrow,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  medium=print
 ]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}
@@ -114,7 +116,8 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 ```
 
 Every document class accepts `fontsize=10pt|11pt|12pt`,
-`margin=normal|narrow`, and `paper=letter|a4`. US Letter remains the default.
+`margin=normal|narrow`, `paper=letter|a4`, `bodyfont=serif|sans`, and
+`medium=print|screen`. US Letter remains the default.
 The résumé defaults to `11pt,narrow`; the CV, letter, and statement classes
 default to `12pt,normal`. `normal` is one inch and `narrow` is half an inch.
 One `fontsize` drives every type size and every structural gap, so the three
@@ -125,6 +128,12 @@ the only body size whose full-measure line lands near the conventional 45–90
 character range. The résumé instead keeps `11pt,narrow` for one-page capacity,
 which runs long in full-width prose — see [`docs/API.md`](docs/API.md) for the
 measured figures and when to override it.
+
+`medium` names the output context and decides whether page furniture is
+emitted. `print` is the default and keeps the running header and `Page N of M`
+folio; `screen` drops both, because a PDF viewer already shows page position.
+It changes nothing else — the text block does not move, so switching `medium`
+cannot reflow a document.
 
 Advanced users can call `\geometry{...}` after `\documentclass` for a custom
 layout, but should not load the already-loaded `geometry` package again.

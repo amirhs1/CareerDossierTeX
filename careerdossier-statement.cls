@@ -35,7 +35,9 @@
 \tl_new:N   \l__cdossier_statement_bodyfont_tl
 \tl_new:N   \l__cdossier_statement_fontsize_tl
 \tl_new:N   \l__cdossier_statement_margin_tl
+\tl_new:N   \l__cdossier_statement_medium_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { interest }
+\tl_set:Nn  \l__cdossier_statement_medium_tl { print }
 \tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
 \tl_set:Nn  \l__cdossier_statement_bodyfont_tl { serif }
 \tl_set:Nn  \l__cdossier_statement_fontsize_tl { 12pt }
@@ -54,9 +56,19 @@
     Supported~options~are~'type'~(interest,~research,~teaching,~
     teaching-philosophy,~diversity,~artist,~purpose),~
     'fontsize'~(10pt,~11pt,~12pt),~'margin'~(normal,~narrow),~
-    'paper'~(letter,~a4),~and~
-    'bodyfont'~(serif,~sans).~Language,~theme,~and~named~font~combinations~
+    'paper'~(letter,~a4),~
+    'bodyfont'~(serif,~sans),~and~
+    'medium'~(print,~screen).~Language,~theme,~and~named~font~combinations~
     cannot~be~set~here.
+  }
+
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so the accepted values are named here.
+\msg_new:nnnn { careerdossier-statement } { unknown-medium }
+  { Unknown~'medium'~value~'#1'~for~careerdossier-statement. }
+  {
+    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
+    and~'screen'~(neither).
   }
 
 \keys_define:nn { cdossier / statement }
@@ -100,6 +112,12 @@
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_statement_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
+    medium .choices:nn =
+      { print , screen }
+      { \tl_set_eq:NN \l__cdossier_statement_medium_tl \l_keys_choice_tl } ,
+    medium / unknown .code:n =
+      { \msg_error:nnn { careerdossier-statement } { unknown-medium } {#1} } ,
+    medium .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-statement } { unknown-option }
           { \l_keys_key_str } } ,
@@ -116,6 +134,14 @@
         margin = \l__cdossier_statement_margin_tl
       }
       { careerdossier-tokens }
+  }
+%% Issue #184: the class validates the public value; careerdossier-components
+%% owns the page furniture and therefore the resulting decision.
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      { medium = \l__cdossier_statement_medium_tl }
+      { careerdossier-components }
   }
 
 \use:x

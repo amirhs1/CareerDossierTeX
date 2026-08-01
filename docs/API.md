@@ -43,6 +43,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Body size | `fontsize=10pt\|11pt\|12pt`, per-class default |
 | Margins | `margin=normal` (1 in) or `margin=narrow` (0.5 in), per-class default |
 | Body font | Serif (default) and opt-in sans |
+| Output medium | `medium=print` (default) or `medium=screen` |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
@@ -129,7 +130,8 @@ actually been verified.
   fontsize=11pt,
   margin=narrow,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  medium=print
 ]{careerdossier-resume}
 ```
 
@@ -254,6 +256,32 @@ size, semantic typography roles, spacing, geometry, or page furniture.
 Unsupported values produce an actionable class error. Arbitrary font names and
 per-role font selection are not supported.
 
+#### `medium`
+
+Every CareerDossierTeX document class accepts:
+
+```text
+print
+screen
+```
+
+`medium` is new after `v0.6.0`.
+
+The default is `print`, which is the page-furniture policy described below: a
+running header from page two and a `Page N of M` folio throughout, both
+suppressed on a one-page document. `screen` emits no running header and no
+folio on any page.
+
+The same dossier is read in two contexts with different needs. On screen the
+PDF viewer already shows page position, so the folio is redundant chrome; on
+paper a loose page has no such affordance, and the folio is what keeps a
+multi-page dossier in order after it is put down.
+
+The option changes only whether furniture is emitted. Page geometry is
+unchanged, so the text block sits in exactly the same place under both values
+and switching `medium` cannot reflow a document. Unsupported values produce an
+actionable class error naming the accepted values.
+
 ### Fixed settings
 
 The following remain fixed and are not accepted as user options:
@@ -267,7 +295,8 @@ It is better to reject or omit an unsupported option than silently ignore it.
 
 ### Page furniture
 
-All four document classes use the same fixed page-furniture policy:
+All four document classes use the same page-furniture policy. Under the default
+`medium=print`:
 
 - a one-page document has no running header and no folio;
 - page one of a multi-page document has only a centered `Page N of M` folio;
@@ -277,9 +306,14 @@ All four document classes use the same fixed page-furniture policy:
   letter families use `Cover Letter`, and a statement uses its independently
   configurable short running title.
 
+Under `medium=screen` neither the running header nor the folio is emitted, on
+any page and at any page count.
+
 Furniture uses the sans-serif furniture step of the calibrated type scale and
 the monochrome text token. It remains print-safe and is marked as a layout
-artifact when tagged PDF is active. Page furniture is not user-configurable.
+artifact when tagged PDF is active. Which furniture is emitted is the only
+user-configurable part of the policy; its typography, wording, and placement
+are not.
 
 The header and the folio sit in the vertical centre of the top and bottom
 margins respectively, at every `fontsize` × `margin` combination and on both
@@ -304,14 +338,17 @@ the required rerun.
   fontsize=12pt,
   margin=normal,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  medium=print
 ]{careerdossier-letter}
 ```
 
 `family` accepts `industry` and `academic`; the default is `industry`. `paper`
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
-uses the shared `serif|sans` contract above and defaults to `serif`. `fontsize`
-and `margin` use the shared contracts above and default to `12pt` and `normal`.
+uses the shared `serif|sans` contract above and defaults to `serif`. `medium`
+uses the shared `print|screen` contract above and defaults to `print`.
+`fontsize` and `margin` use the shared contracts above and default to `12pt`
+and `normal`.
 
 `family` is label- and metadata-only: it selects the PDF document type while
 both values use the same geometry, calibrated type scale, prose rhythm,
@@ -822,7 +859,8 @@ Load the academic CV with:
   fontsize=12pt,
   margin=normal,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  medium=print
 ]{careerdossier-cv}
 ```
 
@@ -834,6 +872,7 @@ The class accepts the same value sets as the résumé class:
 | `margin` | `normal`, `narrow` | `normal` |
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
+| `medium` | `print`, `screen` | `print` |
 
 English and the monochrome theme remain fixed. Unsupported options or values
 must produce an actionable class error rather than being ignored.
@@ -1049,7 +1088,7 @@ design decision before the behavior is merged.
 ### Class and statement types
 
 All statement documents use one class with an optional `type` option and the
-shared `fontsize`, `margin`, `paper`, and `bodyfont` settings:
+shared `fontsize`, `margin`, `paper`, `bodyfont`, and `medium` settings:
 
 ```latex
 \documentclass[
@@ -1057,7 +1096,8 @@ shared `fontsize`, `margin`, `paper`, and `bodyfont` settings:
   fontsize=12pt,
   margin=normal,
   paper=letter,
-  bodyfont=serif
+  bodyfont=serif,
+  medium=print
 ]{careerdossier-statement}
 ```
 
@@ -1100,9 +1140,11 @@ The `v0.6.0` development layout uses the shared calibrated design system:
 - a centered identity block in the body on page one;
 - no running header on page one;
 - a centered `<name> -- <running title>` header from page two; and
-- the shared one-page suppression and multi-page continuation furniture.
+- the shared one-page suppression and multi-page continuation furniture under
+  the default `medium=print`, and no furniture at all under `medium=screen`.
 
-Page furniture is component-owned and not user-configurable. The statement
+Page furniture is component-owned; `medium` is the only public control over
+it, and it decides only whether furniture is emitted. The statement
 class registers its short running title with the shared component and uses the
 same type, rhythm, geometry, paper, and body-font system as the résumé, CV, and
 letter classes. The seven statement types retain independent full display and

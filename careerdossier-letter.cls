@@ -44,14 +44,25 @@
 \tl_set:Nn \l__cdossier_letter_margin_tl { normal }
 \tl_new:N \l__cdossier_letter_bodyfont_tl
 \tl_set:Nn \l__cdossier_letter_bodyfont_tl { serif }
+\tl_new:N \l__cdossier_letter_medium_tl
+\tl_set:Nn \l__cdossier_letter_medium_tl { print }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
   {
     Supported~options~are~'family'~(industry,~academic),~
     'fontsize'~(10pt,~11pt,~12pt),~'margin'~(normal,~narrow),~
-    'paper'~(letter,~a4),~and~'bodyfont'~(serif,~sans).~Language~and~theme~
-    cannot~be~set~here.
+    'paper'~(letter,~a4),~'bodyfont'~(serif,~sans),~and~
+    'medium'~(print,~screen).~Language~and~theme~cannot~be~set~here.
+  }
+
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so the accepted values are named here.
+\msg_new:nnnn { careerdossier-letter } { unknown-medium }
+  { Unknown~'medium'~value~'#1'~for~careerdossier-letter. }
+  {
+    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
+    and~'screen'~(neither).
   }
 
 \keys_define:nn { cdossier / letter }
@@ -82,6 +93,12 @@
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_letter_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
+    medium .choices:nn =
+      { print , screen }
+      { \tl_set_eq:NN \l__cdossier_letter_medium_tl \l_keys_choice_tl } ,
+    medium / unknown .code:n =
+      { \msg_error:nnn { careerdossier-letter } { unknown-medium } {#1} } ,
+    medium .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
@@ -98,6 +115,14 @@
         margin = \l__cdossier_letter_margin_tl
       }
       { careerdossier-tokens }
+  }
+%% Issue #184: the class validates the public value; careerdossier-components
+%% owns the page furniture and therefore the resulting decision.
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      { medium = \l__cdossier_letter_medium_tl }
+      { careerdossier-components }
   }
 
 %% A prose letter reads best at a slightly larger default body size than the
