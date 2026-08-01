@@ -10,8 +10,16 @@ under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
 > **Current status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is released.
-> `v0.3.0` is dropped. The next planned release is `v0.6.1 — Page Furniture
-> Placement and Output Medium`, followed by `v1.0.0 — Stable Public API`.
+> `v0.3.0` is dropped. The next planned release is `v0.7.0 — Page Furniture,
+> Output Medium, and Spacing Ownership`, followed by `v0.8.0 — Examples and
+> Templates Revision` and `v1.0.0 — Stable Public API`.
+>
+> That release was numbered `v0.6.1` until 2026-08-01. It adds new public API —
+> the `medium` option and new spacing tokens — which is a minor release under
+> Semantic Versioning, not a patch; it also renames public design tokens and
+> retunes calibrated values, so documents reflow. The former `v0.7.0 — Examples
+> and Templates Revision` moved to `v0.8.0`. See
+> [issue #205](https://github.com/amirhs1/CareerDossierTeX/issues/205).
 
 ## Release overview
 
@@ -25,7 +33,8 @@ test pass at the end of a milestone.
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.5.0` | Statement classes and broader customization | Released |
 | `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
-| `v0.6.1` | Page furniture placement and the `medium` output-context option | Planned |
+| `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Planned |
+| `v0.8.0` | Examples and templates revision | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
 Repository milestones are tracked on the GitHub milestones page:
@@ -53,8 +62,11 @@ version, the Project uses a short label — so they cross-walk as follows:
 | `Phase 3: v0.4.0` | `Phase 3 — Engine and Accessibility` |
 | `Phase 4: v0.5.0` | `Phase 4 — Expansion` |
 | `Phase 5: v0.6.0` | `Phase 5 — Calibration` |
-| `Phase 6: v0.6.1` | `Phase 6 — Spacing Ownership and Output Medium` |
+| `Phase 6: v0.7.0` | `Phase 6 — Spacing Ownership and Output Medium` |
 | `Phase 7: v1.0.0` | `Phase 7 — Stable API` |
+
+`v0.8.0 — Examples and Templates Revision` has no `Phase` option of its own; its
+issues carry the phase of the work they revise.
 
 ## Phase 0: inventory and baseline
 
@@ -387,13 +399,13 @@ Tracked under
 [milestone `v0.6.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/9)
 and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
 
-## Phase 6: `v0.6.1 — Page Furniture, Output Medium, and Spacing Ownership`
+## Phase 6: `v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership`
 
 ### Goal
 
 Reclaim ownership of vertical placement and spacing for the calibrated design
-system released in `v0.6.0`, and make page furniture selectable by output
-context.
+system released in `v0.6.0`, make page furniture selectable by output context,
+and retune the vertical-rhythm ratios once every gap is owned by a token.
 
 The unifying concern is not page furniture as such. In several places a
 vertical dimension is decided by a third-party default or a hard-coded constant
@@ -402,15 +414,17 @@ defaults place the running header and folio (#183); LaTeX's single `topsep`
 cannot express a different space above and below a list (#191);
 `careerdossier-biblatex` hard-codes the bibliography's inter-entry gap at `6pt`
 (#196); and LaTeX Lab's block default decides the space below a list on the
-tagged path (#193). Each item hands one such decision back to the token that
-should own it.
+tagged path (#193); and the prose `\parskip` floors every header gap, leaving
+the header tokens unable to express the spacing they name (#204). Each item
+hands one such decision back to the token that should own it. #203 then makes
+the token names consistent, and #206 sets the values.
 
-**No calibrated value changes.** No type-scale step, vertical-rhythm ratio,
-margin preset, or `careerdossier-tokens.sty` dimension changes value, and
-retuning any ratio stays out of scope.
+**No type-scale step or margin preset changes value.** The vertical-rhythm
+ratios do, under #206 and against its stated design rules.
 
-Rendered output moves only where a spacing decision was never the design
-system's to begin with:
+Rendered output therefore moves in two ways: it is *corrected* where a spacing
+decision was never the design system's to begin with, and it *reflows by
+design* where the ratios are retuned.
 
 | Item | Rendered effect |
 |---|---|
@@ -460,15 +474,20 @@ source-compatible for every document that does not read the token by name.
   both `medium` values, the unknown-value error, and both list edges on both
   the untagged and tagged paths;
 - this roadmap renumbering and the phase-numbering convention that prevents it
-  from drifting again.
+  from drifting again;
+- one naming convention across the vertical-spacing tokens (#203), and header
+  and letter-block tokens that own the gaps they name rather than inheriting
+  the prose `\parskip` (#204);
+- a retune of the vertical-rhythm ratios (#206), once #203 and #204 leave every
+  gap owned by a token that can express it. Documents reflow.
 
 ### Explicit non-goals
 
-- any change to the *value* of a type-scale step, vertical-rhythm ratio, margin
-  preset, or `careerdossier-tokens.sty` dimension. The list-edge split above is
-  a mechanism change that preserves every rendered gap; retuning either
-  list-edge ratio, or any other ratio, stays out of scope until specific values
-  are proposed against the calibrated type scale;
+- any change to the *value* of a type-scale step or a margin preset. The
+  vertical-rhythm ratios *are* retuned in this release, but only under #206 and
+  only against its stated design rules; a ratio changed incidentally by any
+  other issue here is out of scope. The list-edge split and the token renames
+  are mechanism and naming changes that preserve every rendered gap;
 - colour themes. `theme=monochrome` remains fixed, and `medium` is deliberately
   a separate axis from colour — the two must not be conflated;
 - per-class furniture customization, user-supplied header or footer content,
@@ -496,17 +515,21 @@ source-compatible for every document that does not read the token by name.
   `type-margin-fontsize` (#195);
 - the extraction, tagging, layout, and regression suites pass;
 - both list edges are owned by their tokens on the untagged path, with the
-  rendered gap unchanged from `v0.6.0`;
+  rendered gap unchanged from `v0.6.0` by the split itself (#191) — the later
+  retune (#206) moves it deliberately;
 - the tagged path's closing list edge equals `\CDossierListEdgeSkipAfter`, and
   `pdftotext -bbox` output agrees between tagged and untagged builds of every
   supported example, or every remaining difference is explained (#193);
 - `cv-bibliography`'s inter-entry gap equals `\CDossierItemSepSkip` (#196);
 - `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
   `CHANGELOG.md` are updated;
-- tag and GitHub Release `v0.6.1` are published.
+- the vertical-spacing tokens follow one naming convention (#203), headers and
+  letter blocks own their own gaps (#204), and the retuned ratios are reviewed
+  against rendered output at both margins and all three body sizes (#206);
+- tag and GitHub Release `v0.7.0` are published.
 
 Tracked under
-[milestone `v0.6.1`](https://github.com/amirhs1/CareerDossierTeX/milestone/10)
+[milestone `v0.7.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/10)
 and [epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182).
 
 ## Phase 7: `v1.0.0 — Stable Public API`
