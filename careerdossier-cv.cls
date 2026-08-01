@@ -36,17 +36,30 @@
 \tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper }
 \tl_new:N \l__cdossier_cv_bodyfont_tl
 \tl_set:Nn \l__cdossier_cv_bodyfont_tl { serif }
+\tl_new:N \l__cdossier_cv_medium_tl
+\tl_set:Nn \l__cdossier_cv_medium_tl { print }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   {
     Unknown~class~option~'#1'~for~careerdossier-cv.~
-    Supported~options~are~'fontsize',~'margin',~'paper',~and~'bodyfont'.
+    Supported~options~are~'fontsize',~'margin',~'paper',~'bodyfont',~
+    and~'medium'.
   }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
     'margin'~(normal,~narrow),~
-    'paper'~(letter,~a4),~and~
-    'bodyfont'~(serif,~sans).~Language~and~theme~cannot~be~set~here.
+    'paper'~(letter,~a4),~
+    'bodyfont'~(serif,~sans),~and~
+    'medium'~(print,~screen).~Language~and~theme~cannot~be~set~here.
+  }
+
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so the accepted values are named here.
+\msg_new:nnnn { careerdossier-cv } { unknown-medium }
+  { Unknown~'medium'~value~'#1'~for~careerdossier-cv. }
+  {
+    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
+    and~'screen'~(neither).
   }
 
 \keys_define:nn { cdossier / cv }
@@ -73,6 +86,12 @@
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_cv_bodyfont_tl \l_keys_choice_tl } ,
     bodyfont .value_required:n = true ,
+    medium .choices:nn =
+      { print , screen }
+      { \tl_set_eq:NN \l__cdossier_cv_medium_tl \l_keys_choice_tl } ,
+    medium / unknown .code:n =
+      { \msg_error:nnn { careerdossier-cv } { unknown-medium } {#1} } ,
+    medium .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-cv } { unknown-option } { \l_keys_key_str } } ,
   }
@@ -88,6 +107,14 @@
         margin = \l__cdossier_cv_margin_tl
       }
       { careerdossier-tokens }
+  }
+%% Issue #184: the class validates the public value; careerdossier-components
+%% owns the page furniture and therefore the resulting decision.
+\use:x
+  {
+    \exp_not:N \PassOptionsToPackage
+      { medium = \l__cdossier_cv_medium_tl }
+      { careerdossier-components }
   }
 
 \use:x

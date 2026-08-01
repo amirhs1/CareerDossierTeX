@@ -599,6 +599,7 @@ Responsibilities:
 
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
+- the `medium=print|screen` decision of whether any furniture is emitted;
 - shared CV/résumé section rule, including token-owned vertical spacing and
   tagged layout-artifact treatment;
 - contact line;
@@ -632,6 +633,27 @@ one gap — and shared page
 furniture owns its typography and auxiliary-file page-count decision, while
 leaving page geometry and the document-specific running label to the document
 classes.
+
+#### Why the `medium` option resolves here
+
+`medium=print|screen` is a public *class* option, but the thing it decides —
+whether page furniture is emitted at all — is owned by this module. The four
+classes therefore validate the value and forward it with
+`\PassOptionsToPackage`; this module holds the resolved boolean and
+`\MakeCDossierPageFurniture` acts on it. Putting the decision in the classes
+would replicate one policy four times, and a direct user of
+`careerdossier-components` would get no say at all.
+
+The forwarding direction matters: `\ProcessKeysPackageOptions` reads local
+package options only, never the global `\documentclass` list, so a value
+reaches this module only after the class that owns the public surface has
+validated it.
+
+`medium` deliberately does not reuse the vocabulary of `theme`. `theme` names
+the (fixed) colour decision, and whether a folio is emitted is unrelated to
+colour; `medium` names the output context, which is what actually drives the
+decision. Widening it beyond page furniture is an explicit non-goal of this
+release (see [`ROADMAP.md`](ROADMAP.md)).
 
 #### Why PDF metadata lives here
 
@@ -681,7 +703,9 @@ Responsibilities:
 
 - load an appropriate base class;
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process `fontsize`, `margin`, and `paper` class options;
+- process `fontsize`, `margin`, `paper`, `bodyfont`, and `medium` class
+  options, forwarding `medium` to the components module that owns the
+  furniture decision;
 - register the `Résumé` running label and enable shared page furniture;
 - render résumé sections, entries, and lists from the shared type, rhythm, rule,
   and list tokens;
@@ -708,6 +732,8 @@ Responsibilities:
 - process `family=industry|academic` as a label- and metadata-only choice while
   preserving `industry` as the default;
 - process `paper=letter|a4` while preserving Letter as the default;
+- process `medium=print|screen`, forwarding it to the components module that
+  owns the furniture decision;
 - register the `Cover Letter` running label and enable shared page furniture;
 - support one-page and multi-page letters without résumé-specific compression.
 
@@ -732,7 +758,8 @@ Responsibilities:
 - arrange the centered first-page identity block in logical source order;
 - keep the full meaningful title in the page-one body and PDF metadata while a
   separately bounded running title identifies continuation pages;
-- register that short running title with the shared page-furniture component;
+- register that short running title with the shared page-furniture component,
+  and forward `medium=print|screen` to it;
 - reuse component-owned link normalization and separator-safe contact output;
 - derive every header size and gap plus prose paragraph rhythm from the shared
   token package;
@@ -786,7 +813,9 @@ Owns academic-CV document behavior.
 Responsibilities:
 
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process the documented `fontsize`, `margin`, and `paper` options;
+- process the documented `fontsize`, `margin`, `paper`, `bodyfont`, and
+  `medium` options, forwarding `medium` to the components module that owns the
+  furniture decision;
 - render the first-page identity in the body;
 - register the `Curriculum Vitae` running label and enable shared page
   furniture without making contact details running-only content;

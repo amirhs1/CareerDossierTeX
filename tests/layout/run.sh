@@ -81,12 +81,18 @@ for tex in *.tex; do
       ;;
   esac
 
-  # Shared page furniture is suppressed entirely for a one-page document. A
-  # multi-page document carries `Page N of M` throughout and an
-  # identity-derived running header from page two onwards. Check extracted text
-  # rather than exact coordinates so the test guards behavior without freezing
-  # layout.
+  # Under the default `medium=print`, shared page furniture is suppressed
+  # entirely for a one-page document, and a multi-page document carries
+  # `Page N of M` throughout and an identity-derived running header from page
+  # two onwards. Under `medium=screen` (issue #184, fixtures named
+  # `*-screen-*`) neither is emitted on any page. Check extracted text rather
+  # than exact coordinates so the test guards behavior without freezing layout.
   if command -v pdftotext >/dev/null 2>&1; then
+    case "$base" in
+      *-screen-*) medium_screen=1 ;;
+      *)          medium_screen=0 ;;
+    esac
+
     furniture_label=""
     case "$base" in
       resume-*)           furniture_label="Résumé" ;;
@@ -107,7 +113,16 @@ for tex in *.tex; do
     fi
     for (( n = 1; n <= pages; n++ )); do
       page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
-      if [ "$pages" -eq 1 ]; then
+
+      # Folio. Absent on every page under `screen`; under `print` absent from a
+      # one-page document and present on every page otherwise. The `screen`
+      # assertion is not vacuous: the same fixture under `print` would emit
+      # `Page N of M` on each of its pages.
+      if [ "$medium_screen" -eq 1 ]; then
+        if printf '%s\n' "$page_text" | grep -Eq 'Page [0-9]+ of [0-9]+'; then
+          echo "  UNEXPECTED SCREEN FOLIO on page $n"; furniture_fail=1
+        fi
+      elif [ "$pages" -eq 1 ]; then
         if printf '%s\n' "$page_text" | grep -Fq "Page 1 of 1"; then
           echo "  UNEXPECTED SINGLE-PAGE FOLIO"; furniture_fail=1
         fi
@@ -115,10 +130,17 @@ for tex in *.tex; do
         echo "  MISSING FOLIO: Page $n of $pages"; furniture_fail=1
       fi
 
-      if [ "$pages" -gt 1 ] && [ "$n" -gt 1 ] \
-          && ! printf '%s\n' "$page_text" | grep -Fq "$furniture_label"; then
-        echo "  MISSING RUNNING HEADER on page $n: $furniture_label"
-        furniture_fail=1
+      # Running header, from page two onwards.
+      if [ "$pages" -gt 1 ] && [ "$n" -gt 1 ]; then
+        if [ "$medium_screen" -eq 1 ]; then
+          if printf '%s\n' "$page_text" | grep -Fq "$furniture_label"; then
+            echo "  UNEXPECTED SCREEN RUNNING HEADER on page $n: $furniture_label"
+            furniture_fail=1
+          fi
+        elif ! printf '%s\n' "$page_text" | grep -Fq "$furniture_label"; then
+          echo "  MISSING RUNNING HEADER on page $n: $furniture_label"
+          furniture_fail=1
+        fi
       fi
       if [ "$pages" -gt 1 ] && [ "$n" -eq 1 ]; then
         label_count="$(printf '%s\n' "$page_text" | grep -Fc "$furniture_label" || true)"
@@ -130,6 +152,8 @@ for tex in *.tex; do
     done
     if [ "$furniture_fail" -ne 0 ]; then
       fail=1
+    elif [ "$medium_screen" -eq 1 ]; then
+      echo "  medium=screen: no folio or running header on any page"
     elif [ "$pages" -eq 1 ]; then
       echo "  single-page furniture suppressed"
     else

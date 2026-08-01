@@ -1,0 +1,44 @@
+% letter-screen-two-page.tex — medium=screen (issue #184): a multi-page cover
+% letter must carry no folio on any page and no running header on page two. The
+% page break is forced; see resume-screen-two-page.tex for why.
+\documentclass[medium=screen]{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+}
+\CDossierLetterSetup{
+  date                   = {14 July 2026},
+  recipient-name         = {Hiring Committee},
+  recipient-title        = {Department of Applied Analytics},
+  recipient-organization = {Northbridge Research Institute},
+  recipient-address      = {123 Discovery Avenue\\Vancouver, British Columbia V6T 1Z4},
+  subject                = {Application for the Senior Data Scientist position},
+  salutation             = {Dear Members of the Hiring Committee,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position in computational
+analytics at the Northbridge Research Institute. I recently completed a decade
+of work spanning public-sector analytics, reporting platforms, and reproducible
+research pipelines, and I am eager to contribute that experience to your group's
+mission of building reliable, accessible scientific software.
+
+My most recent work focused on developing scalable, reproducible reporting
+services for high-volume public programs. I designed governed data pipelines,
+implemented performance-critical processing routines, and collaborated closely
+with program teams to translate operational requirements into maintainable
+systems with measurable service standards.
+
+\newpage
+
+Thank you for considering my application. I have enclosed my curriculum vitae and
+would be pleased to discuss how my background and interests align with the goals
+of your group. I am available at your convenience for a conversation and can
+provide references, code samples, and further documentation on request.
+
+\MakeCDossierClosing
+\end{document}

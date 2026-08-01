@@ -449,12 +449,12 @@ source-compatible for every document that does not read the token by name.
 - a public `medium` option (`screen`, `print`) on all four document classes,
   defaulting to `print`: `print` keeps today's behaviour (running header from
   page two, folio throughout, both suppressed on a single-page document) and
-  `screen` emits no running header and no folio on any page. **This is a public
-  API proposal awaiting maintainer sign-off** on the option name and on whether
-  `screen` suppresses the running header as well as the folio; nothing here is
-  implemented or supported until that decision lands;
-- an actionable class error for an unsupported `medium` value, consistent with
-  `fontsize`, `margin`, `paper`, and `bodyfont`;
+  `screen` emits no running header and no folio on any page. Both open
+  questions on the proposal are settled: the option is named `medium`, and
+  `screen` suppresses the running header as well as the folio;
+- an actionable class error for an unsupported `medium` value, rejected like
+  `fontsize`, `margin`, `paper`, and `bodyfont` but naming the accepted values,
+  which `l3keys`' generic choice error used by those four does not;
 - splitting the single list-edge token into `\CDossierListEdgeSkipBefore` and
   `\CDossierListEdgeSkipAfter`, so the space above a list and the space below
   it can be tuned independently (#191). Both keep the value the single token

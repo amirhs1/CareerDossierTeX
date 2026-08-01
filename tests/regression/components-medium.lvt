@@ -1,0 +1,87 @@
+% components-medium.lvt — the `screen' half of the output-medium option (#184).
+%
+% careerdossier-components owns the page furniture and therefore owns the
+% decision of whether to emit it. The four classes only validate the public
+% value and forward it here, so the resolved state and the page styles
+% \MakeCDossierPageFurniture then selects are asserted once, at the component.
+% `print' is the default and is asserted in components-furniture.lvt; a package
+% takes one set of options per document, so the two values need two files.
+%
+% Rendered output under `screen' is covered by the layout suite, and the
+% per-class option surface by the smoke suite.
+\input{regression-test}
+\documentclass{article}
+\usepackage[medium=screen]{careerdossier-components}
+\MakeCDossierPageFurniture
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestReportMedium
+  {
+    \bool_if:NTF \l__cdossier_components_furniture_bool
+      { \TYPE{medium=print} }
+      { \TYPE{medium=screen} }
+  }
+
+%% \thispagestyle only records a name for shipout, so the head and foot read
+%% here are the ones \pagestyle installed. Under `screen' both must be empty:
+%% leaving the base class's `plain' in place would keep a bare page number.
+\cs_new_protected:Npn \cdossiertestReportSelectedStyle
+  {
+    \tl_if_empty:cTF { @oddhead }
+      { \TYPE{head=empty} }
+      { \TYPE{head=furniture} }
+    \tl_if_empty:cTF { @oddfoot }
+      { \TYPE{foot=empty} }
+      { \TYPE{foot=furniture} }
+  }
+
+\cs_new_protected:Npn \cdossiertestReportStyles
+  {
+    \cs_if_exist:cTF { ps@cdossierfurniture }
+      { \TYPE{main-style=defined} }
+      { \TYPE{main-style=missing} }
+    \cs_if_exist:cTF { ps@cdossierfurniturefirst }
+      { \TYPE{first-style=defined} }
+      { \TYPE{first-style=missing} }
+  }
+
+%% Set the option directly rather than through \usepackage, which is available
+%% only once. Both the unsupported key and the unsupported value must be
+%% rejected rather than accepted and ignored.
+\cs_new_protected:Npn \cdossiertestSetOption #1
+  { \keys_set:nn { cdossier / components } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{screen-resolves-to-no-furniture-and-empty-page-styles}{
+  \cdossiertestReportMedium
+  \cdossiertestReportSelectedStyle
+}
+
+\TEST{shared-page-styles-still-exist-under-screen}{
+  \cdossiertestReportStyles
+}
+
+\TEST{print-restores-the-furniture-decision}{
+  \cdossiertestSetOption{medium=print}
+  \cdossiertestReportMedium
+  \cdossiertestSetOption{medium=screen}
+  \cdossiertestReportMedium
+}
+
+\TEST{unknown-package-option-is-rejected}{
+  \cdossiertestSetOption{pagenumbers=off}
+}
+
+\TEST{unknown-medium-value-is-rejected}{
+  \cdossiertestSetOption{medium=paper}
+}
+
+\TEST{medium-requires-a-value}{
+  \cdossiertestSetOption{medium}
+}
+
+\END
+\end{document}

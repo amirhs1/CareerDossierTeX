@@ -1,0 +1,22 @@
+% letter-medium-screen.tex — smoke fixture: medium=screen is a supported value
+% and must build cleanly (issue #184).
+\documentclass[fontsize=10pt, margin=narrow, medium=screen]{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\CDossierLetterSetup{
+  date           = {14 July 2026},
+  recipient-name = {Hiring Committee},
+  subject        = {Application for the Senior Data Scientist position},
+  salutation     = {Dear Members of the Hiring Committee,},
+  closing        = {Sincerely,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position.
+
+\MakeCDossierClosing
+\end{document}

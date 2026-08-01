@@ -31,6 +31,63 @@
 \RequirePackage { careerdossier-theme }
 
 %% ---------------------------------------------------------------------------
+%% Output medium (issue #184).
+%%
+%% The same dossier is read in two contexts with genuinely different needs. On
+%% screen the PDF viewer already shows page position, so a `Page N of M' folio
+%% is redundant chrome; on paper a loose page has no such affordance, and the
+%% folio is what keeps a multi-page dossier in order after it is put down.
+%% `medium' names that output context, which is what actually drives the
+%% decision -- unlike `theme', which names the (fixed) colour decision.
+%%
+%% Package option forwarded by every public document class. The classes own
+%% their public option surfaces and reject unsupported values; this package
+%% owns the page furniture, so it owns the resulting decision.
+%% \ProcessKeysPackageOptions reads local package options only, never the
+%% global \documentclass list, so a class option reaches this package only
+%% after that class has validated it. Direct package users receive the same
+%% validation contract.
+%%
+%% Only the furniture is suppressed. Page geometry is untouched, so the text
+%% block sits in exactly the same place under both values and `medium' cannot
+%% reflow a document.
+%% ---------------------------------------------------------------------------
+\RequirePackage { l3keys2e }
+
+\bool_new:N \l__cdossier_components_furniture_bool
+\bool_set_true:N \l__cdossier_components_furniture_bool
+
+\msg_new:nnnn { careerdossier-components } { unknown-option }
+  { Unknown~package~option~'#1'~for~careerdossier-components. }
+  { Supported~options~are~'medium'~(print,~screen). }
+
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so the accepted values are named here.
+\msg_new:nnnn { careerdossier-components } { unknown-medium }
+  { Unknown~'medium'~value~'#1'. }
+  {
+    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
+    and~'screen'~(neither).
+  }
+
+\keys_define:nn { cdossier / components }
+  {
+    medium .choices:nn =
+      { print , screen }
+      {
+        \bool_set:Nn \l__cdossier_components_furniture_bool
+          { \str_if_eq_p:Vn \l_keys_choice_tl { print } }
+      } ,
+    medium / unknown .code:n =
+      { \msg_error:nnn { careerdossier-components } { unknown-medium } {#1} } ,
+    medium .value_required:n = true ,
+    unknown .code:n =
+      { \msg_error:nnx { careerdossier-components } { unknown-option }
+          { \l_keys_key_str } } ,
+  }
+\ProcessKeysPackageOptions { cdossier / components }
+
+%% ---------------------------------------------------------------------------
 %% Contact line.
 %%
 %% Fields are rendered in one fixed, logical order; missing fields are skipped
@@ -343,13 +400,16 @@
 %% ---------------------------------------------------------------------------
 %% Page furniture.
 %%
-%% All document classes share one page-style pair. A multi-page document gets
-%% a centered "Page N of M" folio throughout and a centered identity label from
-%% page two. A one-page document gets no furniture. The total comes from the
-%% LaTeX kernel's last absolute page, recorded in the auxiliary file, so the
-%% single-page decision settles on the second pass. On the first clean pass the
-%% kernel supplies \maxdimen as the unknown total and the folio is provisionally
-%% shown.
+%% All document classes share one page-style pair. Under the default
+%% `medium=print' a multi-page document gets a centered "Page N of M" folio
+%% throughout and a centered identity label from page two. A one-page document
+%% gets no furniture. The total comes from the LaTeX kernel's last absolute
+%% page, recorded in the auxiliary file, so the single-page decision settles on
+%% the second pass. On the first clean pass the kernel supplies \maxdimen as the
+%% unknown total and the folio is provisionally shown.
+%%
+%% Under `medium=screen' no furniture is emitted on any page and the page-style
+%% pair is never selected.
 %%
 %% Page-style material is artifact-marked by the kernel's tagged-PDF shipout
 %% path. Do not wrap it in document structure here.
@@ -417,8 +477,19 @@
 
 \NewDocumentCommand \MakeCDossierPageFurniture { }
   {
-    \pagestyle { cdossierfurniture }
-    \AtBeginDocument { \thispagestyle { cdossierfurniturefirst } }
+    \bool_if:NTF \l__cdossier_components_furniture_bool
+      {
+        \pagestyle { cdossierfurniture }
+        \AtBeginDocument { \thispagestyle { cdossierfurniturefirst } }
+      }
+      {
+        %% medium=screen. The empty style is selected explicitly rather than
+        %% simply left alone: the base class's default `plain' would otherwise
+        %% put a bare page number in the foot, which is the very furniture this
+        %% value asks to remove.
+        \pagestyle { empty }
+        \AtBeginDocument { \thispagestyle { empty } }
+      }
   }
 
 %% ---------------------------------------------------------------------------
