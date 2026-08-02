@@ -417,6 +417,12 @@ the header tokens unable to express the spacing they name (#204). Each item
 hands one such decision back to the token that should own it. #203 then makes
 the token names consistent, and #206 sets the values.
 
+Two items do not share that concern; both arrived from implementing #184 in
+PR #210. #212 widens the named-values class error from `medium` to every
+choice-valued option — the inconsistency that PR knowingly left behind as out of
+scope. #211 fixes a Biber date-parsing failure that the same work uncovered but
+did not cause; it predates the branch and reproduces on `main`.
+
 **No type-scale step or margin preset changes value.** The vertical-rhythm
 ratios do, under #206 and against its stated design rules.
 
@@ -432,6 +438,8 @@ design* where the ratios are retuned.
 | #195 | none — generated review filenames only |
 | #196 | bibliography entries move up as the hard-coded `6pt` gap closes |
 | #193 | the tagged path's space below a list changes to match the untagged path |
+| #211 | on an affected toolchain, bibliography years reappear and `ydnt` order is corrected; none where Biber already accepts `date` |
+| #212 | none — error text only; no document that compiles today is affected |
 
 The new public surface is one additive class option whose default reproduces
 current output exactly, plus one design-token rename (#191) that is
@@ -452,9 +460,18 @@ source-compatible for every document that does not read the token by name.
   `screen` emits no running header and no folio on any page. Both open
   questions on the proposal are settled: the option is named `medium`, and
   `screen` suppresses the running header as well as the folio;
-- an actionable class error for an unsupported `medium` value, rejected like
-  `fontsize`, `margin`, `paper`, and `bodyfont` but naming the accepted values,
-  which `l3keys`' generic choice error used by those four does not;
+- an actionable class error for an unsupported `medium` value, naming the
+  accepted values instead of falling back to `l3keys`' generic choice error
+  (#184). As shipped in PR #210 this left `medium` the only option that explains
+  itself, which #212 below corrects;
+- every other choice-valued public option naming its accepted values and its
+  owning module when it rejects one (#212): `fontsize`, `margin`, `paper`, and
+  `bodyfont` on all four classes, the letter's `family`, and the same options on
+  `careerdossier-typography` and `careerdossier-tokens` for direct package users.
+  No option name, accepted value, or default changes — only the text of an error
+  that already stops the build — so `docs/MIGRATION.md` needs no entry. The
+  smoke suite's `*-bad-<option>` expectations match on the generic wording and
+  are updated with it;
 - splitting the single list-edge token into `\CDossierListEdgeSkipBefore` and
   `\CDossierListEdgeSkipAfter`, so the space above a list and the space below
   it can be tuned independently (#191). Both keep the value the single token
@@ -462,6 +479,16 @@ source-compatible for every document that does not read the token by name.
 - the bibliography's inter-entry gap reading `\CDossierItemSepSkip` instead of
   a hard-coded `6pt`, so a `biblatex` publication list and a
   `CDossierPublications` list share one rhythm at every `fontsize` (#196);
+- Biber date parsing restored, so the bibliography fixture keeps its years and
+  its `ydnt` sort order (#211). Biber 2.21 on the maintainer's toolchain rejects
+  every `date` value while accepting the legacy `year` field, which drops every
+  year from the rendered bibliography and misorders the entries;
+  `make bibliography-test` fails on a clean tree and is correct to. Switching
+  the fixture to `year=` and relaxing the biber-warning gate in
+  `tests/bibliography/run.sh` are both explicit non-fixes: each turns the suite
+  green while leaving the bibliography wrong. Whether the cause is Biber 2.21
+  generally or one installation cannot be settled on a single machine, so the
+  work includes reproducing it on a second toolchain;
 - the tagged path's closing list edge owned by `\CDossierListEdgeSkipAfter`
   rather than LaTeX Lab's block default, so a tagged and an untagged build of
   one source stop paginating toward different outcomes (#193). The candidate
@@ -469,8 +496,8 @@ source-compatible for every document that does not read the token by name.
   interface, so it targets a guarded fix that degrades cleanly if that
   interface changes;
 - regression, smoke, and layout coverage for the resolved furniture metrics,
-  both `medium` values, the unknown-value error, and both list edges on both
-  the untagged and tagged paths;
+  both `medium` values, the unknown-value error on every choice-valued option,
+  and both list edges on both the untagged and tagged paths;
 - this roadmap renumbering and the phase-numbering convention that prevents it
   from drifting again;
 - one naming convention across the vertical-spacing tokens (#203), and header
@@ -507,8 +534,11 @@ source-compatible for every document that does not read the token by name.
   combination;
 - `medium=screen` suppresses furniture and `medium=print` retains current
   behaviour, on all four document classes;
-- an unsupported `medium` value produces an actionable class error naming the
-  accepted values;
+- an unsupported value for any choice-valued public option — `medium` (#184) and
+  every other option (#212) — produces an actionable class error naming the
+  accepted values and the owning module, with the smoke suite asserting the new
+  text for every `*-bad-*` fixture and a regression pinning one message per
+  module;
 - `make review-matrix` output is reviewed for both media, with PDFs named
   `type-margin-fontsize` (#195);
 - the extraction, tagging, layout, and regression suites pass;
@@ -519,6 +549,9 @@ source-compatible for every document that does not read the token by name.
   `pdftotext -bbox` output agrees between tagged and untagged builds of every
   supported example, or every remaining difference is explained (#193);
 - `cv-bibliography`'s inter-entry gap equals `\CDossierItemSepSkip` (#196);
+- `make bibliography-test` passes on a clean tree with the `date` field and the
+  biber-warning gate both intact, and the rendered bibliography shows every year
+  in `ydnt` order (#211);
 - `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
   `CHANGELOG.md` are updated;
 - the vertical-spacing tokens follow one naming convention (#203), headers and
