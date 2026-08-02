@@ -1,0 +1,120 @@
+% tokens-invariants.lvt — issue #204 vertical-boundary token invariants.
+%
+% Every vertical boundary is owned by exactly one token, and `\addvspace' takes
+% the maximum of the adjacent claims. Which token therefore reaches the page at
+% a shared boundary is decided by the *relative order* of the calibrated ratios,
+% not by any one of them alone. These relations are that order, written down.
+%
+% The saved baseline is the assertion. Each relation reports `holds' or
+% `violated', so a ratio change that silently makes a token unreachable — or
+% that repairs one — shows up as a reviewable diff rather than as a token no
+% document responds to. Three relations are recorded as `violated' at the
+% committed v0.7.0 defaults; issue #204 fixed the mechanism so they became
+% expressible at all, and issue #206 assigns the ratios that satisfy them.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-tokens}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_invariant:nn #1#2
+  {
+    \bool_if:nTF {#2}
+      { \TYPE { #1 ~ => ~ holds } }
+      { \TYPE { #1 ~ => ~ violated~(ratio~retune~pending) } }
+  }
+\cs_new_protected:Npn \cdossiertest_invariants:n #1
+  {
+    \keys_set:nn { cdossier / tokens } { fontsize = #1 }
+    \__cdossier_tokens_resolve:
+    \TYPE { fontsize = #1 }
+    %% The letter's header block has to out-claim the section that follows it in
+    %% a record document, and the one that follows it in a prose document.
+    \cdossiertest_invariant:nn
+      { SharedHeaderBelowSkip > RecordSectionAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierSharedHeaderBelowSkip } > { \CDossierRecordSectionAboveSkip }
+      }
+    \cdossiertest_invariant:nn
+      { SharedHeaderBelowSkip > ProseSectionAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierSharedHeaderBelowSkip } > { \CDossierProseSectionAboveSkip }
+      }
+    %% Two entries must sit closer together than an entry and the section
+    %% heading above it, or the section boundary stops reading as the stronger.
+    \cdossiertest_invariant:nn
+      { RecordEntryAboveSkip < RecordSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordEntryAboveSkip } < { \CDossierRecordSectionBelowSkip }
+      }
+    %% The entry heading -> body gap is a floor a list overrides, so it may not
+    %% exceed the list's own opening edge.
+    \cdossiertest_invariant:nn
+      { RecordEntryGapSkip <= RecordListEdgeAboveSkip }
+      {
+        ! \dim_compare_p:nNn
+            { \CDossierRecordEntryGapSkip } > { \CDossierRecordListEdgeAboveSkip }
+      }
+    %% A bullet list belongs to the entry above it: it must sit closer to that
+    %% entry than to the material below it, and closer than two entries sit to
+    %% each other.
+    \cdossiertest_invariant:nn
+      { RecordListEdgeAboveSkip < RecordListEdgeBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordListEdgeAboveSkip }
+          < { \CDossierRecordListEdgeBelowSkip }
+      }
+    \cdossiertest_invariant:nn
+      { RecordListEdgeAboveSkip < RecordEntryAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordListEdgeAboveSkip } < { \CDossierRecordEntryAboveSkip }
+      }
+    %% Hard, not a preference: `\@xsect' reads a non-positive after-skip as a
+    %% request for a run-in heading, and careerdossier-statement.cls passes
+    %% `below - \parskip'.
+    \cdossiertest_invariant:nn
+      { ProseParSkip < ProseSubsectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierProseParSkip } < { \CDossierProseSubsectionBelowSkip }
+      }
+    %% The letter body's two edges are a symmetric pair, and both have to read
+    %% as stronger than a letterhead block boundary, which in turn has to read
+    %% as stronger than the gap between two paragraphs.
+    \cdossiertest_invariant:nn
+      { LetterBodyAboveSkip = LetterBodyBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierLetterBodyAboveSkip } = { \CDossierLetterBodyBelowSkip }
+      }
+    \cdossiertest_invariant:nn
+      { LetterBodyAboveSkip > LetterBlockSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierLetterBodyAboveSkip } > { \CDossierLetterBlockSkip }
+      }
+    \cdossiertest_invariant:nn
+      { LetterBlockSkip > ProseParSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierLetterBlockSkip } > { \CDossierProseParSkip }
+      }
+  }
+\NewDocumentCommand \cdossiertestInvariants { m }
+  { \cdossiertest_invariants:n {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{boundary-token-ordering}{
+  \cdossiertestInvariants{10pt}
+  \cdossiertestInvariants{11pt}
+  \cdossiertestInvariants{12pt}
+}
+
+\END

@@ -1,0 +1,21 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: gaps-with-no-optional-fields
+============================================================
+addvspace = 0.0pt
+addvspace = 3.625pt
+addvspace = 2.71875pt
+addvspace = 11.78125pt
+============================================================
+============================================================
+TEST 2: gaps-with-every-optional-field
+============================================================
+addvspace = 0.0pt
+addvspace = 3.625pt
+addvspace = 2.71875pt
+addvspace = 2.71875pt
+addvspace = 2.71875pt
+addvspace = 2.71875pt
+addvspace = 11.78125pt
+============================================================

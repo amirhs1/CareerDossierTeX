@@ -1,0 +1,77 @@
+% components-headerstack.lvt — issue #204 shared header-stack gap emission.
+%
+% The header stack must emit exactly one gap per boundary *between* two present
+% header lines, never a leading gap attached to an optional block. Which token
+% guards a boundary is decided by position, so the gap below the name stays
+% \CDossierSharedHeaderNameGapSkip whether or not the optional `headline' below
+% it is present. Before issue #204 that boundary silently fell back to
+% \CDossierSharedHeaderMetaGapSkip when the headline was absent.
+%
+% The letter class is the fixture because it is the prose class that uses the
+% shared header: it sets \parskip to \CDossierProseParSkip document-wide, so it
+% also exercises the \CDossierSharedHeaderParSkip substitution. Each emitted gap
+% is logged in points, so the numbers are the assertion — a gap the stack fails
+% to emit, emits twice, or emits from the wrong token all change the log.
+%
+% \addvspace is intercepted rather than the stack's own helper so the recorded
+% sequence is what actually reaches the vertical list, including the boundary
+% below the stack. The interception is local to each \TEST group.
+\input{regression-test}
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_new_eq:NN \cdossiertest_addvspace:n \addvspace
+\cs_new_protected:Npn \cdossiertest_trace_addvspace:
+  {
+    \cs_set_protected:Npn \addvspace ##1
+      {
+        \TYPE { addvspace~=~ \dim_eval:n {##1} }
+        \cdossiertest_addvspace:n {##1}
+      }
+  }
+\cs_new_protected:Npn \cdossiertest_tokens:
+  {
+    \TYPE { parskip~=~ \dim_eval:n { \parskip } }
+    \TYPE { header-par-skip~=~ \dim_eval:n { \CDossierSharedHeaderParSkip } }
+    \TYPE { above~=~ \dim_eval:n { \CDossierSharedHeaderAboveSkip } }
+    \TYPE { name-gap~=~ \dim_eval:n { \CDossierSharedHeaderNameGapSkip } }
+    \TYPE { meta-gap~=~ \dim_eval:n { \CDossierSharedHeaderMetaGapSkip } }
+    \TYPE { below~=~ \dim_eval:n { \CDossierSharedHeaderBelowSkip } }
+  }
+\NewDocumentCommand \cdossiertestTraceAddvspace { } { \cdossiertest_trace_addvspace: }
+\NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
+\ExplSyntaxOff
+
+\begin{document}
+% Force the math-font loads that \nolinkurl triggers at the contact line's size
+% before the first test, so the font-info lines land outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+\TEST{header-gap-tokens}{
+  \cdossiertestTokens
+}
+
+% Name, headline, contact line: two interior boundaries, then the boundary
+% below the stack. \parskip contributes nothing to any of them.
+\TEST{gaps-with-headline}{
+  \CDossierSetup{headline = {Data Scientist}}
+  \cdossiertestTraceAddvspace
+  \MakeCDossierHeader
+  \par
+}
+
+% Name, contact line. The single interior boundary is still the name gap, and
+% the absent headline leaves no gap of its own behind.
+\TEST{gaps-without-headline}{
+  \CDossierSetup{headline = {}}
+  \cdossiertestTraceAddvspace
+  \MakeCDossierHeader
+  \par
+}
+
+\END

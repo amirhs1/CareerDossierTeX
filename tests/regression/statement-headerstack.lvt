@@ -1,0 +1,63 @@
+% statement-headerstack.lvt — issue #204 statement header via the shared stack.
+%
+% The statement header used to emit \CDossierSharedHeaderMetaGapSkip from four
+% separate sites, each attached as a *leading* skip on the optional block below
+% it. It now states only which lines are present and the shared header stack in
+% careerdossier-components owns every gap between two of them.
+%
+% The two cases that matter are the extremes. With every optional field absent
+% the header is name + title + contacts, so exactly one meta gap may appear and
+% no absent block may leave a gap behind. With all of them present the same
+% single emission site has to produce one gap per boundary and no more.
+%
+% Each emitted gap is logged in points; see components-headerstack.lvt for the
+% shared-header half of this contract and for why \addvspace is intercepted.
+\input{regression-test}
+\documentclass{careerdossier-statement}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_new_eq:NN \cdossiertest_addvspace:n \addvspace
+\cs_new_protected:Npn \cdossiertest_trace_addvspace:
+  {
+    \cs_set_protected:Npn \addvspace ##1
+      {
+        \TYPE { addvspace~=~ \dim_eval:n {##1} }
+        \cdossiertest_addvspace:n {##1}
+      }
+  }
+\NewDocumentCommand \cdossiertestTraceAddvspace { } { \cdossiertest_trace_addvspace: }
+\ExplSyntaxOff
+
+\begin{document}
+% Force the math-font loads that \nolinkurl triggers at the contact line's size
+% before the first test, so the font-info lines land outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+% Name, title, contacts. Subtitle, affiliation, and the context line are all
+% absent and none of them may contribute a gap.
+\TEST{gaps-with-no-optional-fields}{
+  \cdossiertestTraceAddvspace
+  \MakeCDossierStatementHeader
+  \par
+}
+
+% Name, title, subtitle, affiliation, context line, contacts: five interior
+% boundaries from one emission site.
+\TEST{gaps-with-every-optional-field}{
+  \CDossierSetup{affiliation = {Example University}}
+  \CDossierStatementSetup{
+    subtitle = {Reliable computational inquiry},
+    application-context = {Application for Faculty Role},
+    application-id = {APP-104},
+  }
+  \cdossiertestTraceAddvspace
+  \MakeCDossierStatementHeader
+  \par
+}
+
+\END
