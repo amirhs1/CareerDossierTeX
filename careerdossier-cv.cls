@@ -200,11 +200,18 @@
     %% Issue #145: keep the entry heading with the first line of its body, so
     %% the heading cannot be stranded alone at the foot of a page.
     \penalty \CDossierHeadingKeepPenalty
-    \vspace { \CDossierRecordEntryGapSkip }
+    %% Issue #204: `\addvspace', not `\vspace'. As a `\vspace' this was extra
+    %% space that added to whatever the entry body opened with, so a bullet list
+    %% sat further from the entry heading that owns it than from the next entry.
+    %% As an `\addvspace' the token is the *floor* for the heading -> body
+    %% boundary, which a list overrides with its own edge.
+    \addvspace { \CDossierRecordEntryGapSkip }
   }
   {
+    %% Issue #204: the entry's closing boundary is owned by whatever opens next
+    %% -- \CDossierRecordEntryAboveSkip or \CDossierRecordSectionAboveSkip. The
+    %% retired \CDossierRecordEntryBelowSkip lost both of those maxima.
     \par
-    \addvspace { \CDossierRecordEntryBelowSkip }
   }
 
 %% Issue #145: `beginpenalty' keeps the first bullet with whatever precedes the

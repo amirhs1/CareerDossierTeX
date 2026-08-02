@@ -359,6 +359,86 @@
   }
 
 %% ---------------------------------------------------------------------------
+%% Header stack.
+%%
+%% Issue #204: one emission site for every centered header line and every gap
+%% between two of them, shared by \MakeCDossierHeader below and by
+%% \MakeCDossierStatementHeader. Both headers are the same shape -- a name, a
+%% run of optional lines, and a contact line -- and both used to attach each gap
+%% as a *leading* skip on the optional block that followed it. That is the
+%% "separator attached to the item" shape the project forbids everywhere else,
+%% and it hid a defect: which token guarded the boundary below the name depended
+%% on whether an optional field two lines further down happened to be present.
+%%
+%% A caller pushes only the lines it will actually print, in reading order, and
+%% the helper interleaves the gaps. Position decides the token, not presence:
+%% the boundary below the name is always \CDossierSharedHeaderNameGapSkip and
+%% every later boundary is \CDossierSharedHeaderMetaGapSkip, whatever the line
+%% below it turns out to be.
+%%
+%% Each line is its own paragraph, so `\parskip' lands in every boundary. In the
+%% prose classes that is a visible 0.50 line the header tokens cannot express a
+%% gap below, and `\addvspace' cannot absorb it: `\parskip' is inserted at the
+%% next paragraph's start, after `\addvspace' has already read `\lastskip', so
+%% the two always add. The stack therefore sets `\parskip' to
+%% \CDossierSharedHeaderParSkip for its own group and subtracts it from every
+%% gap it emits, so each token names the rendered gap in every class.
+%% ---------------------------------------------------------------------------
+\seq_new:N \l__cdossier_components_headerstack_seq
+\int_new:N \l__cdossier_components_headerline_int
+
+\cs_new_protected:Npn \__cdossier_components_headerstack_begin:
+  { \seq_clear:N \l__cdossier_components_headerstack_seq }
+
+\cs_new_protected:Npn \__cdossier_components_headerstack_line:n #1
+  { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
+
+%% A header gap has to be reduced by the paragraph gap the following line
+%% contributes on its own; see the block comment above.
+\cs_new_protected:Npn \__cdossier_components_headerstack_gap:N #1
+  { \addvspace { \dim_eval:n { #1 - \parskip } } }
+
+\cs_new_protected:Npn \__cdossier_components_headerstack_end:
+  {
+    \seq_if_empty:NF \l__cdossier_components_headerstack_seq
+      {
+        \group_begin:
+          \skip_set_eq:NN \parskip \CDossierSharedHeaderParSkip
+          \centering
+          \int_zero:N \l__cdossier_components_headerline_int
+          \seq_map_inline:Nn \l__cdossier_components_headerstack_seq
+            {
+              \int_incr:N \l__cdossier_components_headerline_int
+              \int_case:nnF { \l__cdossier_components_headerline_int }
+                {
+                  { 1 }
+                    {
+                      \__cdossier_components_headerstack_gap:N
+                        \CDossierSharedHeaderAboveSkip
+                    }
+                  { 2 }
+                    {
+                      \__cdossier_components_headerstack_gap:N
+                        \CDossierSharedHeaderNameGapSkip
+                    }
+                }
+                {
+                  \__cdossier_components_headerstack_gap:N
+                    \CDossierSharedHeaderMetaGapSkip
+                }
+              %% The `\par' belongs inside the line's own group so the paragraph
+              %% is broken with that line's leading, not the surrounding one's.
+              \group_begin:
+                ##1
+                \par
+              \group_end:
+            }
+        \group_end:
+        \addvspace { \CDossierSharedHeaderBelowSkip }
+      }
+  }
+
+%% ---------------------------------------------------------------------------
 %% Identity block.
 %%
 %% A centered block of name, optional headline, and the contact line, shared by
@@ -367,34 +447,30 @@
 \NewDocumentCommand \MakeCDossierHeader { }
   {
     \__cdossier_base_require_name:N \MakeCDossierHeader
-    \addvspace { \CDossierSharedHeaderAboveSkip }
-    \group_begin:
-      \centering
+    \__cdossier_components_headerstack_begin:
+    \__cdossier_components_headerstack_line:n
       {
         \CDossierNameStyle
         \CDossierSizeName
         \CDossierPrintField { name }
-        \par
       }
-      \CDossierIfFieldTF { headline }
-        {
-          \addvspace { \CDossierSharedHeaderNameGapSkip }
+    \CDossierIfFieldTF { headline }
+      {
+        \__cdossier_components_headerstack_line:n
           {
             \CDossierHeadlineStyle
             \CDossierSizeHeadline
             \CDossierPrintField { headline }
-            \par
           }
-        }
-        { }
-      \addvspace { \CDossierSharedHeaderMetaGapSkip }
+      }
+      { }
+    \__cdossier_components_headerstack_line:n
       {
         \CDossierBodyStyle
         \CDossierSizeSmall
         \__cdossier_components_contactparagraph:
       }
-    \group_end:
-    \addvspace { \CDossierSharedHeaderBelowSkip }
+    \__cdossier_components_headerstack_end:
   }
 
 %% ---------------------------------------------------------------------------

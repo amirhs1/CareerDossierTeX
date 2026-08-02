@@ -1,6 +1,8 @@
 Ada Lovelace
+
 Teaching Statement
 Example University
+
 Application for Assistant Professor | Application ID: APP-104
 ada@example.com | example.com/ada
 
