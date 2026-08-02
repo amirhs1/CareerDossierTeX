@@ -10,11 +10,11 @@
     \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
     \TYPE{prose-par-skip = \skip_use:N \CDossierProseParSkip}
     \TYPE{after-header-block-skip =
-      \skip_use:N \CDossierAfterHeaderBlockSkip}
-    \TYPE{block-skip = \skip_use:N \CDossierBlockSkip}
+      \skip_use:N \CDossierLetterheadBelowSkip}
+    \TYPE{block-skip = \skip_use:N \CDossierLetterBlockSkip}
     \TYPE{after-salutation-skip =
-      \skip_use:N \CDossierAfterSalutationSkip}
-    \TYPE{signature-skip = \skip_use:N \CDossierSignatureSkip}
+      \skip_use:N \CDossierLetterBodyAboveSkip}
+    \TYPE{signature-skip = \skip_use:N \CDossierLetterSignatureGapSkip}
     \skip_if_eq:nnTF { \parskip } { \CDossierProseParSkip }
       { \TYPE{paragraph-rhythm = shared} }
       { \TYPE{paragraph-rhythm = local} }

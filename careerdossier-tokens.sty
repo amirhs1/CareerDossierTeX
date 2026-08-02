@@ -118,29 +118,29 @@
 \int_new:N \CDossierWidowPenalty
 \int_set:Nn \CDossierWidowPenalty { 10000 }
 
-\skip_new:N \CDossierHeaderAboveSkip
-\skip_new:N \CDossierHeaderNameGapSkip
-\skip_new:N \CDossierHeaderMetaGapSkip
-\skip_new:N \CDossierHeaderBelowSkip
-\skip_new:N \CDossierSectionAboveSkip
-\skip_new:N \CDossierSectionRuleSkip
-\skip_new:N \CDossierSectionBelowSkip
+\skip_new:N \CDossierSharedHeaderAboveSkip
+\skip_new:N \CDossierSharedHeaderNameGapSkip
+\skip_new:N \CDossierSharedHeaderMetaGapSkip
+\skip_new:N \CDossierSharedHeaderBelowSkip
+\skip_new:N \CDossierRecordSectionAboveSkip
+\skip_new:N \CDossierRecordSectionRuleGapSkip
+\skip_new:N \CDossierRecordSectionBelowSkip
 \skip_new:N \CDossierProseSectionAboveSkip
 \skip_new:N \CDossierProseSectionBelowSkip
 \skip_new:N \CDossierProseSubsectionAboveSkip
 \skip_new:N \CDossierProseSubsectionBelowSkip
-\skip_new:N \CDossierEntryAboveSkip
-\skip_new:N \CDossierEntryGapSkip
-\skip_new:N \CDossierEntryBelowSkip
-\skip_new:N \CDossierListEdgeSkipBefore
-\skip_new:N \CDossierListEdgeSkipAfter
-\skip_new:N \CDossierItemSepSkip
-\skip_new:N \CDossierParSkip
+\skip_new:N \CDossierRecordEntryAboveSkip
+\skip_new:N \CDossierRecordEntryGapSkip
+\skip_new:N \CDossierRecordEntryBelowSkip
+\skip_new:N \CDossierRecordListEdgeAboveSkip
+\skip_new:N \CDossierRecordListEdgeBelowSkip
+\skip_new:N \CDossierRecordItemSepSkip
+\skip_new:N \CDossierRecordParSkip
 \skip_new:N \CDossierProseParSkip
-\skip_new:N \CDossierAfterHeaderBlockSkip
-\skip_new:N \CDossierBlockSkip
-\skip_new:N \CDossierAfterSalutationSkip
-\skip_new:N \CDossierSignatureSkip
+\skip_new:N \CDossierLetterheadBelowSkip
+\skip_new:N \CDossierLetterBlockSkip
+\skip_new:N \CDossierLetterBodyAboveSkip
+\skip_new:N \CDossierLetterSignatureGapSkip
 
 \cs_new_eq:NN \__cdossier_tokens_article_normalsize: \normalsize
 
@@ -246,11 +246,11 @@
           { 0.5 * \dim_to_fp:n { \CDossierBodySize } }
       }
 
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderAboveSkip { 0.00 }
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderNameGapSkip { 0.25 }
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderMetaGapSkip { 0.1875 }
-    \__cdossier_tokens_set_skip:Nn \CDossierHeaderBelowSkip { 0.8125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionAboveSkip { 0.6875 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderAboveSkip { 0.00 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderNameGapSkip { 0.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderMetaGapSkip { 0.1875 }
+    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderBelowSkip { 0.8125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionAboveSkip { 0.6875 }
     %% Issue #169: measured from the section heading's baseline, not from the
     %% bottom of its line box. The value has a hard lower bound -- the heading's
     %% depth, about 0.20 line at every supported size -- because a smaller
@@ -259,18 +259,17 @@
     %% (2.28 pt under a heading without descenders, 4.80 pt under one with).
     %% It is also the smallest sixteenth that clears the descender, so the
     %% normalized scale keeps it rather than moving to a smaller grid step.
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionRuleSkip { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSectionBelowSkip { 0.375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionRuleGapSkip { 0.3125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.375 }
     %% Issue #177: the heading rhythm of a continuous-prose document -- today
     %% the statement class, the only one with headings and prose paragraph
     %% spacing at once. It cannot reuse the four tokens above, which are
-    %% calibrated for a ruled
-    %% heading in a document whose paragraphs are separated by nothing
-    %% (\CDossierParSkip is 0). A prose statement separates its paragraphs by
-    %% \CDossierProseParSkip (0.50), so a heading gap must first exceed that
-    %% before it separates anything at all: at 0.375 the space opening a
-    %% section would be *narrower* than the space between two paragraphs of
-    %% one section.
+    %% calibrated for a ruled heading in a document whose paragraphs are
+    %% separated by nothing (\CDossierRecordParSkip is 0). A prose statement
+    %% separates its paragraphs by \CDossierProseParSkip (0.50), so a heading
+    %% gap must first exceed that before it separates anything at all: at
+    %% 0.375 the space opening a section would be *narrower* than the space
+    %% between two paragraphs of one section.
     %%
     %% The pair is therefore stated against the paragraph gap: 1.50 above is
     %% three times it, 0.75 below is one and a half times it, and the 2:1
@@ -287,9 +286,9 @@
     \__cdossier_tokens_set_skip:Nn \CDossierProseSectionBelowSkip { 0.75 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionAboveSkip { 1.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionBelowSkip { 0.625 }
-    \__cdossier_tokens_set_skip:Nn \CDossierEntryAboveSkip { 0.25 }
-    \__cdossier_tokens_set_skip:Nn \CDossierEntryGapSkip { 0.0625 }
-    \__cdossier_tokens_set_skip:Nn \CDossierEntryBelowSkip { 0.125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryAboveSkip { 0.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryGapSkip { 0.0625 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryBelowSkip { 0.125 }
     %% Issue #176: these tokens own the complete list edge. Until #176 the
     %% lists also inherited LaTeX's `\partopsep' -- 3 pt plus stretch that no
     %% token owned and that did not rescale -- so the rendered edge was 4.5 pt at
@@ -298,8 +297,8 @@
     %% set `partopsep = 0pt' and this ratio absorbs the 3 pt, so the same edge
     %% is reproduced (3.75 / 4.25 / 4.53 pt) and rescales properly. 0.3125 is
     %% the sixteenth nearest that drifting ratio that also keeps the list edge
-    %% below \CDossierSectionBelowSkip (0.375); at 0.375 a list edge would read
-    %% as wide as the gap that opens a section.
+    %% below \CDossierRecordSectionBelowSkip (0.375); at 0.375 a list edge
+    %% would read as wide as the gap that opens a section.
     %%
     %% Issue #191: the edge above a list and the edge below it are separate
     %% tokens, because LaTeX's `\list' offers only one `topsep' for both and so
@@ -308,15 +307,15 @@
     %% calibrated, so the rendered edge is unchanged at every supported size.
     %% Retuning either ratio is deliberately out of scope until specific values
     %% are proposed against the calibrated type scale.
-    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkipBefore { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierListEdgeSkipAfter { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierItemSepSkip { 0.00 }
-    \__cdossier_tokens_set_skip:Nn \CDossierParSkip { 0.00 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordListEdgeAboveSkip { 0.3125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordListEdgeBelowSkip { 0.3125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordItemSepSkip { 0.00 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierAfterHeaderBlockSkip { 0.75 }
-    \__cdossier_tokens_set_skip:Nn \CDossierBlockSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierAfterSalutationSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSignatureSkip { 2.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterheadBelowSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterBlockSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyAboveSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterSignatureGapSkip { 2.25 }
   }
 
 \__cdossier_tokens_resolve:

@@ -7,9 +7,9 @@
 \CDossierSetup{name = {Ada Lovelace}}
 
 \ExplSyntaxOn
-\dim_zero:N \CDossierSectionAboveSkip
-\dim_zero:N \CDossierSectionRuleSkip
-\dim_zero:N \CDossierSectionBelowSkip
+\dim_zero:N \CDossierRecordSectionAboveSkip
+\dim_zero:N \CDossierRecordSectionRuleGapSkip
+\dim_zero:N \CDossierRecordSectionBelowSkip
 \ExplSyntaxOff
 
 \newbox\CDossierSectionSpacingBox

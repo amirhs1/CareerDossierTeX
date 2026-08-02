@@ -407,14 +407,14 @@
   {
     \__cdossier_statement_validate:
     \par
-    \addvspace { \CDossierHeaderAboveSkip }
+    \addvspace { \CDossierSharedHeaderAboveSkip }
     \group_begin:
       \centering
       {
         \CDossierNameStyle \CDossierSizeName
         \CDossierPrintField { name } \par
       }
-      \vspace { \CDossierHeaderNameGapSkip }
+      \vspace { \CDossierSharedHeaderNameGapSkip }
       \__cdossier_typography_heading:n
         {
           \CDossierSectionStyle \CDossierSizeTitle
@@ -422,13 +422,13 @@
         }
       \tl_if_blank:VF \l__cdossier_statement_subtitle_tl
         {
-          \vspace { \CDossierHeaderMetaGapSkip }
+          \vspace { \CDossierSharedHeaderMetaGapSkip }
           { \CDossierHeadlineStyle \CDossierSizeHeadline
             \tl_use:N \l__cdossier_statement_subtitle_tl \par }
         }
       \CDossierIfFieldTF { affiliation }
         {
-          \vspace { \CDossierHeaderMetaGapSkip }
+          \vspace { \CDossierSharedHeaderMetaGapSkip }
           {
             \CDossierBodyStyle \CDossierSizeBody
             \CDossierPrintField { affiliation } \par
@@ -439,19 +439,19 @@
         { ! \tl_if_blank_p:V \l__cdossier_statement_context_tl }
         { ! \tl_if_blank_p:V \l__cdossier_statement_application_id_tl }
         {
-          \vspace { \CDossierHeaderMetaGapSkip }
+          \vspace { \CDossierSharedHeaderMetaGapSkip }
           {
             \CDossierMutedStyle \CDossierSizeSmall
             \__cdossier_statement_contextline: \par
           }
         }
-      \vspace { \CDossierHeaderMetaGapSkip }
+      \vspace { \CDossierSharedHeaderMetaGapSkip }
       { \CDossierBodyStyle \CDossierSizeSmall
         \__cdossier_components_contactparagraph:N
           \l__cdossier_statement_contacts_clist
       }
     \group_end:
-    \addvspace { \CDossierHeaderBelowSkip }
+    \addvspace { \CDossierSharedHeaderBelowSkip }
   }
 
 \endinput

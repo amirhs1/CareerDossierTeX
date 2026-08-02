@@ -35,9 +35,9 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Changed
 
 - **BREAKING (design token):** `\CDossierListEdgeSkip` is now two tokens,
-  `\CDossierListEdgeSkipBefore` for the space above a list and
-  `\CDossierListEdgeSkipAfter` for the space below it, so the two ends of a
-  bullet or publication list can be tuned independently. LaTeX has a single
+  `\CDossierRecordListEdgeAboveSkip` for the space above a list and
+  `\CDossierRecordListEdgeBelowSkip` for the space below it, so the two ends of
+  a bullet or publication list can be tuned independently. LaTeX has a single
   `topsep` and spends it at both ends, so one token could not express a
   different value above and below. ([#191])
 
@@ -45,15 +45,47 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   every list in every class renders exactly as in `v0.6.0` at every `fontsize`.
   Retuning either ratio is deliberately left to a separate change. Only source
   that reads or sets the old token by name needs an edit — read
-  `\CDossierListEdgeSkipBefore` wherever `\CDossierListEdgeSkip` appeared. No
-  class, option, key, command, or environment changed. See
+  `\CDossierRecordListEdgeAboveSkip` wherever `\CDossierListEdgeSkip` appeared.
+  No class, option, key, command, or environment changed. See
   [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
   One path is unaffected by the new token: under
   `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX Lab's
-  own list implementation rather than from `\CDossierListEdgeSkipAfter`. That
-  is pre-existing behavior, not a change in this release; it is tracked as
-  ([#193]).
+  own list implementation rather than from
+  `\CDossierRecordListEdgeBelowSkip`. That is pre-existing behavior, not a
+  change in this release; it is tracked as ([#193]).
+
+- **BREAKING (design token):** every public vertical-spacing token now follows
+  one naming convention, `\CDossier<Family><Scope><Position>Skip`. The family
+  says which documents the token affects — `Shared` (all four classes),
+  `Record` (résumé and CV), `Prose` (letter and statement), or `Letter` — and
+  the position says where the space sits: `Above` or `Below` a block, or `Gap`
+  between two parts of one block. Seventeen of the twenty-two tokens released
+  in `v0.6.0` are renamed; the four `Prose…` heading tokens and
+  `\CDossierProseParSkip` keep their names. ([#203])
+
+  The vocabulary had drifted into three spellings of one idea:
+  `Above`/`Below` before `Skip` on ten tokens, `Before`/`After` after `Skip` on
+  the list-edge pair, and `After` alone on two more, with five tokens carrying
+  no positional word at all. An unprefixed name meant either "shared by every
+  class" or "résumé and CV only", with nothing in the name to tell the two
+  apart, so a token's name did not predict what it affected.
+
+  Two renames also correct what the token is named *for*.
+  `\CDossierAfterSalutationSkip` becomes `\CDossierLetterBodyAboveSkip`, named
+  for the boundary it opens rather than the block before it.
+  `\CDossierSignatureSkip` becomes `\CDossierLetterSignatureGapSkip` rather
+  than `…AboveSkip`, because it is the space reserved *for* a handwritten
+  signature between the closing and the typed name — a `Gap` inside the closing
+  block, not the space above one.
+
+  **Renames only — no calibrated value changes.** Every renamed token keeps its
+  ratio. All eleven supported examples, covering all four document families,
+  render with identical word coordinates before and after the change, and
+  `tests/regression/tokens-scale.tlg` differs only in the token names it
+  records. No class, option, key, command, or environment changed. Only source
+  that reads or sets a token by name needs an edit; the full old-to-new table
+  is in [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 - The smoke and layout-stress suites now run as their own CI jobs instead of
   running in sequence inside the `resume` job, so they start in parallel with
@@ -81,16 +113,17 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   show it further inside the page. ([#183])
 
 - The optional BibLaTeX integration now separates bibliography entries by the
-  CV's calibrated list-item token, `\CDossierItemSepSkip`, instead of a fixed
-  `6pt`. A publication list rendered by `careerdossier-biblatex` therefore has
-  the same inter-item gap as every other list in `careerdossier-cv` — including
+  CV's calibrated list-item token, `\CDossierRecordItemSepSkip`, instead of a
+  fixed `6pt`. A publication list rendered by `careerdossier-biblatex`
+  therefore has the same inter-item gap as every other list in
+  `careerdossier-cv` — including
   the dependency-free `CDossierPublications` — at every supported `fontsize`,
   rather than a wider gap that did not rescale with the type scale. ([#196])
 
   This changes rendered output for documents that load
   `careerdossier-biblatex`: bibliography entries move up as the gap closes, so
   a bibliography near a page boundary may repaginate. No class, option, key,
-  command, or entry format changed, and `\CDossierItemSepSkip` keeps its
+  command, or entry format changed, and `\CDossierRecordItemSepSkip` keeps its
   calibrated value. Loading the package with a class that does not provide the
   token — any non-CareerDossierTeX class — still gets the previous `6pt`.
 
@@ -106,6 +139,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#191]: https://github.com/amirhs1/CareerDossierTeX/issues/191
 [#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
+[#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 
 ## [0.6.0] - 2026-07-30
 

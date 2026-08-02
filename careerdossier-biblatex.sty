@@ -51,8 +51,8 @@
 %% spacing matches the CV's other lists at the same fontsize. Fall back to the
 %% v0.2 fixed value when no CareerDossierTeX token system is loaded (for
 %% example, careerdossier-biblatex used with a non-CareerDossierTeX class).
-\cs_if_exist:NTF \CDossierItemSepSkip
-  { \setlength { \bibitemsep } { \CDossierItemSepSkip } }
+\cs_if_exist:NTF \CDossierRecordItemSepSkip
+  { \setlength { \bibitemsep } { \CDossierRecordItemSepSkip } }
   { \setlength { \bibitemsep } { 6pt } }
 \DeclareFieldFormat { labelnumberwidth } { \mkbibbold {#1) } }
 

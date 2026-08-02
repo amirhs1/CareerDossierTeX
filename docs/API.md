@@ -549,9 +549,9 @@ The document type is part of the title so that a résumé and a cover letter bui
 from one profile are distinguishable in a viewer's tab bar, in document
 properties, and in a file manager.
 
-When `name` is absent, `/Title` and `/Author` are left unset. `\MakeCDossierHeader`
-and `\MakeCDossierLetterhead` already error on a missing `name`; metadata does not
-add a second diagnostic.
+When `name` is absent, `/Title` and `/Author` are left unset.
+`\MakeCDossierHeader` and `\MakeCDossierLetterhead` already error on a missing
+`name`; metadata does not add a second diagnostic.
 
 `/Lang` is `en` because `v0.1.0` is English-only. There is no language key.
 
@@ -648,16 +648,17 @@ rule. Class-controlled spacing places the rule closer to its heading than to
 the content below; no additional paragraph line spacing is inserted around the
 rule.
 
-The rule sits `\CDossierSectionRuleSkip` below the heading's **baseline**, not
-below the bottom of its line box, so its height does not change when the heading
-happens to contain a descender. The token consequently has a lower bound: it
-must exceed the heading's depth, or the rule would cross descender ink.
+The rule sits `\CDossierRecordSectionRuleGapSkip` below the heading's
+**baseline**, not below the bottom of its line box, so its height does not
+change when the heading happens to contain a descender. The token consequently
+has a lower bound: it must exceed the heading's depth, or the rule would cross
+descender ink.
 
 The gap between the rule and the section's first content is the larger of
-`\CDossierSectionBelowSkip` and whatever leading space the following block
-contributes — never their sum. A section that opens with an entry, a bullet
-list, or an ordinary paragraph therefore yields one predictable gap rather than
-three different ones.
+`\CDossierRecordSectionBelowSkip` and whatever leading space the following
+block contributes — never their sum. A section that opens with an entry, a
+bullet list, or an ordinary paragraph therefore yields one predictable gap
+rather than three different ones.
 
 The argument is user-visible text. The command does not automatically translate arbitrary section titles.
 
@@ -707,19 +708,19 @@ Provides a résumé-appropriate itemized list with controlled indentation and sp
 
 Users should prefer this environment over globally redefining `itemize`.
 
-The space above the list is `\CDossierListEdgeSkipBefore` and the space below it
-is `\CDossierListEdgeSkipAfter` (`careerdossier-tokens.sty`). Each token is the
-complete gap at its end of the list, and both collapse with the adjacent block's
-own spacing rather than adding to it. The two replace the single
-`\CDossierListEdgeSkip` of `v0.6.0`, which LaTeX could only apply at both ends
-at once; see [`MIGRATION.md`](MIGRATION.md). Both keep that token's calibrated
-value, so a document's rendered list spacing is unchanged. The CV's
+The space above the list is `\CDossierRecordListEdgeAboveSkip` and the space
+below it is `\CDossierRecordListEdgeBelowSkip` (`careerdossier-tokens.sty`).
+Each token is the complete gap at its end of the list, and both collapse with
+the adjacent block's own spacing rather than adding to it. The two replace the
+single `\CDossierListEdgeSkip` of `v0.6.0`, which LaTeX could only apply at
+both ends at once; see [`MIGRATION.md`](MIGRATION.md). Both keep that token's
+calibrated value, so a document's rendered list spacing is unchanged. The CV's
 `CDossierPublications` list uses the same pair.
 
 Under `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX
-Lab's list implementation rather than from `\CDossierListEdgeSkipAfter`; the
-space above is unaffected. A tagged build therefore spaces the area below a list
-differently from an untagged build of the same source
+Lab's list implementation rather than from `\CDossierRecordListEdgeBelowSkip`;
+the space above is unaffected. A tagged build therefore spaces the area below
+a list differently from an untagged build of the same source
 ([#193](https://github.com/amirhs1/CareerDossierTeX/issues/193)).
 
 When the list crosses a page boundary it is never split so that a single item
@@ -1011,10 +1012,10 @@ monochrome link styling and must not redefine unrelated document lists or
 headings globally.
 
 The gap between bibliography entries follows the same calibrated list token as
-every other list in the CV, `\CDossierItemSepSkip`, so a `biblatex` publication
-list and a `CDossierPublications` list share one rhythm at every supported
-`fontsize`. When the package is loaded by a class that does not provide the
-token, the gap falls back to a fixed `6pt`.
+every other list in the CV, `\CDossierRecordItemSepSkip`, so a `biblatex`
+publication list and a `CDossierPublications` list share one rhythm at every
+supported `fontsize`. When the package is loaded by a class that does not
+provide the token, the gap falls back to a fixed `6pt`.
 
 `\CDossierHighlightAuthor` may be repeated for spelling or initial variants.
 It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and
@@ -1036,10 +1037,10 @@ The academic family extends the existing class:
 
 `family` accepts `industry` and `academic`; its default remains `industry`, so
 existing documents are unchanged. The academic family reuses
-`\CDossierLetterSetup`, `\MakeCDossierLetterhead`, and
-`\MakeCDossierClosing`, including the current recipient, salutation, subject,
-closing, and sender-metadata behavior. Optional recipient and academic profile
-fields collapse independently.
+`\CDossierLetterSetup`, `\MakeCDossierLetterhead`, and `\MakeCDossierClosing`,
+including the current recipient, salutation, subject, closing, and
+sender-metadata behavior. Optional recipient and academic profile fields
+collapse independently.
 
 The academic family derives `/Title` as
 `Academic Cover Letter – <name>`, but it does not change geometry, type scale,
