@@ -229,6 +229,7 @@ retaining a small, inspectable spacing vocabulary.
 | Token | Ratio | `10pt` | `11pt` | `12pt` |
 |---|---:|---:|---:|---:|
 | `\CDossierSharedHeaderAboveSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
+| `\CDossierSharedHeaderParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierSharedHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierSharedHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
 | `\CDossierSharedHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
@@ -241,15 +242,15 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierProseSubsectionBelowSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
 | `\CDossierRecordEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierRecordEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
-| `\CDossierRecordEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
 | `\CDossierRecordListEdgeAboveSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierRecordListEdgeBelowSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierRecordItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierRecordParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterheadBelowSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierLetterRecipientLineGapSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierLetterBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierLetterBodyAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierLetterBodyBelowSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierLetterSignatureGapSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
 
 `\CDossierRecordSectionRuleGapSkip` is the one token whose ratio is **not** a
@@ -341,6 +342,62 @@ gaps a reader measures. That subtraction has a floor: `\@xsect` reads a
 non-positive after-skip as a request for a run-in heading, so both below-tokens
 must stay strictly greater than `\CDossierProseParSkip` (0.50) or every
 statement heading would quietly become run-in.
+
+#### Boundary ownership
+
+Two composition rules decide which token a reader actually sees at a boundary,
+and both are consequences of how the gap is contributed rather than of any
+token's value.
+
+1. **Blocks compose with `\addvspace`, which takes the maximum and never the
+   sum** (#168). Where two tokens meet at one boundary, only the larger renders;
+   the smaller is unreachable, and changing it produces neither a movement nor a
+   diagnostic. #204 therefore gives every boundary exactly one owning token and
+   retires the two that never won a maximum — `\CDossierRecordEntryBelowSkip`
+   (entry → entry, always beaten by `\CDossierRecordEntryAboveSkip`, and entry →
+   section, always beaten by `\CDossierRecordSectionAboveSkip`) and
+   `\CDossierLetterheadBelowSkip` (header → date, always beaten by
+   `\CDossierSharedHeaderBelowSkip`, which the shared header has already
+   contributed at the same point).
+
+   A gap that must *not* participate in a maximum has to be a `\vspace`, and one
+   that must has to be an `\addvspace`. `\CDossierRecordEntryGapSkip` was the
+   former and is now the latter: as a `\vspace` it appended a zero glue after
+   its own skip, so the following block's `\addvspace` saw `\lastskip = 0` and
+   the two added. It is now the floor for the entry heading → body boundary,
+   which a bullet list overrides with `\CDossierRecordListEdgeAboveSkip`. That
+   makes both ends of a list maxima, so "a list belongs to the entry above it"
+   becomes expressible by the ratios alone.
+
+2. **A paragraph boundary also contributes `\parskip`, and `\addvspace` cannot
+   absorb it.** `\parskip` is inserted at the *next* paragraph's start, after
+   `\addvspace` has already read `\lastskip`, so the two always add. A token at
+   such a boundary is therefore emitted as `\addvspace{token − \parskip}`, which
+   is why the table's numbers are gaps a reader measures. `careerdossier-
+   statement.cls` does this for its headings; the shared header stack does it for
+   every header line.
+
+   Every header line is its own paragraph, so before #204 the prose classes'
+   document-wide `\parskip` (0.50) landed in every header boundary on top of the
+   header token, and the header tokens could not express a gap below that floor.
+   The header group now sets `\parskip` to `\CDossierSharedHeaderParSkip` for its
+   own scope, so the three header gap tokens govern header spacing identically in
+   all four classes.
+
+Not every vertical distance is a block boundary. `\CDossierSharedHeaderAboveSkip`
+is glue at the top of the first page in every real document, and TeX discards
+glue there, so it does not render at the committed 0.00 or at any other value;
+it exists for a header that is not the first material on its page.
+`\CDossierRecordParSkip` and `\CDossierProseParSkip` are copied into `\parskip`
+with `\setlength` when the class loads rather than read at each boundary, so
+changing them after `\documentclass` has no effect.
+
+`tests/regression/tokens-invariants.lvt` records the ordering relations these
+rules imply, one line per relation, at all three supported sizes. The baseline is
+the assertion: a ratio change that makes a token unreachable, or that repairs
+one, shows up there as a reviewable diff. Five relations are recorded as
+`violated` at the v0.7.0 defaults — #204 made them expressible, and #206 assigns
+the ratios that satisfy them.
 
 #### Derived metrics
 
@@ -634,6 +691,26 @@ the following block's own leading space, never their sum, so entry-led,
 list-led, and prose-led sections share one gap — and shared page furniture
 owns its typography and auxiliary-file page-count decision, while leaving page
 geometry and the document-specific running label to the document classes.
+
+#### One header stack for both headers
+
+The résumé/CV/letter identity block and the statement header are the same shape
+— a name, a run of optional lines, and a contact line — and until #204 each
+emitted its own gaps: once here, and four more times in
+`careerdossier-statement.cls`. Both attached every gap as a *leading* skip on the
+optional block that followed it, which is the "separator attached to the item"
+shape this project forbids everywhere else, and which hid a defect: which token
+guarded the boundary below the name depended on whether an optional field two
+lines further down happened to be present. With no `headline`, the gap below the
+name silently became `\CDossierSharedHeaderMetaGapSkip` instead of
+`\CDossierSharedHeaderNameGapSkip`.
+
+The shared stack takes the present lines as a sequence and interleaves the gaps,
+so position decides the token rather than presence: the boundary below the name
+is always the name gap, every later boundary is the meta gap, and an absent
+optional field leaves nothing behind. It also owns the header's own `\parskip`
+(`\CDossierSharedHeaderParSkip`) and the boundary below the stack, so a class
+states only which lines it prints, in reading order.
 
 #### Why the `medium` option resolves here
 

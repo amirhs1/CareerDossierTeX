@@ -502,7 +502,12 @@ source-compatible for every document that does not read the token by name.
   from drifting again;
 - one naming convention across the vertical-spacing tokens (#203), and header
   and letter-block tokens that own the gaps they name rather than inheriting
-  the prose `\parskip` (#204);
+  the prose `\parskip` (#204). #204 retires the two tokens that never won an
+  `\addvspace` maximum and adds three for boundaries no token described. Unlike
+  #191 and #203 it is *not* output-neutral: letter and statement headers
+  tighten by the prose paragraph gap at each header boundary, the gap above a
+  bullet list inside an entry tightens by `\CDossierRecordEntryGapSkip`, and a
+  document with no `headline` gains that same amount below the name;
 - a retune of the vertical-rhythm ratios (#206), once #203 and #204 leave every
   gap owned by a token that can express it. Documents reflow.
 
