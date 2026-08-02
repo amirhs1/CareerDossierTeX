@@ -1,17 +1,19 @@
 % Shared regression: the section-rule tokens own the rule-to-content gap.
 %
-% Issue #168. `\CDossierSectionBelowSkip' must own the complete distance from
-% the decorative section rule to the first line of section content, for every
-% kind of content that can follow a section heading.
+% Issue #168. `\CDossierRecordSectionBelowSkip' must own the complete distance
+% from the decorative section rule to the first line of section content, for
+% every kind of content that can follow a section heading.
 %
 % LaTeX vertical spacing composes by collapsing, not by adding: adjacent
 % `\addvspace' skips yield their maximum. The gap after a section rule is
-% therefore the larger of `\CDossierSectionBelowSkip' and whatever leading
-% space the following block contributes -- never their sum. This fixture
-% asserts that contract for the three content paths a section can open with:
+% therefore the larger of `\CDossierRecordSectionBelowSkip' and whatever
+% leading space the following block contributes -- never their sum. This
+% fixture asserts that contract for the three content paths a section can open
+% with:
 %
-%   entry-led  -- CDossierEntry, contributing \CDossierEntryAboveSkip
-%   list-led   -- CDossierItemize, contributing \CDossierListEdgeSkipBefore
+%   entry-led  -- CDossierEntry, contributing \CDossierRecordEntryAboveSkip
+%   list-led   -- CDossierItemize, contributing
+%                 \CDossierRecordListEdgeAboveSkip
 %                 as topsep
 %   prose-led  -- an ordinary paragraph, contributing nothing
 %
@@ -52,9 +54,9 @@
 }
 
 \directlua{
-  local below = \number\dimexpr\CDossierSectionBelowSkip\relax
-  local entryabove = \number\dimexpr\CDossierEntryAboveSkip\relax
-  local listedge = \number\dimexpr\CDossierListEdgeSkipBefore\relax
+  local below = \number\dimexpr\CDossierRecordSectionBelowSkip\relax
+  local entryabove = \number\dimexpr\CDossierRecordEntryAboveSkip\relax
+  local listedge = \number\dimexpr\CDossierRecordListEdgeAboveSkip\relax
 
   local function contains_rule(list)
     if not list then return false end
@@ -109,7 +111,8 @@
       tex.error(
         "Section rule gap is not owned by its token (" .. label .. ")",
         {
-          "CDossierSectionBelowSkip is " .. pt(below) .. " and the following",
+          "CDossierRecordSectionBelowSkip is " .. pt(below) ..
+          " and the following",
           "block contributes " .. pt(blockskip) .. ", so the gap must collapse",
           "to " .. pt(expected) .. "; measured " .. pt(measured) .. "."
         }

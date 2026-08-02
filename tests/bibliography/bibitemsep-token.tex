@@ -9,13 +9,13 @@
 \msg_new:nnn { cdossier-test } { unshared-bibitemsep }
   {
     careerdossier-biblatex~sets~bibitemsep~to~\skip_use:N \bibitemsep ,~but~
-    the~shared~list~token~CDossierItemSepSkip~is~
-    \skip_use:N \CDossierItemSepSkip .
+    the~shared~list~token~CDossierRecordItemSepSkip~is~
+    \skip_use:N \CDossierRecordItemSepSkip .
   }
 \ExplSyntaxOff
 \begin{document}
 \ExplSyntaxOn
-\skip_if_eq:nnF { \bibitemsep } { \CDossierItemSepSkip }
+\skip_if_eq:nnF { \bibitemsep } { \CDossierRecordItemSepSkip }
   { \msg_error:nn { cdossier-test } { unshared-bibitemsep } }
 \ExplSyntaxOff
 \end{document}

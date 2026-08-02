@@ -472,12 +472,12 @@ source-compatible for every document that does not read the token by name.
   that already stops the build — so `docs/MIGRATION.md` needs no entry. The
   smoke suite's `*-bad-<option>` expectations match on the generic wording and
   are updated with it;
-- splitting the single list-edge token into `\CDossierListEdgeSkipBefore` and
-  `\CDossierListEdgeSkipAfter`, so the space above a list and the space below
-  it can be tuned independently (#191). Both keep the value the single token
-  had, so no list moves;
-- the bibliography's inter-entry gap reading `\CDossierItemSepSkip` instead of
-  a hard-coded `6pt`, so a `biblatex` publication list and a
+- splitting the single list-edge token into `\CDossierRecordListEdgeAboveSkip`
+  and `\CDossierRecordListEdgeBelowSkip`, so the space above a list and the
+  space below it can be tuned independently (#191). Both keep the value the
+  single token had, so no list moves;
+- the bibliography's inter-entry gap reading `\CDossierRecordItemSepSkip`
+  instead of a hard-coded `6pt`, so a `biblatex` publication list and a
   `CDossierPublications` list share one rhythm at every `fontsize` (#196);
 - Biber date parsing restored, so the bibliography fixture keeps its years and
   its `ydnt` sort order (#211). Biber 2.21 on the maintainer's toolchain rejects
@@ -489,12 +489,12 @@ source-compatible for every document that does not read the token by name.
   green while leaving the bibliography wrong. Whether the cause is Biber 2.21
   generally or one installation cannot be settled on a single machine, so the
   work includes reproducing it on a second toolchain;
-- the tagged path's closing list edge owned by `\CDossierListEdgeSkipAfter`
-  rather than LaTeX Lab's block default, so a tagged and an untagged build of
-  one source stop paginating toward different outcomes (#193). The candidate
-  fix depends on `latex-lab` testphase package internals rather than a stable
-  interface, so it targets a guarded fix that degrades cleanly if that
-  interface changes;
+- the tagged path's closing list edge owned by
+  `\CDossierRecordListEdgeBelowSkip` rather than LaTeX Lab's block default, so
+  a tagged and an untagged build of one source stop paginating toward
+  different outcomes (#193). The candidate fix depends on `latex-lab`
+  testphase package internals rather than a stable interface, so it targets a
+  guarded fix that degrades cleanly if that interface changes;
 - regression, smoke, and layout coverage for the resolved furniture metrics,
   both `medium` values, the unknown-value error on every choice-valued option,
   and both list edges on both the untagged and tagged paths;
@@ -545,10 +545,12 @@ source-compatible for every document that does not read the token by name.
 - both list edges are owned by their tokens on the untagged path, with the
   rendered gap unchanged from `v0.6.0` by the split itself (#191) — the later
   retune (#206) moves it deliberately;
-- the tagged path's closing list edge equals `\CDossierListEdgeSkipAfter`, and
-  `pdftotext -bbox` output agrees between tagged and untagged builds of every
-  supported example, or every remaining difference is explained (#193);
-- `cv-bibliography`'s inter-entry gap equals `\CDossierItemSepSkip` (#196);
+- the tagged path's closing list edge equals
+  `\CDossierRecordListEdgeBelowSkip`, and `pdftotext -bbox` output agrees
+  between tagged and untagged builds of every supported example, or every
+  remaining difference is explained (#193);
+- `cv-bibliography`'s inter-entry gap equals `\CDossierRecordItemSepSkip`
+  (#196);
 - `make bibliography-test` passes on a clean tree with the `date` field and the
   biber-warning gate both intact, and the rendered bibliography shows every year
   in `ydnt` order (#211);

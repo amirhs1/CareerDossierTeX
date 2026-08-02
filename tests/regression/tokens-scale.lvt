@@ -38,29 +38,29 @@
     \cdossiertest_dimension:N \CDossierFurnitureLeading
     \cdossiertest_dimension:N \CDossierRuleThickness
     \cdossiertest_dimension:N \CDossierListLabelSep
-    \cdossiertest_skip:N \CDossierHeaderAboveSkip
-    \cdossiertest_skip:N \CDossierHeaderNameGapSkip
-    \cdossiertest_skip:N \CDossierHeaderMetaGapSkip
-    \cdossiertest_skip:N \CDossierHeaderBelowSkip
-    \cdossiertest_skip:N \CDossierSectionAboveSkip
-    \cdossiertest_skip:N \CDossierSectionRuleSkip
-    \cdossiertest_skip:N \CDossierSectionBelowSkip
+    \cdossiertest_skip:N \CDossierSharedHeaderAboveSkip
+    \cdossiertest_skip:N \CDossierSharedHeaderNameGapSkip
+    \cdossiertest_skip:N \CDossierSharedHeaderMetaGapSkip
+    \cdossiertest_skip:N \CDossierSharedHeaderBelowSkip
+    \cdossiertest_skip:N \CDossierRecordSectionAboveSkip
+    \cdossiertest_skip:N \CDossierRecordSectionRuleGapSkip
+    \cdossiertest_skip:N \CDossierRecordSectionBelowSkip
     \cdossiertest_skip:N \CDossierProseSectionAboveSkip
     \cdossiertest_skip:N \CDossierProseSectionBelowSkip
     \cdossiertest_skip:N \CDossierProseSubsectionAboveSkip
     \cdossiertest_skip:N \CDossierProseSubsectionBelowSkip
-    \cdossiertest_skip:N \CDossierEntryAboveSkip
-    \cdossiertest_skip:N \CDossierEntryGapSkip
-    \cdossiertest_skip:N \CDossierEntryBelowSkip
-    \cdossiertest_skip:N \CDossierListEdgeSkipBefore
-    \cdossiertest_skip:N \CDossierListEdgeSkipAfter
-    \cdossiertest_skip:N \CDossierItemSepSkip
-    \cdossiertest_skip:N \CDossierParSkip
+    \cdossiertest_skip:N \CDossierRecordEntryAboveSkip
+    \cdossiertest_skip:N \CDossierRecordEntryGapSkip
+    \cdossiertest_skip:N \CDossierRecordEntryBelowSkip
+    \cdossiertest_skip:N \CDossierRecordListEdgeAboveSkip
+    \cdossiertest_skip:N \CDossierRecordListEdgeBelowSkip
+    \cdossiertest_skip:N \CDossierRecordItemSepSkip
+    \cdossiertest_skip:N \CDossierRecordParSkip
     \cdossiertest_skip:N \CDossierProseParSkip
-    \cdossiertest_skip:N \CDossierAfterHeaderBlockSkip
-    \cdossiertest_skip:N \CDossierBlockSkip
-    \cdossiertest_skip:N \CDossierAfterSalutationSkip
-    \cdossiertest_skip:N \CDossierSignatureSkip
+    \cdossiertest_skip:N \CDossierLetterheadBelowSkip
+    \cdossiertest_skip:N \CDossierLetterBlockSkip
+    \cdossiertest_skip:N \CDossierLetterSalutationBelowSkip
+    \cdossiertest_skip:N \CDossierLetterSignatureAboveSkip
   }
 \cs_new_protected:Npn \cdossiertest_margin:n #1
   {
@@ -74,8 +74,8 @@
       [
         leftmargin = * ,
         labelsep = \CDossierListLabelSep ,
-        topsep = \CDossierListEdgeSkipBefore ,
-        itemsep = \CDossierItemSepSkip ,
+        topsep = \CDossierRecordListEdgeAboveSkip ,
+        itemsep = \CDossierRecordItemSepSkip ,
         parsep = 0pt ,
         label = \textbullet ,
       ]

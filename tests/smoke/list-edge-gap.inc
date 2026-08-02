@@ -13,11 +13,11 @@
 % Issue #191. `topsep' is LaTeX's only list-edge key and is used at both ends,
 % so a class that passes one token through it cannot give the closing edge a
 % different value. The second fixture below perturbs
-% `\CDossierListEdgeSkipAfter' alone: without the closing-edge mechanism the
-% list would still emit `\CDossierListEdgeSkipBefore' below itself and the
-% assertion would fail. Keeping the perturbed value distinct from every other
-% rhythm token is what stops the check from passing vacuously while both
-% ratios share one calibrated value.
+% `\CDossierRecordListEdgeBelowSkip' alone: without the closing-edge
+% mechanism the list would still emit `\CDossierRecordListEdgeAboveSkip' below
+% itself and the assertion would fail. Keeping the perturbed value distinct
+% from every other rhythm token is what stops the check from passing vacuously
+% while both ratios share one calibrated value.
 %
 % Both fixtures measure the paragraph-to-list-to-paragraph case, which is
 % exactly the case `\partopsep' applies to. They sum only the explicit vertical
@@ -63,15 +63,15 @@
 \setbox\CDossierListEdgeAfterBox=\vbox{%
   \hsize=20em
   \linewidth=\hsize
-  \CDossierListEdgeSkipAfter=17pt\relax
+  \CDossierRecordListEdgeBelowSkip=17pt\relax
   \noindent Prose line before the list.\par
   \CDossierListEdgeList
   \noindent Prose line after the list.\par
 }
 
 \directlua{
-  local before = \number\dimexpr\CDossierListEdgeSkipBefore\relax
-  local after = \number\dimexpr\CDossierListEdgeSkipAfter\relax
+  local before = \number\dimexpr\CDossierRecordListEdgeAboveSkip\relax
+  local after = \number\dimexpr\CDossierRecordListEdgeBelowSkip\relax
   local perturbed = \number\dimexpr 17pt\relax
 
   % Report in points without a literal per-cent sign inside the string, which
@@ -114,7 +114,8 @@
       tex.error(
         "The opening list-edge gap is not owned by its token (" .. label .. ")",
         {
-          "CDossierListEdgeSkipBefore is " .. pt(expected_before) .. ", so that",
+          "CDossierRecordListEdgeAboveSkip is " .. pt(expected_before) ..
+          ", so that",
           "must be the whole explicit skip before a list opening a new",
           "paragraph; measured " .. pt(measured_before) .. ". A stray 3pt is",
           "LaTeX's partopsep, which the list must set to 0pt."
@@ -125,7 +126,8 @@
       tex.error(
         "The closing list-edge gap is not owned by its token (" .. label .. ")",
         {
-          "CDossierListEdgeSkipAfter is " .. pt(expected_after) .. ", so that",
+          "CDossierRecordListEdgeBelowSkip is " .. pt(expected_after) ..
+          ", so that",
           "must be the whole explicit skip after the list; measured " ..
           pt(measured_after) .. ". LaTeX uses topsep at both ends, so the list",
           "must substitute the closing token before it ends."

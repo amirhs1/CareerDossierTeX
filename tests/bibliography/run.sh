@@ -62,11 +62,11 @@ echo "  Biber completed without warnings/errors"
 # The bibliography's inter-entry gap must stay tied to the CV's calibrated list
 # token instead of drifting back to a fixed length. The fixture raises its own
 # package error on a mismatch, so a clean build is the assertion.
-echo "== bibitemsep-token.tex (bibitemsep tracks CDossierItemSepSkip) =="
+echo "== bibitemsep-token.tex (bibitemsep tracks CDossierRecordItemSepSkip) =="
 if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error \
     "bibitemsep-token.tex" > "bibitemsep-token.stdout" 2>&1; then
-  echo "  \\bibitemsep does not track \\CDossierItemSepSkip"
+  echo "  \\bibitemsep does not track \\CDossierRecordItemSepSkip"
   echo "  (see bibitemsep-token.log)"
   exit 1
 fi
-echo "  bibitemsep tracks CDossierItemSepSkip"
+echo "  bibitemsep tracks CDossierRecordItemSepSkip"

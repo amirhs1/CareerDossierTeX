@@ -367,7 +367,7 @@
 \NewDocumentCommand \MakeCDossierHeader { }
   {
     \__cdossier_base_require_name:N \MakeCDossierHeader
-    \addvspace { \CDossierHeaderAboveSkip }
+    \addvspace { \CDossierSharedHeaderAboveSkip }
     \group_begin:
       \centering
       {
@@ -378,7 +378,7 @@
       }
       \CDossierIfFieldTF { headline }
         {
-          \addvspace { \CDossierHeaderNameGapSkip }
+          \addvspace { \CDossierSharedHeaderNameGapSkip }
           {
             \CDossierHeadlineStyle
             \CDossierSizeHeadline
@@ -387,14 +387,14 @@
           }
         }
         { }
-      \addvspace { \CDossierHeaderMetaGapSkip }
+      \addvspace { \CDossierSharedHeaderMetaGapSkip }
       {
         \CDossierBodyStyle
         \CDossierSizeSmall
         \__cdossier_components_contactparagraph:
       }
     \group_end:
-    \addvspace { \CDossierHeaderBelowSkip }
+    \addvspace { \CDossierSharedHeaderBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -501,13 +501,14 @@
 %% rule remains a layout artifact in tagged output, and the keep penalty still
 %% binds the complete heading/rule unit to the content that follows.
 %%
-%% Issue #169: `\CDossierSectionRuleSkip' is measured from the heading's
-%% *baseline*, not from the bottom of its line box. A line box is as deep as its
-%% deepest glyph, so a box-relative offset dropped the rule further under
-%% `Experience' (p) than under `Education' -- 4.80 pt versus 2.28 pt at 11 pt,
-%% a visible 2.1x swing within one document. The baseline is the line the reader
-%% perceives, and it is what rules and underlines are conventionally set from,
-%% so the offset is taken from there and the token means exactly what it says.
+%% Issue #169: `\CDossierRecordSectionRuleGapSkip' is measured from the
+%% heading's *baseline*, not from the bottom of its line box. A line box is as
+%% deep as its deepest glyph, so a box-relative offset dropped the rule further
+%% under `Experience' (p) than under `Education' -- 4.80 pt versus 2.28 pt at
+%% 11 pt, a visible 2.1x swing within one document. The baseline is the line
+%% the reader perceives, and it is what rules and underlines are conventionally
+%% set from, so the offset is taken from there and the token means exactly what
+%% it says.
 %%
 %% `\prevdepth' carries the heading line's depth here, because the heading
 %% primitive ends with `\par'. Subtracting it converts the token from a
@@ -527,7 +528,8 @@
     \nointerlineskip
     \skip_vertical:n
       {
-        \CDossierSectionRuleSkip - \l__cdossier_components_headingdepth_dim
+        \CDossierRecordSectionRuleGapSkip
+        - \l__cdossier_components_headingdepth_dim
       }
     \noindent
       {
@@ -545,7 +547,7 @@
     %% collapsing. `\addvspace' leaves the skip visible, so LaTeX's usual
     %% collapsing rule applies and the gap is the larger of the two -- never
     %% their sum -- for entry-led, list-led, and prose-led sections alike.
-    \addvspace { \CDossierSectionBelowSkip }
+    \addvspace { \CDossierRecordSectionBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -652,7 +654,7 @@
 %% enclosing list, and it must run before the list ends -- each list environment
 %% calls this immediately before its `\end{itemize}' or `\end{enumerate}'.
 \cs_new_protected:Npn \__cdossier_components_listedge_after:
-  { \use:c { @topsepadd } = \CDossierListEdgeSkipAfter \scan_stop: }
+  { \use:c { @topsepadd } = \CDossierRecordListEdgeBelowSkip \scan_stop: }
 
 %% Choose this boundary's penalty from the item's position in its list. The
 %% kernel reads \@itempenalty inside \item, so the value must be assigned

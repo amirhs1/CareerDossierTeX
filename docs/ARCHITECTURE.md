@@ -228,37 +228,38 @@ retaining a small, inspectable spacing vocabulary.
 
 | Token | Ratio | `10pt` | `11pt` | `12pt` |
 |---|---:|---:|---:|---:|
-| `\CDossierHeaderAboveSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
-| `\CDossierHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
-| `\CDossierHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
-| `\CDossierHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
-| `\CDossierSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
-| `\CDossierSectionRuleSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
+| `\CDossierSharedHeaderAboveSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
+| `\CDossierSharedHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierSharedHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
+| `\CDossierSharedHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
+| `\CDossierRecordSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
+| `\CDossierRecordSectionRuleGapSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierRecordSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierProseSectionAboveSkip` | 1.50 | 18.0 pt | 20.4 pt | 21.75 pt |
 | `\CDossierProseSectionBelowSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
 | `\CDossierProseSubsectionAboveSkip` | 1.00 | 12.0 pt | 13.6 pt | 14.5 pt |
 | `\CDossierProseSubsectionBelowSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
-| `\CDossierEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
-| `\CDossierEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
-| `\CDossierEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
-| `\CDossierListEdgeSkipBefore` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierListEdgeSkipAfter` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
-| `\CDossierParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
+| `\CDossierRecordEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierRecordEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
+| `\CDossierRecordEntryBelowSkip` | 0.125 | 1.5 pt | 1.7 pt | 1.8125 pt |
+| `\CDossierRecordListEdgeAboveSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierRecordListEdgeBelowSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierRecordItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
+| `\CDossierRecordParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierAfterHeaderBlockSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
-| `\CDossierBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierAfterSalutationSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierSignatureSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
+| `\CDossierLetterheadBelowSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierLetterBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierLetterSalutationBelowSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierLetterSignatureAboveSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
 
-`\CDossierSectionRuleSkip` is the one token whose ratio is **not** a visible
-gap. Since #169 it is measured from the section heading's baseline, so it spends
-the heading's own depth — about 0.20 line at every supported size — before the
-rule is reached. Its raw 0.3125 is therefore not comparable with the other
-numbers in the table; the gap a reader sees is roughly 0.11 line (1.63 pt at
-11 pt). 0.3125 is the smallest sixteenth that clears the descender, which is why
-the normalized scale keeps it instead of stepping further down.
+`\CDossierRecordSectionRuleGapSkip` is the one token whose ratio is **not** a
+visible gap. Since #169 it is measured from the section heading's baseline, so
+it spends the heading's own depth — about 0.20 line at every supported size —
+before the rule is reached. Its raw 0.3125 is therefore not comparable with
+the other numbers in the table; the gap a reader sees is roughly 0.11 line
+(1.63 pt at 11 pt). 0.3125 is the smallest sixteenth that clears the
+descender, which is why the normalized scale keeps it instead of stepping
+further down.
 
 Compared that way, the heading-to-rule gap is still deliberately the smallest
 visible structural gap in the project, and must stay unambiguously smaller than
@@ -278,26 +279,28 @@ true costs an extra setting: LaTeX's `\list` adds `\partopsep` on top of
 `fontsize`. Every list built on the shared tokens therefore sets
 `partopsep = 0pt` alongside its `topsep` (#176).
 
-The ratio absorbed that 3 pt rather than discarding it, so the rendered
-edge is materially the one #166 tuned. Before #176 the real gap was 4.5 pt at
+The ratio absorbed that 3 pt rather than discarding it, so the rendered edge
+is materially the one #166 tuned. Before #176 the real gap was 4.5 pt at
 `10pt`, 4.7 pt at `11pt`, and 4.81 pt at `12pt` — an effective ratio drifting
 from 0.375 down to 0.332 of a line as the body size grew, because only part of
 it scaled. At 0.3125 the edge is 3.75 / 4.25 / 4.53 pt and the whole of it
-scales. The ratio stays below `\CDossierSectionBelowSkip` (0.375) deliberately:
-a list edge that equalled the gap opening a section would flatten the
-distinction between entering a section and entering a list inside one.
+scales. The ratio stays below `\CDossierRecordSectionBelowSkip` (0.375)
+deliberately: a list edge that equalled the gap opening a section would
+flatten the distinction between entering a section and entering a list inside
+one.
 
-`\CDossierListEdgeSkipBefore` and `\CDossierListEdgeSkipAfter` are two tokens
-rather than one (#191) because LaTeX offers a single `topsep` and spends it at
-both ends of a list, so one token could not express a different value above and
-below. The opening edge is `topsep`; the closing edge is `\@topsepadd`, the
-register `\@trivlist` loads from `topsep` (+ `\partopsep`) on entry and
-`\@endparenv` contributes as the list's closing `\addvspace`. Every list
-environment reassigns that register from the closing token immediately before it
-ends — the assignment is local to the list's group — which is what
-`\__cdossier_components_listedge_after:` does. Adding a separate skip after the
-list instead would not collapse with the following block's own `\addvspace` the
-way one list-owned skip does, and would reintroduce exactly the additive gap
+`\CDossierRecordListEdgeAboveSkip` and `\CDossierRecordListEdgeBelowSkip` are
+two tokens rather than one (#191) because LaTeX offers a single `topsep` and
+spends it at both ends of a list, so one token could not express a different
+value above and below. The opening edge is `topsep`; the closing edge is
+`\@topsepadd`, the register `\@trivlist` loads from `topsep` (+ `\partopsep`)
+on entry and `\@endparenv` contributes as the list's closing `\addvspace`.
+Every list environment reassigns that register from the closing token
+immediately before it ends — the assignment is local to the list's group —
+which is what `\__cdossier_components_listedge_after:` does. Adding a separate
+skip after the list instead would not collapse with the following block's own
+`\addvspace` the way one list-owned skip does, and would reintroduce exactly
+the additive gap
 #168 removed after section rules.
 
 The split is a mechanism change alone: both ratios start at the single value
@@ -315,12 +318,12 @@ opening edge only. It is tracked as #193.
 
 The four `Prose…` heading tokens exist because the entry-structured section
 tokens above them cannot be reused in a continuous-prose class (#177). Those
-are calibrated for a ruled heading in a document whose paragraphs are separated
-by nothing at all: `\CDossierParSkip` is 0. A statement separates its
-paragraphs by `\CDossierProseParSkip` (0.50), so a heading gap has to clear
-that ratio before it separates anything — at `\CDossierSectionBelowSkip`
-(0.375) the space opening a section would be *narrower* than the space between
-two paragraphs inside it.
+are calibrated for a ruled heading in a document whose paragraphs are
+separated by nothing at all: `\CDossierRecordParSkip` is 0. A statement
+separates its paragraphs by `\CDossierProseParSkip` (0.50), so a heading gap
+has to clear that ratio before it separates anything — at
+`\CDossierRecordSectionBelowSkip` (0.375) the space opening a section would be
+*narrower* than the space between two paragraphs inside it.
 
 The prose pair is therefore stated against the paragraph gap rather than
 against the ruled section: 1.50 above is three times it, 0.75 below is one and
@@ -515,10 +518,10 @@ bilingual, and RTL support is dropped (see `docs/ROADMAP.md`), and a label
 indirection layer earns its keep only once a second language exists.
 
 The letter's English defaults (`Dear Hiring Manager,` and `Sincerely,`) are
-therefore defined inline in `careerdossier-letter.cls`, which owns letter prose
-structure. They are defaults, not fixed strings — `\CDossierLetterSetup` exposes
-`salutation` and `closing` keys, so a user overrides them per document without
-any language machinery:
+therefore defined inline in `careerdossier-letter.cls`, which owns letter
+prose structure. They are defaults, not fixed strings — `\CDossierLetterSetup`
+exposes `salutation` and `closing` keys, so a user overrides them per document
+without any language machinery:
 
 ```latex
 \CDossierLetterSetup{
@@ -623,16 +626,14 @@ The component layer consumes the calibrated type and spacing values from
 base-class environments. In particular, the shared identity block owns its
 centering and vertical rhythm, the shared section-rule primitive prevents
 paragraph line spacing from inflating its calibrated gaps, measures
-`\CDossierSectionRuleSkip` from the heading's baseline rather than from the
-bottom of its line box so the rule's height does not follow the heading's
-glyphs, and emits its
-rule-to-content gap so that LaTeX's collapsing rule applies — the gap is the
-larger of `\CDossierSectionBelowSkip` and the following block's own leading
-space, never their sum, so entry-led, list-led, and prose-led sections share
-one gap — and shared page
-furniture owns its typography and auxiliary-file page-count decision, while
-leaving page geometry and the document-specific running label to the document
-classes.
+`\CDossierRecordSectionRuleGapSkip` from the heading's baseline rather than
+from the bottom of its line box so the rule's height does not follow the
+heading's glyphs, and emits its rule-to-content gap so that LaTeX's collapsing
+rule applies — the gap is the larger of `\CDossierRecordSectionBelowSkip` and
+the following block's own leading space, never their sum, so entry-led,
+list-led, and prose-led sections share one gap — and shared page furniture
+owns its typography and auxiliary-file page-count decision, while leaving page
+geometry and the document-specific running label to the document classes.
 
 #### Why the `medium` option resolves here
 
@@ -844,7 +845,8 @@ Responsibilities:
 - expose repeatable author-highlighting declarations;
 - implement DOI, then e-print, then URL display precedence;
 - reuse semantic monochrome typography and link tokens;
-- inherit the shared list-item rhythm token, `\CDossierItemSepSkip`, when the
+- inherit the shared list-item rhythm token, `\CDossierRecordItemSepSkip`,
+  when the
   host class provides it, and fall back to a fixed value when it does not, so
   the profile never owns a competing spacing value; and
 - report an actionable optional-dependency error when BibLaTeX is unavailable.

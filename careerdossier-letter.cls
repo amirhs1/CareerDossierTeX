@@ -276,25 +276,25 @@
   {
     \MakeCDossierHeader
     \par
-    \addvspace { \CDossierAfterHeaderBlockSkip }
+    \addvspace { \CDossierLetterheadBelowSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_date_tl }
     \par
-    \addvspace { \CDossierBlockSkip }
+    \addvspace { \CDossierLetterBlockSkip }
     \__cdossier_letter_has_recipient:T
       {
         \noindent { \CDossierBodyStyle \__cdossier_letter_recipient: }
         \par
-        \addvspace { \CDossierBlockSkip }
+        \addvspace { \CDossierLetterBlockSkip }
       }
     \tl_if_blank:VF \l__cdossier_letter_subject_tl
       {
         \noindent { \CDossierEntryTitleStyle \tl_use:N \l__cdossier_letter_subject_tl }
         \par
-        \addvspace { \CDossierBlockSkip }
+        \addvspace { \CDossierLetterBlockSkip }
       }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_salutation_tl }
     \par
-    \addvspace { \CDossierAfterSalutationSkip }
+    \addvspace { \CDossierLetterSalutationBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -305,10 +305,10 @@
   {
     \__cdossier_base_require_name:N \MakeCDossierClosing
     \par
-    \addvspace { \CDossierBlockSkip }
+    \addvspace { \CDossierLetterBlockSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
     \par
-    \vspace { \CDossierSignatureSkip }
+    \vspace { \CDossierLetterSignatureAboveSkip }
     \noindent { \CDossierBodyStyle \CDossierPrintField { name } }
     \par
   }

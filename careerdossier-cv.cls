@@ -135,7 +135,7 @@
 \exp_args:NV \CDossierApplyGeometry:n \l__cdossier_cv_paper_tl
 
 \setlength { \parindent } { 0pt }
-\setlength { \parskip }   { \CDossierParSkip }
+\setlength { \parskip }   { \CDossierRecordParSkip }
 
 %% A4's narrower text block needs a little extra paragraph flexibility for
 %% prose-heavy CV entries. Letter output retains its established line-breaking
@@ -153,7 +153,7 @@
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
-    \addvspace { \CDossierSectionAboveSkip }
+    \addvspace { \CDossierRecordSectionAboveSkip }
     \__cdossier_typography_heading:n
       { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
     \__cdossier_components_section_rule:
@@ -191,7 +191,7 @@
     \tl_if_blank:VT \l__cdossier_cv_entry_title_tl
       { \msg_error:nn { careerdossier-cv } { entry-missing-title } }
     \par
-    \addvspace { \CDossierEntryAboveSkip }
+    \addvspace { \CDossierRecordEntryAboveSkip }
     \__cdossier_components_entryhead:VVVV
       \l__cdossier_cv_entry_title_tl
       \l__cdossier_cv_entry_org_tl
@@ -200,11 +200,11 @@
     %% Issue #145: keep the entry heading with the first line of its body, so
     %% the heading cannot be stranded alone at the foot of a page.
     \penalty \CDossierHeadingKeepPenalty
-    \vspace { \CDossierEntryGapSkip }
+    \vspace { \CDossierRecordEntryGapSkip }
   }
   {
     \par
-    \addvspace { \CDossierEntryBelowSkip }
+    \addvspace { \CDossierRecordEntryBelowSkip }
   }
 
 %% Issue #145: `beginpenalty' keeps the first bullet with whatever precedes the
@@ -222,8 +222,9 @@
 %% at 12pt. The token's own ratio absorbs the 3 pt instead.
 %%
 %% Issue #191: `topsep' is LaTeX's only list-edge key and applies at both ends,
-%% so `\CDossierListEdgeSkipBefore' passes through it and the shared component
-%% call below substitutes `\CDossierListEdgeSkipAfter' for the closing edge.
+%% so `\CDossierRecordListEdgeAboveSkip' passes through it and the shared
+%% component call below substitutes `\CDossierRecordListEdgeBelowSkip' for the
+%% closing edge.
 \dim_new:N \l__cdossier_cv_label_width_dim
 
 \NewDocumentEnvironment { CDossierItemize } { }
@@ -246,8 +247,8 @@
                 } ,
             labelwidth = \l__cdossier_cv_label_width_dim ,
             labelsep   = \CDossierListLabelSep ,
-            topsep     = \CDossierListEdgeSkipBefore ,
-            itemsep    = \CDossierItemSepSkip ,
+            topsep     = \CDossierRecordListEdgeAboveSkip ,
+            itemsep    = \CDossierRecordItemSepSkip ,
             parsep     = 0pt ,
             partopsep  = 0pt ,
             label      = \textbullet ,
@@ -259,8 +260,8 @@
           [
             leftmargin = * ,
             labelsep   = \CDossierListLabelSep ,
-            topsep     = \CDossierListEdgeSkipBefore ,
-            itemsep    = \CDossierItemSepSkip ,
+            topsep     = \CDossierRecordListEdgeAboveSkip ,
+            itemsep    = \CDossierRecordItemSepSkip ,
             parsep     = 0pt ,
             partopsep  = 0pt ,
             label      = \textbullet ,
@@ -418,8 +419,8 @@
         label      = \textbf { \arabic*) } ,
         leftmargin = * ,
         labelsep   = \CDossierListLabelSep ,
-        topsep     = \CDossierListEdgeSkipBefore ,
-        itemsep    = \CDossierItemSepSkip ,
+        topsep     = \CDossierRecordListEdgeAboveSkip ,
+        itemsep    = \CDossierRecordItemSepSkip ,
         parsep     = 0pt ,
         partopsep  = 0pt ,
       ]

@@ -340,7 +340,67 @@ in this format.
 
 ## [0.7.0] - unreleased
 
-### `\CDossierListEdgeSkip` split into `\CDossierListEdgeSkipBefore` and `\CDossierListEdgeSkipAfter`
+### Vertical-spacing design tokens renamed onto one convention
+
+Every public vertical-spacing token now has the shape
+`\CDossier<Family><Scope><Position>Skip`:
+
+- **Family** — which documents the token affects. `Shared` (all four classes),
+  `Record` (the entry-structured classes: résumé and CV), `Prose` (the
+  continuous-prose classes: letter and statement), or `Letter`.
+- **Scope** — the block being spaced (`Header`, `Section`, `Entry`,
+  `ListEdge`, `Salutation`, `Signature`, …).
+- **Position** — `Above` or `Below` the block, or `Gap` between two parts of
+  one block.
+
+Seventeen of the twenty-two tokens released in `v0.6.0` are renamed. This
+affects a document only if it reads or sets a token by name; **no value
+changes**, so nothing reflows.
+
+Before → after:
+
+| `v0.6.0` | `v0.7.0` |
+|---|---|
+| `\CDossierHeaderAboveSkip` | `\CDossierSharedHeaderAboveSkip` |
+| `\CDossierHeaderNameGapSkip` | `\CDossierSharedHeaderNameGapSkip` |
+| `\CDossierHeaderMetaGapSkip` | `\CDossierSharedHeaderMetaGapSkip` |
+| `\CDossierHeaderBelowSkip` | `\CDossierSharedHeaderBelowSkip` |
+| `\CDossierSectionAboveSkip` | `\CDossierRecordSectionAboveSkip` |
+| `\CDossierSectionRuleSkip` | `\CDossierRecordSectionRuleGapSkip` |
+| `\CDossierSectionBelowSkip` | `\CDossierRecordSectionBelowSkip` |
+| `\CDossierEntryAboveSkip` | `\CDossierRecordEntryAboveSkip` |
+| `\CDossierEntryGapSkip` | `\CDossierRecordEntryGapSkip` |
+| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` |
+| `\CDossierListEdgeSkip` | `\CDossierRecordListEdgeAboveSkip` **and** `\CDossierRecordListEdgeBelowSkip` (split — see below) |
+| `\CDossierItemSepSkip` | `\CDossierRecordItemSepSkip` |
+| `\CDossierParSkip` | `\CDossierRecordParSkip` |
+| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` |
+| `\CDossierBlockSkip` | `\CDossierLetterBlockSkip` |
+| `\CDossierAfterSalutationSkip` | `\CDossierLetterSalutationBelowSkip` |
+| `\CDossierSignatureSkip` | `\CDossierLetterSignatureAboveSkip` |
+
+Unchanged: `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`,
+`\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, and
+`\CDossierProseParSkip`.
+
+Reason: one idea — the gap on a given side of a block — was spelled three
+ways. Ten tokens used `Above`/`Below` before `Skip`, the list-edge pair used
+`Before`/`After` after `Skip`, two more used `After` with no matching
+`Before`, and five carried no positional word at all. An unprefixed name also
+meant either "shared by every class" or "résumé and CV only", with nothing in
+the name to distinguish them. A reader of [`API.md`](API.md) could not predict
+a token's name from its role, which is the point of a semantic token system.
+
+This is a rename only. Every token keeps its calibrated ratio, all eleven
+supported examples render with identical word coordinates before and after,
+and no class, option, key, command, or environment changed.
+
+`\CDossierLetterBlockSkip` is expected to be superseded: it currently serves
+four distinct letter boundaries, and splitting it into one token per boundary
+is tracked separately as
+[#204](https://github.com/amirhs1/CareerDossierTeX/issues/204).
+
+### `\CDossierListEdgeSkip` split into two tokens
 
 Before:
 
@@ -348,16 +408,16 @@ Before:
 
 After:
 
-\CDossierListEdgeSkipBefore   % the gap above a list
-\CDossierListEdgeSkipAfter    % the gap below a list
+\CDossierRecordListEdgeAboveSkip   % the gap above a list
+\CDossierRecordListEdgeBelowSkip   % the gap below a list
 
 Reason: LaTeX has a single `topsep` and spends it at both ends of a list, so
 one token could not give the space above a list and the space below it
 different values. Both new tokens keep the old token's calibrated value, so no
 document reflows and no example or class option changes; only source that reads
 or sets the token by name needs the edit. Read
-`\CDossierListEdgeSkipBefore` wherever the old name appeared, and set both when
-overriding the list edge as a whole.
+`\CDossierRecordListEdgeAboveSkip` wherever the old name appeared, and set both
+when overriding the list edge as a whole.
 
 ## [0.6.0] - 2026-07-30
 

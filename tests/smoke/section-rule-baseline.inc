@@ -1,9 +1,9 @@
 % Shared regression: the section rule sits a fixed distance below the heading
 % baseline.
 %
-% Issue #169. `\CDossierSectionRuleSkip' is the distance from the section
-% heading's baseline to the top of the decorative rule. That distance must not
-% depend on the heading's glyphs.
+% Issue #169. `\CDossierRecordSectionRuleGapSkip' is the distance from the
+% section heading's baseline to the top of the decorative rule. That distance
+% must not depend on the heading's glyphs.
 %
 % Before the fix the rule was placed relative to the heading's *box bottom*,
 % whose depth grows when the heading contains a descender, so the rule dropped
@@ -35,7 +35,7 @@
 }
 
 \directlua{
-  local expected = \number\dimexpr\CDossierSectionRuleSkip\relax
+  local expected = \number\dimexpr\CDossierRecordSectionRuleGapSkip\relax
 
   local function contains_rule(list)
     if not list then return false end
@@ -91,7 +91,8 @@
       tex.error(
         "Section rule is not placed from the heading baseline (" .. label .. ")",
         {
-          "CDossierSectionRuleSkip is " .. pt(expected) .. ", so the rule must",
+          "CDossierRecordSectionRuleGapSkip is " .. pt(expected) ..
+          ", so the rule must",
           "sit that far below the heading baseline; measured " .. pt(offset) .. ".",
           "The heading box depth is " .. pt(depth) .. "."
         }
@@ -101,7 +102,8 @@
       tex.error(
         "Section rule would cross the heading's descenders (" .. label .. ")",
         {
-          "CDossierSectionRuleSkip is " .. pt(expected) .. " but the heading",
+          "CDossierRecordSectionRuleGapSkip is " .. pt(expected) ..
+          " but the heading",
           "descends " .. pt(depth) .. " below its baseline. The token must",
           "exceed the heading's depth so the rule clears descender ink."
         }
