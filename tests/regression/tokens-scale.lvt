@@ -59,8 +59,8 @@
     \cdossiertest_skip:N \CDossierProseParSkip
     \cdossiertest_skip:N \CDossierLetterheadBelowSkip
     \cdossiertest_skip:N \CDossierLetterBlockSkip
-    \cdossiertest_skip:N \CDossierLetterSalutationBelowSkip
-    \cdossiertest_skip:N \CDossierLetterSignatureAboveSkip
+    \cdossiertest_skip:N \CDossierLetterBodyAboveSkip
+    \cdossiertest_skip:N \CDossierLetterSignatureGapSkip
   }
 \cs_new_protected:Npn \cdossiertest_margin:n #1
   {

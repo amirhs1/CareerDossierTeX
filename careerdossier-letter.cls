@@ -294,7 +294,7 @@
       }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_salutation_tl }
     \par
-    \addvspace { \CDossierLetterSalutationBelowSkip }
+    \addvspace { \CDossierLetterBodyAboveSkip }
   }
 
 %% ---------------------------------------------------------------------------
@@ -308,7 +308,7 @@
     \addvspace { \CDossierLetterBlockSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
     \par
-    \vspace { \CDossierLetterSignatureAboveSkip }
+    \vspace { \CDossierLetterSignatureGapSkip }
     \noindent { \CDossierBodyStyle \CDossierPrintField { name } }
     \par
   }

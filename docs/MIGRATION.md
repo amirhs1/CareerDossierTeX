@@ -376,12 +376,22 @@ Before → after:
 | `\CDossierParSkip` | `\CDossierRecordParSkip` |
 | `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` |
 | `\CDossierBlockSkip` | `\CDossierLetterBlockSkip` |
-| `\CDossierAfterSalutationSkip` | `\CDossierLetterSalutationBelowSkip` |
-| `\CDossierSignatureSkip` | `\CDossierLetterSignatureAboveSkip` |
+| `\CDossierAfterSalutationSkip` | `\CDossierLetterBodyAboveSkip` |
+| `\CDossierSignatureSkip` | `\CDossierLetterSignatureGapSkip` |
 
 Unchanged: `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`,
 `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, and
 `\CDossierProseParSkip`.
+
+Two of these are more than a spelling change:
+
+- `\CDossierAfterSalutationSkip` → `\CDossierLetterBodyAboveSkip`. The token is
+  named for the boundary it opens — the top of the letter body — rather than
+  for the block that happens to precede it. The gap it produces is unchanged.
+- `\CDossierSignatureSkip` → `\CDossierLetterSignatureGapSkip`, not
+  `…AboveSkip`. This is the blank space reserved *for* a handwritten signature
+  between the closing and the typed name, so it is a `Gap` between two parts of
+  the closing block, not the space above a block.
 
 Reason: one idea — the gap on a given side of a block — was spelled three
 ways. Ten tokens used `Above`/`Below` before `Skip`, the list-edge pair used

@@ -249,8 +249,8 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierLetterheadBelowSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
 | `\CDossierLetterBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterSalutationBelowSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterSignatureAboveSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
+| `\CDossierLetterBodyAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierLetterSignatureGapSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
 
 `\CDossierRecordSectionRuleGapSkip` is the one token whose ratio is **not** a
 visible gap. Since #169 it is measured from the section heading's baseline, so

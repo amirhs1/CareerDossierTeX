@@ -71,6 +71,14 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   class" or "résumé and CV only", with nothing in the name to tell the two
   apart, so a token's name did not predict what it affected.
 
+  Two renames also correct what the token is named *for*.
+  `\CDossierAfterSalutationSkip` becomes `\CDossierLetterBodyAboveSkip`, named
+  for the boundary it opens rather than the block before it.
+  `\CDossierSignatureSkip` becomes `\CDossierLetterSignatureGapSkip` rather
+  than `…AboveSkip`, because it is the space reserved *for* a handwritten
+  signature between the closing and the typed name — a `Gap` inside the closing
+  block, not the space above one.
+
   **Renames only — no calibrated value changes.** Every renamed token keeps its
   ratio. All eleven supported examples, covering all four document families,
   render with identical word coordinates before and after the change, and

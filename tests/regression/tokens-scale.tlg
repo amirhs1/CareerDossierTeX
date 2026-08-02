@@ -37,8 +37,8 @@ fontsize=10pt
 \CDossierProseParSkip=6.0pt
 \CDossierLetterheadBelowSkip=9.0pt
 \CDossierLetterBlockSkip=6.0pt
-\CDossierLetterSalutationBelowSkip=6.0pt
-\CDossierLetterSignatureAboveSkip=27.0pt
+\CDossierLetterBodyAboveSkip=6.0pt
+\CDossierLetterSignatureGapSkip=27.0pt
 fontsize=11pt
 \CDossierBodySize=11.0pt
 \CDossierBodyLeading=13.6pt
@@ -73,8 +73,8 @@ fontsize=11pt
 \CDossierProseParSkip=6.8pt
 \CDossierLetterheadBelowSkip=10.20001pt
 \CDossierLetterBlockSkip=6.8pt
-\CDossierLetterSalutationBelowSkip=6.8pt
-\CDossierLetterSignatureAboveSkip=30.6pt
+\CDossierLetterBodyAboveSkip=6.8pt
+\CDossierLetterSignatureGapSkip=30.6pt
 fontsize=12pt
 \CDossierBodySize=12.0pt
 \CDossierBodyLeading=14.5pt
@@ -109,8 +109,8 @@ fontsize=12pt
 \CDossierProseParSkip=7.25pt
 \CDossierLetterheadBelowSkip=10.875pt
 \CDossierLetterBlockSkip=7.25pt
-\CDossierLetterSalutationBelowSkip=7.25pt
-\CDossierLetterSignatureAboveSkip=32.625pt
+\CDossierLetterBodyAboveSkip=7.25pt
+\CDossierLetterSignatureGapSkip=32.625pt
 ============================================================
 ============================================================
 TEST 2: both-margin-presets
@@ -155,8 +155,8 @@ fontsize=11pt
 \CDossierProseParSkip=6.8pt
 \CDossierLetterheadBelowSkip=10.20001pt
 \CDossierLetterBlockSkip=6.8pt
-\CDossierLetterSalutationBelowSkip=6.8pt
-\CDossierLetterSignatureAboveSkip=30.6pt
+\CDossierLetterBodyAboveSkip=6.8pt
+\CDossierLetterSignatureGapSkip=30.6pt
 leftmargin=13.28pt;labelwidth-plus-labelsep=13.28pt
 ============================================================
 ============================================================
@@ -196,7 +196,7 @@ fontsize=11pt
 \CDossierProseParSkip=6.8pt
 \CDossierLetterheadBelowSkip=10.20001pt
 \CDossierLetterBlockSkip=6.8pt
-\CDossierLetterSalutationBelowSkip=6.8pt
-\CDossierLetterSignatureAboveSkip=30.6pt
+\CDossierLetterBodyAboveSkip=6.8pt
+\CDossierLetterSignatureGapSkip=30.6pt
 at-catcode-before=12;after=12
 ============================================================

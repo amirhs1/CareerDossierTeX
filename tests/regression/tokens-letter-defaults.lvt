@@ -13,8 +13,8 @@
       \skip_use:N \CDossierLetterheadBelowSkip}
     \TYPE{block-skip = \skip_use:N \CDossierLetterBlockSkip}
     \TYPE{after-salutation-skip =
-      \skip_use:N \CDossierLetterSalutationBelowSkip}
-    \TYPE{signature-skip = \skip_use:N \CDossierLetterSignatureAboveSkip}
+      \skip_use:N \CDossierLetterBodyAboveSkip}
+    \TYPE{signature-skip = \skip_use:N \CDossierLetterSignatureGapSkip}
     \skip_if_eq:nnTF { \parskip } { \CDossierProseParSkip }
       { \TYPE{paragraph-rhythm = shared} }
       { \TYPE{paragraph-rhythm = local} }
