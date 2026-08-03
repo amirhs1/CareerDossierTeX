@@ -425,19 +425,59 @@
       }
   }
 
+%% The numbered list takes the same two paths as CDossierItemize, and for the
+%% same two reasons: LaTeX Lab's emulation parses `leftmargin' as a dimension
+%% and cannot accept enumitem's `*' calculation, and it places the closing edge
+%% from `cdossier-closing-edge' rather than from `\@topsepadd'. CDossierItemize
+%% gained the first branch with the calibrated token system and this list did
+%% not, so until now it had no tagged path at all (issues #218 and #193).
+%%
+%% enumitem's `*' resolves the label box from the *first* item's label and keeps
+%% that width however long the list runs, so `\textbf{1)}' is the box the
+%% untagged path measures and the one the tagged path has to reproduce. It is
+%% written out rather than derived from the `label' key above it because the
+%% label is a template for every item and this is one rendered instance of it;
+%% CDossierItemize states its own `\textbullet' twice for the same reason.
+\dim_new:N \l__cdossier_cv_publication_label_width_dim
+
 \NewDocumentEnvironment { CDossierPublications } { }
   {
     \bool_set_true:N \l__cdossier_cv_publications_active_bool
-    \begin { enumerate }
-      [
-        label      = \textbf { \arabic*) } ,
-        leftmargin = * ,
-        labelsep   = \CDossierListLabelSep ,
-        topsep     = \CDossierRecordListEdgeAboveSkip ,
-        itemsep    = \CDossierRecordItemSepSkip ,
-        parsep     = 0pt ,
-        partopsep  = 0pt ,
-      ]
+    \tag_if_active:TF
+      {
+        \hbox_set:Nn \l_tmpa_box { \textbf { 1) } }
+        \dim_set:Nn \l__cdossier_cv_publication_label_width_dim
+          { \box_wd:N \l_tmpa_box }
+        \begin { enumerate }
+          [
+            label      = \textbf { \arabic*) } ,
+            leftmargin =
+              \dim_eval:n
+                {
+                  \l__cdossier_cv_publication_label_width_dim
+                  + \CDossierListLabelSep
+                } ,
+            labelwidth = \l__cdossier_cv_publication_label_width_dim ,
+            labelsep   = \CDossierListLabelSep ,
+            topsep     = \CDossierRecordListEdgeAboveSkip ,
+            cdossier-closing-edge = \CDossierRecordListEdgeBelowSkip ,
+            itemsep    = \CDossierRecordItemSepSkip ,
+            parsep     = 0pt ,
+            partopsep  = 0pt ,
+          ]
+      }
+      {
+        \begin { enumerate }
+          [
+            label      = \textbf { \arabic*) } ,
+            leftmargin = * ,
+            labelsep   = \CDossierListLabelSep ,
+            topsep     = \CDossierRecordListEdgeAboveSkip ,
+            itemsep    = \CDossierRecordItemSepSkip ,
+            parsep     = 0pt ,
+            partopsep  = 0pt ,
+          ]
+      }
   }
   {
     \__cdossier_components_listedge_after:
