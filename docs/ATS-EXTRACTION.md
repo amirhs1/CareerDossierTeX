@@ -250,6 +250,57 @@ on a page carrying furniture, after the `Page N of M` folio. The reordering is a
 property of the component's geometry, not of tagging, and Apple PDFKit does not
 show it. `tests/extraction/` pins the order for both classes; see section 11.6.
 
+#### Why the component cannot fix this itself
+
+Poppler groups lines into blocks by vertical proximity, then orders the blocks.
+Its `-bbox-layout` tree shows the whole mechanism:
+
+| list gap | blocks Poppler builds |
+|---|---|
+| wide (`0.3125`) | `[Senior Engineer / Example Labs]`, `[2024–Present / Toronto, ON]`, `[bullets]` — one flow, sorted top-to-bottom then left-to-right, so the column lands in place |
+| tight (`0.125`) | `[Senior Engineer / Example Labs / bullets]`, then `[2024–Present / Toronto, ON]` — the heading and the list merge into one *tall* block |
+
+A tall left block that spans the entire vertical band of a short right-hand one
+is Poppler's signature for a two-column page, so it emits the whole left column
+before the right. The trigger is therefore page-level, not local to the heading:
+with the tight gap unchanged, lengthening a bullet until it reaches the dates'
+horizontal band restores the correct order on its own, because the left column
+then overlaps the right and the two stop looking like separate columns.
+
+That rules out repairing it inside `\__cdossier_components_entryhead:nnnn`.
+Measured against the committed fixtures:
+
+- The heading row is **already** one line box emitting title before dates in
+  source order. Neither is what Poppler groups on.
+- Changing the two heading lines' spacing, from −3 pt to +2 pt, never splits the
+  merged block.
+- Every invisible character that could bridge the gap fails. Poppler discards
+  U+0020, U+00A0, and U+200B outright; U+2000, U+2002, U+2003, U+2007, U+2009,
+  and U+205F are each absent from TeX Gyre Heros and raise hundreds of
+  missing-character warnings.
+- U+00AD *is* kept by Poppler and does bridge, but only as a dense run — one
+  glyph every few points, roughly 130 per heading row. That draws a visible
+  dashed rule across the heading and fills the text layer with soft hyphens,
+  which breaks phrase search across the row. Ten evenly spaced glyphs do
+  nothing.
+
+So the constraint is carried by the vertical gap, and
+`\CDossierRecordListEdgeAboveSkip` is the token that owns it.
+
+#### The measured floor
+
+`\CDossierRecordListEdgeAboveSkip` has an extraction floor of **0.25**. On the
+`*-entry-dates-*` fixtures the column extracts with its entry at `0.25` and
+reorders at `0.1875`, identically for the résumé and CV classes at 10 pt, 11 pt,
+and 12 pt — so the floor is a property of the ratio, not of any body size. The
+committed default is `0.3125`, one sixteenth clear of it.
+
+Any retune of this token must respect the floor. `tokens-invariants` states it
+as a relation, and the three `*-entry-dates-*` fixtures fail if it is breached.
+Note that it interacts with the design rule that a list sits nearer the entry
+above it than the material below (`ListEdgeAbove < RecordEntryAboveSkip`):
+holding both at once forces `RecordEntryAboveSkip` above `0.25` as well.
+
 ### 3.5 Headers, footers, and page numbers
 
 For a one- or two-page résumé, prefer no running header. For a long CV

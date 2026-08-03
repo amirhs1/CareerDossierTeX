@@ -19,9 +19,10 @@
 %   page. Lower `\CDossierRecordListEdgeAboveSkip' below 0.25 and the column
 %   moves after `Page 1 of 2', and this baseline fails.
 %
-%   Once #219 lands, the entry head keeps its column unconditionally and page 2's
-%   dates will extract with their heading too. That is an intended output change:
-%   regenerate this baseline with the fix, and review the diff.
+%   #219 closed without changing the component: Poppler decides this at page
+%   level, so page 2's last entry still trails its own column and that is
+%   expected output, not a pending fix. The assertion above is the whole
+%   contract. See docs/ATS-EXTRACTION.md 3.4.
 %
 %   The committed baseline (resume-entry-dates-page-furniture.expected.txt) is
 %   the assertion; regenerate it only for an intended, reviewed output change.

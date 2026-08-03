@@ -17,6 +17,14 @@
 % #206 has to repair, and the retune's diff will show them flipping to `holds'
 % one at a time instead of arriving as one opaque block of new numbers.
 %
+% One relation is not a design ordering at all. The extraction floor on
+% `\CDossierRecordListEdgeAboveSkip' (issue #219) records a bound imposed from
+% outside the type scale: below it, the entry heading's right-hand column stops
+% extracting with its entry. It is stated here because it constrains the same
+% retune the orderings above constrain, and because nothing in the component it
+% affects can express it. Unlike the rest, it must hold at every value #206 may
+% choose; it is not a target to be repaired later.
+%
 % The three heading pairs are recorded as `above >= 2 x below', not as an
 % equality. Measured on rendered output during #206, the ratio of the *tokens*
 % is not the ratio a reader perceives: both gaps are padded by the same
@@ -135,6 +143,49 @@
       {
         \dim_compare_p:nNn
           { \CDossierRecordListEdgeAboveSkip } < { \CDossierRecordEntryAboveSkip }
+      }
+    %% Issue #219: an extraction floor, not a design preference, and the only
+    %% relation here that is not about how the page reads.
+    %%
+    %% The entry heading sets its dates/location in a right-hand column. Poppler
+    %% builds its reading order from glyph positions alone -- the PDF tag tree
+    %% has no bearing on it -- and groups lines into blocks by vertical
+    %% proximity. Once a bullet list closes up against the heading, the heading's
+    %% left column and the list merge into one *tall* block. A tall left block
+    %% spanning the whole vertical band of a short right-hand one is Poppler's
+    %% signature for a two-column page, so it emits the entire left column and
+    %% only then the right: the dates sort after the bullets, or after the
+    %% `Page N of M' folio on a page carrying furniture.
+    %%
+    %% The trigger is a page-level property the entry head does not own. Nothing
+    %% confined to `\__cdossier_components_entryhead:nnnn' reaches it: the
+    %% heading row is already one line box in source order, which is not what
+    %% Poppler groups on; changing the heading's internal line spacing never
+    %% splits the block; and every invisible character that could bridge the gap
+    %% is either discarded by Poppler (U+0020, U+00A0, U+200B) or absent from
+    %% TeX Gyre Heros (U+2000, U+2002, U+2003, U+2007, U+2009, and U+205F were
+    %% each tried). Bridging with a character Poppler
+    %% does keep needs a dense run of them -- about 130 per heading row, which
+    %% draws visible ink and fills the text layer with junk. Widening the gap
+    %% below the heading is the only lever, so this token carries the constraint.
+    %%
+    %% 0.25 is measured, not assumed: on the committed fixtures the column
+    %% extracts with its entry at 0.25 and reorders at 0.1875, identically for
+    %% the resume and CV classes at 10pt, 11pt, and 12pt. The floor is therefore
+    %% a property of the ratio rather than of any body size. Retuning this token
+    %% below it silently breaks extraction on both classes at once; the three
+    %% `*-entry-dates-*' fixtures in tests/extraction/ catch it, and this
+    %% relation states the bound they enforce. See docs/ATS-EXTRACTION.md 3.4.
+    %%
+    %% The 2 sp tolerance is the rounding artefact documented above: the token is
+    %% rounded to a whole scaled point independently of the comparison value, so
+    %% a ratio set at exactly 0.25 can miss the bound by 1 sp.
+    \cdossiertest_invariant:nn
+      { RecordListEdgeAboveSkip >= 0.25 ~ x ~ BodyLeading ~ (extraction ~ floor) }
+      {
+        ! \dim_compare_p:nNn
+            { \CDossierRecordListEdgeAboveSkip + 2sp }
+            < { 0.25 \CDossierBodyLeading }
       }
     %% Hard, not a preference: `\@xsect' reads a non-positive after-skip as a
     %% request for a run-in heading, and careerdossier-statement.cls passes
