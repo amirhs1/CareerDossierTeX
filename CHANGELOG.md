@@ -314,6 +314,21 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   `margin=` out of that class's option list must now pass the option to
   `\usepackage` (or `\PassOptionsToPackage`) instead.
 
+- A new `make lint` gate keeps the named-values errors added under ([#212])
+  from regressing as options are added. It reads the classes and packages and
+  fails when a choice-valued option is missing either half of that error — the
+  message, or the `unknown` sub-key that reaches it — naming the module and the
+  key. It runs first in `make check` and in its own CI job, compiles nothing,
+  and needs no TeX installation. ([#233])
+
+  Coverage that enumerates the messages that exist cannot catch one that was
+  never written, so this derives the expected set from the source instead:
+  twenty-five choice-valued options today, each verified to define its message
+  and route l3keys' choice error to it, both naming the module the filename
+  implies. **Contributor tooling only.** No class, option, key, command,
+  environment, or calibrated value changed, and no document renders
+  differently.
+
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
 [#184]: https://github.com/amirhs1/CareerDossierTeX/issues/184
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
@@ -326,6 +341,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
+[#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
 
 ## [0.6.0] - 2026-07-30
 
