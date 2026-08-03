@@ -5,35 +5,53 @@ TEST 1: boundary-token-ordering
 ============================================================
 fontsize=10pt
 SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
-SharedHeaderBelowSkip>ProseSectionAboveSkip => violated (ratio retune pending)
+SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
+RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => violated
+ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
+ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => violated
+ProseSubsectionAboveSkip<ProseSectionAboveSkip => holds
+ProseSubsectionBelowSkip<ProseSectionBelowSkip => holds
 RecordEntryAboveSkip<RecordSectionBelowSkip => holds
 RecordEntryGapSkip<=RecordListEdgeAboveSkip => holds
-RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => violated (ratio retune pending)
-RecordListEdgeAboveSkip<RecordEntryAboveSkip => violated (ratio retune pending)
+RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => violated
+RecordListEdgeAboveSkip<RecordEntryAboveSkip => violated
+ProseParSkip<ProseSectionBelowSkip => holds
 ProseParSkip<ProseSubsectionBelowSkip => holds
 LetterBodyAboveSkip=LetterBodyBelowSkip => holds
-LetterBodyAboveSkip>LetterBlockSkip => violated (ratio retune pending)
-LetterBlockSkip>ProseParSkip => violated (ratio retune pending)
+LetterBodyAboveSkip>LetterBlockSkip => violated
+LetterBlockSkip>ProseParSkip => violated
 fontsize=11pt
 SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
-SharedHeaderBelowSkip>ProseSectionAboveSkip => violated (ratio retune pending)
+SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
+RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => violated
+ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
+ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => violated
+ProseSubsectionAboveSkip<ProseSectionAboveSkip => holds
+ProseSubsectionBelowSkip<ProseSectionBelowSkip => holds
 RecordEntryAboveSkip<RecordSectionBelowSkip => holds
 RecordEntryGapSkip<=RecordListEdgeAboveSkip => holds
-RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => violated (ratio retune pending)
-RecordListEdgeAboveSkip<RecordEntryAboveSkip => violated (ratio retune pending)
+RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => violated
+RecordListEdgeAboveSkip<RecordEntryAboveSkip => violated
+ProseParSkip<ProseSectionBelowSkip => holds
 ProseParSkip<ProseSubsectionBelowSkip => holds
 LetterBodyAboveSkip=LetterBodyBelowSkip => holds
-LetterBodyAboveSkip>LetterBlockSkip => violated (ratio retune pending)
-LetterBlockSkip>ProseParSkip => violated (ratio retune pending)
+LetterBodyAboveSkip>LetterBlockSkip => violated
+LetterBlockSkip>ProseParSkip => violated
 fontsize=12pt
 SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
-SharedHeaderBelowSkip>ProseSectionAboveSkip => violated (ratio retune pending)
+SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
+RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => violated
+ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
+ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => violated
+ProseSubsectionAboveSkip<ProseSectionAboveSkip => holds
+ProseSubsectionBelowSkip<ProseSectionBelowSkip => holds
 RecordEntryAboveSkip<RecordSectionBelowSkip => holds
 RecordEntryGapSkip<=RecordListEdgeAboveSkip => holds
-RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => violated (ratio retune pending)
-RecordListEdgeAboveSkip<RecordEntryAboveSkip => violated (ratio retune pending)
+RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => violated
+RecordListEdgeAboveSkip<RecordEntryAboveSkip => violated
+ProseParSkip<ProseSectionBelowSkip => holds
 ProseParSkip<ProseSubsectionBelowSkip => holds
 LetterBodyAboveSkip=LetterBodyBelowSkip => holds
-LetterBodyAboveSkip>LetterBlockSkip => violated (ratio retune pending)
-LetterBlockSkip>ProseParSkip => violated (ratio retune pending)
+LetterBodyAboveSkip>LetterBlockSkip => violated
+LetterBlockSkip>ProseParSkip => violated
 ============================================================
