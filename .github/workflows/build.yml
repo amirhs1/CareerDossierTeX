@@ -248,13 +248,16 @@ jobs:
             build/examples/letter-industry.log
           if-no-files-found: warn
 
-  # The Biber fixture is its own job for the same reason `smoke` and `layout`
-  # are (#190): it is a suite of multi-pass Biber builds, not an example build,
-  # and burying it inside `cv` made its coverage easy to miss -- issue #211 was
-  # filed believing CI never exercised this path, when `cv` had run it since
-  # #69. A named job answers that question from the checks list alone, and it
-  # is the second toolchain that distinguishes a local Biber fault from a
-  # general one.
+  # The Biber fixture is its own job for discoverability, not for speed. Unlike
+  # the #190 split of `smoke` and `layout` -- multi-minute suites where a
+  # separate runner buys real wall clock -- the fixture itself takes ~15s, so
+  # this job spends far longer initializing its container than testing. What it
+  # buys is a named check: buried inside `cv`, the coverage was invisible, and
+  # issue #211 was investigated at length on the premise that CI never
+  # exercised this path, when `cv` had in fact run it since #69. A named job
+  # answers that from the checks list alone, and it is the second toolchain
+  # that tells a local Biber fault apart from a general one. Fold it back into
+  # `cv` if the runner is ever worth more than that.
   bibliography:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
