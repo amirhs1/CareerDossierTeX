@@ -36,14 +36,12 @@
   \end{CDossierItemize}%
 }
 
-% Whether the closing edge is asserted. A tagged build replaces LaTeX's list
-% internals with LaTeX Lab's block templates, which do not take their closing
-% spacing from `\@topsepadd', so the class cannot place the closing token there
-% and the measured gap is LaTeX Lab's own. That divergence predates #191 and
-% is tracked as #193 --
-% it is present on the tagged path with a single shared list-edge token too --
-% so a fixture on that path asserts the opening edge only.
-\providecommand\CDossierListEdgeClosingOwned{1}
+% Issue #193. A tagged build replaces LaTeX's list internals with LaTeX Lab's
+% block templates, which do not take their closing spacing from `\@topsepadd',
+% so the closing token reaches that path through the block template's own
+% closing-edge keys instead. Both assertions below therefore hold on the tagged
+% path as well, and the fixtures that compile this file with tagging on are what
+% keep the two paths from drifting apart again.
 
 \newbox\CDossierListEdgeBox
 \newbox\CDossierListEdgeAfterBox
@@ -109,7 +107,6 @@
       tex.error("The " .. label .. " fixture found no list line after the paragraph")
       return
     end
-    if expected_after == nil then measured_after = nil end
     if measured_before ~= expected_before then
       tex.error(
         "The opening list-edge gap is not owned by its token (" .. label .. ")",
@@ -136,12 +133,9 @@
     end
   end
 
-  local closing_owned = \CDossierListEdgeClosingOwned == 1
-
-  check("default", \number\CDossierListEdgeBox, before,
-        closing_owned and after or nil)
+  check("default", \number\CDossierListEdgeBox, before, after)
   check("perturbed-closing-edge", \number\CDossierListEdgeAfterBox, before,
-        closing_owned and perturbed or nil)
+        perturbed)
 }
 
 \box\CDossierListEdgeBox

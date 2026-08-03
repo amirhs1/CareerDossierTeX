@@ -1,0 +1,12 @@
+% resume-list-edge-gap-tagged-10pt.tex -- see list-edge-gap.inc (issue #193).
+%
+% The tagged closing edge is placed by LaTeX Lab's block template rather than by
+% LaTeX's list internals, and the value it falls back to without #193 is the
+% instance default derived from `article''s own `\topsep' -- a quantity that
+% changes with the class option. The three tagged list-edge fixtures therefore
+% cover all three supported body sizes between them: this one 10pt,
+% resume-list-edge-gap-tagged.tex the résumé default of 11pt, and
+% cv-list-edge-gap-tagged.tex the CV default of 12pt.
+\DocumentMetadata{tagging=on}
+\documentclass[fontsize=10pt]{careerdossier-resume}
+\input{list-edge-gap.inc}

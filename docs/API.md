@@ -724,11 +724,11 @@ both ends at once; see [`MIGRATION.md`](MIGRATION.md). Both keep that token's
 calibrated value, so a document's rendered list spacing is unchanged. The CV's
 `CDossierPublications` list uses the same pair.
 
-Under `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX
-Lab's list implementation rather than from `\CDossierRecordListEdgeBelowSkip`;
-the space above is unaffected. A tagged build therefore spaces the area below
-a list differently from an untagged build of the same source
-([#193](https://github.com/amirhs1/CareerDossierTeX/issues/193)).
+Both tokens apply under `\DocumentMetadata{tagging=on}` as well, so a tagged
+build and an untagged build of the same source place their lists identically
+([#193](https://github.com/amirhs1/CareerDossierTeX/issues/193)). Tagged output
+remains an opt-in preview and carries no conformance claim; see
+[Tagged structure (opt-in)](#tagged-structure-opt-in).
 
 When the list crosses a page boundary it is never split so that a single item
 stands alone on either side; a list longer than a page still breaks normally.

@@ -1,0 +1,17 @@
+% cv-publication-list-edge-gap-tagged.tex -- see list-edge-gap.inc (issues #176,
+% #191, #193, #218). The publication list is a numbered list rather than a
+% bullet list, and until #218 it had no tagged key path at all: it passed
+% enumitem's `*' leftmargin to LaTeX Lab's emulation, which parses that key as a
+% dimension and stopped with `Missing number'. This fixture is what keeps that
+% path built and measured.
+\DocumentMetadata{tagging=on}
+\documentclass{careerdossier-cv}
+\newcommand\CDossierListEdgeList{%
+  \begin{CDossierPublications}
+    \CDossierPublication{
+      authors = {Ada Lovelace},
+      title   = {Notes on the Analytical Engine}
+    }
+  \end{CDossierPublications}%
+}
+\input{list-edge-gap.inc}

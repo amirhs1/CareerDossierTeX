@@ -729,8 +729,75 @@
 %% The assignment is local to the list's group, so it cannot leak into an
 %% enclosing list, and it must run before the list ends -- each list environment
 %% calls this immediately before its `\end{itemize}' or `\end{enumerate}'.
+%%
+%% This is the untagged mechanism only. A tagged list never reads `\@topsepadd'
+%% -- see the `cdossier-closing-edge' key below -- but the assignment is a local
+%% register write either way, so the list environments call it unconditionally
+%% rather than branching twice on the same condition.
 \cs_new_protected:Npn \__cdossier_components_listedge_after:
   { \use:c { @topsepadd } = \CDossierRecordListEdgeBelowSkip \scan_stop: }
+
+%% ---------------------------------------------------------------------------
+%% The same closing edge on the tagged path (issue #193).
+%%
+%% Under `\DocumentMetadata{tagging=on}' LaTeX Lab replaces LaTeX's list
+%% internals with its own block templates. `\@topsepadd' measures 0 pt inside a
+%% tagged list, so the mechanism above cannot reach that path and the closing
+%% gap was LaTeX Lab's own instance default -- 12 pt against the token's 4.25 pt
+%% at the résumé default, enough to shift the last line of a one-page résumé by
+%% a full line of body text relative to the untagged build of the same source.
+%%
+%% The block template does expose the closing edge, as two separate keys:
+%%
+%%   end-vspace        the counterpart of `topsep' (LaTeX Lab: `begin-vspace')
+%%   end-extra-vspace  the counterpart of `partopsep' (`begin-extra-vspace')
+%%
+%% Both are needed. LaTeX Lab's enumitem emulation maps `topsep' and `partopsep'
+%% to the two opening keys and maps nothing to the closing pair, so a list that
+%% sets `partopsep = 0pt' still closes with the interface default of
+%% `end-extra-vspace', which is `\partopsep' as the `article' class left it:
+%% a fixed 3 pt that no token owns. Measured on the résumé fixture, setting
+%% `end-vspace' alone gives token + 3 pt, and setting both gives the token.
+%%
+%% One CDossier-owned key therefore stands for the whole closing edge, and it is
+%% the only name the classes use: the value is the complete gap below the list,
+%% exactly as `\CDossierRecordListEdgeBelowSkip' is documented to be. Keeping
+%% the LaTeX Lab key names in this one place also keeps the dependency on a
+%% testphase interface out of the classes.
+%%
+%% The keys are testphase interfaces and may be renamed or withdrawn. If they
+%% are, the CDossier key becomes a no-op that still consumes its value, so a
+%% tagged build keeps working with LaTeX Lab's closing spacing -- the behaviour
+%% before this issue -- instead of stopping at an unknown-key error. The warning
+%% is what turns that silent fidelity loss into something the maintainer sees.
+\msg_new:nnnn { careerdossier-components } { tagged-list-closing-edge }
+  {
+    LaTeX~Lab~no~longer~offers~'end-vspace';~
+    tagged~lists~keep~its~own~closing~spacing.
+  }
+  {
+    \c_backslash_str CDossierRecordListEdgeBelowSkip~cannot~be~placed~below~a~
+    list~while~tagging~is~active,~so~the~tagged~and~untagged~builds~of~this~
+    document~will~space~lists~differently.~The~untagged~build~is~unaffected.
+  }
+
+%% `\SetEnumitemKey' is the emulation's own interface for adding an
+%% enumitem-style key, and it ships with the emulation: its absence means no
+%% tagged list can be built at all and there is no key path to add anything to.
+\cs_if_exist:NT \SetEnumitemKey
+  {
+    \bool_lazy_and:nnTF
+      { \keys_if_exist_p:nn { template / block / std } { end-vspace } }
+      { \keys_if_exist_p:nn { template / block / std } { end-extra-vspace } }
+      {
+        \SetEnumitemKey { cdossier-closing-edge }
+          { end-vspace = #1 , end-extra-vspace = 0pt }
+      }
+      {
+        \msg_warning:nn { careerdossier-components } { tagged-list-closing-edge }
+        \SetEnumitemKey { cdossier-closing-edge } { }
+      }
+  }
 
 %% Choose this boundary's penalty from the item's position in its list. The
 %% kernel reads \@itempenalty inside \item, so the value must be assigned

@@ -262,6 +262,12 @@
 %% so `\CDossierRecordListEdgeAboveSkip' passes through it and the shared
 %% component call below substitutes `\CDossierRecordListEdgeBelowSkip' for the
 %% closing edge.
+%%
+%% Issue #193: that substitution works on the untagged path only, because a
+%% tagged list is built by LaTeX Lab's block templates and never reads the
+%% register it assigns. The tagged branch names the same token through
+%% `cdossier-closing-edge' instead -- the shared key careerdossier-components
+%% declares for exactly this -- so both paths place the same gap below a list.
 %% ---------------------------------------------------------------------------
 \dim_new:N \l__cdossier_resume_label_width_dim
 
@@ -287,6 +293,7 @@
             labelwidth = \l__cdossier_resume_label_width_dim ,
             labelsep   = \CDossierListLabelSep ,
             topsep     = \CDossierRecordListEdgeAboveSkip ,
+            cdossier-closing-edge = \CDossierRecordListEdgeBelowSkip ,
             itemsep    = \CDossierRecordItemSepSkip ,
             parsep     = 0pt ,
             partopsep  = 0pt ,
