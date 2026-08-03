@@ -344,20 +344,22 @@ in this format.
 
 ## [0.7.0] - unreleased
 
-### Two vertical-spacing tokens retired, three added
+### Three vertical-spacing tokens retired, two added
 
 Every vertical boundary is now owned by exactly one token.
 
-Removed — **neither rendered anything at the released defaults**, so removing
-them changes no output:
+Removed — **none of them rendered anything at the released defaults**, so
+removing them changes no output:
 
 | Removed | Use instead | Why it never rendered |
 |---|---|---|
 | `\CDossierRecordEntryBelowSkip` | `\CDossierRecordEntryAboveSkip` | Block boundaries compose with `\addvspace`, which takes the maximum of the adjacent claims, never their sum. At 0.125 this token lost to `\CDossierRecordEntryAboveSkip` (0.25) between two entries and to `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every boundary it appeared at. |
 | `\CDossierLetterheadBelowSkip` | `\CDossierSharedHeaderBelowSkip` | It claimed the header → date boundary immediately after `\MakeCDossierHeader` had already claimed it, at a smaller value (0.75 against 0.8125), so the maximum discarded it. |
+| `\CDossierHeaderAboveSkip`, renamed `\CDossierSharedHeaderAboveSkip` earlier in this release | nothing — the boundary does not exist | It claimed the boundary *above* the first header line. Every class renders its header as the first material in the document, and TeX discards glue at the top of a page, so the token rendered nothing at `0.00` or at any other value. |
 
-A document that sets either name will now get an undefined-control-sequence
-error. Delete the setting (`\CDossierRecordEntryBelowSkip`) or move it to
+A document that sets any of these names will now get an
+undefined-control-sequence error. Delete the setting
+(`\CDossierRecordEntryBelowSkip`, `\CDossierHeaderAboveSkip`) or move it to
 `\CDossierSharedHeaderBelowSkip` (`\CDossierLetterheadBelowSkip`) — but note
 that the latter is shared with the résumé and CV headers, so it also changes
 the header → section gap in those classes.
@@ -366,7 +368,6 @@ Added:
 
 | Added | Boundary | Default |
 |---|---|---|
-| `\CDossierSharedHeaderParSkip` | the paragraph gap *inside* the header block, in every class | `0.00` |
 | `\CDossierLetterRecipientLineGapSkip` | between two lines of the letter's recipient block | `0.00` |
 | `\CDossierLetterBodyBelowSkip` | letter body → closing | `0.50`, the value the boundary already had |
 
@@ -394,9 +395,13 @@ token, and `\addvspace` could not absorb it: `\parskip` is inserted at the next
 paragraph's start, after `\addvspace` has already read `\lastskip`, so the two
 always add.
 
-The header block now sets its own `\parskip` from
-`\CDossierSharedHeaderParSkip` (`0.00`), so the header gap tokens name the
-rendered gap in all four classes.
+The header block now zeroes `\parskip` for its own scope, so the header gap
+tokens name the rendered gap in all four classes. That zero is fixed, not a
+token: an intermediate revision of this release exposed it as
+`\CDossierSharedHeaderParSkip`, but the value cancelled itself — the stack
+emits every gap as `token − \parskip` and the following header line then
+contributes `\parskip` again — so no value of it changed anything. It is not
+part of the released API.
 
 **Letters and statements reflow.** Each header boundary tightens by
 `\CDossierProseParSkip` — 7.25 pt at `fontsize=12pt`. Measured on the shipped
@@ -406,14 +411,20 @@ example changes its page count, but a statement fits more body text on page one
 than before. Résumé and CV are unaffected, because `\CDossierRecordParSkip` is
 already `0.00`.
 
-To keep the previous letter or statement header spacing, set the token to the
-prose paragraph gap after `\documentclass`:
+To keep the previous letter or statement header spacing, add the prose
+paragraph gap to the two header gap tokens — which is what the old `\parskip`
+floor contributed — after `\documentclass`:
 
 ```latex
 \makeatletter\ExplSyntaxOn
-\skip_set_eq:NN \CDossierSharedHeaderParSkip \CDossierProseParSkip
+\skip_add:Nn \CDossierSharedHeaderNameGapSkip { \CDossierProseParSkip }
+\skip_add:Nn \CDossierSharedHeaderMetaGapSkip { \CDossierProseParSkip }
 \ExplSyntaxOff\makeatother
 ```
+
+At `fontsize=12pt` that restores the name gap to 10.875 pt and every later
+header gap to 9.96875 pt. Do not apply it in the résumé or CV, which never had
+the floor.
 
 ### `\CDossierRecordEntryGapSkip` became a floor rather than added space
 
@@ -468,7 +479,7 @@ Before → after:
 
 | `v0.6.0` | `v0.7.0` |
 |---|---|
-| `\CDossierHeaderAboveSkip` | `\CDossierSharedHeaderAboveSkip` |
+| `\CDossierHeaderAboveSkip` | `\CDossierSharedHeaderAboveSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
 | `\CDossierHeaderNameGapSkip` | `\CDossierSharedHeaderNameGapSkip` |
 | `\CDossierHeaderMetaGapSkip` | `\CDossierSharedHeaderMetaGapSkip` |
 | `\CDossierHeaderBelowSkip` | `\CDossierSharedHeaderBelowSkip` |

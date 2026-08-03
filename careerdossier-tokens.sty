@@ -161,8 +161,16 @@
 %% the token still names the rendered gap. `careerdossier-statement.cls' uses
 %% that pattern for its headings and the shared header stack uses it for every
 %% header line.
-\skip_new:N \CDossierSharedHeaderAboveSkip
-\skip_new:N \CDossierSharedHeaderParSkip
+%%
+%% Issue #220: a token that cannot change output at any value is not a tunable,
+%% whatever its value. `\CDossierSharedHeaderAboveSkip' was glue above the first
+%% header line, which is always the first material on page 1 and therefore
+%% always discarded; `\CDossierSharedHeaderParSkip' was subtracted from every
+%% header gap and then re-contributed by the following header line, so it
+%% cancelled itself for every value. Both are retired; see docs/MIGRATION.md.
+%% The header group still needs its own paragraph gap -- see
+%% `careerdossier-components.sty' -- but it is now a fixed zero rather than a
+%% public knob.
 \skip_new:N \CDossierSharedHeaderNameGapSkip
 \skip_new:N \CDossierSharedHeaderMetaGapSkip
 \skip_new:N \CDossierSharedHeaderBelowSkip
@@ -290,15 +298,6 @@
           { 0.5 * \dim_to_fp:n { \CDossierBodySize } }
       }
 
-    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderAboveSkip { 0.00 }
-    %% Issue #204: the paragraph gap *inside* the header stack. The prose
-    %% classes set `\parskip' to \CDossierProseParSkip document-wide, and every
-    %% header line is its own paragraph, so before this token the prose
-    %% paragraph gap landed in every header boundary on top of the header token
-    %% and the header tokens could not express a gap below that floor. The
-    %% header group now owns its own paragraph gap; 0.00 keeps the header
-    %% boundaries governed by the three gap tokens alone, in every class.
-    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderNameGapSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderMetaGapSkip { 0.1875 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderBelowSkip { 0.8125 }

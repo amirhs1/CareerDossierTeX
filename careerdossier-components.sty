@@ -380,9 +380,18 @@
 %% prose classes that is a visible 0.50 line the header tokens cannot express a
 %% gap below, and `\addvspace' cannot absorb it: `\parskip' is inserted at the
 %% next paragraph's start, after `\addvspace' has already read `\lastskip', so
-%% the two always add. The stack therefore sets `\parskip' to
-%% \CDossierSharedHeaderParSkip for its own group and subtracts it from every
-%% gap it emits, so each token names the rendered gap in every class.
+%% the two always add. The stack therefore zeroes `\parskip' for its own group
+%% and subtracts it from every gap it emits, so each token names the rendered
+%% gap in every class.
+%%
+%% Issue #220: that isolation is load-bearing and must stay, but the zero is not
+%% a tunable. It used to come from a public \CDossierSharedHeaderParSkip, which
+%% cancelled itself algebraically: the stack emitted every gap as
+%% `gap - \parskip' and the following header line then contributed `\parskip'
+%% again, so the rendered gap was `gap' for every value of the token. It is now
+%% a literal zero; the subtraction below is kept because it is the project-wide
+%% emission contract for a paragraph boundary, not because `\parskip' can be
+%% non-zero here.
 %% ---------------------------------------------------------------------------
 \seq_new:N \l__cdossier_components_headerstack_seq
 \int_new:N \l__cdossier_components_headerline_int
@@ -403,7 +412,7 @@
     \seq_if_empty:NF \l__cdossier_components_headerstack_seq
       {
         \group_begin:
-          \skip_set_eq:NN \parskip \CDossierSharedHeaderParSkip
+          \skip_zero:N \parskip
           \centering
           \int_zero:N \l__cdossier_components_headerline_int
           \seq_map_inline:Nn \l__cdossier_components_headerstack_seq
@@ -411,11 +420,12 @@
               \int_incr:N \l__cdossier_components_headerline_int
               \int_case:nnF { \l__cdossier_components_headerline_int }
                 {
-                  { 1 }
-                    {
-                      \__cdossier_components_headerstack_gap:N
-                        \CDossierSharedHeaderAboveSkip
-                    }
+                  %% Issue #220: the first line has no boundary above it inside
+                  %% the stack. The retired \CDossierSharedHeaderAboveSkip
+                  %% claimed one, but a header is always the first material on
+                  %% its page, where TeX discards the glue -- so it rendered
+                  %% nothing at any value.
+                  { 1 } { }
                   { 2 }
                     {
                       \__cdossier_components_headerstack_gap:N

@@ -32,13 +32,12 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   values. `medium` is a separate axis from `theme`, which remains fixed at
   `monochrome`; it does not affect colour, hyperlinks, or PDF metadata.
 
-- Three vertical boundaries that no token described now have one:
-  `\CDossierSharedHeaderParSkip` (the paragraph gap inside the header block, in
-  every class), `\CDossierLetterRecipientLineGapSkip` (between two lines of the
-  letter's recipient block), and `\CDossierLetterBodyBelowSkip` (letter body →
-  closing). ([#204])
+- Two vertical boundaries that no token described now have one:
+  `\CDossierLetterRecipientLineGapSkip` (between two lines of the letter's
+  recipient block) and `\CDossierLetterBodyBelowSkip` (letter body → closing).
+  ([#204])
 
-  The last two are additive: `\CDossierLetterRecipientLineGapSkip` defaults to
+  Both are additive: `\CDossierLetterRecipientLineGapSkip` defaults to
   `0.00`, reproducing the plain `\baselineskip` the bare line break gave, and
   `\CDossierLetterBodyBelowSkip` defaults to the value that boundary already
   borrowed from `\CDossierLetterBlockSkip` — a token that names the boundaries
@@ -48,12 +47,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Changed
 
-- **BREAKING (design token):** the header block now sets its own paragraph gap
-  from `\CDossierSharedHeaderParSkip` (`0.00`) instead of inheriting the prose
-  classes' document-wide `\parskip`, so the header gap tokens name the gap a
-  reader measures in all four classes. **Letters and statements reflow:** every
-  header boundary tightens by `\CDossierProseParSkip`, 7.25 pt at
-  `fontsize=12pt`. ([#204])
+- **BREAKING (design token):** the header block now zeroes its own paragraph
+  gap instead of inheriting the prose classes' document-wide `\parskip`, so the
+  header gap tokens name the gap a reader measures in all four classes.
+  **Letters and statements reflow:** every header boundary tightens by
+  `\CDossierProseParSkip`, 7.25 pt at `fontsize=12pt`. ([#204], [#220])
 
   Every header line is its own paragraph, so `\parskip` landed in every header
   boundary on top of the header token, and `\addvspace` could not absorb it —
@@ -67,8 +65,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   43.3 pt in `research-statement`. No example changes its page count, but a
   statement fits more body text on page one than before. Résumé and CV are
   unaffected, because `\CDossierRecordParSkip` is already `0.00`. To keep the
-  previous spacing, set `\CDossierSharedHeaderParSkip` to
-  `\CDossierProseParSkip`; see [`docs/MIGRATION.md`](docs/MIGRATION.md).
+  previous spacing, add `\CDossierProseParSkip` to the two header gap tokens;
+  see [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 - **BREAKING (design token):** `\CDossierRecordEntryGapSkip` is now the *floor*
   for the entry heading → body boundary rather than space added on top of it.
@@ -221,6 +219,23 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   undefined-control-sequence error; see
   [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
+- **BREAKING (design token):** `\CDossierSharedHeaderAboveSkip` — released in
+  `v0.6.0` as `\CDossierHeaderAboveSkip` — is removed. It named the space above
+  the first header line, and every class renders its header as the first
+  material in the document, where TeX discards glue at the top of the page. It
+  therefore rendered nothing at `0.00` or at any other value, so **no document
+  changes.** ([#220])
+
+  A document that sets either name now gets an undefined-control-sequence
+  error; delete the setting. The space *around* the identity block is owned by
+  `\CDossierSharedHeaderBelowSkip` below it and by the page geometry above it.
+  See [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
+  This closes an acceptance criterion the pending ratio retune could not
+  otherwise satisfy: a zero-and-rebuild sweep must show no token with zero
+  effect in the class that uses it, and this one failed that check by
+  construction.
+
 ### Fixed
 
 - Under `\DocumentMetadata{tagging=on}`, the space below a bullet or
@@ -340,6 +355,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#212]: https://github.com/amirhs1/CareerDossierTeX/issues/212
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
+[#220]: https://github.com/amirhs1/CareerDossierTeX/issues/220
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 [#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
 

@@ -9,7 +9,6 @@
     \TYPE{body-size = \dim_use:N \CDossierBodySize}
     \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
     \TYPE{prose-par-skip = \skip_use:N \CDossierProseParSkip}
-    \TYPE{header-par-skip = \skip_use:N \CDossierSharedHeaderParSkip}
     \TYPE{recipient-line-gap-skip =
       \skip_use:N \CDossierLetterRecipientLineGapSkip}
     \TYPE{block-skip = \skip_use:N \CDossierLetterBlockSkip}
