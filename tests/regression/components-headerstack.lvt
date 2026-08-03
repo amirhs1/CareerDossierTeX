@@ -8,10 +8,12 @@
 % \CDossierSharedHeaderMetaGapSkip when the headline was absent.
 %
 % The letter class is the fixture because it is the prose class that uses the
-% shared header: it sets \parskip to \CDossierProseParSkip document-wide, so it
-% also exercises the \CDossierSharedHeaderParSkip substitution. Each emitted gap
-% is logged in points, so the numbers are the assertion — a gap the stack fails
-% to emit, emits twice, or emits from the wrong token all change the log.
+% shared header: it sets \parskip to \CDossierProseParSkip document-wide, so the
+% logged document-wide \parskip and the logged gaps together also assert the
+% group-local zeroing of \parskip inside the stack (issue #220). Each emitted
+% gap is logged in points, so the numbers are the assertion — a gap the stack
+% fails to emit, emits twice, emits from the wrong token, or emits reduced by an
+% un-zeroed \parskip all change the log.
 %
 % \addvspace is intercepted rather than the stack's own helper so the recorded
 % sequence is what actually reaches the vertical list, including the boundary
@@ -36,8 +38,6 @@
 \cs_new_protected:Npn \cdossiertest_tokens:
   {
     \TYPE { parskip~=~ \dim_eval:n { \parskip } }
-    \TYPE { header-par-skip~=~ \dim_eval:n { \CDossierSharedHeaderParSkip } }
-    \TYPE { above~=~ \dim_eval:n { \CDossierSharedHeaderAboveSkip } }
     \TYPE { name-gap~=~ \dim_eval:n { \CDossierSharedHeaderNameGapSkip } }
     \TYPE { meta-gap~=~ \dim_eval:n { \CDossierSharedHeaderMetaGapSkip } }
     \TYPE { below~=~ \dim_eval:n { \CDossierSharedHeaderBelowSkip } }

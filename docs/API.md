@@ -603,8 +603,7 @@ Expected behavior:
   `fontsize` type scale;
 - derives the gaps within and around the identity block from the shared
   baseline rhythm rather than the base class's `center` environment, and from
-  `\CDossierSharedHeaderParSkip` rather than the class's document-wide
-  `\parskip`;
+  its own zeroed `\parskip` rather than the class's document-wide one;
 - renders `headline` only when present, and leaves no gap behind when it is
   absent;
 - guards the boundary below the name with
@@ -1462,7 +1461,7 @@ resolved values at each `fontsize` are tabulated in
 
 | Family | Tokens |
 |---|---|
-| Shared (all four classes) | `\CDossierSharedHeaderAboveSkip`, `\CDossierSharedHeaderParSkip`, `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip`, `\CDossierSharedHeaderBelowSkip` |
+| Shared (all four classes) | `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip`, `\CDossierSharedHeaderBelowSkip` |
 | Record (résumé, CV) | `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
 | Prose (letter, statement) | `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
 | Letter | `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
@@ -1483,12 +1482,12 @@ them in mind is the usual reason an override appears to do nothing:
 - **A paragraph boundary also contributes `\parskip`.** In the prose classes
   that is `\CDossierProseParSkip`, and a token at such a boundary is emitted as
   `token − \parskip` so the token still names the rendered gap. The header block
-  substitutes `\CDossierSharedHeaderParSkip` for its own scope, which is why
-  the three header gap tokens behave identically in all four classes.
+  zeroes `\parskip` for its own scope, which is why the three header gap tokens
+  behave identically in all four classes.
 
-Since `v0.7.0`, `\CDossierSharedHeaderParSkip`,
-`\CDossierLetterRecipientLineGapSkip`, and `\CDossierLetterBodyBelowSkip` are
-new, and `\CDossierRecordEntryBelowSkip` and `\CDossierLetterheadBelowSkip` are
+Since `v0.7.0`, `\CDossierLetterRecipientLineGapSkip` and
+`\CDossierLetterBodyBelowSkip` are new, and `\CDossierRecordEntryBelowSkip`,
+`\CDossierLetterheadBelowSkip`, and `\CDossierSharedHeaderAboveSkip` are
 removed; see [`MIGRATION.md`](MIGRATION.md#070---unreleased).
 
 The calibrated *values* are not stable API before `v1.0.0`; the token names and

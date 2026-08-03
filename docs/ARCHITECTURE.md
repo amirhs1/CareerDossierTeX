@@ -240,8 +240,6 @@ retaining a small, inspectable spacing vocabulary.
 
 | Token | Ratio | `10pt` | `11pt` | `12pt` |
 |---|---:|---:|---:|---:|
-| `\CDossierSharedHeaderAboveSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
-| `\CDossierSharedHeaderParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierSharedHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierSharedHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
 | `\CDossierSharedHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
@@ -419,17 +417,23 @@ token's value.
    Every header line is its own paragraph, so before #204 the prose classes'
    document-wide `\parskip` (0.50) landed in every header boundary on top of the
    header token, and the header tokens could not express a gap below that floor.
-   The header group now sets `\parskip` to `\CDossierSharedHeaderParSkip` for its
-   own scope, so the three header gap tokens govern header spacing identically in
-   all four classes.
+   The header group now zeroes `\parskip` for its own scope, so the three header
+   gap tokens govern header spacing identically in all four classes.
 
-Not every vertical distance is a block boundary. `\CDossierSharedHeaderAboveSkip`
-is glue at the top of the first page in every real document, and TeX discards
-glue there, so it does not render at the committed 0.00 or at any other value;
-it exists for a header that is not the first material on its page.
-`\CDossierRecordParSkip` and `\CDossierProseParSkip` are copied into `\parskip`
-with `\setlength` when the class loads rather than read at each boundary, so
-changing them after `\documentclass` has no effect.
+   That zero is deliberately not a token. #204 exposed it as
+   `\CDossierSharedHeaderParSkip`, but the value cancelled itself: the stack
+   emitted every gap as `token − \parskip` and the following header line then
+   contributed `\parskip` again, so the rendered gap was `token` for every
+   value. It was retired in #220 along with `\CDossierSharedHeaderAboveSkip`,
+   which claimed the boundary *above* the first header line — always the first
+   material on page 1, where TeX discards the glue, so it too rendered nothing
+   at any value. A knob that cannot move the page is not a knob; see
+   [`MIGRATION.md`](MIGRATION.md#070---unreleased).
+
+Not every token is read at the boundary it names. `\CDossierRecordParSkip` and
+`\CDossierProseParSkip` are copied into `\parskip` with `\setlength` when the
+class loads rather than read at each boundary, so changing them after
+`\documentclass` has no effect.
 
 `tests/regression/tokens-invariants.lvt` records the ordering relations these
 rules imply, one line per relation, at all three supported sizes. The baseline is
@@ -748,8 +752,8 @@ The shared stack takes the present lines as a sequence and interleaves the gaps,
 so position decides the token rather than presence: the boundary below the name
 is always the name gap, every later boundary is the meta gap, and an absent
 optional field leaves nothing behind. It also owns the header's own `\parskip`
-(`\CDossierSharedHeaderParSkip`) and the boundary below the stack, so a class
-states only which lines it prints, in reading order.
+(zeroed for the group; see #220 above) and the boundary below the stack, so a
+class states only which lines it prints, in reading order.
 
 #### Why the `medium` option resolves here
 
