@@ -561,6 +561,38 @@ and DOI → e-print → URL precedence:
 The ordinary academic CV smoke/example path remains separate and must continue
 to compile without loading BibLaTeX or invoking Biber.
 
+CI runs this fixture in its own `bibliography` job, on the pinned TeX Live
+container, so a local failure can always be checked against a second toolchain.
+
+#### Known local failure: Biber rejects every `date` field
+
+If the fixture fails with a Biber log full of
+
+    WARN - article entry 'newest' (publications.bib): Invalid format '2026' of
+    date field 'date' - ignoring
+
+then Biber dropped the dates, every year disappeared from the rendered
+bibliography, and the `ydnt` sort order came out wrong (issue #211). The tell is
+that *every* entry is rejected at every granularity — `2024`, `2024-01`, and
+`2024-01-01` alike — while the legacy `year` field still works.
+
+This is a fault in the local Biber install, not in the fixture data. Biber ships
+as a PAR-packed binary that unpacks its Perl runtime into a per-user cache under
+`TMPDIR`; on macOS that lives in `/var/folders/...`, which the system purges
+periodically. Only the `date` path needs the bundled DateTime modules, so an
+incomplete cache breaks `date` while leaving `year` intact. Clear the cache and
+let Biber unpack itself again:
+
+    rm -rf "${TMPDIR:-/tmp}"/par-*
+    biber --version
+
+Two fixes that look tempting are both wrong. Switching the fixture to `year=`
+turns the suite green while hiding a genuinely wrong bibliography, and makes the
+fixture test less than it does now — `date` is BibLaTeX's modern field.
+Relaxing the Biber-warning gate in `tests/bibliography/run.sh` removes the only
+thing that caught the corruption. The runner prints this diagnosis itself when
+it sees the signature, and still fails.
+
 ### Log inspection
 
 After compiling, inspect logs for:
