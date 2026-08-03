@@ -1,0 +1,67 @@
+% resume-entry-dates-order.tex — extraction fixture for careerdossier-resume.cls.
+%
+% Purpose (issue #221)
+%   Pin the reading order of the entry heading's right-hand dates/location
+%   column relative to the bullet list its entry owns.
+%
+%   `\__cdossier_components_entryhead:nnnn' sets title/organization on the left
+%   and dates/location on the right. Poppler keeps that right column with its
+%   entry only while the entry's vertical band stays distinct from the list
+%   beneath it; once the list closes up against the heading, poppler groups the
+%   two bands and sorts the right column as trailing material (issue #219).
+%
+%   Two entries, not one, is what makes this assertion discriminate. The last
+%   entry sorted on a page always trails its own column — that is a property of
+%   being the final block, and it holds at every list-edge value, so a one-entry
+%   fixture cannot see the fault change. The *first* entry is the assertion: its
+%   dates must extract between its heading and its bullets. Lower
+%   `\CDossierRecordListEdgeAboveSkip' below 0.25 and they move after the
+%   bullets instead, and this baseline fails.
+%
+%   No page furniture is involved. The two-page form of the same fault, where
+%   the column sorts after the `Page N of M' folio, is covered separately by
+%   resume-entry-dates-page-furniture.tex; page furniture makes the misordering
+%   more visible but is not required to provoke it.
+%
+%   Once #219 lands, the entry head keeps its column unconditionally and both
+%   entries' dates will extract with their heading. That is an intended output
+%   change: regenerate this baseline with the fix, and review the diff.
+%
+%   The committed baseline (resume-entry-dates-order.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-entry-dates-order.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Accessibility Engineer},
+  email    = {ada@example.com},
+  phone    = {+1 416 555 0142},
+  website  = {example.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Engineer},
+  organization = {Example Labs},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First achievement in source order.
+    \item Second achievement with a measurable reporting outcome.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Engineer},
+  organization = {Example Services},
+  location     = {Ottawa, ON},
+  dates        = {2022--2024}
+]
+  \begin{CDossierItemize}
+    \item Later achievement that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

@@ -1,0 +1,58 @@
+% cv-entry-dates-order.tex — extraction fixture for careerdossier-cv.cls.
+%
+% Purpose (issue #221)
+%   The CV counterpart of resume-entry-dates-order.tex. Both classes render
+%   their entry headings through the same shared component,
+%   `\__cdossier_components_entryhead:nnnn', but they do not share geometry: the
+%   CV is 12pt/normal against the résumé's 11pt/narrow, so the same list-edge
+%   ratio resolves to a different measured gap and the reading-order threshold
+%   has to be asserted for each.
+%
+%   As in the résumé fixture, the *first* entry is the assertion — its dates and
+%   location must extract between its heading and its bullets. The last entry on
+%   a page trails its own column regardless of the list edge, so it discriminates
+%   nothing. Lower `\CDossierRecordListEdgeAboveSkip' below 0.25 and the first
+%   entry's dates move after its bullets, and this baseline fails.
+%
+%   Once #219 lands, the entry head keeps its column unconditionally and both
+%   entries' dates will extract with their heading. That is an intended output
+%   change: regenerate this baseline with the fix, and review the diff.
+%
+%   The committed baseline (cv-entry-dates-order.expected.txt) is the assertion;
+%   regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode cv-entry-dates-order.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Research Engineer},
+  email    = {ada@example.edu},
+  phone    = {+1 416 555 0142},
+  website  = {example.edu/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research Experience}
+\begin{CDossierEntry}[
+  title        = {Postdoctoral Researcher},
+  organization = {Example University},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First research contribution in source order.
+    \item Second research contribution with a reproducible analysis pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Graduate Researcher},
+  organization = {Example Institute},
+  location     = {Ottawa, ON},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Later contribution that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

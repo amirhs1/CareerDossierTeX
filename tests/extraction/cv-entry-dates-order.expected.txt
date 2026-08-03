@@ -1,0 +1,20 @@
+Ada Lovelace
+Research Engineer
+
+ada@example.edu | +1 416 555 0142 | example.edu/ada
+
+Research Experience
+Postdoctoral Researcher
+Example University
+
+2024–Present
+Toronto, ON
+
+• First research contribution in source order.
+• Second research contribution with a reproducible analysis pipeline.
+Graduate Researcher
+Example Institute
+• Later contribution that follows the first entry on the same page.
+
+2020–2024
+Ottawa, ON
