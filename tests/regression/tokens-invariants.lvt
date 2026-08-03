@@ -8,9 +8,23 @@
 % The saved baseline is the assertion. Each relation reports `holds' or
 % `violated', so a ratio change that silently makes a token unreachable — or
 % that repairs one — shows up as a reviewable diff rather than as a token no
-% document responds to. Three relations are recorded as `violated' at the
-% committed v0.7.0 defaults; issue #204 fixed the mechanism so they became
-% expressible at all, and issue #206 assigns the ratios that satisfy them.
+% document responds to. Issue #204 fixed the mechanism that made several of
+% these expressible at all; issue #206 assigns the ratios that satisfy them.
+%
+% Several relations are therefore recorded as `violated' at the committed
+% defaults. That is deliberate and is the point of committing this test before
+% the retune rather than with it: the baseline states exactly which orderings
+% #206 has to repair, and the retune's diff will show them flipping to `holds'
+% one at a time instead of arriving as one opaque block of new numbers.
+%
+% The three heading pairs are recorded as `above >= 2 x below', not as an
+% equality. Measured on rendered output during #206, the ratio of the *tokens*
+% is not the ratio a reader perceives: both gaps are padded by the same
+% line-box white, and a section heading set in a larger size spends part of its
+% own below-gap on its deeper font box, so a pair at exactly 2:1 reads flatter
+% than 2:1. A trial retune at 2.67:1 measured about 3.5:1 of visible white in
+% the statement class. The relation therefore names the floor the hierarchy
+% depends on and leaves the surplus to the calibration.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-tokens}
@@ -20,7 +34,7 @@
   {
     \bool_if:nTF {#2}
       { \TYPE { #1 ~ => ~ holds } }
-      { \TYPE { #1 ~ => ~ violated~(ratio~retune~pending) } }
+      { \TYPE { #1 ~ => ~ violated } }
   }
 \cs_new_protected:Npn \cdossiertest_invariants:n #1
   {
@@ -40,6 +54,55 @@
       {
         \dim_compare_p:nNn
           { \CDossierSharedHeaderBelowSkip } > { \CDossierProseSectionAboveSkip }
+      }
+    %% Each heading pair binds the heading to the text it introduces: the gap
+    %% opening the block is at least twice the gap closing the heading. A pair
+    %% that fell below this floor would read as a heading suspended between two
+    %% blocks rather than as one that belongs to what follows.
+    %%
+    %% The 2 sp tolerance is not slack in the design rule; it removes a rounding
+    %% artefact. Each token is rounded to a whole scaled point independently, so
+    %% a pair set at exactly 2:1 can miss by 1 sp depending on which way the
+    %% halves fall: at 11pt the body leading is 13.6pt = 891290 sp, and
+    %% 0.75 x 891290 rounds up to 668468, whose double exceeds 1.5 x 891290 by
+    %% one scaled point. Without the tolerance an exactly-2:1 pair reports
+    %% `holds' at 10pt and 12pt and `violated' at 11pt, which is a false
+    %% failure and would push a retune away from exact 2:1 for no design reason.
+    \cdossiertest_invariant:nn
+      { RecordSectionAboveSkip >= 2 ~ x ~ RecordSectionBelowSkip }
+      {
+        ! \dim_compare_p:nNn
+            { \CDossierRecordSectionAboveSkip + 2sp }
+            < { \CDossierRecordSectionBelowSkip * 2 }
+      }
+    \cdossiertest_invariant:nn
+      { ProseSectionAboveSkip >= 2 ~ x ~ ProseSectionBelowSkip }
+      {
+        ! \dim_compare_p:nNn
+            { \CDossierProseSectionAboveSkip + 2sp }
+            < { \CDossierProseSectionBelowSkip * 2 }
+      }
+    \cdossiertest_invariant:nn
+      { ProseSubsectionAboveSkip >= 2 ~ x ~ ProseSubsectionBelowSkip }
+      {
+        ! \dim_compare_p:nNn
+            { \CDossierProseSubsectionAboveSkip + 2sp }
+            < { \CDossierProseSubsectionBelowSkip * 2 }
+      }
+    %% A subsection is a child of the section containing it, on both edges.
+    \cdossiertest_invariant:nn
+      { ProseSubsectionAboveSkip < ProseSectionAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierProseSubsectionAboveSkip }
+          < { \CDossierProseSectionAboveSkip }
+      }
+    \cdossiertest_invariant:nn
+      { ProseSubsectionBelowSkip < ProseSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierProseSubsectionBelowSkip }
+          < { \CDossierProseSectionBelowSkip }
       }
     %% Two entries must sit closer together than an entry and the section
     %% heading above it, or the section boundary stops reading as the stronger.
@@ -76,6 +139,12 @@
     %% Hard, not a preference: `\@xsect' reads a non-positive after-skip as a
     %% request for a run-in heading, and careerdossier-statement.cls passes
     %% `below - \parskip'.
+    \cdossiertest_invariant:nn
+      { ProseParSkip < ProseSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierProseParSkip } < { \CDossierProseSectionBelowSkip }
+      }
     \cdossiertest_invariant:nn
       { ProseParSkip < ProseSubsectionBelowSkip }
       {
