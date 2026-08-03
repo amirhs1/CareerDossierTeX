@@ -14,9 +14,12 @@
 %   nothing. Lower `\CDossierRecordListEdgeAboveSkip' below 0.25 and the first
 %   entry's dates move after its bullets, and this baseline fails.
 %
-%   Once #219 lands, the entry head keeps its column unconditionally and both
-%   entries' dates will extract with their heading. That is an intended output
-%   change: regenerate this baseline with the fix, and review the diff.
+%   #219 established that the component cannot keep its column unconditionally:
+%   Poppler groups blocks at page level, so the gap below the heading is the
+%   only lever. The floor measured 0.25 for this class too — identical to the
+%   résumé's, at 10pt, 11pt, and 12pt — which is why the bound is stated as a
+%   ratio in tokens-invariants rather than per class. See
+%   docs/ATS-EXTRACTION.md 3.4.
 %
 %   The committed baseline (cv-entry-dates-order.expected.txt) is the assertion;
 %   regenerate it only for an intended, reviewed output change.

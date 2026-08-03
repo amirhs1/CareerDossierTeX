@@ -304,6 +304,17 @@ skip after the list instead would not collapse with the following block's own
 the additive gap
 #168 removed after section rules.
 
+`\CDossierRecordListEdgeAboveSkip` carries one constraint that does not come
+from the type scale at all: a floor of 0.25, below which the entry heading's
+right-hand dates column stops extracting with its entry (#219). Poppler orders
+text by glyph geometry, and once the list closes up against the heading it reads
+the entry as the left column of a two-column page and emits the dates last. The
+component cannot own this, because the trigger is a page-level property of how
+the blocks group rather than anything `\__cdossier_components_entryhead:nnnn`
+emits; the gap below the heading is the only lever, so this token holds the
+bound. `tokens-invariants` states it and the `*-entry-dates-*` extraction
+fixtures enforce it. See `ATS-EXTRACTION.md` section 3.4 for the measurements.
+
 The split is a mechanism change alone: both ratios start at the single value
 #176 calibrated, so the rendered edge is unchanged at every supported size.
 Retuning either ratio is deliberately out of scope until specific values are

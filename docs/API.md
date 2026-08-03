@@ -724,6 +724,16 @@ both ends at once; see [`MIGRATION.md`](MIGRATION.md). Both keep that token's
 calibrated value, so a document's rendered list spacing is unchanged. The CV's
 `CDossierPublications` list uses the same pair.
 
+`\CDossierRecordListEdgeAboveSkip` additionally has a **lower bound of `0.25`**,
+which is an extraction constraint rather than a design preference. The entry
+heading sets its dates and location in a right-hand column, and Poppler keeps
+that column with its entry only while the entry's vertical band stays distinct
+from the list beneath it. Below `0.25` the two merge and the dates extract after
+the bullets — on the résumé and the CV alike, at every supported body size, and
+on tagged and untagged output equally. Overriding this token below `0.25`
+therefore breaks reading order in `pdftotext`-class consumers; see
+[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) section 3.4.
+
 Both tokens apply under `\DocumentMetadata{tagging=on}` as well, so a tagged
 build and an untagged build of the same source place their lists identically
 ([#193](https://github.com/amirhs1/CareerDossierTeX/issues/193)). Tagged output
@@ -1458,6 +1468,10 @@ them in mind is the usual reason an override appears to do nothing:
   `\CDossierRecordEntryGapSkip` in particular is a *floor* for the entry
   heading → body boundary, which a bullet list overrides with
   `\CDossierRecordListEdgeAboveSkip`.
+- **One token also carries a constraint from outside the type scale.**
+  `\CDossierRecordListEdgeAboveSkip` may not go below `0.25` without breaking
+  the extraction order of the entry heading's dates column, as described under
+  [`CDossierItemize`](#cdossieritemize).
 - **A paragraph boundary also contributes `\parskip`.** In the prose classes
   that is `\CDossierProseParSkip`, and a token at such a boundary is emitted as
   `token − \parskip` so the token still names the rendered gap. The header block

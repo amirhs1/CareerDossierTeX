@@ -23,9 +23,12 @@
 %   resume-entry-dates-page-furniture.tex; page furniture makes the misordering
 %   more visible but is not required to provoke it.
 %
-%   Once #219 lands, the entry head keeps its column unconditionally and both
-%   entries' dates will extract with their heading. That is an intended output
-%   change: regenerate this baseline with the fix, and review the diff.
+%   #219 investigated making the entry head keep its column unconditionally and
+%   concluded it cannot: Poppler's grouping is page-level, so no change confined
+%   to the component reaches it. 0.25 is a floor this fixture enforces, not a
+%   value awaiting a fix, and the trailing column on the *last* entry is
+%   expected output rather than a defect. Do not regenerate this baseline to
+%   accommodate a lower list edge. See docs/ATS-EXTRACTION.md 3.4.
 %
 %   The committed baseline (resume-entry-dates-order.expected.txt) is the
 %   assertion; regenerate it only for an intended, reviewed output change.

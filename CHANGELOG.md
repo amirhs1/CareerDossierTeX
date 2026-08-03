@@ -157,6 +157,30 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   their CI artifacts moved out of `resume-artifacts` into the new
   `smoke-artifacts` and `layout-artifacts`. ([#188])
 
+- `\CDossierRecordListEdgeAboveSkip` now has a documented lower bound of `0.25`.
+  Below it, the entry heading's right-hand dates and location stop extracting
+  with their entry and sort after the entry's bullets — or after the `Page N of
+  M` folio on a page carrying furniture. Overriding the token below `0.25`
+  therefore breaks reading order for `pdftotext`-class consumers. The shipped
+  default is `0.3125` and is unchanged. ([#219])
+
+  The bound is an extraction constraint, not a design preference, and it is not
+  something the entry heading can be repaired to avoid. Poppler builds reading
+  order from glyph positions alone, so once a bullet list closes up against the
+  heading it groups the heading and the list into one tall block and reads the
+  entry as the left column of a two-column page. The trigger is a property of
+  the whole page rather than of the component, which is why the gap below the
+  heading is the only lever. The floor measured identically — `0.25` holds,
+  `0.1875` reorders — for the résumé and the CV at 10 pt, 11 pt, and 12 pt, and
+  on tagged and untagged output alike; the tag tree is correct in every case
+  and veraPDF UA-2 still passes. `tests/regression/tokens-invariants` states the
+  bound and the three `*-entry-dates-*` extraction fixtures enforce it.
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) section 3.4 records the
+  measurements and the alternatives ruled out.
+
+  **Documentation and tests only.** No class, option, key, command, environment,
+  or calibrated value changed, and no document renders differently.
+
 ### Removed
 
 - **BREAKING (design token):** `\CDossierRecordEntryBelowSkip` and
@@ -261,6 +285,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 [#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
+[#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
 
 ## [0.6.0] - 2026-07-30
 
