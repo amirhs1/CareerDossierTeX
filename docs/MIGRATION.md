@@ -6,11 +6,15 @@
 and changes every class's layout defaults** — see
 [Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
-The unreleased `v0.7.0` renames public design tokens, adds new ones beside
-them, and retunes the calibrated vertical-rhythm ratios. Renamed tokens need a
-source edit only if a document reads or sets them by name; the retune reflows
-every document — see [`[0.7.0]`](#070---unreleased) below. This release was
-numbered `v0.6.1` until 2026-08-01.
+The unreleased `v0.7.0` renames public design tokens, adds new ones beside them,
+**retires two**, and retunes the calibrated vertical-rhythm ratios. Renamed
+tokens need a source edit only if a document reads or sets them by name, and the
+two retired tokens rendered nothing at the released defaults — but three
+mechanism changes do move the page: letter and statement headers tighten, the
+gap above a bullet list inside an entry tightens, and a document with no
+`headline` gains a little space below the name. The retune then reflows every
+document. See [`[0.7.0]`](#070---unreleased) below. This release was numbered
+`v0.6.1` until 2026-08-01.
 
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
@@ -340,6 +344,109 @@ in this format.
 
 ## [0.7.0] - unreleased
 
+### Two vertical-spacing tokens retired, three added
+
+Every vertical boundary is now owned by exactly one token.
+
+Removed — **neither rendered anything at the released defaults**, so removing
+them changes no output:
+
+| Removed | Use instead | Why it never rendered |
+|---|---|---|
+| `\CDossierRecordEntryBelowSkip` | `\CDossierRecordEntryAboveSkip` | Block boundaries compose with `\addvspace`, which takes the maximum of the adjacent claims, never their sum. At 0.125 this token lost to `\CDossierRecordEntryAboveSkip` (0.25) between two entries and to `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every boundary it appeared at. |
+| `\CDossierLetterheadBelowSkip` | `\CDossierSharedHeaderBelowSkip` | It claimed the header → date boundary immediately after `\MakeCDossierHeader` had already claimed it, at a smaller value (0.75 against 0.8125), so the maximum discarded it. |
+
+A document that sets either name will now get an undefined-control-sequence
+error. Delete the setting (`\CDossierRecordEntryBelowSkip`) or move it to
+`\CDossierSharedHeaderBelowSkip` (`\CDossierLetterheadBelowSkip`) — but note
+that the latter is shared with the résumé and CV headers, so it also changes
+the header → section gap in those classes.
+
+Added:
+
+| Added | Boundary | Default |
+|---|---|---|
+| `\CDossierSharedHeaderParSkip` | the paragraph gap *inside* the header block, in every class | `0.00` |
+| `\CDossierLetterRecipientLineGapSkip` | between two lines of the letter's recipient block | `0.00` |
+| `\CDossierLetterBodyBelowSkip` | letter body → closing | `0.50`, the value the boundary already had |
+
+`\CDossierLetterBodyBelowSkip` is the pair of `\CDossierLetterBodyAboveSkip`.
+The boundary previously borrowed `\CDossierLetterBlockSkip`, which names the
+boundaries *between letterhead blocks*; a document that set
+`\CDossierLetterBlockSkip` to change the space above its closing must now set
+`\CDossierLetterBodyBelowSkip` instead.
+
+`\CDossierLetterRecipientLineGapSkip` replaces a bare `\\` between recipient
+lines, which was plain `\baselineskip` — the one vertical distance in the letter
+no token expressed. At `0.00` it reproduces that spacing exactly.
+
+Reason: `\addvspace` takes the maximum of the claims at a boundary, so where two
+tokens met, the smaller was unreachable — a maintainer who lowered it saw no
+change and no diagnostic. Giving each boundary exactly one token is a
+prerequisite for retuning the ratios ([#206](https://github.com/amirhs1/CareerDossierTeX/issues/206)).
+
+### Header spacing no longer floored by `\parskip`
+
+`careerdossier-letter` and `careerdossier-statement` set `\parskip` to
+`\CDossierProseParSkip` document-wide. Every header line is its own paragraph,
+so that paragraph gap landed in every header boundary on top of the header
+token, and `\addvspace` could not absorb it: `\parskip` is inserted at the next
+paragraph's start, after `\addvspace` has already read `\lastskip`, so the two
+always add.
+
+The header block now sets its own `\parskip` from
+`\CDossierSharedHeaderParSkip` (`0.00`), so the header gap tokens name the
+rendered gap in all four classes.
+
+**Letters and statements reflow.** Each header boundary tightens by
+`\CDossierProseParSkip` — 7.25 pt at `fontsize=12pt`. Measured on the shipped
+examples at 12 pt: `letter-industry` and `letter-academic` reclaim 21.7 pt,
+`artist-statement` 36.1 pt, and `research-statement` 43.3 pt on page one. No
+example changes its page count, but a statement fits more body text on page one
+than before. Résumé and CV are unaffected, because `\CDossierRecordParSkip` is
+already `0.00`.
+
+To keep the previous letter or statement header spacing, set the token to the
+prose paragraph gap after `\documentclass`:
+
+```latex
+\makeatletter\ExplSyntaxOn
+\skip_set_eq:NN \CDossierSharedHeaderParSkip \CDossierProseParSkip
+\ExplSyntaxOff\makeatother
+```
+
+### `\CDossierRecordEntryGapSkip` became a floor rather than added space
+
+The entry heading → body gap is now contributed with `\addvspace` instead of
+`\vspace`. A `\vspace` appends a zero glue after its own skip, so the following
+block's `\addvspace` saw `\lastskip = 0` and the two *added*; the gap above a
+bullet list was `\CDossierRecordEntryGapSkip` **plus**
+`\CDossierRecordListEdgeAboveSkip`. It is now the larger of the two.
+
+**Résumés and CVs reflow slightly.** The gap above every bullet list inside an
+entry tightens by `\CDossierRecordEntryGapSkip` — 0.85 pt at `fontsize=11pt`,
+0.91 pt at `12pt`. An entry whose body is ordinary prose is unchanged. The
+shipped `resume-english` example reclaims 4.2 pt over its five lists;
+`cv-academic` 0.9 pt. Neither changes page count.
+
+Reason: with the closing edge already a maximum and the opening edge a sum, the
+design intent that a bullet list belongs to the entry above it was
+inexpressible — at the released values the list sat 5.10 pt from the entry that
+owns it and 4.25 pt from the next one, inverting the intent. Both ends are now
+maxima, so the relation follows from the ratios alone.
+
+### The gap below the name no longer depends on `headline`
+
+The résumé, CV, and letter identity block and the statement header now emit
+their lines and gaps from one shared helper. Position decides which token
+guards a boundary, not presence: the boundary below the name is always
+`\CDossierSharedHeaderNameGapSkip`.
+
+**A résumé, CV, or letter with no `headline` reflows.** That boundary
+previously fell through to `\CDossierSharedHeaderMetaGapSkip` (0.1875), so it
+now gains `0.0625` of a line — 0.85 pt at `fontsize=11pt`. A document that sets
+`headline` is unaffected.
+
 ### Vertical-spacing design tokens renamed onto one convention
 
 Every public vertical-spacing token now has the shape
@@ -370,11 +477,11 @@ Before → after:
 | `\CDossierSectionBelowSkip` | `\CDossierRecordSectionBelowSkip` |
 | `\CDossierEntryAboveSkip` | `\CDossierRecordEntryAboveSkip` |
 | `\CDossierEntryGapSkip` | `\CDossierRecordEntryGapSkip` |
-| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` |
+| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` — then **retired** in the same release; see “Two vertical-spacing tokens retired, three added” above |
 | `\CDossierListEdgeSkip` | `\CDossierRecordListEdgeAboveSkip` **and** `\CDossierRecordListEdgeBelowSkip` (split — see below) |
 | `\CDossierItemSepSkip` | `\CDossierRecordItemSepSkip` |
 | `\CDossierParSkip` | `\CDossierRecordParSkip` |
-| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` |
+| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` — then **retired** in the same release; see “Two vertical-spacing tokens retired, three added” above |
 | `\CDossierBlockSkip` | `\CDossierLetterBlockSkip` |
 | `\CDossierAfterSalutationSkip` | `\CDossierLetterBodyAboveSkip` |
 | `\CDossierSignatureSkip` | `\CDossierLetterSignatureGapSkip` |
@@ -401,14 +508,14 @@ meant either "shared by every class" or "résumé and CV only", with nothing in
 the name to distinguish them. A reader of [`API.md`](API.md) could not predict
 a token's name from its role, which is the point of a semantic token system.
 
-This is a rename only. Every token keeps its calibrated ratio, all eleven
-supported examples render with identical word coordinates before and after,
-and no class, option, key, command, or environment changed.
+This particular change is a rename only. Every token keeps its calibrated
+ratio, all eleven supported examples render with identical word coordinates
+before and after, and no class, option, key, command, or environment changed.
+The other `0.7.0` entries above do move rendered output; read them separately.
 
-`\CDossierLetterBlockSkip` is expected to be superseded: it currently serves
-four distinct letter boundaries, and splitting it into one token per boundary
-is tracked separately as
-[#204](https://github.com/amirhs1/CareerDossierTeX/issues/204).
+`\CDossierLetterBlockSkip` no longer serves the letter body's closing edge —
+that boundary is now `\CDossierLetterBodyBelowSkip` (see above). It still
+serves the boundaries between the letterhead's own blocks.
 
 ### `\CDossierListEdgeSkip` split into two tokens
 

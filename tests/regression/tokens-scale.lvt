@@ -39,6 +39,7 @@
     \cdossiertest_dimension:N \CDossierRuleThickness
     \cdossiertest_dimension:N \CDossierListLabelSep
     \cdossiertest_skip:N \CDossierSharedHeaderAboveSkip
+    \cdossiertest_skip:N \CDossierSharedHeaderParSkip
     \cdossiertest_skip:N \CDossierSharedHeaderNameGapSkip
     \cdossiertest_skip:N \CDossierSharedHeaderMetaGapSkip
     \cdossiertest_skip:N \CDossierSharedHeaderBelowSkip
@@ -51,15 +52,15 @@
     \cdossiertest_skip:N \CDossierProseSubsectionBelowSkip
     \cdossiertest_skip:N \CDossierRecordEntryAboveSkip
     \cdossiertest_skip:N \CDossierRecordEntryGapSkip
-    \cdossiertest_skip:N \CDossierRecordEntryBelowSkip
     \cdossiertest_skip:N \CDossierRecordListEdgeAboveSkip
     \cdossiertest_skip:N \CDossierRecordListEdgeBelowSkip
     \cdossiertest_skip:N \CDossierRecordItemSepSkip
     \cdossiertest_skip:N \CDossierRecordParSkip
     \cdossiertest_skip:N \CDossierProseParSkip
-    \cdossiertest_skip:N \CDossierLetterheadBelowSkip
+    \cdossiertest_skip:N \CDossierLetterRecipientLineGapSkip
     \cdossiertest_skip:N \CDossierLetterBlockSkip
     \cdossiertest_skip:N \CDossierLetterBodyAboveSkip
+    \cdossiertest_skip:N \CDossierLetterBodyBelowSkip
     \cdossiertest_skip:N \CDossierLetterSignatureGapSkip
   }
 \cs_new_protected:Npn \cdossiertest_margin:n #1

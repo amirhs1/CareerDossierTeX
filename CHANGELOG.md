@@ -32,7 +32,73 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   values. `medium` is a separate axis from `theme`, which remains fixed at
   `monochrome`; it does not affect colour, hyperlinks, or PDF metadata.
 
+- Three vertical boundaries that no token described now have one:
+  `\CDossierSharedHeaderParSkip` (the paragraph gap inside the header block, in
+  every class), `\CDossierLetterRecipientLineGapSkip` (between two lines of the
+  letter's recipient block), and `\CDossierLetterBodyBelowSkip` (letter body →
+  closing). ([#204])
+
+  The last two are additive: `\CDossierLetterRecipientLineGapSkip` defaults to
+  `0.00`, reproducing the plain `\baselineskip` the bare line break gave, and
+  `\CDossierLetterBodyBelowSkip` defaults to the value that boundary already
+  borrowed from `\CDossierLetterBlockSkip` — a token that names the boundaries
+  *between letterhead blocks*, not the body's closing edge. A document that set
+  `\CDossierLetterBlockSkip` to change the space above its closing must now set
+  `\CDossierLetterBodyBelowSkip`.
+
 ### Changed
+
+- **BREAKING (design token):** the header block now sets its own paragraph gap
+  from `\CDossierSharedHeaderParSkip` (`0.00`) instead of inheriting the prose
+  classes' document-wide `\parskip`, so the header gap tokens name the gap a
+  reader measures in all four classes. **Letters and statements reflow:** every
+  header boundary tightens by `\CDossierProseParSkip`, 7.25 pt at
+  `fontsize=12pt`. ([#204])
+
+  Every header line is its own paragraph, so `\parskip` landed in every header
+  boundary on top of the header token, and `\addvspace` could not absorb it —
+  `\parskip` is inserted at the *next* paragraph's start, after `\addvspace`
+  has already read `\lastskip`, so the two always add. The header tokens
+  therefore could not express any gap below that floor: at 12 pt they
+  contributed about a fifth of each gap they named.
+
+  Measured on the shipped examples at 12 pt, page one reclaims 21.7 pt in
+  `letter-industry` and `letter-academic`, 36.1 pt in `artist-statement`, and
+  43.3 pt in `research-statement`. No example changes its page count, but a
+  statement fits more body text on page one than before. Résumé and CV are
+  unaffected, because `\CDossierRecordParSkip` is already `0.00`. To keep the
+  previous spacing, set `\CDossierSharedHeaderParSkip` to
+  `\CDossierProseParSkip`; see [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
+- **BREAKING (design token):** `\CDossierRecordEntryGapSkip` is now the *floor*
+  for the entry heading → body boundary rather than space added on top of it.
+  **Résumés and CVs reflow slightly:** the gap above a bullet list inside an
+  entry tightens by that token — 0.85 pt at `fontsize=11pt`. An entry whose
+  body is ordinary prose is unchanged. ([#204])
+
+  The gap was contributed with `\vspace`, which appends a zero glue after its
+  own skip, so the following block's `\addvspace` saw `\lastskip = 0` and the
+  two added instead of collapsing. A bullet list therefore opened at
+  `\CDossierRecordEntryGapSkip` **plus** `\CDossierRecordListEdgeAboveSkip`,
+  which put it 5.10 pt from the entry that owns it and 4.25 pt from the next
+  one — inverting the design intent that a list belongs to the entry above it.
+  Both ends of a list are now maxima, so that relation follows from the ratios
+  alone. `resume-english` reclaims 4.2 pt over its five lists and `cv-academic`
+  0.9 pt; neither changes page count.
+
+- The résumé, CV, and letter identity block and the statement header now emit
+  their lines and the gaps between them from one shared helper instead of five
+  separate sites, each of which attached a gap to the optional block below it.
+  A gap is now placed *between* two present lines, so an absent optional field
+  leaves neither a blank line nor a gap. ([#204])
+
+  This corrects a defect the duplication hid: which token guarded the boundary
+  below the name depended on whether an optional field two lines further down
+  was present. **A résumé, CV, or letter with no `headline` reflows** — that
+  boundary fell through to `\CDossierSharedHeaderMetaGapSkip` and is now
+  `\CDossierSharedHeaderNameGapSkip`, gaining 0.85 pt at `fontsize=11pt`. A
+  document that sets `headline` is unaffected, and no class, option, key,
+  command, or environment changed.
 
 - **BREAKING (design token):** `\CDossierListEdgeSkip` is now two tokens,
   `\CDossierRecordListEdgeAboveSkip` for the space above a list and
@@ -93,6 +159,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   their CI artifacts moved out of `resume-artifacts` into the new
   `smoke-artifacts` and `layout-artifacts`. ([#188])
 
+### Removed
+
+- **BREAKING (design token):** `\CDossierRecordEntryBelowSkip` and
+  `\CDossierLetterheadBelowSkip` are removed. Neither rendered anything at the
+  released defaults, so **no document changes** — a maintainer who lowered
+  either one saw no movement and no diagnostic. ([#204])
+
+  Block boundaries compose with `\addvspace`, which takes the maximum of the
+  adjacent claims and never their sum, so where two tokens met at one boundary
+  the smaller was unreachable. `\CDossierRecordEntryBelowSkip` (0.125) lost to
+  `\CDossierRecordEntryAboveSkip` (0.25) between two entries and to
+  `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every
+  boundary it appeared at. `\CDossierLetterheadBelowSkip` (0.75) claimed the
+  header → date boundary immediately after `\MakeCDossierHeader` had already
+  claimed it with `\CDossierSharedHeaderBelowSkip` (0.8125).
+
+  `\CDossierRecordEntryAboveSkip` is now the sole inter-entry token and
+  `\CDossierSharedHeaderBelowSkip` the sole owner of the letter's header → date
+  boundary. A document that sets either removed name now gets an
+  undefined-control-sequence error; see
+  [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
 ### Fixed
 
 - The running header and the `Page N of M` folio now sit in the vertical centre
@@ -140,6 +228,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
+[#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
 
 ## [0.6.0] - 2026-07-30
 

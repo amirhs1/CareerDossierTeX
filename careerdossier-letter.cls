@@ -233,12 +233,18 @@
 %% logical order, each on its own line, with a line break inserted only between
 %% present lines. A missing field therefore leaves no blank line, and when every
 %% field is absent the caller omits the block entirely (see the letterhead).
+%%
+%% Issue #204: the break carries \CDossierLetterRecipientLineGapSkip. Until then
+%% it was a bare `\\', which is plain `\baselineskip' -- the only vertical
+%% distance in the letter that the token system did not express. The token
+%% defaults to 0.00, which is that same plain `\baselineskip'.
 %% ---------------------------------------------------------------------------
 \cs_new_protected:Npn \__cdossier_letter_rcptline:N #1
   {
     \tl_if_blank:VF #1
       {
-        \bool_if:NT \l__cdossier_letter_printed_bool { \\ }
+        \bool_if:NT \l__cdossier_letter_printed_bool
+          { \\ [ \CDossierLetterRecipientLineGapSkip ] }
         \tl_use:N #1
         \bool_set_true:N \l__cdossier_letter_printed_bool
       }
@@ -271,12 +277,17 @@
 %% date, recipient block, optional subject, and salutation. Each optional block
 %% and the vertical space that follows it are emitted together, so an absent
 %% recipient or subject leaves no gap. \MakeCDossierHeader validates `name'.
+%%
+%% Issue #204: the header -> date boundary is owned by
+%% \CDossierSharedHeaderBelowSkip, which \MakeCDossierHeader has already
+%% contributed. The retired \CDossierLetterheadBelowSkip claimed the same
+%% boundary immediately afterwards with a smaller value (0.75 against 0.8125),
+%% and `\addvspace' takes the maximum, so it never reached the page.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierLetterhead { }
   {
     \MakeCDossierHeader
     \par
-    \addvspace { \CDossierLetterheadBelowSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_date_tl }
     \par
     \addvspace { \CDossierLetterBlockSkip }
@@ -300,12 +311,17 @@
 %% ---------------------------------------------------------------------------
 %% \MakeCDossierClosing -- the letter close: the configured closing, signature
 %% space, and the profile name. Validates `name' because it prints it.
+%%
+%% Issue #204: the body's closing edge is \CDossierLetterBodyBelowSkip, the pair
+%% of \CDossierLetterBodyAboveSkip that opens it. It previously borrowed
+%% \CDossierLetterBlockSkip, which names the boundary *between letterhead
+%% blocks*; the two are separate boundaries and the default value is unchanged.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierClosing { }
   {
     \__cdossier_base_require_name:N \MakeCDossierClosing
     \par
-    \addvspace { \CDossierLetterBlockSkip }
+    \addvspace { \CDossierLetterBodyBelowSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
     \par
     \vspace { \CDossierLetterSignatureGapSkip }

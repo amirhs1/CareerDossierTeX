@@ -1,0 +1,73 @@
+% resume-entry-edges.lvt — issue #204 entry and list boundary composition.
+%
+% Two contracts, both invisible in the token values alone.
+%
+% 1. The entry heading -> body gap is contributed with \addvspace, not \vspace.
+%    A \vspace appends a zero glue after its own skip, so \lastskip is 0 when
+%    the following block's \addvspace runs and the two *add*; as an \addvspace
+%    the token is a floor the block's own edge maxes against. A bullet list
+%    therefore opens at \CDossierRecordListEdgeAboveSkip rather than at
+%    \CDossierRecordEntryGapSkip + \CDossierRecordListEdgeAboveSkip.
+%
+% 2. The entry contributes nothing when it closes. Its closing boundary is
+%    owned by whatever opens next — \CDossierRecordEntryAboveSkip between two
+%    entries, \CDossierRecordSectionAboveSkip at a section end. The retired
+%    \CDossierRecordEntryBelowSkip claimed the boundary from the other side and
+%    lost every maximum it entered.
+%
+% \pagetotal is the assertion: it is the height of the page so far, so the
+% difference across a boundary is the rendered gap, after the maxima have
+% resolved. Tracing the skips instead would report the claims, not the result.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_mark:n #1
+  { \par \TYPE { #1 ~ page-total~=~ \dim_eval:n { \pagetotal } } }
+\cs_new_protected:Npn \cdossiertest_tokens:
+  {
+    \TYPE { section-above~=~ \dim_eval:n { \CDossierRecordSectionAboveSkip } }
+    \TYPE { section-below~=~ \dim_eval:n { \CDossierRecordSectionBelowSkip } }
+    \TYPE { entry-above~=~ \dim_eval:n { \CDossierRecordEntryAboveSkip } }
+    \TYPE { entry-gap~=~ \dim_eval:n { \CDossierRecordEntryGapSkip } }
+    \TYPE { list-edge-above~=~ \dim_eval:n { \CDossierRecordListEdgeAboveSkip } }
+    \TYPE { list-edge-below~=~ \dim_eval:n { \CDossierRecordListEdgeBelowSkip } }
+  }
+\NewDocumentCommand \cdossiertestMark { m } { \cdossiertest_mark:n {#1} }
+\NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
+\ExplSyntaxOff
+
+\begin{document}
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+% A section, an entry whose body opens with a bullet list, and a second entry.
+% The marks bracket every boundary the two contracts above govern.
+\TEST{entry-and-list-boundaries}{
+  \CDossierSection{Experience}
+  \cdossiertestMark{after-section-heading}
+  \begin{CDossierEntry}[title = {Staff Engineer}]
+    \cdossiertestMark{after-entry-heading}
+    \begin{CDossierItemize}
+      \item Shipped the thing.
+    \end{CDossierItemize}
+    \cdossiertestMark{after-list}
+  \end{CDossierEntry}
+  \cdossiertestMark{after-entry}
+  \begin{CDossierEntry}[title = {Senior Engineer}]
+    \cdossiertestMark{after-second-entry-heading}
+    Prose body, no list.
+  \end{CDossierEntry}
+  \cdossiertestMark{after-second-entry}
+}
+
+% The tokens the marks above resolve, for reading the differences against.
+\TEST{entry-and-list-tokens}{
+  \cdossiertestTokens
+}
+
+\END

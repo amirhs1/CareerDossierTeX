@@ -595,8 +595,15 @@ Expected behavior:
 - sets the name, optional headline, and contact line with the calibrated
   `fontsize` type scale;
 - derives the gaps within and around the identity block from the shared
-  baseline rhythm rather than the base class's `center` environment;
-- renders `headline` only when present;
+  baseline rhythm rather than the base class's `center` environment, and from
+  `\CDossierSharedHeaderParSkip` rather than the class's document-wide
+  `\parskip`;
+- renders `headline` only when present, and leaves no gap behind when it is
+  absent;
+- guards the boundary below the name with
+  `\CDossierSharedHeaderNameGapSkip` whether or not `headline` is present
+  (before `v0.7.0` an absent `headline` silently moved that boundary to
+  `\CDossierSharedHeaderMetaGapSkip`);
 - renders available contact fields;
 - inserts separators only between rendered fields that remain on the same
   visual line;
@@ -1229,8 +1236,13 @@ items in this fixed logical order:
 6. required `email`, followed by the active type's present optional contacts.
 
 Application context is not a second subtitle, and it is not mixed into the
-contact list. Each optional line owns its spacing, so an absent value leaves no
-blank line. Contact and context separators are inserted only between present
+contact list. Since `v0.7.0` the header shares one emission site with
+`\MakeCDossierHeader`, which places a gap *between* two present lines rather
+than attaching one to each optional block, so an absent value leaves neither a
+blank line nor a gap. The boundary below the name is
+`\CDossierSharedHeaderNameGapSkip` and every later boundary is
+`\CDossierSharedHeaderMetaGapSkip`, whatever the line beneath it turns out to
+be. Contact and context separators are inserted only between present
 items and are layout artifacts in tagged output. The selected page-one `title`
 drives PDF document metadata; the shorter `running-title` exists only for page
 furniture and does not replace the full title in meaningful content.
@@ -1421,6 +1433,44 @@ type values, required and invalid inputs, optional-field collapse, continuation
 page furniture, PDF metadata, source-order extraction, and tagged/untagged
 output. The six complete specialized-type two-page examples provide the visual
 review surface.
+
+## Vertical-spacing tokens
+
+Every vertical boundary in the four classes is owned by exactly one token, and
+each token is the complete gap a reader measures. The names follow
+`\CDossier<Family><Scope><Position>Skip`; the calibrated ratios and their
+resolved values at each `fontsize` are tabulated in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm).
+
+| Family | Tokens |
+|---|---|
+| Shared (all four classes) | `\CDossierSharedHeaderAboveSkip`, `\CDossierSharedHeaderParSkip`, `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip`, `\CDossierSharedHeaderBelowSkip` |
+| Record (résumé, CV) | `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
+| Prose (letter, statement) | `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
+| Letter | `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
+
+Two rules govern how a token reaches the page, and overriding a token without
+them in mind is the usual reason an override appears to do nothing:
+
+- **Boundaries compose with `\addvspace`, which takes the maximum of the
+  adjacent claims and never their sum.** Raising a token past its neighbour is
+  what makes it visible; lowering it below its neighbour makes it inert.
+  `\CDossierRecordEntryGapSkip` in particular is a *floor* for the entry
+  heading → body boundary, which a bullet list overrides with
+  `\CDossierRecordListEdgeAboveSkip`.
+- **A paragraph boundary also contributes `\parskip`.** In the prose classes
+  that is `\CDossierProseParSkip`, and a token at such a boundary is emitted as
+  `token − \parskip` so the token still names the rendered gap. The header block
+  substitutes `\CDossierSharedHeaderParSkip` for its own scope, which is why
+  the three header gap tokens behave identically in all four classes.
+
+Since `v0.7.0`, `\CDossierSharedHeaderParSkip`,
+`\CDossierLetterRecipientLineGapSkip`, and `\CDossierLetterBodyBelowSkip` are
+new, and `\CDossierRecordEntryBelowSkip` and `\CDossierLetterheadBelowSkip` are
+removed; see [`MIGRATION.md`](MIGRATION.md#070---unreleased).
+
+The calibrated *values* are not stable API before `v1.0.0`; the token names and
+the boundaries they own are.
 
 ## Colors and theme tokens
 

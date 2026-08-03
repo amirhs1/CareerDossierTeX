@@ -403,55 +403,64 @@
       { Application~ID:~\tl_use:N \l__cdossier_statement_application_id_tl }
   }
 
+%% Issue #204: the header lines and the gaps between them are emitted by the
+%% shared header stack in careerdossier-components, which this class used to
+%% duplicate from five separate sites -- each gap attached as a leading skip on
+%% the optional block below it. The class now states only which lines are
+%% present, in reading order; the component owns the gap between two of them,
+%% the paragraph gap inside the header group, and the boundary below the stack.
 \NewDocumentCommand \MakeCDossierStatementHeader { }
   {
     \__cdossier_statement_validate:
     \par
-    \addvspace { \CDossierSharedHeaderAboveSkip }
-    \group_begin:
-      \centering
+    \__cdossier_components_headerstack_begin:
+    \__cdossier_components_headerstack_line:n
       {
         \CDossierNameStyle \CDossierSizeName
-        \CDossierPrintField { name } \par
+        \CDossierPrintField { name }
       }
-      \vspace { \CDossierSharedHeaderNameGapSkip }
-      \__cdossier_typography_heading:n
-        {
-          \CDossierSectionStyle \CDossierSizeTitle
-          \tl_use:N \l__cdossier_statement_title_tl
-        }
-      \tl_if_blank:VF \l__cdossier_statement_subtitle_tl
-        {
-          \vspace { \CDossierSharedHeaderMetaGapSkip }
-          { \CDossierHeadlineStyle \CDossierSizeHeadline
-            \tl_use:N \l__cdossier_statement_subtitle_tl \par }
-        }
-      \CDossierIfFieldTF { affiliation }
-        {
-          \vspace { \CDossierSharedHeaderMetaGapSkip }
+    \__cdossier_components_headerstack_line:n
+      {
+        \__cdossier_typography_heading:n
+          {
+            \CDossierSectionStyle \CDossierSizeTitle
+            \tl_use:N \l__cdossier_statement_title_tl
+          }
+      }
+    \tl_if_blank:VF \l__cdossier_statement_subtitle_tl
+      {
+        \__cdossier_components_headerstack_line:n
+          {
+            \CDossierHeadlineStyle \CDossierSizeHeadline
+            \tl_use:N \l__cdossier_statement_subtitle_tl
+          }
+      }
+    \CDossierIfFieldTF { affiliation }
+      {
+        \__cdossier_components_headerstack_line:n
           {
             \CDossierBodyStyle \CDossierSizeBody
-            \CDossierPrintField { affiliation } \par
+            \CDossierPrintField { affiliation }
           }
-        }
-        { }
-      \bool_lazy_or:nnT
-        { ! \tl_if_blank_p:V \l__cdossier_statement_context_tl }
-        { ! \tl_if_blank_p:V \l__cdossier_statement_application_id_tl }
-        {
-          \vspace { \CDossierSharedHeaderMetaGapSkip }
+      }
+      { }
+    \bool_lazy_or:nnT
+      { ! \tl_if_blank_p:V \l__cdossier_statement_context_tl }
+      { ! \tl_if_blank_p:V \l__cdossier_statement_application_id_tl }
+      {
+        \__cdossier_components_headerstack_line:n
           {
             \CDossierMutedStyle \CDossierSizeSmall
-            \__cdossier_statement_contextline: \par
+            \__cdossier_statement_contextline:
           }
-        }
-      \vspace { \CDossierSharedHeaderMetaGapSkip }
-      { \CDossierBodyStyle \CDossierSizeSmall
+      }
+    \__cdossier_components_headerstack_line:n
+      {
+        \CDossierBodyStyle \CDossierSizeSmall
         \__cdossier_components_contactparagraph:N
           \l__cdossier_statement_contacts_clist
       }
-    \group_end:
-    \addvspace { \CDossierSharedHeaderBelowSkip }
+    \__cdossier_components_headerstack_end:
   }
 
 \endinput

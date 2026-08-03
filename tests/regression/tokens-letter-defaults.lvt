@@ -9,11 +9,14 @@
     \TYPE{body-size = \dim_use:N \CDossierBodySize}
     \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
     \TYPE{prose-par-skip = \skip_use:N \CDossierProseParSkip}
-    \TYPE{after-header-block-skip =
-      \skip_use:N \CDossierLetterheadBelowSkip}
+    \TYPE{header-par-skip = \skip_use:N \CDossierSharedHeaderParSkip}
+    \TYPE{recipient-line-gap-skip =
+      \skip_use:N \CDossierLetterRecipientLineGapSkip}
     \TYPE{block-skip = \skip_use:N \CDossierLetterBlockSkip}
-    \TYPE{after-salutation-skip =
+    \TYPE{body-above-skip =
       \skip_use:N \CDossierLetterBodyAboveSkip}
+    \TYPE{body-below-skip =
+      \skip_use:N \CDossierLetterBodyBelowSkip}
     \TYPE{signature-skip = \skip_use:N \CDossierLetterSignatureGapSkip}
     \skip_if_eq:nnTF { \parskip } { \CDossierProseParSkip }
       { \TYPE{paragraph-rhythm = shared} }

@@ -118,7 +118,26 @@
 \int_new:N \CDossierWidowPenalty
 \int_set:Nn \CDossierWidowPenalty { 10000 }
 
+%% Issue #204: every vertical boundary is owned by exactly one token, and every
+%% token declared here reaches the page at some boundary in the class that uses
+%% it. Two rules make that possible and both are load-bearing.
+%%
+%% Block boundaries compose with `\addvspace', which takes the *maximum* of the
+%% adjacent claims and never their sum (issue #168). Where two tokens met at one
+%% boundary the smaller was therefore unreachable: changing it moved nothing and
+%% produced no diagnostic. `\CDossierRecordEntryBelowSkip' and
+%% `\CDossierLetterheadBelowSkip' were exactly that and are retired; see
+%% docs/MIGRATION.md.
+%%
+%% A paragraph boundary additionally contributes `\parskip', which `\addvspace'
+%% cannot absorb -- `\parskip' is inserted at the *next* paragraph's start, after
+%% `\addvspace' has already read `\lastskip', so the two always add. A token at
+%% such a boundary is therefore emitted as `\addvspace{token - \parskip}', so
+%% the token still names the rendered gap. `careerdossier-statement.cls' uses
+%% that pattern for its headings and the shared header stack uses it for every
+%% header line.
 \skip_new:N \CDossierSharedHeaderAboveSkip
+\skip_new:N \CDossierSharedHeaderParSkip
 \skip_new:N \CDossierSharedHeaderNameGapSkip
 \skip_new:N \CDossierSharedHeaderMetaGapSkip
 \skip_new:N \CDossierSharedHeaderBelowSkip
@@ -131,15 +150,15 @@
 \skip_new:N \CDossierProseSubsectionBelowSkip
 \skip_new:N \CDossierRecordEntryAboveSkip
 \skip_new:N \CDossierRecordEntryGapSkip
-\skip_new:N \CDossierRecordEntryBelowSkip
 \skip_new:N \CDossierRecordListEdgeAboveSkip
 \skip_new:N \CDossierRecordListEdgeBelowSkip
 \skip_new:N \CDossierRecordItemSepSkip
 \skip_new:N \CDossierRecordParSkip
 \skip_new:N \CDossierProseParSkip
-\skip_new:N \CDossierLetterheadBelowSkip
+\skip_new:N \CDossierLetterRecipientLineGapSkip
 \skip_new:N \CDossierLetterBlockSkip
 \skip_new:N \CDossierLetterBodyAboveSkip
+\skip_new:N \CDossierLetterBodyBelowSkip
 \skip_new:N \CDossierLetterSignatureGapSkip
 
 \cs_new_eq:NN \__cdossier_tokens_article_normalsize: \normalsize
@@ -247,6 +266,14 @@
       }
 
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderAboveSkip { 0.00 }
+    %% Issue #204: the paragraph gap *inside* the header stack. The prose
+    %% classes set `\parskip' to \CDossierProseParSkip document-wide, and every
+    %% header line is its own paragraph, so before this token the prose
+    %% paragraph gap landed in every header boundary on top of the header token
+    %% and the header tokens could not express a gap below that floor. The
+    %% header group now owns its own paragraph gap; 0.00 keeps the header
+    %% boundaries governed by the three gap tokens alone, in every class.
+    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderNameGapSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderMetaGapSkip { 0.1875 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderBelowSkip { 0.8125 }
@@ -286,9 +313,19 @@
     \__cdossier_tokens_set_skip:Nn \CDossierProseSectionBelowSkip { 0.75 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionAboveSkip { 1.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionBelowSkip { 0.625 }
+    %% Issue #204: \CDossierRecordEntryAboveSkip is the sole inter-entry token.
+    %% The retired \CDossierRecordEntryBelowSkip claimed the same boundary from
+    %% the other side and lost every max it entered -- to this token between two
+    %% entries, and to \CDossierRecordSectionAboveSkip at a section end.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryAboveSkip { 0.25 }
+    %% Issue #204: the floor for the entry heading -> body boundary, emitted with
+    %% `\addvspace' rather than `\vspace'. As a `\vspace' it was extra space that
+    %% *added* to whatever the body opened with, so a bullet list sat at
+    %% EntryGap + ListEdgeAbove above its own entry and at max(...) below it --
+    %% further from the entry that owns it than from the next one. Both ends of a
+    %% list are now maxes, so the "a list belongs to the entry above it" relation
+    %% is expressible by the ratios alone.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryGapSkip { 0.0625 }
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryBelowSkip { 0.125 }
     %% Issue #176: these tokens own the complete list edge. Until #176 the
     %% lists also inherited LaTeX's `\partopsep' -- 3 pt plus stretch that no
     %% token owned and that did not rescale -- so the rendered edge was 4.5 pt at
@@ -312,9 +349,18 @@
     \__cdossier_tokens_set_skip:Nn \CDossierRecordItemSepSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierLetterheadBelowSkip { 0.75 }
+    %% Issue #204: the recipient block prints one field per line and separated
+    %% them with a bare `\\', so the only vertical distance in the letter that no
+    %% token expressed was the one inside its most structured block. 0.00
+    %% reproduces the plain `\baselineskip' the bare `\\' gave.
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterRecipientLineGapSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierLetterBlockSkip { 0.50 }
+    %% Issue #204: the letter body's two edges are a pair, and naming only the
+    %% opening one left the closing one borrowing \CDossierLetterBlockSkip -- a
+    %% token for the boundaries *between* letterhead blocks, not for the body.
+    %% The default reproduces that borrowed value exactly.
     \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyAboveSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyBelowSkip { 0.50 }
     \__cdossier_tokens_set_skip:Nn \CDossierLetterSignatureGapSkip { 2.25 }
   }
 
