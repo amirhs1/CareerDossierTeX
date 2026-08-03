@@ -1,0 +1,30 @@
+% typography-option-values.lvt — rejected careerdossier-typography option
+% values (#212).
+%
+% See resume-option-values.lvt for the contract these files assert. A class
+% forwards an already-validated `bodyfont' here, so this message is reached
+% only by a direct \usepackage; a direct package user gets the same named
+% values a class user does. The unknown-*option* message is asserted alongside
+% it, since the two are the whole rejection surface of this package.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-typography}
+
+\ExplSyntaxOn
+\NewDocumentCommand \cdossiertestSetOption { m }
+  { \keys_set:nn { cdossier / typography } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-bodyfont-value-is-rejected}{
+  \cdossiertestSetOption{bodyfont=decorative}
+}
+
+\TEST{unknown-package-option-is-rejected}{
+  \cdossiertestSetOption{fontface=serif}
+}
+
+\END
+\end{document}

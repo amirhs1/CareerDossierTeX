@@ -1,0 +1,46 @@
+% resume-option-values.lvt — rejected careerdossier-resume option values (#212).
+%
+% Every choice-valued class option names its own accepted values rather than
+% falling back on l3keys' stock "accepts only a fixed set of choices", which
+% tells the reader their value is wrong without saying what is right. The class
+% already knows the answer, so the message is the assertion here: one bad value
+% per option, with the saved baseline pinning the exact wording.
+%
+% The values are set through \keys_set:nn rather than \documentclass, which
+% takes one set of options per document; the class option and this call reach
+% the same `<key> / unknown' handler. Which values are *accepted* is asserted by
+% the smoke suite's building fixtures, not here.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+
+\ExplSyntaxOn
+\NewDocumentCommand \cdossiertestSetOption { m }
+  { \keys_set:nn { cdossier / resume } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-fontsize-value-is-rejected}{
+  \cdossiertestSetOption{fontsize=9pt}
+}
+
+\TEST{unknown-margin-value-is-rejected}{
+  \cdossiertestSetOption{margin=wide}
+}
+
+\TEST{unknown-paper-value-is-rejected}{
+  \cdossiertestSetOption{paper=legal}
+}
+
+\TEST{unknown-bodyfont-value-is-rejected}{
+  \cdossiertestSetOption{bodyfont=decorative}
+}
+
+\TEST{unknown-medium-value-is-rejected}{
+  \cdossiertestSetOption{medium=paper}
+}
+
+\END
+\end{document}

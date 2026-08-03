@@ -49,11 +49,24 @@
   { Unknown~package~option~'#1'~for~careerdossier-typography. }
   { Supported~options~are~'bodyfont'~(serif,~sans). }
 
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so the accepted values are named here. A
+%% class forwards an already-validated value, so this message is reached only
+%% by a direct \usepackage; the contract is the same either way.
+\msg_new:nnnn { careerdossier-typography } { unknown-bodyfont }
+  { Unknown~'bodyfont'~value~'#1'~for~careerdossier-typography. }
+  {
+    The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
+    'sans'~(TeX~Gyre~Heros~body).
+  }
+
 \keys_define:nn { cdossier / typography }
   {
     bodyfont .choices:nn =
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_typography_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont / unknown .code:n =
+      { \msg_error:nnn { careerdossier-typography } { unknown-bodyfont } {#1} } ,
     bodyfont .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-typography } { unknown-option }

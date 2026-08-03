@@ -1,0 +1,41 @@
+% statement-option-values.lvt — rejected careerdossier-statement option values
+% (#212).
+%
+% See resume-option-values.lvt for the contract these files assert. `type' is
+% not covered here: it is hand-rolled rather than an l3keys choice list and has
+% named its seven accepted values since v0.5.0, so it was already the precedent
+% this issue generalised. The smoke suite pins its message.
+\input{regression-test}
+\documentclass{careerdossier-statement}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+
+\ExplSyntaxOn
+\NewDocumentCommand \cdossiertestSetOption { m }
+  { \keys_set:nn { cdossier / statement } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-fontsize-value-is-rejected}{
+  \cdossiertestSetOption{fontsize=13pt}
+}
+
+\TEST{unknown-margin-value-is-rejected}{
+  \cdossiertestSetOption{margin=wide}
+}
+
+\TEST{unknown-paper-value-is-rejected}{
+  \cdossiertestSetOption{paper=legal}
+}
+
+\TEST{unknown-bodyfont-value-is-rejected}{
+  \cdossiertestSetOption{bodyfont=decorative}
+}
+
+\TEST{unknown-medium-value-is-rejected}{
+  \cdossiertestSetOption{medium=paper}
+}
+
+\END
+\end{document}

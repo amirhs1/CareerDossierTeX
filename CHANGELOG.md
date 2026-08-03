@@ -181,6 +181,24 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **Documentation and tests only.** No class, option, key, command, environment,
   or calibrated value changed, and no document renders differently.
 
+- Every option that takes a fixed set of values now rejects an unsupported one
+  with an error naming the accepted values and the owning class or package,
+  instead of LaTeX's stock "accepts only a fixed set of choices" — which told
+  the reader their value was wrong without saying what was right. This covers
+  `fontsize`, `margin`, `paper`, and `bodyfont` on all four document classes,
+  `family` on the letter class, and the same options on
+  `careerdossier-typography` and `careerdossier-tokens` when either is loaded
+  directly as a package. ([#212])
+
+  `medium` reported this way from the start, and the statement class's `type`
+  has since `v0.5.0`; the rest sent the reader to
+  [`docs/API.md`](docs/API.md) to find an answer the class already had.
+
+  **No accepted value, default, or option name changed**, and no document that
+  compiles today is affected: only the wording of an error that already stopped
+  the build. A build script matching the old message text needs its pattern
+  updated.
+
 ### Removed
 
 - **BREAKING (design token):** `\CDossierRecordEntryBelowSkip` and
@@ -284,6 +302,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 [#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
+[#212]: https://github.com/amirhs1/CareerDossierTeX/issues/212
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
 

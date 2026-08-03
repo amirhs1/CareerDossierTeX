@@ -3,20 +3,20 @@ Don't change this file in any respect.
 ============================================================
 TEST 1: unknown-fontsize-errors
 ============================================================
-! LaTeX Error: Key 'cdossier/tokens/fontsize' accepts only a fixed set of choices.
+! Package careerdossier-tokens Error: Unknown 'fontsize' value '9pt' for careerdossier-tokens.
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The key 'cdossier/tokens/fontsize' only accepts predefined values, and '9pt' is not one of these.
+The accepted values are '10pt', '11pt', and '12pt'.
 ============================================================
 ============================================================
 TEST 2: unknown-margin-errors
 ============================================================
-! LaTeX Error: Key 'cdossier/tokens/margin' accepts only a fixed set of choices.
+! Package careerdossier-tokens Error: Unknown 'margin' value 'spacious' for careerdossier-tokens.
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The key 'cdossier/tokens/margin' only accepts predefined values, and 'spacious' is not one of these.
+The accepted values are 'normal' (one-inch margins) and 'narrow' (half-inch margins).
 ============================================================
 ============================================================
 TEST 3: unknown-package-option-errors

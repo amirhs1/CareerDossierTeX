@@ -81,10 +81,10 @@ cases=(
   "resume-medium-screen pass"
   "resume-density-option fail|Supported options are 'fontsize', 'margin', 'paper', 'bodyfont', and 'medium'."
   "resume-missing-name fail|required profile field 'name' is not"
-  "resume-bad-fontsize fail|accepts only a fixed set of"
-  "resume-bad-paper fail|accepts only a fixed set of"
-  "resume-bad-bodyfont fail|accepts only a fixed set of"
-  "resume-bad-medium fail|Unknown 'medium' value 'paper'"
+  "resume-bad-fontsize fail|Unknown 'fontsize' value '9pt' for careerdossier-resume."
+  "resume-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-resume."
+  "resume-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-resume."
+  "resume-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-resume."
   "resume-unknown-option fail|Unknown class option 'format'"
   "resume-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "resume-contact-too-wide fail|is wider than the available contact-line width."
@@ -105,10 +105,10 @@ cases=(
   "cv-medium-screen pass"
   "cv-density-option fail|Supported options are 'fontsize', 'margin', 'paper', 'bodyfont', and 'medium'."
   "cv-missing-name fail|required profile field 'name' is not"
-  "cv-bad-fontsize fail|accepts only a fixed set of"
-  "cv-bad-paper fail|accepts only a fixed set of"
-  "cv-bad-bodyfont fail|accepts only a fixed set of"
-  "cv-bad-medium fail|Unknown 'medium' value 'paper'"
+  "cv-bad-fontsize fail|Unknown 'fontsize' value '9pt' for careerdossier-cv."
+  "cv-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-cv."
+  "cv-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-cv."
+  "cv-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-cv."
   "cv-unknown-option fail|Unknown class option 'format'"
   "cv-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "cv-publications-valid pass"
@@ -128,12 +128,12 @@ cases=(
   "letter-academic-12pt pass"
   "letter-sans-body pass"
   "letter-medium-screen pass"
-  "letter-bad-family fail|accepts only a fixed set of"
-  "letter-bad-fontsize fail|accepts only a fixed set of"
-  "letter-bad-margin fail|accepts only a fixed set of"
-  "letter-bad-paper fail|accepts only a fixed set of"
-  "letter-bad-bodyfont fail|accepts only a fixed set of"
-  "letter-bad-medium fail|Unknown 'medium' value 'paper'"
+  "letter-bad-family fail|Unknown 'family' value 'committee' for careerdossier-letter."
+  "letter-bad-fontsize fail|Unknown 'fontsize' value '13pt' for careerdossier-letter."
+  "letter-bad-margin fail|Unknown 'margin' value 'wide' for careerdossier-letter."
+  "letter-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-letter."
+  "letter-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-letter."
+  "letter-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-letter."
   "letter-no-subject pass"
   "letter-no-recipient-subject pass"
   "letter-missing-name fail|required profile field 'name' is not"
@@ -155,13 +155,13 @@ cases=(
   "statement-general-interest fail|'general-interest'."
   "statement-sans-body pass"
   "statement-medium-screen pass"
-  "statement-bad-medium fail|Unknown 'medium' value 'paper'"
+  "statement-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-statement."
   "statement-empty-type fail|The key 'cdossier/statement/type' requires a value"
   "statement-bad-type fail|Unknown statement type 'grant'"
-  "statement-bad-paper fail|accepts only a fixed set of"
-  "statement-bad-fontsize fail|accepts only a fixed set of"
-  "statement-bad-margin fail|accepts only a fixed set of"
-  "statement-bad-bodyfont fail|accepts only a fixed set of"
+  "statement-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-statement."
+  "statement-bad-fontsize fail|Unknown 'fontsize' value '13pt' for careerdossier-statement."
+  "statement-bad-margin fail|Unknown 'margin' value 'wide' for careerdossier-statement."
+  "statement-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-statement."
   "statement-unknown-option fail|Unknown class option 'format'"
   "statement-unknown-meta-key fail|Unknown \CDossierStatementSetup key"
   "statement-missing-name fail|required profile field 'name' is not"
@@ -207,16 +207,13 @@ for entry in "${cases[@]}"; do
       if [ "$rc" -eq 0 ]; then
         echo "  EXPECTED FAILURE but compile succeeded"; fail=1; continue
       fi
-      flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ')"
-      if [[ "$base" = *-density-option ]]; then
-        flat="$(printf '%s' "$flat" \
-          | sed 's/(careerdossier-resume)[[:space:]]*/ /g;
-                 s/(careerdossier-cv)[[:space:]]*/ /g' | tr -s ' ')"
-      fi
-      if [ "$base" = "resume-contact-too-wide" ]; then
-        flat="$(printf '%s' "$flat" \
-          | sed 's/(careerdossier-components)[[:space:]]*/ /g' | tr -s ' ')"
-      fi
+      # A message longer than the terminal width is wrapped, and TeX prefixes
+      # every continuation line with the reporting module in parentheses. That
+      # marker lands mid-sentence and would break any needle spanning the wrap,
+      # so it is removed before matching. Dropping it costs nothing: the module
+      # is still named in the "! Package <module> Error:" opening.
+      flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ' \
+        | sed 's/(careerdossier-[a-z]*)[[:space:]]*/ /g' | tr -s ' ')"
       if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
         echo "  FAILED for the wrong reason: expected '$needle' in the log"; fail=1
       else
