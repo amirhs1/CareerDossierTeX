@@ -16,7 +16,7 @@ plus six other statement types — see `docs/API.md` and `docs/ROADMAP.md`. Ever
 class accepts the calibrated `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`
 options; the résumé and CV no longer accept `density`.
 **Maintainer:** Amir Sadeghi
-**Last reviewed:** 2026-07-30
+**Last reviewed:** 2026-08-03
 
 > **Scope banner.** Material tagged **(Phase 1)** records the released `v0.1.x`
 > foundation. Material tagged **(planned — vX.Y.Z)** describes future work
@@ -240,6 +240,15 @@ January 2023 - Present
 If a compact same-line presentation is offered, implement it as an option and
 require extraction fixtures proving that the title and date remain associated. Do
 not use a two-cell table merely to push the date right.
+
+The shipped entry heading takes the right-aligned form, and "it must be tested"
+is not a formality: Poppler keeps the right-hand dates/location column with its
+entry only while the entry's vertical band stays distinct from the block beneath
+it. Close the following bullet list up against the heading and Poppler groups the
+two bands, then sorts the column as trailing material — after the bullets, or,
+on a page carrying furniture, after the `Page N of M` folio. The reordering is a
+property of the component's geometry, not of tagging, and Apple PDFKit does not
+show it. `tests/extraction/` pins the order for both classes; see section 11.6.
 
 ### 3.5 Headers, footers, and page numbers
 
@@ -1090,6 +1099,34 @@ contact information; the `Experience` heading precedes the first job; each title
 remains near its organization and date; bullets remain under their entry;
 `Education` does not interleave with `Skills`; and page furniture does not
 interrupt sentences.
+
+**Entry-head column order is covered** (issue #221). Three fixtures in
+`tests/extraction/` assert that an entry heading's right-hand dates/location
+column extracts between its heading and its bullets, on the untagged path this
+suite builds:
+
+| Fixture | Class | Pages | What it adds |
+|---|---|---|---|
+| `resume-entry-dates-order` | résumé | 1 | the cheapest form of the assertion |
+| `cv-entry-dates-order` | CV | 1 | the same component under CV geometry |
+| `resume-entry-dates-page-furniture` | résumé | 2 | running header and folio present |
+
+Two findings from building them are worth keeping, because they decide what a
+fixture of this kind has to look like:
+
+- **Two entries, not one.** The last entry sorted on a page always trails its
+  own column, at every list-edge value. A one-entry fixture therefore cannot see
+  the fault appear or disappear — which is why the three pre-existing fixtures
+  with dates (`resume-contact-optional`, `resume-contact-wrap`,
+  `cv-contact-optional`) stayed green throughout the #219 regression. The
+  assertion lives on an entry that is followed by more material.
+- **Page furniture is sufficient, not necessary.** A single page with two
+  entries reproduces the reordering exactly as the two-page form does; the folio
+  only makes it more conspicuous by putting the dates below the page furniture.
+
+Poppler is the discriminating consumer here. The committed `*.pdfkit.txt`
+baselines keep each heading row on one line at every value tested, so they
+record the layout but do not detect the fault.
 
 ### 11.7 Visual regression
 

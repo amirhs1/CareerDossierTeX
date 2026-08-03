@@ -1,0 +1,65 @@
+% resume-entry-dates-page-furniture.tex — extraction fixture for
+% careerdossier-resume.cls.
+%
+% Purpose (issue #221)
+%   The two-page form of the entry-head reading-order assertion made by
+%   resume-entry-dates-order.tex: with a running header and a `Page N of M'
+%   folio on the page, a misordered dates/location column does not merely sort
+%   after its own bullets, it sorts after the folio — landing an entry's dates
+%   below the page furniture in every consumer that trusts the text layer.
+%
+%   Until #221 no fixture in tests/extraction/ rendered a second page at all,
+%   so the interaction between an entry's right-hand column and page furniture
+%   was untested here. It was `make tagging' that caught the #219 regression,
+%   through tests/tagging/resume.expected.txt — the wrong way round for a defect
+%   that reproduces identically on the untagged path this suite builds.
+%
+%   Assertion: on page 1 the dates and location must extract between the entry
+%   heading and its bullets, and the folio must remain the last text on the
+%   page. Lower `\CDossierRecordListEdgeAboveSkip' below 0.25 and the column
+%   moves after `Page 1 of 2', and this baseline fails.
+%
+%   Once #219 lands, the entry head keeps its column unconditionally and page 2's
+%   dates will extract with their heading too. That is an intended output change:
+%   regenerate this baseline with the fix, and review the diff.
+%
+%   The committed baseline (resume-entry-dates-page-furniture.expected.txt) is
+%   the assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-entry-dates-page-furniture.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Accessibility Engineer},
+  email    = {ada@example.com},
+  phone    = {+1 416 555 0142},
+  website  = {example.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Engineer},
+  organization = {Example Labs},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First achievement in source order.
+    \item Second achievement with a measurable reporting outcome.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\newpage
+\CDossierSection{Additional Experience}
+\begin{CDossierEntry}[
+  title        = {Engineer},
+  organization = {Example Services},
+  location     = {Ottawa, ON},
+  dates        = {2022--2024}
+]
+  \begin{CDossierItemize}
+    \item Second-page content that follows the shared page furniture.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
