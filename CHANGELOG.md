@@ -294,6 +294,26 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   shares its baseline with its entry, and `pdftotext -layout` reports the
   entries in source order.
 
+- A rejected `fontsize` or `margin` class option is now reported once, by the
+  class that owns it. It was reported twice — once by the class, and again by
+  `careerdossier-tokens`, an internal package that appears in no `\usepackage`
+  line a class user writes, so the second report named a module the reader had
+  never heard of and could not act on. ([#232])
+
+  `careerdossier-tokens` read the global `\documentclass` option list in
+  addition to its own, so it re-validated the raw class option independently of
+  the class that owns that public surface. It now reads local package options
+  only, like `careerdossier-typography` and `careerdossier-components`. Every
+  class already forwards the *resolved* value explicitly, so no valid document
+  is affected and no option, value, or default changed; the only difference is
+  that one diagnostic disappears from a build that already stopped.
+
+  `\usepackage[fontsize=…]{careerdossier-tokens}` is still validated and still
+  names the accepted values. A document that loaded `careerdossier-tokens`
+  under a non-CareerDossierTeX class and relied on it picking `fontsize=` or
+  `margin=` out of that class's option list must now pass the option to
+  `\usepackage` (or `\PassOptionsToPackage`) instead.
+
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
 [#184]: https://github.com/amirhs1/CareerDossierTeX/issues/184
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
@@ -305,6 +325,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#212]: https://github.com/amirhs1/CareerDossierTeX/issues/212
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
+[#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 
 ## [0.6.0] - 2026-07-30
 

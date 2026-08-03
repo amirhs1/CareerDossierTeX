@@ -536,6 +536,37 @@ or sets the token by name needs the edit. Read
 `\CDossierRecordListEdgeAboveSkip` wherever the old name appeared, and set both
 when overriding the list edge as a whole.
 
+### `careerdossier-tokens` no longer reads global `\documentclass` options
+
+Before:
+
+```latex
+\documentclass[fontsize=10pt]{article}   % some non-CareerDossierTeX class
+\usepackage{careerdossier-tokens}        % picked `fontsize' up from above
+```
+
+After:
+
+```latex
+\documentclass{article}
+\usepackage[fontsize=10pt]{careerdossier-tokens}
+```
+
+Reason: `fontsize` and `margin` are public *class* options, owned and validated
+by the four document classes, which forward the resolved value with
+`\PassOptionsToPackage`. Reading the global option list as well made
+`careerdossier-tokens` re-validate the raw class option on its own account, so a
+rejected value was reported twice — the second time under a package name that
+appears in no `\usepackage` line a class user writes (see
+[`CHANGELOG.md`](../CHANGELOG.md), #232).
+
+No CareerDossierTeX class or example is affected, because all four forward
+explicitly; this applies only to a document that loads `careerdossier-tokens`
+directly under some other class *and* sets `fontsize=` or `margin=` as an option
+to that class. Passing the option to `\usepackage`, or with
+`\PassOptionsToPackage`, works exactly as before, and an unsupported value is
+still rejected with the accepted values named.
+
 ## [0.6.0] - 2026-07-30
 
 ### `density=compact|standard` removed from `careerdossier-resume` and `careerdossier-cv`

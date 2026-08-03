@@ -198,6 +198,18 @@ output. `careerdossier-components` and all four document classes require it.
 The direction is one-way: the tokens package never learns which class loaded
 it.
 
+The one-way direction extends to how options arrive. Like
+`careerdossier-typography` and `careerdossier-components`, this package uses
+`\ProcessKeysPackageOptions`, which reads local package options only and never
+the global `\documentclass` list. `fontsize` and `margin` are public *class*
+options: each class validates its own value and forwards the resolved one with
+`\PassOptionsToPackage`, so a value reaches this package only after the class
+that owns the public surface has accepted it. Reading the global list here
+would make this package re-validate the raw class option on its own account and
+report a rejected value a second time, under a package name that appears in no
+`\usepackage` line the class user wrote (#232). A direct `\usepackage` user
+still gets the full validation contract through the package's own option list.
+
 #### Type scale
 
 The ratio column is design intent and does not ship; the point columns ship.
