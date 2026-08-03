@@ -1,0 +1,29 @@
+%% lintfixture-wrong-module.sty — option-lint fixture (issue #233)
+%%
+%% `margin' has both halves, but the message was pasted in from another module,
+%% so it is defined for a module this file is not. Expected verdict: OK for
+%% `fontsize', WRONG MODULE for `margin'. Lint input only.
+
+\msg_new:nnnn { lintfixture-wrong-module } { unknown-fontsize }
+  { Unknown~'fontsize'~value~'#1'~for~lintfixture-wrong-module. }
+  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+\msg_new:nnnn { careerdossier-resume } { unknown-margin }
+  { Unknown~'margin'~value~'#1'~for~careerdossier-resume. }
+  { The~accepted~values~are~'normal'~and~'narrow'. }
+
+\keys_define:nn { cdossier / lintfixture }
+  {
+    fontsize .choices:nn =
+      { 10pt , 11pt , 12pt }
+      { \tl_set_eq:NN \l__lintfixture_fontsize_tl \l_keys_choice_tl } ,
+    fontsize / unknown .code:n =
+      { \msg_error:nnn { lintfixture-wrong-module } { unknown-fontsize } {#1} } ,
+    fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__lintfixture_margin_tl \l_keys_choice_tl } ,
+    margin / unknown .code:n =
+      { \msg_error:nnn { careerdossier-resume } { unknown-margin } {#1} } ,
+    margin .value_required:n = true ,
+  }

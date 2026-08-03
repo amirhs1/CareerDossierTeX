@@ -226,9 +226,9 @@ Build every supported example:
 make
 ```
 
-Run every suite CI runs — regression, extraction, smoke, layout, the focused
-BibLaTeX/Biber fixture, and the tagged-structure fixtures — plus all supported
-example builds:
+Run every suite CI runs — the option lint, regression, extraction, smoke,
+layout, the focused BibLaTeX/Biber fixture, and the tagged-structure fixtures —
+plus all supported example builds:
 
 ```bash
 make check
@@ -522,6 +522,39 @@ minutes that a per-push job should not pay. A separate weekly
 `verapdf-scheduled` workflow builds veraPDF from a pinned commit and runs the
 same gate; see "Pinned dependencies" below and
 [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) section 7.1.
+
+### Option lint
+
+Every choice-valued public option must name its accepted values when it is given
+one that is not accepted. That needs two hand-written pieces in the same file —
+a `\msg_new:nnnn { <module> } { unknown-<key> }` and a `<key> / unknown .code:n`
+sub-key routing l3keys' choice error to it — and LaTeX enforces neither. Omit
+the sub-key and the option falls back to l3keys' stock "accepts only a fixed set
+of choices" error, which never says what the set is, with no test failure: every
+other test asserts a message that *is* defined, not the absence of one that is
+not.
+
+The lint derives the expected set from the source instead. For each
+`<key> .choices:nn` in a root `.cls`/`.sty` it requires both halves, in the same
+`\keys_define:nn` block and the same file, each naming the module the filename
+implies:
+
+    make lint                  # or: tests/lint/run.sh
+
+It compiles nothing, needs no TeX installation, and finishes in under a second,
+so run it first. A failure names the module, the key, and which half is missing.
+Adding a choice-valued option therefore means adding its message and its
+`unknown` sub-key, not remembering to.
+
+`careerdossier-statement`'s `type` is deliberately outside the lint: it is
+hand-rolled with `\str_case:nnF` rather than `.choices:nn` and already names its
+seven values.
+
+The fixtures under `tests/lint/fixtures/` are the lint's own tests — one
+complete option and four each missing or misdirecting one half — and the runner
+checks itself against them every run, so a lint that stopped detecting anything
+fails rather than passing everything. They are lint input, never compiled, and
+not part of the Work.
 
 ### Module regression suite (l3build)
 

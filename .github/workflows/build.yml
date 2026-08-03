@@ -82,6 +82,24 @@ jobs:
           path: toolchain.txt
           if-no-files-found: warn
 
+  # The one job that needs no TeX. tests/lint/run.sh only reads the sources, so
+  # it runs on the bare runner in seconds rather than pulling the TeX Live
+  # container — and it is the second toolchain the lint needs: local `grep` is
+  # ugrep and local `awk` is the one-true-awk, so a pattern that works on the
+  # maintainer's machine is not thereby proven to work here.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Record lint toolchain
+        run: |
+          bash --version | head -1
+          grep --version | head -1
+          awk --version 2>&1 | head -1 || awk -W version 2>&1 | head -1
+      - name: Option lint (choice-valued options name their accepted values)
+        run: make lint
+
   regression:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373

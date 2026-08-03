@@ -1,0 +1,27 @@
+%% lintfixture-no-handler.sty — option-lint fixture (issue #233)
+%%
+%% `margin' defines its message but never routes l3keys' choice error to it, so
+%% the stock "accepts only a fixed set of choices" error still fires. Expected
+%% verdict: OK for `fontsize', MISSING HANDLER for `margin'. Lint input only.
+
+\msg_new:nnnn { lintfixture-no-handler } { unknown-fontsize }
+  { Unknown~'fontsize'~value~'#1'~for~lintfixture-no-handler. }
+  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+\msg_new:nnnn { lintfixture-no-handler } { unknown-margin }
+  { Unknown~'margin'~value~'#1'~for~lintfixture-no-handler. }
+  { The~accepted~values~are~'normal'~and~'narrow'. }
+
+\keys_define:nn { cdossier / lintfixture }
+  {
+    fontsize .choices:nn =
+      { 10pt , 11pt , 12pt }
+      { \tl_set_eq:NN \l__lintfixture_fontsize_tl \l_keys_choice_tl } ,
+    fontsize / unknown .code:n =
+      { \msg_error:nnn { lintfixture-no-handler } { unknown-fontsize } {#1} } ,
+    fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__lintfixture_margin_tl \l_keys_choice_tl } ,
+    margin .value_required:n = true ,
+  }

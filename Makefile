@@ -3,7 +3,8 @@
 # Build and test commands live here so local workflows and CI can invoke the
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
-# Requirements: LuaLaTeX and latexmk for everything; l3build for `regression`;
+# Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
+# pure text processing and needs only bash and awk; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`, and
 # `tagging`; pdftoppm (Poppler) for `review-page-two`;
 # BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
@@ -41,7 +42,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test regression smoke layout review-page-two review-matrix extract-test bibliography-test tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix extract-test bibliography-test tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -73,10 +74,16 @@ academic-letter: | $(EXAMPLES_BUILD_DIR) ## Build the academic letter example
 statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 	$(LATEXMK) $(STATEMENTS)
 
-check: regression extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
+# `lint` runs first: it compiles nothing, finishes in well under a second, and
+# what it catches is a source-level omission that every LaTeX-running suite
+# below would report as green.
+check: lint regression extract-test smoke layout bibliography-test tagging examples ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
 
 test: check ## Alias for check
+
+lint: ## Static option lint (choice-valued options name their accepted values)
+	tests/lint/run.sh
 
 regression: ## Module regression suite (l3build check on LuaTeX)
 	l3build check

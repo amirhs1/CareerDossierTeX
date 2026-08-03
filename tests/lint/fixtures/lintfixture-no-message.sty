@@ -1,0 +1,24 @@
+%% lintfixture-no-message.sty — option-lint fixture (issue #233)
+%%
+%% `margin' routes its choice error to a message no one defined. Expected
+%% verdict: OK for `fontsize', MISSING MESSAGE for `margin'. Lint input only.
+
+\msg_new:nnnn { lintfixture-no-message } { unknown-fontsize }
+  { Unknown~'fontsize'~value~'#1'~for~lintfixture-no-message. }
+  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+\keys_define:nn { cdossier / lintfixture }
+  {
+    fontsize .choices:nn =
+      { 10pt , 11pt , 12pt }
+      { \tl_set_eq:NN \l__lintfixture_fontsize_tl \l_keys_choice_tl } ,
+    fontsize / unknown .code:n =
+      { \msg_error:nnn { lintfixture-no-message } { unknown-fontsize } {#1} } ,
+    fontsize .value_required:n = true ,
+    margin .choices:nn =
+      { normal , narrow }
+      { \tl_set_eq:NN \l__lintfixture_margin_tl \l_keys_choice_tl } ,
+    margin / unknown .code:n =
+      { \msg_error:nnn { lintfixture-no-message } { unknown-margin } {#1} } ,
+    margin .value_required:n = true ,
+  }
