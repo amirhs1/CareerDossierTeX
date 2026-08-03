@@ -57,7 +57,31 @@
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
-%% without saying what that set is, so the accepted values are named here.
+%% without saying what that set is, so every choice-valued option below names
+%% its own accepted values. Each message is reached through the matching
+%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
+\msg_new:nnnn { careerdossier-resume } { unknown-fontsize }
+  { Unknown~'fontsize'~value~'#1'~for~careerdossier-resume. }
+  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+\msg_new:nnnn { careerdossier-resume } { unknown-margin }
+  { Unknown~'margin'~value~'#1'~for~careerdossier-resume. }
+  {
+    The~accepted~values~are~'normal'~(one-inch~margins)~and~
+    'narrow'~(half-inch~margins).
+  }
+
+\msg_new:nnnn { careerdossier-resume } { unknown-paper }
+  { Unknown~'paper'~value~'#1'~for~careerdossier-resume. }
+  { The~accepted~values~are~'letter'~(US~Letter)~and~'a4'~(ISO~A4). }
+
+\msg_new:nnnn { careerdossier-resume } { unknown-bodyfont }
+  { Unknown~'bodyfont'~value~'#1'~for~careerdossier-resume. }
+  {
+    The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
+    'sans'~(TeX~Gyre~Heros~body).
+  }
+
 \msg_new:nnnn { careerdossier-resume } { unknown-medium }
   { Unknown~'medium'~value~'#1'~for~careerdossier-resume. }
   {
@@ -70,10 +94,14 @@
     fontsize .choices:nn =
       { 10pt , 11pt , 12pt }
       { \tl_set_eq:NN \l__cdossier_resume_fontsize_tl \l_keys_choice_tl } ,
+    fontsize / unknown .code:n =
+      { \msg_error:nnn { careerdossier-resume } { unknown-fontsize } {#1} } ,
     fontsize .value_required:n = true ,
     margin .choices:nn =
       { normal , narrow }
       { \tl_set_eq:NN \l__cdossier_resume_margin_tl \l_keys_choice_tl } ,
+    margin / unknown .code:n =
+      { \msg_error:nnn { careerdossier-resume } { unknown-margin } {#1} } ,
     margin .value_required:n = true ,
     paper .choices:nn =
       { letter , a4 }
@@ -84,10 +112,14 @@
             { a4 }     { \tl_set:Nn \l__cdossier_resume_paper_tl { a4paper } }
           }
       } ,
+    paper / unknown .code:n =
+      { \msg_error:nnn { careerdossier-resume } { unknown-paper } {#1} } ,
     paper .value_required:n = true ,
     bodyfont .choices:nn =
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_resume_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont / unknown .code:n =
+      { \msg_error:nnn { careerdossier-resume } { unknown-bodyfont } {#1} } ,
     bodyfont .value_required:n = true ,
     medium .choices:nn =
       { print , screen }

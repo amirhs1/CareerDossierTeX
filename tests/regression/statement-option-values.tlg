@@ -1,0 +1,47 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: unknown-fontsize-value-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown 'fontsize' value '13pt' for careerdossier-statement.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are '10pt', '11pt', and '12pt'.
+============================================================
+============================================================
+TEST 2: unknown-margin-value-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown 'margin' value 'wide' for careerdossier-statement.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'normal' (one-inch margins) and 'narrow' (half-inch margins).
+============================================================
+============================================================
+TEST 3: unknown-paper-value-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown 'paper' value 'legal' for careerdossier-statement.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'letter' (US Letter) and 'a4' (ISO A4).
+============================================================
+============================================================
+TEST 4: unknown-bodyfont-value-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown 'bodyfont' value 'decorative' for careerdossier-statement.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'serif' (TeX Gyre Termes body) and 'sans' (TeX Gyre Heros body).
+============================================================
+============================================================
+TEST 5: unknown-medium-value-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown 'medium' value 'paper' for careerdossier-statement.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'print' (running header and 'Page N of M' folio) and 'screen' (neither).
+============================================================

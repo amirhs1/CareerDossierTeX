@@ -1,0 +1,43 @@
+% letter-option-values.lvt — rejected careerdossier-letter option values (#212).
+%
+% See resume-option-values.lvt for the contract these files assert. The letter
+% carries one option the other classes do not: `family', which selects the
+% industry or academic cover-letter family.
+\input{regression-test}
+\documentclass{careerdossier-letter}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+
+\ExplSyntaxOn
+\NewDocumentCommand \cdossiertestSetOption { m }
+  { \keys_set:nn { cdossier / letter } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-family-value-is-rejected}{
+  \cdossiertestSetOption{family=committee}
+}
+
+\TEST{unknown-fontsize-value-is-rejected}{
+  \cdossiertestSetOption{fontsize=13pt}
+}
+
+\TEST{unknown-margin-value-is-rejected}{
+  \cdossiertestSetOption{margin=wide}
+}
+
+\TEST{unknown-paper-value-is-rejected}{
+  \cdossiertestSetOption{paper=legal}
+}
+
+\TEST{unknown-bodyfont-value-is-rejected}{
+  \cdossiertestSetOption{bodyfont=decorative}
+}
+
+\TEST{unknown-medium-value-is-rejected}{
+  \cdossiertestSetOption{medium=paper}
+}
+
+\END
+\end{document}

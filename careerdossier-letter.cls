@@ -57,7 +57,38 @@
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
-%% without saying what that set is, so the accepted values are named here.
+%% without saying what that set is, so every choice-valued option below names
+%% its own accepted values. Each message is reached through the matching
+%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
+\msg_new:nnnn { careerdossier-letter } { unknown-family }
+  { Unknown~'family'~value~'#1'~for~careerdossier-letter. }
+  {
+    The~accepted~values~are~'industry'~(the~default~cover~letter)~and~
+    'academic'~(the~academic~cover-letter~family).
+  }
+
+\msg_new:nnnn { careerdossier-letter } { unknown-fontsize }
+  { Unknown~'fontsize'~value~'#1'~for~careerdossier-letter. }
+  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+\msg_new:nnnn { careerdossier-letter } { unknown-margin }
+  { Unknown~'margin'~value~'#1'~for~careerdossier-letter. }
+  {
+    The~accepted~values~are~'normal'~(one-inch~margins)~and~
+    'narrow'~(half-inch~margins).
+  }
+
+\msg_new:nnnn { careerdossier-letter } { unknown-paper }
+  { Unknown~'paper'~value~'#1'~for~careerdossier-letter. }
+  { The~accepted~values~are~'letter'~(US~Letter)~and~'a4'~(ISO~A4). }
+
+\msg_new:nnnn { careerdossier-letter } { unknown-bodyfont }
+  { Unknown~'bodyfont'~value~'#1'~for~careerdossier-letter. }
+  {
+    The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
+    'sans'~(TeX~Gyre~Heros~body).
+  }
+
 \msg_new:nnnn { careerdossier-letter } { unknown-medium }
   { Unknown~'medium'~value~'#1'~for~careerdossier-letter. }
   {
@@ -70,14 +101,20 @@
     family .choices:nn =
       { industry , academic }
       { \tl_set_eq:NN \l__cdossier_letter_family_tl \l_keys_choice_tl } ,
+    family / unknown .code:n =
+      { \msg_error:nnn { careerdossier-letter } { unknown-family } {#1} } ,
     family .value_required:n = true ,
     fontsize .choices:nn =
       { 10pt , 11pt , 12pt }
       { \tl_set_eq:NN \l__cdossier_letter_fontsize_tl \l_keys_choice_tl } ,
+    fontsize / unknown .code:n =
+      { \msg_error:nnn { careerdossier-letter } { unknown-fontsize } {#1} } ,
     fontsize .value_required:n = true ,
     margin .choices:nn =
       { normal , narrow }
       { \tl_set_eq:NN \l__cdossier_letter_margin_tl \l_keys_choice_tl } ,
+    margin / unknown .code:n =
+      { \msg_error:nnn { careerdossier-letter } { unknown-margin } {#1} } ,
     margin .value_required:n = true ,
     paper .choices:nn =
       { letter , a4 }
@@ -88,10 +125,14 @@
             { a4 }     { \tl_set:Nn \l__cdossier_letter_paper_tl { a4paper } }
           }
       } ,
+    paper / unknown .code:n =
+      { \msg_error:nnn { careerdossier-letter } { unknown-paper } {#1} } ,
     paper .value_required:n = true ,
     bodyfont .choices:nn =
       { serif , sans }
       { \tl_set_eq:NN \l__cdossier_letter_bodyfont_tl \l_keys_choice_tl } ,
+    bodyfont / unknown .code:n =
+      { \msg_error:nnn { careerdossier-letter } { unknown-bodyfont } {#1} } ,
     bodyfont .value_required:n = true ,
     medium .choices:nn =
       { print , screen }

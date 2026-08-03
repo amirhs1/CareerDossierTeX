@@ -1,0 +1,56 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: unknown-family-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'family' value 'committee' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'industry' (the default cover letter) and 'academic' (the academic cover-letter family).
+============================================================
+============================================================
+TEST 2: unknown-fontsize-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'fontsize' value '13pt' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are '10pt', '11pt', and '12pt'.
+============================================================
+============================================================
+TEST 3: unknown-margin-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'margin' value 'wide' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'normal' (one-inch margins) and 'narrow' (half-inch margins).
+============================================================
+============================================================
+TEST 4: unknown-paper-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'paper' value 'legal' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'letter' (US Letter) and 'a4' (ISO A4).
+============================================================
+============================================================
+TEST 5: unknown-bodyfont-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'bodyfont' value 'decorative' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'serif' (TeX Gyre Termes body) and 'sans' (TeX Gyre Heros body).
+============================================================
+============================================================
+TEST 6: unknown-medium-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'medium' value 'paper' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'print' (running header and 'Page N of M' folio) and 'screen' (neither).
+============================================================

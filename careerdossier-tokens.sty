@@ -39,15 +39,36 @@
     'margin'~(normal,~narrow).
   }
 
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so the accepted values are named here.
+%% Options are processed with \ProcessKeysOptions, which also reads the global
+%% \documentclass options, so a bad `fontsize' or `margin' on a class that
+%% forwards these keys is reported twice -- once by the class and once here.
+%% Each report names its own module, and both name the same accepted values.
+\msg_new:nnnn { careerdossier-tokens } { unknown-fontsize }
+  { Unknown~'fontsize'~value~'#1'~for~careerdossier-tokens. }
+  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+\msg_new:nnnn { careerdossier-tokens } { unknown-margin }
+  { Unknown~'margin'~value~'#1'~for~careerdossier-tokens. }
+  {
+    The~accepted~values~are~'normal'~(one-inch~margins)~and~
+    'narrow'~(half-inch~margins).
+  }
+
 \keys_define:nn { cdossier / tokens }
   {
     fontsize .choices:nn =
       { 10pt , 11pt , 12pt }
       { \tl_set_eq:NN \l__cdossier_tokens_fontsize_tl \l_keys_choice_tl } ,
+    fontsize / unknown .code:n =
+      { \msg_error:nnn { careerdossier-tokens } { unknown-fontsize } {#1} } ,
     fontsize .value_required:n = true ,
     margin .choices:nn =
       { normal , narrow }
       { \tl_set_eq:NN \l__cdossier_tokens_margin_tl \l_keys_choice_tl } ,
+    margin / unknown .code:n =
+      { \msg_error:nnn { careerdossier-tokens } { unknown-margin } {#1} } ,
     margin .value_required:n = true ,
     unknown .code:n =
       {

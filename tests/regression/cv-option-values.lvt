@@ -1,0 +1,39 @@
+% cv-option-values.lvt — rejected careerdossier-cv option values (#212).
+%
+% See resume-option-values.lvt for the contract these files assert. Each class
+% owns its own message set, so each needs its own baseline: the module name in
+% the message is part of what makes the error actionable.
+\input{regression-test}
+\documentclass{careerdossier-cv}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+
+\ExplSyntaxOn
+\NewDocumentCommand \cdossiertestSetOption { m }
+  { \keys_set:nn { cdossier / cv } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{unknown-fontsize-value-is-rejected}{
+  \cdossiertestSetOption{fontsize=9pt}
+}
+
+\TEST{unknown-margin-value-is-rejected}{
+  \cdossiertestSetOption{margin=wide}
+}
+
+\TEST{unknown-paper-value-is-rejected}{
+  \cdossiertestSetOption{paper=legal}
+}
+
+\TEST{unknown-bodyfont-value-is-rejected}{
+  \cdossiertestSetOption{bodyfont=decorative}
+}
+
+\TEST{unknown-medium-value-is-rejected}{
+  \cdossiertestSetOption{medium=paper}
+}
+
+\END
+\end{document}

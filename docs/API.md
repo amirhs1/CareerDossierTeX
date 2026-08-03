@@ -137,6 +137,13 @@ actually been verified.
 
 ### Options
 
+Every option below takes a fixed set of values. An unsupported value stops the
+build with a class error that names the option, the value supplied, the owning
+class, and the accepted values — so the accepted set never has to be looked up
+here to act on the error. `careerdossier-typography` and `careerdossier-tokens`
+report the same way for the options they accept when either is loaded directly
+as a package.
+
 #### `fontsize`
 
 Accepted values:
@@ -153,7 +160,7 @@ Default:
 11pt
 ```
 
-Any unsupported value should produce an actionable class error.
+Any unsupported value produces a class error naming the accepted values.
 
 `fontsize` selects one whole-point type scale for the entire document. It is
 the only input to type size; there is no per-element size option. The sizes it
@@ -189,7 +196,7 @@ narrow
 
 `normal` means one-inch margins and `narrow` means half-inch margins. The
 résumé defaults to `narrow`; the CV, letter, and statement classes default to
-`normal`. Unsupported values produce an actionable class error.
+`normal`. Unsupported values produce a class error naming the accepted values.
 
 `margin` and `fontsize` together decide line length. Measured in TeX Gyre
 Termes on US Letter, full lines of running prose hold roughly:
@@ -237,8 +244,8 @@ a4
 The default is `letter`. `a4` selects an ISO A4 media box while retaining the
 selected `normal` or `narrow` margin preset, font size, spacing, and
 page-furniture design. Because A4 is slightly narrower and taller than US
-Letter, line and page breaks may change. Unsupported values produce an
-actionable class error.
+Letter, line and page breaks may change. Unsupported values produce a class
+error naming the accepted values.
 
 #### `bodyfont`
 
@@ -253,8 +260,8 @@ The default is `serif`, preserving the existing TeX Gyre Termes body and TeX
 Gyre Heros headings. `sans` selects TeX Gyre Heros for the ordinary document
 body while headings remain TeX Gyre Heros. The option does not change font
 size, semantic typography roles, spacing, geometry, or page furniture.
-Unsupported values produce an actionable class error. Arbitrary font names and
-per-role font selection are not supported.
+Unsupported values produce a class error naming the accepted values. Arbitrary
+font names and per-role font selection are not supported.
 
 #### `medium`
 
@@ -279,8 +286,8 @@ multi-page dossier in order after it is put down.
 
 The option changes only whether furniture is emitted. Page geometry is
 unchanged, so the text block sits in exactly the same place under both values
-and switching `medium` cannot reflow a document. Unsupported values produce an
-actionable class error naming the accepted values.
+and switching `medium` cannot reflow a document. Unsupported values produce a
+class error naming the accepted values.
 
 ### Fixed settings
 
@@ -893,7 +900,8 @@ The class accepts the same value sets as the résumé class:
 | `medium` | `print`, `screen` | `print` |
 
 English and the monochrome theme remain fixed. Unsupported options or values
-must produce an actionable class error rather than being ignored.
+must produce a class error rather than being ignored, and the error for an
+unsupported value must name the accepted set.
 
 Section, entry, rule, bullet-list, and manual-publication-list metrics derive
 from the shared calibrated tokens and scale with `fontsize`. The CV intentionally
@@ -1065,7 +1073,7 @@ prose rhythm, or letterhead spacing. Both letter families follow the shared
 page-furniture policy: one-page output is clean, while multi-page output uses
 `Cover Letter` as its continuation label. The academic family does not
 introduce new recipient keys or change the industry family's defaults. Unknown
-family values must produce an actionable class error.
+family values must produce a class error naming the accepted values.
 
 ### Historical exclusions in `v0.2.0`
 
