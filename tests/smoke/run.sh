@@ -7,6 +7,13 @@
 #   fail  — must stop with a nonzero exit, and its log must contain the expected
 #           diagnostic substring (proving the *intended* error fired, not an
 #           unrelated one)
+#   fail-once
+#         — as `fail', plus a second substring that must appear exactly once.
+#           A rejected class option is owned by one module, so it must be
+#           reported by one module (issue #232). Proving that needs the whole
+#           document processed, so these fixtures run without -halt-on-error:
+#           under it TeX stops at the first report and a second one further
+#           down the preamble would never reach the log.
 #
 # This is the supported-build and required-failure gate for the résumé class.
 # It complements the layout runner (page stress) and the extraction runner
@@ -59,9 +66,14 @@ echo
 # mathematics and intentionally loads neither Unicode-math package.
 allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOff|Neither unicode-math nor lua-unicode-math|rerun|Reading font info|geometry|hyperref|fancyhdr'
 
-# Fixture expectations: "<basename> <pass|fail> [expected log substring]".
-# The substring is matched against the log with whitespace flattened, so it may
-# span the log's wrapped lines.
+# Fixture expectations:
+#
+#   "<basename> <pass|fail> [expected log substring]"
+#   "<basename> fail-once|<expected substring>|<substring expected exactly once>"
+#
+# Substrings are matched against the log with whitespace flattened, so they may
+# span the log's wrapped lines. The `fail-once' pair is split on the last `|',
+# so neither substring may contain one.
 cases=(
   "resume-valid pass"
   "resume-12pt pass"
@@ -81,7 +93,7 @@ cases=(
   "resume-medium-screen pass"
   "resume-density-option fail|Supported options are 'fontsize', 'margin', 'paper', 'bodyfont', and 'medium'."
   "resume-missing-name fail|required profile field 'name' is not"
-  "resume-bad-fontsize fail|Unknown 'fontsize' value '9pt' for careerdossier-resume."
+  "resume-bad-fontsize fail-once|Unknown 'fontsize' value '9pt' for careerdossier-resume.|Unknown 'fontsize' value '9pt'"
   "resume-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-resume."
   "resume-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-resume."
   "resume-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-resume."
@@ -105,7 +117,7 @@ cases=(
   "cv-medium-screen pass"
   "cv-density-option fail|Supported options are 'fontsize', 'margin', 'paper', 'bodyfont', and 'medium'."
   "cv-missing-name fail|required profile field 'name' is not"
-  "cv-bad-fontsize fail|Unknown 'fontsize' value '9pt' for careerdossier-cv."
+  "cv-bad-fontsize fail-once|Unknown 'fontsize' value '9pt' for careerdossier-cv.|Unknown 'fontsize' value '9pt'"
   "cv-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-cv."
   "cv-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-cv."
   "cv-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-cv."
@@ -129,8 +141,8 @@ cases=(
   "letter-sans-body pass"
   "letter-medium-screen pass"
   "letter-bad-family fail|Unknown 'family' value 'committee' for careerdossier-letter."
-  "letter-bad-fontsize fail|Unknown 'fontsize' value '13pt' for careerdossier-letter."
-  "letter-bad-margin fail|Unknown 'margin' value 'wide' for careerdossier-letter."
+  "letter-bad-fontsize fail-once|Unknown 'fontsize' value '13pt' for careerdossier-letter.|Unknown 'fontsize' value '13pt'"
+  "letter-bad-margin fail-once|Unknown 'margin' value 'wide' for careerdossier-letter.|Unknown 'margin' value 'wide'"
   "letter-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-letter."
   "letter-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-letter."
   "letter-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-letter."
@@ -159,8 +171,8 @@ cases=(
   "statement-empty-type fail|The key 'cdossier/statement/type' requires a value"
   "statement-bad-type fail|Unknown statement type 'grant'"
   "statement-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-statement."
-  "statement-bad-fontsize fail|Unknown 'fontsize' value '13pt' for careerdossier-statement."
-  "statement-bad-margin fail|Unknown 'margin' value 'wide' for careerdossier-statement."
+  "statement-bad-fontsize fail-once|Unknown 'fontsize' value '13pt' for careerdossier-statement.|Unknown 'fontsize' value '13pt'"
+  "statement-bad-margin fail-once|Unknown 'margin' value 'wide' for careerdossier-statement.|Unknown 'margin' value 'wide'"
   "statement-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-statement."
   "statement-unknown-option fail|Unknown class option 'format'"
   "statement-unknown-meta-key fail|Unknown \CDossierStatementSetup key"
@@ -172,13 +184,22 @@ cases=(
 
 for entry in "${cases[@]}"; do
   base="${entry%% *}"; rest="${entry#* }"
-  expect="${rest%%|*}"; needle=""
+  expect="${rest%%|*}"; needle=""; once=""
   [ "$rest" != "$expect" ] && needle="${rest#*|}"
+  if [ "$expect" = "fail-once" ]; then once="${needle##*|}"; needle="${needle%|*}"; fi
   tex="$base.tex"
   echo "== $tex ($expect) =="
   if [ ! -f "$tex" ]; then echo "  MISSING fixture $tex"; fail=1; continue; fi
 
-  lualatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1
+  # `fail-once' counts reports across the whole preamble, so it must not stop
+  # at the first one. Every other expectation keeps -halt-on-error. The flag is
+  # spelled out in both branches rather than held in an array, because an empty
+  # array expansion is an unbound-variable error under `set -u' in bash 3.2.
+  if [ "$expect" = "fail-once" ]; then
+    lualatex -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1
+  else
+    lualatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1
+  fi
   rc=$?
 
   case "$expect" in
@@ -203,7 +224,7 @@ for entry in "${cases[@]}"; do
         echo "  build OK, log clean"
       fi
       ;;
-    fail)
+    fail|fail-once)
       if [ "$rc" -eq 0 ]; then
         echo "  EXPECTED FAILURE but compile succeeded"; fail=1; continue
       fi
@@ -216,6 +237,15 @@ for entry in "${cases[@]}"; do
         | sed 's/(careerdossier-[a-z]*)[[:space:]]*/ /g' | tr -s ' ')"
       if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
         echo "  FAILED for the wrong reason: expected '$needle' in the log"; fail=1
+      elif [ -n "$once" ]; then
+        # -o prints one line per match, so this counts occurrences rather than
+        # matching lines; the log has already been flattened to a single line.
+        count="$(printf '%s' "$flat" | grep -oF "$once" | wc -l | tr -d ' ')"
+        if [ "$count" != "1" ]; then
+          echo "  REPORTED $count TIMES, expected exactly 1: '$once'"; fail=1
+        else
+          echo "  failed as intended, reported once ($needle)"
+        fi
       else
         echo "  failed as intended${needle:+ ($needle)}"
       fi

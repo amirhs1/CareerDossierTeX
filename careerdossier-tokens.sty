@@ -41,10 +41,6 @@
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
 %% without saying what that set is, so the accepted values are named here.
-%% Options are processed with \ProcessKeysOptions, which also reads the global
-%% \documentclass options, so a bad `fontsize' or `margin' on a class that
-%% forwards these keys is reported twice -- once by the class and once here.
-%% Each report names its own module, and both name the same accepted values.
 \msg_new:nnnn { careerdossier-tokens } { unknown-fontsize }
   { Unknown~'fontsize'~value~'#1'~for~careerdossier-tokens. }
   { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
@@ -76,7 +72,15 @@
           { \l_keys_key_str }
       } ,
   }
-\ProcessKeysOptions { cdossier / tokens }
+%% \ProcessKeysPackageOptions reads local package options only, never the
+%% global \documentclass list, matching careerdossier-typography and
+%% careerdossier-components. Every public class owns its own `fontsize' and
+%% `margin' surface and forwards the *resolved* value with
+%% \PassOptionsToPackage, so a class option reaches this package only after
+%% that class has validated it -- and a value that class rejected is reported
+%% once, by the class that owns it. Direct package users receive the same
+%% validation contract through \usepackage's own option list.
+\ProcessKeysPackageOptions { cdossier / tokens }
 
 %% Resolved base metrics. Keep one public token for body size and one for body
 %% leading: duplicate aliases make it unclear which value downstream modules
