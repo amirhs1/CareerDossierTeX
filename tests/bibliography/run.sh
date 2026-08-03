@@ -27,6 +27,31 @@ fi
 if grep -Eiq '(^| - )(WARN|ERROR) -' "$base.blg"; then
   echo "  BIBER WARNINGS/ERRORS:"
   grep -Ei '(^| - )(WARN|ERROR) -' "$base.blg" | sed 's/^/    /'
+  # If Biber rejected the `date` of every entry that has one, the fault is its
+  # date parser, not this fixture's data: the years vanish and the ydnt sort
+  # order silently comes out wrong (issue #211). Counting `date` fields rather
+  # than entries keeps this correct if a `year`-only entry is added later. Biber
+  # is a PAR-packed binary that unpacks its Perl runtime -- including the
+  # DateTime modules only the `date` path uses -- into a per-user cache under
+  # TMPDIR, which macOS purges periodically. An incomplete cache breaks `date`
+  # while the legacy `year` field, which needs no DateTime, keeps working. Name
+  # that here so the next reader does not re-derive it; the gate still fails.
+  dated="$(grep -Ec '^[[:space:]]*date[[:space:]]*=' publications.bib || true)"
+  rejected="$(grep -Eic "Invalid format .* of date field" "$base.blg" || true)"
+  if [ "$rejected" -gt 0 ] && [ "$rejected" -eq "$dated" ]; then
+    echo
+    echo "  DIAGNOSIS: Biber rejected the 'date' field of all $dated entries."
+    echo "  This is a local Biber install fault, not a fixture-data problem."
+    echo "  The same fixture passes in CI on the pinned TeX Live container, so"
+    echo "  it is this install rather than Biber in general. To repair it:"
+    echo
+    echo "    rm -rf \"\${TMPDIR:-/tmp}\"/par-*   # drop Biber's unpacked cache"
+    echo "    biber --version                   # re-unpack, then re-run"
+    echo
+    echo "  If that does not help, see CONTRIBUTING.md (\"BibLaTeX/Biber"
+    echo "  fixture\"). Do not switch the fixture to 'year=' and do not relax"
+    echo "  this gate: either would hide a genuinely wrong bibliography."
+  fi
   exit 1
 fi
 unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' \
