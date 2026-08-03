@@ -309,13 +309,29 @@ The split is a mechanism change alone: both ratios start at the single value
 Retuning either ratio is deliberately out of scope until specific values are
 proposed against the calibrated type scale.
 
-One path does not honour the closing token. Under `\DocumentMetadata{tagging=on}`
-LaTeX Lab replaces LaTeX's list internals with its own block templates, whose
-closing spacing does not come from `\@topsepadd`, so the tagged build renders
-LaTeX Lab's own gap below a list (12 pt at the résumé default) rather than the
-token's. That divergence is not introduced by #191 — it is present with a single
-shared list-edge token too — and the tagged fixture therefore asserts the
-opening edge only. It is tracked as #193.
+The tagged path reaches the same closing edge by a different route (#193). Under
+`\DocumentMetadata{tagging=on}` LaTeX Lab replaces LaTeX's list internals with
+its own block templates, and `\@topsepadd` measures 0 pt inside a tagged list,
+so the mechanism above cannot reach that path at all. Its block template does
+expose the closing edge, as two keys — `end-vspace`, the counterpart of
+`topsep`, and `end-extra-vspace`, the counterpart of `partopsep` — and LaTeX
+Lab's enumitem emulation maps the two opening keys but nothing to that pair, so
+a list that sets `partopsep = 0pt` still closed with the interface default of
+`end-extra-vspace`: `\partopsep` as `article` left it, a fixed 3 pt that no
+token owns. `careerdossier-components.sty` therefore declares one
+CDossier-owned key, `cdossier-closing-edge`, that sets both, and the tagged
+branch of each list environment names that key instead of calling
+`\__cdossier_components_listedge_after:`. Keeping the LaTeX Lab key names in one
+place also keeps the classes free of a testphase interface. If a later LaTeX Lab
+withdraws those keys, the CDossier key becomes a no-op that still consumes its
+value, so a tagged build warns once and keeps LaTeX Lab's own closing spacing
+instead of stopping at an unknown-key error.
+
+Until #193 that divergence rendered LaTeX Lab's own gap below a list — 12 pt at
+the résumé default against the token's 4.25 pt — which was enough to move the
+last line of the one-page résumé example 13 pt down the page relative to the
+untagged build of the same source. It was not introduced by #191; it was present
+with a single shared list-edge token too.
 
 The four `Prose…` heading tokens exist because the entry-structured section
 tokens above them cannot be reused in a continuous-prose class (#177). Those

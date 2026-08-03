@@ -115,11 +115,9 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   No class, option, key, command, or environment changed. See
   [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
-  One path is unaffected by the new token: under
-  `\DocumentMetadata{tagging=on}` the space below a list comes from LaTeX Lab's
-  own list implementation rather than from
-  `\CDossierRecordListEdgeBelowSkip`. That is pre-existing behavior, not a
-  change in this release; it is tracked as ([#193]).
+  Both tokens apply under `\DocumentMetadata{tagging=on}` as well. Reaching the
+  closing edge on that path took a separate mechanism, recorded under ([#193])
+  below.
 
 - **BREAKING (design token):** every public vertical-spacing token now follows
   one naming convention, `\CDossier<Family><Scope><Position>Skip`. The family
@@ -183,6 +181,39 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- Under `\DocumentMetadata{tagging=on}`, the space below a bullet or
+  publication list now comes from `\CDossierRecordListEdgeBelowSkip`, like the
+  space above it and like both edges on the untagged path. It came from LaTeX
+  Lab's own block default before — 12 pt against the token's 4.25 pt at the
+  résumé default. **Tagged builds reflow; untagged builds are unaffected.**
+  ([#193])
+
+  A tagging switch is not supposed to change where text sits on the page, and
+  it did: the tagged build of `resume-english` placed 99 of its 206 words lower
+  than the untagged build of the same source, drifting from 7.72 pt after the
+  first list to 13.0 pt by the last line — about a full line of body text, and
+  enough to push a résumé onto a second page that the untagged build fits on
+  one. After this change, `pdftotext -bbox` reports every word of all eleven
+  supported examples at the identical vertical position in both builds.
+
+  The mechanism the untagged path uses cannot reach a tagged list: LaTeX Lab
+  replaces LaTeX's list internals, and the register that carries the closing
+  edge measures 0 pt there. The closing token is now applied through LaTeX Lab's
+  own block-template keys instead. Those are testphase interfaces, so their
+  withdrawal is handled rather than assumed: a build whose LaTeX Lab no longer
+  offers them warns once and keeps LaTeX Lab's spacing, instead of stopping at
+  an error. Tagged output remains an opt-in preview and carries no PDF/UA,
+  WCAG, or ATS conformance claim.
+
+- The CV's `CDossierPublications` list now builds with tagging on. It passed
+  enumitem's `leftmargin=*` calculation to LaTeX Lab's emulation, which parses
+  that key as a dimension, so a tagged build of any CV with a manual
+  publication list stopped with `Missing number, treated as zero` and produced
+  no PDF — including `examples/academic/cv-academic.tex`. The list now takes
+  the same explicitly measured label box on the tagged path that
+  `CDossierItemize` already took, reproducing the untagged `leftmargin` and
+  `labelwidth` exactly. Untagged output is unchanged. ([#218])
+
 - The running header and the `Page N of M` folio now sit in the vertical centre
   of the top and bottom margins at every `fontsize` and `margin` combination and
   on both paper sizes. They were positioned by `geometry`'s untouched defaults —
@@ -229,6 +260,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 [#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
+[#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 
 ## [0.6.0] - 2026-07-30
 
