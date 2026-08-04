@@ -321,53 +321,73 @@
     %% \CDossierSharedHeaderBelowSkip had to clear whichever of those was
     %% largest in *any* class, so raising a section gap in one family spent
     %% vertical space in the other two, and the letter carried a floor set by a
-    %% boundary it does not have. All three ship at the single value that token
-    %% carried, so the split is mechanism-only and no document reflows;
-    %% retuning any of them is a separate decision under issue #206.
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordHeaderBelowSkip { 0.8125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierProseHeaderBelowSkip { 0.8125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierLetterHeaderBelowSkip { 0.8125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionAboveSkip { 0.6875 }
+    %% boundary it does not have. The split shipped mechanism-only, with all
+    %% three at the single value the shared token carried; issue #206 then
+    %% retuned them together. They remain equal because each still clears its
+    %% own neighbour with room to spare, not because one value is imposed on
+    %% all three -- the point of #223 is that they may now diverge freely.
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordHeaderBelowSkip { 0.9375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseHeaderBelowSkip { 0.9375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterHeaderBelowSkip { 0.9375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionAboveSkip { 0.875 }
     %% Issue #169: measured from the section heading's baseline, not from the
     %% bottom of its line box. The value has a hard lower bound -- the heading's
     %% depth, about 0.20 line at every supported size -- because a smaller
     %% offset would draw the rule through descender ink. 0.3125 leaves 1.63 pt
     %% of clearance at 11 pt and sits between the two distances it replaces
     %% (2.28 pt under a heading without descenders, 4.80 pt under one with).
-    %% It is also the smallest sixteenth that clears the descender, so the
-    %% normalized scale keeps it rather than moving to a smaller grid step.
+    %%
+    %% Issue #206: this comment used to claim 0.3125 was the smallest sixteenth
+    %% that clears the descender. It is not -- 0.25 also passes
+    %% `tests/smoke/section-rule-baseline.inc' at all three body sizes. The
+    %% value is kept for the clearance it leaves, not because a smaller grid
+    %% step is unavailable.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionRuleGapSkip { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.4375 }
     %% Issue #177: the heading rhythm of a continuous-prose document -- today
     %% the statement class, the only one with headings and prose paragraph
     %% spacing at once. It cannot reuse the four tokens above, which are
     %% calibrated for a ruled heading in a document whose paragraphs are
     %% separated by nothing (\CDossierRecordParSkip is 0). A prose statement
-    %% separates its paragraphs by \CDossierProseParSkip (0.50), so a heading
-    %% gap must first exceed that before it separates anything at all: at
-    %% 0.375 the space opening a section would be *narrower* than the space
-    %% between two paragraphs of one section.
+    %% separates its paragraphs by \CDossierProseParSkip (0.25), so a heading
+    %% gap must first exceed that before it separates anything at all.
     %%
-    %% The pair is therefore stated against the paragraph gap: 1.50 above is
-    %% three times it, 0.75 below is one and a half times it, and the 2:1
-    %% ratio between them binds a heading to the text it introduces rather
+    %% The pair is therefore stated against the paragraph gap: 0.875 above is
+    %% three and a half times it, 0.375 below is one and a half times it, and
+    %% the ratio between them binds a heading to the text it introduces rather
     %% than leaving it floating between two blocks. The subsection pair keeps
-    %% that shape one step down (1.00 / 0.625): still clear of the paragraph
+    %% that shape one step down (0.625 / 0.3125): still clear of the paragraph
     %% gap, but unambiguously tighter than the section it sits inside.
+    %%
+    %% Issue #206 retuned all four. The pair relation is a floor -- above is at
+    %% least twice below -- rather than an equality, because the ratio of the
+    %% tokens is not the ratio a reader perceives: both gaps are padded by the
+    %% same line-box white and a heading spends part of its own below-gap on
+    %% its deeper font box, so a pair at 2:1 in tokens renders wider than 2:1
+    %% in white. Measured on the built statement at 12 pt, this pair renders
+    %% 9.65 pt above against 3.27 pt below -- 2.95:1. The subsection pair
+    %% renders 7.03 / 2.68, or 2.62:1. `tests/regression/tokens-invariants.lvt'
+    %% asserts the floor at 10/11/12 pt.
+    %%
+    %% One consequence is easy to mis-state: a section that opens directly with
+    %% a subsection does *not* take the subsection's above-gap. `\@startsection'
+    %% guards its before-skip with `\if@nobreak', which is true immediately
+    %% after a heading, so the before-skip is never added there and
+    %% \CDossierProseSectionBelowSkip owns that boundary.
     %%
     %% Each of these four owns the complete gap, including the \parskip the
     %% adjacent paragraph contributes; see the sectioning block in
     %% careerdossier-statement.cls for how that is arranged and why the two
     %% below-tokens must stay strictly greater than \CDossierProseParSkip.
-    \__cdossier_tokens_set_skip:Nn \CDossierProseSectionAboveSkip { 1.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierProseSectionBelowSkip { 0.75 }
-    \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionAboveSkip { 1.00 }
-    \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionBelowSkip { 0.625 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSectionAboveSkip { 0.875 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSectionBelowSkip { 0.375 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionAboveSkip { 0.625 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionBelowSkip { 0.3125 }
     %% Issue #204: \CDossierRecordEntryAboveSkip is the sole inter-entry token.
     %% The retired \CDossierRecordEntryBelowSkip claimed the same boundary from
     %% the other side and lost every max it entered -- to this token between two
     %% entries, and to \CDossierRecordSectionAboveSkip at a section end.
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryAboveSkip { 0.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryAboveSkip { 0.4375 }
     %% Issue #204: the floor for the entry heading -> body boundary, emitted with
     %% `\addvspace' rather than `\vspace'. As a `\vspace' it was extra space that
     %% *added* to whatever the body opened with, so a bullet list sat at
@@ -382,31 +402,42 @@
     %% 10pt, 4.7 pt at 11pt, and 4.81 pt at 12pt: an effective ratio drifting
     %% from 0.375 down to 0.332 of a line as the body size grew. The lists now
     %% set `partopsep = 0pt' and this ratio absorbs the 3 pt, so the same edge
-    %% is reproduced (3.75 / 4.25 / 4.53 pt) and rescales properly. 0.3125 is
-    %% the sixteenth nearest that drifting ratio that also keeps the list edge
-    %% below \CDossierRecordSectionBelowSkip (0.375); at 0.375 a list edge
-    %% would read as wide as the gap that opens a section.
+    %% is reproduced and rescales properly.
     %%
     %% Issue #191: the edge above a list and the edge below it are separate
     %% tokens, because LaTeX's `\list' offers only one `topsep' for both and so
-    %% could not express a different value at the two ends. The split is a
-    %% mechanism change alone: both ratios start at the single value #176
-    %% calibrated, so the rendered edge is unchanged at every supported size.
-    %% Retuning either ratio is deliberately out of scope until specific values
-    %% are proposed against the calibrated type scale.
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordListEdgeAboveSkip { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordListEdgeBelowSkip { 0.3125 }
+    %% could not express a different value at the two ends. The split shipped
+    %% as a mechanism change alone, both ratios at the single value #176
+    %% calibrated.
+    %%
+    %% Issue #206 gave them the asymmetry the split exists for: a bullet list
+    %% belongs to the entry above it, so it sits closer to that entry than to
+    %% the next one. Measured on the résumé at 11 pt, 2.30 pt above the list
+    %% against 4.99 pt below -- 2.17:1.
+    %%
+    %% The opening edge is not a free choice. 0.25 is a hard floor imposed by
+    %% Poppler's reading order, not by this design: below it the entry head's
+    %% date column extracts after the bullets. The column extracts with its
+    %% entry at 0.25 and reorders at 0.1875, identically for the résumé and CV
+    %% at 10pt, 11pt, and 12pt, so all of the asymmetry has to come from the
+    %% closing edge. See the block comment in careerdossier-components.sty,
+    %% `tokens-invariants', the `*-entry-dates-*' extraction fixtures, and
+    %% docs/ATS-EXTRACTION.md 3.4.
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordListEdgeAboveSkip { 0.25 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordListEdgeBelowSkip { 0.50 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordItemSepSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordParSkip { 0.00 }
-    \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.25 }
     %% Issue #222: \CDossierProseParSkip set \parskip for both the letter and
     %% the statement, but the statement's heading below-tokens must stay
     %% strictly greater than it (see the comment above), while the letter has
     %% no heading scale to bound it and would prefer a more generous gap
     %% between its unindented block paragraphs. Splitting the token per family
-    %% lets either retune independently; both ship at the same 0.50 value so
-    %% the split itself is mechanism-only and no document reflows.
-    \__cdossier_tokens_set_skip:Nn \CDossierLetterParSkip { 0.50 }
+    %% lets either retune independently; both shipped at the same 0.50 value,
+    %% so the split itself was mechanism-only. Issue #206 then tightened both
+    %% to 0.25 -- still equal, but now by measurement rather than by the split's
+    %% starting condition, and either may move alone from here.
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterParSkip { 0.25 }
     %% Issue #204: the recipient block prints one field per line and separated
     %% them with a bare `\\', so the only vertical distance in the letter that no
     %% token expressed was the one inside its most structured block. 0.00
@@ -416,10 +447,14 @@
     %% Issue #204: the letter body's two edges are a pair, and naming only the
     %% opening one left the closing one borrowing \CDossierLetterBlockSkip -- a
     %% token for the boundaries *between* letterhead blocks, not for the body.
-    %% The default reproduces that borrowed value exactly.
-    \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyAboveSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyBelowSkip { 0.50 }
-    \__cdossier_tokens_set_skip:Nn \CDossierLetterSignatureGapSkip { 2.25 }
+    %% The pair shipped at that borrowed value, which made it invisible: the
+    %% salutation -> body gap was identical to the gap between two body
+    %% paragraphs. Issue #206 lifted it clear of both, so the body now reads as
+    %% a framed block. The two must stay equal -- the frame is symmetric
+    %% because the body is bounded by peers, not opened by a heading.
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyAboveSkip { 0.625 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyBelowSkip { 0.625 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterSignatureGapSkip { 2.00 }
   }
 
 \__cdossier_tokens_resolve:

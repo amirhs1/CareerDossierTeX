@@ -5,7 +5,7 @@ TEST 1: gaps-with-no-optional-fields
 ============================================================
 addvspace = 3.625pt
 addvspace = 2.71875pt
-addvspace = 11.78125pt
+addvspace = 13.59375pt
 ============================================================
 ============================================================
 TEST 2: gaps-with-every-optional-field
@@ -15,7 +15,7 @@ addvspace = 2.71875pt
 addvspace = 2.71875pt
 addvspace = 2.71875pt
 addvspace = 2.71875pt
-addvspace = 11.78125pt
+addvspace = 13.59375pt
 ============================================================
 ============================================================
 TEST 3: below-token-is-the-prose-family-token

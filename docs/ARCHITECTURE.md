@@ -265,29 +265,29 @@ retaining a small, inspectable spacing vocabulary.
 |---|---:|---:|---:|---:|
 | `\CDossierSharedHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierSharedHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
-| `\CDossierRecordHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
-| `\CDossierProseHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
-| `\CDossierLetterHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
-| `\CDossierRecordSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
+| `\CDossierRecordHeaderBelowSkip` | 0.9375 | 11.25 pt | 12.75 pt | 13.59375 pt |
+| `\CDossierProseHeaderBelowSkip` | 0.9375 | 11.25 pt | 12.75 pt | 13.59375 pt |
+| `\CDossierLetterHeaderBelowSkip` | 0.9375 | 11.25 pt | 12.75 pt | 13.59375 pt |
+| `\CDossierRecordSectionAboveSkip` | 0.875 | 10.5 pt | 11.9 pt | 12.6875 pt |
 | `\CDossierRecordSectionRuleGapSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierRecordSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
-| `\CDossierProseSectionAboveSkip` | 1.50 | 18.0 pt | 20.4 pt | 21.75 pt |
-| `\CDossierProseSectionBelowSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
-| `\CDossierProseSubsectionAboveSkip` | 1.00 | 12.0 pt | 13.6 pt | 14.5 pt |
-| `\CDossierProseSubsectionBelowSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
-| `\CDossierRecordEntryAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierRecordSectionBelowSkip` | 0.4375 | 5.25 pt | 5.95 pt | 6.34375 pt |
+| `\CDossierProseSectionAboveSkip` | 0.875 | 10.5 pt | 11.9 pt | 12.6875 pt |
+| `\CDossierProseSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
+| `\CDossierProseSubsectionAboveSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
+| `\CDossierProseSubsectionBelowSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierRecordEntryAboveSkip` | 0.4375 | 5.25 pt | 5.95 pt | 6.34375 pt |
 | `\CDossierRecordEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
-| `\CDossierRecordListEdgeAboveSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierRecordListEdgeBelowSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
+| `\CDossierRecordListEdgeAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierRecordListEdgeBelowSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierRecordItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierRecordParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
-| `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierProseParSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
+| `\CDossierLetterParSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierLetterRecipientLineGapSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierLetterBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterBodyAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterBodyBelowSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
-| `\CDossierLetterSignatureGapSkip` | 2.25 | 27.0 pt | 30.6 pt | 32.625 pt |
+| `\CDossierLetterBodyAboveSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
+| `\CDossierLetterBodyBelowSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
+| `\CDossierLetterSignatureGapSkip` | 2.00 | 24.0 pt | 27.2 pt | 29.0 pt |
 
 `\CDossierRecordSectionRuleGapSkip` is the one token whose ratio is **not** a
 visible gap. Since #169 it is measured from the section heading's baseline, so
