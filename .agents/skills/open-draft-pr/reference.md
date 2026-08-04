@@ -134,10 +134,16 @@ Use only labels already defined by `scripts/setup-labels.sh`.
 | Typography implementation | `type:feature`, `area:typography` |
 | GitHub Actions change | `type:ci`, `area:build` |
 | Theme restructuring without behavior change | `type:refactor`, `area:theme` |
-| Claude Code / Codex agent tooling or sandbox config | `type:ci`, `area:agents` |
+| Agent instructions, skills, or workflow docs | `type:docs`, `area:agents` |
+| Agent sandbox, permissions, or settings config | `type:ci`, `area:agents` |
 
 A PR may have several area labels but should normally have exactly one primary
 type label.
+
+The two `area:agents` rows differ by what the change *is*, not what it touches.
+Editing `AGENTS.md`, a `SKILL.md`, or a `reference.md` is documentation.
+Changing `.claude/settings.json` or `.codex/config.toml` alters how a tool is
+permitted to execute, which is closer to build and CI configuration.
 
 ## Status transitions
 

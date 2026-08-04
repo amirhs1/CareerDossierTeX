@@ -120,7 +120,7 @@ Use:
 type/short-description
 ```
 
-Recommended prefixes:
+Allowed prefixes:
 
 ```text
 feat/
@@ -130,7 +130,10 @@ test/
 ci/
 refactor/
 release/
+chore/
 ```
+
+`docs/NAMING-CONVENTION.md` section 3 is the canonical list.
 
 Examples:
 
@@ -758,6 +761,13 @@ Update documentation in the same pull request as the related behavior.
 - dependency direction changes;
 - a new shared package is introduced;
 - language, testing, or build strategy changes.
+
+### Update `ATS-EXTRACTION.md` when:
+
+- extracted text content, order, or spacing changes;
+- tagged-structure behavior or a validator result changes;
+- a fixture, baseline, or extractor in the extraction or tagging suites changes;
+- the reproducibility or screen-reader procedure changes.
 
 ### Update `ROADMAP.md` when:
 
