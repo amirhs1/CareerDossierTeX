@@ -30,8 +30,13 @@ existing remote metadata unless the current work clearly requires a change.
 
 If directly authorized work has no focused issue, stop before the first push and
 ask the maintainer whether to create or select one and which release metadata
-applies. Do not open a PR with milestone, Phase, or Priority omitted unless the
-maintainer explicitly authorizes that exception.
+applies. Do not invent a milestone, Phase, or Priority to fill the gap.
+
+Once a focused issue exists, its own metadata governs: inherit what the issue
+has, and where the issue itself has no Phase or Priority, leave that PR field
+unset and name the missing issue field — see "Project field values" and
+"Verification". The rule above is about opening a PR with no focused issue at
+all, not about an issue whose fields are incomplete.
 
 If GitHub metadata conflicts with repository documentation, report the conflict
 and preserve the existing remote value until the maintainer decides.

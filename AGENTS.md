@@ -32,8 +32,10 @@ If sources conflict, report the conflict instead of silently choosing one.
 Use these canonical sources when they exist:
 
 - `README.md` — supported behavior and user-facing status
-- `AI-POLICY.md` — AI use, disclosure, attribution, security, and accountability
+- `AI-POLICY.md` — AI use, disclosure, attribution, security, accountability,
+  and the map of this instruction file set
 - `CONTRIBUTING.md` — contribution, test, PR, CI, and release workflow
+- `.github/pull_request_template.md` — the canonical PR section set
 - `docs/NAMING-CONVENTION.md` — naming for GitHub objects and releases
 - `.agents/skills/open-draft-pr/reference.md` — draft PR and Project metadata workflow
 - `.agents/skills/release-notes/reference.md` — CHANGELOG and GitHub Release workflow

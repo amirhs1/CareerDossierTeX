@@ -300,23 +300,21 @@ to postpone tests already known to be necessary for an implementation issue.
 Test-as-you-go is not one uniform activity. What "the smallest relevant test"
 means depends on what the module owns, so match the test type to the concern:
 
-- **Logic-bearing modules** — `careerdossier-base.sty` (metadata, field
-  presence, separator logic) and the non-visual parts of
-  `careerdossier-typography.sty` (engine checks,
-  role dispatch) and `careerdossier-biblatex.sty` (author matching and fixed
-  profile behavior) — carry behavior that can be asserted directly. Write a
-  focused `l3build` regression test (`.lvt` source with a saved `.tlg` baseline) per
-  module as the behavior is added, in the same rhythm as writing a `test_*.py`
-  beside each Python module. This is where a pre-implementation failing test is
-  usually practical and most valuable.
-- **Layout classes** — `careerdossier-resume.cls`,
-  `careerdossier-letter.cls`, `careerdossier-cv.cls`, and
-  `careerdossier-statement.cls` — own page geometry and visual result, which no
-  log diff fully captures. Cover them with smoke tests (compiles clean, expected
-  diagnostics), extraction tests (text present and in logical order), and a
-  small set of reviewed reference PDFs. Final layout correctness stays a human
-  visual check. Do not force brittle per-line-break or per-metric assertions
-  onto a class before its design has settled.
+- **Observable logic** — values, options, errors, or emitted structure — can be
+  asserted directly by a log diff. Write a focused `l3build` regression test
+  (`.lvt` source with a saved `.tlg` baseline) under `tests/regression/` as the
+  behavior is added, in the same rhythm as writing a `test_*.py` beside each
+  Python module. This is where a pre-implementation failing test is usually
+  practical and most valuable. **No module is exempt.** Every shared package and
+  every class already has such coverage — 28 `.lvt`/`.tlg` pairs — so extend the
+  existing file for that module rather than assuming a class does not need one.
+- **Layout behavior** — the visual result the classes own — is what no log diff
+  fully captures, and it takes coverage *in addition to* the regression test:
+  smoke tests (compiles clean, expected diagnostics), extraction tests (text
+  present and in logical order), tagging fixtures, and a small set of reviewed
+  reference PDFs. Final layout correctness stays a human visual check. Do not
+  force brittle per-line-break or per-metric assertions onto a class before its
+  design has settled.
 
 When a change spans both — a shared package edit that both classes render — add
 or update the unit-level regression for the shared logic *and* re-run the smoke,
@@ -419,20 +417,26 @@ or in the same change as — the first module whose coverage depends on it, rath
 than accumulating `.lvt` sources that no runner can execute. Until the harness
 lands, record the specific regression tests owed as explicit, tracked debt.
 
-### Phase 1 coverage expectations
+### Coverage expectations
 
-Changes affecting shared packages should test both supported classes.
+Changes affecting a shared package should test every affected class. There are
+four: résumé, cover letter (industry and academic families), academic CV, and
+statement.
 
-Minimum smoke tests include:
+`AGENTS.md` ("Build and test") states the coverage matrix in full. In summary,
+cover the relevant parts of:
 
-1. valid résumé;
-2. valid cover letter;
-3. missing required `name`;
-4. missing optional `phone`;
-5. missing optional `website`;
-6. long LinkedIn or website field;
-7. two-page résumé stress example;
-8. text extraction.
+1. each affected document family, and each affected statement `type`;
+2. missing required `name`, per affected class;
+3. missing optional `phone` and `website` without stray separators;
+4. long URL or contact field, and contact-line wrapping;
+5. two-page output, page furniture, and single-page suppression;
+6. text extraction and logical reading order;
+7. the unsupported-engine error;
+8. every option's accepted and rejected values, including the error naming the
+   accepted values, and rejection reported exactly once;
+9. tagged and untagged output, after tagging or shared-package changes;
+10. bibliography sorting and field precedence, after Biber-facing changes.
 
 Example extraction command:
 
@@ -682,13 +686,27 @@ Do not use private commands in examples or documentation.
 Place code according to ownership:
 
 - metadata and validation → `careerdossier-base.sty`;
+- type scale, vertical rhythm, list metrics, and page geometry →
+  `careerdossier-tokens.sty`;
 - fonts and semantic text roles → `careerdossier-typography.sty`;
 - colors and visual tokens → `careerdossier-theme.sty`;
-- reusable rendered pieces → `careerdossier-components.sty`;
-- résumé geometry and layout → `careerdossier-resume.cls`;
-- letter geometry and prose behavior → `careerdossier-letter.cls`.
+- reusable rendered pieces, page furniture, and PDF metadata →
+  `careerdossier-components.sty`;
+- the BibLaTeX/Biber boundary → `careerdossier-biblatex.sty`;
+- résumé structure and options → `careerdossier-resume.cls`;
+- cover-letter structure and prose behavior → `careerdossier-letter.cls`;
+- academic CV flow and the manual publication list → `careerdossier-cv.cls`;
+- the statement model and its type-specific validation →
+  `careerdossier-statement.cls`.
 
-Do not place margins in the metadata package or duplicate contact-line logic inside both classes.
+`AGENTS.md` ("Module ownership") carries the same map with the dependency
+direction; `docs/ARCHITECTURE.md` has the per-file detail.
+
+Page geometry belongs to `careerdossier-tokens.sty`, not to a class: a class
+chooses paper and options and does not set margins itself. Do not duplicate
+contact-line logic inside the classes, and do not load
+`careerdossier-biblatex.sty` from `careerdossier-cv.cls` — the CV must build
+without a bibliography toolchain.
 
 ### Maintainable LaTeX
 
