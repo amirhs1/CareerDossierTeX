@@ -1238,11 +1238,34 @@ assert this.
 
 No PDF/UA or WCAG conformance is asserted. Fixture coverage checks that a
 structure tree exists and that headings, links, and artifacts are classified as
-intended for five named profiles, with list checks on the résumé and CV. All
-five automated fixtures have independent validator and three-extractor results;
-the four `v0.4.0` profiles also have a macOS VoiceOver pass, while the statement
-fixture and Windows/NVDA remain screen-reader-unverified. See the guide's
-tagging section before adding any tagging-related dependency.
+intended.
+
+`tests/tagging/run.sh` runs three tiers, and the difference between them matters
+when reporting what is covered:
+
+- **Five named profiles** — résumé, CV, letter, academic letter, and statement —
+  take the full pass: structure, two-page continuation furniture, the page-two
+  artifact stream, extraction, untagged equivalence, visual equivalence, and
+  PDF/UA-2 validation. List checks apply to the résumé and CV.
+- **`resume-contact-labels`** is a sixth blocking fixture, deliberately outside
+  that loop because it is one page and must *not* have continuation furniture.
+  It takes contact-label tagging, extraction, and PDF/UA-2 validation.
+- **`biblatex`** is a seventh fixture and is **non-blocking by design**. Tagging
+  support inside BibLaTeX and Biber is upstream work, so the runner records its
+  build and validator result rather than asserting them; a failure fails the
+  suite only if CareerDossierTeX's own code caused it, which is a maintainer
+  judgement made from the retained report.
+
+So six fixtures carry three-extractor baselines (Poppler, MuPDF, and Apple
+PDFKit) and blocking validator results; the seventh carries a recorded one and
+no extraction baseline. Of the screen-reader checks, the four `v0.4.0` profiles
+have a macOS VoiceOver pass; the statement fixture and Windows/NVDA remain
+unverified.
+
+veraPDF is not installed in the per-PR `tagging` job — it runs weekly from
+`.github/workflows/verapdf-scheduled.yml` — so a pull request is not
+PDF/UA-validated on the strength of its own checks. See the guide's tagging
+section before adding any tagging-related dependency.
 
 ## Repository layout
 
