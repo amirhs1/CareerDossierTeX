@@ -1,0 +1,49 @@
+% components-header-stack-doc.tex — issue #252. The worked example documented
+% under "\CDossierHeaderBegin, \CDossierHeaderLine, \CDossierHeaderEnd" in
+% docs/API.md, kept compilable.
+%
+% A documented example is a promise that the code in it runs. This fixture is
+% the only thing that keeps that promise honest: the composition below is the
+% published one verbatim, so a rename, a signature change, or a role/size token
+% that stops existing fails here rather than in a reader's document.
+%
+% What it exercises that no other fixture does: the public triple driven by a
+% *document*, with a line emitted conditionally. Gap emission itself is asserted
+% in tests/regression/components-headerstack.lvt; this is a build gate.
+\documentclass{careerdossier-resume}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  location = {London, UK},
+  email    = {ada@example.com},
+}
+
+\begin{document}
+
+\CDossierHeaderBegin
+\CDossierHeaderLine{
+  \CDossierNameStyle \CDossierSizeName
+  \CDossierPrintField{name}
+}
+\CDossierHeaderLine{
+  \CDossierHeadlineStyle \CDossierSizeHeadline
+  \CDossierPrintField{headline}
+}
+\CDossierIfFieldTF{location}
+  {
+    \CDossierHeaderLine{
+      \CDossierMutedStyle \CDossierSizeSmall
+      \CDossierPrintField{location}
+    }
+  }
+  { }
+\CDossierHeaderLine{
+  \CDossierBodyStyle \CDossierSizeSmall
+  \CDossierPrintField{email}
+}
+\CDossierHeaderEnd
+
+\CDossierSection{Experience}
+
+\end{document}

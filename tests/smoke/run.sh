@@ -59,6 +59,44 @@ for engine in xelatex pdflatex; do
 done
 echo
 
+# Issue #252: the header-stack fixture below compiles the worked example
+# published in docs/API.md, so it is only worth compiling while the two are the
+# same text. Nothing else notices when a documented example is edited and its
+# fixture is not -- the fixture keeps building, and the promise it was added to
+# keep quietly stops being kept. Compare them before compiling anything.
+#
+# The documented block is found by its content (the fenced `latex' block that
+# declares a document *and* opens a header stack), not by the prose around it,
+# so rewording the paragraph above the example does not break this.
+doc_source="$root/docs/API.md"
+doc_fixture="$here/components-header-stack-doc.tex"
+echo "== docs/API.md worked example == components-header-stack-doc.tex =="
+awk '
+  /^```latex$/          { inblock = 1; buf = ""; next }
+  inblock && /^```$/    {
+                          inblock = 0
+                          if (buf ~ /CDossierHeaderBegin/ && buf ~ /documentclass/)
+                            { found++; out = buf }
+                          next
+                        }
+  inblock               { buf = buf $0 "\n" }
+  END                   { if (found != 1) exit 1; printf "%s", out }
+' "$doc_source" > "$here/doc-example.stdout"
+if [ $? -ne 0 ]; then
+  echo "  FAILED to locate exactly one worked example in docs/API.md"
+  fail=1
+else
+  awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/doc-fixture.stdout"
+  if diff -u "$here/doc-example.stdout" "$here/doc-fixture.stdout" > "$here/doc-example.diff"; then
+    echo "  documented example and fixture are identical"
+  else
+    echo "  DRIFTED — the fixture no longer compiles what docs/API.md publishes:"
+    sed 's/^/    /' "$here/doc-example.diff"
+    fail=1
+  fi
+fi
+echo
+
 # Warnings tolerated in a "pass" build. Kept short and justified; mirrors the
 # extraction runner. hyperref/geometry are expected loads; the ...Off ligature
 # notices come from fonts without those OpenType tables. The tagpdf math-font
@@ -101,6 +139,7 @@ cases=(
   "resume-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"
   "resume-contact-too-wide fail|is wider than the available contact-line width."
   "resume-shared-profile pass"
+  "components-header-stack-doc pass"
   "cv-valid pass"
   "cv-sans-body pass"
   "cv-shared-profile pass"
