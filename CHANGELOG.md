@@ -231,6 +231,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the build. A build script matching the old message text needs its pattern
   updated.
 
+- **BREAKING (internal name):** three class-to-package primitives that carried
+  a public prefix without being part of the author-facing interface are now
+  private: `\CDossierApplyBodySize` → `\__cdossier_tokens_apply_body_size:`,
+  `\CDossierApplyGeometry:n` → `\__cdossier_tokens_apply_geometry:n`, and
+  `\MakeCDossierPageFurniture` → `\__cdossier_components_apply_page_furniture:`.
+  **No document reflows and no supported document needs an edit.** ([#242])
+
+  Each is called once, by a document class, in its own preamble, to apply
+  something a shared package had already computed — none was ever documented in
+  [`docs/API.md`](docs/API.md), and no example or fixture calls one.
+  `\CDossierApplyGeometry:n` was in addition the only name in the codebase that
+  mixed the public prefix with an expl3 argument signature, a form reserved for
+  private names. `\MakeCDossierPageFurniture` shared the `Make…` prefix with
+  `\MakeCDossierHeader` and its siblings without sharing what makes them a
+  family: each of those emits document material where the author calls it,
+  while this one emits nothing at all.
+
+  `v1.0.0` freezes the public interface, so a name still carrying a public
+  prefix then is supported whether or not it is documented. The other fifteen
+  public-prefixed names reviewed for the same reason — the type-scale size
+  commands, the resolved dimension tokens, and the two keep-together penalties
+  — were confirmed public and keep their names. Source that called one of the
+  three old names gets an undefined-control-sequence error; see
+  [`docs/MIGRATION.md`](docs/MIGRATION.md), which also covers the `\ExplSyntaxOn`
+  requirement the new spellings carry.
+
 ### Removed
 
 - **BREAKING (design token):** `\CDossierRecordEntryBelowSkip` and
@@ -410,6 +436,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 [#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
 [#236]: https://github.com/amirhs1/CareerDossierTeX/issues/236
+[#242]: https://github.com/amirhs1/CareerDossierTeX/issues/242
 
 ## [0.6.0] - 2026-07-30
 

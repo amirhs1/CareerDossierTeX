@@ -180,9 +180,9 @@
 \RequirePackage { careerdossier-components }
 \RequirePackage { careerdossier-tokens }
 \RequirePackage { hyperref }
-\CDossierApplyBodySize
+\__cdossier_tokens_apply_body_size:
 
-\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_statement_paper_tl
+\exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_statement_paper_tl
 \setlength { \parindent }        { 0pt }
 \setlength { \parskip }          { \CDossierProseParSkip }
 \setlength { \emergencystretch } { 2em }
@@ -408,7 +408,7 @@
 
 \__cdossier_components_runninglabel:n
   { \tl_use:N \l__cdossier_statement_running_title_tl }
-\MakeCDossierPageFurniture
+\__cdossier_components_apply_page_furniture:
 
 %% ---------------------------------------------------------------------------
 %% Header rendering and validation.

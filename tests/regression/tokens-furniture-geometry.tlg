@@ -47,3 +47,9 @@ TEST 2: furniture-centred-in-margins
 12pt narrow a4paper:above-head=12.0675pt; below-head=12.06749pt; above-foot=12.0675pt; below-foot=12.06749pt
 12pt narrow a4paper:textheight=772.77686pt; textwidth=525.23788pt; text-top=36.135pt
 ============================================================
+============================================================
+TEST 3: geometry-primitive-name-surface
+============================================================
+private-apply-geometry=defined
+public-apply-geometry=undefined
+============================================================

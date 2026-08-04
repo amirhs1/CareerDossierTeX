@@ -28,3 +28,9 @@ medium=print
 head=furniture
 foot=furniture
 ============================================================
+============================================================
+TEST 6: page-furniture-primitive-name-surface
+============================================================
+private-page-furniture=defined
+public-page-furniture=undefined
+============================================================

@@ -435,7 +435,13 @@
 %% Reuse article's own \normalsize setup so its display skips remain tied to
 %% the selected class option, then pin the font itself to the resolved whole
 %% point size and calibrated leading. No catcode changes occur at call time.
-\NewDocumentCommand \CDossierApplyBodySize { }
+%%
+%% Issue #242: this is class-to-package plumbing, not an author command. It
+%% transports a resolved load-time option -- \l__cdossier_tokens_fontsize_tl,
+%% which is package-private -- into \normalsize, so a document body cannot
+%% call it usefully and re-calling it changes nothing. It was named
+%% \CDossierApplyBodySize; see docs/MIGRATION.md.
+\cs_new_protected:Npn \__cdossier_tokens_apply_body_size:
   {
     \str_if_eq:VnTF \l__cdossier_tokens_fontsize_tl { 11pt }
       {
@@ -451,6 +457,12 @@
 
 %% The paper name remains a class concern. The shared primitive is the only
 %% place that translates the public normal/narrow preset into geometry options.
+%%
+%% Issue #242: the name was \CDossierApplyGeometry:n, the one name in the
+%% codebase that mixed the public CDossier prefix with an expl3 argument
+%% signature. It is plumbing either way -- its argument is the paper name only
+%% the calling class knows, and geometry is applied once at load -- so it takes
+%% the private form the signature already implied. See docs/MIGRATION.md.
 %%
 %% Issue #183: the running header and the folio are placed by this module too,
 %% because their position is a function of the resolved margin. Until #183 the
@@ -498,7 +510,7 @@
 %% is too small and the ink can overrun the box it is nominally inside. The
 %% furniture leading is that height by construction; `geometry''s fixed 12pt is
 %% short of the 12pt line at fontsize=12pt once the line's depth is counted.
-\cs_new_protected:Npn \CDossierApplyGeometry:n #1
+\cs_new_protected:Npn \__cdossier_tokens_apply_geometry:n #1
   {
     \geometry
       {

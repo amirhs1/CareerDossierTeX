@@ -1,8 +1,10 @@
 % tokens-furniture-geometry.lvt — page-furniture placement (issue #183).
 %
-% Pins the three furniture dimensions \CDossierApplyGeometry:n derives from the
-% resolved margin at every fontsize x margin x paper combination, and asserts
-% that deriving them leaves the text block exactly where v0.6.0 put it.
+% Pins the three furniture dimensions \__cdossier_tokens_apply_geometry:n
+% derives from the resolved margin at every fontsize x margin x paper
+% combination, and asserts that deriving them leaves the text block exactly
+% where v0.6.0 put it. Issue #242 renamed that command from the public
+% \CDossierApplyGeometry:n; the name surface itself is asserted below.
 %
 % Every probe runs in the preamble: geometry's \geometry is a preamble-only
 % command, so the values are recorded there and only replayed in the body.
@@ -17,7 +19,7 @@
   {
     \keys_set:nn { cdossier / tokens } { fontsize = #1 , margin = #2 }
     \__cdossier_tokens_resolve:
-    \CDossierApplyGeometry:n {#3}
+    \__cdossier_tokens_apply_geometry:n {#3}
     %% The four gaps the acceptance criterion is stated in. Both \headsep and
     %% \footskip resolve to a baseline, so each nominal line box is bounded by
     %% baseline - 0.7 H above and baseline + 0.3 H below. Centred means the two
@@ -111,6 +113,20 @@
         furniture-leading = \dim_use:N \CDossierFurnitureLeading
       }
   }
+
+%% Issue #242 classified the geometry primitive as class-to-package plumbing
+%% and renamed it. Asserting only that the private name works would leave the
+%% public one free to reappear, so both halves are pinned: the old name must be
+%% undefined, not merely unused.
+\NewDocumentCommand \cdossiertestNameSurface { }
+  {
+    \cs_if_exist:cTF { __cdossier_tokens_apply_geometry:n }
+      { \TYPE{private-apply-geometry=defined} }
+      { \TYPE{private-apply-geometry=missing} }
+    \cs_if_exist:cTF { CDossierApplyGeometry:n }
+      { \TYPE{public-apply-geometry=defined} }
+      { \TYPE{public-apply-geometry=undefined} }
+  }
 \ExplSyntaxOff
 
 \begin{document}
@@ -124,6 +140,10 @@
 
 \TEST{furniture-centred-in-margins}{
   \cdossiertestReplay
+}
+
+\TEST{geometry-primitive-name-surface}{
+  \cdossiertestNameSurface
 }
 
 \END

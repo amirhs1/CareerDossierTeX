@@ -18,8 +18,10 @@ two retired tokens rendered nothing at the released defaults — but three
 mechanism changes do move the page: letter and statement headers tighten, the
 gap above a bullet list inside an entry tightens, and a document with no
 `headline` gains a little space below the name. The retune then reflows every
-document. See [`[0.7.0]`](#070---unreleased) below. This release was numbered
-`v0.6.1` until 2026-08-01.
+document. It also makes three undocumented class-to-package primitives private,
+which changes no output and affects no supported document. See
+[`[0.7.0]`](#070---unreleased) below. This release was numbered `v0.6.1` until
+2026-08-01.
 
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
@@ -639,6 +641,54 @@ directly under some other class *and* sets `fontsize=` or `margin=` as an option
 to that class. Passing the option to `\usepackage`, or with
 `\PassOptionsToPackage`, works exactly as before, and an unsupported value is
 still rejected with the accepted values named.
+
+### Three class-to-package primitives made private
+
+Three names carried the public `CDossier` / `MakeCDossier` prefix without being
+part of the author-facing interface. Each is called once, by a document class,
+in its own preamble, to apply something the shared package had already computed.
+They now carry the private form `AGENTS.md` reserves for internal names:
+
+| Before | After |
+|---|---|
+| `\CDossierApplyBodySize` | `\__cdossier_tokens_apply_body_size:` |
+| `\CDossierApplyGeometry:n` | `\__cdossier_tokens_apply_geometry:n` |
+| `\MakeCDossierPageFurniture` | `\__cdossier_components_apply_page_furniture:` |
+
+**No document reflows and no supported document needs an edit.** None of the
+three was ever documented in [`API.md`](API.md), and no example, fixture, or
+class option calls them by the old name; the three renames are internal to the
+package-to-class boundary. Source that called one of the old names now gets an
+undefined-control-sequence error.
+
+Calling the new names is possible but unsupported, and the spelling is stricter:
+an expl3 private name only tokenises as one control sequence inside
+`\ExplSyntaxOn`, because outside it the `_` is a subscript character. Written in
+a plain preamble the name silently splits into `\_` plus ordinary text and the
+command never runs — no error, just a document missing its page furniture or its
+body size.
+
+Reason: each name promised an author-facing command that does not exist.
+`\CDossierApplyBodySize` and `\CDossierApplyGeometry:n` transport a resolved
+load-time option — one held in a package-private variable — from
+`careerdossier-tokens` into `\normalsize` and `geometry`; neither does anything
+useful when called a second time, and `\CDossierApplyGeometry:n` was in addition
+the only name in the codebase that mixed the public prefix with an expl3
+argument signature, a form `AGENTS.md` reserves for private names.
+`\MakeCDossierPageFurniture` shared the `Make…` prefix with
+`\MakeCDossierHeader`, `\MakeCDossierLetterhead`, `\MakeCDossierClosing`, and
+`\MakeCDossierStatementHeader` without sharing what makes them a family: each of
+those emits document material where the author calls it, while this one emits
+nothing at all — it selects a `\pagestyle` and queues an `\AtBeginDocument`
+hook, so by the time a document body could call it the hook has already run.
+All three sit beside private siblings that do the same job, such as
+`\__cdossier_components_headerbelow:N`.
+
+`v1.0.0` freezes the public interface, so a name that still carries a public
+prefix then is supported whether or not it is documented. See
+[#242](https://github.com/amirhs1/CareerDossierTeX/issues/242) for the
+classification of the full public-prefixed name surface; the other fifteen names
+it reviewed were confirmed public and keep their names.
 
 ## [0.6.0] - 2026-07-30
 

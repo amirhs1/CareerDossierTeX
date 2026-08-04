@@ -93,7 +93,7 @@
 \cs_new_protected:Npn \cdossiertest_body_catcode:
   {
     \int_set:Nn \l_tmpa_int { \char_value_catcode:n { `@ } }
-    \CDossierApplyBodySize
+    \__cdossier_tokens_apply_body_size:
     \TYPE
       {
         at-catcode-before = \int_use:N \l_tmpa_int ;
@@ -108,6 +108,20 @@
   { \cdossiertest_list: }
 \NewDocumentCommand \cdossiertestBodyCatcode { }
   { \cdossiertest_body_catcode: }
+
+%% Issue #242 classified the body-size primitive as class-to-package plumbing
+%% and renamed it. Asserting only that the private name works would leave the
+%% public one free to reappear, so both halves are pinned: the old name must be
+%% undefined, not merely unused.
+\NewDocumentCommand \cdossiertestNameSurface { }
+  {
+    \cs_if_exist:cTF { __cdossier_tokens_apply_body_size: }
+      { \TYPE{private-apply-body-size=defined} }
+      { \TYPE{private-apply-body-size=missing} }
+    \cs_if_exist:cTF { CDossierApplyBodySize }
+      { \TYPE{public-apply-body-size=defined} }
+      { \TYPE{public-apply-body-size=undefined} }
+  }
 \ExplSyntaxOff
 
 \begin{document}
@@ -132,6 +146,10 @@
 \TEST{body-size-preserves-caller-catcodes}{
   \cdossiertestScale{11pt}
   \cdossiertestBodyCatcode
+}
+
+\TEST{body-size-primitive-name-surface}{
+  \cdossiertestNameSurface
 }
 
 \END

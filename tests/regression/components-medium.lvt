@@ -3,7 +3,8 @@
 % careerdossier-components owns the page furniture and therefore owns the
 % decision of whether to emit it. The four classes only validate the public
 % value and forward it here, so the resolved state and the page styles
-% \MakeCDossierPageFurniture then selects are asserted once, at the component.
+% \__cdossier_components_apply_page_furniture: then selects are asserted once,
+% at the component.
 % `print' is the default and is asserted in components-furniture.lvt; a package
 % takes one set of options per document, so the two values need two files.
 %
@@ -12,9 +13,13 @@
 \input{regression-test}
 \documentclass{article}
 \usepackage[medium=screen]{careerdossier-components}
-\MakeCDossierPageFurniture
 
+%% The furniture primitive is an expl3 private name (issue #242), so the call
+%% has to sit inside \ExplSyntaxOn: outside it the `_' is a subscript and the
+%% name silently splits into \_ plus text, leaving the page styles unset.
 \ExplSyntaxOn
+\__cdossier_components_apply_page_furniture:
+
 \cs_new_protected:Npn \cdossiertestReportMedium
   {
     \bool_if:NTF \l__cdossier_components_furniture_bool
