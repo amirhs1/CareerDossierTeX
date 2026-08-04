@@ -359,7 +359,7 @@
   }
 
 %% ---------------------------------------------------------------------------
-%% Header stack.
+%% Header stack -- public composition API.
 %%
 %% Issue #204: one emission site for every centered header line and every gap
 %% between two of them, shared by \MakeCDossierHeader below and by
@@ -369,6 +369,24 @@
 %% "separator attached to the item" shape the project forbids everywhere else,
 %% and it hid a defect: which token guarded the boundary below the name depended
 %% on whether an optional field two lines further down happened to be present.
+%%
+%% Issue #224: the stack is public. \MakeCDossierHeader renders a fixed
+%% three-line identity block, but the statement needs up to six lines whose
+%% extra ones *interleave* with it -- its title sits between the name and the
+%% contact line -- so neither an append-only hook nor a split into "identity,
+%% then metadata" preserves the reading order. The statement therefore composed
+%% its header by driving this module's private primitives, which is a boundary
+%% leak. \CDossierHeaderBegin, \CDossierHeaderLine, and \CDossierHeaderEnd are
+%% those primitives promoted verbatim, and both wrappers now compose over them.
+%% Spelled as a command triple rather than a `CDossierHeader' environment: an
+%% environment reads more idiomatically only if its body is genuinely restricted
+%% to line calls, and here it is not -- a caller interleaves arbitrary
+%% conditionals between lines, as both wrappers below do.
+%%
+%% Going public moves nothing else across the boundary. The component still owns
+%% every gap and the triple adds no spacing knob, and validation stays with the
+%% wrappers: neither `name' nor a statement type is a precondition of stacking
+%% lines.
 %%
 %% A caller pushes only the lines it will actually print, in reading order, and
 %% the helper interleaves the gaps. Position decides the token, not presence:
@@ -413,10 +431,13 @@
 \cs_new_protected:Npn \__cdossier_components_headerbelow:N #1
   { \tl_set:Nn \l__cdossier_components_headerbelow_tl {#1} }
 
-\cs_new_protected:Npn \__cdossier_components_headerstack_begin:
+\NewDocumentCommand \CDossierHeaderBegin { }
   { \seq_clear:N \l__cdossier_components_headerstack_seq }
 
-\cs_new_protected:Npn \__cdossier_components_headerstack_line:n #1
+%% The argument is stored unexpanded and re-used once, so a line may carry
+%% structure -- the statement's title line wraps itself in
+%% \__cdossier_typography_heading:n and keeps its heading tagging.
+\NewDocumentCommand \CDossierHeaderLine { m }
   { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
 
 %% A header gap has to be reduced by the paragraph gap the following line
@@ -424,7 +445,7 @@
 \cs_new_protected:Npn \__cdossier_components_headerstack_gap:N #1
   { \addvspace { \dim_eval:n { #1 - \parskip } } }
 
-\cs_new_protected:Npn \__cdossier_components_headerstack_end:
+\NewDocumentCommand \CDossierHeaderEnd { }
   {
     \seq_if_empty:NF \l__cdossier_components_headerstack_seq
       {
@@ -470,12 +491,14 @@
 %%
 %% A centered block of name, optional headline, and the contact line, shared by
 %% the résumé header and the cover-letter sender identity. Requires `name`.
+%% A thin wrapper over the public header stack above: it owns the validation and
+%% the choice of the three lines, and nothing else.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierHeader { }
   {
     \__cdossier_base_require_name:N \MakeCDossierHeader
-    \__cdossier_components_headerstack_begin:
-    \__cdossier_components_headerstack_line:n
+    \CDossierHeaderBegin
+    \CDossierHeaderLine
       {
         \CDossierNameStyle
         \CDossierSizeName
@@ -483,7 +506,7 @@
       }
     \CDossierIfFieldTF { headline }
       {
-        \__cdossier_components_headerstack_line:n
+        \CDossierHeaderLine
           {
             \CDossierHeadlineStyle
             \CDossierSizeHeadline
@@ -491,13 +514,13 @@
           }
       }
       { }
-    \__cdossier_components_headerstack_line:n
+    \CDossierHeaderLine
       {
         \CDossierBodyStyle
         \CDossierSizeSmall
         \__cdossier_components_contactparagraph:
       }
-    \__cdossier_components_headerstack_end:
+    \CDossierHeaderEnd
   }
 
 %% ---------------------------------------------------------------------------

@@ -44,6 +44,11 @@
   }
 \NewDocumentCommand \cdossiertestTraceAddvspace { } { \cdossiertest_trace_addvspace: }
 \NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
+% Issue #224: a header line that announces when its body is executed. The
+% announcement is what distinguishes "stored unexpanded and used once, in place"
+% from "expanded at push time" or "used twice".
+\NewDocumentCommand \cdossiertestMark { m }
+  { \TYPE { line-body~ #1 } #1 }
 \ExplSyntaxOff
 
 \begin{document}
@@ -87,6 +92,47 @@
   \cdossiertestTraceAddvspace
   \MakeCDossierHeader
   \par
+}
+
+% Issue #224: the stack is a public composition API, so a caller that is neither
+% \MakeCDossierHeader nor \MakeCDossierStatementHeader gets the same contract.
+% Position decides the token for an arbitrary line list too: the name gap guards
+% the first boundary and the meta gap every later one, whatever the lines are.
+\TEST{public-triple-emits-the-positional-gaps}{
+  \setlength\CDossierLetterHeaderBelowSkip{33pt}
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{Alpha}
+  \CDossierHeaderLine{Beta}
+  \CDossierHeaderLine{Gamma}
+  \CDossierHeaderEnd
+  \par
+}
+
+% A line body is stored, not expanded at push time, and is executed exactly once
+% where the stack places it. Every `line-body' announcement therefore lands
+% *between* the traced gaps, in reading order — the statement's title line
+% depends on this to keep the heading structure it wraps itself in. If
+% \CDossierHeaderLine expanded its argument, all three would precede the first
+% gap instead.
+\TEST{public-line-body-is-deferred-and-used-once}{
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{\cdossiertestMark{Alpha}}
+  \CDossierHeaderLine{\cdossiertestMark{Beta}}
+  \CDossierHeaderEnd
+  \par
+}
+
+% An empty stack renders nothing at all — no boundary below a header that has no
+% lines. \CDossierHeaderBegin also clears whatever a previous group left behind,
+% so the three lines pushed two tests above cannot reappear here.
+\TEST{public-empty-stack-emits-nothing}{
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderBegin
+  \CDossierHeaderEnd
+  \par
+  \TYPE{empty-stack-done}
 }
 
 \END

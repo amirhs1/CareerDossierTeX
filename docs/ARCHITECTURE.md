@@ -755,6 +755,7 @@ Owns reusable rendered pieces.
 
 Responsibilities:
 
+- the public header-stack composition API every header is built from;
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
 - the `medium=print|screen` decision of whether any furniture is emitted;
@@ -812,6 +813,29 @@ is always the name gap, every later boundary is the meta gap, and an absent
 optional field leaves nothing behind. It also owns the header's own `\parskip`
 (zeroed for the group; see #220 above) and the boundary below the stack, so a
 class states only which lines it prints, in reading order.
+
+Since #224 the stack is a **public interface owned by this module**:
+`\CDossierHeaderBegin`, `\CDossierHeaderLine`, and `\CDossierHeaderEnd`, with
+`\MakeCDossierHeader` and `\MakeCDossierStatementHeader` both implemented over
+it. #204 shared the mechanism but left it private, so the statement class drove
+another module's `\__cdossier_components_headerstack_*` primitives — a boundary
+leak the naming convention forbids. Sharing it under a public name is the fix;
+reusing `\MakeCDossierHeader` is not available, because the statement's title,
+subtitle, and context lines interleave with the identity lines rather than
+appending to them, so no hook on a fixed three-line block preserves the reading
+order.
+
+It is a command triple, not a `CDossierHeader` environment, even though the
+project ships public environments elsewhere. An environment is the better
+spelling only when its body is genuinely restricted to line calls; here both
+wrappers interleave conditionals between lines, so the begin/end pair is no
+harder to misuse and the triple translates the existing primitives verbatim.
+
+The split of concerns across that boundary is fixed: the stack owns every gap
+and holds no validation, while each wrapper owns its own line list and its own
+preconditions — `\__cdossier_base_require_name:N` for `\MakeCDossierHeader`,
+`\__cdossier_statement_validate:` for `\MakeCDossierStatementHeader`. Neither
+precondition belongs to stacking lines.
 
 #### Why the `medium` option resolves here
 
@@ -1053,6 +1077,7 @@ Examples include:
 ```latex
 \CDossierSetup
 \CDossierLetterSetup
+\CDossierHeaderBegin … \CDossierHeaderLine … \CDossierHeaderEnd
 \MakeCDossierHeader
 \MakeCDossierLetterhead
 \MakeCDossierClosing

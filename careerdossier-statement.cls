@@ -441,17 +441,23 @@
 %% the optional block below it. The class now states only which lines are
 %% present, in reading order; the component owns the gap between two of them,
 %% the paragraph gap inside the header group, and the boundary below the stack.
+%%
+%% Issue #224: it states them through the public \CDossierHeaderBegin /
+%% \CDossierHeaderLine / \CDossierHeaderEnd triple. It used to drive the
+%% component's private primitives, which no class may do. The statement cannot
+%% reuse \MakeCDossierHeader instead, because its title, subtitle, and context
+%% lines interleave with the identity lines rather than following them.
 \NewDocumentCommand \MakeCDossierStatementHeader { }
   {
     \__cdossier_statement_validate:
     \par
-    \__cdossier_components_headerstack_begin:
-    \__cdossier_components_headerstack_line:n
+    \CDossierHeaderBegin
+    \CDossierHeaderLine
       {
         \CDossierNameStyle \CDossierSizeName
         \CDossierPrintField { name }
       }
-    \__cdossier_components_headerstack_line:n
+    \CDossierHeaderLine
       {
         \__cdossier_typography_heading:n
           {
@@ -461,7 +467,7 @@
       }
     \tl_if_blank:VF \l__cdossier_statement_subtitle_tl
       {
-        \__cdossier_components_headerstack_line:n
+        \CDossierHeaderLine
           {
             \CDossierHeadlineStyle \CDossierSizeHeadline
             \tl_use:N \l__cdossier_statement_subtitle_tl
@@ -469,7 +475,7 @@
       }
     \CDossierIfFieldTF { affiliation }
       {
-        \__cdossier_components_headerstack_line:n
+        \CDossierHeaderLine
           {
             \CDossierBodyStyle \CDossierSizeBody
             \CDossierPrintField { affiliation }
@@ -480,19 +486,19 @@
       { ! \tl_if_blank_p:V \l__cdossier_statement_context_tl }
       { ! \tl_if_blank_p:V \l__cdossier_statement_application_id_tl }
       {
-        \__cdossier_components_headerstack_line:n
+        \CDossierHeaderLine
           {
             \CDossierMutedStyle \CDossierSizeSmall
             \__cdossier_statement_contextline:
           }
       }
-    \__cdossier_components_headerstack_line:n
+    \CDossierHeaderLine
       {
         \CDossierBodyStyle \CDossierSizeSmall
         \__cdossier_components_contactparagraph:N
           \l__cdossier_statement_contacts_clist
       }
-    \__cdossier_components_headerstack_end:
+    \CDossierHeaderEnd
   }
 
 \endinput

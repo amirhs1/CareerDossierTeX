@@ -616,13 +616,63 @@ with `\hypersetup` as usual.
 
 ## Public commands
 
+### `\CDossierHeaderBegin`, `\CDossierHeaderLine`, `\CDossierHeaderEnd`
+
+```latex
+\CDossierHeaderBegin
+\CDossierHeaderLine{<content>}
+\CDossierHeaderLine{<content>}
+\CDossierHeaderEnd
+```
+
+Composes a centered header stack line by line. New in `v0.7.0`.
+
+`\MakeCDossierHeader` and `\MakeCDossierStatementHeader` render fixed line
+lists and are what a document normally uses. This triple is the interface
+beneath them, for a header whose lines a class or a document has to choose
+itself — the statement's title, subtitle, and context lines interleave with the
+identity lines rather than following them, so no append-only hook over
+`\MakeCDossierHeader` can express it.
+
+A caller states only which lines are present, in reading order.
+`careerdossier-components` owns every gap, and the triple adds no spacing
+option:
+
+- no gap above the first line;
+- `\CDossierSharedHeaderNameGapSkip` below the first line;
+- `\CDossierSharedHeaderMetaGapSkip` below every later line;
+- the rendering class's own header-below token as the boundary under the stack
+  (`\CDossierRecordHeaderBelowSkip`, `\CDossierLetterHeaderBelowSkip`, or
+  `\CDossierProseHeaderBelowSkip`);
+- `\parskip` zeroed for the header group, so each token names the rendered gap
+  in every class.
+
+Position decides which token guards a boundary, never presence, so an omitted
+line leaves neither a blank line nor a gap behind. Emit a line conditionally by
+calling `\CDossierHeaderLine` only when you have content for it.
+
+Expected behavior:
+
+- `\CDossierHeaderBegin` starts a stack and discards any lines left over from
+  an abandoned one;
+- `\CDossierHeaderLine` stores its argument unexpanded and does not typeset
+  anything yet, so a line may carry structure — a heading, a link, a tagged
+  element — and keeps it;
+- `\CDossierHeaderEnd` renders the collected lines, each as its own centered
+  paragraph, and emits the boundary below the stack;
+- a stack with no lines renders nothing, including no boundary below it;
+- no validation is performed. `\CDossierHeaderBegin` does not require `name`;
+  the wrapper commands keep their own validation.
+
 ### `\MakeCDossierHeader`
 
 ```latex
 \MakeCDossierHeader
 ```
 
-Renders the résumé identity block using shared profile metadata.
+Renders the résumé identity block using shared profile metadata. Since `v0.7.0`
+it is a wrapper over the public header stack above, which it drives with a
+fixed three-line list.
 
 Expected behavior:
 
@@ -1287,7 +1337,11 @@ than attaching one to each optional block, so an absent value leaves neither a
 blank line nor a gap. The boundary below the name is
 `\CDossierSharedHeaderNameGapSkip` and every later boundary is
 `\CDossierSharedHeaderMetaGapSkip`, whatever the line beneath it turns out to
-be. Contact and context separators are inserted only between present
+be. That emission site is the public `\CDossierHeaderBegin` /
+`\CDossierHeaderLine` / `\CDossierHeaderEnd` triple, which
+`\MakeCDossierStatementHeader` composes over; the interleaved order above is why
+the statement cannot simply call `\MakeCDossierHeader`. Contact and context
+separators are inserted only between present
 items and are layout artifacts in tagged output. The selected page-one `title`
 drives PDF document metadata; the shorter `running-title` exists only for page
 furniture and does not replace the full title in meaningful content.
