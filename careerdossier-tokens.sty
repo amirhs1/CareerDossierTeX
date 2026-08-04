@@ -188,6 +188,7 @@
 \skip_new:N \CDossierRecordItemSepSkip
 \skip_new:N \CDossierRecordParSkip
 \skip_new:N \CDossierProseParSkip
+\skip_new:N \CDossierLetterParSkip
 \skip_new:N \CDossierLetterRecipientLineGapSkip
 \skip_new:N \CDossierLetterBlockSkip
 \skip_new:N \CDossierLetterBodyAboveSkip
@@ -373,6 +374,14 @@
     \__cdossier_tokens_set_skip:Nn \CDossierRecordItemSepSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.50 }
+    %% Issue #222: \CDossierProseParSkip set \parskip for both the letter and
+    %% the statement, but the statement's heading below-tokens must stay
+    %% strictly greater than it (see the comment above), while the letter has
+    %% no heading scale to bound it and would prefer a more generous gap
+    %% between its unindented block paragraphs. Splitting the token per family
+    %% lets either retune independently; both ship at the same 0.50 value so
+    %% the split itself is mechanism-only and no document reflows.
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterParSkip { 0.50 }
     %% Issue #204: the recipient block prints one field per line and separated
     %% them with a bare `\\', so the only vertical distance in the letter that no
     %% token expressed was the one inside its most structured block. 0.00

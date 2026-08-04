@@ -55,6 +55,7 @@
     \cdossiertest_skip:N \CDossierRecordItemSepSkip
     \cdossiertest_skip:N \CDossierRecordParSkip
     \cdossiertest_skip:N \CDossierProseParSkip
+    \cdossiertest_skip:N \CDossierLetterParSkip
     \cdossiertest_skip:N \CDossierLetterRecipientLineGapSkip
     \cdossiertest_skip:N \CDossierLetterBlockSkip
     \cdossiertest_skip:N \CDossierLetterBodyAboveSkip

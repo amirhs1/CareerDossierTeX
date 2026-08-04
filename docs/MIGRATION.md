@@ -498,8 +498,9 @@ Before → after:
 | `\CDossierSignatureSkip` | `\CDossierLetterSignatureGapSkip` |
 
 Unchanged: `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`,
-`\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, and
-`\CDossierProseParSkip`.
+`\CDossierProseSubsectionAboveSkip`, and `\CDossierProseSubsectionBelowSkip`.
+`\CDossierProseParSkip` is unchanged for `careerdossier-statement`, but no
+longer sets `\parskip` in `careerdossier-letter` — see the split below.
 
 Two of these are more than a spelling change:
 
@@ -546,6 +547,31 @@ document reflows and no example or class option changes; only source that reads
 or sets the token by name needs the edit. Read
 `\CDossierRecordListEdgeAboveSkip` wherever the old name appeared, and set both
 when overriding the list edge as a whole.
+
+### `\CDossierProseParSkip` split for `careerdossier-letter`
+
+Before:
+
+\CDossierProseParSkip   % set \parskip in both careerdossier-letter and
+                        % careerdossier-statement
+
+After:
+
+\CDossierLetterParSkip  % sets \parskip in careerdossier-letter
+\CDossierProseParSkip   % unchanged: sets \parskip in careerdossier-statement
+
+Reason: both classes set `\parindent = 0pt`, so this token was the only thing
+separating one paragraph from the next in either class, but the two classes
+pull it in opposite directions. The statement's heading below-tokens must stay
+strictly greater than it — `\@xsect` reads a non-positive after-skip as a
+request for a run-in heading — so the token is a floor under the statement's
+entire heading scale. The letter has no heading scale to bound it and would
+prefer a more generous paragraph gap for its unindented block paragraphs. A
+single shared token meant retuning either class's paragraph gap was decided for
+the other as a side effect. `\CDossierLetterParSkip` ships at the same `0.50`
+ratio as `\CDossierProseParSkip`, so the split renders no document differently;
+only source that reads or sets the letter's paragraph gap by name needs the
+edit.
 
 ### `careerdossier-tokens` no longer reads global `\documentclass` options
 

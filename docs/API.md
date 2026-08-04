@@ -1463,8 +1463,8 @@ resolved values at each `fontsize` are tabulated in
 |---|---|
 | Shared (all four classes) | `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip`, `\CDossierSharedHeaderBelowSkip` |
 | Record (résumé, CV) | `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
-| Prose (letter, statement) | `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
-| Letter | `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
+| Prose (statement) | `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
+| Letter | `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
 
 Two rules govern how a token reaches the page, and overriding a token without
 them in mind is the usual reason an override appears to do nothing:
@@ -1479,14 +1479,15 @@ them in mind is the usual reason an override appears to do nothing:
   `\CDossierRecordListEdgeAboveSkip` may not go below `0.25` without breaking
   the extraction order of the entry heading's dates column, as described under
   [`CDossierItemize`](#cdossieritemize).
-- **A paragraph boundary also contributes `\parskip`.** In the prose classes
-  that is `\CDossierProseParSkip`, and a token at such a boundary is emitted as
+- **A paragraph boundary also contributes `\parskip`.** In the statement class
+  that is `\CDossierProseParSkip`, and in the letter class it is
+  `\CDossierLetterParSkip`; a token at such a boundary is emitted as
   `token − \parskip` so the token still names the rendered gap. The header block
   zeroes `\parskip` for its own scope, which is why the three header gap tokens
   behave identically in all four classes.
 
-Since `v0.7.0`, `\CDossierLetterRecipientLineGapSkip` and
-`\CDossierLetterBodyBelowSkip` are new, and `\CDossierRecordEntryBelowSkip`,
+Since `v0.7.0`, `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`,
+and `\CDossierLetterBodyBelowSkip` are new, and `\CDossierRecordEntryBelowSkip`,
 `\CDossierLetterheadBelowSkip`, and `\CDossierSharedHeaderAboveSkip` are
 removed; see [`MIGRATION.md`](MIGRATION.md#070---unreleased).
 
