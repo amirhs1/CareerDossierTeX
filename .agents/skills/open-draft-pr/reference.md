@@ -170,7 +170,8 @@ Obtain explicit approval before:
 
 ## Verification
 
-After opening or updating the PR, verify and report:
+After opening or updating the PR, read the metadata back from GitHub — do not
+report what you intended to set — and confirm each of:
 
 - PR URL and draft status;
 - base and head branches;
@@ -184,6 +185,16 @@ After opening or updating the PR, verify and report:
 - Priority;
 - Size;
 - fields intentionally left unset and why.
+
+A blank field in that read-back is unfinished work, not a reporting line. Fill
+it and read back again. Adding a PR to the Project populates no field, and an
+`item-edit` call can apply to the wrong item, so the read-back is the only
+evidence the values landed.
+
+Status, Size, assignee, labels, and milestone are always determinable and must
+not be left unset. Phase and Priority are inherited from the focused issue and
+must not be invented: if the issue has none, leave the PR field unset and name
+the missing issue field.
 
 If Project API access is unavailable, still create the authorized draft PR and
 set all supported ordinary PR metadata. Report the exact fields that could not

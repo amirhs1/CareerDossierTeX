@@ -31,7 +31,37 @@ Read and follow, in order:
 12. Inherit the focused issue's milestone, Phase, and Priority.
 13. Set Status to `In progress`.
 14. Estimate Size from the actual completed scope.
-15. Verify every metadata field and report anything left unset.
+15. Read the metadata back and fill anything still unset (see below).
+
+## Metadata is not done until it is read back
+
+Setting a field and assuming it took is the common failure. A `gh project
+item-edit` call can silently apply to the wrong item, and adding a PR to the
+Project does not populate any field. So after step 14, query the item and
+compare against what you intended:
+
+```bash
+gh project item-list 2 --owner amirhs1 --limit 400 --format json \
+  --jq '.items[] | select(.content.number==<pr> and .content.type=="PullRequest")
+        | {Status, Phase, Priority, Size}'
+gh pr view <pr> --json isDraft,assignees,labels,milestone
+```
+
+Anything blank in that output is unfinished work, not a reporting line. Fill it:
+
+- **Status, Size, and the assignee** are always determinable from the PR itself.
+  There is no case where an agent may leave these unset — Status is
+  `In progress` for a newly opened draft, and Size comes from the actual
+  completed scope.
+- **Labels and milestone** come from the focused issue and the change. Apply one
+  primary `type:*` and every relevant `area:*`.
+- **Phase and Priority** are inherited from the focused issue and must not be
+  invented. These are the only fields that may legitimately stay blank, and only
+  when the issue itself has none. Say which issue field was missing.
+
+Re-run the read-back after filling. Report the final values, and for any field
+still unset, name it and say why — a missing issue field, or Project API access
+unavailable. "I set the metadata" without the read-back output is not a report.
 
 ## PR body template
 
