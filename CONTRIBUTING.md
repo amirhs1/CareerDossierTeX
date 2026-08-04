@@ -26,9 +26,12 @@ other contribution.
 
 **Disclose material assistance.** If an agent or model wrote or substantially
 shaped code, tests, documentation, or other submitted content, name the tool and
-summarize its role in the pull-request description. A short statement is enough;
-do not include prompts, private reasoning, secrets, or personal data. Commit
-attribution does not replace the pull-request disclosure.
+summarize its role in the `AI assistance` section of the pull-request template,
+which is its last section. A short statement is enough; do not include prompts,
+private reasoning, secrets, or personal data. Commit attribution does not
+replace the pull-request disclosure — when a commit carries an AI
+`Co-authored-by` trailer, repeat that trailer's exact identity and email in the
+disclosure so the two records agree.
 
 **Own what you submit.** Before opening the pull request:
 

@@ -6,12 +6,6 @@ Explain the change and its purpose.
 
 Closes #
 
-## AI assistance
-
-State `None`, or name each AI tool that materially shaped the contribution and
-briefly describe its role. If a commit has an AI co-author trailer, repeat that
-identity and email here. Do not include prompts, secrets, or personal data.
-
 ## Changes
 
 -
@@ -43,3 +37,22 @@ Attach or link the relevant PDF or preview when layout changed.
 ## Notes for review
 
 Describe any design decision, uncertainty, or follow-up issue.
+
+## AI assistance
+
+Keep this section last, and always fill it in.
+
+State `None`, or name each AI tool that materially shaped the contribution and
+briefly describe its role. If any commit on the branch carries an AI
+`Co-authored-by` trailer, repeat that trailer's exact identity and email here so
+the commit record and the PR record agree, for example:
+
+```text
+Claude Code — drafted the token refactor and its regression test.
+Co-authored-by: Claude Opus 5 <noreply@anthropic.com>
+```
+
+Copy the identity from the actual commits (`git log`), not from this example —
+each agent emits its own configured identity, and it is not a fixed string.
+Do not include prompts, secrets, or personal data. This disclosure does not
+transfer responsibility for the change; see `AI-POLICY.md`.

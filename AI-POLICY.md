@@ -33,16 +33,23 @@ is sufficient.
 
 Disclosure and Git authorship are related but distinct:
 
-- Material AI assistance is disclosed in the pull-request description.
+- Material AI assistance is disclosed in the pull-request description, in the
+  `AI assistance` section of the pull-request template. A commit trailer does
+  not satisfy this, and the section is not left blank.
 - A commit uses a `Co-authored-by` trailer only for a person or tool that
   materially co-authored that commit.
 - Agents use their current configured attribution rather than a hard-coded
   vendor or model identity. Do not attribute a tool that did not participate,
   and do not add duplicate attribution blocks.
+- When a branch carries an AI trailer, the disclosure repeats that trailer's
+  exact identity and email, so the commit record and the PR record agree. The
+  identity is not a fixed string: an agent's trailer may name the specific model
+  that produced the work, and it varies between sessions and tools.
 - Human contributors retain responsibility for the resulting contribution,
   regardless of any trailer.
 
-The exact commit-message rules live in `AGENTS.md`. GitHub's trailer format is
+The exact commit-message rules live in `AGENTS.md`, and the step-by-step
+procedure lives in the `open-draft-pr` skill. GitHub's trailer format is
 documented in [Creating a commit with multiple authors][github-coauthors].
 
 ## Review and verification
@@ -109,8 +116,14 @@ defining the Work remain authoritative.
 
 - `AGENTS.md` is the canonical repository-wide operating contract.
 - `CLAUDE.md` is a thin Claude Code adapter and does not duplicate shared policy.
-- `.agents/` and `.claude/` contain tool-specific skills, rules, and settings.
+- `.agents/` holds the one copy of every skill and path-scoped rule, in the
+  vendor-neutral location other agents already scan.
+- `.claude/` and `.codex/` hold only that tool's own settings, plus symlinks
+  into `.agents/`. Instruction content is never copied between them.
+- `.github/pull_request_template.md` is the canonical PR section set.
 - `CONTRIBUTING.md` states the requirements that apply to human contributors.
+
+`docs/agent-workflows/README.md` maps the file set and explains the split.
 
 Hard requirements should be enforced by tests, linters, permissions, sandboxing,
 hooks, branch protection, or rulesets when practical. Instruction text alone
@@ -122,9 +135,15 @@ This policy follows the current official guidance for concise repository agent
 instructions, least-privilege and sandboxed agent operation, accurate Git
 trailers, and LPPL maintenance:
 
-- [OpenAI: custom instructions with `AGENTS.md`][openai-agents]
-- [Anthropic: Claude Code permissions][claude-permissions] and
-  [settings][claude-settings]
+- [The `AGENTS.md` convention][agents-md] and
+  [OpenAI: custom instructions with `AGENTS.md`][openai-agents]
+- [OpenAI: building Codex skills][codex-skills] — the `.agents/skills/` scan path
+- [Agent Skills: the `SKILL.md` specification][agent-skills] and its
+  [client-implementation guidance][agent-skills-clients] on sharing one skill
+  set across tools
+- [Anthropic: Claude Code permissions][claude-permissions],
+  [settings][claude-settings] (including `attribution`),
+  [memory and rules][claude-memory], and [skills][claude-skills]
 - [GitHub: secure use of GitHub Actions][github-actions-security]
 - [GitHub: creating a commit with multiple authors][github-coauthors]
 - [LaTeX Project: LPPL version 1.3c][lppl]
@@ -133,9 +152,15 @@ trailers, and LPPL maintenance:
 Review this policy when those mechanisms or the repository's threat model
 materially change.
 
+[agents-md]: https://agents.md/
 [openai-agents]: https://learn.chatgpt.com/docs/agent-configuration/agents-md
+[codex-skills]: https://learn.chatgpt.com/docs/build-skills
+[agent-skills]: https://agentskills.io/specification
+[agent-skills-clients]: https://agentskills.io/client-implementation/adding-skills-support
 [claude-permissions]: https://code.claude.com/docs/en/permissions
 [claude-settings]: https://code.claude.com/docs/en/settings
+[claude-memory]: https://code.claude.com/docs/en/memory
+[claude-skills]: https://code.claude.com/docs/en/skills
 [github-actions-security]: https://docs.github.com/en/actions/reference/security/secure-use
 [github-coauthors]: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
 [lppl]: https://www.latex-project.org/lppl/lppl-1-3c/

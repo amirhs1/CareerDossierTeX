@@ -10,10 +10,22 @@ it here; add only Claude Code-specific behavior below.
 ## Local and scoped instructions
 
 - Read `CLAUDE.local.md` when present; keep it gitignored and never commit it.
-- Path-scoped rules live in `.claude/rules/` and load only for matching files
-  (for example, `.claude/rules/latex.md` for `*.tex`, `*.sty`, `*.cls`, `*.dtx`,
-  and `*.ins`).
+- Path-scoped rules load only for matching files — `.claude/rules/latex.md` for
+  `*.tex`, `*.sty`, `*.cls`, `*.dtx`, and `*.ins`.
 - Recurring multi-step procedures live in `.claude/skills/` and load on demand.
+
+Both are symlinks into `.agents/`, which is the vendor-neutral location other
+agents already scan:
+
+```text
+.claude/rules/latex.md        -> ../../.agents/rules/latex.md
+.claude/skills/open-draft-pr  -> ../../.agents/skills/open-draft-pr
+.claude/skills/release-notes  -> ../../.agents/skills/release-notes
+```
+
+Edit the file in `.agents/`, never the link. Do not replace a link with a copy:
+a second copy is what let the two skill sets drift apart before this layout, and
+Claude Code resolves symlinked rules and skill directories normally.
 
 ## Permissions and enforcement
 
@@ -33,16 +45,26 @@ hard-coded generic identity, or add a duplicate attribution trailer. Attribute
 Claude only when it materially co-authored the commit, and preserve at most one
 attribution block.
 
+The trailer names the session's active model, so it is not a constant — this
+repository already contains both `Claude Opus 5` and `Claude Sonnet 5
+<noreply@anthropic.com>`. Copy the identity from the commit when writing the PR
+disclosure; never retype it from memory.
+
+The commit trailer does not satisfy the PR disclosure. `AGENTS.md` ("AI
+attribution and disclosure") requires both, and the `AI assistance` section is
+the last section of `.github/pull_request_template.md`.
+
 ## Draft pull requests
 
-For an authorized draft PR, follow `.claude/skills/open-draft-pr/SKILL.md`, which
-loads `docs/agent-workflows/github-project.md`. If GitHub Projects access is
-unavailable, set all supported ordinary PR metadata and report exactly which
-Project fields remain unset.
+For an authorized draft PR, follow the `open-draft-pr` skill, which loads
+`docs/agent-workflows/github-project.md`. Build the PR body from
+`.github/pull_request_template.md` and fill every section, including the final
+`AI assistance` one. If GitHub Projects access is unavailable, set all supported
+ordinary PR metadata and report exactly which Project fields remain unset.
 
 ## Release notes
 
-For a `CHANGELOG.md` entry or GitHub Release notes, follow
-`.claude/skills/release-notes/SKILL.md`, which loads
-`docs/agent-workflows/release-notes.md`. Never tag or publish a release
-without the maintainer's explicit authorization for that exact release.
+For a `CHANGELOG.md` entry or GitHub Release notes, follow the `release-notes`
+skill, which loads `docs/agent-workflows/release-notes.md`. Never tag or publish
+a release without the maintainer's explicit authorization for that exact
+release.

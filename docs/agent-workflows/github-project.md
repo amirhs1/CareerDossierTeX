@@ -52,21 +52,28 @@ Confirm:
 
 ## PR body
 
-Include:
+`.github/pull_request_template.md` is the canonical section set. Keep its
+section order and fill every section. In order:
 
-- concise summary;
-- `Closes #NN` for the focused issue when the PR should complete it;
-- AI-assistance disclosure naming each material tool and its role; when a commit
-  carries an AI co-author trailer, repeat that trailer's identity and email in
-  the disclosure so the commit and PR records agree;
-- change list;
-- public-API impact;
-- tests run and exact outcomes;
-- tests added or updated under `tests/`, including the expected pre-fix failure
-  when it was demonstrated;
-- visual and accessibility checks when relevant;
-- documentation and changelog impact;
-- known limitations and follow-up work.
+- **Summary** — concise statement of the change and its purpose;
+- **Related issues** — `Closes #NN` for the focused issue when the PR should
+  complete it;
+- **Changes** — the change list;
+- **Public API impact**;
+- **Testing** — tests run and exact outcomes, and tests added or updated under
+  `tests/`, including the expected pre-fix failure when it was demonstrated;
+- **Visual verification** — visual and accessibility checks when relevant;
+- **Notes for review** — design decisions, known limitations, follow-up work,
+  and documentation/changelog impact;
+- **AI assistance** — last, and never omitted or left as template text. Name
+  each AI tool that materially shaped the contribution and its role, or state
+  `None`. When a branch commit carries an AI `Co-authored-by` trailer, repeat
+  that trailer's exact identity and email so the commit and PR records agree.
+  Read the trailers rather than recalling them:
+
+  ```bash
+  git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
+  ```
 
 Do not close the parent epic from a focused implementation PR.
 
