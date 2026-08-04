@@ -275,7 +275,7 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierProseSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierProseSubsectionAboveSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
 | `\CDossierProseSubsectionBelowSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierRecordEntryAboveSkip` | 0.4375 | 5.25 pt | 5.95 pt | 6.34375 pt |
+| `\CDossierRecordEntryAboveSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierRecordEntryGapSkip` | 0.0625 | 0.75 pt | 0.85 pt | 0.90625 pt |
 | `\CDossierRecordListEdgeAboveSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierRecordListEdgeBelowSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |

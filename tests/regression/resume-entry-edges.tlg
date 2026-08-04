@@ -15,7 +15,7 @@ TEST 2: entry-and-list-tokens
 ============================================================
 section-above = 11.90001pt
 section-below = 5.95pt
-entry-above = 5.95pt
+entry-above = 4.25pt
 entry-gap = 0.85pt
 list-edge-above = 3.4pt
 list-edge-below = 6.8pt
