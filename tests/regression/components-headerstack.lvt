@@ -40,7 +40,7 @@
     \TYPE { parskip~=~ \dim_eval:n { \parskip } }
     \TYPE { name-gap~=~ \dim_eval:n { \CDossierSharedHeaderNameGapSkip } }
     \TYPE { meta-gap~=~ \dim_eval:n { \CDossierSharedHeaderMetaGapSkip } }
-    \TYPE { below~=~ \dim_eval:n { \CDossierSharedHeaderBelowSkip } }
+    \TYPE { below~=~ \dim_eval:n { \CDossierLetterHeaderBelowSkip } }
   }
 \NewDocumentCommand \cdossiertestTraceAddvspace { } { \cdossiertest_trace_addvspace: }
 \NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
@@ -69,6 +69,21 @@
 % the absent headline leaves no gap of its own behind.
 \TEST{gaps-without-headline}{
   \CDossierSetup{headline = {}}
+  \cdossiertestTraceAddvspace
+  \MakeCDossierHeader
+  \par
+}
+
+% Issue #223: the boundary below the stack is owned by the *letter's* token, not
+% by a token shared with the record classes. All three families ship at one
+% ratio, so equal values cannot tell them apart; the three tokens are given
+% distinct, deliberately un-calibrated values here and the emitted gap names
+% which one the class selected. Before the split this reported 44.0pt.
+\TEST{below-token-is-the-letter-family-token}{
+  \CDossierSetup{headline = {}}
+  \setlength\CDossierLetterHeaderBelowSkip{33pt}
+  \setlength\CDossierRecordHeaderBelowSkip{44pt}
+  \setlength\CDossierProseHeaderBelowSkip{55pt}
   \cdossiertestTraceAddvspace
   \MakeCDossierHeader
   \par

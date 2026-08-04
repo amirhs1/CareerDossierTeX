@@ -354,15 +354,15 @@ removing them changes no output:
 | Removed | Use instead | Why it never rendered |
 |---|---|---|
 | `\CDossierRecordEntryBelowSkip` | `\CDossierRecordEntryAboveSkip` | Block boundaries compose with `\addvspace`, which takes the maximum of the adjacent claims, never their sum. At 0.125 this token lost to `\CDossierRecordEntryAboveSkip` (0.25) between two entries and to `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every boundary it appeared at. |
-| `\CDossierLetterheadBelowSkip` | `\CDossierSharedHeaderBelowSkip` | It claimed the header → date boundary immediately after `\MakeCDossierHeader` had already claimed it, at a smaller value (0.75 against 0.8125), so the maximum discarded it. |
+| `\CDossierLetterheadBelowSkip` | `\CDossierLetterHeaderBelowSkip` | It claimed the header → date boundary immediately after `\MakeCDossierHeader` had already claimed it, at a smaller value (0.75 against 0.8125), so the maximum discarded it. |
 | `\CDossierHeaderAboveSkip`, renamed `\CDossierSharedHeaderAboveSkip` earlier in this release | nothing — the boundary does not exist | It claimed the boundary *above* the first header line. Every class renders its header as the first material in the document, and TeX discards glue at the top of a page, so the token rendered nothing at `0.00` or at any other value. |
 
 A document that sets any of these names will now get an
 undefined-control-sequence error. Delete the setting
 (`\CDossierRecordEntryBelowSkip`, `\CDossierHeaderAboveSkip`) or move it to
-`\CDossierSharedHeaderBelowSkip` (`\CDossierLetterheadBelowSkip`) — but note
-that the latter is shared with the résumé and CV headers, so it also changes
-the header → section gap in those classes.
+`\CDossierLetterHeaderBelowSkip` (`\CDossierLetterheadBelowSkip`), which owns
+the letter's header → date boundary and, since the split below, affects no
+other class.
 
 Added:
 
@@ -482,7 +482,7 @@ Before → after:
 | `\CDossierHeaderAboveSkip` | `\CDossierSharedHeaderAboveSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
 | `\CDossierHeaderNameGapSkip` | `\CDossierSharedHeaderNameGapSkip` |
 | `\CDossierHeaderMetaGapSkip` | `\CDossierSharedHeaderMetaGapSkip` |
-| `\CDossierHeaderBelowSkip` | `\CDossierSharedHeaderBelowSkip` |
+| `\CDossierHeaderBelowSkip` | `\CDossierRecordHeaderBelowSkip`, `\CDossierProseHeaderBelowSkip`, **and** `\CDossierLetterHeaderBelowSkip` (split — see below) |
 | `\CDossierSectionAboveSkip` | `\CDossierRecordSectionAboveSkip` |
 | `\CDossierSectionRuleSkip` | `\CDossierRecordSectionRuleGapSkip` |
 | `\CDossierSectionBelowSkip` | `\CDossierRecordSectionBelowSkip` |
@@ -572,6 +572,42 @@ the other as a side effect. `\CDossierLetterParSkip` ships at the same `0.50`
 ratio as `\CDossierProseParSkip`, so the split renders no document differently;
 only source that reads or sets the letter's paragraph gap by name needs the
 edit.
+
+### `\CDossierHeaderBelowSkip` split into one token per family
+
+Before:
+
+\CDossierHeaderBelowSkip   % v0.6.0: the gap below the header block in all
+                           % four classes
+
+After:
+
+\CDossierRecordHeaderBelowSkip   % careerdossier-resume, careerdossier-cv
+\CDossierProseHeaderBelowSkip    % careerdossier-statement
+\CDossierLetterHeaderBelowSkip   % careerdossier-letter
+
+Reason: the two gaps *inside* the header block are genuinely shared — every
+class stacks the same lines in the same order, and the block zeroes `\parskip`
+for its own scope, so one ratio renders one gap everywhere. The gap *below* the
+block is not shared in that sense: it is a boundary against whatever the class
+puts next, and that neighbour differs per family — a ruled `\CDossierSection`
+in the record classes, a prose section heading in the statement, and the date
+line (`\CDossierLetterBlockSkip`, `0.50`) in the letter. One token therefore had
+to clear whichever of those was largest in *any* class, so raising the
+statement's section gap spent vertical space in the résumé and the CV, and the
+letter carried a floor set by a section boundary it does not have.
+
+All three ship at the `0.8125` ratio the single token carried, so the split
+renders no document differently; only source that reads or sets the gap below a
+header by name needs the edit. Replace `\CDossierHeaderBelowSkip` with the
+token for the class being styled, and set all three when styling every class
+from one shared preamble. Retuning any of them is tracked separately under
+issue #206.
+
+Note the intermediate name. Earlier in this same unreleased release the token
+was renamed `\CDossierSharedHeaderBelowSkip`; that name is superseded here and
+was never released, so `v0.6.0` source migrates straight from
+`\CDossierHeaderBelowSkip` to the three tokens above.
 
 ### `careerdossier-tokens` no longer reads global `\documentclass` options
 

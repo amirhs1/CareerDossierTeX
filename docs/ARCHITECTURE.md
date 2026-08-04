@@ -265,7 +265,9 @@ retaining a small, inspectable spacing vocabulary.
 |---|---:|---:|---:|---:|
 | `\CDossierSharedHeaderNameGapSkip` | 0.25 | 3.0 pt | 3.4 pt | 3.625 pt |
 | `\CDossierSharedHeaderMetaGapSkip` | 0.1875 | 2.25 pt | 2.55 pt | 2.71875 pt |
-| `\CDossierSharedHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
+| `\CDossierRecordHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
+| `\CDossierProseHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
+| `\CDossierLetterHeaderBelowSkip` | 0.8125 | 9.75 pt | 11.05 pt | 11.78125 pt |
 | `\CDossierRecordSectionAboveSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
 | `\CDossierRecordSectionRuleGapSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierRecordSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
@@ -417,9 +419,9 @@ token's value.
    retires the two that never won a maximum — `\CDossierRecordEntryBelowSkip`
    (entry → entry, always beaten by `\CDossierRecordEntryAboveSkip`, and entry →
    section, always beaten by `\CDossierRecordSectionAboveSkip`) and
-   `\CDossierLetterheadBelowSkip` (header → date, always beaten by
-   `\CDossierSharedHeaderBelowSkip`, which the shared header has already
-   contributed at the same point).
+   `\CDossierLetterheadBelowSkip` (header → date, always beaten by the header
+   stack's own below-token — since #223 `\CDossierLetterHeaderBelowSkip` — which
+   the shared header has already contributed at the same point).
 
    A gap that must *not* participate in a maximum has to be a `\vspace`, and one
    that must has to be an `\addvspace`. `\CDossierRecordEntryGapSkip` was the
@@ -441,8 +443,8 @@ token's value.
    Every header line is its own paragraph, so before #204 the prose classes'
    document-wide `\parskip` (0.50) landed in every header boundary on top of the
    header token, and the header tokens could not express a gap below that floor.
-   The header group now zeroes `\parskip` for its own scope, so the three header
-   gap tokens govern header spacing identically in all four classes.
+   The header group now zeroes `\parskip` for its own scope, so the two shared
+   header gap tokens govern header spacing identically in all four classes.
 
    That zero is deliberately not a token. #204 exposed it as
    `\CDossierSharedHeaderParSkip`, but the value cancelled itself: the stack
@@ -470,6 +472,23 @@ paragraphs. A single shared token made retuning either class a side effect on
 the other. Both ship at the same 0.50 ratio so the split itself does not move
 any rendered gap; retuning either is a separate, independently reviewable
 decision.
+
+`\CDossierRecordHeaderBelowSkip`, `\CDossierProseHeaderBelowSkip`, and
+`\CDossierLetterHeaderBelowSkip` are the same kind of split (#223), one step
+further out. The two gaps *inside* the header stack are genuinely shared — every
+class stacks the same shape, and the group-local `\parskip` zero above makes one
+ratio render one gap everywhere — but the gap *below* the stack is a boundary
+against whatever the class puts next, and that neighbour differs per family: a
+ruled `\CDossierSection` in the record classes, a prose section heading in the
+statement, and the date line (`\CDossierLetterBlockSkip`) in the letter. The
+single `\CDossierSharedHeaderBelowSkip` therefore had to clear whichever of
+those was largest in *any* class, so raising the statement's section gap spent
+vertical space in the résumé and the CV, and the letter carried a floor set by a
+section boundary it does not have. `careerdossier-components` no longer names
+the token itself: each class declares its own with
+`\__cdossier_components_headerbelow:N` when it loads, and the header stack emits
+that. All three ship at the `0.8125` ratio the shared token carried, so the
+split moves nothing; #206 owns any retune.
 
 `tests/regression/tokens-invariants.lvt` records the ordering relations these
 rules imply, one line per relation, at all three supported sizes. The baseline is

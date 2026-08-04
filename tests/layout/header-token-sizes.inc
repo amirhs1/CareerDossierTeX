@@ -46,7 +46,7 @@
             { absent~headline~used~a~headline~size } }
     \fi
     \dim_compare:nNnF
-      { \CDossierSharedHeaderBelowSkip } > { \CDossierRecordSectionAboveSkip }
+      { \CDossierRecordHeaderBelowSkip } > { \CDossierRecordSectionAboveSkip }
       { \msg_fatal:nnn { cdossier-test } { header-layout }
           { header-below~spacing~must~exceed~section-above~spacing } }
   }

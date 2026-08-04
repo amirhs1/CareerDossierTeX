@@ -179,6 +179,12 @@
 \MakeCDossierPageFurniture
 \CDossierApplyPageBreakPenalties
 
+%% Issue #223: the shared header stack ends at a boundary against whatever the
+%% class puts next -- here a ruled \CDossierSection -- so the class names the
+%% token that owns it rather than sharing one gap with the letter and the
+%% statement, whose next block is not a ruled section at all.
+\__cdossier_components_headerbelow:N \CDossierRecordHeaderBelowSkip
+
 %% The keep-together penalty (issue #145) after the heading and rule keeps the
 %% title with the content that follows it, so a section heading is never
 %% stranded alone at the foot of a page.

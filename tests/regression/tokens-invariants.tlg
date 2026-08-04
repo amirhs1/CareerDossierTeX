@@ -4,8 +4,9 @@ Don't change this file in any respect.
 TEST 1: boundary-token-ordering
 ============================================================
 fontsize=10pt
-SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
-SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
+RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
+ProseHeaderBelowSkip>ProseSectionAboveSkip => violated
+LetterHeaderBelowSkip>LetterBlockSkip => holds
 RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => violated
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => violated
@@ -22,8 +23,9 @@ LetterBodyAboveSkip=LetterBodyBelowSkip => holds
 LetterBodyAboveSkip>LetterBlockSkip => violated
 LetterBlockSkip>LetterParSkip => violated
 fontsize=11pt
-SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
-SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
+RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
+ProseHeaderBelowSkip>ProseSectionAboveSkip => violated
+LetterHeaderBelowSkip>LetterBlockSkip => holds
 RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => violated
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => violated
@@ -40,8 +42,9 @@ LetterBodyAboveSkip=LetterBodyBelowSkip => holds
 LetterBodyAboveSkip>LetterBlockSkip => violated
 LetterBlockSkip>LetterParSkip => violated
 fontsize=12pt
-SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
-SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
+RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
+ProseHeaderBelowSkip>ProseSectionAboveSkip => violated
+LetterHeaderBelowSkip>LetterBlockSkip => holds
 RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => violated
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => violated

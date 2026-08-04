@@ -1489,10 +1489,15 @@ resolved values at each `fontsize` are tabulated in
 
 | Family | Tokens |
 |---|---|
-| Shared (all four classes) | `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip`, `\CDossierSharedHeaderBelowSkip` |
-| Record (résumé, CV) | `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
-| Prose (statement) | `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
-| Letter | `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
+| Shared (all four classes) | `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip` |
+| Record (résumé, CV) | `\CDossierRecordHeaderBelowSkip`, `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
+| Prose (statement) | `\CDossierProseHeaderBelowSkip`, `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
+| Letter | `\CDossierLetterHeaderBelowSkip`, `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
+
+Only the two gaps *inside* the header block are shared. The gap *below* it is a
+boundary against whatever the class puts next — a ruled section in the record
+classes, a prose section in the statement, the date line in the letter — so each
+family owns that one, and all three ship at the same `0.8125` ratio.
 
 Two rules govern how a token reaches the page, and overriding a token without
 them in mind is the usual reason an override appears to do nothing:
@@ -1511,13 +1516,16 @@ them in mind is the usual reason an override appears to do nothing:
   that is `\CDossierProseParSkip`, and in the letter class it is
   `\CDossierLetterParSkip`; a token at such a boundary is emitted as
   `token − \parskip` so the token still names the rendered gap. The header block
-  zeroes `\parskip` for its own scope, which is why the three header gap tokens
-  behave identically in all four classes.
+  zeroes `\parskip` for its own scope, which is why the two shared header gap
+  tokens behave identically in all four classes.
 
-Since `v0.7.0`, `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`,
-and `\CDossierLetterBodyBelowSkip` are new, and `\CDossierRecordEntryBelowSkip`,
-`\CDossierLetterheadBelowSkip`, and `\CDossierSharedHeaderAboveSkip` are
-removed; see [`MIGRATION.md`](MIGRATION.md#070---unreleased).
+Since `v0.7.0`, `\CDossierRecordHeaderBelowSkip`,
+`\CDossierProseHeaderBelowSkip`, `\CDossierLetterHeaderBelowSkip`,
+`\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`, and
+`\CDossierLetterBodyBelowSkip` are new, and `\CDossierRecordEntryBelowSkip`,
+`\CDossierLetterheadBelowSkip`, `\CDossierSharedHeaderAboveSkip`, and
+`\CDossierSharedHeaderBelowSkip` are removed; see
+[`MIGRATION.md`](MIGRATION.md#070---unreleased).
 
 The calibrated *values* are not stable API before `v1.0.0`; the token names and
 the boundaries they own are.

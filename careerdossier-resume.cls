@@ -188,6 +188,12 @@
 \setlength { \parskip }   { \CDossierRecordParSkip }
 \CDossierApplyPageBreakPenalties
 
+%% Issue #223: the shared header stack ends at a boundary against whatever the
+%% class puts next -- here a ruled \CDossierSection -- so the class names the
+%% token that owns it rather than sharing one gap with the letter and the
+%% statement, whose next block is not a ruled section at all.
+\__cdossier_components_headerbelow:N \CDossierRecordHeaderBelowSkip
+
 %% ---------------------------------------------------------------------------
 %% \CDossierSection {title} -- a résumé section heading followed by a full-width
 %% rule. Uses the semantic section style with class-controlled size, spacing,

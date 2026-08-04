@@ -40,7 +40,9 @@
     \cdossiertest_dimension:N \CDossierListLabelSep
     \cdossiertest_skip:N \CDossierSharedHeaderNameGapSkip
     \cdossiertest_skip:N \CDossierSharedHeaderMetaGapSkip
-    \cdossiertest_skip:N \CDossierSharedHeaderBelowSkip
+    \cdossiertest_skip:N \CDossierRecordHeaderBelowSkip
+    \cdossiertest_skip:N \CDossierProseHeaderBelowSkip
+    \cdossiertest_skip:N \CDossierLetterHeaderBelowSkip
     \cdossiertest_skip:N \CDossierRecordSectionAboveSkip
     \cdossiertest_skip:N \CDossierRecordSectionRuleGapSkip
     \cdossiertest_skip:N \CDossierRecordSectionBelowSkip

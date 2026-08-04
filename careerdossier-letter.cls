@@ -209,6 +209,12 @@
 %% the shared values and the reasoning for using one strength across families.
 \CDossierApplyPageBreakPenalties
 
+%% Issue #223: nothing that follows a letter header is a section -- the next
+%% block is the date line, at \CDossierLetterBlockSkip. The letter therefore
+%% names its own gap below the header stack instead of carrying a floor set by
+%% a section boundary the class does not have.
+\__cdossier_components_headerbelow:N \CDossierLetterHeaderBelowSkip
+
 %% ---------------------------------------------------------------------------
 %% Letter metadata.
 %%
@@ -319,11 +325,12 @@
 %% and the vertical space that follows it are emitted together, so an absent
 %% recipient or subject leaves no gap. \MakeCDossierHeader validates `name'.
 %%
-%% Issue #204: the header -> date boundary is owned by
-%% \CDossierSharedHeaderBelowSkip, which \MakeCDossierHeader has already
-%% contributed. The retired \CDossierLetterheadBelowSkip claimed the same
-%% boundary immediately afterwards with a smaller value (0.75 against 0.8125),
-%% and `\addvspace' takes the maximum, so it never reached the page.
+%% Issue #204: the header -> date boundary is owned by the header stack's own
+%% below-token, which \MakeCDossierHeader has already contributed -- for this
+%% class \CDossierLetterHeaderBelowSkip (issue #223). The retired
+%% \CDossierLetterheadBelowSkip claimed the same boundary immediately
+%% afterwards with a smaller value (0.75 against 0.8125), and `\addvspace'
+%% takes the maximum, so it never reached the page.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierLetterhead { }
   {
