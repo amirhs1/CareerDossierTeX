@@ -45,12 +45,9 @@ deleting the ones that seem empty. In order:
 `docs/agent-workflows/github-project.md` states what belongs in each section.
 **`AI assistance` is always last.**
 
-When writing the body to a file for `gh pr create --body-file`, start from the
-committed template so a section is never silently dropped:
-
-```bash
-cp .github/pull_request_template.md /tmp/pr-body.md   # then fill each section
-```
+When writing the body to a file for `gh pr create --body-file`, start from a
+copy of the committed template so a section is never silently dropped, and keep
+that copy outside the repository so it is never staged.
 
 ### AI assistance
 
