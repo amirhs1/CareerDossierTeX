@@ -331,20 +331,15 @@ one shared, proportional design system, driven by two public inputs —
 
 ### Agreed defaults and their measured cost
 
-Defaults are per class, not uniform, because document conventions differ.
-Characters per line are measured from extracted text of full prose lines in
-TeX Gyre Termes on US Letter:
-
-| Class | `fontsize` | `margin` | Characters per line |
-|---|---|---|---|
-| résumé | `11pt` | `narrow` | 118–127 |
-| CV | `12pt` | `normal` | 93–101 |
-| letter | `12pt` | `normal` | 93–101 |
-| statement | `12pt` | `normal` | 93–101 |
+Defaults are per class, not uniform, because document conventions differ: the
+résumé is `11pt` at `margin=narrow`, and the CV, letter, and statement classes
+are `12pt` at `margin=normal`. The measured characters per line for each
+combination live in [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty),
+which records the `\textwidth` values and the counting method alongside them.
 
 The prose classes take `12pt` specifically to control measure: at `normal`,
-`11pt` yields about 102–113 characters per line, outside the conventional
-45–90 guidance, while `12pt` lands just inside it. Capping `\textwidth` from a
+`11pt` runs longer than the conventional 45–90 guidance while `12pt` lands just
+inside it. Capping `\textwidth` from a
 target measure was considered and rejected — reaching 80 characters at `11pt`
 needs side margins near 1.68 in, which no career-services guidance endorses.
 

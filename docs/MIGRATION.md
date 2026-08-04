@@ -41,15 +41,10 @@ size or margin has changed. A document that took two pages may now take three,
 or one. No source edit is required unless you pass `density`, but do not ship
 an upgraded document without looking at it.
 
-The measure changes too. Counting characters including spaces on full lines of
-running prose in TeX Gyre Termes on US Letter:
-
-| Class | `v0.6.0` default | Characters per line |
-|---|---|---|
-| résumé | `11pt`, `narrow` | 118–127 |
-| CV | `12pt`, `normal` | 93–101 |
-| letter | `12pt`, `normal` | 93–101 |
-| statement | `12pt`, `normal` | 93–101 |
+The measure changes too. The résumé defaults to `11pt` at `margin=narrow`, and
+the CV, letter, and statement classes to `12pt` at `margin=normal`; the measured
+characters per line for every combination are tabulated in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
 
 The résumé's default is the longest measure in the project, kept deliberately
 for one-page capacity; see [`API.md`](API.md) for when to override it.
