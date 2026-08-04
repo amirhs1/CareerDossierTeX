@@ -34,12 +34,23 @@ software realization, and its limits can be inspected together.
 
 \section*{Prior and Current Contributions}
 
+% The two subsections below exist so the size/margin matrix renders the
+% subsection pair. Every other statement fixture uses \section alone, which
+% left \CDossierProseSubsectionAboveSkip and \CDossierProseSubsectionBelowSkip
+% unmeasured in rendered output. The first also covers the case the token
+% comment calls out: a section that opens directly with a subsection takes the
+% subsection's above-gap, not the section's below-gap. No prose is added --
+% the existing paragraphs are split between the two headings.
+\CDossierSubsection{Adaptive Algorithms with Meaningful Error Estimates}
+
 My first line of work develops adaptive algorithms whose error estimates remain
 meaningful when data quality and computational resources vary. I combine
 analysis with executable experiments, using small reference implementations to
 make each theoretical claim testable. This approach has helped collaborators
 distinguish uncertainty arising from a physical model from error introduced by
 discretization or implementation choices.
+
+\CDossierSubsection{Durable Computational Records}
 
 A second line of work concerns durable computational records. I design workflows
 that connect source data, environment descriptions, tests, and figures without

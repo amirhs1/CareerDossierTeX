@@ -54,8 +54,10 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   strictly greater than it, while the letter has no heading scale to bound it
   and would prefer a more generous gap. A single shared token meant retuning
   either class's paragraph gap was decided for the other as a side effect.
-  `\CDossierLetterParSkip` ships at the same `0.50` ratio, so the split
-  reflows nothing; see [`docs/MIGRATION.md`](docs/MIGRATION.md).
+  `\CDossierLetterParSkip` was introduced at the same `0.50` ratio
+  `\CDossierProseParSkip` then carried, so the split itself reflowed nothing;
+  [#206] later retuned both to `0.25`. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 - `\CDossierHeaderBegin`, `\CDossierHeaderLine`, and `\CDossierHeaderEnd`
   compose a centered header stack line by line. ([#224])
@@ -74,6 +76,30 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   additive and renders nothing differently.
 
 ### Changed
+
+- **BREAKING (calibrated values):** the vertical-rhythm ratios are retuned.
+  **Every document reflows.** No public name changes and no token is added or
+  removed; only the values move. ([#206])
+
+  The retune does three things. Prose documents tighten: the statement's
+  paragraph gap halves and its section gaps come down with it, so a statement
+  fits more argument on a page. Every heading pair is now asymmetric by at
+  least 2:1, above to below, so a heading binds to the text it introduces
+  instead of floating between two blocks. And two relations that the tokens
+  named but the page never showed now hold in rendered white — a bullet list
+  sits closer to the entry that owns it than to the next one, and the letter's
+  body is framed by a gap visibly wider than an ordinary paragraph break.
+
+  Measured on the built documents: the statement's section pair renders 9.65 pt
+  above against 3.27 pt below at 12 pt, and its subsections 7.03 / 2.68. The
+  résumé's bullet lists sit 2.30 pt below their entry heading and 4.99 pt above
+  the next entry, reversing an inversion in which a list sat *further* from the
+  entry that owned it. **No supported combination changes its page count** —
+  all four classes at both margins and all three body sizes.
+
+  A document that overrode any of these tokens keeps its own value and is
+  unaffected. To restore the previous spacing exactly, set the tokens to the
+  ratios recorded in the `v0.6.0` vertical-rhythm table.
 
 - **BREAKING (design token):** the header block now zeroes its own paragraph
   gap instead of inheriting the prose classes' document-wide `\parskip`, so the
@@ -443,6 +469,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 [#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
+[#206]: https://github.com/amirhs1/CareerDossierTeX/issues/206
 [#212]: https://github.com/amirhs1/CareerDossierTeX/issues/212
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219

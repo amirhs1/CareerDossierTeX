@@ -15,6 +15,17 @@
 %    \CDossierRecordEntryBelowSkip claimed the boundary from the other side and
 %    lost every maximum it entered.
 %
+% 3. \CDossierRecordEntryAboveSkip is only reachable between two entries that
+%    carry no bullet list. Where an entry ends with a list, that boundary is
+%    max(\CDossierRecordListEdgeBelowSkip, \CDossierRecordEntryAboveSkip) and
+%    the list edge governs it; where an entry opens a section, it is
+%    max(\CDossierRecordSectionBelowSkip, \CDossierRecordEntryAboveSkip) and
+%    the section gap governs it. TEST 1 alone therefore reports the token's
+%    value without ever rendering it, which is exactly the unreachable-token
+%    condition issue #204 exists to prevent. TEST 3 supplies the missing shape
+%    -- two bodiless entries, as the résumé's Education and Certificates
+%    sections are written -- so a change to the ratio moves a recorded number.
+%
 % \pagetotal is the assertion: it is the height of the page so far, so the
 % difference across a boundary is the rendered gap, after the maxima have
 % resolved. Tracing the skips instead would report the claims, not the result.
@@ -68,6 +79,22 @@
 % The tokens the marks above resolve, for reading the differences against.
 \TEST{entry-and-list-tokens}{
   \cdossiertestTokens
+}
+
+% Two bodiless entries. The first sits against the section rule, so its opening
+% boundary is \CDossierRecordSectionBelowSkip; the second sits against the
+% first, so its opening boundary is \CDossierRecordEntryAboveSkip and nothing
+% else claims it. Both entries are a single title line, so the two recorded
+% differences are directly comparable and the second isolates the token.
+\TEST{bare-entry-boundaries}{
+  \CDossierSection{Education}
+  \cdossiertestMark{after-education-heading}
+  \begin{CDossierEntry}[title = {Ph.D. in Computer Science}]
+  \end{CDossierEntry}
+  \cdossiertestMark{after-first-bare-entry}
+  \begin{CDossierEntry}[title = {M.Sc. in Software Engineering}]
+  \end{CDossierEntry}
+  \cdossiertestMark{after-second-bare-entry}
 }
 
 \END

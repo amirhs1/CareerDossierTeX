@@ -123,13 +123,23 @@
           { \CDossierProseSubsectionBelowSkip }
           < { \CDossierProseSectionBelowSkip }
       }
-    %% Two entries must sit closer together than an entry and the section
+    %% Two entries must not sit further apart than an entry and the section
     %% heading above it, or the section boundary stops reading as the stronger.
+    %%
+    %% Stated as `<=', not `<'. The two boundaries are not comparable in the way
+    %% a strict ordering assumes: the section boundary carries a rule, so it is
+    %% marked by ink as well as by white and does not need to win on white
+    %% alone. Equality also lets one value serve both the inter-entry gap and
+    %% the gap below a list, which is what keeps entry separation uniform
+    %% between a section whose entries carry bullet lists and one whose entries
+    %% do not -- see `RecordListEdgeBelowSkip'. This is the same argument that
+    %% retired rule 5's "match the two section pairs" in issue #206: a ruled
+    %% heading and a bare one spend their gaps differently.
     \cdossiertest_invariant:nn
-      { RecordEntryAboveSkip < RecordSectionBelowSkip }
+      { RecordEntryAboveSkip <= RecordSectionBelowSkip }
       {
-        \dim_compare_p:nNn
-          { \CDossierRecordEntryAboveSkip } < { \CDossierRecordSectionBelowSkip }
+        ! \dim_compare_p:nNn
+            { \CDossierRecordEntryAboveSkip } > { \CDossierRecordSectionBelowSkip }
       }
     %% The entry heading -> body gap is a floor a list overrides, so it may not
     %% exceed the list's own opening edge.
