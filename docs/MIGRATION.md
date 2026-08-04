@@ -1,5 +1,10 @@
 # Migration Notes
 
+For people with documents built on an earlier release: what changed between
+versions, which changes need a source edit, and which only change how a document
+renders. Read it before upgrading. It records the *differences* — the current
+interface itself is in [`API.md`](API.md).
+
 ## Status
 
 `v0.6.0` is the current published release. It **removes the `density` option

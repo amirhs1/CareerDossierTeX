@@ -1,5 +1,10 @@
 # CareerDossierTeX Public API
 
+For people writing documents with the toolkit: every public class, option,
+command, key, and design token, with its accepted values and default. It
+describes the released interface, not the internals —
+[`ARCHITECTURE.md`](ARCHITECTURE.md) covers which module owns what and why.
+
 ## Status
 
 This document records the released public interface:

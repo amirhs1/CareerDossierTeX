@@ -2,6 +2,11 @@
 
 A reusable LuaLaTeX toolkit for producing consistent career documents from shared profile data.
 
+For people using the toolkit: what it supports today, how to install and build,
+and the options at a glance. [`docs/API.md`](docs/API.md) is the complete
+interface reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing
+the code.
+
 > **Status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is the current
 > published release. It replaces the mixture of inherited `article` defaults
 > with one shared, proportional design system driven by `fontsize` and

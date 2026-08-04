@@ -1,5 +1,10 @@
 # CareerDossierTeX Roadmap
 
+Release scope, phase boundaries, and explicit non-goals — what each release is
+for, and what it deliberately excludes. **Nothing here is a support statement.**
+A feature described in a planned phase does not exist yet; `README.md` and
+[`API.md`](API.md) describe what is actually released.
+
 ## Product direction
 
 CareerDossierTeX is a reusable LuaLaTeX toolkit for creating consistent career documents from shared profile data.

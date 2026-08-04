@@ -2,6 +2,11 @@
 
 Thank you for helping improve CareerDossierTeX.
 
+For people changing the code: how to propose, build, test, and submit a change.
+[`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md) owns the naming rules
+this file refers to, and [`AGENTS.md`](AGENTS.md) is the equivalent contract for
+AI coding agents.
+
 This project uses focused issues, short-lived branches, pull requests, repeatable LuaLaTeX builds, and incremental releases. The goal is not process for its own sake; the goal is a repository whose behavior and history remain understandable.
 
 ## Before contributing

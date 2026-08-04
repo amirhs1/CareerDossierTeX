@@ -1,5 +1,10 @@
 # CareerDossierTeX Architecture
 
+For people changing the code: which module owns which concern, why the
+boundaries fall where they do, and how the pieces load. It is the reference for
+deciding *where* a change belongs. What each public name does belongs in
+[`API.md`](API.md); this file does not restate it.
+
 ## Purpose
 
 CareerDossierTeX is a modular LuaLaTeX toolkit for producing related career documents from shared profile data.
