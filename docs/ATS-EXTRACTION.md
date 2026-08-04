@@ -975,7 +975,7 @@ Every file should identify itself and its minimum kernel date:
 ```tex
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesClass{careerdossier-resume}
-  [2026-07-13 v0.1.0 ATS-conscious résumé class]
+  [2026-07-30 v0.6.0 ATS-conscious résumé class]
 ```
 
 Choose the actual date based on the newest kernel interface used. The current LaTeX
@@ -1374,7 +1374,7 @@ C++, Python, SQL, data modelling, technical writing
 ```tex
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesClass{careerdossier-resume}
-  [2026-07-13 v0.1.0 ATS-conscious résumé class]
+  [2026-07-30 v0.6.0 ATS-conscious résumé class]
 
 % Declare and process class keys (fontsize, margin) here via l3keys,
 % before \LoadClass. Pass documented base-class options deliberately.

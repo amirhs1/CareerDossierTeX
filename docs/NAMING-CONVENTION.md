@@ -276,8 +276,8 @@ Examples:
 ```text
 v0.1.0 — English Industry Dossier
 v0.2.0 — Academic Dossier
-v0.3.0 — Farsi and Bilingual Support
 v0.5.0 — Statements and Customization
+v0.6.0 — Calibrated Type Scale and Rhythm
 v1.0.0 — Stable Public API
 ```
 
