@@ -255,9 +255,14 @@ gh project item-edit --project-id <PVT_...> --id <item-id> \
 # 6. Read the values back. Step 3 populates no field, and step 5 addresses an
 #    item by id, so a wrong id succeeds silently against the wrong row. This
 #    query is the only evidence the values landed.
+#
+#    The field keys are lower-case: status, phase, priority, size. jq's {Status}
+#    shorthand means {Status: .Status} and yields null for every field, which
+#    reads exactly like unset metadata. Spell each mapping out.
 gh project item-list <project-number> --owner amirhs1 --limit 400 --format json \
   --jq '.items[] | select(.content.number==<pr-number>
-        and .content.type=="PullRequest") | {Status, Phase, Priority, Size}'
+        and .content.type=="PullRequest")
+        | {Status:.status, Phase:.phase, Priority:.priority, Size:.size}'
 
 # Repository metadata reads back separately
 gh pr view <pr-number> --json isDraft,assignees,labels,milestone
