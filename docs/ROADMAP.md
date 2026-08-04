@@ -1,5 +1,10 @@
 # CareerDossierTeX Roadmap
 
+Release scope, phase boundaries, and explicit non-goals — what each release is
+for, and what it deliberately excludes. **Nothing here is a support statement.**
+A feature described in a planned phase does not exist yet; `README.md` and
+[`API.md`](API.md) describe what is actually released.
+
 ## Product direction
 
 CareerDossierTeX is a reusable LuaLaTeX toolkit for creating consistent career documents from shared profile data.
@@ -331,20 +336,15 @@ one shared, proportional design system, driven by two public inputs —
 
 ### Agreed defaults and their measured cost
 
-Defaults are per class, not uniform, because document conventions differ.
-Characters per line are measured from extracted text of full prose lines in
-TeX Gyre Termes on US Letter:
-
-| Class | `fontsize` | `margin` | Characters per line |
-|---|---|---|---|
-| résumé | `11pt` | `narrow` | 118–127 |
-| CV | `12pt` | `normal` | 93–101 |
-| letter | `12pt` | `normal` | 93–101 |
-| statement | `12pt` | `normal` | 93–101 |
+Defaults are per class, not uniform, because document conventions differ: the
+résumé is `11pt` at `margin=narrow`, and the CV, letter, and statement classes
+are `12pt` at `margin=normal`. The measured characters per line for each
+combination live in [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty),
+which records the `\textwidth` values and the counting method alongside them.
 
 The prose classes take `12pt` specifically to control measure: at `normal`,
-`11pt` yields about 102–113 characters per line, outside the conventional
-45–90 guidance, while `12pt` lands just inside it. Capping `\textwidth` from a
+`11pt` runs longer than the conventional 45–90 guidance while `12pt` lands just
+inside it. Capping `\textwidth` from a
 target measure was considered and rejected — reaching 80 characters at `11pt`
 needs side margins near 1.68 in, which no career-services guidance endorses.
 
@@ -629,22 +629,16 @@ required by a feature's acceptance criteria.
 The repository uses an `l3build` regression harness (`build.lua`, run with
 `l3build check`) whose sources and baselines live under `tests/regression/`, so
 all test material remains under `tests/` with no top-level `testfiles/`
-directory. Committed regression coverage for the already-merged Phase 1
-packages (base, components, theme, and the non-visual parts of typography) is in
-place alongside the extraction round-trip fixture; extend it with the behavior
-each future change adds.
+directory. Every shared package and every document class carries committed
+regression coverage — no module is exempt — alongside the extraction, layout,
+tagging, bibliography, and lint suites; extend the existing file for a module
+with the behavior each future change adds. `docs/ARCHITECTURE.md` ("Testing
+strategy") holds the current count and its per-module split.
 
 ## Engineering work (tracked as issues)
 
 The live issue and Project metadata now follow the continuous-testing policy:
 
-- Establish the `l3build` regression harness (`build.lua`,
-  `tests/regression/`) during active Phase 1 work in
-  [issue #25](https://github.com/amirhs1/CareerDossierTeX/issues/25). Add each
-  new regression with the behavior it protects.
-- Backfill committed coverage for the already-merged Phase 1 modules in
-  [issue #10](https://github.com/amirhs1/CareerDossierTeX/issues/10). Résumé and
-  letter tests remain owned by their feature issues rather than this debt item.
 - CTAN packaging via `l3build ctan`; decide handwritten vs `.dtx` — `v1.0.0`.
 - Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
   LuaLaTeX transition supersedes that precondition, and opt-in tagged structure

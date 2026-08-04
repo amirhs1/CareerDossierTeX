@@ -2,6 +2,11 @@
 
 Thank you for helping improve CareerDossierTeX.
 
+For people changing the code: how to propose, build, test, and submit a change.
+[`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md) owns the naming rules
+this file refers to, and [`AGENTS.md`](AGENTS.md) is the equivalent contract for
+AI coding agents.
+
 This project uses focused issues, short-lived branches, pull requests, repeatable LuaLaTeX builds, and incremental releases. The goal is not process for its own sake; the goal is a repository whose behavior and history remain understandable.
 
 ## Before contributing
@@ -120,7 +125,7 @@ Use:
 type/short-description
 ```
 
-Recommended prefixes:
+Allowed prefixes:
 
 ```text
 feat/
@@ -130,7 +135,10 @@ test/
 ci/
 refactor/
 release/
+chore/
 ```
+
+`docs/NAMING-CONVENTION.md` section 3 is the canonical list.
 
 Examples:
 
@@ -281,10 +289,13 @@ All automated test sources, expected outputs, fixtures, and runners belong under
 
 ```text
 tests/
+├── lint/         # source-level invariants no compiled fixture can assert
 ├── regression/   # package/class API, options, diagnostics, and fixed bugs
 ├── smoke/        # supported document builds and failure-path fixtures
 ├── extraction/   # text-layer and reading-order round trips
-└── layout/       # long-value, multi-page, and page-break stress sources
+├── layout/       # long-value, multi-page, and page-break stress sources
+├── bibliography/ # Biber-backed sorting and rendered identifier precedence
+└── tagging/      # tagged structure, the untagged path, and the extractor matrix
 ```
 
 Create subdirectories only when the first real test needs them. Keep user-facing
@@ -758,6 +769,13 @@ Update documentation in the same pull request as the related behavior.
 - dependency direction changes;
 - a new shared package is introduced;
 - language, testing, or build strategy changes.
+
+### Update `ATS-EXTRACTION.md` when:
+
+- extracted text content, order, or spacing changes;
+- tagged-structure behavior or a validator result changes;
+- a fixture, baseline, or extractor in the extraction or tagging suites changes;
+- the reproducibility or screen-reader procedure changes.
 
 ### Update `ROADMAP.md` when:
 

@@ -276,8 +276,8 @@ Examples:
 ```text
 v0.1.0 — English Industry Dossier
 v0.2.0 — Academic Dossier
-v0.3.0 — Farsi and Bilingual Support
 v0.5.0 — Statements and Customization
+v0.6.0 — Calibrated Type Scale and Rhythm
 v1.0.0 — Stable Public API
 ```
 
@@ -326,10 +326,14 @@ Use the Project `Status` field for workflow state:
 ```text
 Backlog
 Ready
-In progress
-In review
+In Progress
 Done
+In review
 ```
+
+Listed in the Project's own option order. Copy the exact string from
+`gh project field-list 2 --owner amirhs1`; option lookup is by name, so a
+mismatched transcription sets nothing and reports no error.
 
 Meanings:
 
@@ -337,13 +341,13 @@ Meanings:
 |---|---|
 | Backlog | Accepted but not ready or not currently scheduled |
 | Ready | Defined enough to start |
-| In progress | Active branch or implementation exists |
-| In review | Pull request is open and awaiting checks or review |
+| In Progress | Active branch or implementation exists |
 | Done | Merged, closed, or otherwise completed |
+| In review | Pull request is open and awaiting checks or review |
 
 Rules:
 
-- Parent epic can be `In progress` while the release is active.
+- Parent epic can be `In Progress` while the release is active.
 - Sub-issues should move individually through the workflow.
 - PRs usually correspond to `In review`.
 - Merged PRs and closed issues should become `Done`.

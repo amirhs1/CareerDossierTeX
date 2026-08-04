@@ -343,6 +343,7 @@ Update only the docs affected by behavior:
 
 - public API/default/error changes → `docs/API.md`
 - module/dependency changes → `docs/ARCHITECTURE.md`
+- extraction, tagging, or reading-order changes → `docs/ATS-EXTRACTION.md`
 - phase/release-boundary changes → `docs/ROADMAP.md`
 - incompatible public changes → `docs/MIGRATION.md`
 - user-visible changes → `CHANGELOG.md`
