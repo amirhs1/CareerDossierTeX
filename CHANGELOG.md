@@ -356,6 +356,19 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   environment, or calibrated value changed, and no document renders
   differently.
 
+- The statement class's `type` option is declared as an ordinary l3keys choice
+  list, so it is covered by that lint like every other choice-valued option.
+  ([#236])
+
+  It was the one exception: hand-rolled from `\str_case:nnF`, which the lint
+  keys off `.choices:nn` and could not see. The exclusion cost nothing today —
+  the fallback branch was there and named all seven types — but it left a
+  second way to declare a choice option, one where dropping the fallback makes
+  the option accept a bad value in silence, which is worse than the stock error
+  the lint exists to replace. **Contributor tooling only.** The seven accepted
+  values, the default, and the wording of both the unknown-value and
+  missing-value errors are unchanged, and no document renders differently.
+
 [#183]: https://github.com/amirhs1/CareerDossierTeX/issues/183
 [#184]: https://github.com/amirhs1/CareerDossierTeX/issues/184
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
@@ -371,6 +384,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#222]: https://github.com/amirhs1/CareerDossierTeX/issues/222
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 [#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
+[#236]: https://github.com/amirhs1/CareerDossierTeX/issues/236
 
 ## [0.6.0] - 2026-07-30
 

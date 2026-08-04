@@ -623,9 +623,12 @@ so run it first. A failure names the module, the key, and which half is missing.
 Adding a choice-valued option therefore means adding its message and its
 `unknown` sub-key, not remembering to.
 
-`careerdossier-statement`'s `type` is deliberately outside the lint: it is
-hand-rolled with `\str_case:nnF` rather than `.choices:nn` and already names its
-seven values.
+Every public choice-valued option is inside the lint. That is also why
+`.choices:nn` is the only supported way to declare one: a choice list
+hand-rolled from `\str_case:nnF` — as `careerdossier-statement`'s `type` was
+until `v0.7.0` — is invisible to the lint, and dropping its `F` branch makes it
+accept a bad value in silence, which is worse than the stock error the lint
+exists to replace. Convert such an option rather than declaring a new one.
 
 The fixtures under `tests/lint/fixtures/` are the lint's own tests — one
 complete option and four each missing or misdirecting one half — and the runner

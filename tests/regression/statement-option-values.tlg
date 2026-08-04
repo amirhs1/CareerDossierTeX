@@ -1,7 +1,27 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: unknown-fontsize-value-is-rejected
+TEST 1: accepted-type-values-are-selected
+============================================================
+interest -> interest
+research -> research
+teaching -> teaching
+teaching-philosophy -> teaching-philosophy
+diversity -> diversity
+artist -> artist
+purpose -> purpose
+============================================================
+============================================================
+TEST 2: unknown-type-value-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown statement type 'grant'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted types are: interest, research, teaching, teaching-philosophy, diversity, artist, purpose.
+============================================================
+============================================================
+TEST 3: unknown-fontsize-value-is-rejected
 ============================================================
 ! Package careerdossier-statement Error: Unknown 'fontsize' value '13pt' for careerdossier-statement.
 For immediate help type H <return>.
@@ -10,7 +30,7 @@ l. ...}
 The accepted values are '10pt', '11pt', and '12pt'.
 ============================================================
 ============================================================
-TEST 2: unknown-margin-value-is-rejected
+TEST 4: unknown-margin-value-is-rejected
 ============================================================
 ! Package careerdossier-statement Error: Unknown 'margin' value 'wide' for careerdossier-statement.
 For immediate help type H <return>.
@@ -19,7 +39,7 @@ l. ...}
 The accepted values are 'normal' (one-inch margins) and 'narrow' (half-inch margins).
 ============================================================
 ============================================================
-TEST 3: unknown-paper-value-is-rejected
+TEST 5: unknown-paper-value-is-rejected
 ============================================================
 ! Package careerdossier-statement Error: Unknown 'paper' value 'legal' for careerdossier-statement.
 For immediate help type H <return>.
@@ -28,7 +48,7 @@ l. ...}
 The accepted values are 'letter' (US Letter) and 'a4' (ISO A4).
 ============================================================
 ============================================================
-TEST 4: unknown-bodyfont-value-is-rejected
+TEST 6: unknown-bodyfont-value-is-rejected
 ============================================================
 ! Package careerdossier-statement Error: Unknown 'bodyfont' value 'decorative' for careerdossier-statement.
 For immediate help type H <return>.
@@ -37,7 +57,7 @@ l. ...}
 The accepted values are 'serif' (TeX Gyre Termes body) and 'sans' (TeX Gyre Heros body).
 ============================================================
 ============================================================
-TEST 5: unknown-medium-value-is-rejected
+TEST 7: unknown-medium-value-is-rejected
 ============================================================
 ! Package careerdossier-statement Error: Unknown 'medium' value 'paper' for careerdossier-statement.
 For immediate help type H <return>.
