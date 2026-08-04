@@ -8,7 +8,7 @@ description: Write or update a CareerDossierTeX CHANGELOG.md entry, or draft Git
 Read and follow, in order:
 
 1. `AGENTS.md`
-2. `docs/agent-workflows/release-notes.md`
+2. `reference.md`, alongside this file
 3. `CHANGELOG.md` — existing entries for house style, and the current
    `[Unreleased]` section
 4. `docs/NAMING-CONVENTION.md` (tag, milestone, and release-title naming)
@@ -37,8 +37,7 @@ Read and follow, in order:
 7. Retitle `[Unreleased]` to the dated version heading and open a fresh empty
    `[Unreleased]` section above it.
 8. Draft the GitHub Release body using the structure and worked examples in
-   `docs/agent-workflows/release-notes.md`. Keep it a selective announcement,
-   not a restated CHANGELOG.
+   `reference.md`. Keep it a selective announcement, not a restated CHANGELOG.
 9. Run the LaTeX-package compatibility checklist (engine support,
    `\ProvidesExpl*` version/date sync, public API changes, output-affecting
    changes, dependency changes, unvalidated-scope disclaimers).
@@ -53,5 +52,5 @@ that exact release. Drafting the CHANGELOG entry and the release-note text is
 routine; tagging and publishing are not.
 
 Do not invent a support claim (ATS, WCAG, PDF/UA, or otherwise) beyond what
-`AGENTS.md` and `docs/agent-workflows/release-notes.md` allow, and do not
-carry a preview-feature scope note over into general-capability language.
+`AGENTS.md` and `reference.md` allow, and do not carry a preview-feature scope
+note over into general-capability language.

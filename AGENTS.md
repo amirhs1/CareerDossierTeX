@@ -32,16 +32,21 @@ If sources conflict, report the conflict instead of silently choosing one.
 Use these canonical sources when they exist:
 
 - `README.md` — supported behavior and user-facing status
-- `AI-POLICY.md` — AI use, disclosure, attribution, security, and accountability
+- `AI-POLICY.md` — AI use, disclosure, attribution, security, accountability,
+  and the map of this instruction file set
 - `CONTRIBUTING.md` — contribution, test, PR, CI, and release workflow
+- `.github/pull_request_template.md` — the canonical PR section set
 - `docs/NAMING-CONVENTION.md` — naming for GitHub objects and releases
-- `docs/agent-workflows/github-project.md` — draft PR and Project metadata workflow
-- `docs/agent-workflows/README.md` — map of the agent-instruction file set
+- `.agents/skills/open-draft-pr/reference.md` — draft PR and Project metadata workflow
+- `.agents/skills/release-notes/reference.md` — CHANGELOG and GitHub Release workflow
 - `docs/API.md` — public API, defaults, warnings, and errors
-- `docs/ARCHITECTURE.md` — module boundaries and dependency direction
+- `docs/ARCHITECTURE.md` — per-file responsibilities and dependency direction
+- `docs/ATS-EXTRACTION.md` — extraction, tagging, and reproducibility expectations
 - `docs/ROADMAP.md` — release scope, phases, and non-goals
 - `docs/MIGRATION.md` — public renames and incompatible changes
 - `CHANGELOG.md` — user-visible changes
+- `Makefile` — the build and test entry points an agent should actually run
+- `manifest.txt` — the LPPL Work file set, and the complete list of modules
 - `scripts/setup-labels.sh` — allowed labels
 
 ## Non-negotiable rules
@@ -68,19 +73,53 @@ Use these canonical sources when they exist:
 11. **Maintainer authority:** never push directly to `main`, mark a PR ready,
     merge, enable auto-merge, publish a release, or alter repository protections
     unless the maintainer explicitly authorizes that exact action.
+12. **AI disclosure:** every PR fills in the `AI assistance` section, and every
+    AI co-author trailer on the branch is repeated there verbatim. A commit
+    trailer is not a disclosure. See "AI attribution and disclosure".
 
-## Target module ownership
+## Module ownership
 
-Apply this map when the corresponding files exist. Until then, follow the
-focused issue and current repository structure rather than creating the entire
-target architecture incidentally.
+All ten modules below exist and are released. `docs/ARCHITECTURE.md` holds the
+detailed per-file responsibilities and the disambiguation table; this is the
+short map. `manifest.txt` is the authoritative file list.
 
-- `careerdossier-base.sty` — metadata, shared keys, and validation; no layout
-- `careerdossier-typography.sty` — engine checks, fonts, semantic text roles
-- `careerdossier-theme.sty` — semantic monochrome visual tokens
-- `careerdossier-components.sty` — shared rendered components; no page geometry
-- `careerdossier-resume.cls` — résumé geometry and layout
-- `careerdossier-letter.cls` — industry-letter geometry and prose structure
+Shared packages:
+
+- `careerdossier-base.sty` — profile metadata, the shared profile keys, and
+  required-field validation; no layout, geometry, typography, or colour
+- `careerdossier-tokens.sty` — the calibrated type scale, baseline-derived
+  vertical rhythm, rule and list metrics, and the `margin` page presets; owns
+  `geometry` and the shared body-size application
+- `careerdossier-typography.sty` — the LuaLaTeX engine guard, `fontspec` and
+  default fonts, `bodyfont` selection, and semantic text roles; no colour
+- `careerdossier-theme.sty` — semantic monochrome colour, rule, and link tokens
+- `careerdossier-components.sty` — shared rendered parts: the identity/header
+  stack, page furniture and the `medium` decision, section rules, the contact
+  line, optional-field separators, entry primitives, and PDF metadata; no page
+  geometry
+- `careerdossier-biblatex.sty` — opt-in BibLaTeX/Biber boundary: the numeric
+  year-descending profile, preferred-author emphasis, and DOI→e-print→URL
+  precedence
+
+Document classes:
+
+- `careerdossier-resume.cls` — résumé structure, paper, and class options
+- `careerdossier-letter.cls` — the industry and academic cover-letter families,
+  letter metadata, recipient block, letterhead, and closing
+- `careerdossier-cv.cls` — academic CV flow and the dependency-free manual
+  publication list
+- `careerdossier-statement.cls` — the shared statement model, its `type` values,
+  statement-scoped metadata, and type-specific validation
+
+Dependency direction is one-way. Classes load the shared packages; no shared
+package depends on a class. Classes pass options to the owning package with
+`\PassOptionsToPackage` before `\LoadClass`, so an option's values are validated
+by the package that owns the behavior, not by each class. Two standing rules:
+
+- Page geometry belongs to `careerdossier-tokens.sty`. A class chooses paper and
+  options; it does not set margins itself.
+- `careerdossier-cv.cls` must not load `careerdossier-biblatex.sty`. The CV works
+  without a bibliography toolchain, and BibLaTeX stays opt-in.
 
 Before editing, identify the owning module and affected public API.
 
@@ -107,7 +146,7 @@ Before editing, identify the owning module and affected public API.
 4. **Verify:** run relevant checks, then the supported suite when available.
 5. **Self-review:** inspect the full branch diff, logs, artifacts, and docs.
 6. **Commit:** create coherent commits on the focused feature branch.
-7. **Draft PR:** follow `docs/agent-workflows/github-project.md`.
+7. **Draft PR:** follow `.agents/skills/open-draft-pr/reference.md`.
 8. **Report:** distinguish completed, verified, and unverified work.
 
 Ask a focused question only for a material product, scope, design, release,
@@ -126,40 +165,56 @@ implementation and committed in the same PR. A separate test-only issue is for
 test infrastructure, cross-cutting coverage, or explicit legacy test debt—not a
 place to postpone acceptance tests already required by a feature.
 
-Match the test to the module. Logic-bearing modules (`careerdossier-base.sty`
-and the non-visual parts of
-`careerdossier-typography.sty`) take a focused `l3build` regression test
-(`.lvt` source, saved `.tlg` baseline) per module. Layout classes
-(`careerdossier-resume.cls`, `careerdossier-letter.cls`) take smoke, extraction,
-and reviewed reference-PDF coverage; final layout correctness stays a human
-visual check, so do not force brittle per-metric assertions on unsettled design.
+Match the test to the module. Anything with observable logic — values, options,
+errors, or emitted structure — takes a focused `l3build` regression test (`.lvt`
+source, saved `.tlg` baseline) under `tests/regression/`. Every shared package
+and every class already has such coverage, so extend the existing file for that
+module rather than assuming a module is exempt. Layout behavior additionally
+takes smoke, extraction, tagging, and reviewed reference-PDF coverage; final
+layout correctness stays a human visual check, so do not force brittle
+per-metric assertions on unsettled design.
 
 A saved baseline is the assertion, not a formality: regenerate a `.tlg` or
 extraction reference only for an intended output change, review the diff before
-committing it, and never regenerate one merely to turn a red suite green. The
-`l3build` harness is a prerequisite for `.lvt` tests—stand it up before or with
-the first module that depends on it, and until then record owed regressions as
-tracked debt rather than committing tests no runner can execute.
+committing it, and never regenerate one merely to turn a red suite green. A
+`.tlg` may echo the same value several times; regenerate every affected line,
+not the first one.
 
-When the documented example exists, the baseline form is:
+Run the `Makefile` targets rather than hand-written engine invocations, because
+they redirect output to `build/` and keep the source tree free of artifacts:
 
 ```bash
-latexmk -lualatex -interaction=nonstopmode -halt-on-error \
-  examples/industry/resume-english.tex
+make check   # lint regression extract-test smoke layout bibliography-test tagging examples
 ```
+
+Individual targets: `lint`, `regression`, `smoke`, `layout`, `extract-test`,
+`bibliography-test`, `tagging`, `examples`, and the per-family builds `resume`,
+`letter`, `academic-cv`, `academic-bibliography`, `academic-letter`, and
+`statements`. `review-page-two` and `review-matrix` render pages for visual
+review. Note that the extraction and bibliography targets are `extract-test` and
+`bibliography-test`, while the matching CI jobs are named `extraction` and
+`bibliography`.
 
 Cover the relevant parts of this matrix:
 
-- valid résumé
-- valid industry letter
-- missing required `name` with a clear error
+- each affected document family: résumé, industry letter, academic letter,
+  academic CV, and each affected statement `type`
+- missing required `name` with a clear error, per affected class
 - missing optional `phone` and `website` without stray separators
-- long URL or contact field
-- two-page résumé
-- text extraction and logical reading order
+- long URL or contact field, and contact-line wrapping
+- two-page output, page furniture, and single-page suppression
+- text extraction and logical reading order, across the supported extractors
 - unsupported-engine error
-- both classes after changes to shared packages
+- every option's accepted and rejected values, including the error naming the
+  accepted values, and rejection reported exactly once
+- all affected classes after changes to a shared package
 - tagged and untagged output after changes to tagging or shared packages
+- bibliography sorting and field precedence after `careerdossier-biblatex.sty`
+  or Biber-facing changes
+
+PDF/UA-2 validation with veraPDF is deliberately not part of the per-PR tagging
+job; it runs on the scheduled workflow. Do not describe a PR as PDF/UA-validated
+on the strength of the PR checks alone.
 
 Inspect logs for errors, undefined control sequences, emergency stops, overfull
 boxes, missing glyphs, font substitutions, and unresolved references. For layout
@@ -183,8 +238,8 @@ constraints, options considered, recommendation, and trade-offs.
 - Keep text selectable and searchable.
 - Treat text extraction as a baseline check, not proof of full accessibility.
 - Claim tagged-PDF or PDF/UA conformance only after appropriate validation.
-
-Claude-specific path-scoped LaTeX rules live in `.claude/rules/latex.md`.
+- Tagged structure is opt-in through `\DocumentMetadata{tagging=on}`. Keep the
+  untagged path unchanged when editing tagging code.
 
 ## Git and draft PR policy
 
@@ -200,12 +255,39 @@ Use `docs/NAMING-CONVENTION.md` for names.
 - After maintainer review begins, do not amend published commits, rebase, or
   force-push unless requested or explicitly approved.
 - Do not add agent/tool prefixes to commit or PR titles.
-- Attribute only people or tools that materially co-authored the commit. Use an
-  active agent's current configured attribution; do not hard-code a vendor or
-  model identity or attribute a tool that did not participate.
-- Put trailers in one final block, separated from the message body by a blank
-  line. Use one `Co-authored-by:` line per actual co-author, with no blank lines
-  between trailers, and do not duplicate equivalent attribution.
+
+### AI attribution and disclosure
+
+These are two separate obligations, and the second is the one most often
+missed. Both are required.
+
+1. **Commit trailer.** Attribute only people or tools that materially
+   co-authored that commit. Use the agent's own configured attribution; do not
+   hard-code a vendor or model identity, and do not attribute a tool that did
+   not participate. The identity is not a fixed string — Claude Code's trailer
+   names the session's model, so this repository contains both `Claude Opus 5`
+   and `Claude Sonnet 5 <noreply@anthropic.com>`, while Codex writes
+   `Codex <noreply@openai.com>`.
+2. **PR disclosure.** Every PR fills in the `AI assistance` section of
+   `.github/pull_request_template.md`, which is its last section. Name each tool
+   that materially shaped the work, and repeat the exact identity and email of
+   every AI `Co-authored-by` trailer the branch carries so the commit record and
+   the PR record agree. A trailer does not satisfy this; the disclosure is
+   separate. State `None` when no AI tool materially participated.
+
+Put trailers in one final block, separated from the message body by a blank
+line. Use one `Co-authored-by:` line per actual co-author, with no blank lines
+between trailers, and do not duplicate equivalent attribution.
+
+Read the branch's real trailers before writing the disclosure rather than
+recalling them:
+
+```bash
+git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
+```
+
+`AI-POLICY.md` holds the policy behind both obligations; the `open-draft-pr`
+skill holds the step-by-step procedure.
 
 When implementation of a focused issue is authorized, the agent may commit,
 push the focused branch, open or update a draft PR, and populate routine PR and
@@ -213,8 +295,9 @@ Project metadata without separate approval for every field.
 
 Follow:
 
-- `docs/agent-workflows/github-project.md`
-- the `open-draft-pr` skill available to the current tool
+- `.agents/skills/open-draft-pr/reference.md`
+- the `open-draft-pr` skill, and `.github/pull_request_template.md` for the PR
+  body
 
 The maintainer alone may mark the PR ready, approve, merge, enable auto-merge,
 change release scope, publish releases, or alter Project/repository configuration.
@@ -264,9 +347,9 @@ Update only the docs affected by behavior:
 - incompatible public changes → `docs/MIGRATION.md`
 - user-visible changes → `CHANGELOG.md`
 
-Follow `docs/agent-workflows/release-notes.md` (via the current tool's
-`release-notes` skill) for `CHANGELOG.md` house style and for drafting GitHub
-Release notes; tagging and publishing a release stay maintainer-only.
+Follow `.agents/skills/release-notes/reference.md` (via the `release-notes` skill)
+for `CHANGELOG.md` house style and for drafting GitHub Release notes; tagging
+and publishing a release stay maintainer-only.
 
 Keep `LICENSE` unchanged. Add the required project copyright, license,
 maintenance-status, and maintainer notice to new `.cls` and `.sty` files. Update

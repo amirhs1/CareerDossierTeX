@@ -1,7 +1,7 @@
 # GitHub Project and draft pull-request workflow
 
 This is the canonical repository procedure for opening or updating a draft pull
-request and populating its GitHub metadata. It applies to Codex and Claude Code.
+request and populating its GitHub metadata. It applies to every agent.
 
 ## Authority boundary
 
@@ -30,8 +30,13 @@ existing remote metadata unless the current work clearly requires a change.
 
 If directly authorized work has no focused issue, stop before the first push and
 ask the maintainer whether to create or select one and which release metadata
-applies. Do not open a PR with milestone, Phase, or Priority omitted unless the
-maintainer explicitly authorizes that exception.
+applies. Do not invent a milestone, Phase, or Priority to fill the gap.
+
+Once a focused issue exists, its own metadata governs: inherit what the issue
+has, and where the issue itself has no Phase or Priority, leave that PR field
+unset and name the missing issue field — see "Project field values" and
+"Verification". The rule above is about opening a PR with no focused issue at
+all, not about an issue whose fields are incomplete.
 
 If GitHub metadata conflicts with repository documentation, report the conflict
 and preserve the existing remote value until the maintainer decides.
@@ -52,21 +57,28 @@ Confirm:
 
 ## PR body
 
-Include:
+`.github/pull_request_template.md` is the canonical section set. Keep its
+section order and fill every section. In order:
 
-- concise summary;
-- `Closes #NN` for the focused issue when the PR should complete it;
-- AI-assistance disclosure naming each material tool and its role; when a commit
-  carries an AI co-author trailer, repeat that trailer's identity and email in
-  the disclosure so the commit and PR records agree;
-- change list;
-- public-API impact;
-- tests run and exact outcomes;
-- tests added or updated under `tests/`, including the expected pre-fix failure
-  when it was demonstrated;
-- visual and accessibility checks when relevant;
-- documentation and changelog impact;
-- known limitations and follow-up work.
+- **Summary** — concise statement of the change and its purpose;
+- **Related issues** — `Closes #NN` for the focused issue when the PR should
+  complete it;
+- **Changes** — the change list;
+- **Public API impact**;
+- **Testing** — tests run and exact outcomes, and tests added or updated under
+  `tests/`, including the expected pre-fix failure when it was demonstrated;
+- **Visual verification** — visual and accessibility checks when relevant;
+- **Notes for review** — design decisions, known limitations, follow-up work,
+  and documentation/changelog impact;
+- **AI assistance** — last, and never omitted or left as template text. Name
+  each AI tool that materially shaped the contribution and its role, or state
+  `None`. When a branch commit carries an AI `Co-authored-by` trailer, repeat
+  that trailer's exact identity and email so the commit and PR records agree.
+  Read the trailers rather than recalling them:
+
+  ```bash
+  git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
+  ```
 
 Do not close the parent epic from a focused implementation PR.
 
@@ -89,7 +101,8 @@ After opening or updating the draft PR:
 
 For a newly opened draft PR:
 
-- **Status:** `In progress`
+- **Status:** the in-progress option — `docs/NAMING-CONVENTION.md` section 9 for
+  what it means, `gh project field-list` for how it is spelled
 - **Phase:** inherit from the focused issue
 - **Priority:** inherit from the focused issue
 - **Size:** estimate from the actual completed PR scope
@@ -163,7 +176,8 @@ Obtain explicit approval before:
 
 ## Verification
 
-After opening or updating the PR, verify and report:
+After opening or updating the PR, read the metadata back from GitHub — do not
+report what you intended to set — and confirm each of:
 
 - PR URL and draft status;
 - base and head branches;
@@ -177,6 +191,20 @@ After opening or updating the PR, verify and report:
 - Priority;
 - Size;
 - fields intentionally left unset and why.
+
+A blank field in that read-back is unfinished work, not a reporting line. Fill
+it and read back again. The appendix has the queries.
+
+Which blanks are legitimate:
+
+- **Status, Size, assignee, labels, and milestone** are always determinable from
+  the PR and the focused issue, so none of them may be left unset. `Status` for
+  a newly opened draft comes from `docs/NAMING-CONVENTION.md` section 9; `Size`
+  from "Size guide" above, judged on the completed scope.
+- **Phase and Priority** are inherited and must not be invented. They are the
+  only fields that may stay blank, and only when the focused issue itself has
+  none — in which case name the missing *issue* field, not the PR field.
+  `docs/NAMING-CONVENTION.md` section 10 defines the Phase numbering.
 
 If Project API access is unavailable, still create the authorized draft PR and
 set all supported ordinary PR metadata. Report the exact fields that could not
@@ -228,8 +256,35 @@ gh project item-edit --project-id <PVT_...> --id <item-id> \
   --field-id <field-id> --single-select-option-id <option-id>
 
 # Text, date, and number fields use --text, --date, or --number instead.
+
+# 6. Read the values back. Step 3 populates no field, and step 5 addresses an
+#    item by id, so a wrong id succeeds silently against the wrong row. This
+#    query is the only evidence the values landed.
+#
+#    The field keys are lower-case: status, phase, priority, size. jq's {Status}
+#    shorthand means {Status: .Status} and yields null for every field, which
+#    reads exactly like unset metadata. Spell each mapping out.
+gh project item-list <project-number> --owner amirhs1 --limit 400 --format json \
+  --jq '.items[] | select(.content.number==<pr-number>
+        and .content.type=="PullRequest")
+        | {Status:.status, Phase:.phase, Priority:.priority, Size:.size}'
+
+# Repository metadata reads back separately
+gh pr view <pr-number> --json isDraft,assignees,labels,milestone
 ```
 
-Field values must match the Project's configured options exactly (for example
-Status `In progress`; Phase `Phase 1 — Industry`; Priority `P2 — Normal`;
-Size `S`). Do not invent option names.
+**Discover option strings from step 2, never from prose.** The live Project is
+authoritative for the exact text of an option; this document and
+`docs/NAMING-CONVENTION.md` are authoritative for *which* option to choose and
+what it means. Those are different questions, and the transcriptions drift: as
+of 2026-08-03 the Project's option reads `In Progress` while
+`docs/NAMING-CONVENTION.md` section 9 writes `In progress`.
+
+The casing matters because the lookup is by name. A `--jq 'select(.name=="In
+progress")'` against an option actually called `In Progress` yields an empty
+option id, and the resulting `item-edit` sets nothing while reporting no error.
+Read `gh project field-list` output and copy the string it returns.
+
+So: take `Status` semantics from `docs/NAMING-CONVENTION.md` section 9 and
+`Phase` from section 10, take `Priority` and `Size` from "Project field values"
+above, and take every literal option string from `field-list`.
