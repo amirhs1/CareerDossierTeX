@@ -184,7 +184,7 @@
 \RequirePackage { careerdossier-components }
 \RequirePackage { careerdossier-tokens }
 \RequirePackage { hyperref }
-\CDossierApplyBodySize
+\__cdossier_tokens_apply_body_size:
 
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a résumé built off the same profile. The title
@@ -193,10 +193,10 @@
   { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
   { \__cdossier_components_doctype:n { Cover~Letter } }
 
-\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_letter_paper_tl
+\exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_letter_paper_tl
 
 \__cdossier_components_runninglabel:n { Cover~Letter }
-\MakeCDossierPageFurniture
+\__cdossier_components_apply_page_furniture:
 
 %% Block format: no paragraph indentation, paragraphs separated by the shared
 %% prose token. \emergencystretch keeps justified prose from producing overfull

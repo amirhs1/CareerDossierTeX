@@ -578,7 +578,16 @@
 }
 \makeatother
 
-\NewDocumentCommand \MakeCDossierPageFurniture { }
+%% Issue #242: named \MakeCDossierPageFurniture until v0.7.0, which put it in
+%% the same family as \MakeCDossierHeader, \MakeCDossierLetterhead,
+%% \MakeCDossierClosing, and \MakeCDossierStatementHeader. It does not belong
+%% there: every one of those emits document material where the author calls it,
+%% while this one emits nothing at all. It selects a \pagestyle and queues an
+%% \AtBeginDocument hook, so it is only meaningful in a class preamble -- by the
+%% time a document body could call it the hook has already run. It is the same
+%% class-to-package plumbing as \__cdossier_components_headerbelow:N alongside
+%% it, and now carries the same private form. See docs/MIGRATION.md.
+\cs_new_protected:Npn \__cdossier_components_apply_page_furniture:
   {
     \bool_if:NTF \l__cdossier_components_furniture_bool
       {

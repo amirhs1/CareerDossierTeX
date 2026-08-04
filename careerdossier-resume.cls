@@ -172,17 +172,17 @@
 \RequirePackage { careerdossier-tokens }
 \RequirePackage { enumitem }
 \RequirePackage { hyperref }
-\CDossierApplyBodySize
+\__cdossier_tokens_apply_body_size:
 
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a letter built off the same profile. The title
 %% itself is assembled in careerdossier-components, which owns identity.
 \__cdossier_components_doctype:n { Résumé }
 
-\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_resume_paper_tl
+\exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_resume_paper_tl
 
 \__cdossier_components_runninglabel:n { Résumé }
-\MakeCDossierPageFurniture
+\__cdossier_components_apply_page_furniture:
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierRecordParSkip }

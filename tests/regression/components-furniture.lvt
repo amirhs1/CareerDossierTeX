@@ -10,9 +10,13 @@
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
-\MakeCDossierPageFurniture
 
+%% The furniture primitive is an expl3 private name (issue #242), so the call
+%% has to sit inside \ExplSyntaxOn: outside it the `_' is a subscript and the
+%% name silently splits into \_ plus text, leaving the page styles unset.
 \ExplSyntaxOn
+\__cdossier_components_apply_page_furniture:
+
 \tl_new:N \l__cdossiertest_runninglabel_tl
 
 \cs_new_protected:Npn \cdossiertestSetLastPage #1
@@ -38,7 +42,8 @@
 \cs_new_protected:Npn \cdossiertestReportRunningLabel
   { \TYPE{label=\l__cdossier_components_runninglabel_tl} }
 
-%% The resolved output medium, and what \MakeCDossierPageFurniture did with it.
+%% The resolved output medium, and what
+%% \__cdossier_components_apply_page_furniture: did with it.
 %% \thispagestyle only records a name for shipout, so the head and foot read
 %% here are the ones \pagestyle installed.
 \cs_new_protected:Npn \cdossiertestReportMedium
@@ -64,6 +69,21 @@
     \__cdossier_components_runninglabel:n
       { \tl_use:N \l__cdossiertest_runninglabel_tl }
     \tl_set:Nn \l__cdossiertest_runninglabel_tl { Updated }
+  }
+
+%% Issue #242 classified the furniture primitive as class-to-package plumbing
+%% rather than a member of the author-facing \MakeCDossier... family, and
+%% renamed it. Asserting only that the private name works would leave the
+%% public one free to reappear, so both halves are pinned: the old name must be
+%% undefined, not merely unused.
+\cs_new_protected:Npn \cdossiertestReportNameSurface
+  {
+    \cs_if_exist:cTF { __cdossier_components_apply_page_furniture: }
+      { \TYPE{private-page-furniture=defined} }
+      { \TYPE{private-page-furniture=missing} }
+    \cs_if_exist:cTF { MakeCDossierPageFurniture }
+      { \TYPE{public-page-furniture=defined} }
+      { \TYPE{public-page-furniture=undefined} }
   }
 \ExplSyntaxOff
 
@@ -92,6 +112,10 @@
 \TEST{default-medium-is-print-and-selects-the-furniture-styles}{
   \cdossiertestReportMedium
   \cdossiertestReportSelectedStyle
+}
+
+\TEST{page-furniture-primitive-name-surface}{
+  \cdossiertestReportNameSurface
 }
 
 \END

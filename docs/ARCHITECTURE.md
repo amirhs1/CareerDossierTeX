@@ -251,9 +251,9 @@ rather than three separately tuned designs.
 | Running header, folio | `\CDossierSizeFurniture` | 0.85 | 8 / 10 | 9 / 11 | 10 / 12 |
 
 Body leading keeps `article`'s own values so pagination stays predictable.
-`article`'s `11pt` option actually sets 10.95 pt, so `\CDossierApplyBodySize`
-re-pins `\normalsize` to a whole 11 pt while leaving the class option honoured
-for leading and display skips.
+`article`'s `11pt` option actually sets 10.95 pt, so
+`\__cdossier_tokens_apply_body_size:` re-pins `\normalsize` to a whole 11 pt
+while leaving the class option honoured for leading and display skips.
 
 #### Vertical rhythm
 
@@ -512,8 +512,8 @@ the ratios that satisfy them.
 
 The running header and the folio are the only components positioned by the page
 geometry rather than by the vertical rhythm, so `careerdossier-tokens` derives
-their placement inside `\CDossierApplyGeometry:n` from the resolved margin `M`
-and the furniture line height `H` (`\CDossierFurnitureLeading`):
+their placement inside `\__cdossier_tokens_apply_geometry:n` from the resolved
+margin `M` and the furniture line height `H` (`\CDossierFurnitureLeading`):
 
 | `geometry` key | Derivation |
 |---|---|
@@ -790,7 +790,8 @@ list-led, and prose-led sections share one gap — and shared page furniture
 owns its typography and auxiliary-file page-count decision, while leaving the
 document-specific running label to the document classes. The furniture's own
 geometry is not a class concern either: `careerdossier-tokens.sty` derives
-`\headheight`, `\headsep`, and `\footskip` inside `\CDossierApplyGeometry:n`.
+`\headheight`, `\headsep`, and `\footskip` inside
+`\__cdossier_tokens_apply_geometry:n`.
 
 #### One header stack for both headers
 
@@ -818,8 +819,8 @@ class states only which lines it prints, in reading order.
 whether page furniture is emitted at all — is owned by this module. The four
 classes therefore validate the value and forward it with
 `\PassOptionsToPackage`; this module holds the resolved boolean and
-`\MakeCDossierPageFurniture` acts on it. Putting the decision in the classes
-would replicate one policy four times, and a direct user of
+`\__cdossier_components_apply_page_furniture:` acts on it. Putting the decision
+in the classes would replicate one policy four times, and a direct user of
 `careerdossier-components` would get no say at all.
 
 The forwarding direction matters: `\ProcessKeysPackageOptions` reads local

@@ -160,11 +160,11 @@
 \RequirePackage { careerdossier-tokens }
 \RequirePackage { enumitem }
 \RequirePackage { hyperref }
-\CDossierApplyBodySize
+\__cdossier_tokens_apply_body_size:
 
 \__cdossier_components_doctype:n { Curriculum\c_space_tl Vitae }
 
-\exp_args:NV \CDossierApplyGeometry:n \l__cdossier_cv_paper_tl
+\exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_cv_paper_tl
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierRecordParSkip }
@@ -176,7 +176,7 @@
   { \setlength { \emergencystretch } { 2em } }
 
 \__cdossier_components_runninglabel:n { Curriculum~Vitae }
-\MakeCDossierPageFurniture
+\__cdossier_components_apply_page_furniture:
 \CDossierApplyPageBreakPenalties
 
 %% Issue #223: the shared header stack ends at a boundary against whatever the

@@ -210,3 +210,9 @@ fontsize=11pt
 \CDossierLetterSignatureGapSkip=30.6pt
 at-catcode-before=12;after=12
 ============================================================
+============================================================
+TEST 5: body-size-primitive-name-surface
+============================================================
+private-apply-body-size=defined
+public-apply-body-size=undefined
+============================================================
