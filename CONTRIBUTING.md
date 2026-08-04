@@ -284,10 +284,13 @@ All automated test sources, expected outputs, fixtures, and runners belong under
 
 ```text
 tests/
+├── lint/         # source-level invariants no compiled fixture can assert
 ├── regression/   # package/class API, options, diagnostics, and fixed bugs
 ├── smoke/        # supported document builds and failure-path fixtures
 ├── extraction/   # text-layer and reading-order round trips
-└── layout/       # long-value, multi-page, and page-break stress sources
+├── layout/       # long-value, multi-page, and page-break stress sources
+├── bibliography/ # Biber-backed sorting and rendered identifier precedence
+└── tagging/      # tagged structure, the untagged path, and the extractor matrix
 ```
 
 Create subdirectories only when the first real test needs them. Keep user-facing

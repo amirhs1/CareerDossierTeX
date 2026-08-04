@@ -629,22 +629,16 @@ required by a feature's acceptance criteria.
 The repository uses an `l3build` regression harness (`build.lua`, run with
 `l3build check`) whose sources and baselines live under `tests/regression/`, so
 all test material remains under `tests/` with no top-level `testfiles/`
-directory. Committed regression coverage for the already-merged Phase 1
-packages (base, components, theme, and the non-visual parts of typography) is in
-place alongside the extraction round-trip fixture; extend it with the behavior
-each future change adds.
+directory. Every shared package and every document class carries committed
+regression coverage — no module is exempt — alongside the extraction, layout,
+tagging, bibliography, and lint suites; extend the existing file for a module
+with the behavior each future change adds. `docs/ARCHITECTURE.md` ("Testing
+strategy") holds the current count and its per-module split.
 
 ## Engineering work (tracked as issues)
 
 The live issue and Project metadata now follow the continuous-testing policy:
 
-- Establish the `l3build` regression harness (`build.lua`,
-  `tests/regression/`) during active Phase 1 work in
-  [issue #25](https://github.com/amirhs1/CareerDossierTeX/issues/25). Add each
-  new regression with the behavior it protects.
-- Backfill committed coverage for the already-merged Phase 1 modules in
-  [issue #10](https://github.com/amirhs1/CareerDossierTeX/issues/10). Résumé and
-  letter tests remain owned by their feature issues rather than this debt item.
 - CTAN packaging via `l3build ctan`; decide handwritten vs `.dtx` — `v1.0.0`.
 - Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
   LuaLaTeX transition supersedes that precondition, and opt-in tagged structure

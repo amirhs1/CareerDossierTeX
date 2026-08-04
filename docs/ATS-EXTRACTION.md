@@ -325,9 +325,11 @@ Good defaults for most career documents are:
 - no negative `\vspace` as a routine layout tool.
 
 Use named lengths for every public spacing control, defined in the module that
-owns the concern — margins and section spacing belong in the class, not in
-`careerdossier-base`. Do not scatter unexplained numeric dimensions through the
-implementation.
+owns the concern — page geometry, margins, and the vertical rhythm belong in
+`careerdossier-tokens.sty`, never in a class or in `careerdossier-base`. A class
+chooses paper and options and passes them down. Do not scatter unexplained
+numeric dimensions through the implementation. See `docs/ARCHITECTURE.md`
+("File responsibilities") for the full ownership map.
 
 ## 4. Typography and font engineering under LuaLaTeX
 
@@ -548,8 +550,11 @@ loading:
 ]
 ```
 
-If the package supports a serif profile **(planned)**, declare it separately and
-run the full extraction suite for both profiles.
+The shipped default is the opposite of this illustration: `bodyfont=serif`
+(TeX Gyre Termes body, TeX Gyre Heros headings) since `v0.5.0`, with
+`bodyfont=sans` selecting Heros for both. The example above shows the mechanism,
+not the default. Run the full extraction suite for both profiles when either
+changes.
 
 ### 4.7 Font acceptance criteria
 
@@ -978,8 +983,8 @@ class/package author guide notes that kernel key-value options
 (`\DeclareKeys`/`\ProcessKeyOptions`) require at least the 2022-06-01 release.
 
 Fail early and clearly under the wrong engine (the canonical check lives in
-`careerdossier-typography.sty`). Do not allow pdfLaTeX or LuaLaTeX to proceed until
-a late, confusing font error appears.
+`careerdossier-typography.sty`). Do not allow pdfLaTeX or XeLaTeX to proceed until
+a late, confusing font error appears. LuaLaTeX is the supported engine.
 
 ### 8.4 Public API: semantic, small, and stable
 
@@ -1389,9 +1394,10 @@ C++, Python, SQL, data modelling, technical writing
 % English-only; multilingual support is dropped (docs/ROADMAP.md), so pdflang
 % is hard-coded rather than routed through a language-abstraction layer.
 
-% Résumé geometry, section spacing, and margins belong HERE (module ownership),
-% not in careerdossier-base. Build entries from the shared semantic primitives —
-% not from tables, columns, or positioned boxes.
+% Page geometry, margins, and the vertical rhythm belong to
+% careerdossier-tokens, NOT here and not in careerdossier-base: this class
+% chooses paper and options and passes them down. Build entries from the shared
+% semantic primitives — not from tables, columns, or positioned boxes.
 ```
 
 The exact load order for `fontspec`, `hyperref`, language support, and any

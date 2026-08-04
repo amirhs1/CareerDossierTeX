@@ -7,7 +7,7 @@ and changes every class's layout defaults** — see
 [Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
 The unreleased `v0.7.0` renames public design tokens, adds new ones beside them,
-**retires two**, and retunes the calibrated vertical-rhythm ratios. Renamed
+**retires three**, and retunes the calibrated vertical-rhythm ratios. Renamed
 tokens need a source edit only if a document reads or sets them by name, and the
 two retired tokens rendered nothing at the released defaults — but three
 mechanism changes do move the page: letter and statement headers tighten, the
@@ -304,7 +304,7 @@ requires no migration. To try it, add `\DocumentMetadata` before
 \documentclass{careerdossier-resume}
 ```
 
-Tagged output is a tested preview for the four fixture profiles only and carries
+Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See [`API.md`](API.md) for scope.
 
 ## Purpose
@@ -488,11 +488,11 @@ Before → after:
 | `\CDossierSectionBelowSkip` | `\CDossierRecordSectionBelowSkip` |
 | `\CDossierEntryAboveSkip` | `\CDossierRecordEntryAboveSkip` |
 | `\CDossierEntryGapSkip` | `\CDossierRecordEntryGapSkip` |
-| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` — then **retired** in the same release; see “Two vertical-spacing tokens retired, three added” above |
+| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
 | `\CDossierListEdgeSkip` | `\CDossierRecordListEdgeAboveSkip` **and** `\CDossierRecordListEdgeBelowSkip` (split — see below) |
 | `\CDossierItemSepSkip` | `\CDossierRecordItemSepSkip` |
 | `\CDossierParSkip` | `\CDossierRecordParSkip` |
-| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` — then **retired** in the same release; see “Two vertical-spacing tokens retired, three added” above |
+| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
 | `\CDossierBlockSkip` | `\CDossierLetterBlockSkip` |
 | `\CDossierAfterSalutationSkip` | `\CDossierLetterBodyAboveSkip` |
 | `\CDossierSignatureSkip` | `\CDossierLetterSignatureGapSkip` |

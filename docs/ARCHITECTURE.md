@@ -129,17 +129,35 @@ careerdossier-components.sty
     ├── identity block
     ├── contact line
     ├── links
-    └── entry primitives
+    ├── entry primitives
+    └── page furniture
             │
             ▼
-document class
+document class  (resume / letter / cv / statement)
     │
-    ├── résumé geometry and spacing
-    └── letter geometry and prose flow
+    ├── chooses paper and class options
+    ├── passes fontsize + margin  ─────▶ careerdossier-tokens.sty
+    │                                       ├── type scale
+    │                                       ├── vertical rhythm
+    │                                       └── page geometry
+    ├── passes bodyfont           ─────▶ careerdossier-typography.sty
+    │                                       ├── engine guard
+    │                                       └── fonts, semantic roles
+    ├── passes medium             ─────▶ careerdossier-components.sty
+    │                                       └── furniture on / off
+    ├── colour and rule tokens    ─────▶ careerdossier-theme.sty
+    └── owns document structure and the running label
             │
             ▼
 PDF output
 ```
+
+The class is not where geometry lives. It selects paper and options and hands
+each one to the package that owns the behavior, using `\PassOptionsToPackage`
+before `\LoadClass`, so an option's values are validated once by its owner
+rather than separately by each class. `careerdossier-biblatex.sty` sits outside
+this flow: it is opt-in, loaded by the document rather than by a class, and
+`careerdossier-cv.cls` must not load it.
 
 Letter-specific metadata follows the same pattern:
 
@@ -745,8 +763,10 @@ heading's glyphs, and emits its rule-to-content gap so that LaTeX's collapsing
 rule applies — the gap is the larger of `\CDossierRecordSectionBelowSkip` and
 the following block's own leading space, never their sum, so entry-led,
 list-led, and prose-led sections share one gap — and shared page furniture
-owns its typography and auxiliary-file page-count decision, while leaving page
-geometry and the document-specific running label to the document classes.
+owns its typography and auxiliary-file page-count decision, while leaving the
+document-specific running label to the document classes. The furniture's own
+geometry is not a class concern either: `careerdossier-tokens.sty` derives
+`\headheight`, `\headsep`, and `\footskip` inside `\CDossierApplyGeometry:n`.
 
 #### One header stack for both headers
 

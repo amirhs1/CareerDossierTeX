@@ -114,9 +114,11 @@ and links as structure, and mark decorative rules, contact separators, and
 running page furniture as layout artifacts. When it is not active, output is
 unchanged from the untagged path.
 
-Tagged output is a tested preview for the four fixture profiles (industry
-résumé, industry letter, academic CV, academic letter). It is not a PDF/UA,
-WCAG, ATS, or general accessibility conformance claim. See
+Tagged output is a tested preview for the five fixture profiles (industry
+résumé, industry letter, academic CV, academic letter, and statement). It is not
+a PDF/UA, WCAG, ATS, or general accessibility conformance claim. The macOS
+VoiceOver pass covers four of the five — the statement fixture and
+Windows/NVDA remain screen-reader-unverified. See
 [`../README.md`](../README.md) and
 [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) for the scope of what has
 actually been verified.
@@ -1168,7 +1170,7 @@ duplicating geometry and page behavior across statement document models.
 
 ### Statement layout
 
-The `v0.6.0` development layout uses the shared calibrated design system:
+The `v0.6.0` layout uses the shared calibrated design system:
 
 - LuaLaTeX, English, and monochrome output;
 - `paper=letter|a4`, defaulting to US Letter and preserving the academic
