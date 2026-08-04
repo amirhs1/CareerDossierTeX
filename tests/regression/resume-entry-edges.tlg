@@ -20,3 +20,10 @@ entry-gap = 0.85pt
 list-edge-above = 3.4pt
 list-edge-below = 6.8pt
 ============================================================
+============================================================
+TEST 3: bare-entry-boundaries
+============================================================
+after-education-heading page-total = 117.64203pt
+after-first-bare-entry page-total = 128.35904pt
+after-second-bare-entry page-total = 146.22005pt
+============================================================
