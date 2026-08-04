@@ -191,6 +191,12 @@
 %% the shared values and the reasoning for using one strength across families.
 \CDossierApplyPageBreakPenalties
 
+%% Issue #223: the shared header stack ends at a boundary against this class's
+%% prose section heading, whose gap is calibrated against the paragraph gap
+%% rather than against the record classes' ruled furniture. Naming its own token
+%% keeps a retune of that heading scale inside this class.
+\__cdossier_components_headerbelow:N \CDossierProseHeaderBelowSkip
+
 %% ---------------------------------------------------------------------------
 %% Section headings (issue #177).
 %%

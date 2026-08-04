@@ -161,6 +161,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   that reads or sets a token by name needs an edit; the full old-to-new table
   is in [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
+- **BREAKING (design token):** the gap below the header block is one token per
+  document family — `\CDossierRecordHeaderBelowSkip` (résumé, CV),
+  `\CDossierProseHeaderBelowSkip` (statement), and
+  `\CDossierLetterHeaderBelowSkip` (letter) — replacing the single
+  `\CDossierHeaderBelowSkip` released in `v0.6.0`. ([#223])
+
+  The two gaps *inside* the header block are genuinely shared: every class
+  stacks the same lines in the same order. The gap *below* it is not. It is a
+  boundary against whatever the class puts next, and that neighbour differs per
+  family — a ruled section in the résumé and the CV, a prose section heading in
+  the statement, the date line in the letter. One token had to clear whichever
+  of those was largest in *any* class, so raising the statement's section gap
+  spent vertical space in the résumé and the CV, and the letter carried a floor
+  set by a section boundary it does not have.
+
+  **Mechanism only — no calibrated value changes.** All three ship at the
+  `0.8125` ratio the single token carried. All eleven supported examples,
+  covering all four document families, render with identical word coordinates
+  before and after the change, and every committed baseline except the token
+  dump is unchanged. Only source that reads or sets the gap below a header by
+  name needs an edit; see [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
 - The smoke and layout-stress suites now run as their own CI jobs instead of
   running in sequence inside the `resume` job, so they start in parallel with
   the rest of the workflow. Coverage and the commands themselves are unchanged;
@@ -223,10 +245,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every
   boundary it appeared at. `\CDossierLetterheadBelowSkip` (0.75) claimed the
   header → date boundary immediately after `\MakeCDossierHeader` had already
-  claimed it with `\CDossierSharedHeaderBelowSkip` (0.8125).
+  claimed it with the header block's own below-token (0.8125), today
+  `\CDossierLetterHeaderBelowSkip`.
 
   `\CDossierRecordEntryAboveSkip` is now the sole inter-entry token and
-  `\CDossierSharedHeaderBelowSkip` the sole owner of the letter's header → date
+  `\CDossierLetterHeaderBelowSkip` the sole owner of the letter's header → date
   boundary. A document that sets either removed name now gets an
   undefined-control-sequence error; see
   [`docs/MIGRATION.md`](docs/MIGRATION.md).
@@ -240,7 +263,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
   A document that sets either name now gets an undefined-control-sequence
   error; delete the setting. The space *around* the identity block is owned by
-  `\CDossierSharedHeaderBelowSkip` below it and by the page geometry above it.
+  the header block's own below-token below it and by the page geometry above
+  it.
   See [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
   This closes an acceptance criterion the pending ratio retune could not
@@ -382,6 +406,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
 [#220]: https://github.com/amirhs1/CareerDossierTeX/issues/220
 [#222]: https://github.com/amirhs1/CareerDossierTeX/issues/222
+[#223]: https://github.com/amirhs1/CareerDossierTeX/issues/223
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 [#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
 [#236]: https://github.com/amirhs1/CareerDossierTeX/issues/236

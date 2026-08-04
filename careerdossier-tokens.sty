@@ -171,9 +171,22 @@
 %% The header group still needs its own paragraph gap -- see
 %% `careerdossier-components.sty' -- but it is now a fixed zero rather than a
 %% public knob.
+%%
+%% Issue #223: the two gaps *inside* the header stack are genuinely shared --
+%% every class stacks the same lines in the same order, and the stack zeroes
+%% `\parskip' for its own group, so the same ratio renders the same gap
+%% everywhere. The gap *below* the stack is not shared in the same sense: it is
+%% a boundary against whatever the class puts next, and that neighbour differs
+%% per family (a ruled section in the record classes, a prose section in the
+%% statement, the date line in the letter). One token therefore had to clear
+%% the most demanding neighbour in any class, and a heading retune in one
+%% family silently spent vertical space in the other two. It is split into one
+%% token per family below; see docs/MIGRATION.md.
 \skip_new:N \CDossierSharedHeaderNameGapSkip
 \skip_new:N \CDossierSharedHeaderMetaGapSkip
-\skip_new:N \CDossierSharedHeaderBelowSkip
+\skip_new:N \CDossierRecordHeaderBelowSkip
+\skip_new:N \CDossierProseHeaderBelowSkip
+\skip_new:N \CDossierLetterHeaderBelowSkip
 \skip_new:N \CDossierRecordSectionAboveSkip
 \skip_new:N \CDossierRecordSectionRuleGapSkip
 \skip_new:N \CDossierRecordSectionBelowSkip
@@ -301,7 +314,19 @@
 
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderNameGapSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderMetaGapSkip { 0.1875 }
-    \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderBelowSkip { 0.8125 }
+    %% Issue #223: one gap below the header stack per document family, each
+    %% answering only for the boundary it actually meets -- the record classes'
+    %% ruled section heading, the statement's prose section heading, and the
+    %% letter's date line (\CDossierLetterBlockSkip, 0.50). The retired
+    %% \CDossierSharedHeaderBelowSkip had to clear whichever of those was
+    %% largest in *any* class, so raising a section gap in one family spent
+    %% vertical space in the other two, and the letter carried a floor set by a
+    %% boundary it does not have. All three ship at the single value that token
+    %% carried, so the split is mechanism-only and no document reflows;
+    %% retuning any of them is a separate decision under issue #206.
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordHeaderBelowSkip { 0.8125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierProseHeaderBelowSkip { 0.8125 }
+    \__cdossier_tokens_set_skip:Nn \CDossierLetterHeaderBelowSkip { 0.8125 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionAboveSkip { 0.6875 }
     %% Issue #169: measured from the section heading's baseline, not from the
     %% bottom of its line box. The value has a hard lower bound -- the heading's

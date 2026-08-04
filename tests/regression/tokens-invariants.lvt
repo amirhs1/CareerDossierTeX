@@ -49,19 +49,30 @@
     \keys_set:nn { cdossier / tokens } { fontsize = #1 }
     \__cdossier_tokens_resolve:
     \TYPE { fontsize = #1 }
-    %% The letter's header block has to out-claim the section that follows it in
-    %% a record document, and the one that follows it in a prose document.
+    %% Issue #223: the gap below the header stack is one token per family, and
+    %% each is stated against the block its own class actually puts next -- a
+    %% ruled section in the record classes, a prose section in the statement,
+    %% and the date line (\CDossierLetterBlockSkip) in the letter. Before the
+    %% split one token answered for all three, so it was floored by whichever
+    %% neighbour was largest in any class and a heading retune in one family
+    %% moved output in the other two.
     \cdossiertest_invariant:nn
-      { SharedHeaderBelowSkip > RecordSectionAboveSkip }
+      { RecordHeaderBelowSkip > RecordSectionAboveSkip }
       {
         \dim_compare_p:nNn
-          { \CDossierSharedHeaderBelowSkip } > { \CDossierRecordSectionAboveSkip }
+          { \CDossierRecordHeaderBelowSkip } > { \CDossierRecordSectionAboveSkip }
       }
     \cdossiertest_invariant:nn
-      { SharedHeaderBelowSkip > ProseSectionAboveSkip }
+      { ProseHeaderBelowSkip > ProseSectionAboveSkip }
       {
         \dim_compare_p:nNn
-          { \CDossierSharedHeaderBelowSkip } > { \CDossierProseSectionAboveSkip }
+          { \CDossierProseHeaderBelowSkip } > { \CDossierProseSectionAboveSkip }
+      }
+    \cdossiertest_invariant:nn
+      { LetterHeaderBelowSkip > LetterBlockSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierLetterHeaderBelowSkip } > { \CDossierLetterBlockSkip }
       }
     %% Each heading pair binds the heading to the text it introduces: the gap
     %% opening the block is at least twice the gap closing the heading. A pair

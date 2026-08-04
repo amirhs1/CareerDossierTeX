@@ -60,4 +60,26 @@
   \par
 }
 
+% Issue #223: the boundary below the stack is owned by the *prose* token, not by
+% a token shared with the record classes. All three families ship at one ratio,
+% so equal values cannot tell them apart; the three tokens are given distinct,
+% deliberately un-calibrated values here and the emitted gap names which one the
+% class selected. Before the split this reported 44.0pt.
+\TEST{below-token-is-the-prose-family-token}{
+  % Restore the minimal header of TEST 1: the optional fields set above persist
+  % past their own group, and the line count is not what this case is about.
+  \CDossierSetup{affiliation = {}}
+  \CDossierStatementSetup{
+    subtitle = {},
+    application-context = {},
+    application-id = {},
+  }
+  \setlength\CDossierProseHeaderBelowSkip{55pt}
+  \setlength\CDossierRecordHeaderBelowSkip{44pt}
+  \setlength\CDossierLetterHeaderBelowSkip{33pt}
+  \cdossiertestTraceAddvspace
+  \MakeCDossierStatementHeader
+  \par
+}
+
 \END
