@@ -131,6 +131,14 @@ The split is by loading frequency, not by topic: what applies to every task
 belongs in `AGENTS.md`, which is always loaded in full, and what applies
 occasionally belongs in a skill, which is loaded on demand.
 
+Two rules are deliberately repeated across these files rather than stated once,
+because an agent that loads only one of them must still be bound: the limits of
+maintainer authority, and the AI-disclosure obligation. Repetition is a hazard —
+copies drift, and that is how the duplicated skill files diverged — so it is
+confined to these two, each is short, and each must be updated everywhere in the
+same change. Everything else has one home. Do not add a third exception without
+deciding that the rule is worth the drift risk.
+
 Hard requirements should be enforced by tests, linters, permissions, sandboxing,
 hooks, branch protection, or rulesets when practical. Instruction text alone
 must not be treated as enforcement.
