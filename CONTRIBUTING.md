@@ -71,9 +71,62 @@ The ordinary résumé, letter, and no-BibLaTeX CV paths do not require BibLaTeX 
 Biber. CareerDossierTeX is LuaLaTeX-only; XeLaTeX and pdfLaTeX fail with an
 actionable engine error.
 
+## Work item structure
+
+Three rules govern how work is divided across issues, pull requests, and
+branches. They exist so the history explains itself: every change should be
+traceable to a release, to a written rationale, and to a reviewable diff.
+
+These three rules are documentation, not enforcement. What actually gates a
+merge to `main` is the `Protect Main` ruleset; see "CI expectations".
+
+### 1. Every issue carries a milestone
+
+The milestone answers *which release*, and every issue can answer it. An issue
+without one is invisible to release planning and to the Project's `Phase` field,
+which follows the milestone.
+
+An **epic parent** is for work that genuinely decomposes into several issues — a
+release epic, or a cross-cutting effort spanning more than one class or package.
+A bug found mid-milestone, a CI repair, or a documentation sync takes a
+milestone and no parent. Do not create a placeholder epic so a lone issue has
+somewhere to sit; that reproduces the milestone with extra steps.
+
+Where an epic exists, its **sub-issue graph is canonical**. A checklist in the
+epic body is a rendering of that graph, not a second register — if the two
+disagree, the graph is right. Prefer GitHub's rendered sub-issue progress over a
+list maintained by hand.
+
+### 2. Every pull request links an issue, with three exceptions
+
+Use `Closes #...` or `Fixes #...` in the pull request body. The exceptions are:
+
+- a revert of a merged change;
+- a release chore, such as a version bump or a changelog assembly pull request;
+- a CI, tooling, or lint repair that restores an existing check.
+
+When an exception applies, the pull request body carries what the issue would
+have: the problem, the proposal, and the acceptance criteria. The obligation is
+that the reasoning exists in a reviewable place before the change merges — the
+issue is the usual vehicle for it, not the only one.
+
+An issue whose body would only restate its pull request's title is a sign that
+an exception applies, not a form to fill in.
+
+### 3. Every pull request comes from a focused branch, merged within three days
+
+Branch from an up-to-date `main`, one issue per branch where practical. Never
+commit or push to `main` directly.
+
+Three days is the assessable part of "short-lived". A branch that outlives it is
+rebased onto `main`, split into smaller pieces, or closed — not silently
+carried. A long-running branch accumulates conflicts against calibrated token
+values and saved `.tlg` baselines faster than it accumulates review.
+
 ## Issue workflow
 
-Open or select an issue before starting a meaningful change.
+Open or select an issue before starting a meaningful change, subject to the
+exceptions in "Every pull request links an issue" above.
 
 A good implementation issue explains:
 
@@ -83,7 +136,8 @@ A good implementation issue explains:
 4. likely affected files;
 5. observable acceptance criteria;
 6. the test files under `tests/` that will prove those criteria;
-7. the parent issue and release milestone.
+7. the release milestone, which is required, and the parent epic when the issue
+   is part of one.
 
 Use focused issues that can be completed on one branch. Split work that becomes too broad.
 
@@ -192,6 +246,11 @@ git push -u origin feat/resume-class
 ```
 
 Open a draft pull request early when the work is incomplete but ready for CI or design discussion.
+
+Keep the branch short-lived. Merge or rebase onto `main` within three days; if
+the work will not land in that window, split it rather than letting the branch
+run. See "Every pull request comes from a focused branch, merged within three
+days".
 
 ## Commit messages
 
@@ -827,7 +886,9 @@ Before `v1.0.0`, breaking changes are allowed but must be documented in `CHANGEL
 A pull request should include:
 
 - a concise summary;
-- linked issues using `Closes #...` or `Fixes #...`;
+- linked issues using `Closes #...` or `Fixes #...`, or, under one of the three
+  exceptions in "Work item structure", the problem, proposal, and acceptance
+  criteria stated in the body instead;
 - a focused change list;
 - public API impact;
 - tests added or updated under `tests/`;

@@ -32,6 +32,15 @@ If directly authorized work has no focused issue, stop before the first push and
 ask the maintainer whether to create or select one and which release metadata
 applies. Do not invent a milestone, Phase, or Priority to fill the gap.
 
+Three kinds of work are exempt from needing a focused issue, per
+`CONTRIBUTING.md` "Work item structure": a revert of a merged change, a release
+chore, and a CI/tooling repair that restores an existing check. For these,
+proceed without stopping, but state the problem, the proposal, and the
+acceptance criteria in the PR body — the exemption is from the issue object, not
+from the reasoning. Set the milestone from the release the work lands in; leave
+Phase and Priority to follow it as usual. Anything outside those three still
+stops for the maintainer.
+
 Once a focused issue exists, its own metadata governs: inherit what the issue
 has, and where the issue itself has no Phase or Priority, leave that PR field
 unset and name the missing issue field — see "Project field values" and
@@ -46,7 +55,9 @@ and preserve the existing remote value until the maintainer decides.
 Confirm:
 
 - the branch is not `main`;
-- the focused issue is identified;
+- the focused issue is identified, or one of the three exemptions applies and
+  the PR body carries the rationale in its place;
+- the issue carries a milestone;
 - the diff is limited to the issue;
 - behavior changes include their focused committed tests under `tests/` rather
   than deferring them to a later milestone task;
