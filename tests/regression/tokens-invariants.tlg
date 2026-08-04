@@ -20,7 +20,7 @@ ProseParSkip<ProseSectionBelowSkip => holds
 ProseParSkip<ProseSubsectionBelowSkip => holds
 LetterBodyAboveSkip=LetterBodyBelowSkip => holds
 LetterBodyAboveSkip>LetterBlockSkip => violated
-LetterBlockSkip>ProseParSkip => violated
+LetterBlockSkip>LetterParSkip => violated
 fontsize=11pt
 SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
 SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
@@ -38,7 +38,7 @@ ProseParSkip<ProseSectionBelowSkip => holds
 ProseParSkip<ProseSubsectionBelowSkip => holds
 LetterBodyAboveSkip=LetterBodyBelowSkip => holds
 LetterBodyAboveSkip>LetterBlockSkip => violated
-LetterBlockSkip>ProseParSkip => violated
+LetterBlockSkip>LetterParSkip => violated
 fontsize=12pt
 SharedHeaderBelowSkip>RecordSectionAboveSkip => holds
 SharedHeaderBelowSkip>ProseSectionAboveSkip => violated
@@ -56,5 +56,5 @@ ProseParSkip<ProseSectionBelowSkip => holds
 ProseParSkip<ProseSubsectionBelowSkip => holds
 LetterBodyAboveSkip=LetterBodyBelowSkip => holds
 LetterBodyAboveSkip>LetterBlockSkip => violated
-LetterBlockSkip>ProseParSkip => violated
+LetterBlockSkip>LetterParSkip => violated
 ============================================================

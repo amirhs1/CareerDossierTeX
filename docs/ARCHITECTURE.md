@@ -257,6 +257,7 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierRecordItemSepSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierRecordParSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierProseParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
+| `\CDossierLetterParSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierLetterRecipientLineGapSkip` | 0.00 | 0.0 pt | 0.0 pt | 0.0 pt |
 | `\CDossierLetterBlockSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 | `\CDossierLetterBodyAboveSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
@@ -430,10 +431,22 @@ token's value.
    at any value. A knob that cannot move the page is not a knob; see
    [`MIGRATION.md`](MIGRATION.md#070---unreleased).
 
-Not every token is read at the boundary it names. `\CDossierRecordParSkip` and
-`\CDossierProseParSkip` are copied into `\parskip` with `\setlength` when the
-class loads rather than read at each boundary, so changing them after
-`\documentclass` has no effect.
+Not every token is read at the boundary it names. `\CDossierRecordParSkip`,
+`\CDossierProseParSkip`, and `\CDossierLetterParSkip` are copied into `\parskip`
+with `\setlength` when the class loads rather than read at each boundary, so
+changing them after `\documentclass` has no effect.
+
+`\CDossierProseParSkip` and `\CDossierLetterParSkip` are a deliberate split
+(#222). Both set `\parindent = 0pt`, so the paragraph gap is the only thing
+separating paragraphs in either class, but the two pull in opposite
+directions: the statement's heading below-tokens must stay strictly greater
+than its paragraph gap (see below), which pins `\CDossierProseParSkip` to the
+bottom of the statement's heading scale, while the letter has no heading scale
+to bound it and can prefer a more generous gap between its unindented block
+paragraphs. A single shared token made retuning either class a side effect on
+the other. Both ship at the same 0.50 ratio so the split itself does not move
+any rendered gap; retuning either is a separate, independently reviewable
+decision.
 
 `tests/regression/tokens-invariants.lvt` records the ordering relations these
 rules imply, one line per relation, at all three supported sizes. The baseline is

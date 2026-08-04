@@ -45,6 +45,18 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   `\CDossierLetterBlockSkip` to change the space above its closing must now set
   `\CDossierLetterBodyBelowSkip`.
 
+- `\CDossierLetterParSkip` sets the letter's paragraph gap, split off from
+  `\CDossierProseParSkip`, which now sets only the statement's. ([#222])
+
+  Both classes set `\parindent = 0pt`, so this token was the only thing
+  separating one paragraph from the next in either class, but the two pull it
+  in opposite directions: the statement's heading below-tokens must stay
+  strictly greater than it, while the letter has no heading scale to bound it
+  and would prefer a more generous gap. A single shared token meant retuning
+  either class's paragraph gap was decided for the other as a side effect.
+  `\CDossierLetterParSkip` ships at the same `0.50` ratio, so the split
+  reflows nothing; see [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
 ### Changed
 
 - **BREAKING (design token):** the header block now zeroes its own paragraph
@@ -356,6 +368,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
 [#220]: https://github.com/amirhs1/CareerDossierTeX/issues/220
+[#222]: https://github.com/amirhs1/CareerDossierTeX/issues/222
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 [#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
 

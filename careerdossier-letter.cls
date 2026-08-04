@@ -202,7 +202,7 @@
 %% prose token. \emergencystretch keeps justified prose from producing overfull
 %% boxes when a paragraph has few break points.
 \setlength { \parindent }       { 0pt }
-\setlength { \parskip }         { \CDossierProseParSkip }
+\setlength { \parskip }         { \CDossierLetterParSkip }
 \setlength { \emergencystretch }{ 2em }
 
 %% Typographic page-break penalties (issue #171): see careerdossier-tokens for
