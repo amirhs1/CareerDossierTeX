@@ -1246,40 +1246,69 @@ tagging section before adding any tagging-related dependency.
 
 ## Repository layout
 
-At the end of `v0.1.0`:
+The tracked tree:
 
 ```text
 CareerDossierTeX/
 ├── careerdossier-base.sty
+├── careerdossier-tokens.sty
 ├── careerdossier-typography.sty
 ├── careerdossier-theme.sty
 ├── careerdossier-components.sty
 ├── careerdossier-resume.cls
 ├── careerdossier-letter.cls
+├── careerdossier-cv.cls
+├── careerdossier-statement.cls
+├── careerdossier-biblatex.sty
 ├── examples/
 │   ├── profiles/
-│   │   └── profile-english.tex
-│   └── industry/
-│       ├── resume-english.tex
-│       └── letter-industry.tex
+│   │   ├── profile-english.tex
+│   │   └── profile-academic.tex
+│   ├── industry/
+│   │   ├── resume-english.tex
+│   │   └── letter-industry.tex
+│   ├── academic/
+│   │   ├── cv-academic.tex
+│   │   ├── cv-bibliography.tex
+│   │   ├── letter-academic.tex
+│   │   └── publications.bib
+│   └── statements/           (one example per statement type)
 ├── docs/
 │   ├── API.md
 │   ├── ARCHITECTURE.md
 │   ├── ATS-EXTRACTION.md
 │   ├── MIGRATION.md
+│   ├── NAMING-CONVENTION.md
 │   └── ROADMAP.md
 ├── tests/
+│   ├── lint/
 │   ├── regression/
 │   ├── smoke/
 │   ├── layout/
-│   └── extraction/
-│       ├── extraction-torture.tex
-│       ├── extraction-torture.expected.txt
-│       └── run.sh
+│   ├── extraction/
+│   ├── bibliography/
+│   └── tagging/
+├── scripts/
+│   ├── setup-labels.sh
+│   └── create-phase-1-issues.sh
+├── .agents/
+│   └── skills/
+│       ├── open-draft-pr/
+│       │   ├── SKILL.md
+│       │   └── reference.md
+│       └── release-notes/
+│           ├── SKILL.md
+│           └── reference.md
+├── .claude/
+│   ├── settings.json
+│   └── skills/               (symlinks into .agents/skills/)
+├── .codex/
+│   └── config.toml
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   ├── workflows/
-│   │   └── build.yml
+│   │   ├── build.yml
+│   │   └── verapdf-scheduled.yml
 │   └── pull_request_template.md
 ├── build.lua
 ├── Makefile
@@ -1287,9 +1316,17 @@ CareerDossierTeX/
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
+├── AGENTS.md
+├── AI-POLICY.md
+├── CLAUDE.md
 ├── LICENSE
 └── .gitignore
 ```
+
+`manifest.txt` is the authoritative list of the files constituting the Work;
+update it in the same change whenever that set changes. Agent instruction
+content has one home under `.agents/`, and the per-tool directories hold only
+that tool's own settings.
 
 Do not create empty placeholder classes for future releases.
 
@@ -1337,15 +1374,29 @@ PDF and log
     └── text extraction
 ```
 
-The Phase 1 CI pipeline should:
+`.github/workflows/build.yml` runs on pull requests to `main` and on pushes to
+`main`, with `contents: read` and every action and container pinned to an
+immutable reference. A `toolchain` job records the exact TeX Live, LuaLaTeX,
+`fontspec`, `pdfmanagement-testphase`, `tagpdf`, `l3build`, BibLaTeX/Biber, and
+default-font versions a run used, so a result can be read alongside the
+toolchain that produced it. Twelve independent check jobs run in parallel, each
+uploading its PDFs, logs, or reports as artifacts:
 
-1. check out the repository;
-2. provide a tested LuaLaTeX environment;
-3. run the committed regression, smoke, layout, and extraction tests that exist;
-4. build the résumé example;
-5. build the letter example;
-6. fail on test or compilation errors;
-7. upload PDFs and logs as artifacts.
+- `lint` runs `make lint`. It is the one job that needs no TeX, so it runs on the
+  bare runner rather than the TeX Live container — which also means the option
+  lint is exercised against a second `grep` and `awk` implementation.
+- `regression` runs `l3build check`.
+- `smoke`, `layout`, `extraction`, `tagging`, and `bibliography` run the matching
+  fixture runner under `tests/`.
+- `resume`, `letter`, `cv`, `academic-letter`, and `statement` build the
+  supported examples for each document family.
+
+A second workflow, `.github/workflows/verapdf-scheduled.yml`, reruns
+`tests/tagging/run.sh` weekly with veraPDF built from a pinned commit. Building
+that validator costs several minutes, which the project pays weekly rather than
+on every pull request, so the per-PR `tagging` job skips the PDF/UA-2 gate and
+runs the structural, extraction, and geometry checks only. A pull request is
+therefore not PDF/UA-validated on the strength of its own checks.
 
 CI answers two main questions:
 
@@ -1366,57 +1417,75 @@ run.
 
 All automated test material belongs under `tests/`:
 
+- `tests/lint/` — source-level invariants no compiled fixture can assert, with
+  their own fixture packages;
 - `tests/regression/` — stable API behavior, options, diagnostics, load order,
   and fixed bugs;
 - `tests/smoke/` — supported document builds and required failure paths;
 - `tests/extraction/` — expected text, Unicode mapping, and reading order;
-- `tests/layout/` — long fields, multi-page content, and page-break stress; and
+- `tests/layout/` — long fields, multi-page content, and page-break stress;
 - `tests/bibliography/` — Biber-backed sorting and rendered identifier
-  precedence.
+  precedence; and
+- `tests/tagging/` — tagged structure, the untagged path, and the extractor
+  matrix.
 
 User examples remain under `examples/`. CI should build them, but they are not a
 substitute for focused tests. A milestone release reruns the accumulated suite;
 it does not introduce tests that were already known to be required.
 
-The test type follows the module's concern. Logic-bearing modules — metadata and
-separator logic in `careerdossier-base.sty`, and the engine-check and
-role-dispatch logic in `careerdossier-typography.sty` — expose behavior that a
-log diff can assert, so they take `l3build` regression tests (`.lvt` sources
-with saved `.tlg` baselines) in `tests/regression/`. Layout classes —
-`careerdossier-resume.cls` and `careerdossier-letter.cls` — own visual results
-that no log diff fully captures, so they rely on smoke, extraction, and reviewed
-reference PDFs, with final layout correctness confirmed by human inspection. A
-saved baseline is the assertion: regenerate one only for an intended, reviewed
-output change.
+The test type follows the module's concern, but no module is exempt from a log
+diff. Anything with observable logic — values, options, errors, or emitted
+structure — takes an `l3build` regression test (`.lvt` source with a saved `.tlg`
+baseline) in `tests/regression/`. Every shared package and every class already
+has that coverage: 28 `.lvt`/`.tlg` pairs, spread across
+`careerdossier-base.sty` (2), `careerdossier-tokens.sty` (8),
+`careerdossier-components.sty` (6), `careerdossier-typography.sty` (3),
+`careerdossier-theme.sty` (1), `careerdossier-biblatex.sty` (1), and the four
+classes (7). Extend the existing file for a module rather than assuming the
+module is exempt. Layout behavior additionally owns visual results that no log
+diff fully captures, so the classes also carry smoke, layout, extraction,
+tagging, and reviewed reference-PDF coverage, with final layout correctness
+confirmed by human inspection. A saved baseline is the assertion: regenerate one
+only for an intended, reviewed output change.
 
-### Phase 1 coverage
+### Coverage matrix
 
-- valid résumé;
-- valid cover letter;
-- missing required name;
-- missing optional phone;
-- missing optional website;
-- long LinkedIn or website field;
-- two-page résumé stress example;
-- text extraction.
+Cover the relevant parts of this matrix, which `AGENTS.md` states in full:
 
-Already-merged Phase 1 modules have test debt because their local verification
-fixtures were not committed. Backfill that coverage before or alongside the next
-production feature.
+- each affected document family: résumé, industry letter, academic letter,
+  academic CV, and each affected statement `type`;
+- missing required `name` with a clear error, per affected class;
+- missing optional `phone` and `website` without stray separators;
+- long URL or contact field, and contact-line wrapping;
+- two-page output, page furniture, and single-page suppression;
+- text extraction and logical reading order, across the supported extractors;
+- unsupported-engine error;
+- every option's accepted and rejected values, including the error naming the
+  accepted values, and rejection reported exactly once;
+- all affected classes after changes to a shared package;
+- tagged and untagged output after changes to tagging or shared packages; and
+- bibliography sorting and field precedence after `careerdossier-biblatex.sty`
+  or Biber-facing changes.
 
 ### Regression harness
 
-Adopt `l3build` during active Phase 1 work and point its test directory at
-`tests/regression/`. Add each regression when its behavior is introduced or a
-bug is fixed; do not wait for academic CV and bibliography work to start the
-suite. Verify the exact configuration variables against the current `l3build`
-manual when the harness is implemented.
+`build.lua` configures `l3build` for the module regression suite. `testfiledir`
+points at `tests/regression/`, so no top-level `testfiles/` directory is
+introduced. There is no `.dtx`/`.ins` unpack step: the handwritten sources live
+at the repository root, and `sourcefiles`/`installfiles` copy
+`careerdossier-*.sty` and `careerdossier-*.cls` into the test sandbox so
+`\usepackage` and `\documentclass` resolve them. Because the project is
+LuaLaTeX-only, `checkengines` and `stdengine` are `luatex` and `checkformat` is
+`latex`. These tests assert token lists and diagnostics rather than multi-pass
+references, so `checkruns` is 1.
+
+`l3build check` runs the whole suite, `l3build check <name>` one test, and
+`l3build save <name>` regenerates a baseline. The shell-driven runners under
+`tests/` are not invoked by `l3build`; `make check` runs both.
 
 Because a `.lvt` test cannot run without the harness, the harness precedes the
-tests that depend on it: land `build.lua` before — or in the same change as — the
-first module that relies on `l3build` coverage, rather than accumulating `.lvt`
-sources no runner can execute. Regressions owed before the harness lands are
-tracked as explicit test debt.
+tests that depend on it: a module that relies on `l3build` coverage does not land
+ahead of the configuration that can execute it.
 
 Tests should focus on stable behavior, not every line break or font metric before the design settles.
 
