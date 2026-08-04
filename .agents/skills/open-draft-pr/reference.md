@@ -203,14 +203,19 @@ it and read back again. The appendix has the queries.
 
 Which blanks are legitimate:
 
-- **Status, Size, assignee, labels, and milestone** are always determinable from
-  the PR and the focused issue, so none of them may be left unset. `Status` for
-  a newly opened draft comes from `docs/NAMING-CONVENTION.md` section 9; `Size`
-  from "Size guide" above, judged on the completed scope.
-- **Phase and Priority** are inherited and must not be invented. They are the
-  only fields that may stay blank, and only when the focused issue itself has
-  none — in which case name the missing *issue* field, not the PR field.
+- **Status, Size, assignee, and labels** are determinable from the PR itself, so
+  none of them may be left unset. `Status` for a newly opened draft comes from
+  `docs/NAMING-CONVENTION.md` section 9; `Size` from "Size guide" above, judged
+  on the completed scope.
+- **Milestone, Phase, and Priority** are inherited and must not be invented. Each
+  may stay blank, and only when the focused issue itself has none — in which case
+  name the missing *issue* field, not the PR field.
   `docs/NAMING-CONVENTION.md` section 10 defines the Phase numbering.
+
+A deliberately unmilestoned issue is the ordinary case for work the maintainer
+has postponed, and a PR against one inherits no milestone. Do not read the rule
+against blank fields as licence to pick a milestone the issue does not have —
+that silently pulls postponed work into a release.
 
 If Project API access is unavailable, still create the authorized draft PR and
 set all supported ordinary PR metadata. Report the exact fields that could not
