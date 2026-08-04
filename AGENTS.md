@@ -20,7 +20,9 @@ At the start of a task:
 
 1. Inspect the current branch, `git status --short`, and recent commits.
 2. Inspect the relevant files and available build/test commands.
-3. Identify the focused issue or PR, its parent epic, milestone, and Project fields.
+3. Identify the focused issue or PR, its milestone, its Project fields, and its
+   parent epic when it has one. Not every issue has a parent; every issue has a
+   milestone.
 4. Confirm the requested work belongs to the active milestone.
 5. State material assumptions and keep the change limited to the requested scope.
 
@@ -247,6 +249,15 @@ Use `docs/NAMING-CONVENTION.md` for names.
 
 - Never commit or push directly to `main`.
 - Keep one focused issue per meaningful branch where practical.
+- Every issue carries a milestone. An epic parent only when the work genuinely
+  decomposes into several issues; where an epic exists its sub-issue graph is
+  canonical, and a body checklist is a rendering of that graph, not a second
+  register.
+- Every PR links an issue with `Closes #...`, except a revert, a release chore,
+  or a CI/tooling repair — which state the problem, proposal, and acceptance
+  criteria in the PR body instead.
+- Every PR comes from a focused branch merged or rebased onto `main` within
+  three days. Split work that will not land in that window.
 - Routine local commits on a focused branch do not require separate approval.
 - Before the first push, inspect `git status --short`, review the complete
   branch-versus-base diff, check for unrelated files, generated artifacts,
@@ -255,6 +266,10 @@ Use `docs/NAMING-CONVENTION.md` for names.
 - After maintainer review begins, do not amend published commits, rebase, or
   force-push unless requested or explicitly approved.
 - Do not add agent/tool prefixes to commit or PR titles.
+
+`CONTRIBUTING.md` "Work item structure" is the canonical statement of the
+milestone, linked-issue, and branch-lifetime rules above; the bullets here are
+the short agent-facing form.
 
 ### AI attribution and disclosure
 

@@ -63,6 +63,12 @@ Example:
 
 Use lowercase `[epic]` for visual consistency with other bracket prefixes.
 
+Create an epic only for work that genuinely decomposes into several issues. An
+issue does not need a parent, and a placeholder epic created so a lone issue has
+somewhere to sit only reproduces its milestone. Where an epic exists, its
+sub-issue graph is canonical and a body checklist is a rendering of it. See
+"Work item structure" in `CONTRIBUTING.md`.
+
 ---
 
 ## 3. Branch naming convention
@@ -201,6 +207,9 @@ Rules:
 
 - A PR title should describe the whole branch, not every small commit.
 - Use `Closes #issue-number` in the PR body when the PR completes an issue.
+  Every PR links an issue except a revert, a release chore, or a CI/tooling
+  repair; those state the problem, proposal, and acceptance criteria in the body
+  instead. See "Work item structure" in `CONTRIBUTING.md`.
 - Do not close a large epic from an early implementation PR. Close the focused sub-issue instead.
 - Use draft PRs for unfinished branches that need CI or notes.
 
@@ -284,7 +293,11 @@ v1.0.0 — Stable Public API
 Rules:
 
 - Milestones represent releases.
-- Issues and PRs can belong to milestones.
+- **Every issue carries a milestone.** It is the field that answers "which
+  release", and the Project's `Phase` follows it. A pull request inherits its
+  issue's milestone.
+- An epic parent is conditional; the milestone is not. See "Work item structure"
+  in `CONTRIBUTING.md`.
 - Do not create labels like `v0.1.0`; the milestone already tracks this.
 
 ---
@@ -410,12 +423,16 @@ When creating a new item, ask:
    Use labels: `type:*` and `area:*`.
 
 6. Is this release tracking?  
-   Use a milestone: `vX.Y.Z — Release Name`.
+   Use a milestone: `vX.Y.Z — Release Name`. Every issue gets one.
 
-7. Is this workflow state?  
+7. Does this issue belong to a larger effort?  
+   Set an epic parent — but only if the effort really spans several issues.
+   Otherwise the milestone alone is correct.
+
+8. Is this workflow state?  
    Use the Project `Status` field.
 
-8. Is this a stage of the product plan?  
+9. Is this a stage of the product plan?  
    Use the Project `Phase` field, and mirror its number in `docs/ROADMAP.md`.
 
 ---

@@ -469,6 +469,18 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for release boundaries and non-goals.
 
 Focused bug reports, feature proposals, documentation improvements, and pull requests are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request.
 
+Three rules shape how work is divided here:
+
+- every issue carries a release milestone, and an epic parent only when the work
+  spans several issues;
+- every pull request links an issue, except a revert, a release chore, or a
+  CI/tooling repair, which state their rationale in the pull request body;
+- every pull request comes from a focused branch, merged or rebased onto `main`
+  within three days.
+
+See [Work item structure](CONTRIBUTING.md#work-item-structure) for the full
+statement and the reasoning behind each.
+
 ## License
 
 CareerDossierTeX is distributed under the LaTeX Project Public License, version 1.3c or, at your option, any later version.
