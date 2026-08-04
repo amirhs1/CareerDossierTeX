@@ -1,10 +1,12 @@
 % statement-option-values.lvt — rejected careerdossier-statement option values
 % (#212).
 %
-% See resume-option-values.lvt for the contract these files assert. `type' is
-% not covered here: it is hand-rolled rather than an l3keys choice list and has
-% named its seven accepted values since v0.5.0, so it was already the precedent
-% this issue generalised. The smoke suite pins its message.
+% See resume-option-values.lvt for the contract these files assert. `type' has
+% named its seven accepted values since v0.5.0 -- it was the precedent this
+% issue generalised -- but it stated them from a hand-rolled \str_case:nnF
+% whose fallback no check could see, so only the smoke suite pinned its
+% message. It is an ordinary choice list as of #236 and is asserted here with
+% the other five.
 \input{regression-test}
 \documentclass{careerdossier-statement}
 \CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
@@ -12,10 +14,33 @@
 \ExplSyntaxOn
 \NewDocumentCommand \cdossiertestSetOption { m }
   { \keys_set:nn { cdossier / statement } {#1} }
+% `type' is the one option here whose accepted values are not pinned by a
+% building smoke fixture: a value that failed to select would leave the
+% default `interest' selected and the fixture would still compile. So set each
+% value through the option and log what it stored.
+\NewDocumentCommand \cdossiertestSelectType { m }
+  {
+    \keys_set:nn { cdossier / statement } { type = #1 }
+    \TYPE { #1 ~ -> ~ \tl_use:N \l__cdossier_statement_type_tl }
+  }
 \ExplSyntaxOff
 
 \begin{document}
 \START
+
+\TEST{accepted-type-values-are-selected}{
+  \cdossiertestSelectType{interest}
+  \cdossiertestSelectType{research}
+  \cdossiertestSelectType{teaching}
+  \cdossiertestSelectType{teaching-philosophy}
+  \cdossiertestSelectType{diversity}
+  \cdossiertestSelectType{artist}
+  \cdossiertestSelectType{purpose}
+}
+
+\TEST{unknown-type-value-is-rejected}{
+  \cdossiertestSetOption{type=grant}
+}
 
 \TEST{unknown-fontsize-value-is-rejected}{
   \cdossiertestSetOption{fontsize=13pt}

@@ -27,10 +27,11 @@
 # for the wrong module, and a handler pointing at another key's message would
 # otherwise satisfy (1) while reporting the wrong accepted values.
 #
-# Deliberately out of scope: careerdossier-statement's `type', which is
-# hand-rolled with \str_case:nnF rather than .choices:nn and already names its
-# seven values. The lint keys off .choices:nn, so it does not see `type'. That
-# omission is intended, not a gap.
+# Every public choice-valued option is in scope. careerdossier-statement's
+# `type' was the one exception when this lint landed, because it was hand-rolled
+# with \str_case:nnF rather than .choices:nn; #236 made it an ordinary choice
+# list, so a choice option declared any other way is now a thing to convert
+# rather than a shape the lint has to learn.
 #
 # The lint parses text; it runs no LaTeX and needs no TeX installation. It ends
 # by running itself against tests/lint/fixtures/, which hold one complete option
