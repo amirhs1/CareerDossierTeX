@@ -54,13 +54,23 @@ installed by one client are visible to another. Claude Code scans
 a directory elsewhere, which it follows to read `SKILL.md`. The symlinks are the
 supported bridge between the two.
 
-Rules are the asymmetric case. Claude Code's `.claude/rules/` with `paths:`
-frontmatter has no Codex equivalent — Codex's "rules" are sandbox command
-permissions, an unrelated feature with the same name. So `.agents/rules/` is
-canonical for humans and for any future tool, Claude reaches it through the
-symlink, and the concise LaTeX invariants are *also* stated in `AGENTS.md`
-because that is the only file Codex will read them from. That single overlap is
-deliberate and is the one place the no-duplication rule is relaxed.
+Rules are the asymmetric case, and `.agents/rules/` is **a local convention, not
+a standard**. No vendor documents it and no tool discovers it. Claude Code's
+`.claude/rules/` with `paths:` frontmatter is the only path-scoped rules feature
+that exists; Codex's "rules" are sandbox command permissions, an unrelated
+feature that shares the name.
+
+So the rules file is reached exactly one way: Claude Code reads
+`.claude/rules/latex.md`, which is a symlink. `.agents/rules/` holds the file so
+that every piece of agent instruction content has one home and one copy, and so
+a second tool that gains the feature has an obvious place to point at. It earns
+nothing from any tool today. If that indirection ever costs more than it is
+worth, the correct simplification is to move the file back to
+`.claude/rules/latex.md` and drop the link — not to add a second copy.
+
+Because Codex cannot read that file at all, the concise LaTeX invariants are
+*also* stated in `AGENTS.md`. That single overlap is deliberate and is the one
+place the no-duplication rule is relaxed.
 
 A caveat worth knowing: a Git checkout on a filesystem or platform without
 symlink support materializes these links as plain text files containing their

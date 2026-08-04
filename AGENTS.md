@@ -237,9 +237,10 @@ constraints, options considered, recommendation, and trade-offs.
 - Treat text extraction as a baseline check, not proof of full accessibility.
 - Claim tagged-PDF or PDF/UA conformance only after appropriate validation.
 
-The detailed LaTeX rules live in `.agents/rules/latex.md`. They are the same
-rules stated above, kept where a path-scoped loader can pick them up; see
-`docs/agent-workflows/README.md`.
+The detailed LaTeX rules live in `.agents/rules/latex.md`, reached by Claude Code
+through `.claude/rules/latex.md`. They restate the rules above for a path-scoped
+loader; `docs/agent-workflows/README.md` explains why that file sits where it
+does.
 
 ## Git and draft PR policy
 
