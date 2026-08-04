@@ -147,8 +147,8 @@ permitted to execute, which is closer to build and CI configuration.
 
 ## Status transitions
 
-- focused issue selected and branch created → issue `In progress`
-- draft PR opened → PR `In progress`
+- focused issue selected and branch created → issue `In Progress`
+- draft PR opened → PR `In Progress`
 - maintainer marks PR ready → PR `In review`
 - PR merged → PR and completed issue `Done`
 - PR closed without merge → restore or preserve the appropriate issue status
@@ -166,7 +166,7 @@ The following are pre-authorized for an authorized draft PR:
 - inheritance of the issue's existing milestone;
 - addition to the `CareerDossierTeX Development` Project;
 - Project values derived from the issue and actual PR scope;
-- moving the focused issue to `In progress`.
+- moving the focused issue to `In Progress`.
 
 Obtain explicit approval before:
 
@@ -282,14 +282,16 @@ gh pr view <pr-number> --json isDraft,assignees,labels,milestone
 **Discover option strings from step 2, never from prose.** The live Project is
 authoritative for the exact text of an option; this document and
 `docs/NAMING-CONVENTION.md` are authoritative for *which* option to choose and
-what it means. Those are different questions, and the transcriptions drift: as
-of 2026-08-03 the Project's option reads `In Progress` while
-`docs/NAMING-CONVENTION.md` section 9 writes `In progress`.
+what it means. Those are different questions, and a transcription of the first
+into prose drifts silently.
 
-The casing matters because the lookup is by name. A `--jq 'select(.name=="In
-progress")'` against an option actually called `In Progress` yields an empty
-option id, and the resulting `item-edit` sets nothing while reporting no error.
-Read `gh project field-list` output and copy the string it returns.
+The casing is the part that bites, because lookup is by name. A `--jq
+'select(.name=="In progress")'` against an option actually called `In Progress`
+yields an empty option id, and the resulting `item-edit` sets nothing while
+reporting no error — a failure with no failing exit status. This exact mismatch
+existed between the Project and `docs/NAMING-CONVENTION.md` section 9 until
+2026-08-04, when the documentation was corrected to match the Project. Assume it
+can recur; read `gh project field-list` output and copy the string it returns.
 
 So: take `Status` semantics from `docs/NAMING-CONVENTION.md` section 9 and
 `Phase` from section 10, take `Priority` and `Size` from "Project field values"
