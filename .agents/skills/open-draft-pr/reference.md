@@ -1,7 +1,7 @@
 # GitHub Project and draft pull-request workflow
 
 This is the canonical repository procedure for opening or updating a draft pull
-request and populating its GitHub metadata. It applies to Codex and Claude Code.
+request and populating its GitHub metadata. It applies to every agent.
 
 ## Authority boundary
 

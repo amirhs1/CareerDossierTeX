@@ -35,8 +35,8 @@ Use these canonical sources when they exist:
 - `AI-POLICY.md` — AI use, disclosure, attribution, security, and accountability
 - `CONTRIBUTING.md` — contribution, test, PR, CI, and release workflow
 - `docs/NAMING-CONVENTION.md` — naming for GitHub objects and releases
-- `docs/agent-workflows/github-project.md` — draft PR and Project metadata workflow
-- `docs/agent-workflows/README.md` — map of the agent-instruction file set
+- `.agents/skills/open-draft-pr/reference.md` — draft PR and Project metadata workflow
+- `.agents/skills/release-notes/reference.md` — CHANGELOG and GitHub Release workflow
 - `docs/API.md` — public API, defaults, warnings, and errors
 - `docs/ARCHITECTURE.md` — per-file responsibilities and dependency direction
 - `docs/ATS-EXTRACTION.md` — extraction, tagging, and reproducibility expectations
@@ -144,7 +144,7 @@ Before editing, identify the owning module and affected public API.
 4. **Verify:** run relevant checks, then the supported suite when available.
 5. **Self-review:** inspect the full branch diff, logs, artifacts, and docs.
 6. **Commit:** create coherent commits on the focused feature branch.
-7. **Draft PR:** follow `docs/agent-workflows/github-project.md`.
+7. **Draft PR:** follow `.agents/skills/open-draft-pr/reference.md`.
 8. **Report:** distinguish completed, verified, and unverified work.
 
 Ask a focused question only for a material product, scope, design, release,
@@ -236,11 +236,8 @@ constraints, options considered, recommendation, and trade-offs.
 - Keep text selectable and searchable.
 - Treat text extraction as a baseline check, not proof of full accessibility.
 - Claim tagged-PDF or PDF/UA conformance only after appropriate validation.
-
-The detailed LaTeX rules live in `.agents/rules/latex.md`, reached by Claude Code
-through `.claude/rules/latex.md`. They restate the rules above for a path-scoped
-loader; `docs/agent-workflows/README.md` explains why that file sits where it
-does.
+- Tagged structure is opt-in through `\DocumentMetadata{tagging=on}`. Keep the
+  untagged path unchanged when editing tagging code.
 
 ## Git and draft PR policy
 
@@ -296,7 +293,7 @@ Project metadata without separate approval for every field.
 
 Follow:
 
-- `docs/agent-workflows/github-project.md`
+- `.agents/skills/open-draft-pr/reference.md`
 - the `open-draft-pr` skill, and `.github/pull_request_template.md` for the PR
   body
 
@@ -348,7 +345,7 @@ Update only the docs affected by behavior:
 - incompatible public changes → `docs/MIGRATION.md`
 - user-visible changes → `CHANGELOG.md`
 
-Follow `docs/agent-workflows/release-notes.md` (via the `release-notes` skill)
+Follow `.agents/skills/release-notes/reference.md` (via the `release-notes` skill)
 for `CHANGELOG.md` house style and for drafting GitHub Release notes; tagging
 and publishing a release stay maintainer-only.
 

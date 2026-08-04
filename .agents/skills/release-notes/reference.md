@@ -1,7 +1,7 @@
 # CHANGELOG and release-note workflow
 
 This is the canonical repository procedure for writing `CHANGELOG.md` entries
-and GitHub Release notes. It applies to Codex and Claude Code.
+and GitHub Release notes. It applies to every agent.
 
 `CONTRIBUTING.md` says *when* each file must be updated. This document says
 *how* to write what goes in them — house style, structure, and the

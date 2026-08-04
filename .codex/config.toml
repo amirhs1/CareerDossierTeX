@@ -1,9 +1,9 @@
 # Codex-specific settings only.
 #
 # Shared instructions live in AGENTS.md, which Codex reads from the repository
-# root. Skills and path-scoped rules live in .agents/, which Codex already
-# scans; nothing agent-neutral belongs in this file.
+# root. Skills live in .agents/skills/, which Codex already scans. Nothing
+# agent-neutral belongs in this file.
 #
-# See docs/agent-workflows/README.md for the full layout.
+# See AI-POLICY.md, "Agent instruction structure", for the layout.
 
 sandbox_mode = "workspace-write"

@@ -114,16 +114,22 @@ defining the Work remain authoritative.
 
 ## Agent instruction structure
 
-- `AGENTS.md` is the canonical repository-wide operating contract.
+- `AGENTS.md` is the canonical repository-wide operating contract, and holds
+  every rule an agent must apply on every task.
 - `CLAUDE.md` is a thin Claude Code adapter and does not duplicate shared policy.
-- `.agents/` holds the one copy of every skill and path-scoped rule, in the
-  vendor-neutral location other agents already scan.
-- `.claude/` and `.codex/` hold only that tool's own settings, plus symlinks
-  into `.agents/`. Instruction content is never copied between them.
-- `.github/pull_request_template.md` is the canonical PR section set.
+- `.agents/skills/` holds the one copy of each occasional multi-step procedure:
+  a `SKILL.md` and the `reference.md` it loads. This is the vendor-neutral
+  location other agents already scan.
+- `.claude/` and `.codex/` hold only that tool's own settings. `.claude/skills/`
+  entries are symlinks into `.agents/skills/`; instruction content is never
+  copied between tool directories.
+- `.github/pull_request_template.md` is the canonical PR section set, and its
+  `AI assistance` section is last.
 - `CONTRIBUTING.md` states the requirements that apply to human contributors.
 
-`docs/agent-workflows/README.md` maps the file set and explains the split.
+The split is by loading frequency, not by topic: what applies to every task
+belongs in `AGENTS.md`, which is always loaded in full, and what applies
+occasionally belongs in a skill, which is loaded on demand.
 
 Hard requirements should be enforced by tests, linters, permissions, sandboxing,
 hooks, branch protection, or rulesets when practical. Instruction text alone

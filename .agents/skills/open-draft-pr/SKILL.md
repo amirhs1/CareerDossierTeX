@@ -8,7 +8,7 @@ description: Open or update a CareerDossierTeX draft pull request and populate i
 Read and follow, in order:
 
 1. `AGENTS.md`
-2. `docs/agent-workflows/github-project.md`
+2. `reference.md`, alongside this file
 3. `docs/NAMING-CONVENTION.md`
 4. `scripts/setup-labels.sh`
 5. the focused GitHub issue and its current Project metadata
@@ -42,7 +42,7 @@ deleting the ones that seem empty. In order:
 `Summary` → `Related issues` → `Changes` → `Public API impact` → `Testing` →
 `Visual verification` → `Notes for review` → `AI assistance`
 
-`docs/agent-workflows/github-project.md` states what belongs in each section.
+`reference.md` states what belongs in each section.
 **`AI assistance` is always last.**
 
 When writing the body to a file for `gh pr create --body-file`, start from a
