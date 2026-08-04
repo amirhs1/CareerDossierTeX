@@ -1,0 +1,69 @@
+% resume-header-edges.lvt — issue #255 the record family's rendered header gap.
+%
+% \CDossierRecordHeaderBelowSkip was the one spacing token no fixture touched
+% beyond its value. `tokens-scale' echoes it, `tokens-invariants' compares it to
+% \CDossierRecordSectionAboveSkip, and `components-headerstack' proves only that
+% a record class would select it — that fixture is a letter, and it makes the
+% point by giving the three family tokens deliberately distinct values. Nothing
+% showed the record class's gap reaching a page at the calibrated ratio, and the
+% margin there is one sixteenth of a line: the token is 0.9375 against a section
+% above-gap of 0.875, so which of the two \addvspace keeps is decided by a
+% single grid step.
+%
+% The instrument is the composed height of a \vbox rather than \pagetotal,
+% because the boundary is between the two blocks that open the document and a
+% \pagetotal reading of the first of them would be taken where TeX discards
+% glue. A \vbox composes the same material through the same maximum; \ht + \dp
+% so the last line's depth is not dropped.
+%
+% Two heights, and the relation between how they move is the assertion:
+%
+%   header-only         one shared header stack, ending in the class's own
+%                       \CDossierRecordHeaderBelowSkip
+%   header-and-section  the same, then the first ruled section heading, whose
+%                       \CDossierRecordSectionAboveSkip claims the same boundary
+%
+% Lowering \CDossierRecordHeaderBelowSkip therefore moves `header-only' by the
+% full change and `header-and-section' by less, because the section's above-gap
+% takes over the maximum partway. A token that had already lost that maximum
+% would move `header-only' alone.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertest_boxheight:nn #1#2
+  {
+    \vbox_set:Nn \l_cdossiertest_box {#2}
+    \TYPE
+      {
+        #1 ~ height~=~
+        \dim_eval:n
+          {
+            \box_ht:N \l_cdossiertest_box + \box_dp:N \l_cdossiertest_box
+          }
+      }
+  }
+\NewDocumentCommand \cdossiertestBoxHeight { m +m }
+  { \cdossiertest_boxheight:nn {#1} {#2} }
+\ExplSyntaxOff
+
+\begin{document}
+% Force the math-font loads that \nolinkurl triggers at the contact line's size
+% before the first test, so the font-info lines land outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+\TEST{header-below-boundary}{
+  \cdossiertestBoxHeight{header-only}{\MakeCDossierHeader}
+  \cdossiertestBoxHeight{header-and-section}{
+    \MakeCDossierHeader
+    \CDossierSection{Experience}
+  }
+}
+
+\END

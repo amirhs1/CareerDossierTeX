@@ -44,6 +44,24 @@
   }
 \NewDocumentCommand \cdossiertestTraceAddvspace { } { \cdossiertest_trace_addvspace: }
 \NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
+% Issue #255: the composed height of the stack, for the tests that have to
+% measure what reaches the page rather than what the stack claims. \ht + \dp so
+% the last line's depth is not dropped.
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertest_boxheight:nn #1#2
+  {
+    \vbox_set:Nn \l_cdossiertest_box {#2}
+    \TYPE
+      {
+        #1 ~ height~=~
+        \dim_eval:n
+          {
+            \box_ht:N \l_cdossiertest_box + \box_dp:N \l_cdossiertest_box
+          }
+      }
+  }
+\NewDocumentCommand \cdossiertestBoxHeight { m +m }
+  { \cdossiertest_boxheight:nn {#1} {#2} }
 % Issue #224: a header line that announces when its body is executed. The
 % announcement is what distinguishes "stored unexpanded and used once, in place"
 % from "expanded at push time" or "used twice".
@@ -133,6 +151,37 @@
   \CDossierHeaderEnd
   \par
   \TYPE{empty-stack-done}
+}
+
+% Issue #255: every test above records the *claim* — the argument \addvspace was
+% called with. A claim is not a rendered gap: \addvspace takes the maximum of
+% the adjacent claims, so a token can be traced at every boundary it names and
+% still contribute nothing to the page. That is the condition #204 exists to
+% prevent, and it was found reproduced inside a fixture during #206.
+%
+% The three composed heights below are the rendering half of the contract, and
+% they separate the three tokens because each stack has one more boundary than
+% the one above it:
+%
+%   stack-one-line     one line + \CDossierLetterHeaderBelowSkip
+%   header-two-lines   + one line + \CDossierSharedHeaderNameGapSkip
+%   header-three-lines + one line + \CDossierSharedHeaderMetaGapSkip
+%
+% The letter class is what makes this worth measuring rather than deriving. Its
+% \parskip is a visible 0.25 line, and the stack subtracts \parskip from every
+% gap it emits and zeroes it for its own group (issue #220). If that isolation
+% were lost, the traced claims above would not change at all and only these
+% heights would move.
+\TEST{stack-heights-are-the-rendered-gaps}{
+  \CDossierSetup{headline = {}}
+  \cdossiertestBoxHeight{stack-one-line}{
+    \CDossierHeaderBegin
+    \CDossierHeaderLine{Alpha}
+    \CDossierHeaderEnd
+  }
+  \cdossiertestBoxHeight{header-two-lines}{\MakeCDossierHeader}
+  \CDossierSetup{headline = {Data Scientist}}
+  \cdossiertestBoxHeight{header-three-lines}{\MakeCDossierHeader}
 }
 
 \END

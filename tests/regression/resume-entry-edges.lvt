@@ -97,4 +97,26 @@
   \cdossiertestMark{after-second-bare-entry}
 }
 
+% Issue #255: \CDossierRecordItemSepSkip is the gap *between* two bullets, so a
+% one-item list cannot render it — and TEST 1's list has one item, which is the
+% same gap between reporting a token and rendering it that point 3 above
+% describes. A two-item list is the missing shape, and it is the only one: the
+% token reaches the page nowhere else in the record classes, and the only other
+% place it is read at all is `\bibitemsep' in careerdossier-biblatex.
+%
+% The recorded difference across the list is two bullet lines, one item gap, and
+% both list edges. It is the item gap that distinguishes it from TEST 1's
+% single-item list, whose difference has no item gap in it at all.
+\TEST{list-item-separation}{
+  \CDossierSection{Skills}
+  \begin{CDossierEntry}[title = {Tooling}]
+    \cdossiertestMark{after-skills-entry-heading}
+    \begin{CDossierItemize}
+      \item First bullet.
+      \item Second bullet.
+    \end{CDossierItemize}
+    \cdossiertestMark{after-two-item-list}
+  \end{CDossierEntry}
+}
+
 \END

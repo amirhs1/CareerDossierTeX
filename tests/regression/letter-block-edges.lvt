@@ -1,0 +1,165 @@
+% letter-block-edges.lvt — issue #255 rendered letter block boundaries.
+%
+% Every one of the letter's seven spacing tokens was pinned only by value:
+% `tokens-letter-defaults' echoes six of them, `tokens-invariants' compares them
+% to each other, and `components-headerstack' traces the header stack's
+% \addvspace *claims* and the document-wide \parskip. None of that is evidence
+% that a gap reaches the page — an echoed number moves whenever the ratio moves,
+% whether or not the token ever wins a maximum, which is the unreachable-token
+% condition issue #204 exists to prevent and issue #206 found reproduced inside
+% `resume-entry-edges'.
+%
+% The instrument here is the composed height of a \vbox, not \pagetotal. The
+% letterhead has to be measured in four configurations to separate the tokens
+% that share it, and four letterheads plus a body do not fit on one page, so a
+% \pagetotal reading would be cut by a page break and the difference across it
+% would be meaningless. A \vbox composes the same material through the same
+% \addvspace maxima and the same \parskip additions, and its natural height is
+% independent of where on a page the block would land. The measured quantity is
+% \ht + \dp so that the last line's depth is not silently dropped.
+%
+% The one property a \vbox does not reproduce is the discarding of glue at the
+% top of a page. No token is measured at the top of a box here: every box opens
+% with a header line or a body line, both of which are boxes.
+%
+% Which token each recorded height carries:
+%
+%   letterhead-minimal            \CDossierLetterHeaderBelowSkip (the stack's
+%                                 own below-gap, against the date line),
+%                                 one \CDossierLetterBlockSkip (date ->
+%                                 salutation), \CDossierLetterBodyAboveSkip,
+%                                 and \CDossierLetterParSkip at every boundary
+%   letterhead-one-recipient-line adds a second \CDossierLetterBlockSkip
+%   letterhead-four-recipient-lines
+%                                 adds three \CDossierLetterRecipientLineGapSkip
+%   letterhead-with-subject       adds a third \CDossierLetterBlockSkip
+%   body-one-paragraph            the reference for the two below it
+%   body-two-paragraphs           adds one \CDossierLetterParSkip
+%   body-and-closing              adds \CDossierLetterBodyBelowSkip and
+%                                 \CDossierLetterSignatureGapSkip
+%
+% The closing block records its two tokens in one number, because
+% \MakeCDossierClosing emits the body's closing edge and the signature gap with
+% no public boundary between them. Each was verified to move that number on its
+% own; only a retune that moved both by equal and opposite amounts could hide,
+% and the two are an \addvspace floor and an additive \vspace at a four-fold
+% difference in scale.
+%
+% The tokens are deliberately measured at their committed values and are not
+% overridden to distinctive ones. An override would prove that a token *can*
+% reach the page, which is not the question — the question is whether it does at
+% the calibrated ratios, and an override would keep answering yes after a retune
+% made the token unreachable.
+\input{regression-test}
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertest_boxheight:nn #1#2
+  {
+    \vbox_set:Nn \l_cdossiertest_box {#2}
+    \TYPE
+      {
+        #1 ~ height~=~
+        \dim_eval:n
+          {
+            \box_ht:N \l_cdossiertest_box + \box_dp:N \l_cdossiertest_box
+          }
+      }
+  }
+\NewDocumentCommand \cdossiertestBoxHeight { m +m }
+  { \cdossiertest_boxheight:nn {#1} {#2} }
+\ExplSyntaxOff
+
+\begin{document}
+% Force the math-font loads that \nolinkurl triggers at the contact line's size
+% before the first test, so the font-info lines land outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+% Sender identity, date, salutation. One block boundary, and no recipient or
+% subject block to contribute one of its own.
+\TEST{letterhead-minimal}{
+  \CDossierLetterSetup{
+    date = {1 January 2026},
+    recipient-name = {},
+    recipient-title = {},
+    recipient-organization = {},
+    recipient-address = {},
+    subject = {},
+  }
+  \cdossiertestBoxHeight{letterhead-minimal}{\MakeCDossierLetterhead}
+}
+
+% One recipient line. The difference against the minimal letterhead is one line
+% plus one \CDossierLetterBlockSkip.
+\TEST{letterhead-one-recipient-line}{
+  \CDossierLetterSetup{
+    date = {1 January 2026},
+    recipient-name = {Grace Hopper},
+    recipient-title = {},
+    recipient-organization = {},
+    recipient-address = {},
+    subject = {},
+  }
+  \cdossiertestBoxHeight{letterhead-one-recipient-line}{\MakeCDossierLetterhead}
+}
+
+% Four recipient lines. The block boundary count is unchanged, so the difference
+% against the one-line letterhead is three lines plus the three line gaps inside
+% the block — the only place \CDossierLetterRecipientLineGapSkip is emitted.
+\TEST{letterhead-four-recipient-lines}{
+  \CDossierLetterSetup{
+    date = {1 January 2026},
+    recipient-name = {Grace Hopper},
+    recipient-title = {Director},
+    recipient-organization = {Example Institute},
+    recipient-address = {1 Example Way},
+    subject = {},
+  }
+  \cdossiertestBoxHeight{letterhead-four-recipient-lines}{\MakeCDossierLetterhead}
+}
+
+% A subject line restores the one-line recipient block and adds a third block
+% boundary, so the difference against the one-line letterhead is one line plus
+% one more \CDossierLetterBlockSkip.
+\TEST{letterhead-with-subject}{
+  \CDossierLetterSetup{
+    date = {1 January 2026},
+    recipient-name = {Grace Hopper},
+    recipient-title = {},
+    recipient-organization = {},
+    recipient-address = {},
+    subject = {Application for the advertised post},
+  }
+  \cdossiertestBoxHeight{letterhead-with-subject}{\MakeCDossierLetterhead}
+}
+
+% The body and the closing. The three heights are read as two differences: one
+% paragraph step, and one closing block.
+\TEST{body-and-closing-boundaries}{
+  \CDossierLetterSetup{closing = {Sincerely,}}
+  \cdossiertestBoxHeight{body-one-paragraph}{
+    Body paragraph one.
+    \par
+  }
+  \cdossiertestBoxHeight{body-two-paragraphs}{
+    Body paragraph one.
+    \par
+    Body paragraph two.
+    \par
+  }
+  \cdossiertestBoxHeight{body-and-closing}{
+    Body paragraph one.
+    \par
+    Body paragraph two.
+    \par
+    \MakeCDossierClosing
+  }
+}
+
+\END

@@ -1,35 +1,29 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: entry-and-list-boundaries
+TEST 1: letterhead-minimal
 ============================================================
-after-section-heading page-total = 21.64pt
-after-entry-heading page-total = 32.36801pt
-after-list page-total = 55.45pt
-after-entry page-total = 55.45pt
-after-second-entry-heading page-total = 69.76802pt
-after-second-entry page-total = 81.10202pt
+letterhead-minimal height = 102.16425pt
 ============================================================
 ============================================================
-TEST 2: entry-and-list-tokens
+TEST 2: letterhead-one-recipient-line
 ============================================================
-section-above = 11.90001pt
-section-below = 5.95pt
-entry-above = 4.25pt
-entry-gap = 0.85pt
-list-edge-above = 3.4pt
-list-edge-below = 6.8pt
+letterhead-one-recipient-line height = 127.53925pt
 ============================================================
 ============================================================
-TEST 3: bare-entry-boundaries
+TEST 3: letterhead-four-recipient-lines
 ============================================================
-after-education-heading page-total = 117.64203pt
-after-first-bare-entry page-total = 128.35904pt
-after-second-bare-entry page-total = 146.22005pt
+letterhead-four-recipient-lines height = 171.03925pt
 ============================================================
 ============================================================
-TEST 4: list-item-separation
+TEST 4: letterhead-with-subject
 ============================================================
-after-skills-entry-heading page-total = 190.31706pt
-after-two-item-list page-total = 224.75507pt
+letterhead-with-subject height = 152.91425pt
+============================================================
+============================================================
+TEST 5: body-and-closing-boundaries
+============================================================
+body-one-paragraph height = 10.812pt
+body-two-paragraphs height = 28.937pt
+body-and-closing height = 100.8015pt
 ============================================================

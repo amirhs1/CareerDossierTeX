@@ -663,6 +663,76 @@ Catcodes cannot be switched inside an already-tokenized `\TEST` body, so any
 expl3 or `@`-bearing name must be reached through a helper defined earlier under
 `\ExplSyntaxOn`, or via `\use:c`.
 
+### Spacing tokens: reporting a value is not rendering a gap
+
+A spacing token reaches the page only where it wins a maximum. `\addvspace`
+collapses two adjacent claims to the larger one, so a token that is smaller than
+its neighbour everywhere a fixture happens to look contributes nothing there —
+and a fixture that prints the token with `\TYPE` still records a difference when
+the ratio changes. Its baseline moves, and the test looks like it is working.
+
+That is not hypothetical. `resume-entry-edges` exists to assert entry and list
+boundary composition and printed `\CDossierRecordEntryAboveSkip`, but every
+entry in it had a body, and that token only wins a maximum between two *bodiless*
+entries. When issue #206 moved the ratio, only the echoed number changed. The
+unreachable-token condition issue #204 exists to prevent was reproduced inside
+the test written to catch it.
+
+So each public spacing token must be rendered by at least one committed fixture,
+and the table below records which. Extend the fixture named there when you retune
+a ratio, and add a row when you add a token.
+
+| Token | Rendered by | At the boundary |
+| --- | --- | --- |
+| `\CDossierSharedHeaderNameGapSkip` | `components-headerstack` | header line 1 → line 2 |
+| `\CDossierSharedHeaderMetaGapSkip` | `components-headerstack` | header line 2 → line 3 |
+| `\CDossierRecordHeaderBelowSkip` | `resume-header-edges` | header stack → first ruled section |
+| `\CDossierRecordSectionAboveSkip` | `resume-entry-edges` | entry → next section heading |
+| `\CDossierRecordSectionRuleGapSkip` | `resume-entry-edges` | heading baseline → section rule |
+| `\CDossierRecordSectionBelowSkip` | `resume-entry-edges` | section rule → first entry |
+| `\CDossierRecordEntryAboveSkip` | `resume-entry-edges` | bodiless entry → bodiless entry |
+| `\CDossierRecordEntryGapSkip` | `resume-entry-edges` | entry heading → prose body |
+| `\CDossierRecordListEdgeAboveSkip` | `resume-entry-edges` | entry heading → bullet list |
+| `\CDossierRecordListEdgeBelowSkip` | `resume-entry-edges` | bullet list → next block |
+| `\CDossierRecordItemSepSkip` | `resume-entry-edges` | bullet → bullet |
+| `\CDossierRecordParSkip` | `resume-entry-edges` | every paragraph boundary |
+| `\CDossierProseHeaderBelowSkip` | `statement-prose-edges` | header stack → first section |
+| `\CDossierProseSectionAboveSkip` | `statement-prose-edges` | paragraph → section heading |
+| `\CDossierProseSectionBelowSkip` | `statement-prose-edges` | section heading → paragraph |
+| `\CDossierProseSubsectionAboveSkip` | `statement-prose-edges` | paragraph → subsection heading |
+| `\CDossierProseSubsectionBelowSkip` | `statement-prose-edges` | subsection heading → paragraph |
+| `\CDossierProseParSkip` | `statement-prose-edges` | paragraph → paragraph |
+| `\CDossierLetterHeaderBelowSkip` | `letter-block-edges`, `components-headerstack` | header stack → date line |
+| `\CDossierLetterParSkip` | `letter-block-edges` | paragraph → paragraph |
+| `\CDossierLetterRecipientLineGapSkip` | `letter-block-edges` | recipient line → recipient line |
+| `\CDossierLetterBlockSkip` | `letter-block-edges` | letterhead block → letterhead block |
+| `\CDossierLetterBodyAboveSkip` | `letter-block-edges` | salutation → body |
+| `\CDossierLetterBodyBelowSkip` | `letter-block-edges` | body → closing |
+| `\CDossierLetterSignatureGapSkip` | `letter-block-edges` | closing → signature name |
+
+Two kinds of fixture are *not* in that column, and neither is a substitute.
+
+`tokens-scale`, the four `tokens-*-defaults`, and `tokens-invariants` echo values
+and compare them to one another. Pinning resolved values and their ordering is a
+legitimate contract on its own — it is what catches a ratio changed by accident —
+but it answers a different question, so a token covered only there is untested.
+The same holds for a traced `\addvspace`: `components-headerstack` and
+`statement-headerstack` intercept it to record *which* token the header stack
+selected and how many times, which is a claim, not a rendered gap. Both fixtures
+keep those traces; `components-headerstack` adds composed heights alongside them.
+
+`tests/layout/` renders rather than reports, but it asserts page counts, overfull
+boxes, furniture, media box, and widow/orphan behaviour — not gaps. A spacing
+change of a grid step or two moves nothing it looks at. It is corroboration when
+a retune flips a page count, not a per-token instrument.
+
+Verify a new shape by perturbing the ratio and rebuilding — do not assume it from
+the token's definition. Perturb *downward* where the token allows it: raising a
+token that currently loses its maximum can make it win, which reports coverage
+the committed values do not have. For a token whose default is `0.00` only the
+upward direction exists, and the reading is then "any non-zero value renders",
+not "this gap is on the page today".
+
 ### BibLaTeX/Biber fixture
 
 The optional integration has a focused multi-pass fixture that runs Biber,
