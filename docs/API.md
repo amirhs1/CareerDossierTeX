@@ -140,9 +140,22 @@ actually been verified.
 Every option below takes a fixed set of values. An unsupported value stops the
 build with a class error that names the option, the value supplied, the owning
 class, and the accepted values — so the accepted set never has to be looked up
-here to act on the error. `careerdossier-typography` and `careerdossier-tokens`
-report the same way for the options they accept when either is loaded directly
-as a package.
+here to act on the error.
+
+Three packages also accept options when loaded directly with `\usepackage`, and
+report an unsupported value the same way:
+
+| Package | Options | Package default |
+|---|---|---|
+| `careerdossier-tokens` | `fontsize`, `margin` | `fontsize=12pt`, `margin=normal` |
+| `careerdossier-typography` | `bodyfont` | `bodyfont=serif` |
+| `careerdossier-components` | `medium` | `medium=print` |
+
+**A package default is not a class default.** Loading `careerdossier-tokens`
+directly gives `12pt`/`normal`, while `\documentclass{careerdossier-resume}`
+resolves to `11pt`/`narrow` — the class passes its own values down with
+`\PassOptionsToPackage` before `\LoadClass`. Set the option explicitly when
+loading a package directly; do not assume it inherits a class's choice.
 
 #### `fontsize`
 
@@ -406,8 +419,16 @@ remain compatible with the released industry classes.
 | `github` | No | Released | GitHub URL or profile path |
 | `scholar` | No | Released | Google Scholar profile URL or identifier |
 | `orcid` | No | `v0.2.0` | ORCID identifier or profile URL |
+| `affiliation` | Conditional | `v0.5.0` | Current institution, organization, studio, or independent-practice description |
 
 Whitespace-only values should be treated as missing.
+
+`name` is the only key every class requires. A class may require a further key
+for a particular document, and three do — the statement class requires `email`
+for every statement, `affiliation` for `type=research`, and `website` for
+`type=artist`. "Conditional" in the table above means exactly that: the key is
+optional to the profile and required by some documents that use it. See
+"Required profile fields and displayed contacts" for the statement rules.
 
 ### Contact-field labels (`contact-labels`)
 
