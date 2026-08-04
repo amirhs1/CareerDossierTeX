@@ -96,7 +96,8 @@ After opening or updating the draft PR:
 
 For a newly opened draft PR:
 
-- **Status:** `In progress`
+- **Status:** the in-progress option — `docs/NAMING-CONVENTION.md` section 9 for
+  what it means, `gh project field-list` for how it is spelled
 - **Phase:** inherit from the focused issue
 - **Priority:** inherit from the focused issue
 - **Size:** estimate from the actual completed PR scope
@@ -187,14 +188,18 @@ report what you intended to set — and confirm each of:
 - fields intentionally left unset and why.
 
 A blank field in that read-back is unfinished work, not a reporting line. Fill
-it and read back again. Adding a PR to the Project populates no field, and an
-`item-edit` call can apply to the wrong item, so the read-back is the only
-evidence the values landed.
+it and read back again. The appendix has the queries.
 
-Status, Size, assignee, labels, and milestone are always determinable and must
-not be left unset. Phase and Priority are inherited from the focused issue and
-must not be invented: if the issue has none, leave the PR field unset and name
-the missing issue field.
+Which blanks are legitimate:
+
+- **Status, Size, assignee, labels, and milestone** are always determinable from
+  the PR and the focused issue, so none of them may be left unset. `Status` for
+  a newly opened draft comes from `docs/NAMING-CONVENTION.md` section 9; `Size`
+  from "Size guide" above, judged on the completed scope.
+- **Phase and Priority** are inherited and must not be invented. They are the
+  only fields that may stay blank, and only when the focused issue itself has
+  none — in which case name the missing *issue* field, not the PR field.
+  `docs/NAMING-CONVENTION.md` section 10 defines the Phase numbering.
 
 If Project API access is unavailable, still create the authorized draft PR and
 set all supported ordinary PR metadata. Report the exact fields that could not
@@ -246,8 +251,30 @@ gh project item-edit --project-id <PVT_...> --id <item-id> \
   --field-id <field-id> --single-select-option-id <option-id>
 
 # Text, date, and number fields use --text, --date, or --number instead.
+
+# 6. Read the values back. Step 3 populates no field, and step 5 addresses an
+#    item by id, so a wrong id succeeds silently against the wrong row. This
+#    query is the only evidence the values landed.
+gh project item-list <project-number> --owner amirhs1 --limit 400 --format json \
+  --jq '.items[] | select(.content.number==<pr-number>
+        and .content.type=="PullRequest") | {Status, Phase, Priority, Size}'
+
+# Repository metadata reads back separately
+gh pr view <pr-number> --json isDraft,assignees,labels,milestone
 ```
 
-Field values must match the Project's configured options exactly (for example
-Status `In progress`; Phase `Phase 1 — Industry`; Priority `P2 — Normal`;
-Size `S`). Do not invent option names.
+**Discover option strings from step 2, never from prose.** The live Project is
+authoritative for the exact text of an option; this document and
+`docs/NAMING-CONVENTION.md` are authoritative for *which* option to choose and
+what it means. Those are different questions, and the transcriptions drift: as
+of 2026-08-03 the Project's option reads `In Progress` while
+`docs/NAMING-CONVENTION.md` section 9 writes `In progress`.
+
+The casing matters because the lookup is by name. A `--jq 'select(.name=="In
+progress")'` against an option actually called `In Progress` yields an empty
+option id, and the resulting `item-edit` sets nothing while reporting no error.
+Read `gh project field-list` output and copy the string it returns.
+
+So: take `Status` semantics from `docs/NAMING-CONVENTION.md` section 9 and
+`Phase` from section 10, take `Priority` and `Size` from "Project field values"
+above, and take every literal option string from `field-list`.

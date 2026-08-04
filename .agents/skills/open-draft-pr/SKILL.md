@@ -29,39 +29,18 @@ Read and follow, in order:
 10. Add the PR to the `CareerDossierTeX Development` Project.
 11. Apply one existing primary `type:*` label and all relevant `area:*` labels.
 12. Inherit the focused issue's milestone, Phase, and Priority.
-13. Set Status to `In progress`.
+13. Set Status to the Project's in-progress option.
 14. Estimate Size from the actual completed scope.
-15. Read the metadata back and fill anything still unset (see below).
+15. Read every field back from GitHub, fill anything still blank, and read back
+    again. A blank is unfinished work, not a reporting line. `reference.md`
+    ("Verification") says which fields have no legitimate blank value and holds
+    the queries.
 
-## Metadata is not done until it is read back
-
-Setting a field and assuming it took is the common failure. A `gh project
-item-edit` call can silently apply to the wrong item, and adding a PR to the
-Project does not populate any field. So after step 14, query the item and
-compare against what you intended:
-
-```bash
-gh project item-list 2 --owner amirhs1 --limit 400 --format json \
-  --jq '.items[] | select(.content.number==<pr> and .content.type=="PullRequest")
-        | {Status, Phase, Priority, Size}'
-gh pr view <pr> --json isDraft,assignees,labels,milestone
-```
-
-Anything blank in that output is unfinished work, not a reporting line. Fill it:
-
-- **Status, Size, and the assignee** are always determinable from the PR itself.
-  There is no case where an agent may leave these unset — Status is
-  `In progress` for a newly opened draft, and Size comes from the actual
-  completed scope.
-- **Labels and milestone** come from the focused issue and the change. Apply one
-  primary `type:*` and every relevant `area:*`.
-- **Phase and Priority** are inherited from the focused issue and must not be
-  invented. These are the only fields that may legitimately stay blank, and only
-  when the issue itself has none. Say which issue field was missing.
-
-Re-run the read-back after filling. Report the final values, and for any field
-still unset, name it and say why — a missing issue field, or Project API access
-unavailable. "I set the metadata" without the read-back output is not a report.
+`docs/NAMING-CONVENTION.md` section 9 defines which `Status` to use and section
+10 the `Phase` numbering; `reference.md` ("Project field values") covers the
+rest. Copy every literal option string from `gh project field-list`, never from
+prose in this file or any other — the transcriptions drift, and a name that does
+not match sets nothing without reporting an error.
 
 ## PR body template
 
