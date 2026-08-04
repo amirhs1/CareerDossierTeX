@@ -43,13 +43,6 @@
 \tl_set:Nn  \l__cdossier_statement_fontsize_tl { 12pt }
 \tl_set:Nn  \l__cdossier_statement_margin_tl { normal }
 
-\msg_new:nnnn { careerdossier-statement } { unknown-type }
-  { Unknown~statement~type~'#1'. }
-  {
-    The~accepted~types~are:~interest,~research,~teaching,~
-    teaching-philosophy,~diversity,~artist,~purpose.
-  }
-
 \msg_new:nnnn { careerdossier-statement } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-statement. }
   {
@@ -65,8 +58,16 @@
 %% l3keys' own choice error reports that the value is not one of a fixed set
 %% without saying what that set is, so every choice-valued option below names
 %% its own accepted values. Each message is reached through the matching
-%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error;
-%% `type' is hand-rolled rather than a choice list and reports unknown-type.
+%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
+%% `type' names its values in the message body rather than the first line, so
+%% the one-line report stays short; the pairing is the same as the rest.
+\msg_new:nnnn { careerdossier-statement } { unknown-type }
+  { Unknown~statement~type~'#1'. }
+  {
+    The~accepted~types~are:~interest,~research,~teaching,~
+    teaching-philosophy,~diversity,~artist,~purpose.
+  }
+
 \msg_new:nnnn { careerdossier-statement } { unknown-fontsize }
   { Unknown~'fontsize'~value~'#1'~for~careerdossier-statement. }
   { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
@@ -98,22 +99,14 @@
 
 \keys_define:nn { cdossier / statement }
   {
-    type .code:n =
+    type .choices:nn =
       {
-        \str_case:nnF {#1}
-          {
-            { interest }
-              { \tl_set:Nn \l__cdossier_statement_type_tl { interest } }
-            { research }            { \tl_set:Nn \l__cdossier_statement_type_tl { research } }
-            { teaching }            { \tl_set:Nn \l__cdossier_statement_type_tl { teaching } }
-            { teaching-philosophy }
-              { \tl_set:Nn \l__cdossier_statement_type_tl { teaching-philosophy } }
-            { diversity }           { \tl_set:Nn \l__cdossier_statement_type_tl { diversity } }
-            { artist }              { \tl_set:Nn \l__cdossier_statement_type_tl { artist } }
-            { purpose }             { \tl_set:Nn \l__cdossier_statement_type_tl { purpose } }
-          }
-          { \msg_error:nnn { careerdossier-statement } { unknown-type } {#1} }
-      } ,
+        interest , research , teaching , teaching-philosophy ,
+        diversity , artist , purpose
+      }
+      { \tl_set_eq:NN \l__cdossier_statement_type_tl \l_keys_choice_tl } ,
+    type / unknown .code:n =
+      { \msg_error:nnn { careerdossier-statement } { unknown-type } {#1} } ,
     type .value_required:n = true ,
     fontsize .choices:nn =
       { 10pt , 11pt , 12pt }
