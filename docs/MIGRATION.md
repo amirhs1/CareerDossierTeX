@@ -1,5 +1,10 @@
 # Migration Notes
 
+For people with documents built on an earlier release: what changed between
+versions, which changes need a source edit, and which only change how a document
+renders. Read it before upgrading. It records the *differences* — the current
+interface itself is in [`API.md`](API.md).
+
 ## Status
 
 `v0.6.0` is the current published release. It **removes the `density` option
@@ -7,7 +12,7 @@ and changes every class's layout defaults** — see
 [Upgrading to `v0.6.0`](#upgrading-to-v060) below.
 
 The unreleased `v0.7.0` renames public design tokens, adds new ones beside them,
-**retires two**, and retunes the calibrated vertical-rhythm ratios. Renamed
+**retires three**, and retunes the calibrated vertical-rhythm ratios. Renamed
 tokens need a source edit only if a document reads or sets them by name, and the
 two retired tokens rendered nothing at the released defaults — but three
 mechanism changes do move the page: letter and statement headers tighten, the
@@ -41,15 +46,10 @@ size or margin has changed. A document that took two pages may now take three,
 or one. No source edit is required unless you pass `density`, but do not ship
 an upgraded document without looking at it.
 
-The measure changes too. Counting characters including spaces on full lines of
-running prose in TeX Gyre Termes on US Letter:
-
-| Class | `v0.6.0` default | Characters per line |
-|---|---|---|
-| résumé | `11pt`, `narrow` | 118–127 |
-| CV | `12pt`, `normal` | 93–101 |
-| letter | `12pt`, `normal` | 93–101 |
-| statement | `12pt`, `normal` | 93–101 |
+The measure changes too. The résumé defaults to `11pt` at `margin=narrow`, and
+the CV, letter, and statement classes to `12pt` at `margin=normal`; the measured
+characters per line for every combination are tabulated in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
 
 The résumé's default is the longest measure in the project, kept deliberately
 for one-page capacity; see [`API.md`](API.md) for when to override it.
@@ -304,7 +304,7 @@ requires no migration. To try it, add `\DocumentMetadata` before
 \documentclass{careerdossier-resume}
 ```
 
-Tagged output is a tested preview for the four fixture profiles only and carries
+Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See [`API.md`](API.md) for scope.
 
 ## Purpose
@@ -488,11 +488,11 @@ Before → after:
 | `\CDossierSectionBelowSkip` | `\CDossierRecordSectionBelowSkip` |
 | `\CDossierEntryAboveSkip` | `\CDossierRecordEntryAboveSkip` |
 | `\CDossierEntryGapSkip` | `\CDossierRecordEntryGapSkip` |
-| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` — then **retired** in the same release; see “Two vertical-spacing tokens retired, three added” above |
+| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
 | `\CDossierListEdgeSkip` | `\CDossierRecordListEdgeAboveSkip` **and** `\CDossierRecordListEdgeBelowSkip` (split — see below) |
 | `\CDossierItemSepSkip` | `\CDossierRecordItemSepSkip` |
 | `\CDossierParSkip` | `\CDossierRecordParSkip` |
-| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` — then **retired** in the same release; see “Two vertical-spacing tokens retired, three added” above |
+| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
 | `\CDossierBlockSkip` | `\CDossierLetterBlockSkip` |
 | `\CDossierAfterSalutationSkip` | `\CDossierLetterBodyAboveSkip` |
 | `\CDossierSignatureSkip` | `\CDossierLetterSignatureGapSkip` |

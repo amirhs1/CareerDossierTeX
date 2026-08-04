@@ -134,15 +134,21 @@ Use only labels already defined by `scripts/setup-labels.sh`.
 | Typography implementation | `type:feature`, `area:typography` |
 | GitHub Actions change | `type:ci`, `area:build` |
 | Theme restructuring without behavior change | `type:refactor`, `area:theme` |
-| Claude Code / Codex agent tooling or sandbox config | `type:ci`, `area:agents` |
+| Agent instructions, skills, or workflow docs | `type:docs`, `area:agents` |
+| Agent sandbox, permissions, or settings config | `type:ci`, `area:agents` |
 
 A PR may have several area labels but should normally have exactly one primary
 type label.
 
+The two `area:agents` rows differ by what the change *is*, not what it touches.
+Editing `AGENTS.md`, a `SKILL.md`, or a `reference.md` is documentation.
+Changing `.claude/settings.json` or `.codex/config.toml` alters how a tool is
+permitted to execute, which is closer to build and CI configuration.
+
 ## Status transitions
 
-- focused issue selected and branch created → issue `In progress`
-- draft PR opened → PR `In progress`
+- focused issue selected and branch created → issue `In Progress`
+- draft PR opened → PR `In Progress`
 - maintainer marks PR ready → PR `In review`
 - PR merged → PR and completed issue `Done`
 - PR closed without merge → restore or preserve the appropriate issue status
@@ -160,7 +166,7 @@ The following are pre-authorized for an authorized draft PR:
 - inheritance of the issue's existing milestone;
 - addition to the `CareerDossierTeX Development` Project;
 - Project values derived from the issue and actual PR scope;
-- moving the focused issue to `In progress`.
+- moving the focused issue to `In Progress`.
 
 Obtain explicit approval before:
 
@@ -197,14 +203,19 @@ it and read back again. The appendix has the queries.
 
 Which blanks are legitimate:
 
-- **Status, Size, assignee, labels, and milestone** are always determinable from
-  the PR and the focused issue, so none of them may be left unset. `Status` for
-  a newly opened draft comes from `docs/NAMING-CONVENTION.md` section 9; `Size`
-  from "Size guide" above, judged on the completed scope.
-- **Phase and Priority** are inherited and must not be invented. They are the
-  only fields that may stay blank, and only when the focused issue itself has
-  none — in which case name the missing *issue* field, not the PR field.
+- **Status, Size, assignee, and labels** are determinable from the PR itself, so
+  none of them may be left unset. `Status` for a newly opened draft comes from
+  `docs/NAMING-CONVENTION.md` section 9; `Size` from "Size guide" above, judged
+  on the completed scope.
+- **Milestone, Phase, and Priority** are inherited and must not be invented. Each
+  may stay blank, and only when the focused issue itself has none — in which case
+  name the missing *issue* field, not the PR field.
   `docs/NAMING-CONVENTION.md` section 10 defines the Phase numbering.
+
+A deliberately unmilestoned issue is the ordinary case for work the maintainer
+has postponed, and a PR against one inherits no milestone. Do not read the rule
+against blank fields as licence to pick a milestone the issue does not have —
+that silently pulls postponed work into a release.
 
 If Project API access is unavailable, still create the authorized draft PR and
 set all supported ordinary PR metadata. Report the exact fields that could not
@@ -276,14 +287,16 @@ gh pr view <pr-number> --json isDraft,assignees,labels,milestone
 **Discover option strings from step 2, never from prose.** The live Project is
 authoritative for the exact text of an option; this document and
 `docs/NAMING-CONVENTION.md` are authoritative for *which* option to choose and
-what it means. Those are different questions, and the transcriptions drift: as
-of 2026-08-03 the Project's option reads `In Progress` while
-`docs/NAMING-CONVENTION.md` section 9 writes `In progress`.
+what it means. Those are different questions, and a transcription of the first
+into prose drifts silently.
 
-The casing matters because the lookup is by name. A `--jq 'select(.name=="In
-progress")'` against an option actually called `In Progress` yields an empty
-option id, and the resulting `item-edit` sets nothing while reporting no error.
-Read `gh project field-list` output and copy the string it returns.
+The casing is the part that bites, because lookup is by name. A `--jq
+'select(.name=="In progress")'` against an option actually called `In Progress`
+yields an empty option id, and the resulting `item-edit` sets nothing while
+reporting no error — a failure with no failing exit status. This exact mismatch
+existed between the Project and `docs/NAMING-CONVENTION.md` section 9 until
+2026-08-04, when the documentation was corrected to match the Project. Assume it
+can recur; read `gh project field-list` output and copy the string it returns.
 
 So: take `Status` semantics from `docs/NAMING-CONVENTION.md` section 9 and
 `Phase` from section 10, take `Priority` and `Size` from "Project field values"
