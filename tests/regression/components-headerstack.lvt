@@ -8,7 +8,7 @@
 % \CDossierSharedHeaderMetaGapSkip when the headline was absent.
 %
 % The letter class is the fixture because it is the prose class that uses the
-% shared header: it sets \parskip to \CDossierProseParSkip document-wide, so the
+% shared header: it sets \parskip to \CDossierLetterParSkip document-wide, so the
 % logged document-wide \parskip and the logged gaps together also assert the
 % group-local zeroing of \parskip inside the stack (issue #220). Each emitted
 % gap is logged in points, so the numbers are the assertion — a gap the stack

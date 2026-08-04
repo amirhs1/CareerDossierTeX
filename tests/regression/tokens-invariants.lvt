@@ -218,10 +218,10 @@
           { \CDossierLetterBodyAboveSkip } > { \CDossierLetterBlockSkip }
       }
     \cdossiertest_invariant:nn
-      { LetterBlockSkip > ProseParSkip }
+      { LetterBlockSkip > LetterParSkip }
       {
         \dim_compare_p:nNn
-          { \CDossierLetterBlockSkip } > { \CDossierProseParSkip }
+          { \CDossierLetterBlockSkip } > { \CDossierLetterParSkip }
       }
   }
 \NewDocumentCommand \cdossiertestInvariants { m }
