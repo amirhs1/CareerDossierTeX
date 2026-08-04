@@ -57,6 +57,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   `\CDossierLetterParSkip` ships at the same `0.50` ratio, so the split
   reflows nothing; see [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
+- `\CDossierHeaderBegin`, `\CDossierHeaderLine`, and `\CDossierHeaderEnd`
+  compose a centered header stack line by line. ([#224])
+
+  `\MakeCDossierHeader` and `\MakeCDossierStatementHeader` remain what a
+  document uses; both are now implemented over this triple, which is the
+  interface for a header whose lines a class has to choose itself. The
+  statement's title, subtitle, and context lines interleave with the identity
+  lines rather than following them, so no hook on the fixed three-line identity
+  block can express its reading order — until now it reached into another
+  module's private commands instead.
+
+  `careerdossier-components` keeps owning every gap and the triple adds no
+  spacing option: a caller states only which lines are present, in reading
+  order, and position decides which token guards each boundary. This is
+  additive and renders nothing differently.
+
 ### Changed
 
 - **BREAKING (design token):** the header block now zeroes its own paragraph
@@ -433,6 +449,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#220]: https://github.com/amirhs1/CareerDossierTeX/issues/220
 [#222]: https://github.com/amirhs1/CareerDossierTeX/issues/222
 [#223]: https://github.com/amirhs1/CareerDossierTeX/issues/223
+[#224]: https://github.com/amirhs1/CareerDossierTeX/issues/224
 [#232]: https://github.com/amirhs1/CareerDossierTeX/issues/232
 [#233]: https://github.com/amirhs1/CareerDossierTeX/issues/233
 [#236]: https://github.com/amirhs1/CareerDossierTeX/issues/236
