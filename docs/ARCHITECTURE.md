@@ -831,6 +831,18 @@ spelling only when its body is genuinely restricted to line calls; here both
 wrappers interleave conditionals between lines, so the begin/end pair is no
 harder to misuse and the triple translates the existing primitives verbatim.
 
+How the triple meets the four public-API conditions above (#252): it is named
+and documented in `docs/API.md`, covered by `components-headerstack.lvt`, and
+introduced in the changelog. The "used by a supported example" condition is met
+by the two wrappers, which exercise it on every build of every class, plus a
+worked example in `docs/API.md` compiled as
+`tests/smoke/components-header-stack-doc.tex`. Deliberately **no** new document
+under `examples/`: that directory is user documentation for people writing
+dossiers, and this is a composition interface for whoever writes the class. A
+document author reaches for `\MakeCDossierHeader`. The smoke runner diffs the
+fixture against the published block before compiling it, so the documented
+example cannot drift from the one that is known to build.
+
 The split of concerns across that boundary is fixed: the stack owns every gap
 and holds no validation, while each wrapper owns its own line list and its own
 preconditions — `\__cdossier_base_require_name:N` for `\MakeCDossierHeader`,

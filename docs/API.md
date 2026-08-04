@@ -664,6 +664,63 @@ Expected behavior:
 - no validation is performed. `\CDossierHeaderBegin` does not require `name`;
   the wrapper commands keep their own validation.
 
+Worked example. `\MakeCDossierHeader` renders name, optional headline, and
+contact line; this résumé wants `location` on a line of its own *between* the
+headline and the contact line, which is a position no append-only hook can
+reach:
+
+```latex
+\documentclass{careerdossier-resume}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  location = {London, UK},
+  email    = {ada@example.com},
+}
+
+\begin{document}
+
+\CDossierHeaderBegin
+\CDossierHeaderLine{
+  \CDossierNameStyle \CDossierSizeName
+  \CDossierPrintField{name}
+}
+\CDossierHeaderLine{
+  \CDossierHeadlineStyle \CDossierSizeHeadline
+  \CDossierPrintField{headline}
+}
+\CDossierIfFieldTF{location}
+  {
+    \CDossierHeaderLine{
+      \CDossierMutedStyle \CDossierSizeSmall
+      \CDossierPrintField{location}
+    }
+  }
+  { }
+\CDossierHeaderLine{
+  \CDossierBodyStyle \CDossierSizeSmall
+  \CDossierPrintField{email}
+}
+\CDossierHeaderEnd
+
+\CDossierSection{Experience}
+
+\end{document}
+```
+
+The `location` line is emitted only when the field is set — that is the whole
+of "conditional", and it is why the guard wraps the `\CDossierHeaderLine` call
+rather than appearing inside it. Drop the `location` key from `\CDossierSetup`
+and the header renders three lines with no gap left behind, because the tokens
+follow position: the boundary below the name stays
+`\CDossierSharedHeaderNameGapSkip` and each later boundary is
+`\CDossierSharedHeaderMetaGapSkip`, whichever lines are present.
+
+This composes a header; it does not replace `\MakeCDossierHeader`'s validation.
+A document that needs `name` enforced should keep calling `\MakeCDossierHeader`,
+or check the field itself.
+
 ### `\MakeCDossierHeader`
 
 ```latex
