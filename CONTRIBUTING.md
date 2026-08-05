@@ -82,9 +82,18 @@ merge to `main` is the `Protect Main` ruleset; see "CI expectations".
 
 ### 1. Every issue carries a milestone
 
-The milestone answers *which release*, and every issue can answer it. An issue
-without one is invisible to release planning and to the Project's `Phase` field,
-which follows the milestone.
+The milestone answers *which release*, and almost every issue can answer it. An
+issue without one is invisible to release planning and to the Project's `Phase`
+field, which follows the milestone.
+
+The exception is work whose release is **genuinely undecided** — deferred design
+work with no scheduled release, or a proposal whose home has not been chosen.
+Such an issue stays unmilestoned rather than take a milestone that would
+misstate the plan, and it stays invisible to release planning on purpose until
+that decision is made. Do not invent a placeholder milestone for it, and do not
+park it in the furthest-out open milestone. `docs/NAMING-CONVENTION.md` §7 names
+the issues that currently qualify; anything unmilestoned beyond those is an
+oversight.
 
 An **epic parent** is for work that genuinely decomposes into several issues — a
 release epic, or a cross-cutting effort spanning more than one class or package.
