@@ -629,6 +629,32 @@ When using the optional `careerdossier-biblatex` integration, test the fixed
 bibliography profile and every field type used. A bibliography package update
 can change punctuation and extraction.
 
+Two properties of that profile exist specifically to survive the default
+extractor, and both are horizontal rather than vertical:
+
+- **Entry numbers.** `pdftotext`'s default (non-layout) mode groups a narrow
+  left column of short tokens once the gap to the text beside them reaches
+  roughly one em, and then emits the whole column ahead of the text. BibLaTeX's
+  default label separation sits on that threshold, so entry numbers extracted
+  as `1)`, `2)`, `3)` in a block before any entry. The profile therefore uses
+  the shared `\CDossierListLabelSep`, which is half the body size. Note what
+  this is not: the PDF was correct throughout — every label shared a baseline
+  with its entry, and `pdftotext -layout` reported source order — so the
+  symptom is a heuristic in one extractor, and the fix belongs in the label
+  geometry, never in the calibrated vertical gap between entries.
+- **URLs.** Poppler splits a word wherever an intra-word gap exceeds 0.1 em.
+  BibLaTeX stretches URLs at their break points to justify a line, which can
+  push a URL past that and extract it as `https : / / example . invalid /`.
+  The profile caps that stretch. Treat this as a mitigation: TeX will exceed a
+  stated stretch to set an otherwise underfull line, so a narrow measure can
+  still spread a URL.
+
+`tests/bibliography/run.sh` checks both the extracted text and, separately, the
+label/entry baseline pairing read from `pdftotext -bbox`. The second check is
+the one that stays meaningful if Poppler's grouping heuristic changes: it reads
+the geometry out of the PDF instead of trusting the extractor's line grouping,
+so an extractor change and a real regression stay distinguishable.
+
 ### 5.5 Cover letter **(Phase 1)**
 
 Do not place the applicant's address, recipient, date, or subject only in a
