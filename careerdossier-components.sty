@@ -1051,3 +1051,25 @@
 
 \AddToHook { begindocument }
   { \cs_if_exist:NT \hypersetup { \__cdossier_components_pdfmeta: } }
+
+%% Ordering against hyperref's own begindocument code (issue #276).
+%%
+%% /Lang is not written at \end{document} with the rest of the metadata. Without
+%% \DocumentMetadata the kernel's PDF management is inactive, so hyperref writes
+%% the catalog itself, from its own begindocument chunk -- /Lang(\@pdflang) in
+%% hluatex.def's \pdfcatalog. Anything that sets pdflang after that chunk has
+%% run is simply not in the file. /Title and /Author are unaffected: those go to
+%% the Info dictionary from \PDF@FinishDoc at \end{document}.
+%%
+%% So the derived pdflang above reaches the PDF only if this package's chunk of
+%% `begindocument' precedes hyperref's. Today it does, but only as an accident
+%% of load order: the four classes \RequirePackage this package before they
+%% \RequirePackage hyperref, and `begindocument' runs its chunks in the order
+%% their packages were loaded. Load this package after hyperref -- which a
+%% document using it directly may well do -- and /Lang silently disappears from
+%% the output, with nothing in the log.
+%%
+%% State the requirement instead of inheriting it. The rule is declared, not
+%% assumed, so the ordering survives a change in load order.
+\DeclareHookRule { begindocument } { careerdossier-components } { before }
+  { hyperref }

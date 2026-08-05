@@ -8,6 +8,27 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Fixed
+
+- `/Lang` no longer depends on package load order. A document that loads
+  `careerdossier-components` directly, after `hyperref`, produced a PDF with no
+  language declaration at all — silently, with nothing in the log. The four
+  document classes were never affected: each loads the package before
+  `hyperref`, which is the order the language declaration needs, so their output
+  is unchanged. ([#276])
+
+  On the default build path `hyperref` writes the PDF catalog itself, early at
+  `\begin{document}`, and a language set after that point never reaches the
+  file. The package now states that ordering requirement rather than inheriting
+  it from how the classes happen to load. `/Title` and `/Author` were never
+  exposed to this; they are written at `\end{document}`.
+
+  A new `make metadata` suite covers PDF metadata on the default build path,
+  which no existing suite could see — every tagged fixture passes
+  `\DocumentMetadata`, and that supplies catalog entries of its own.
+
+[#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
+
 ## [0.7.0] - 2026-08-04
 
 ### Added

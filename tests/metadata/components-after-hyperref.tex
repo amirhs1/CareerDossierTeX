@@ -1,0 +1,15 @@
+% careerdossier-components used directly, and loaded AFTER hyperref.
+%
+% This is the ordering the four classes never produce: they load the package
+% first, so their derived pdflang reaches hyperref's catalog write by accident
+% of load order. Here it does not, and only the \DeclareHookRule in
+% careerdossier-components keeps /Lang in the file. Remove that rule and this
+% fixture is the one that fails.
+\documentclass{article}
+\input{uncompressed.inc}
+\usepackage{hyperref}
+\usepackage{careerdossier-components}
+\CDossierSetup{ name={Metadata Fixture}, email={metadata@example.test} }
+\begin{document}
+A paragraph, so the document has a body.
+\end{document}

@@ -1,6 +1,6 @@
 % components-pdfmeta.lvt — careerdossier-components PDF metadata construction.
 %
-% Two things are checked here, neither of which any other suite can see.
+% Three things are checked here, none of which any other suite can see.
 %
 % 1. The "has the document already set this?" test. The module derives
 %    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
@@ -19,9 +19,17 @@
 %    cover letter built from one profile do not receive identical titles; with no
 %    doctype the title is the bare name.
 %
+% 3. What is actually written, as opposed to what is derived. The two cases
+%    above test the ingredients; this one records the \hypersetup calls the
+%    module makes, so the derived pdflang and the decision to leave a
+%    user-supplied one alone are pinned as behaviour rather than inferred from
+%    the conditional. That is the half of issue #276 a log can see.
+%
 % Whether the values actually reach the PDF catalog and info dictionary is a
-% property of the built document, not of this log, and is covered by the smoke
-% fixtures.
+% property of the built document, not of this log. The smoke fixtures cover the
+% derived title and author; tests/metadata/run.sh covers /Lang, which is written
+% by a different mechanism at a different time and is the only one of the three
+% that depends on package load order.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
@@ -53,6 +61,22 @@
   { \__cdossier_components_doctype:n {#1} }
 \cs_new_protected:Npn \cdossiertestClearDoctype
   { \tl_clear:N \l__cdossier_components_doctype_tl }
+
+% A recorder standing in for hyperref's \hypersetup. It is installed inside a
+% \TEST, so the definition is local: it must not exist while the begindocument
+% hook runs, or \__cdossier_components_pdfmeta: would take this file for a
+% document that loaded hyperref.
+\cs_new_protected:Npn \cdossiertestRecordHypersetup
+  {
+    \cs_set_protected:Npn \hypersetup ##1
+      { \TYPE{ hypersetup: ~ \tl_to_str:n {##1} } }
+  }
+\cs_new_protected:Npn \cdossiertestPdfmeta
+  { \__cdossier_components_pdfmeta: }
+% Stand in for a document that set pdflang itself. hyperref stores the value in
+% \@pdflang, which is what the module reads.
+\cs_new_protected:Npn \cdossiertestSetUserLang #1
+  { \cs_set_nopar:cpn { @pdflang } {#1} }
 \ExplSyntaxOff
 
 \begin{document}
@@ -98,6 +122,23 @@
 \TEST{title-without-doctype-is-bare-name}{
   \cdossiertestClearDoctype
   \cdossiertestTitle
+}
+
+% With nothing supplied by the document, all three fields are derived, and
+% pdflang is one of them. The project is English-only, so the value is fixed.
+\TEST{pdfmeta-derives-pdflang-en}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetDoctype{Testdoc}
+  \cdossiertestPdfmeta
+}
+
+% A document that set pdflang keeps it: no pdflang line below. The other two
+% fields are still derived, which is what makes this a precedence test rather
+% than an all-or-nothing one.
+\TEST{pdfmeta-keeps-user-pdflang}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetUserLang{en-GB}
+  \cdossiertestPdfmeta
 }
 
 \END
