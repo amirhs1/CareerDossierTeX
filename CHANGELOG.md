@@ -10,6 +10,26 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- The PDF title derived from your profile now actually appears in the viewer.
+  Every document requests `ViewerPreferences /DisplayDocTitle`, so a viewer
+  shows `Résumé – <name>` in its window title, tab bar, and recent-documents
+  list instead of the filename. ([#277])
+
+  The title itself was already being written; nothing was telling viewers to
+  use it, so the computed value sat in the file unused. That gap is what
+  WCAG 2.1 AA 2.4.2 (Page Titled) is about, and it was the one substantive
+  item between the documented tagged path — `\DocumentMetadata{tagging=on}` —
+  and a clean veraPDF PDF/UA-2 result. That path now passes clause 8.11.2; it
+  still declines to declare a PDF/UA identifier, which is a deliberate choice,
+  not a defect.
+
+  The request is made on the default path as well as the tagged one, and it
+  changes nothing about rendering, extracted text, or the structure tree: no
+  class, option, key, or command changed, and every example renders as before.
+  A document that prefers the filename sets
+  `\hypersetup{ pdfdisplaydoctitle = false }` in its preamble, which overrides
+  the request — see `docs/API.md`.
+
 - A `careerdossier-biblatex` bibliography's entry numbers now extract on the
   same line as their entry under a plain `pdftotext` run, instead of appearing
   as `1)`, `2)`, `3)` in a block ahead of all the entry text. ([#199])
@@ -39,6 +59,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   stretch is now capped; the break points are unchanged, so URLs still break in
   the same places. This narrows the failure rather than removing it — TeX will
   exceed a stated stretch to set an otherwise underfull line.
+
+[#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 
 ## [0.7.0] - 2026-08-04
 
