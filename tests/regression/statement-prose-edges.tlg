@@ -1,0 +1,14 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: prose-heading-and-paragraph-boundaries
+============================================================
+after-header page-total = 72.09149pt
+after-section-heading page-total = 90.259pt
+after-first-paragraph page-total = 108.267pt
+after-second-paragraph page-total = 126.392pt
+after-subsection-heading page-total = 150.96875pt
+after-third-paragraph page-total = 168.98575pt
+after-second-section-heading page-total = 201.31975pt
+after-fourth-paragraph page-total = 216.61075pt
+============================================================

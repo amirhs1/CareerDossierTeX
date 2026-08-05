@@ -1,0 +1,90 @@
+% statement-prose-edges.lvt — issue #255 rendered prose heading boundaries.
+%
+% The six tokens that shape a statement's vertical rhythm were pinned only by
+% value: `tokens-statement-defaults' echoes them, `tokens-invariants' compares
+% them to each other, and `statement-headerstack' traces the header stack's
+% \addvspace *claims*. None of those is evidence that a gap reaches the page.
+% A token that loses its maximum at every boundary a fixture happens to contain
+% still moves an echoed number when its ratio changes, so the baseline shifts
+% and the test looks like it is doing its job — the condition issue #204 exists
+% to prevent, reproduced once inside `resume-entry-edges' and found again here.
+%
+% \pagetotal is the assertion, as in `resume-entry-edges': it is the height of
+% the page so far, so the difference across a boundary is the rendered gap after
+% the maxima and the \parskip additions have resolved. The recorded values are
+% therefore read as a sequence of differences, not as six independent numbers;
+% a token that stops reaching the page changes one of those differences, while a
+% token that only moves a claim changes none.
+%
+% One document supplies every shape, because each of the six tokens needs a
+% different neighbour. A heading's mark is taken after `\@xsect' has already
+% contributed the after-skip, so a heading carries *both* of its gaps into the
+% difference against the mark before it; the mark after the following paragraph
+% is then a plain paragraph step. Each token therefore first moves exactly one
+% recorded number, and which one identifies it:
+%
+%   after-header                  \CDossierProseHeaderBelowSkip, which wins the
+%                                 maximum against the first heading's above-gap
+%   after-section-heading         \CDossierProseSectionBelowSkip
+%   after-first-paragraph         \CDossierProseParSkip
+%   after-subsection-heading      \CDossierProseSubsectionAboveSkip and
+%                                 \CDossierProseSubsectionBelowSkip
+%   after-second-section-heading  \CDossierProseSectionAboveSkip
+%
+% Every later number moves with it, because \pagetotal accumulates; the leading
+% edge of the shift is the reading, not the count of changed lines. The two
+% subsection tokens share a mark, but at different magnitudes, and each was
+% verified to move it alone.
+%
+% Two of those placements are deliberate rather than incidental. The subsection
+% follows a paragraph and not the section heading, because `\@startsection'
+% guards its before-skip with `\if@nobreak' — true immediately after a heading —
+% so a subsection opening a section never takes its own above-gap and would
+% report the section's below-gap instead. And the second section follows a
+% paragraph rather than opening the document, because glue at the top of a page
+% is discarded: the first heading here cannot render an above-gap at any value,
+% which is why the header boundary above it is recorded separately.
+%
+% The tokens are not echoed here. `tokens-statement-defaults' pins their values
+% and that is a separate, legitimate contract; repeating it in this file would
+% put an echoed number next to a rendered one and invite the same confusion the
+% fixture exists to remove.
+\input{regression-test}
+\documentclass{careerdossier-statement}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_mark:n #1
+  { \par \TYPE { #1 ~ page-total~=~ \dim_eval:n { \pagetotal } } }
+\NewDocumentCommand \cdossiertestMark { m } { \cdossiertest_mark:n {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+% Force the math-font loads that \nolinkurl triggers at the contact line's size
+% before the first test, so the font-info lines land outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+\TEST{prose-heading-and-paragraph-boundaries}{
+  \MakeCDossierStatementHeader
+  \cdossiertestMark{after-header}
+  \CDossierSection{Research}
+  \cdossiertestMark{after-section-heading}
+  Prose paragraph one.
+  \cdossiertestMark{after-first-paragraph}
+  Prose paragraph two.
+  \cdossiertestMark{after-second-paragraph}
+  \CDossierSubsection{Methods}
+  \cdossiertestMark{after-subsection-heading}
+  Prose paragraph three.
+  \cdossiertestMark{after-third-paragraph}
+  \CDossierSection{Teaching}
+  \cdossiertestMark{after-second-section-heading}
+  Prose paragraph four.
+  \cdossiertestMark{after-fourth-paragraph}
+}
+
+\END
