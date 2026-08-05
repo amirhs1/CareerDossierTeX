@@ -1077,7 +1077,13 @@ Responsibilities:
 - inherit the shared list-item rhythm token, `\CDossierRecordItemSepSkip`,
   when the
   host class provides it, and fall back to a fixed value when it does not, so
-  the profile never owns a competing spacing value; and
+  the profile never owns a competing spacing value;
+- inherit the shared list label token, `\CDossierListLabelSep`, for the
+  horizontal gap between an entry number and its entry, for the same reason and
+  on the same terms, so the label geometry matches `CDossierPublications`
+  rather than BibLaTeX's wider `2\labelsep` default;
+- keep printed URLs extractable by capping the stretch BibLaTeX applies at each
+  URL break point, without removing the break points themselves; and
 - report an actionable optional-dependency error when BibLaTeX is unavailable.
 
 It must not:

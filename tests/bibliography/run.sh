@@ -84,6 +84,54 @@ fi
 
 echo "  Biber completed without warnings/errors"
 
+# Assert label/entry association from the geometry rather than from pdftotext's
+# line grouping (issue #199). The baseline above pins the default extractor's
+# *output*, which is what a naive consumer sees, but that output depends on
+# Poppler's column heuristic and so can shift with the extractor version. Each
+# entry number shares a baseline with the first word of its entry in the page
+# content, and that is a property of the PDF itself: check it directly, so a
+# future Poppler change is distinguishable from a real regression here.
+echo "== $base.pdf (each entry number shares its entry's baseline) =="
+pairing="$(pdftotext -bbox "$base.pdf" - \
+  | awk -F'"' '
+      BEGIN { tol = 2 }
+      # <word xMin=".." yMin=".." xMax=".." yMax="..">text</word>
+      /<word /{
+        text = $0; sub(/^[^>]*>/, "", text); sub(/<\/word>.*$/, "", text)
+        xmin = $2 + 0; ymin = $4 + 0; xmax = $6 + 0
+        if (text ~ /^[0-9]+\)$/ && labelymin[text] == "") {
+          labelymin[text] = ymin; labelxmax[text] = xmax
+          order[++n] = text
+          next
+        }
+        # Leftmost word to the right of a label, on that label|s baseline. The
+        # tolerance is deliberate: a bibliography line mixes roman, bold, and
+        # small text, whose reported yMin differs by a fraction of a point on
+        # one and the same typeset baseline. Requiring exact equality would
+        # match a later word on the line instead of the entry|s first word.
+        for (l in labelymin)
+          if (labelymin[l] - ymin < tol && ymin - labelymin[l] < tol \
+              && xmin > labelxmax[l] \
+              && (entry[l] == "" || xmin < entryxmin[l])) {
+            entry[l] = text; entryxmin[l] = xmin; gap[l] = xmin - labelxmax[l]
+          }
+      }
+      END {
+        for (i = 1; i <= n; i++) {
+          l = order[i]
+          if (entry[l] == "")
+            printf "UNPAIRED %s (no word shares its baseline)\n", l
+          else
+            printf "ok %s -> %s (gap %.3fpt)\n", l, entry[l], gap[l]
+        }
+        if (n == 0) print "NO LABELS FOUND"
+      }')"
+printf '%s\n' "$pairing" | sed 's/^/    /'
+if printf '%s\n' "$pairing" | grep -qE '^(UNPAIRED|NO LABELS FOUND)'; then
+  echo "  ENTRY NUMBER NOT PAIRED WITH ITS ENTRY"
+  exit 1
+fi
+
 # The bibliography's inter-entry gap must stay tied to the CV's calibrated list
 # token instead of drifting back to a fixed length. The fixture raises its own
 # package error on a mismatch, so a clean build is the assertion.
@@ -95,3 +143,15 @@ if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error \
   exit 1
 fi
 echo "  bibitemsep tracks CDossierRecordItemSepSkip"
+
+# The label/entry gap must stay tied to the shared list label token rather than
+# drifting back to BibLaTeX's 2\labelsep, which lands it on the threshold where
+# pdftotext's default mode splits the numbers into their own column (#199).
+echo "== biblabelsep-token.tex (biblabelsep tracks CDossierListLabelSep) =="
+if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error \
+    "biblabelsep-token.tex" > "biblabelsep-token.stdout" 2>&1; then
+  echo "  \\biblabelsep does not track \\CDossierListLabelSep"
+  echo "  (see biblabelsep-token.log)"
+  exit 1
+fi
+echo "  biblabelsep tracks CDossierListLabelSep"
