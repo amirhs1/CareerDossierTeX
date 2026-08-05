@@ -1,0 +1,26 @@
+% biblabelsep-token.tex — careerdossier-biblatex must inherit the shared list
+% label separation (issue #199) rather than keep BibLaTeX's own 2\labelsep, so
+% an entry number sits as close to its entry as a manual CDossierPublications
+% label does. BibLaTeX's default lands the gap at roughly one em, which is
+% exactly where pdftotext's default mode stops reading the numbers as labels
+% and starts reading them as a separate left-hand column.
+%
+% This pins the geometry; tests/bibliography/run.sh pins the extracted result.
+% The fixture fails the build itself, so the runner only checks the exit status.
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\CDossierSetup{name = {Ada Lovelace}}
+\ExplSyntaxOn
+\msg_new:nnn { cdossier-test } { unshared-biblabelsep }
+  {
+    careerdossier-biblatex~sets~biblabelsep~to~\skip_use:N \biblabelsep ,~but~
+    the~shared~list~label~token~CDossierListLabelSep~is~
+    \dim_use:N \CDossierListLabelSep .
+  }
+\ExplSyntaxOff
+\begin{document}
+\ExplSyntaxOn
+\dim_compare:nNnF { \biblabelsep } = { \CDossierListLabelSep }
+  { \msg_error:nn { cdossier-test } { unshared-biblabelsep } }
+\ExplSyntaxOff
+\end{document}

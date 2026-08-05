@@ -54,6 +54,44 @@
 \cs_if_exist:NTF \CDossierRecordItemSepSkip
   { \setlength { \bibitemsep } { \CDossierRecordItemSepSkip } }
   { \setlength { \bibitemsep } { 6pt } }
+
+%% Track the shared list label separation for the horizontal gap too, so an
+%% entry number sits as close to its entry as a manual CDossierPublications
+%% label does. BibLaTeX's own default is \biblabelsep = 2\labelsep, which lands
+%% the gap at roughly one em -- and one em is exactly where pdftotext's default
+%% (non-layout) mode stops reading the numbers as labels and starts reading
+%% them as a separate left-hand column, emitting them as a block ahead of the
+%% entry text (issue #199). Measured on tests/bibliography/cv-bibliography.tex
+%% with Poppler 25.x, the fixture splits at a 11.955pt gap and pairs at
+%% 11.905pt; the entries are correctly placed and `pdftotext -layout' reports
+%% them in source order either way, so this is the extractor's column
+%% heuristic rather than a content-stream defect.
+%%
+%% \CDossierListLabelSep is half the body size, so the gap clears that
+%% threshold by a factor of two at every supported fontsize instead of sitting
+%% on it. Fixing this horizontally is deliberate: #196 tied the *vertical*
+%% inter-entry gap to \CDossierRecordItemSepSkip, and reopening a vertical gap
+%% to appease an extractor would undo that calibration.
+\cs_if_exist:NT \CDossierListLabelSep
+  { \setlength { \biblabelsep } { \CDossierListLabelSep } }
+
+%% Cap the stretch BibLaTeX puts at each URL breakpoint. \biburlbigskip is
+%% 0mu plus 3mu by default -- one sixth of an em per breakpoint -- so a
+%% justified line ending in a URL spreads the URL rather than the word spaces.
+%% Poppler splits a word wherever the gap exceeds 0.1em, so a stretched URL
+%% extracts as `https : / / example . invalid /', which is neither searchable
+%% nor copyable. 1mu is 1/18em, keeping a realized breakpoint gap under that
+%% threshold while leaving the line enough flexibility to avoid an overfull
+%% box; the breakpoints themselves come from the penalties \biburlsetup
+%% installs and are unaffected, so URLs still break in the same places.
+%%
+%% This is a mitigation rather than a guarantee: TeX will exceed a stated
+%% stretch to set an otherwise underfull line, and a sufficiently narrow
+%% measure can still spread a URL past the threshold.
+\muskip_set:Nn \biburlbigskip { 0mu plus 1mu }
+
+%% The trailing space is inside the measured label box and does not widen the
+%% gap; \biblabelsep above is what separates the label from the entry.
 \DeclareFieldFormat { labelnumberwidth } { \mkbibbold {#1) } }
 
 %% Show only the strongest public identifier: DOI, then e-print, then URL.

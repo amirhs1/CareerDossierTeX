@@ -30,6 +30,36 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   `\hypersetup{ pdfdisplaydoctitle = false }` in its preamble, which overrides
   the request — see `docs/API.md`.
 
+- A `careerdossier-biblatex` bibliography's entry numbers now extract on the
+  same line as their entry under a plain `pdftotext` run, instead of appearing
+  as `1)`, `2)`, `3)` in a block ahead of all the entry text. ([#199])
+
+  The PDF was never wrong: each label shared a baseline with its entry, and
+  `pdftotext -layout` reported source order throughout. `pdftotext`'s default
+  mode groups a narrow left column of short tokens once the gap beside them
+  reaches about one em, and BibLaTeX's `2\labelsep` default sat on that
+  threshold — measured on the project's own fixture, the numbers split at a
+  11.955 pt gap and paired at 11.905 pt. The label separation now follows the
+  shared `\CDossierListLabelSep`, half the body size, which clears the
+  threshold at every supported `fontsize` and matches the geometry a manual
+  `CDossierPublications` list already used. The calibrated *vertical* gap
+  between entries is untouched: it stays `\CDossierRecordItemSepSkip`, as
+  [#196] set it.
+
+  Bibliography entries are indented slightly less as a result, so a document
+  with a bibliography can reflow. All eleven supported examples still build,
+  and `examples/academic/cv-bibliography.tex` remains one page.
+
+- URLs printed in a bibliography no longer extract as separated tokens
+  (`https : / / example . invalid /`) when they end a justified line. ([#199])
+
+  BibLaTeX stretches a URL at its break points to help justify the line, and
+  Poppler splits a word wherever the gap exceeds a tenth of an em, so a
+  sufficiently stretched URL came out neither searchable nor copyable. The
+  stretch is now capped; the break points are unchanged, so URLs still break in
+  the same places. This narrows the failure rather than removing it — TeX will
+  exceed a stated stretch to set an otherwise underfull line.
+
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 
 ## [0.7.0] - 2026-08-04
@@ -531,6 +561,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
 [#195]: https://github.com/amirhs1/CareerDossierTeX/issues/195
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
+[#199]: https://github.com/amirhs1/CareerDossierTeX/issues/199
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 [#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
 [#206]: https://github.com/amirhs1/CareerDossierTeX/issues/206

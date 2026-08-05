@@ -1215,6 +1215,23 @@ publication list and a `CDossierPublications` list share one rhythm at every
 supported `fontsize`. When the package is loaded by a class that does not
 provide the token, the gap falls back to a fixed `6pt`.
 
+The horizontal gap between an entry number and its entry follows the shared
+list label token, `\CDossierListLabelSep`, for the same reason: an entry number
+sits as close to its entry as a `CDossierPublications` label does. BibLaTeX's
+own default is `2\labelsep`, which places the gap at roughly one em — the width
+at which `pdftotext`'s default (non-layout) mode stops treating the numbers as
+labels and starts treating them as a separate left-hand column, emitting them
+as a block ahead of the entry text. `\CDossierListLabelSep` is half the body
+size, so the gap clears that threshold at every supported `fontsize`. When the
+host class does not provide the token, BibLaTeX's own default is left in place.
+
+URLs printed in a bibliography keep BibLaTeX's break points but use a reduced
+stretch at each of them, so a justified line ending in a URL spreads its word
+spaces rather than the URL itself. A stretched URL extracts as separate tokens
+(`https : / / example . invalid /`) and is then neither searchable nor
+copyable. This narrows the failure considerably but cannot rule it out: TeX
+will exceed a stated stretch to set an otherwise underfull line.
+
 `\CDossierHighlightAuthor` may be repeated for spelling or initial variants.
 It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and
 does not alter citations. Both keys are required; an incomplete declaration
