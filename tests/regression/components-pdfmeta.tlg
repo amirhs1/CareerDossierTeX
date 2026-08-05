@@ -36,14 +36,19 @@ TEST 7: title-without-doctype-is-bare-name
 [Ada Lovelace]
 ============================================================
 ============================================================
-TEST 8: pdfmeta-derives-pdflang-en
+TEST 8: displaydoctitle-asks-hyperref-for-true
+============================================================
+hypersetup: pdfdisplaydoctitle=true
+============================================================
+============================================================
+TEST 9: pdfmeta-writes-title-author-and-lang
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
 hypersetup: pdfauthor={\CDossierFieldValue {name}}
 hypersetup: pdflang=en
 ============================================================
 ============================================================
-TEST 9: pdfmeta-keeps-user-pdflang
+TEST 10: pdfmeta-keeps-user-pdflang
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
 hypersetup: pdfauthor={\CDossierFieldValue {name}}

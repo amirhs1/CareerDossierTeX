@@ -1,0 +1,36 @@
+% resume-displaydoctitle-off.tex -- a document that refuses DisplayDocTitle.
+%
+% careerdossier-components asks hyperref for pdfdisplaydoctitle=true while the
+% class is still loading, precisely so that a document can take it back. This
+% fixture is the proof that it can: the same \hypersetup any user would write,
+% in the ordinary place, must leave /DisplayDocTitle out of the catalog.
+%
+% It stays uncompressed for the same reason the other tagging fixtures do --
+% run.sh reads the catalog out of the file. That matters more here than
+% elsewhere, because this fixture asserts an *absence*: with a compressed object
+% stream the check would pass without reading anything, so run.sh also requires
+% the derived /Title to still be present in this build.
+\DocumentMetadata{lang=en,tagging=on}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\documentclass{careerdossier-resume}
+\hypersetup{ pdfdisplaydoctitle = false }
+\CDossierSetup{
+  name={Tagged Industry Resume},
+  headline={Accessibility Engineer},
+  email={resume@example.test}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title={Engineer},
+  organization={Example Labs},
+  location={Toronto},
+  dates={2024--2026}
+]
+\begin{CDossierItemize}
+  \item An achievement, so the entry is not empty.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

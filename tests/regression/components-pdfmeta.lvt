@@ -1,6 +1,6 @@
 % components-pdfmeta.lvt — careerdossier-components PDF metadata construction.
 %
-% Three things are checked here, none of which any other suite can see.
+% Four things are checked here, none of which any other suite can see.
 %
 % 1. The "has the document already set this?" test. The module derives
 %    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
@@ -19,17 +19,32 @@
 %    cover letter built from one profile do not receive identical titles; with no
 %    doctype the title is the bare name.
 %
-% 3. What is actually written, as opposed to what is derived. The two cases
-%    above test the ingredients; this one records the \hypersetup calls the
-%    module makes, so the derived pdflang and the decision to leave a
+% 3. What is actually written, as opposed to what is derived (issue #276). The
+%    two cases above test the ingredients; this one records the \hypersetup
+%    calls the module makes, so the derived pdflang and the decision to leave a
 %    user-supplied one alone are pinned as behaviour rather than inferred from
-%    the conditional. That is the half of issue #276 a log can see.
+%    the conditional.
+%
+% 4. The ViewerPreferences /DisplayDocTitle request (issue #277), which is the
+%    one piece of this metadata that is *not* applied at \begin{document}. It
+%    cannot be: pdfdisplaydoctitle is a boolean whose default is
+%    indistinguishable from a document's explicit `false', so the only way to
+%    let the document win is to write it before the document can — as soon as
+%    hyperref exists, while the class is still loading. Two halves of that are
+%    pinned here: the request is made, and it asks for `true'; and the function
+%    applied at \begin{document} does not also make it, so folding the two
+%    together fails this file rather than quietly starting to overwrite user
+%    values. That the request is on the hyperref load hook, and that a
+%    document's own `false' therefore wins, is a property of a built PDF and is
+%    asserted in tests/tagging/run.sh.
 %
 % Whether the values actually reach the PDF catalog and info dictionary is a
 % property of the built document, not of this log. The smoke fixtures cover the
-% derived title and author; tests/metadata/run.sh covers /Lang, which is written
-% by a different mechanism at a different time and is the only one of the three
-% that depends on package load order.
+% derived title and author; /DisplayDocTitle is covered by tests/tagging/run.sh
+% and /Lang by tests/metadata/run.sh, both of which inspect built PDFs. /Lang
+% needs its own suite because it is written by a different mechanism at a
+% different time, and is the only one of the three that depends on package load
+% order.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
@@ -71,6 +86,8 @@
     \cs_set_protected:Npn \hypersetup ##1
       { \TYPE{ hypersetup: ~ \tl_to_str:n {##1} } }
   }
+\cs_new_protected:Npn \cdossiertestDisplayDocTitle
+  { \__cdossier_components_pdfdisplaydoctitle: }
 \cs_new_protected:Npn \cdossiertestPdfmeta
   { \__cdossier_components_pdfmeta: }
 % Stand in for a document that set pdflang itself. hyperref stores the value in
@@ -124,9 +141,23 @@
   \cdossiertestTitle
 }
 
-% With nothing supplied by the document, all three fields are derived, and
-% pdflang is one of them. The project is English-only, so the value is fixed.
-\TEST{pdfmeta-derives-pdflang-en}{
+% The viewer is asked to display the title, and asked for `true' -- the value
+% is what makes /DisplayDocTitle appear in the catalog at all.
+\TEST{displaydoctitle-asks-hyperref-for-true}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestDisplayDocTitle
+}
+
+% Everything \__cdossier_components_pdfmeta: asks hyperref for, in one place.
+% Two contracts read off the same three lines:
+%
+%   * no pdfdisplaydoctitle among them (#277). The derived fields are applied at
+%     \begin{document}, where a user value can be detected and preserved, while
+%     that one is applied at hyperref load time, where it can be overridden
+%     instead. Fold the two together and a line appears below.
+%   * pdflang is derived, and its value is `en' (#276). The project is
+%     English-only, so the value is fixed.
+\TEST{pdfmeta-writes-title-author-and-lang}{
   \cdossiertestRecordHypersetup
   \cdossiertestSetDoctype{Testdoc}
   \cdossiertestPdfmeta

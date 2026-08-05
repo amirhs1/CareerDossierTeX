@@ -583,7 +583,8 @@ The recipient block must collapse cleanly when one or more optional fields are a
 ## PDF document metadata
 
 Both classes derive the PDF's document metadata from the shared profile. Nothing
-needs to be called; the values are applied automatically at `\begin{document}`.
+needs to be called; the derived values are applied automatically at
+`\begin{document}`.
 
 | PDF field | Derived from | Résumé value | Letter value |
 |---|---|---|---|
@@ -600,6 +601,17 @@ When `name` is absent, `/Title` and `/Author` are left unset.
 `name`; metadata does not add a second diagnostic.
 
 `/Lang` is `en` because `v0.1.0` is English-only. There is no language key.
+
+### `/DisplayDocTitle`
+
+A `/Title` in the file is not what a viewer puts in its window title, tab bar, or
+recent-documents list. A viewer uses the filename unless the PDF's
+`ViewerPreferences` ask otherwise, so the classes also request
+`/DisplayDocTitle true`. Without it the derived title is present and unused —
+the case PDF/UA-2 clause 8.11.2 and WCAG 2.1 AA 2.4.2 (Page Titled) are about.
+
+It is requested on both the default and the tagged build path, and it changes
+nothing about rendering, extracted text, or the structure tree. New in `v0.8.0`.
 
 ### Overriding the derived metadata
 
@@ -621,6 +633,22 @@ A field you set is never overwritten, and the order does not matter — the
 `\hypersetup` may appear before or after `\CDossierSetup`. Fields you do not set
 are still derived, so overriding `pdftitle` alone leaves `/Author` and `/Lang`
 in place.
+
+`pdfdisplaydoctitle` is the one setting that works by ordering rather than by
+detection, because `hyperref` gives a boolean no state that distinguishes "not
+set" from "set to `false`". The classes request it while `hyperref` is still
+loading, so any value in your preamble is later and wins:
+
+```latex
+\documentclass{careerdossier-resume}
+
+\hypersetup{ pdfdisplaydoctitle = false }   % show the filename instead
+```
+
+The one place that does not reach is a value passed as a package option — with
+`\PassOptionsToPackage{...}{hyperref}` before `\documentclass` — which
+`hyperref` processes before the classes can be asked anything. Set it with
+`\hypersetup` in the preamble instead.
 
 Other `hyperref` metadata (`pdfsubject`, `pdfkeywords`, …) is untouched; set it
 with `\hypersetup` as usual.
@@ -1186,6 +1214,23 @@ every other list in the CV, `\CDossierRecordItemSepSkip`, so a `biblatex`
 publication list and a `CDossierPublications` list share one rhythm at every
 supported `fontsize`. When the package is loaded by a class that does not
 provide the token, the gap falls back to a fixed `6pt`.
+
+The horizontal gap between an entry number and its entry follows the shared
+list label token, `\CDossierListLabelSep`, for the same reason: an entry number
+sits as close to its entry as a `CDossierPublications` label does. BibLaTeX's
+own default is `2\labelsep`, which places the gap at roughly one em — the width
+at which `pdftotext`'s default (non-layout) mode stops treating the numbers as
+labels and starts treating them as a separate left-hand column, emitting them
+as a block ahead of the entry text. `\CDossierListLabelSep` is half the body
+size, so the gap clears that threshold at every supported `fontsize`. When the
+host class does not provide the token, BibLaTeX's own default is left in place.
+
+URLs printed in a bibliography keep BibLaTeX's break points but use a reduced
+stretch at each of them, so a justified line ending in a URL spreads its word
+spaces rather than the URL itself. A stretched URL extracts as separate tokens
+(`https : / / example . invalid /`) and is then neither searchable nor
+copyable. This narrows the failure considerably but cannot rule it out: TeX
+will exceed a stated stretch to set an otherwise underfull line.
 
 `\CDossierHighlightAuthor` may be repeated for spelling or initial variants.
 It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and

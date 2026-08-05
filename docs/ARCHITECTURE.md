@@ -918,9 +918,23 @@ Three constraints shape the implementation:
   rather than inheriting it (#276). `tests/metadata/` holds the fixture that
   fails without the rule.
 
-This module does not load `hyperref` (the classes own it), so the entry point is
-guarded and the package still loads without it, matching how the link wrappers
-already degrade.
+`/DisplayDocTitle` is the exception to both, and is applied separately from
+`\__cdossier_components_pdfmeta:` for that reason. It is a boolean, not a
+derived string: `hyperref` records no state that separates its `false` default
+from a document's explicit `pdfdisplaydoctitle = false` — the legacy driver has
+only `\ifHy@pdfdisplaydoctitle`, and under `\DocumentMetadata` the key writes
+straight to the catalog, so a refused flag and an unset one are both an absent
+entry. With nothing to detect, a write at `\begin{document}` could only
+overwrite the document's choice. It also needs no profile data, so it does not
+have to wait. It is therefore requested from the `package/hyperref/after` hook,
+where it precedes every preamble line the document writes, and both drivers
+honour the last write — which reverses the precedence mechanism, from detection
+to ordering, while keeping the same outcome. The limits of that are recorded in
+[`API.md`](API.md).
+
+This module does not load `hyperref` (the classes own it), so the entry points
+are guarded and the package still loads without it, matching how the link
+wrappers already degrade.
 
 A critical invariant is:
 
@@ -1090,7 +1104,13 @@ Responsibilities:
 - inherit the shared list-item rhythm token, `\CDossierRecordItemSepSkip`,
   when the
   host class provides it, and fall back to a fixed value when it does not, so
-  the profile never owns a competing spacing value; and
+  the profile never owns a competing spacing value;
+- inherit the shared list label token, `\CDossierListLabelSep`, for the
+  horizontal gap between an entry number and its entry, for the same reason and
+  on the same terms, so the label geometry matches `CDossierPublications`
+  rather than BibLaTeX's wider `2\labelsep` default;
+- keep printed URLs extractable by capping the stretch BibLaTeX applies at each
+  URL break point, without removing the break points themselves; and
 - report an actionable optional-dependency error when BibLaTeX is unavailable.
 
 It must not:

@@ -1052,6 +1052,47 @@
 \AddToHook { begindocument }
   { \cs_if_exist:NT \hypersetup { \__cdossier_components_pdfmeta: } }
 
+%% Ask the viewer to show the derived /Title (issue #277).
+%%
+%% A /Title in the file is not what a viewer puts in its window title, tab bar,
+%% or recent-documents list; it uses the filename unless the catalog's
+%% ViewerPreferences carry /DisplayDocTitle true. Without the flag the title
+%% derived above is present and unused, which is what PDF/UA-2 clause 8.11.2
+%% and WCAG 2.1 AA 2.4.2 are about. hyperref only sets it when the document
+%% asks, or when \DocumentMetadata is given pdfstandard=ua-2, so the documented
+%% tagged path -- \DocumentMetadata{tagging=on} -- did not get it.
+%%
+%% Why this is not part of \__cdossier_components_pdfmeta: above. That function
+%% runs at \begin{document} and protects a user's value by *detecting* it, which
+%% works because pdftitle/pdfauthor/pdflang are string fields with an observable
+%% unset state. pdfdisplaydoctitle is a boolean, and its default is false --
+%% exactly what an explicit `pdfdisplaydoctitle = false' leaves behind. Neither
+%% driver records the difference: the legacy one has only the switch
+%% \ifHy@pdfdisplaydoctitle, and under \DocumentMetadata the key writes straight
+%% to the catalog, so an unset flag and a refused one are both simply an absent
+%% entry. There is nothing to detect, and a write at \begin{document} could
+%% therefore only overwrite a document's own choice.
+%%
+%% So precedence is obtained by ordering instead. The flag is set as soon as
+%% hyperref exists, which is while the class is still loading -- before any
+%% preamble line the document itself writes. Both drivers honour the last write
+%% (the pdfmanagement key removes the catalog entry again), so a document that
+%% wants the filename back writes the ordinary \hypersetup { pdfdisplaydoctitle
+%% = false } and wins. The one case ordering cannot cover is the value arriving
+%% as a package option, via \PassOptionsToPackage before \documentclass: those
+%% are processed while hyperref loads, so this hook still runs last. See
+%% docs/API.md.
+%%
+%% Unlike the derived fields this is not gated on `name'. It carries no value of
+%% its own, and with no /Title in the file a viewer falls back to the filename
+%% exactly as it does now, so there is nothing to suppress -- and `name' is not
+%% known yet at this point in any case.
+\cs_new_protected:Npn \__cdossier_components_pdfdisplaydoctitle:
+  { \hypersetup { pdfdisplaydoctitle = true } }
+
+\AddToHook { package/hyperref/after }
+  { \__cdossier_components_pdfdisplaydoctitle: }
+
 %% Ordering against hyperref's own begindocument code (issue #276).
 %%
 %% /Lang is not written at \end{document} with the rest of the metadata. Without
