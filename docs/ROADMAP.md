@@ -65,10 +65,15 @@ https://github.com/amirhs1/CareerDossierTeX/milestones
 ## Phase numbering
 
 The Project's `Phase` field is the canonical numbering; the headings below
-follow it. A release that never ships does not retain a phase number, which is
-why `v0.3.0` appears here as an unnumbered section and `v1.1.0` — closed empty
-before it had a phase option at all — has none. See
-`docs/NAMING-CONVENTION.md` §10.
+follow it. Every shipped major or minor release has a phase of its own. A patch
+release does not — its issues carry the phase of the minor release they correct,
+which is why `v0.1.1` and `v0.2.1` appear in the release overview above but have
+no phase heading here.
+
+A release that never ships has no phase number at all. `v0.3.0` **held**
+`Phase 3` and gave it up when it was dropped, and the Project reused the slot for
+`v0.4.0`; `v1.1.0` was closed empty before it had an option to give up. Both
+therefore appear unnumbered. See `docs/NAMING-CONVENTION.md` §10.
 
 The two forms differ deliberately — this document keys each phase to its
 version, the Project uses a short label — so they cross-walk as follows:
@@ -87,6 +92,11 @@ version, the Project uses a short label — so they cross-walk as follows:
 | `Phase 8: v0.9.0` | `Phase 8 — Documentation, Examples, and Release Readiness` |
 | `Phase 9: v1.0.0` | `Phase 9 — Stable API` |
 | `v1.1.0` **(closed empty, unnumbered)** | *(none — never had an option)* |
+
+The two patch releases have no heading of their own: `v0.1.1` carries
+`Phase 1 — Industry` and `v0.2.1` carries `Phase 2 — Academic`, alongside the
+minor release each one corrects. `Phase 0 — Inventory` runs the other way — it is
+the pre-release baseline and has no milestone.
 
 ## Phase 0: inventory and baseline
 
