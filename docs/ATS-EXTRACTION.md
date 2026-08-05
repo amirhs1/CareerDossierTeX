@@ -8,13 +8,14 @@ package is built toward. It is **not** documentation of shipped behavior; only
 **Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
 sections that discuss XeTeX behavior are retained as rationale and history, and
 are marked as such.
-**Current published scope (`v0.6.0`):** English industry résumé, industry and academic
+**Current published scope (`v0.7.0`):** English industry résumé, industry and academic
 cover-letter families, academic CV, statement documents, and optional publication
 support; US Letter (default) and opt-in A4, monochrome, LuaLaTeX, and opt-in
 tagged structure. The statement class supports a default statement of interest
 plus six other statement types — see `docs/API.md` and `docs/ROADMAP.md`. Every
 class accepts the calibrated `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`
-options; the résumé and CV no longer accept `density`.
+options plus `medium=print|screen`, which decides whether page furniture is
+emitted at all; the résumé and CV no longer accept `density`.
 **Maintainer:** Amir Sadeghi
 **Last reviewed:** 2026-08-03
 

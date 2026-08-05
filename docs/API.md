@@ -10,7 +10,7 @@ describes the released interface, not the internals —
 This document records the released public interface:
 
 ```text
-Released: v0.6.0 — Calibrated Type Scale and Rhythm
+Released: v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.
@@ -18,23 +18,34 @@ Before `v1.0.0` the interface may still change between minor versions; such
 changes are recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
 [`MIGRATION.md`](MIGRATION.md).
 
-`v0.6.0` changed the layout interface. Its interface changes are:
+`v0.7.0` changed the interface in four ways:
 
-- `fontsize` and `margin` are accepted by all four document classes;
-  `fontsize` is new on the letter and statement classes, and `12pt` is new
-  everywhere.
-- Defaults are per class, not uniform: the résumé is `11pt` at
-  `margin=narrow`; the CV, letter, and statement classes are `12pt` at
-  `margin=normal`.
-- `density=compact|standard` is **removed** from the résumé and CV classes.
-  There is no replacement key: vertical rhythm is now derived from `fontsize`.
-  Passing `density` produces the class's unknown-option error.
-- `family=academic` on the letter class is label- and metadata-only and no
-  longer selects a distinct layout.
+- `medium=print|screen` is accepted by all four document classes. `print` is
+  the default and reproduces the previous behaviour exactly; `screen` emits no
+  running header and no folio on any page.
+- `\CDossierHeaderBegin`, `\CDossierHeaderLine`, and `\CDossierHeaderEnd`
+  compose a centered header stack line by line. `\MakeCDossierHeader` and
+  `\MakeCDossierStatementHeader` remain what a document uses.
+- **The vertical-spacing design tokens are reworked.** Every one is renamed onto
+  `\CDossier<Family><Scope><Position>Skip`; three that could never render are
+  retired; two are added for boundaries no token described; and three are split
+  — the list edge into an above and a below token, and the header below-gap and
+  the prose paragraph gap into one token per document family. The vocabulary
+  goes from twenty-two tokens to twenty-five. A document needs a source edit
+  only if it reads or sets one of these tokens by name.
+- **Every choice-valued option now names its accepted values** when it rejects
+  one. No option name, accepted value, or default changed — only the wording of
+  an error that already stopped the build.
 
-These are breaking layout changes. Existing documents compile without a source
-edit unless they pass `density`, but their line and page breaks will differ.
-See [`MIGRATION.md`](MIGRATION.md).
+The calibrated ratios behind those tokens were also retuned, so **every document
+reflows**, though no supported combination changes its page count. See
+[`MIGRATION.md`](MIGRATION.md#070---2026-08-04).
+
+`v0.6.0` before it removed `density=compact|standard` from the résumé and CV
+classes with no replacement, made `fontsize` and `margin` uniform across all
+four classes with per-class defaults, and reduced `family=academic` to a
+label- and metadata-only distinction. A document coming from `v0.5.x` or
+earlier needs that migration too.
 
 The API is intentionally small. Internal helper commands are not public merely because they are technically accessible.
 
@@ -1608,7 +1619,7 @@ resolved values at each `fontsize` are tabulated in
 Only the two gaps *inside* the header block are shared. The gap *below* it is a
 boundary against whatever the class puts next — a ruled section in the record
 classes, a prose section in the statement, the date line in the letter — so each
-family owns that one, and all three ship at the same `0.8125` ratio.
+family owns that one, and all three ship at the same `0.9375` ratio.
 
 Two rules govern how a token reaches the page, and overriding a token without
 them in mind is the usual reason an override appears to do nothing:
@@ -1636,7 +1647,7 @@ Since `v0.7.0`, `\CDossierRecordHeaderBelowSkip`,
 `\CDossierLetterBodyBelowSkip` are new, and `\CDossierRecordEntryBelowSkip`,
 `\CDossierLetterheadBelowSkip`, `\CDossierSharedHeaderAboveSkip`, and
 `\CDossierSharedHeaderBelowSkip` are removed; see
-[`MIGRATION.md`](MIGRATION.md#070---unreleased).
+[`MIGRATION.md`](MIGRATION.md#070---2026-08-04).
 
 The calibrated *values* are not stable API before `v1.0.0`; the token names and
 the boundaries they own are.

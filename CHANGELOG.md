@@ -8,6 +8,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-04
+
 ### Added
 
 - All four document classes accept `medium=print|screen`, controlling whether
@@ -231,12 +233,24 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   their CI artifacts moved out of `resume-artifacts` into the new
   `smoke-artifacts` and `layout-artifacts`. ([#188])
 
+- `make review-matrix` now names each rendered PDF `<type>-<margin>-<fontsize>`
+  rather than `<type>-<fontsize>-<margin>`, and builds margin as the outer loop
+  so the build order matches the sorted order. A directory listing previously
+  interleaved the two margin presets — `resume-10pt-narrow` sorted between
+  `resume-10pt-normal` and `resume-11pt-narrow` — so a reviewer comparing the
+  three sizes of one preset had to skip every second file. ([#195])
+
+  **Naming only.** The same 24 combinations are built from the same fixtures
+  with the same class options, and the diagnostic collection, the 24-PDF count
+  check, and the exit codes are untouched.
+
 - `\CDossierRecordListEdgeAboveSkip` now has a documented lower bound of `0.25`.
   Below it, the entry heading's right-hand dates and location stop extracting
   with their entry and sort after the entry's bullets — or after the `Page N of
   M` folio on a page carrying furniture. Overriding the token below `0.25`
-  therefore breaks reading order for `pdftotext`-class consumers. The shipped
-  default is `0.3125` and is unchanged. ([#219])
+  therefore breaks reading order for `pdftotext`-class consumers. The default
+  was `0.3125` when the bound was measured; [#206] below then retuned the token
+  to `0.25`, so it now ships exactly *at* the floor. ([#219])
 
   The bound is an extraction constraint, not a design preference, and it is not
   something the entry heading can be repaired to avoid. Poppler builds reading
@@ -442,11 +456,36 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
   Coverage that enumerates the messages that exist cannot catch one that was
   never written, so this derives the expected set from the source instead:
-  twenty-five choice-valued options today, each verified to define its message
+  twenty-six choice-valued options today, each verified to define its message
   and route l3keys' choice error to it, both naming the module the filename
   implies. **Contributor tooling only.** No class, option, key, command,
   environment, or calibrated value changed, and no document renders
   differently.
+
+- The BibLaTeX/Biber fixture now runs as its own `bibliography` CI job, and
+  `tests/bibliography/run.sh` recognises a Biber installation that rejects every
+  `date` field and names the cause and the remedy instead of only reporting the
+  warnings. ([#211])
+
+  The reported failure — Biber 2.21 dropping every year from the rendered
+  bibliography and misordering the entries, while accepting the legacy `year`
+  field — **did not reproduce**: `make bibliography-test` passes on a clean tree
+  with the same binary, unchanged on disk. Two premises of the report were also
+  wrong. CI had exercised this path since `v0.2.0`, inside the job named `cv`,
+  so the coverage was real but invisible from the checks list; and the fixture
+  needed no change, because its extraction reference already pinned all three
+  years and the `ydnt` order independently of the Biber-warning gate.
+
+  The likely mechanism is recorded as plausible rather than proven: `biber` is a
+  `PAR::Packer` binary that unpacks its Perl runtime into a per-user cache under
+  `TMPDIR`, only the `date` path needs the `DateTime` modules from that cache,
+  and macOS purges `/var/folders` periodically — which would break `date` while
+  leaving `year` intact. It could not be forced to recur, because `biber`
+  re-extracts missing cache files on demand.
+
+  **Diagnosis and CI visibility only.** The fixture keeps `date=`, the
+  biber-warning gate is not relaxed, and no class, option, key, command,
+  environment, or calibrated value changed.
 
 - The statement class's `type` option is declared as an ordinary l3keys choice
   list, so it is covered by that lint like every other choice-valued option.
@@ -466,10 +505,12 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#188]: https://github.com/amirhs1/CareerDossierTeX/issues/188
 [#191]: https://github.com/amirhs1/CareerDossierTeX/issues/191
 [#193]: https://github.com/amirhs1/CareerDossierTeX/issues/193
+[#195]: https://github.com/amirhs1/CareerDossierTeX/issues/195
 [#196]: https://github.com/amirhs1/CareerDossierTeX/issues/196
 [#203]: https://github.com/amirhs1/CareerDossierTeX/issues/203
 [#204]: https://github.com/amirhs1/CareerDossierTeX/issues/204
 [#206]: https://github.com/amirhs1/CareerDossierTeX/issues/206
+[#211]: https://github.com/amirhs1/CareerDossierTeX/issues/211
 [#212]: https://github.com/amirhs1/CareerDossierTeX/issues/212
 [#218]: https://github.com/amirhs1/CareerDossierTeX/issues/218
 [#219]: https://github.com/amirhs1/CareerDossierTeX/issues/219
@@ -1123,7 +1164,8 @@ in a monochrome theme.
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.4.0...v0.5.0
 [0.2.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.0...v0.2.1

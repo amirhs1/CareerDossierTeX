@@ -300,7 +300,7 @@ further down.
 
 Compared that way, the heading-to-rule gap is still deliberately the smallest
 visible structural gap in the project, and must stay unambiguously smaller than
-the rule-to-content gap (0.375) — about 1:3.1. A rule belongs to the heading
+the rule-to-content gap (0.4375) — about 1:4. A rule belongs to the heading
 above it; at 1:2 it starts to read as a divider floating between two blocks. A
 retune may move both numbers, but not their order, and may not take the rule
 skip below the heading's depth. These two tokens own the complete vertical
@@ -320,11 +320,11 @@ The ratio absorbed that 3 pt rather than discarding it, so the rendered edge
 is materially the one #166 tuned. Before #176 the real gap was 4.5 pt at
 `10pt`, 4.7 pt at `11pt`, and 4.81 pt at `12pt` — an effective ratio drifting
 from 0.375 down to 0.332 of a line as the body size grew, because only part of
-it scaled. At 0.3125 the edge is 3.75 / 4.25 / 4.53 pt and the whole of it
-scales. The ratio stays below `\CDossierRecordSectionBelowSkip` (0.375)
-deliberately: a list edge that equalled the gap opening a section would
-flatten the distinction between entering a section and entering a list inside
-one.
+it scaled. #176 restated the whole edge as a single scaling 0.3125; #206 later
+split the two ends apart, to 0.25 above and 0.50 below. Both stay below
+`\CDossierRecordSectionBelowSkip` (0.4375) deliberately: a list edge that
+equalled the gap opening a section would flatten the distinction between
+entering a section and entering a list inside one.
 
 `\CDossierRecordListEdgeAboveSkip` and `\CDossierRecordListEdgeBelowSkip` are
 two tokens rather than one (#191) because LaTeX offers a single `topsep` and
@@ -350,11 +350,15 @@ the blocks group rather than anything `\__cdossier_components_entryhead:nnnn`
 emits; the gap below the heading is the only lever, so this token holds the
 bound. `tokens-invariants` states it and the `*-entry-dates-*` extraction
 fixtures enforce it. See `ATS-EXTRACTION.md` section 3.4 for the measurements.
+Since #206 the token ships *at* that floor rather than above it, so a further
+tightening of the list's opening edge is not available without first solving the
+extraction fault the floor stands in for.
 
-The split is a mechanism change alone: both ratios start at the single value
-#176 calibrated, so the rendered edge is unchanged at every supported size.
-Retuning either ratio is deliberately out of scope until specific values are
-proposed against the calibrated type scale.
+The split itself was a mechanism change alone: both ratios started at the single
+value #176 calibrated, so no list moved when #191 landed. #206 then retuned them
+apart, to 0.25 above and 0.50 below, which is what makes a list sit nearer the
+entry that owns it than the next one — the relation the single token could state
+but never render.
 
 The tagged path reaches the same closing edge by a different route (#193). Under
 `\DocumentMetadata{tagging=on}` LaTeX Lab replaces LaTeX's list internals with
@@ -384,17 +388,22 @@ The four `Prose…` heading tokens exist because the entry-structured section
 tokens above them cannot be reused in a continuous-prose class (#177). Those
 are calibrated for a ruled heading in a document whose paragraphs are
 separated by nothing at all: `\CDossierRecordParSkip` is 0. A statement
-separates its paragraphs by `\CDossierProseParSkip` (0.50), so a heading gap
-has to clear that ratio before it separates anything — at
-`\CDossierRecordSectionBelowSkip` (0.375) the space opening a section would be
-*narrower* than the space between two paragraphs inside it.
+separates its paragraphs by `\CDossierProseParSkip`, so a prose heading gap has
+to clear that ratio before it separates anything. When #177 made the case the
+two numbers were 0.50 against `\CDossierRecordSectionBelowSkip`'s 0.375, so
+reusing the record token would have opened a section *more narrowly* than the
+gap between two paragraphs inside it. #206 has since moved both — 0.25 and
+0.4375 — but the constraint is structural rather than a property of those two
+values: one pair is calibrated against a zero paragraph gap and the other
+against a non-zero one, so neither can serve both classes.
 
 The prose pair is therefore stated against the paragraph gap rather than
-against the ruled section: 1.50 above is three times it, 0.75 below is one and
-a half times it, and the 2:1 ratio between the two binds a heading to the text
-it introduces instead of leaving it suspended between two blocks. The
-subsection pair repeats that shape one step down (1.00 / 0.625) — still clear
-of the paragraph gap, unambiguously tighter than the section containing it.
+against the ruled section: 0.875 above is three and a half times it, 0.375
+below is one and a half times it, and the 2.33:1 asymmetry between the two
+binds a heading to the text it introduces instead of leaving it suspended
+between two blocks. The subsection pair repeats that shape one step down
+(0.625 / 0.3125, exactly 2:1) — still clear of the paragraph gap, unambiguously
+tighter than the section containing it.
 
 Like the list-edge tokens, each of the four is the complete gap, and keeping
 that true costs a setting. A heading is a paragraph and so is the text beneath
@@ -403,7 +412,7 @@ sectioning command asks for. The statement class subtracts `\parskip` from both
 skips it passes to `\@startsection`, which is why the table's numbers are the
 gaps a reader measures. That subtraction has a floor: `\@xsect` reads a
 non-positive after-skip as a request for a run-in heading, so both below-tokens
-must stay strictly greater than `\CDossierProseParSkip` (0.50) or every
+must stay strictly greater than `\CDossierProseParSkip` (0.25) or every
 statement heading would quietly become run-in.
 
 #### Boundary ownership
@@ -441,8 +450,9 @@ token's value.
    every header line.
 
    Every header line is its own paragraph, so before #204 the prose classes'
-   document-wide `\parskip` (0.50) landed in every header boundary on top of the
-   header token, and the header tokens could not express a gap below that floor.
+   document-wide `\parskip` — 0.50 at the time — landed in every header
+   boundary on top of the header token, and the header tokens could not express
+   a gap below that floor.
    The header group now zeroes `\parskip` for its own scope, so the two shared
    header gap tokens govern header spacing identically in all four classes.
 
@@ -454,7 +464,7 @@ token's value.
    which claimed the boundary *above* the first header line — always the first
    material on page 1, where TeX discards the glue, so it too rendered nothing
    at any value. A knob that cannot move the page is not a knob; see
-   [`MIGRATION.md`](MIGRATION.md#070---unreleased).
+   [`MIGRATION.md`](MIGRATION.md#070---2026-08-04).
 
 Not every token is read at the boundary it names. `\CDossierRecordParSkip`,
 `\CDossierProseParSkip`, and `\CDossierLetterParSkip` are copied into `\parskip`
@@ -469,9 +479,10 @@ than its paragraph gap (see below), which pins `\CDossierProseParSkip` to the
 bottom of the statement's heading scale, while the letter has no heading scale
 to bound it and can prefer a more generous gap between its unindented block
 paragraphs. A single shared token made retuning either class a side effect on
-the other. Both ship at the same 0.50 ratio so the split itself does not move
-any rendered gap; retuning either is a separate, independently reviewable
-decision.
+the other. Both were introduced at the same 0.50 ratio, so the split itself
+moved no rendered gap; #206 then retuned both together to 0.25. Moving one
+without the other is now an independently reviewable decision, which is the
+point of the split.
 
 `\CDossierRecordHeaderBelowSkip`, `\CDossierProseHeaderBelowSkip`, and
 `\CDossierLetterHeaderBelowSkip` are the same kind of split (#223), one step
@@ -487,15 +498,19 @@ vertical space in the résumé and the CV, and the letter carried a floor set by
 section boundary it does not have. `careerdossier-components` no longer names
 the token itself: each class declares its own with
 `\__cdossier_components_headerbelow:N` when it loads, and the header stack emits
-that. All three ship at the `0.8125` ratio the shared token carried, so the
-split moves nothing; #206 owns any retune.
+that. All three were introduced at the `0.8125` ratio the shared token carried,
+so the split moved nothing; #206 then raised all three together to 0.9375.
 
 `tests/regression/tokens-invariants.lvt` records the ordering relations these
 rules imply, one line per relation, at all three supported sizes. The baseline is
 the assertion: a ratio change that makes a token unreachable, or that repairs
-one, shows up there as a reviewable diff. Five relations are recorded as
-`violated` at the v0.7.0 defaults — #204 made them expressible, and #206 assigns
-the ratios that satisfy them.
+one, shows up there as a reviewable diff. All eighteen relations hold at the
+`v0.7.0` defaults, at `10pt`, `11pt`, and `12pt` alike — #204 made them
+expressible and #206 assigned the ratios that satisfy them, so the baseline's
+remaining job is to catch a later ratio change that breaks one. Two of the
+eighteen hold with no margin at all: `RecordSectionAboveSkip` is exactly twice
+`RecordSectionBelowSkip`, and `RecordListEdgeAboveSkip` sits exactly on its
+extraction floor.
 
 #### Derived metrics
 

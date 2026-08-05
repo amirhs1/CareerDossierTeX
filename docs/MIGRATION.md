@@ -7,21 +7,21 @@ interface itself is in [`API.md`](API.md).
 
 ## Status
 
-`v0.6.0` is the current published release. It **removes the `density` option
-and changes every class's layout defaults** — see
-[Upgrading to `v0.6.0`](#upgrading-to-v060) below.
+`v0.7.0` is the current published release. It renames public design tokens, adds
+new ones beside them, **retires three**, and retunes the calibrated
+vertical-rhythm ratios. Renamed tokens need a source edit only if a document
+reads or sets them by name, and all three retired tokens rendered nothing at the
+`v0.6.0` defaults — but three mechanism changes do move the page: letter and
+statement headers tighten, the gap above a bullet list inside an entry tightens,
+and a document with no `headline` gains a little space below the name. **The
+retune then reflows every document.** It also makes three undocumented
+class-to-package primitives private, which changes no output and affects no
+supported document. See [`[0.7.0]`](#070---2026-08-04) below. This release was
+numbered `v0.6.1` until 2026-08-01.
 
-The unreleased `v0.7.0` renames public design tokens, adds new ones beside them,
-**retires three**, and retunes the calibrated vertical-rhythm ratios. Renamed
-tokens need a source edit only if a document reads or sets them by name, and the
-two retired tokens rendered nothing at the released defaults — but three
-mechanism changes do move the page: letter and statement headers tighten, the
-gap above a bullet list inside an entry tightens, and a document with no
-`headline` gains a little space below the name. The retune then reflows every
-document. It also makes three undocumented class-to-package primitives private,
-which changes no output and affects no supported document. See
-[`[0.7.0]`](#070---unreleased) below. This release was numbered `v0.6.1` until
-2026-08-01.
+`v0.6.0` **removes the `density` option and changes every class's layout
+defaults** — see [Upgrading to `v0.6.0`](#upgrading-to-v060) below. A document
+coming from `v0.5.x` or earlier needs that section as well as the `v0.7.0` one.
 
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
@@ -344,7 +344,66 @@ is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
 in this format.
 
-## [0.7.0] - unreleased
+## [0.7.0] - 2026-08-04
+
+### The vertical-rhythm ratios are retuned
+
+**Every document reflows.** No name is added, removed, or renamed by this change
+and no source edit is required — only the calibrated values move. Seventeen of
+the twenty-five tokens end this release at a different ratio from the one their
+boundary carried in `v0.6.0`, and eight are unchanged. The type scale, the
+margin presets, and the page geometry do not move at all, and none of the 24
+supported class × `fontsize` × `margin` combinations changes its page count.
+
+What moves, and why:
+
+- **Statements tighten.** The paragraph gap halves and the section and
+  subsection gaps come down with it, so a statement fits more argument on a
+  page.
+- **Every heading pair becomes asymmetric by at least 2:1**, above to below, so
+  a heading binds to the text it introduces instead of floating between two
+  blocks.
+- **Two relations the tokens named but the page never showed now hold**: a
+  bullet list sits closer to the entry that owns it than to the next one, and
+  the letter's body is framed by a gap visibly wider than an ordinary paragraph
+  break — previously it was identical to one.
+
+A document that already overrode one of these tokens keeps its own value and is
+unaffected by the change to that token.
+
+To restore the `v0.6.0` spacing exactly, set the changed tokens back after
+`\documentclass`. The names are the `v0.7.0` ones; use the rename table below to
+find what each was called in `v0.6.0`.
+
+| Token | `v0.6.0` | `v0.7.0` |
+|---|---:|---:|
+| `\CDossierRecordHeaderBelowSkip` | 0.8125 | 0.9375 |
+| `\CDossierProseHeaderBelowSkip` | 0.8125 | 0.9375 |
+| `\CDossierLetterHeaderBelowSkip` | 0.8125 | 0.9375 |
+| `\CDossierRecordSectionAboveSkip` | 0.6875 | 0.875 |
+| `\CDossierRecordSectionBelowSkip` | 0.375 | 0.4375 |
+| `\CDossierRecordEntryAboveSkip` | 0.25 | 0.3125 |
+| `\CDossierRecordListEdgeAboveSkip` | 0.3125 | 0.25 |
+| `\CDossierRecordListEdgeBelowSkip` | 0.3125 | 0.50 |
+| `\CDossierProseSectionAboveSkip` | 1.50 | 0.875 |
+| `\CDossierProseSectionBelowSkip` | 0.75 | 0.375 |
+| `\CDossierProseSubsectionAboveSkip` | 1.00 | 0.625 |
+| `\CDossierProseSubsectionBelowSkip` | 0.625 | 0.3125 |
+| `\CDossierProseParSkip` | 0.50 | 0.25 |
+| `\CDossierLetterParSkip` | 0.50, as `\CDossierProseParSkip` | 0.25 |
+| `\CDossierLetterBodyAboveSkip` | 0.50 | 0.625 |
+| `\CDossierLetterBodyBelowSkip` | 0.50, borrowed from `\CDossierLetterBlockSkip` | 0.625 |
+| `\CDossierLetterSignatureGapSkip` | 2.25 | 2.00 |
+
+The remaining eight tokens keep their `v0.6.0` ratio. A ratio is a multiple of
+the body baseline, so restoring one means setting the token to that multiple of
+the leading for the size in use — 12.0 pt at `10pt`, 13.6 pt at `11pt`, and
+14.5 pt at `12pt`. The resolved values at each size are tabulated in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm).
+
+Restoring the whole set is rarely what you want. The retune exists because
+several of these tokens could not previously render the relation they named, so
+a full restore reinstates those defects along with the spacing.
 
 ### Three vertical-spacing tokens retired, two added
 
@@ -371,7 +430,7 @@ Added:
 | Added | Boundary | Default |
 |---|---|---|
 | `\CDossierLetterRecipientLineGapSkip` | between two lines of the letter's recipient block | `0.00` |
-| `\CDossierLetterBodyBelowSkip` | letter body → closing | `0.50`, the value the boundary already had |
+| `\CDossierLetterBodyBelowSkip` | letter body → closing | `0.625`. It was added at `0.50`, the value the boundary already had; [#206](https://github.com/amirhs1/CareerDossierTeX/issues/206) then retuned it with the rest of the scale |
 
 `\CDossierLetterBodyBelowSkip` is the pair of `\CDossierLetterBodyAboveSkip`.
 The boundary previously borrowed `\CDossierLetterBlockSkip`, which names the
@@ -405,28 +464,31 @@ emits every gap as `token − \parskip` and the following header line then
 contributes `\parskip` again — so no value of it changed anything. It is not
 part of the released API.
 
-**Letters and statements reflow.** Each header boundary tightens by
-`\CDossierProseParSkip` — 7.25 pt at `fontsize=12pt`. Measured on the shipped
-examples at 12 pt: `letter-industry` and `letter-academic` reclaim 21.7 pt,
-`artist-statement` 36.1 pt, and `research-statement` 43.3 pt on page one. No
-example changes its page count, but a statement fits more body text on page one
-than before. Résumé and CV are unaffected, because `\CDossierRecordParSkip` is
-already `0.00`.
+**Letters and statements reflow.** Each header boundary tightens by the prose
+paragraph gap as it stood before the retune above — 0.50 of a line, 7.25 pt at
+`fontsize=12pt`. The figures below isolate *this* change; the retune then moves
+the same boundaries again. Measured on the shipped examples at 12 pt:
+`letter-industry` and `letter-academic` reclaim 21.7 pt, `artist-statement`
+36.1 pt, and `research-statement` 43.3 pt on page one. No example changes its
+page count, but a statement fits more body text on page one than before. Résumé
+and CV are unaffected, because `\CDossierRecordParSkip` is already `0.00`.
 
-To keep the previous letter or statement header spacing, add the prose
-paragraph gap to the two header gap tokens — which is what the old `\parskip`
-floor contributed — after `\documentclass`:
+To keep the previous letter or statement header spacing, add back what the old
+`\parskip` floor contributed — 0.50 of a line — after `\documentclass`:
 
 ```latex
 \makeatletter\ExplSyntaxOn
-\skip_add:Nn \CDossierSharedHeaderNameGapSkip { \CDossierProseParSkip }
-\skip_add:Nn \CDossierSharedHeaderMetaGapSkip { \CDossierProseParSkip }
+\skip_add:Nn \CDossierSharedHeaderNameGapSkip { 7.25pt }
+\skip_add:Nn \CDossierSharedHeaderMetaGapSkip { 7.25pt }
 \ExplSyntaxOff\makeatother
 ```
 
-At `fontsize=12pt` that restores the name gap to 10.875 pt and every later
-header gap to 9.96875 pt. Do not apply it in the résumé or CV, which never had
-the floor.
+That figure is for `fontsize=12pt`; use `6.8pt` at `11pt` and `6pt` at `10pt`.
+It is written out rather than expressed as `\CDossierProseParSkip` because the
+retune above halves that token, so reading it here would add only half the
+floor. At `12pt` this restores the name gap to 10.875 pt and every later header
+gap to 9.96875 pt. Do not apply it in the résumé or CV, which never had the
+floor.
 
 ### `\CDossierRecordEntryGapSkip` became a floor rather than added space
 

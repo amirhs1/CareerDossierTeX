@@ -14,12 +14,12 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is released.
-> `v0.3.0` is dropped. The next planned release is `v0.7.0 — Page Furniture,
-> Output Medium, and Spacing Ownership`, followed by `v0.8.0 — Examples and
-> Templates Revision` and `v1.0.0 — Stable Public API`.
+> **Current status:** `v0.7.0 — Page Furniture, Output Medium, and Spacing
+> Ownership` is released. `v0.3.0` is dropped. The next planned release is
+> `v0.8.0 — Examples and Templates Revision`, followed by `v1.0.0 — Stable
+> Public API`.
 >
-> That release was numbered `v0.6.1` until 2026-08-01. It adds new public API —
+> `v0.7.0` was numbered `v0.6.1` until 2026-08-01. It adds new public API —
 > the `medium` option and new spacing tokens — which is a minor release under
 > Semantic Versioning, not a patch; it also renames public design tokens and
 > retunes calibrated values, so documents reflow. The former `v0.7.0 — Examples
@@ -38,7 +38,7 @@ test pass at the end of a milestone.
 | `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
 | `v0.5.0` | Statement classes and broader customization | Released |
 | `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
-| `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Planned |
+| `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released |
 | `v0.8.0` | Examples and templates revision | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 
@@ -411,17 +411,37 @@ rather than by the design system that is supposed to own it: `geometry`'s
 defaults place the running header and folio (#183); LaTeX's single `topsep`
 cannot express a different space above and below a list (#191);
 `careerdossier-biblatex` hard-codes the bibliography's inter-entry gap at `6pt`
-(#196); and LaTeX Lab's block default decides the space below a list on the
-tagged path (#193); and the prose `\parskip` floors every header gap, leaving
-the header tokens unable to express the spacing they name (#204). Each item
-hands one such decision back to the token that should own it. #203 then makes
-the token names consistent, and #206 sets the values.
+(#196); LaTeX Lab's block default decides the space below a list on the tagged
+path (#193); and the prose `\parskip` floors every header gap, leaving the
+header tokens unable to express the spacing they name (#204). Each item hands
+one such decision back to the token that should own it. #203 then makes the
+token names consistent, and #206 sets the values.
 
 Two items do not share that concern; both arrived from implementing #184 in
 PR #210. #212 widens the named-values class error from `medium` to every
 choice-valued option — the inconsistency that PR knowingly left behind as out of
-scope. #211 fixes a Biber date-parsing failure that the same work uncovered but
-did not cause; it predates the branch and reproduces on `main`.
+scope. #211 investigates a Biber date-parsing failure that the same work
+uncovered but did not cause.
+
+**Scope expanded on 2026-08-03.** A trial retune under #206 established that
+four of the values it had to set were pinned by defects rather than chosen by
+design: the list-edge opening token by an extraction-order fault (#219), the
+shared header gap by a cross-family coupling (#223), the prose paragraph gap by
+one token serving both the letter and the statement (#222), and two header
+tokens that could not affect output at any value (#220). Tuning against those
+would have reflowed every document twice in consecutive releases, so #219–#225
+were added ahead of #206. As shipped, all six are output-neutral or corrective —
+the milestone description's "five of the six" predates #219 resolving as
+documentation and tests only — and #206 remains the release's one deliberate
+reflow. #220, #222, and #223 change the public token list and #224 adds three
+public commands, so the breaking surface and `MIGRATION.md` grew accordingly.
+
+A further group landed as the work proceeded: #218 (the CV's manual publication
+list did not build under tagging), #232 and #233 and #236 (option-error
+reporting and the lint that keeps it from regressing), #242 (three
+public-prefixed internal primitives made private), and the documentation and
+process issues #205, #208, #213, #239, #241, #246, #252, and the fixture audit
+#255.
 
 **No type-scale step or margin preset changes value.** The vertical-rhythm
 ratios do, under #206 and against its stated design rules.
@@ -438,12 +458,19 @@ design* where the ratios are retuned.
 | #195 | none — generated review filenames only |
 | #196 | bibliography entries move up as the hard-coded `6pt` gap closes |
 | #193 | the tagged path's space below a list changes to match the untagged path |
-| #211 | on an affected toolchain, bibliography years reappear and `ydnt` order is corrected; none where Biber already accepts `date` |
+| #211 | none — the reported failure did not reproduce; see below |
 | #212 | none — error text only; no document that compiles today is affected |
+| #204, #220, #222, #223, #224 | header and list boundaries move where a token could not previously express its gap; the token splits themselves are output-neutral |
+| #206 | every document reflows by design; no combination changes page count |
+| #218, #219, #232, #233, #236, #242 | none for a document that builds today; #218 makes a tagged CV build at all |
 
 The new public surface is one additive class option whose default reproduces
-current output exactly, plus one design-token rename (#191) that is
-source-compatible for every document that does not read the token by name.
+current output exactly (#184), three additive header-composition commands
+(#224), and a reworked vertical-spacing token vocabulary: renamed onto one
+convention (#191, #203), split per family where one token served two (#222,
+#223), extended where a boundary had no token (#204), and reduced where a token
+could not reach the page (#204, #220). Every rename and retirement is
+source-compatible for a document that does not read the token by name.
 
 ### Included
 
@@ -479,16 +506,18 @@ source-compatible for every document that does not read the token by name.
 - the bibliography's inter-entry gap reading `\CDossierRecordItemSepSkip`
   instead of a hard-coded `6pt`, so a `biblatex` publication list and a
   `CDossierPublications` list share one rhythm at every `fontsize` (#196);
-- Biber date parsing restored, so the bibliography fixture keeps its years and
-  its `ydnt` sort order (#211). Biber 2.21 on the maintainer's toolchain rejects
-  every `date` value while accepting the legacy `year` field, which drops every
-  year from the rendered bibliography and misorders the entries;
-  `make bibliography-test` fails on a clean tree and is correct to. Switching
-  the fixture to `year=` and relaxing the biber-warning gate in
-  `tests/bibliography/run.sh` are both explicit non-fixes: each turns the suite
-  green while leaving the bibliography wrong. Whether the cause is Biber 2.21
-  generally or one installation cannot be settled on a single machine, so the
-  work includes reproducing it on a second toolchain;
+- a diagnosis and named CI coverage for the Biber date-parsing failure reported
+  in #211, which **did not reproduce**. It was reported as Biber 2.21 rejecting
+  every `date` value while accepting the legacy `year` field — dropping every
+  year from the rendered bibliography and misordering the entries — but
+  `make bibliography-test` passes on a clean tree with the same binary, and CI
+  had been running that suite since #69, buried inside the job named `cv`. The
+  likely mechanism is an incomplete `PAR::Packer` cache under `TMPDIR`, which
+  only the `date` path depends on; it is documented as plausible, not proven.
+  The work therefore keeps the `date` field and the biber-warning gate exactly
+  as they were — both proposed escapes remain explicit non-fixes — and instead
+  splits the suite into a visible `bibliography` CI job and teaches
+  `tests/bibliography/run.sh` to recognise the signature and name the remedy;
 - the tagged path's closing list edge owned by
   `\CDossierRecordListEdgeBelowSkip` rather than LaTeX Lab's block default, so
   a tagged and an untagged build of one source stop paginating toward
@@ -508,8 +537,30 @@ source-compatible for every document that does not read the token by name.
   tighten by the prose paragraph gap at each header boundary, the gap above a
   bullet list inside an entry tightens by `\CDossierRecordEntryGapSkip`, and a
   document with no `headline` gains that same amount below the name;
+- the four defects that pinned values #206 had to set: the entry-head date
+  column extracting out of order below a list-edge floor of `0.25` (#219, with
+  #221 covering it in the extraction suite), the two header tokens that could
+  not affect output at any value (#220), and the two tokens that each served two
+  families and so coupled their retunes (#222, #223). #224 makes the shared
+  header stack a public composition triple so the statement class can interleave
+  its own lines without reaching into another module's private commands, and
+  #225 asserts the heading-pair and run-in floors before the retune moves them;
 - a retune of the vertical-rhythm ratios (#206), once #203 and #204 leave every
-  gap owned by a token that can express it. Documents reflow.
+  gap owned by a token that can express it. Documents reflow;
+- option-error consistency and the gate that holds it: one report per rejected
+  class option instead of two (#232), a TeX-free `make lint` that fails when a
+  choice-valued option does not name its accepted values (#233), and the
+  statement class's `type` declared as an ordinary choice list so the lint can
+  see it (#236);
+- the CV's `CDossierPublications` list building under
+  `\DocumentMetadata{tagging=on}`, where it stopped with `Missing number,
+  treated as zero` and produced no PDF at all (#218);
+- three class-to-package primitives that carried a public prefix without being
+  part of the author-facing interface made private, ahead of `v1.0.0` freezing
+  whatever still carries that prefix (#242);
+- a fixture audit establishing that a spacing token's value being *reported* by
+  a regression fixture is not the same as its gap being *rendered* by one, and
+  a committed fixture that renders every token (#255).
 
 ### Explicit non-goals
 
@@ -557,13 +608,19 @@ source-compatible for every document that does not read the token by name.
 - `cv-bibliography`'s inter-entry gap equals `\CDossierRecordItemSepSkip`
   (#196);
 - `make bibliography-test` passes on a clean tree with the `date` field and the
-  biber-warning gate both intact, and the rendered bibliography shows every year
-  in `ydnt` order (#211);
+  biber-warning gate both intact, the rendered bibliography shows every year in
+  `ydnt` order, and that suite is visible as its own CI job rather than nested
+  in another (#211);
 - `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
   `CHANGELOG.md` are updated;
 - the vertical-spacing tokens follow one naming convention (#203), headers and
   letter blocks own their own gaps (#204), and the retuned ratios are reviewed
   against rendered output at both margins and all three body sizes (#206);
+- every ordering relation in `tests/regression/tokens-invariants` holds at all
+  three body sizes, and every spacing token is rendered — not merely reported —
+  by a committed fixture (#225, #255);
+- `make lint` passes, and every choice-valued option in the classes and shared
+  packages names its accepted values and its owning module (#233, #236);
 - tag and GitHub Release `v0.7.0` are published.
 
 Tracked under

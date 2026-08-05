@@ -7,12 +7,16 @@ and the options at a glance. [`docs/API.md`](docs/API.md) is the complete
 interface reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing
 the code.
 
-> **Status:** `v0.6.0 — Calibrated Type Scale and Rhythm` is the current
-> published release. It replaces the mixture of inherited `article` defaults
-> with one shared, proportional design system driven by `fontsize` and
-> `margin`, now accepted by all four document classes. **Breaking:** the
-> résumé and CV classes no longer accept `density`, and every class's default
-> layout changes; see [`docs/MIGRATION.md`](docs/MIGRATION.md) for the
+> **Status:** `v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership`
+> is the current published release. Several vertical placement and spacing
+> decisions were being made by a third-party default or a hard-coded constant
+> rather than by the design system meant to own them; this release hands each
+> one back to a calibrated token, gives the tokens one naming convention, and
+> retunes the ratios now that every gap is expressible. It also adds
+> `medium=print|screen`, which decides whether page furniture is emitted at all.
+> **Breaking:** public design tokens are renamed, split, and retired, and the
+> retune means **every document reflows** — though no supported combination
+> changes its page count. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the
 > upgrade path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
@@ -326,8 +330,9 @@ by default**. Opt in with `\DocumentMetadata` before `\documentclass`:
 When tagging is on, section headings, lists, paragraphs, and links are exposed
 as structure, while decorative rules, contact separators, and running page
 furniture are marked as layout artifacts. No public command or class option
-changes, and documents that do not enable tagging produce byte-identical output
-to the untagged path.
+changes, and since `v0.7.0` a tagged build puts every word of all eleven
+supported examples at the same vertical position as the untagged build of the
+same source — turning tagging on does not repaginate a document.
 
 **What is and is not claimed.** This is a tested preview for five profiles
 covered by fixtures — industry résumé, industry letter, academic CV, academic
@@ -430,7 +435,9 @@ gate, not the stage where feature tests are first created. See
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
 - [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
+- [`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md): naming for issues, branches, commits, labels, milestones, and releases
 - [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
+- [`AGENTS.md`](AGENTS.md): the operating contract for coding agents
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
 
@@ -442,7 +449,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.6.0 — Calibrated Type Scale and Rhythm
+v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -458,6 +465,8 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.4.0` | LuaLaTeX transition and tagged-PDF preview |
 | `v0.5.0` | Statement classes and broader customization |
 | `v0.6.0` | Calibrated type scale and vertical rhythm |
+| `v0.7.0` | Page furniture placement, the `medium` option, and spacing ownership |
+| `v0.8.0` | Examples and templates revision |
 | `v1.0.0` | Stable and documented public API |
 
 Farsi, bilingual, and right-to-left support (`v0.3.0`) is dropped.
