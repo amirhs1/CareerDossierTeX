@@ -288,17 +288,33 @@ v0.2.0 — Academic Dossier
 v0.5.0 — Statements and Customization
 v0.6.0 — Calibrated Type Scale and Rhythm
 v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership
+v0.8.0 — Semantic Structure and Tagged Output
 v1.0.0 — Stable Public API
 ```
 
 Rules:
 
 - Milestones represent releases.
-- **Every issue carries a milestone.** It is the field that answers "which
-  release", and the Project's `Phase` follows it. A pull request inherits its
-  issue's milestone.
-- An epic parent is conditional; the milestone is not. See "Work item structure"
-  in `CONTRIBUTING.md`.
+- **Every issue carries a milestone**, with the one exception below. It is the
+  field that answers "which release", and the Project's `Phase` follows it. A
+  pull request inherits its issue's milestone.
+- **Exception — genuinely undecided work.** An issue whose release is not
+  decided stays unmilestoned rather than take a milestone that would misstate
+  the plan: deferred design work with no scheduled release, or a proposal whose
+  home has not been chosen. Such an issue also carries no Project `Phase`, and
+  it is excluded from release planning until it gets a milestone. Do not create
+  a placeholder milestone to hold it, and do not park it in the furthest-out
+  open milestone.
+
+  As of 2026-08-05 exactly two issues qualify:
+  [#120](https://github.com/amirhs1/CareerDossierTeX/issues/120) (semantic font
+  families, deferred on 2026-07-22, and the reason `v1.1.0 — Themes and Font
+  Families` was closed empty) and
+  [#280](https://github.com/amirhs1/CareerDossierTeX/issues/280) (structural
+  templates). An unmilestoned issue beyond these two is an oversight, not the
+  exception.
+- An epic parent is conditional; the milestone is all but unconditional. See
+  "Work item structure" in `CONTRIBUTING.md`.
 - Do not create labels like `v0.1.0`; the milestone already tracks this.
 
 ---
@@ -391,11 +407,31 @@ Rules:
 
 - The two forms differ deliberately. Only the **numbers** must agree; the
   labels need not.
-- A dropped release **does not retain a phase number**. Its `docs/ROADMAP.md`
-  section stays as a design record but becomes an unnumbered heading, and the
-  Project may reuse the freed slot for the next phase. This is what happened to
-  `v0.3.0 — Farsi and Bilingual Support`.
-- Refer to a dropped phase by name, never by number.
+- **Every shipped major or minor release has its own phase.** `vX.0.0` and
+  `v0.Y.0` each get one `Phase` option and one `docs/ROADMAP.md` phase heading.
+- **A patch release does not get its own phase.** Its issues carry the phase of
+  the minor release they correct, because a patch continues that stage of the
+  plan rather than opening a new one, and it gets no phase heading in
+  `docs/ROADMAP.md` — only a release-overview row. This is why `v0.1.1` sits in
+  `Phase 1 — Industry` and `v0.2.1` in `Phase 2 — Academic`.
+- **A release that never ships has no phase number.** This is one rule, not two,
+  and the two recorded cases differ only in when it applied:
+
+  - `v0.3.0 — Farsi and Bilingual Support` **held** `Phase 3` and gave it up when
+    the release was dropped on 2026-07-16. The Project reused the freed slot for
+    the engine and accessibility work that shipped as `v0.4.0`, and the
+    `docs/ROADMAP.md` section stays as a design record under an unnumbered
+    heading.
+  - `v1.1.0 — Themes and Font Families` was closed empty on 2026-08-05 without
+    ever having been given an option, so it had nothing to give up. It appears in
+    the release overview with its closing date and in the cross-walk with no
+    number.
+
+  Refer to either by name, never by phase number.
+- **A phase may exist with no milestone.** `Phase 0 — Inventory` covers the
+  pre-release baseline and never had one. The rule runs from milestone to phase,
+  not the reverse — do not create a milestone to give an existing phase a
+  release.
 - When adding, dropping, or reordering a phase, change the Project field first,
   then update `docs/ROADMAP.md` and its cross-walk table to match.
 - Check `git grep -nE "Phase [0-9]"` after any renumbering: references to

@@ -16,15 +16,27 @@ test pass at the end of a milestone.
 
 > **Current status:** `v0.7.0 — Page Furniture, Output Medium, and Spacing
 > Ownership` is released. `v0.3.0` is dropped. The next planned release is
-> `v0.8.0 — Examples and Templates Revision`, followed by `v1.0.0 — Stable
-> Public API`.
+> `v0.8.0 — Semantic Structure and Tagged Output`, followed by `v0.9.0 —
+> Documentation, Examples, and Release Readiness` and `v1.0.0 — Stable Public
+> API`.
 >
-> `v0.7.0` was numbered `v0.6.1` until 2026-08-01. It adds new public API —
-> the `medium` option and new spacing tokens — which is a minor release under
-> Semantic Versioning, not a patch; it also renames public design tokens and
-> retunes calibrated values, so documents reflow. The former `v0.7.0 — Examples
-> and Templates Revision` moved to `v0.8.0`. See
+> **Renumbered on 2026-08-01.** `v0.7.0` was numbered `v0.6.1` until then. It
+> adds new public API — the `medium` option and new spacing tokens — which is a
+> minor release under Semantic Versioning, not a patch; it also renames public
+> design tokens and retunes calibrated values, so documents reflow. The former
+> `v0.7.0 — Examples and Templates Revision` moved to `v0.8.0`. See
 > [issue #205](https://github.com/amirhs1/CareerDossierTeX/issues/205).
+>
+> **Reorganised on 2026-08-05.** By then `v0.8.0` held eleven structure and
+> semantics issues against three examples issues, so its title no longer
+> described its contents. It was retitled `v0.8.0 — Semantic Structure and
+> Tagged Output`, and the examples and documentation work moved into `v0.9.0`,
+> retitled from `Documentation, Packaging, and Release Readiness` to
+> `Documentation, Examples, and Release Readiness`. `v1.0.0` moved from
+> `Phase 8` to `Phase 9` to make room for the `v0.9.0` phase section, which this
+> document previously did not have. `v1.1.0 — Themes and Font Families` was
+> closed empty; its deferred work has no milestone. See
+> [issue #279](https://github.com/amirhs1/CareerDossierTeX/issues/279).
 
 ## Release overview
 
@@ -39,8 +51,10 @@ test pass at the end of a milestone.
 | `v0.5.0` | Statement classes and broader customization | Released |
 | `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
 | `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released |
-| `v0.8.0` | Examples and templates revision | Planned |
+| `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Planned |
+| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
+| `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** |
 
 Repository milestones are tracked on the GitHub milestones page:
 
@@ -51,9 +65,15 @@ https://github.com/amirhs1/CareerDossierTeX/milestones
 ## Phase numbering
 
 The Project's `Phase` field is the canonical numbering; the headings below
-follow it. A dropped release does not retain a phase number, which is why
-`v0.3.0` appears here as an unnumbered section. See
-`docs/NAMING-CONVENTION.md` §10.
+follow it. Every shipped major or minor release has a phase of its own. A patch
+release does not — its issues carry the phase of the minor release they correct,
+which is why `v0.1.1` and `v0.2.1` appear in the release overview above but have
+no phase heading here.
+
+A release that never ships has no phase number at all. `v0.3.0` **held**
+`Phase 3` and gave it up when it was dropped, and the Project reused the slot for
+`v0.4.0`; `v1.1.0` was closed empty before it had an option to give up. Both
+therefore appear unnumbered. See `docs/NAMING-CONVENTION.md` §10.
 
 The two forms differ deliberately — this document keys each phase to its
 version, the Project uses a short label — so they cross-walk as follows:
@@ -68,8 +88,15 @@ version, the Project uses a short label — so they cross-walk as follows:
 | `Phase 4: v0.5.0` | `Phase 4 — Expansion` |
 | `Phase 5: v0.6.0` | `Phase 5 — Calibration` |
 | `Phase 6: v0.7.0` | `Phase 6 — Spacing Ownership and Output Medium` |
-| `Phase 7: v0.8.0` | `Phase 7 — Examples and Templates` |
-| `Phase 8: v1.0.0` | `Phase 8 — Stable API` |
+| `Phase 7: v0.8.0` | `Phase 7 — Semantic Structure and Tagged Output` |
+| `Phase 8: v0.9.0` | `Phase 8 — Documentation, Examples, and Release Readiness` |
+| `Phase 9: v1.0.0` | `Phase 9 — Stable API` |
+| `v1.1.0` **(closed empty, unnumbered)** | *(none — never had an option)* |
+
+The two patch releases have no heading of their own: `v0.1.1` carries
+`Phase 1 — Industry` and `v0.2.1` carries `Phase 2 — Academic`, alongside the
+minor release each one corrects. `Phase 0 — Inventory` runs the other way — it is
+the pre-release baseline and has no milestone.
 
 ## Phase 0: inventory and baseline
 
@@ -627,31 +654,104 @@ Tracked under
 [milestone `v0.7.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/10)
 and [epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182).
 
-## Phase 7: `v0.8.0 — Examples and Templates Revision`
+## Phase 7: `v0.8.0 — Semantic Structure and Tagged Output`
 
 ### Goal
 
-Review every example end to end against the calibrated token system, and decide
-whether a separate `templates/` folder is warranted.
+Complete the semantic structure and the tagged-output metadata, and settle the
+public typography and colour roles, before the `v1.0.0` API freeze.
+
+The unifying concern is that the released output carries less structure than it
+appears to. At `v0.7.0` no document from any of the four classes contains an
+`/H1`, and the résumé and CV contain no `Sect` division at all where the
+statement nests two (#267, #268); the derived `/Title` never reaches a viewer's
+window because `DisplayDocTitle` is unset (#277); and `/Lang` is absent from the
+default build path (#276). Alongside that, three public roles are still
+unsettled: `Title` names two different things in the type scale and the entry
+primitives (#269), entry metadata has no decided de-emphasis role (#271), and
+several semantic colour tokens are declared but never consumed (#270).
+
+Two items change rendered output where the current behaviour is a defect rather
+than a choice: links have no visible affordance under `medium=screen` (#278),
+and `emergencystretch` is set in more than one place with no named token (#272).
+
+### Included
+
+- a top-level heading role for the document identity, so tagged output has an
+  `/H1` (#267);
+- `Sect` divisions around résumé and CV section headings, matching the statement
+  class (#268);
+- `/Lang` emitted on the default build path (#276);
+- `DisplayDocTitle` set so the derived `/Title` reaches the viewer (#277);
+- the `Title` collision between the type scale and the entry role resolved
+  (#269);
+- a decided rendered de-emphasis role for entry metadata (#271);
+- the unused semantic colour tokens either consumed or retired (#270);
+- a visible link affordance under `medium=screen`, keeping `medium=print`
+  unchanged (#278);
+- one `emergencystretch` policy behind one named token (#272);
+- an inline entry-metadata option, which also frees the list-edge floor (#230);
+- the extracted reading order of bibliography entry numbers corrected (#199), a
+  follow-up from #196 that `v0.7.0` lists as a non-goal because fixing it means
+  changing `biblatex` label geometry.
+
+### Explicit non-goals
+
+- PDF/UA-2 conformance claims. Tagged structure remains opt-in through
+  `\DocumentMetadata{tagging=on}`, and veraPDF validation runs on the scheduled
+  workflow, not on the per-PR tagging job.
+- colour themes and named font families. Deferred on 2026-07-22 with no
+  milestone; `v1.1.0 — Themes and Font Families` was closed empty on 2026-08-05
+  ([issue #120](https://github.com/amirhs1/CareerDossierTeX/issues/120)).
+- a `templates/` folder. Proposed in
+  [issue #280](https://github.com/amirhs1/CareerDossierTeX/issues/280) and
+  deliberately unmilestoned; the release that carries it is undecided.
+
+Tracked under
+[milestone `v0.8.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/11)
+and [epic #281](https://github.com/amirhs1/CareerDossierTeX/issues/281).
+
+## Phase 8: `v0.9.0 — Documentation, Examples, and Release Readiness`
+
+### Goal
+
+Consolidate the documentation set, revise and extend the examples, build the PDF
+manual, and configure the CTAN release archive.
 
 ### Scope
+
+Documentation:
+
+- split `docs/ATS-EXTRACTION.md` into its charter and the documents that own the
+  rest of its material (#262);
+- give each duplicated mechanism explanation one canonical home (#259);
+- document how to install the classes (#261);
+- correct two source comments that document rejected behaviour (#275);
+- decide whether maintainer-tooling fixes belong in `CHANGELOG.md`, which #245
+  currently has no entry for (#260).
+
+Examples:
 
 - review each example under `examples/` for currency against the calibrated
   token system, consistency with the others, and whether it still demonstrates
   its intended feature clearly;
-- add longer, more representative examples where the current fixture is too thin
-  to show real behavior, starting with `cv-bibliography` (#197);
-- correct the extracted reading order of bibliography entry numbers (#199), a
-  follow-up from #196 that `v0.7.0` lists as a non-goal because fixing it means
-  changing `biblatex` label geometry;
-- evaluate whether a `templates/` folder is warranted — ready-to-copy starting
-  points, distinct from feature-demonstration examples — and if so define its
-  scope and its relationship to `examples/`.
+- add a longer, multi-page `cv-bibliography` example where the current fixture is
+  too thin to show real behavior (#197);
+- demonstrate tagging and contact labels in a shipped example (#273).
+
+Release readiness:
+
+- build a PDF manual and ship it with its source (#263) — the one hard blocker
+  on a CTAN submission;
+- configure `l3build ctan` and inspect the resulting archive (#264);
+- lint that every Work file declares the same version and date (#258);
+- record a VoiceOver reading-order check for the statement fixture (#274).
 
 Tracked under
-[milestone `v0.8.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/11).
+[milestone `v0.9.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/12)
+and [epic #283](https://github.com/amirhs1/CareerDossierTeX/issues/283).
 
-## Phase 8: `v1.0.0 — Stable Public API`
+## Phase 9: `v1.0.0 — Stable Public API`
 
 ### Goal
 
@@ -666,6 +766,10 @@ Declare a stable and fully documented interface.
 - release ZIP works on Overleaf;
 - examples and manual are complete;
 - CI verifies all supported configurations.
+
+Tracked under
+[milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
+and [epic #285](https://github.com/amirhs1/CareerDossierTeX/issues/285).
 
 ## Continuous testing policy
 
@@ -696,7 +800,9 @@ strategy") holds the current count and its per-module split.
 
 The live issue and Project metadata now follow the continuous-testing policy:
 
-- CTAN packaging via `l3build ctan`; decide handwritten vs `.dtx` — `v1.0.0`.
+- CTAN packaging via `l3build ctan`, and the PDF manual a submission requires —
+  `v0.9.0`, under #264 and #263. Whether the manual is handwritten or generated
+  from a `.dtx` is decided there; `.dtx` is not a CTAN requirement.
 - Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
   LuaLaTeX transition supersedes that precondition, and opt-in tagged structure
   is now in-scope for `v0.4.0` via

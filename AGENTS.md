@@ -21,8 +21,8 @@ At the start of a task:
 1. Inspect the current branch, `git status --short`, and recent commits.
 2. Inspect the relevant files and available build/test commands.
 3. Identify the focused issue or PR, its milestone, its Project fields, and its
-   parent epic when it has one. Not every issue has a parent; every issue has a
-   milestone.
+   parent epic when it has one. Not every issue has a parent, and a small,
+   named set of undecided issues has no milestone either — everything else does.
 4. Confirm the requested work belongs to the active milestone.
 5. State material assumptions and keep the change limited to the requested scope.
 
@@ -249,7 +249,9 @@ Use `docs/NAMING-CONVENTION.md` for names.
 
 - Never commit or push directly to `main`.
 - Keep one focused issue per meaningful branch where practical.
-- Every issue carries a milestone. An epic parent only when the work genuinely
+- Every issue carries a milestone, except work whose release is genuinely
+  undecided — see the exception in `docs/NAMING-CONVENTION.md` §7, which names
+  the issues that currently qualify. An epic parent only when the work genuinely
   decomposes into several issues; where an epic exists its sub-issue graph is
   canonical, and a body checklist is a rendering of that graph, not a second
   register.

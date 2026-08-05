@@ -466,11 +466,14 @@ Source archives and selected example PDFs are available through GitHub Releases.
 | `v0.5.0` | Statement classes and broader customization |
 | `v0.6.0` | Calibrated type scale and vertical rhythm |
 | `v0.7.0` | Page furniture placement, the `medium` option, and spacing ownership |
-| `v0.8.0` | Examples and templates revision |
+| `v0.8.0` | Semantic structure, tagged-output metadata, and public typography and colour roles |
+| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive |
 | `v1.0.0` | Stable and documented public API |
 
 Farsi, bilingual, and right-to-left support (`v0.3.0`) is dropped.
-CareerDossierTeX is English-only.
+CareerDossierTeX is English-only. Colour themes and named font families
+(`v1.1.0`) are deferred with no scheduled release; that milestone was closed
+empty on 2026-08-05.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for release boundaries and non-goals.
 
