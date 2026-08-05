@@ -895,7 +895,7 @@ know: what kind of document they produce, declared through
 `\__cdossier_components_doctype:n`, so a résumé and a letter built from one
 profile do not receive identical titles.
 
-Two constraints shape the implementation:
+Three constraints shape the implementation:
 
 - **Timing.** The values cannot be applied when the class loads `hyperref`,
   because `\CDossierSetup` has not run yet and the profile is still empty. They
@@ -903,7 +903,28 @@ Two constraints shape the implementation:
 - **Precedence.** Because they are applied late, a blind write would silently
   discard a user's own `\hypersetup` — including the one the ATS guide's own
   template places *before* `\CDossierSetup`. Each field is therefore written
-  only when the document has not already set it.
+  only when the document has not already set it. The language has two routes and
+  both count: `\hypersetup{pdflang=...}` lands in `hyperref`'s `\@pdflang`, while
+  `\DocumentMetadata{lang=...}` is recorded by the kernel and never reaches
+  `hyperref` at all. Reading only the first mistakes the second kind of document
+  for one that declared nothing, so `\GetDocumentProperties{document/lang}` is
+  consulted as well. It is undefined exactly when `\DocumentMetadata` was never
+  used — the path where the derived value is the one that should apply — and
+  under `\DocumentMetadata` it always holds a language, defaulting to `en`, so
+  the kernel owns `/Lang` outright there.
+- **Ordering against `hyperref`.** The three fields are not written by the same
+  mechanism at the same moment, and `/Lang` is the odd one out. `/Title` and
+  `/Author` reach the Info dictionary from `\PDF@FinishDoc` at `\end{document}`,
+  so nothing here can be too late for them. On the default path, where
+  `\DocumentMetadata` is absent and the kernel's PDF management is inactive,
+  `hyperref` writes the *catalog* itself from its own `begindocument` chunk —
+  `/Lang(\@pdflang)` in `hluatex.def` — and a `pdflang` set after that chunk has
+  run is simply not in the file, with nothing logged. This module's chunk must
+  therefore precede `hyperref`'s. The four classes produce that order anyway,
+  since each loads this package before it loads `hyperref`, but a document using
+  the package directly need not, so a `\DeclareHookRule` states the requirement
+  rather than inheriting it (#276). `tests/metadata/` holds the fixture that
+  fails without the rule.
 
 `/DisplayDocTitle` is the exception to both, and is applied separately from
 `\__cdossier_components_pdfmeta:` for that reason. It is a boolean, not a
@@ -1565,9 +1586,17 @@ All automated test material belongs under `tests/`:
 - `tests/extraction/` — expected text, Unicode mapping, and reading order;
 - `tests/layout/` — long fields, multi-page content, and page-break stress;
 - `tests/bibliography/` — Biber-backed sorting and rendered identifier
-  precedence; and
+  precedence;
+- `tests/metadata/` — PDF metadata on the default (untagged) build path, where
+  no `\DocumentMetadata` is in play; and
 - `tests/tagging/` — tagged structure, the untagged path, and the extractor
   matrix.
+
+`tests/metadata/` and `tests/tagging/` divide by build path, not by subject.
+Every tagging fixture opts into `\DocumentMetadata`, which supplies catalog
+entries of its own — so it is exactly the wrong place to ask what this package
+contributes without it. That masking is why the `/Lang` question in #276 had no
+suite that could answer it.
 
 User examples remain under `examples/`. CI should build them, but they are not a
 substitute for focused tests. A milestone release reruns the accumulated suite;

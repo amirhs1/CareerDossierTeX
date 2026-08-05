@@ -1029,6 +1029,34 @@
       }
   }
 
+%% Has \DocumentMetadata already declared the document's language?
+%%
+%% There are two ways into /Lang and the module can only see one of them.
+%% \__cdossier_components_hyp_if_unset:n reads hyperref's \@pdflang, which
+%% catches \hypersetup{pdflang=...} but not \DocumentMetadata{lang=...}: the
+%% kernel records that separately and writes the catalog itself. Read only
+%% \@pdflang and a document that declared `de' looks like a document that
+%% declared nothing, so the derived `en' overwrites it -- silently, since both
+%% mechanisms are simply writing the same catalog key.
+%%
+%% \GetDocumentProperties is the kernel's own record of it, and is undefined
+%% when \DocumentMetadata was never used at all -- which is the default path,
+%% where this module's derived value is exactly what should apply. Note that
+%% \DocumentMetadata *always* yields a language, defaulting to `en' when the
+%% document gave no lang key, so on that path the kernel owns /Lang outright and
+%% this module correctly stays out of it.
+\prg_new_protected_conditional:Npnn \__cdossier_components_kernel_lang_if_set:
+  { T , F , TF }
+  {
+    \cs_if_exist:NTF \GetDocumentProperties
+      {
+        \exp_args:Ne \tl_if_blank:nTF { \GetDocumentProperties { document / lang } }
+          { \prg_return_false: }
+          { \prg_return_true: }
+      }
+      { \prg_return_false: }
+  }
+
 %% Apply the derived metadata. Only ever called when hyperref is present.
 \cs_new_protected:Npn \__cdossier_components_pdfmeta:
   {
@@ -1044,9 +1072,13 @@
       }
       { }
     %% v0.1.0 is English-only (see docs/ARCHITECTURE.md); there is no language
-    %% key to route this through yet.
-    \__cdossier_components_hyp_if_unset:nT { @pdflang }
-      { \hypersetup { pdflang = en } }
+    %% key to route this through yet. Either way of declaring one wins over the
+    %% derived value: the document's own \hypersetup, and \DocumentMetadata.
+    \__cdossier_components_kernel_lang_if_set:F
+      {
+        \__cdossier_components_hyp_if_unset:nT { @pdflang }
+          { \hypersetup { pdflang = en } }
+      }
   }
 
 \AddToHook { begindocument }
@@ -1092,3 +1124,25 @@
 
 \AddToHook { package/hyperref/after }
   { \__cdossier_components_pdfdisplaydoctitle: }
+
+%% Ordering against hyperref's own begindocument code (issue #276).
+%%
+%% /Lang is not written at \end{document} with the rest of the metadata. Without
+%% \DocumentMetadata the kernel's PDF management is inactive, so hyperref writes
+%% the catalog itself, from its own begindocument chunk -- /Lang(\@pdflang) in
+%% hluatex.def's \pdfcatalog. Anything that sets pdflang after that chunk has
+%% run is simply not in the file. /Title and /Author are unaffected: those go to
+%% the Info dictionary from \PDF@FinishDoc at \end{document}.
+%%
+%% So the derived pdflang above reaches the PDF only if this package's chunk of
+%% `begindocument' precedes hyperref's. Today it does, but only as an accident
+%% of load order: the four classes \RequirePackage this package before they
+%% \RequirePackage hyperref, and `begindocument' runs its chunks in the order
+%% their packages were loaded. Load this package after hyperref -- which a
+%% document using it directly may well do -- and /Lang silently disappears from
+%% the output, with nothing in the log.
+%%
+%% State the requirement instead of inheriting it. The rule is declared, not
+%% assumed, so the ordering survives a change in load order.
+\DeclareHookRule { begindocument } { careerdossier-components } { before }
+  { hyperref }

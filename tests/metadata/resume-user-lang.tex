@@ -1,0 +1,11 @@
+% A document that sets pdflang itself, in the place and the form docs/API.md
+% advertises. The derived `en' must not replace it.
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\hypersetup{ pdflang = {en-GB} }
+\CDossierSetup{ name={Metadata Fixture}, email={metadata@example.test} }
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+A paragraph, so the document has a body.
+\end{document}

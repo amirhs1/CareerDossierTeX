@@ -561,6 +561,31 @@ Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
 [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md).
 
+### Default-path metadata suite
+
+The PDF metadata a document gets when it does *not* opt into tagging has its own
+small suite:
+
+    make metadata              # or: tests/metadata/run.sh
+
+It builds each class on the default path and checks the catalog's `/Lang`, plus
+a document that sets `pdflang` itself and one that loads
+`careerdossier-components` after `hyperref`. It needs only LuaLaTeX.
+
+Two things about it are deliberate and worth keeping. Its fixtures build
+uncompressed, because on the default path the catalog otherwise sits inside a
+compressed object stream, where a text search of the file finds nothing whether
+or not the entry is there — a false negative indistinguishable from the bug, and
+the reason #276 was reported against behaviour that was working. And every
+assertion is paired with a positive control (`/Type /Catalog`, found by the same
+method on the same file), so a build that produced nothing cannot pass by
+silence.
+
+It is separate from the tagged-PDF suite below by build path rather than by
+subject: every tagging fixture passes `\DocumentMetadata`, which supplies
+catalog entries itself and therefore cannot show what the package contributes on
+its own.
+
 ### Tagged-PDF suite
 
 Opt-in tagged output has its own suite covering five profiles — industry

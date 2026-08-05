@@ -10,6 +10,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- `/Lang` no longer depends on package load order. A document that loads
+  `careerdossier-components` directly, after `hyperref`, produced a PDF with no
+  language declaration at all — silently, with nothing in the log. The four
+  document classes were never affected: each loads the package before
+  `hyperref`, which is the order the language declaration needs, so their output
+  is unchanged. ([#276])
+
+  On the default build path `hyperref` writes the PDF catalog itself, early at
+  `\begin{document}`, and a language set after that point never reaches the
+  file. The package now states that ordering requirement rather than inheriting
+  it from how the classes happen to load. `/Title` and `/Author` were never
+  exposed to this; they are written at `\end{document}`.
+
+  A new `make metadata` suite covers PDF metadata on the default build path,
+  which no existing suite could see — every tagged fixture passes
+  `\DocumentMetadata`, and that supplies catalog entries of its own.
+
+- A language declared with `\DocumentMetadata{lang=...}` is no longer replaced
+  by the derived `en`. A document that asked for `de` got a PDF that said `en`,
+  silently, because the two ways of declaring a language write the same catalog
+  key by different routes and only one of them was being checked. Both are now
+  honoured, alongside `\hypersetup{pdflang=...}`, which was already. ([#276])
+
+  No English document changes: `\DocumentMetadata` settles on `en` when given no
+  `lang` key, which is what the classes already produced.
+
 - The PDF title derived from your profile now actually appears in the viewer.
   Every document requests `ViewerPreferences /DisplayDocTitle`, so a viewer
   shows `Résumé – <name>` in its window title, tab bar, and recent-documents
@@ -60,6 +86,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the same places. This narrows the failure rather than removing it — TeX will
   exceed a stated stretch to set an otherwise underfull line.
 
+[#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 
 ## [0.7.0] - 2026-08-04

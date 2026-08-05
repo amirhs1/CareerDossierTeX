@@ -41,9 +41,21 @@ TEST 8: displaydoctitle-asks-hyperref-for-true
 hypersetup: pdfdisplaydoctitle=true
 ============================================================
 ============================================================
-TEST 9: pdfmeta-does-not-set-displaydoctitle
+TEST 9: pdfmeta-writes-title-author-and-lang
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
 hypersetup: pdfauthor={\CDossierFieldValue {name}}
 hypersetup: pdflang=en
+============================================================
+============================================================
+TEST 10: pdfmeta-keeps-user-pdflang
+============================================================
+hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
+hypersetup: pdfauthor={\CDossierFieldValue {name}}
+============================================================
+============================================================
+TEST 11: pdfmeta-keeps-documentmetadata-lang
+============================================================
+hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
+hypersetup: pdfauthor={\CDossierFieldValue {name}}
 ============================================================

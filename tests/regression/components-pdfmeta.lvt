@@ -1,6 +1,6 @@
 % components-pdfmeta.lvt — careerdossier-components PDF metadata construction.
 %
-% Three things are checked here, none of which any other suite can see.
+% Four things are checked here, none of which any other suite can see.
 %
 % 1. The "has the document already set this?" test. The module derives
 %    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
@@ -19,7 +19,13 @@
 %    cover letter built from one profile do not receive identical titles; with no
 %    doctype the title is the bare name.
 %
-% 3. The ViewerPreferences /DisplayDocTitle request (issue #277), which is the
+% 3. What is actually written, as opposed to what is derived (issue #276). The
+%    two cases above test the ingredients; this one records the \hypersetup
+%    calls the module makes, so the derived pdflang and the decision to leave a
+%    user-supplied one alone are pinned as behaviour rather than inferred from
+%    the conditional.
+%
+% 4. The ViewerPreferences /DisplayDocTitle request (issue #277), which is the
 %    one piece of this metadata that is *not* applied at \begin{document}. It
 %    cannot be: pdfdisplaydoctitle is a boolean whose default is
 %    indistinguishable from a document's explicit `false', so the only way to
@@ -33,9 +39,12 @@
 %    asserted in tests/tagging/run.sh.
 %
 % Whether the values actually reach the PDF catalog and info dictionary is a
-% property of the built document, not of this log. The derived fields are
-% covered by the smoke fixtures; /DisplayDocTitle is covered by
-% tests/tagging/run.sh, which inspects built PDFs.
+% property of the built document, not of this log. The smoke fixtures cover the
+% derived title and author; /DisplayDocTitle is covered by tests/tagging/run.sh
+% and /Lang by tests/metadata/run.sh, both of which inspect built PDFs. /Lang
+% needs its own suite because it is written by a different mechanism at a
+% different time, and is the only one of the three that depends on package load
+% order.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
@@ -81,6 +90,17 @@
   { \__cdossier_components_pdfdisplaydoctitle: }
 \cs_new_protected:Npn \cdossiertestPdfmeta
   { \__cdossier_components_pdfmeta: }
+% Stand in for a document that set pdflang itself. hyperref stores the value in
+% \@pdflang, which is what the module reads.
+\cs_new_protected:Npn \cdossiertestSetUserLang #1
+  { \cs_set_nopar:cpn { @pdflang } {#1} }
+% ... and for the other route, \DocumentMetadata{lang=...}, which hyperref never
+% sees: the kernel records it and writes the catalog itself. The stand-in takes
+% the property name the real one does, and is undefined in this file until a
+% test installs it -- which is also the state of a document that never used
+% \DocumentMetadata.
+\cs_new_protected:Npn \cdossiertestSetKernelLang #1
+  { \cs_set:cpn { GetDocumentProperties } ##1 {#1} }
 \ExplSyntaxOff
 
 \begin{document}
@@ -135,15 +155,38 @@
   \cdossiertestDisplayDocTitle
 }
 
-% ... and \__cdossier_components_pdfmeta: does not also ask for it. That is the
-% timing contract: the derived fields are applied at \begin{document}, where a
-% user value can be detected and preserved, while this one is applied at
-% hyperref load time, where it can be overridden instead. Recording everything
-% pdfmeta asks hyperref for is what keeps the two apart -- if the request is
-% ever moved in here, a line appears below and this test fails.
-\TEST{pdfmeta-does-not-set-displaydoctitle}{
+% Everything \__cdossier_components_pdfmeta: asks hyperref for, in one place.
+% Two contracts read off the same three lines:
+%
+%   * no pdfdisplaydoctitle among them (#277). The derived fields are applied at
+%     \begin{document}, where a user value can be detected and preserved, while
+%     that one is applied at hyperref load time, where it can be overridden
+%     instead. Fold the two together and a line appears below.
+%   * pdflang is derived, and its value is `en' (#276). The project is
+%     English-only, so the value is fixed.
+\TEST{pdfmeta-writes-title-author-and-lang}{
   \cdossiertestRecordHypersetup
   \cdossiertestSetDoctype{Testdoc}
+  \cdossiertestPdfmeta
+}
+
+% A document that set pdflang keeps it: no pdflang line below. The other two
+% fields are still derived, which is what makes this a precedence test rather
+% than an all-or-nothing one.
+\TEST{pdfmeta-keeps-user-pdflang}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetUserLang{en-GB}
+  \cdossiertestPdfmeta
+}
+
+% The same, for a language declared through \DocumentMetadata rather than
+% \hypersetup. hyperref's \@pdflang is untouched by that route, so reading it
+% alone would report "the document declared nothing" and the derived `en' would
+% overwrite a language the document did in fact state -- silently, since both
+% end up writing the same catalog key. Again: no pdflang line below.
+\TEST{pdfmeta-keeps-documentmetadata-lang}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetKernelLang{de}
   \cdossiertestPdfmeta
 }
 
