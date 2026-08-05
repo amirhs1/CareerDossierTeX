@@ -905,9 +905,23 @@ Two constraints shape the implementation:
   template places *before* `\CDossierSetup`. Each field is therefore written
   only when the document has not already set it.
 
-This module does not load `hyperref` (the classes own it), so the entry point is
-guarded and the package still loads without it, matching how the link wrappers
-already degrade.
+`/DisplayDocTitle` is the exception to both, and is applied separately from
+`\__cdossier_components_pdfmeta:` for that reason. It is a boolean, not a
+derived string: `hyperref` records no state that separates its `false` default
+from a document's explicit `pdfdisplaydoctitle = false` — the legacy driver has
+only `\ifHy@pdfdisplaydoctitle`, and under `\DocumentMetadata` the key writes
+straight to the catalog, so a refused flag and an unset one are both an absent
+entry. With nothing to detect, a write at `\begin{document}` could only
+overwrite the document's choice. It also needs no profile data, so it does not
+have to wait. It is therefore requested from the `package/hyperref/after` hook,
+where it precedes every preamble line the document writes, and both drivers
+honour the last write — which reverses the precedence mechanism, from detection
+to ordering, while keeping the same outcome. The limits of that are recorded in
+[`API.md`](API.md).
+
+This module does not load `hyperref` (the classes own it), so the entry points
+are guarded and the package still loads without it, matching how the link
+wrappers already degrade.
 
 A critical invariant is:
 

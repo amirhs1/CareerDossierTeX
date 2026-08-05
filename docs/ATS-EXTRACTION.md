@@ -577,7 +577,8 @@ A font profile is releasable only if:
 
 All document types should provide:
 
-- a real document title in PDF metadata;
+- a real document title in PDF metadata, and the `ViewerPreferences` flag that
+  makes a viewer use it instead of the filename;
 - a language declaration;
 - a visible applicant name;
 - a body-level contact block when contact information is relevant;
@@ -729,6 +730,11 @@ and do not invoke the tagging path:
 script support. CareerDossierTeX is English-only and multilingual support is
 dropped (see `docs/ROADMAP.md`), so hard-coding `pdflang = en` here is correct
 and does not need a language-abstraction layer.
+
+The title itself needs nothing set here: the classes derive `/Title` from the
+profile and ask the viewer to display it (`/DisplayDocTitle`), on this path as
+well as the tagged one. See [`API.md`](API.md) for the derived fields and how to
+override them.
 
 Opt in to tagged structure with `\DocumentMetadata` before `\documentclass`:
 

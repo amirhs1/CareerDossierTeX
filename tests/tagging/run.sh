@@ -431,6 +431,50 @@ check_untagged() {
   fi
 }
 
+# ViewerPreferences /DisplayDocTitle (issue #277).
+#
+# A viewer shows the filename in its window title, tab bar, and recent-documents
+# list unless the catalog asks it not to, so the /Title careerdossier-components
+# derives is present and unused without this flag -- PDF/UA-2 clause 8.11.2 and
+# WCAG 2.1 AA 2.4.2. hyperref sets it only for a document that asks, or for
+# \DocumentMetadata{...,pdfstandard=ua-2}, which meant the *-ua2.tex variants
+# had it and the documented tagged path did not. The check is therefore on the
+# plain fixtures, tagged and untagged, and not on the UA-2 ones: those would
+# pass on hyperref's doing alone and prove nothing about ours.
+check_display_doc_title() {
+  local base="$1" variant
+
+  for variant in "$base" "$base-untagged"; do
+    grep -Fqa '/DisplayDocTitle true' "$work/$variant.pdf" \
+      || record_failure "$variant does not request /DisplayDocTitle"
+  done
+}
+
+# The other half of the contract: a document that does not want it wins.
+#
+# The flag is a boolean with no observable unset state, so it cannot be applied
+# the way the derived fields are -- there is nothing to detect at
+# \begin{document}. It is applied at hyperref load time instead, before any line
+# the document itself writes, and an ordinary \hypersetup in the preamble
+# overrides it. Nothing else in the suite would notice if that ordering were
+# lost.
+#
+# The /Title assertion is not decoration. This fixture asserts an absence, and an
+# absence is also what a compressed catalog would produce; requiring the derived
+# title in the same file keeps the check from passing vacuously.
+check_display_doc_title_override() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+
+  if grep -Fqa '/DisplayDocTitle' "$pdf"; then
+    record_failure "$base kept /DisplayDocTitle despite pdfdisplaydoctitle=false"
+  fi
+  if [ -z "$(pdfinfo "$pdf" | awk -F': +' '/^Title:/ { print $2 }')" ]; then
+    record_failure \
+      "$base has no derived /Title, so its /DisplayDocTitle check is vacuous"
+  fi
+}
+
 check_visual_equivalence() {
   local base="$1" tagged="$work/$base.bbox" plain="$work/$base-untagged.bbox"
   # Compare every rendered word and its bounding box with an explicit 0.11pt
@@ -564,6 +608,7 @@ for base in resume cv letter academic-letter statement; do
   check_page_two_artifact_stream "$base"
   check_extraction "$base"
   check_untagged "$base"
+  check_display_doc_title "$base"
   check_visual_equivalence "$base"
 
   if [ "$have_verapdf" -eq 1 ]; then
@@ -584,6 +629,14 @@ if compile_fixture resume-contact-labels.tex resume-contact-labels; then
     compile_fixture resume-contact-labels-ua2.tex resume-contact-labels-ua2 \
       && validate_ua2 resume-contact-labels
   fi
+fi
+
+# The DisplayDocTitle override sits outside the five-document loop for the same
+# reason: it is a one-page fixture with no continuation furniture, and it is the
+# only fixture whose preamble contradicts the package on purpose.
+echo "== resume-displaydoctitle-off =="
+if compile_fixture resume-displaydoctitle-off.tex resume-displaydoctitle-off; then
+  check_display_doc_title_override resume-displaydoctitle-off
 fi
 
 if [ "$have_biber" -eq 1 ]; then

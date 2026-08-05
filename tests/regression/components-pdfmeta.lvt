@@ -1,6 +1,6 @@
 % components-pdfmeta.lvt — careerdossier-components PDF metadata construction.
 %
-% Two things are checked here, neither of which any other suite can see.
+% Three things are checked here, none of which any other suite can see.
 %
 % 1. The "has the document already set this?" test. The module derives
 %    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
@@ -19,9 +19,23 @@
 %    cover letter built from one profile do not receive identical titles; with no
 %    doctype the title is the bare name.
 %
+% 3. The ViewerPreferences /DisplayDocTitle request (issue #277), which is the
+%    one piece of this metadata that is *not* applied at \begin{document}. It
+%    cannot be: pdfdisplaydoctitle is a boolean whose default is
+%    indistinguishable from a document's explicit `false', so the only way to
+%    let the document win is to write it before the document can — as soon as
+%    hyperref exists, while the class is still loading. Two halves of that are
+%    pinned here: the request is made, and it asks for `true'; and the function
+%    applied at \begin{document} does not also make it, so folding the two
+%    together fails this file rather than quietly starting to overwrite user
+%    values. That the request is on the hyperref load hook, and that a
+%    document's own `false' therefore wins, is a property of a built PDF and is
+%    asserted in tests/tagging/run.sh.
+%
 % Whether the values actually reach the PDF catalog and info dictionary is a
-% property of the built document, not of this log, and is covered by the smoke
-% fixtures.
+% property of the built document, not of this log. The derived fields are
+% covered by the smoke fixtures; /DisplayDocTitle is covered by
+% tests/tagging/run.sh, which inspects built PDFs.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
@@ -53,6 +67,20 @@
   { \__cdossier_components_doctype:n {#1} }
 \cs_new_protected:Npn \cdossiertestClearDoctype
   { \tl_clear:N \l__cdossier_components_doctype_tl }
+
+% A recorder standing in for hyperref's \hypersetup. It is installed inside a
+% \TEST, so the definition is local: it must not exist while the begindocument
+% hook runs, or \__cdossier_components_pdfmeta: would take this file for a
+% document that loaded hyperref.
+\cs_new_protected:Npn \cdossiertestRecordHypersetup
+  {
+    \cs_set_protected:Npn \hypersetup ##1
+      { \TYPE{ hypersetup: ~ \tl_to_str:n {##1} } }
+  }
+\cs_new_protected:Npn \cdossiertestDisplayDocTitle
+  { \__cdossier_components_pdfdisplaydoctitle: }
+\cs_new_protected:Npn \cdossiertestPdfmeta
+  { \__cdossier_components_pdfmeta: }
 \ExplSyntaxOff
 
 \begin{document}
@@ -98,6 +126,25 @@
 \TEST{title-without-doctype-is-bare-name}{
   \cdossiertestClearDoctype
   \cdossiertestTitle
+}
+
+% The viewer is asked to display the title, and asked for `true' -- the value
+% is what makes /DisplayDocTitle appear in the catalog at all.
+\TEST{displaydoctitle-asks-hyperref-for-true}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestDisplayDocTitle
+}
+
+% ... and \__cdossier_components_pdfmeta: does not also ask for it. That is the
+% timing contract: the derived fields are applied at \begin{document}, where a
+% user value can be detected and preserved, while this one is applied at
+% hyperref load time, where it can be overridden instead. Recording everything
+% pdfmeta asks hyperref for is what keeps the two apart -- if the request is
+% ever moved in here, a line appears below and this test fails.
+\TEST{pdfmeta-does-not-set-displaydoctitle}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetDoctype{Testdoc}
+  \cdossiertestPdfmeta
 }
 
 \END
