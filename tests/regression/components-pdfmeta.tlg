@@ -53,3 +53,9 @@ TEST 10: pdfmeta-keeps-user-pdflang
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
 hypersetup: pdfauthor={\CDossierFieldValue {name}}
 ============================================================
+============================================================
+TEST 11: pdfmeta-keeps-documentmetadata-lang
+============================================================
+hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
+hypersetup: pdfauthor={\CDossierFieldValue {name}}
+============================================================

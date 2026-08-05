@@ -1,0 +1,23 @@
+% A document that declares its language the other way: \DocumentMetadata.
+%
+% There are two routes into /Lang, and the module can only see one of them
+% directly. \hypersetup{pdflang=...} lands in hyperref's \@pdflang, which the
+% derived-metadata code reads; \DocumentMetadata{lang=...} is recorded by the
+% kernel, which writes the catalog itself. A module that reads only \@pdflang
+% therefore mistakes the second kind of document for one that declared nothing,
+% and overwrites its language with the derived `en' -- silently, because both
+% mechanisms are writing the same catalog key.
+%
+% `de' is deliberate: it is a language the project would never derive, so a pass
+% here cannot be an accident of the value. It says nothing about supporting
+% German, which remains out of scope (docs/ROADMAP.md) -- only that a language
+% the document declared is the language the PDF carries.
+\DocumentMetadata{lang=de}
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Metadata Fixture}, email={metadata@example.test} }
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+A paragraph, so the document has a body.
+\end{document}

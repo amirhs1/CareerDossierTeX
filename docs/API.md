@@ -634,6 +634,22 @@ A field you set is never overwritten, and the order does not matter — the
 are still derived, so overriding `pdftitle` alone leaves `/Author` and `/Lang`
 in place.
 
+The language has a second route, and it wins too:
+
+```latex
+\DocumentMetadata{ lang = de, tagging = on }
+\documentclass{careerdossier-resume}
+```
+
+`\DocumentMetadata` records the language for the LaTeX kernel, which writes
+`/Lang` itself, and the derived `en` stands aside. `\DocumentMetadata` always
+settles on a language — it defaults to `en` when you give no `lang` key — so on
+that path the kernel owns `/Lang` outright.
+
+Declaring a language does not make the document that language. CareerDossierTeX
+is English-only (see [`ROADMAP.md`](ROADMAP.md)); `lang` sets the declaration a
+screen reader reads, not hyphenation, fonts, or any fixed string.
+
 `pdfdisplaydoctitle` is the one setting that works by ordering rather than by
 detection, because `hyperref` gives a boolean no state that distinguishes "not
 set" from "set to `false`". The classes request it while `hyperref` is still

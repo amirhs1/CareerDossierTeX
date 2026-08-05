@@ -27,6 +27,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   which no existing suite could see — every tagged fixture passes
   `\DocumentMetadata`, and that supplies catalog entries of its own.
 
+- A language declared with `\DocumentMetadata{lang=...}` is no longer replaced
+  by the derived `en`. A document that asked for `de` got a PDF that said `en`,
+  silently, because the two ways of declaring a language write the same catalog
+  key by different routes and only one of them was being checked. Both are now
+  honoured, alongside `\hypersetup{pdflang=...}`, which was already. ([#276])
+
+  No English document changes: `\DocumentMetadata` settles on `en` when given no
+  `lang` key, which is what the classes already produced.
+
 - The PDF title derived from your profile now actually appears in the viewer.
   Every document requests `ViewerPreferences /DisplayDocTitle`, so a viewer
   shows `Résumé – <name>` in its window title, tab bar, and recent-documents

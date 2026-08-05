@@ -94,6 +94,13 @@
 % \@pdflang, which is what the module reads.
 \cs_new_protected:Npn \cdossiertestSetUserLang #1
   { \cs_set_nopar:cpn { @pdflang } {#1} }
+% ... and for the other route, \DocumentMetadata{lang=...}, which hyperref never
+% sees: the kernel records it and writes the catalog itself. The stand-in takes
+% the property name the real one does, and is undefined in this file until a
+% test installs it -- which is also the state of a document that never used
+% \DocumentMetadata.
+\cs_new_protected:Npn \cdossiertestSetKernelLang #1
+  { \cs_set:cpn { GetDocumentProperties } ##1 {#1} }
 \ExplSyntaxOff
 
 \begin{document}
@@ -169,6 +176,17 @@
 \TEST{pdfmeta-keeps-user-pdflang}{
   \cdossiertestRecordHypersetup
   \cdossiertestSetUserLang{en-GB}
+  \cdossiertestPdfmeta
+}
+
+% The same, for a language declared through \DocumentMetadata rather than
+% \hypersetup. hyperref's \@pdflang is untouched by that route, so reading it
+% alone would report "the document declared nothing" and the derived `en' would
+% overwrite a language the document did in fact state -- silently, since both
+% end up writing the same catalog key. Again: no pdflang line below.
+\TEST{pdfmeta-keeps-documentmetadata-lang}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetKernelLang{de}
   \cdossiertestPdfmeta
 }
 

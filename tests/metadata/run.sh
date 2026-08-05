@@ -14,6 +14,8 @@
 #   * every class emits a catalog /Lang on the default path;
 #   * a document's own \hypersetup{pdflang=...} reaches the PDF unchanged --
 #     including the en-GB form docs/API.md advertises;
+#   * so does a \DocumentMetadata{lang=...}, which is the other route in and the
+#     one the module cannot see through hyperref;
 #   * /Lang survives careerdossier-components being loaded AFTER hyperref.
 #
 # The third is the one with teeth. Without \DocumentMetadata the kernel's PDF
@@ -106,9 +108,17 @@ for base in resume letter cv statement; do
 done
 echo
 
-echo "== a document's own pdflang is what reaches the PDF =="
+echo "== a document's own language is what reaches the PDF =="
 if compile_fixture resume-user-lang.tex resume-user-lang; then
   check_lang resume-user-lang en-GB
+fi
+# The other route in. \hypersetup lands in hyperref's \@pdflang, which the
+# module reads; \DocumentMetadata{lang=...} does not, so a module reading only
+# \@pdflang overwrites it with the derived `en' and says nothing. `de' is a
+# language this project would never derive, so a pass here cannot come from the
+# value happening to match.
+if compile_fixture resume-documentmetadata-lang.tex resume-documentmetadata-lang; then
+  check_lang resume-documentmetadata-lang de
 fi
 echo
 

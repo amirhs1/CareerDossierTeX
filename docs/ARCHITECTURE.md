@@ -903,7 +903,15 @@ Three constraints shape the implementation:
 - **Precedence.** Because they are applied late, a blind write would silently
   discard a user's own `\hypersetup` — including the one the ATS guide's own
   template places *before* `\CDossierSetup`. Each field is therefore written
-  only when the document has not already set it.
+  only when the document has not already set it. The language has two routes and
+  both count: `\hypersetup{pdflang=...}` lands in `hyperref`'s `\@pdflang`, while
+  `\DocumentMetadata{lang=...}` is recorded by the kernel and never reaches
+  `hyperref` at all. Reading only the first mistakes the second kind of document
+  for one that declared nothing, so `\GetDocumentProperties{document/lang}` is
+  consulted as well. It is undefined exactly when `\DocumentMetadata` was never
+  used — the path where the derived value is the one that should apply — and
+  under `\DocumentMetadata` it always holds a language, defaulting to `en`, so
+  the kernel owns `/Lang` outright there.
 - **Ordering against `hyperref`.** The three fields are not written by the same
   mechanism at the same moment, and `/Lang` is the odd one out. `/Title` and
   `/Author` reach the Info dictionary from `\PDF@FinishDoc` at `\end{document}`,

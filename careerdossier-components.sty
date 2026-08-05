@@ -1029,6 +1029,34 @@
       }
   }
 
+%% Has \DocumentMetadata already declared the document's language?
+%%
+%% There are two ways into /Lang and the module can only see one of them.
+%% \__cdossier_components_hyp_if_unset:n reads hyperref's \@pdflang, which
+%% catches \hypersetup{pdflang=...} but not \DocumentMetadata{lang=...}: the
+%% kernel records that separately and writes the catalog itself. Read only
+%% \@pdflang and a document that declared `de' looks like a document that
+%% declared nothing, so the derived `en' overwrites it -- silently, since both
+%% mechanisms are simply writing the same catalog key.
+%%
+%% \GetDocumentProperties is the kernel's own record of it, and is undefined
+%% when \DocumentMetadata was never used at all -- which is the default path,
+%% where this module's derived value is exactly what should apply. Note that
+%% \DocumentMetadata *always* yields a language, defaulting to `en' when the
+%% document gave no lang key, so on that path the kernel owns /Lang outright and
+%% this module correctly stays out of it.
+\prg_new_protected_conditional:Npnn \__cdossier_components_kernel_lang_if_set:
+  { T , F , TF }
+  {
+    \cs_if_exist:NTF \GetDocumentProperties
+      {
+        \exp_args:Ne \tl_if_blank:nTF { \GetDocumentProperties { document / lang } }
+          { \prg_return_false: }
+          { \prg_return_true: }
+      }
+      { \prg_return_false: }
+  }
+
 %% Apply the derived metadata. Only ever called when hyperref is present.
 \cs_new_protected:Npn \__cdossier_components_pdfmeta:
   {
@@ -1044,9 +1072,13 @@
       }
       { }
     %% v0.1.0 is English-only (see docs/ARCHITECTURE.md); there is no language
-    %% key to route this through yet.
-    \__cdossier_components_hyp_if_unset:nT { @pdflang }
-      { \hypersetup { pdflang = en } }
+    %% key to route this through yet. Either way of declaring one wins over the
+    %% derived value: the document's own \hypersetup, and \DocumentMetadata.
+    \__cdossier_components_kernel_lang_if_set:F
+      {
+        \__cdossier_components_hyp_if_unset:nT { @pdflang }
+          { \hypersetup { pdflang = en } }
+      }
   }
 
 \AddToHook { begindocument }
