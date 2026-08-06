@@ -10,6 +10,33 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- All four document classes accept `muted=italic|gray|both`, controlling how
+  de-emphasized runs are rendered — an entry's dates and location in the résumé
+  and CV, and the statement's application-context line. `italic` is the default
+  and renders exactly as before. `gray` sets the same runs upright in the muted
+  color token instead, and `both` applies the italic and the color together.
+  ([#271])
+
+  Which one to want is a real trade-off, which is why it is a choice. Italic at
+  small sizes is harder to read for low-vision and dyslexic readers than a
+  high-contrast gray, and this metadata is scanned rather than read; but shape,
+  unlike a gray level, survives a fax, a photocopy, and a 1-bit print. Under
+  every value the dates are identified by their position and content as well, so
+  color is never the only carrier of meaning, and the muted token measures
+  8.52:1 against white under the WCAG 2.1 relative-luminance formula — the
+  source previously estimated "about 8.5:1" and nothing rendered it.
+
+  All three values are visual only: no extractor sees a difference and the
+  reading order is identical under each.
+
+  **Breaking for direct package users:** `\CDossierMutedStyle` is now published
+  by `careerdossier-components` rather than `careerdossier-typography`, because
+  two of the three values resolve it to a color and the typography package owns
+  no color. Every document class loads components, so no document built on a
+  CareerDossierTeX class needs an edit; a document that loads
+  `careerdossier-typography` on its own should load `careerdossier-components`
+  instead. See [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
+
 - A new `make links` suite asserts that no URL or e-mail address a document
   renders picks up extraction whitespace within a visual line — and that one
   which legitimately wraps reassembles exactly from its line fragments — across
@@ -112,6 +139,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the same places. This narrows the failure rather than removing it — TeX will
   exceed a stated stretch to set an otherwise underfull line.
 
+[#271]: https://github.com/amirhs1/CareerDossierTeX/issues/271
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 [#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294

@@ -26,9 +26,17 @@
 \RequirePackage { xcolor }
 
 %% ---------------------------------------------------------------------------
-%% Monochrome palette. Body text is black; the muted grey is dark enough to
-%% keep at least 4.5:1 contrast on white (0.30 grey is about 8.5:1), so it is
-%% used only for de-emphasis, never to carry meaning on its own.
+%% Monochrome palette. Body text is black; the muted gray is dark enough to
+%% keep well above the 4.5:1 normal-text floor on white. Measured against the
+%% WCAG 2.1 relative-luminance formula, DeviceGray 0.30 on white is 8.52:1
+%% (issue #271); "about 8.5:1" here was an estimate until then.
+%%
+%% `cdossier-muted' is consumed by the components module's de-emphasis role,
+%% \CDossierMutedStyle, under `muted=gray' and `muted=both'. It is never the
+%% only carrier of meaning: the runs it de-emphasises -- an entry's dates and
+%% location, and the statement context line -- are identified by their position
+%% and their content, and `muted=italic' (the default) reaches the same reader
+%% with no colour at all. See careerdossier-components.sty.
 %% ---------------------------------------------------------------------------
 \definecolor { cdossier-primary } { gray } { 0 }
 \definecolor { cdossier-text }    { gray } { 0 }

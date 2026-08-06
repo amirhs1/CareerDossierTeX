@@ -1,49 +1,57 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: screen-resolves-to-no-furniture-and-empty-page-styles
+TEST 1: italic-is-the-default
 ============================================================
-medium=screen
-head=empty
-foot=empty
-============================================================
-============================================================
-TEST 2: shared-page-styles-still-exist-under-screen
-============================================================
-main-style=defined
-first-style=defined
+serif
+series=m, shape=it
+colour=theme-text-token
 ============================================================
 ============================================================
-TEST 3: print-restores-the-furniture-decision
+TEST 2: gray-is-upright-in-the-theme-muted-token
 ============================================================
-medium=print
-medium=screen
+serif
+series=m, shape=n
+colour=theme-muted-token
 ============================================================
 ============================================================
-TEST 4: unknown-package-option-is-rejected
+TEST 3: both-is-italic-in-the-theme-muted-token
 ============================================================
-! Package careerdossier-components Error: Unknown package option 'pagenumbers' for careerdossier-components.
+serif
+series=m, shape=it
+colour=theme-muted-token
+============================================================
+============================================================
+TEST 4: italic-restores-the-black-italic-role
+============================================================
+serif
+series=m, shape=it
+colour=theme-text-token
+============================================================
+============================================================
+TEST 5: unknown-muted-value-is-rejected
+============================================================
+! Package careerdossier-components Error: Unknown 'muted' value 'grey'.
 For immediate help type H <return>.
  ...                                              
 l. ...}
-Supported options are 'medium' (print, screen) and 'muted' (italic, gray, both).
+The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), and 'both' (italic and gray).
 ============================================================
 ============================================================
-TEST 5: unknown-medium-value-is-rejected
+TEST 6: muted-requires-a-value
 ============================================================
-! Package careerdossier-components Error: Unknown 'medium' value 'paper'.
+! LaTeX Error: The key 'cdossier/components/muted' requires a value.
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The accepted values are 'print' (running header and 'Page N of M' folio) and 'screen' (neither).
-============================================================
-============================================================
-TEST 6: medium-requires-a-value
-============================================================
-! LaTeX Error: The key 'cdossier/components/medium' requires a value.
-For immediate help type H <return>.
- ...                                              
-l. ...}
-The key 'cdossier/components/medium' must have a value.
+The key 'cdossier/components/muted' must have a value.
 No value was present: the key will be ignored.
+============================================================
+============================================================
+TEST 7: entry-dates-and-location-render-through-the-role
+============================================================
+>entrytitle
+>muted
+>body
+>muted
 ============================================================

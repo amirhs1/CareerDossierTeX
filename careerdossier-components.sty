@@ -59,7 +59,10 @@
 
 \msg_new:nnnn { careerdossier-components } { unknown-option }
   { Unknown~package~option~'#1'~for~careerdossier-components. }
-  { Supported~options~are~'medium'~(print,~screen). }
+  {
+    Supported~options~are~'medium'~(print,~screen)~
+    and~'muted'~(italic,~gray,~both).
+  }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
 %% without saying what that set is, so the accepted values are named here.
@@ -68,6 +71,40 @@
   {
     The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
     and~'screen'~(neither).
+  }
+
+%% ---------------------------------------------------------------------------
+%% Entry-metadata de-emphasis (issue #271).
+%%
+%% `Muted' used to name two mechanisms in two modules -- a gray in the theme and
+%% an italic in typography -- and only the italic reached the page. It now names
+%% one rendered result, chosen by the document:
+%%
+%%   muted = italic  the run is italic and black                    (default)
+%%   muted = gray    the run is upright in cdossier-muted, gray 0.30
+%%   muted = both    the run is italic *and* gray
+%%
+%% There is a real trade-off behind the choice, which is why it is an option
+%% rather than a fixed decision. Italic at small sizes is harder for low-vision
+%% and dyslexic readers than a high-contrast gray, and entry metadata is scanned
+%% rather than read. But shape is the only de-emphasis that survives output that
+%% loses gray levels -- a fax, a photocopy, a 1-bit print -- and it is the
+%% appearance every document written before this option carried, so it stays the
+%% default.
+%%
+%% The role lives here because it is the only place it can. careerdossier-theme
+%% owns the colour and careerdossier-typography owns the shape, and neither may
+%% reach into the other; this package owns rendered parts and loads both. The
+%% option is forwarded by every public class, exactly as `medium' is.
+%%
+%% Under every value this is a visual role only: no extractor sees a difference,
+%% and the extraction baselines do not move.
+%% ---------------------------------------------------------------------------
+\msg_new:nnnn { careerdossier-components } { unknown-muted }
+  { Unknown~'muted'~value~'#1'. }
+  {
+    The~accepted~values~are~'italic'~(italic,~black),~
+    'gray'~(upright,~gray~0.30),~and~'both'~(italic~and~gray).
   }
 
 \keys_define:nn { cdossier / components }
@@ -81,10 +118,42 @@
     medium / unknown .code:n =
       { \msg_error:nnn { careerdossier-components } { unknown-medium } {#1} } ,
     medium .value_required:n = true ,
+    muted .choices:nn =
+      { italic , gray , both }
+      { \__cdossier_components_set_muted:V \l_keys_choice_tl } ,
+    muted / unknown .code:n =
+      { \msg_error:nnn { careerdossier-components } { unknown-muted } {#1} } ,
+    muted .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-components } { unknown-option }
           { \l_keys_key_str } } ,
   }
+
+%% The role is redefined rather than branched at each use, so a de-emphasised
+%% run costs the same as before the option existed and there is exactly one
+%% definition to read. \CDossierBodyStyle carries the family and resets the
+%% shape, so `gray' is upright without saying so twice.
+\cs_new_protected:Npn \__cdossier_components_set_muted:n #1
+  {
+    \str_case:nn {#1}
+      {
+        { italic }
+          { \RenewDocumentCommand \CDossierMutedStyle { }
+              { \CDossierBodyStyle \itshape } }
+        { gray }
+          { \RenewDocumentCommand \CDossierMutedStyle { }
+              { \CDossierBodyStyle \CDossierMutedColor } }
+        { both }
+          { \RenewDocumentCommand \CDossierMutedStyle { }
+              { \CDossierBodyStyle \itshape \CDossierMutedColor } }
+      }
+  }
+\cs_generate_variant:Nn \__cdossier_components_set_muted:n { V }
+
+%% Declared before the options are read so the default is the same statement as
+%% every other value, and \RenewDocumentCommand above always has a target.
+\NewDocumentCommand \CDossierMutedStyle { } { \CDossierBodyStyle \itshape }
+
 \ProcessKeysPackageOptions { cdossier / components }
 
 %% ---------------------------------------------------------------------------

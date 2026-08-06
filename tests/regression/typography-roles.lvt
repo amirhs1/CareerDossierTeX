@@ -43,7 +43,11 @@
 \TEST{section-is-sans-bold}{     \cdossiertestRole{\CDossierSectionStyle}    }
 \TEST{entrytitle-is-serif-bold}{ \cdossiertestRole{\CDossierEntryTitleStyle} }
 \TEST{body-is-serif-regular}{    \cdossiertestRole{\CDossierBodyStyle}       }
-\TEST{muted-is-serif-italic}{    \cdossiertestRole{\CDossierMutedStyle}      }
+
+% \CDossierMutedStyle is not asserted here. Issue #271 made de-emphasis
+% configurable, and `muted=gray' resolves to a colour, which this package does
+% not own; the complete role moved to careerdossier-components and is asserted
+% in components-muted.lvt.
 
 % Issue #75: the regression harness and typography package must use LuaTeX.
 \TEST{lualatex-engine-contract}{

@@ -344,6 +344,37 @@ is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
 in this format.
 
+## [0.8.0] - unreleased
+
+### `\CDossierMutedStyle` is published by `careerdossier-components`
+
+No source edit is required in any document that uses a CareerDossierTeX class,
+and nothing renders differently by default.
+
+Before, the role was defined by `careerdossier-typography` and was fixed at
+`\rmfamily \itshape`. It is now defined by `careerdossier-components` and
+resolved by the new `muted=italic|gray|both` class option, whose default,
+`italic`, renders exactly as before.
+
+Every document class loads `careerdossier-components`, so `\CDossierMutedStyle`
+is available in all of them as it always was. The one case that changes is a
+document that loads the typography package on its own:
+
+Before:
+
+    \usepackage{careerdossier-typography}
+    ... \CDossierMutedStyle ...
+
+After:
+
+    \usepackage{careerdossier-components}   % loads careerdossier-typography
+    ... \CDossierMutedStyle ...
+
+Reason: `muted=gray` and `muted=both` resolve the role to a colour, and
+`careerdossier-typography` owns no colour — only `careerdossier-components` may
+combine a typography shape role with a theme colour token. See
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-componentssty).
+
 ## [0.7.0] - 2026-08-04
 
 ### The vertical-rhythm ratios are retuned

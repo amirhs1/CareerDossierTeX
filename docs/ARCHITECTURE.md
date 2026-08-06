@@ -148,8 +148,9 @@ document class  (resume / letter / cv / statement)
     ├── passes bodyfont           ─────▶ careerdossier-typography.sty
     │                                       ├── engine guard
     │                                       └── fonts, semantic roles
-    ├── passes medium             ─────▶ careerdossier-components.sty
-    │                                       └── furniture on / off
+    ├── passes medium, muted      ─────▶ careerdossier-components.sty
+    │                                       ├── furniture on / off
+    │                                       └── de-emphasis role
     ├── colour and rule tokens    ─────▶ careerdossier-theme.sty
     └── owns document structure and the running label
             │
@@ -205,7 +206,7 @@ Three packages are easy to confuse because all three are described as owning
 | Package | Answers | Owns | Does not own |
 |---|---|---|---|
 | `careerdossier-tokens` | *How big, and how far apart?* | body size, type scale, vertical rhythm, rule thickness, list metrics, margin presets | any colour, any font file, any named text role |
-| `careerdossier-typography` | *In which typeface and role?* | engine guard, font loading, semantic roles such as section and muted text | the point sizes and gaps those roles are set at |
+| `careerdossier-typography` | *In which typeface and role?* | engine guard, font loading, semantic roles such as name, section, entry title, and body | the point sizes and gaps those roles are set at, and any colour — which is why the de-emphasis role is component-owned |
 | `careerdossier-theme` | *In which colour?* | semantic monochrome colour, rule colour, link colour | every dimension |
 
 A semantic role therefore asks `careerdossier-tokens` for its size and asks
@@ -713,7 +714,7 @@ Responsibilities:
 - require LuaLaTeX and fail fatally under any other engine;
 - load `fontspec`;
 - select the portable default fonts and the opt-in sans body family;
-- define semantic styles such as name, headline, section, entry title, body, and muted text;
+- define semantic styles such as name, headline, section, entry title, and body;
 - own the cross-class `bodyfont=serif|sans` selection forwarded by each class;
 - provide extension points for future named font combinations;
 - apply the Latin ligature-suppression and lining-numbers defaults;
@@ -774,6 +775,8 @@ Responsibilities:
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
 - the `medium=print|screen` decision of whether any furniture is emitted;
+- the `muted=italic|gray|both` de-emphasis role, `\CDossierMutedStyle`, and the
+  decision of what it resolves to;
 - shared CV/résumé section rule, including token-owned vertical spacing and
   tagged layout-artifact treatment;
 - contact line;
@@ -885,6 +888,26 @@ colour; `medium` names the output context, which is what actually drives the
 decision. Widening it beyond page furniture is an explicit non-goal of this
 release (see [`ROADMAP.md`](ROADMAP.md)).
 
+#### Why the de-emphasis role resolves here
+
+`Muted` used to name two mechanisms in two modules — `\CDossierMutedColor` in
+the theme and `\CDossierMutedStyle` in typography — and only the italic one
+reached the page. Making it one rendered result forced the question of where it
+can live, and there is exactly one answer.
+
+`careerdossier-theme` owns colour and `careerdossier-typography` owns shape,
+and the dependency direction forbids either from reaching into the other:
+typography must contain no colour, which is precisely what `muted=gray` needs.
+This module owns rendered parts and already loads both, so it is the only place
+a role combining a shape and a colour token can be assembled. `muted` therefore
+follows the same forwarding path as `medium` — each class validates the public
+value, this module holds the decision — and `\CDossierMutedStyle` is published
+from here.
+
+The role is resolved once, at option time, into a single `\RenewDocumentCommand`
+rather than branched at each use, so there is one definition to read and a
+de-emphasised run costs no more than it did before the option existed.
+
 #### Why PDF metadata lives here
 
 `/Title`, `/Author`, and `/Lang` are derived from profile data this module
@@ -968,9 +991,9 @@ Responsibilities:
 
 - load an appropriate base class;
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process `fontsize`, `margin`, `paper`, `bodyfont`, and `medium` class
-  options, forwarding `medium` to the components module that owns the
-  furniture decision;
+- process `fontsize`, `margin`, `paper`, `bodyfont`, `medium`, and `muted`
+  class options, forwarding `medium` and `muted` to the components module that
+  owns the furniture and de-emphasis decisions;
 - register the `Résumé` running label and enable shared page furniture;
 - render résumé sections, entries, and lists from the shared type, rhythm, rule,
   and list tokens;
@@ -997,8 +1020,8 @@ Responsibilities:
 - process `family=industry|academic` as a label- and metadata-only choice while
   preserving `industry` as the default;
 - process `paper=letter|a4` while preserving Letter as the default;
-- process `medium=print|screen`, forwarding it to the components module that
-  owns the furniture decision;
+- process `medium=print|screen` and `muted=italic|gray|both`, forwarding both
+  to the components module that owns the furniture and de-emphasis decisions;
 - register the `Cover Letter` running label and enable shared page furniture;
 - support one-page and multi-page letters without résumé-specific compression.
 
@@ -1024,7 +1047,7 @@ Responsibilities:
 - keep the full meaningful title in the page-one body and PDF metadata while a
   separately bounded running title identifies continuation pages;
 - register that short running title with the shared page-furniture component,
-  and forward `medium=print|screen` to it;
+  and forward `medium=print|screen` and `muted=italic|gray|both` to it;
 - reuse component-owned link normalization and separator-safe contact output;
 - derive every header size and gap plus prose paragraph rhythm from the shared
   token package;
@@ -1078,9 +1101,9 @@ Owns academic-CV document behavior.
 Responsibilities:
 
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process the documented `fontsize`, `margin`, `paper`, `bodyfont`, and
-  `medium` options, forwarding `medium` to the components module that owns the
-  furniture decision;
+- process the documented `fontsize`, `margin`, `paper`, `bodyfont`, `medium`,
+  and `muted` options, forwarding `medium` and `muted` to the components module
+  that owns the furniture and de-emphasis decisions;
 - render the first-page identity in the body;
 - register the `Curriculum Vitae` running label and enable shared page
   furniture without making contact details running-only content;

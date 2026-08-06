@@ -45,6 +45,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Paper size | US Letter and A4 | `paper=letter` remains the default; `paper=a4` is opt-in |
 | Body font | Serif and sans | `bodyfont=serif` remains the default; `bodyfont=sans` is opt-in |
 | Output medium | Print and screen | `medium=print` remains the default; `medium=screen` drops the running header and folio |
+| Entry-metadata de-emphasis | Italic, gray, or both | `muted=italic` remains the default; `muted=gray` and `muted=both` opt into the muted color token |
 | Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
@@ -98,7 +99,8 @@ Optional fields may be omitted. Contact separators should adjust automatically w
   margin=narrow,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=print,
+  muted=italic
 ]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}
@@ -125,8 +127,9 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 ```
 
 Every document class accepts `fontsize=10pt|11pt|12pt`,
-`margin=normal|narrow`, `paper=letter|a4`, `bodyfont=serif|sans`, and
-`medium=print|screen`. US Letter remains the default.
+`margin=normal|narrow`, `paper=letter|a4`, `bodyfont=serif|sans`,
+`medium=print|screen`, and `muted=italic|gray|both`. US Letter remains the
+default.
 The résumé defaults to `11pt,narrow`; the CV, letter, and statement classes
 default to `12pt,normal`. `normal` is one inch and `narrow` is half an inch.
 One `fontsize` drives every type size and every structural gap, so the three
@@ -143,6 +146,16 @@ emitted. `print` is the default and keeps the running header and `Page N of M`
 folio; `screen` drops both, because a PDF viewer already shows page position.
 It changes nothing else — the text block does not move, so switching `medium`
 cannot reflow a document.
+
+`muted` decides how de-emphasized runs are rendered: an entry's dates and
+location, and the statement's application-context line. `italic` is the default
+and keeps them italic and black; `gray` renders them upright in the muted color
+token (`gray 0.30`, measured at 8.52:1 against white); `both` applies the
+italic and the color together. Italic is harder to read at small sizes than a
+high-contrast gray, but shape survives a photocopy that a gray level does not —
+which is why this is a choice rather than a fixed decision. Under every value
+the dates are also identified by their position and content, so color is never
+the only carrier of meaning, and no extractor sees any difference.
 
 Advanced users can call `\geometry{...}` after `\documentclass` for a custom
 layout, but should not load the already-loaded `geometry` package again.

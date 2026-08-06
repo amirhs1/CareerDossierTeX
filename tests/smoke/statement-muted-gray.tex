@@ -1,0 +1,16 @@
+% statement-muted-gray.tex — smoke fixture: the statement context line is the
+% de-emphasis role's second call site, so muted=gray must build cleanly there
+% too (issue #271). Both context fields are set so the line is emitted.
+\documentclass[type=research, muted=gray]{careerdossier-statement}
+\CDossierSetup{
+  name        = {Ada Lovelace},
+  email       = {ada@example.test},
+  affiliation = {Example University},
+}
+\CDossierStatementSetup{
+  application-context = {Faculty application},
+  application-id      = {APP-144},
+}
+\begin{document}
+\MakeCDossierStatementHeader
+\end{document}

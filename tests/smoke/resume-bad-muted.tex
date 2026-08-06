@@ -1,0 +1,9 @@
+% resume-bad-muted.tex — smoke fixture: an unsupported `muted' value must be
+% rejected with a message naming the accepted values (issues #212, #271).
+% `grey' is the plausible wrong spelling, so the fixture doubles as the record
+% that the accepted spelling is `gray'.
+\documentclass[muted=grey]{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+\begin{document}
+\MakeCDossierHeader
+\end{document}

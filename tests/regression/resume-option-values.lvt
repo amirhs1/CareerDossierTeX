@@ -42,5 +42,9 @@
   \cdossiertestSetOption{medium=paper}
 }
 
+\TEST{unknown-muted-value-is-rejected}{
+  \cdossiertestSetOption{muted=grey}
+}
+
 \END
 \end{document}

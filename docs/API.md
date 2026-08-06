@@ -60,6 +60,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Margins | `margin=normal` (1 in) or `margin=narrow` (0.5 in), per-class default |
 | Body font | Serif (default) and opt-in sans |
 | Output medium | `medium=print` (default) or `medium=screen` |
+| Entry-metadata de-emphasis | `muted=italic` (default), `muted=gray`, or `muted=both` |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
@@ -149,7 +150,8 @@ actually been verified.
   margin=narrow,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=print,
+  muted=italic
 ]{careerdossier-resume}
 ```
 
@@ -167,7 +169,7 @@ report an unsupported value the same way:
 |---|---|---|
 | `careerdossier-tokens` | `fontsize`, `margin` | `fontsize=12pt`, `margin=normal` |
 | `careerdossier-typography` | `bodyfont` | `bodyfont=serif` |
-| `careerdossier-components` | `medium` | `medium=print` |
+| `careerdossier-components` | `medium`, `muted` | `medium=print`, `muted=italic` |
 
 **A package default is not a class default.** Loading `careerdossier-tokens`
 directly gives `12pt`/`normal`, while `\documentclass{careerdossier-resume}`
@@ -320,6 +322,41 @@ unchanged, so the text block sits in exactly the same place under both values
 and switching `medium` cannot reflow a document. Unsupported values produce a
 class error naming the accepted values.
 
+#### `muted`
+
+Every CareerDossierTeX document class accepts:
+
+```text
+italic
+gray
+both
+```
+
+`muted` is new after `v0.7.0`. Note the spelling: `gray`, not `grey`.
+
+`muted` decides how de-emphasised runs are rendered — an entry's dates and
+location in the résumé and CV, and the statement's application-context line.
+The default is `italic`, which reproduces the previous behaviour exactly:
+italic in the body family, in the ordinary black text token. `gray` renders the
+same runs upright in the muted token instead, and `both` applies the italic and
+the muted token together.
+
+The muted token is `gray 0.30`, which measures 8.52:1 against white under the
+WCAG 2.1 relative-luminance formula — well above the 4.5:1 normal-text floor.
+
+Which value to choose is a genuine trade-off, which is why it is an option:
+
+- italic at small sizes is harder to read for low-vision and dyslexic readers
+  than a high-contrast gray, and this metadata is scanned rather than read;
+- shape, unlike a gray level, survives a fax, a photocopy, and a 1-bit print.
+
+Under every value the de-emphasis is reinforced by position and content — the
+dates sit in their own flush-right column and read as a date range — so colour
+is never the only carrier of meaning. All three values are visual only: no
+extractor sees a difference, and the reading order is identical under each.
+
+Unsupported values produce a class error naming the accepted values.
+
 ### Fixed settings
 
 The following remain fixed and are not accepted as user options:
@@ -377,14 +414,16 @@ the required rerun.
   margin=normal,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=print,
+  muted=italic
 ]{careerdossier-letter}
 ```
 
 `family` accepts `industry` and `academic`; the default is `industry`. `paper`
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
 uses the shared `serif|sans` contract above and defaults to `serif`. `medium`
-uses the shared `print|screen` contract above and defaults to `print`.
+uses the shared `print|screen` contract above and defaults to `print`. `muted`
+uses the shared `italic|gray|both` contract above and defaults to `italic`.
 `fontsize` and `margin` use the shared contracts above and default to `12pt`
 and `normal`.
 
@@ -1038,10 +1077,17 @@ The typography package may expose semantic style commands for internal and advan
 \CDossierSectionStyle
 \CDossierEntryTitleStyle
 \CDossierBodyStyle
-\CDossierMutedStyle
 ```
 
 These commands describe meaning rather than a particular font family, weight, or size.
+
+One further role, `\CDossierMutedStyle`, is published by
+`careerdossier-components` rather than by the typography package, because
+`muted=gray` and `muted=both` resolve it to a colour and the typography package
+owns no colour. It behaves like the roles above and is available in every
+document class; only a document loading `careerdossier-typography` on its own
+does not get it. See [`muted`](#muted) and
+[`MIGRATION.md`](MIGRATION.md#080---unreleased).
 
 Their visual definitions may evolve before `v1.0.0`.
 
@@ -1074,7 +1120,8 @@ Load the academic CV with:
   margin=normal,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=print,
+  muted=italic
 ]{careerdossier-cv}
 ```
 
@@ -1087,6 +1134,7 @@ The class accepts the same value sets as the résumé class:
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
 | `medium` | `print`, `screen` | `print` |
+| `muted` | `italic`, `gray`, `both` | `italic` |
 
 English and the monochrome theme remain fixed. Unsupported options or values
 must produce a class error rather than being ignored, and the error for an
@@ -1329,7 +1377,8 @@ shared `fontsize`, `margin`, `paper`, `bodyfont`, and `medium` settings:
   margin=normal,
   paper=letter,
   bodyfont=serif,
-  medium=print
+  medium=print,
+  muted=italic
 ]{careerdossier-statement}
 ```
 
@@ -1724,6 +1773,11 @@ The monochrome theme may expose semantic tokens:
 \CDossierRuleColor
 \CDossierLinkColor
 ```
+
+`\CDossierMutedColor` is `gray 0.30`, measured at 8.52:1 against white under
+the WCAG 2.1 relative-luminance formula. It is what `muted=gray` and
+`muted=both` render de-emphasised runs in; under the default `muted=italic`
+nothing uses it.
 
 Users should not rely on the underlying color names or values as stable API before `v1.0.0`.
 
