@@ -208,8 +208,9 @@ Cover the relevant parts of this matrix:
 - long URL or contact field, and contact-line wrapping
 - two-page output, page furniture, and single-page suppression
 - text extraction and logical reading order, across the supported extractors
-- copy-paste integrity of any URL or e-mail address a change touches: it must
-  extract as one token, not as pieces sharing a baseline (`make links`)
+- copy-paste integrity of any URL or e-mail address a change touches: no
+  pieces sharing one visual line, and a wrapped address reassembles exactly
+  (`make links`)
 - unsupported-engine error
 - every option's accepted and rejected values, including the error naming the
   accepted values, and rejection reported exactly once

@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # run.sh — CareerDossierTeX copy-paste integrity runner (issue #294)
 #
-# A URL or an e-mail address must survive copy-and-paste out of a generated PDF
-# as one unbroken token. That is a typesetting property, not a text one: Poppler
-# starts a new word wherever an intra-word gap exceeds 0.1 em, so a URL whose
-# breakpoints were stretched by a justified line extracts as
+# A URL or an e-mail address must not pick up extraction whitespace inside a
+# visual line, and when it legitimately wraps, concatenating its ordered line
+# fragments must reproduce the exact address. That pair is the checkable form
+# of "it survives copy-and-paste", and it is a typesetting property, not a
+# text one: Poppler's extractor starts a new word when the spacing between two
+# characters exceeds 0.1x the font size (current Poppler; the runner prints
+# `pdftotext -v' so each run records the version that judged it), so a URL
+# whose breakpoints were stretched by a justified line extracts as
 # `https : / / example . invalid /' while the rendered page looks untouched.
+# What this suite proves is scoped to that extraction model; the PDFKit
+# baselines in tests/extraction/ are the second consumer the project checks.
 #
 # Each fixture declares the tokens that must stay atomic in its own header:
 #
@@ -48,6 +54,12 @@ if ! command -v pdftotext > /dev/null 2>&1; then
   echo "from word bounding boxes and has nothing to assert without it."
   exit 1
 fi
+
+# The word-break threshold is an extractor implementation detail, so put the
+# extractor's version on record with every verdict (pdftotext -v writes to
+# stderr).
+pdftotext -v 2>&1 | head -1
+echo
 
 for tex in *.tex; do
   base="${tex%.tex}"

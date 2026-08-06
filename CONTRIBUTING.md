@@ -564,18 +564,22 @@ Rationale and the full method are in
 
 ### Link copy-paste integrity suite
 
-A URL or an e-mail address must survive copy-and-paste out of the PDF as one
-unbroken token:
+A URL or an e-mail address must not pick up extraction whitespace within a
+visual line, and one that legitimately wraps must reassemble exactly from its
+ordered line fragments — the checkable form of "it survives copy-and-paste":
 
     make links                 # or: tests/links/run.sh
 
-Whether it does is a typesetting question, not a text one. Poppler starts a new
-word wherever an intra-word gap exceeds 0.1 em, so a URL whose breakpoints were
-stretched to justify a line extracts as `https : / / example . invalid /` while
-the rendered page looks entirely normal. Ordinary extracted text cannot even
-diagnose it: a legitimate line wrap and a split token both appear as whitespace.
-The suite therefore reads `pdftotext -bbox` coordinates — pieces on *different*
-baselines are a wrap, pieces sharing *one* baseline are the defect.
+Whether it does is a typesetting question, not a text one. Current Poppler
+starts a new word when the spacing between two characters exceeds 0.1× the
+font size, so a URL whose breakpoints were stretched to justify a line
+extracts as `https : / / example . invalid /` while the rendered page looks
+entirely normal. Ordinary extracted text cannot even diagnose it: a legitimate
+line wrap and a split token both appear as whitespace. The suite therefore
+reads `pdftotext -bbox` coordinates — pieces on *different* visual lines are a
+wrap, pieces sharing *one* line are the defect. The threshold is an extractor
+implementation detail, so the runner prints `pdftotext -v` at the start of
+every run, and what the suite proves is scoped to that extractor's model.
 
 Each fixture declares what must stay atomic in its own header, and the runner
 extracts the directives:

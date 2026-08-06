@@ -1,18 +1,23 @@
 # link-token-check.awk — copy-paste integrity of URLs and e-mail addresses
 # (issue #294) decided from `pdftotext -bbox` output for a whole PDF.
 #
-# A URL or an e-mail address must survive copy-and-paste out of the PDF as one
-# unbroken token. What decides that is not the character sequence — which is
-# always correct — but the *typesetting*: Poppler starts a new `<word>` wherever
-# an intra-word gap exceeds 0.1 em, so a URL whose breakpoints were stretched by
-# a justified line extracts as `https : / / example . invalid /`. The rendered
-# page looks unremarkable, which is why this needs its own checker.
+# The invariant, stated checkably: a URL or an e-mail address must not be
+# divided into several words on one visual line, and when it legitimately
+# wraps, concatenating its ordered line fragments must reproduce the exact
+# address. What decides that is not the character sequence — which is always
+# correct — but the *typesetting*: current Poppler starts a new `<word>` when
+# the spacing between two characters exceeds 0.1x the font size, so a URL
+# whose breakpoints were stretched by a justified line extracts as
+# `https : / / example . invalid /`. The rendered page looks unremarkable,
+# which is why this needs its own checker.
 #
 # Why coordinates rather than extracted text. In plain `pdftotext` output a
 # legitimate line wrap and a split token are indistinguishable: both put
 # whitespace between the pieces. The bounding boxes tell them apart — pieces on
-# *different* baselines are a wrap, pieces sharing *one* baseline are the
-# defect.
+# *different* visual lines are a wrap, pieces sharing *one* line are the
+# defect. Line identity is inferred from `yMin`, which is the top of the word's
+# box rather than the typographic baseline — a proxy, hence the tolerance in
+# baseline_of() below and the extra edge conditions on a wrap.
 #
 # Each fixture declares the tokens that must stay atomic, one per line, in a
 # companion `<fixture>.tokens` file (run.sh extracts these from the fixture's
@@ -46,12 +51,17 @@ function unescape(s) {
   return s
 }
 
-# Baseline bucket for a word's yMin. Words typeset on one baseline report the
-# same yMin to the last decimal when they share a font, but a line mixing sizes
+# Visual-line bucket for a word's yMin. yMin is the top of the word's box, not
+# the baseline itself: words on one typeset baseline report the same yMin to
+# the last decimal when they share a font and size, but a line mixing sizes
 # (the contact line's small text beside a symbol, a bibliography's bold label)
 # differs by a fraction of a point on the very same baseline — so bucket within
 # a tolerance rather than on exact equality. The tolerance stays far below the
-# leading, which is what separates two real lines.
+# leading, which is what separates two real lines. (`pdftotext -bbox-layout`
+# reports Poppler's own line grouping, but its words arrive in layout order;
+# this checker needs content-stream order for the concatenation step, which is
+# what plain `-bbox` provides — the same order tests/layout/page-break-check.awk
+# trusts.)
 function baseline_of(y,   b) {
   for (b = 1; b <= nb; b++)
     if (y - bys[b] < tol && bys[b] - y < tol) return b

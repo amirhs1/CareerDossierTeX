@@ -5,6 +5,13 @@
 % natural-width \hbox and whole lines are centred between \hfil — so these must
 % come out atomic; this fixture is what says so.
 %
+% It shares its profile with tests/extraction/resume-contact-wrap.tex on
+% purpose. That fixture's `-layout' text check would notice a split in this one
+% document, but only there and only as a missing string; this suite states the
+% property for every family, decides it from geometry, and proves on each run
+% that it can still see the defect. Keep the two profiles identical so a
+% difference between the suites is never a difference in the input.
+%
 % LINKTOKEN: alexandria.montgomery.fitzgerald@a-very-long-department.example.org
 % LINKTOKEN: example.org/alexandria-montgomery-fitzgerald/portfolio
 % LINKTOKEN: linkedin.com/in/alexandria-montgomery-fitzgerald

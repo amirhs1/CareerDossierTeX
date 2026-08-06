@@ -709,13 +709,16 @@ columns. Labels such as `Email:` and `Phone:` improve plain-text clarity.
 
 #### Copy-paste integrity
 
-A URL or an e-mail address must come out of the PDF as one unbroken token, so
-that a reader who copies it gets something that pastes into a browser or a
-mail client. The character sequence is never the problem; the *typesetting*
-is. Poppler starts a new word wherever an intra-word gap exceeds 0.1 em, so a
-URL whose breakpoints were stretched to justify a line extracts as
-`https : / / example . invalid /` — a text defect produced by a line-breaking
-decision, and invisible in the rendered page.
+A reader who copies a URL or an e-mail address out of the PDF must get
+something that pastes into a browser or a mail client. Stated checkably, that
+is two requirements: the address must not be divided into several words within
+one visual line, and when it legitimately wraps, its ordered line fragments
+must concatenate back to the exact address. The character sequence is never
+the problem; the *typesetting* is. In current Poppler versions the extractor
+starts a new word when the spacing between two characters exceeds 0.1× the
+font size, so a URL whose breakpoints were stretched to justify a line
+extracts as `https : / / example . invalid /` — a text defect produced by a
+line-breaking decision, and invisible in the rendered page.
 
 Two things follow. First, a change that adds stretch at a URL's breakpoints is
 an extraction change even though it touches no text: BibLaTeX's
@@ -727,10 +730,13 @@ than justified.
 
 Second, plain extracted text cannot check this: a legitimate line wrap and a
 split token both read as whitespace. The decision needs word bounding boxes —
-pieces on different baselines are a wrap, pieces sharing one baseline are the
+pieces on different visual lines are a wrap, pieces sharing one line are the
 defect. `make links` (§11) is the assertion, and it carries a negative control
 that restores the BibLaTeX default so the check is re-proved against the real
-failure on every run.
+failure on every run. Because the word-break threshold is an extractor
+implementation detail, each run records its `pdftotext` version, and the
+guarantee is scoped to that extraction model — the PDFKit baselines in
+`tests/extraction/` remain the second consumer the project checks.
 
 ### Icons
 
@@ -1244,14 +1250,17 @@ record the layout but do not detect the fault.
 
 **Link copy-paste integrity is covered** (issue #294). `tests/links/`
 (`make links`) asserts that no URL or e-mail address is emitted as two or more
-words sharing a baseline — see §6, "Copy-paste integrity", for the mechanism.
-One fixture per link site: the résumé contact line, the CV contact line and its
-manual publication list, both letter families, and the BibLaTeX bibliography.
+words sharing a visual line, and that a wrapped one reassembles exactly — see
+§6, "Copy-paste integrity", for the mechanism. One fixture per link site: the
+résumé contact line, the CV contact line and its manual publication list, both
+letter families, and the BibLaTeX bibliography.
 
 Three properties of the suite are the point of it:
 
 - **It reads coordinates, not text.** `pdftotext -bbox` is what distinguishes a
-  wrap from a split; the plain text of the two is identical.
+  wrap from a split; the plain text of the two is identical. Line identity is
+  inferred from `yMin` — the top of the word box, a line-position proxy rather
+  than the typographic baseline, hence a small tolerance.
 - **It declares its expectations in the fixture.** A `% LINKTOKEN:` line names
   each token that must stay atomic, and a token that is absent from the PDF
   fails the run — a fixture that stops rendering its link cannot pass quietly.
