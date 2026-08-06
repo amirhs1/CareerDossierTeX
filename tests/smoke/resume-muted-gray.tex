@@ -1,0 +1,24 @@
+% resume-muted-gray.tex — smoke fixture: muted=gray is a supported value and
+% must build cleanly (issue #271). The entry carries both metadata cells, so
+% the de-emphasis role renders twice; what it resolves to is asserted by
+% tests/regression/components-muted, and how it looks is a visual check.
+\documentclass[fontsize=10pt, margin=normal, muted=gray]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Corp},
+  location     = {Berlin, DE},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

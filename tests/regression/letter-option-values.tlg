@@ -54,3 +54,12 @@ For immediate help type H <return>.
 l. ...}
 The accepted values are 'print' (running header and 'Page N of M' folio) and 'screen' (neither).
 ============================================================
+============================================================
+TEST 7: unknown-muted-value-is-rejected
+============================================================
+! Package careerdossier-letter Error: Unknown 'muted' value 'grey' for careerdossier-letter.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), and 'both' (italic and gray).
+============================================================

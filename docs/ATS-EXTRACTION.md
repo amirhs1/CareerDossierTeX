@@ -15,7 +15,9 @@ tagged structure. The statement class supports a default statement of interest
 plus six other statement types — see `docs/API.md` and `docs/ROADMAP.md`. Every
 class accepts the calibrated `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`
 options plus `medium=print|screen`, which decides whether page furniture is
-emitted at all; the résumé and CV no longer accept `density`.
+emitted at all, and `muted=italic|gray|both`, which decides how an entry's
+dates and location are de-emphasized; the résumé and CV no longer accept
+`density`. Neither option changes the text layer or the reading order.
 **Maintainer:** Amir Sadeghi
 **Last reviewed:** 2026-08-03
 

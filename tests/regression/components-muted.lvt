@@ -1,0 +1,133 @@
+% components-muted.lvt — the entry-metadata de-emphasis role (#271).
+%
+% `Muted' named two mechanisms in two modules before this: a gray in the theme
+% and an italic in typography, of which only the italic ever reached the page.
+% It now names one rendered result, chosen by `muted=italic|gray|both'.
+%
+% Two separate things are asserted here, because either one alone would pass
+% while the feature was broken:
+%
+%   1. what each value *resolves to* -- shape from careerdossier-typography and
+%      colour from careerdossier-theme. A resolution test alone would still pass
+%      if no component called the role.
+%   2. that a rendered entry's metadata actually *goes through* the role. The
+%      four semantic roles are replaced by markers and an entry heading is
+%      typeset, so the baseline records which role each of the four cells
+%      reaches, in order. A use test alone would still pass if the role resolved
+%      to the wrong thing.
+%
+% Colour is compared against the theme tokens rather than against a driver's
+% literal colour string, so the assertion is `this is the theme's muted token',
+% not `this is the text 0.3 g'.
+%
+% The values are set through \keys_set:nn rather than \usepackage, which takes
+% one set of options per document; the class option, the package option, and
+% this call all reach the same key. Rendered appearance is a visual check
+% (make review-matrix); no extractor sees any of this, and the extraction
+% baselines do not move under any value.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+\tl_new:N \g_cdossiertest_role_tl
+\tl_new:N \g_cdossiertest_body_tl
+\tl_new:N \g_cdossiertest_muted_tl
+
+%% \current@color contains @, which is not a letter under \ExplSyntaxOn, so it
+%% is reached with \use:c. Capturing inside a group keeps each probe from
+%% leaking into the next.
+\cs_new_protected:Npn \cdossiertestCaptureColor #1#2
+  {
+    \group_begin:
+      #2
+      \tl_gset:Nx #1 { \use:c { current@color } }
+    \group_end:
+  }
+
+%% Report the resolved role as font class, series, shape, and which theme colour
+%% token it matches. Family is compared against the NFSS defaults, as in
+%% typography-roles.lvt, so the assertion survives font-internal changes.
+\cs_new_protected:Npn \cdossiertestReportMuted
+  {
+    \group_begin:
+      \CDossierMutedStyle
+      \str_if_eq:eeTF { \use:c { f@family } } { \sfdefault }
+        { \TYPE{sans} }
+        {
+          \str_if_eq:eeTF { \use:c { f@family } } { \rmdefault }
+            { \TYPE{serif} } { \TYPE{other} }
+        }
+      \TYPE{ series = \use:c { f@series } , ~ shape = \use:c { f@shape } }
+    \group_end:
+    \cdossiertestCaptureColor \g_cdossiertest_role_tl  { \CDossierMutedStyle }
+    \cdossiertestCaptureColor \g_cdossiertest_body_tl  { \CDossierTextColor  }
+    \cdossiertestCaptureColor \g_cdossiertest_muted_tl { \CDossierMutedColor }
+    \tl_if_eq:NNTF \g_cdossiertest_role_tl \g_cdossiertest_muted_tl
+      { \TYPE{ colour = theme-muted-token } }
+      {
+        \tl_if_eq:NNTF \g_cdossiertest_role_tl \g_cdossiertest_body_tl
+          { \TYPE{ colour = theme-text-token } }
+          { \TYPE{ colour = neither-token } }
+      }
+  }
+
+\cs_new_protected:Npn \cdossiertestSetOption #1
+  { \keys_set:nn { cdossier / components } {#1} }
+
+%% Replace the four semantic roles with markers and typeset one entry heading,
+%% so the baseline records which role each rendered cell reaches. Boxing keeps
+%% the heading out of the page being shipped; \TYPE fires as the box is built,
+%% so the markers appear in rendered order.
+\box_new:N \l_cdossiertest_entry_box
+\cs_new_protected:Npn \cdossiertestTraceEntryHead
+  {
+    \RenewDocumentCommand \CDossierEntryTitleStyle { } { \TYPE{ >entrytitle } }
+    \RenewDocumentCommand \CDossierBodyStyle       { } { \TYPE{ >body       } }
+    \RenewDocumentCommand \CDossierMutedStyle      { } { \TYPE{ >muted      } }
+    \vbox_set:Nn \l_cdossiertest_entry_box
+      {
+        \__cdossier_components_entryhead:nnnn
+          { Research~Engineer } { Example~Lab } { Berlin,~DE } { 2020--2024 }
+      }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{italic-is-the-default}{
+  \cdossiertestReportMuted
+}
+
+\TEST{gray-is-upright-in-the-theme-muted-token}{
+  \cdossiertestSetOption{muted=gray}
+  \cdossiertestReportMuted
+}
+
+\TEST{both-is-italic-in-the-theme-muted-token}{
+  \cdossiertestSetOption{muted=both}
+  \cdossiertestReportMuted
+}
+
+\TEST{italic-restores-the-black-italic-role}{
+  \cdossiertestSetOption{muted=italic}
+  \cdossiertestReportMuted
+}
+
+\TEST{unknown-muted-value-is-rejected}{
+  \cdossiertestSetOption{muted=grey}
+}
+
+\TEST{muted-requires-a-value}{
+  \cdossiertestSetOption{muted}
+}
+
+% Last: the tracing renewals are deliberately permanent, so nothing after this
+% would still be reporting the real roles.
+\TEST{entry-dates-and-location-render-through-the-role}{
+  \cdossiertestTraceEntryHead
+}
+
+\END
+\end{document}

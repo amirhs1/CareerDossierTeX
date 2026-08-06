@@ -38,19 +38,22 @@
 \tl_set:Nn \l__cdossier_cv_bodyfont_tl { serif }
 \tl_new:N \l__cdossier_cv_medium_tl
 \tl_set:Nn \l__cdossier_cv_medium_tl { print }
+\tl_new:N \l__cdossier_cv_muted_tl
+\tl_set:Nn \l__cdossier_cv_muted_tl { italic }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   {
     Unknown~class~option~'#1'~for~careerdossier-cv.~
     Supported~options~are~'fontsize',~'margin',~'paper',~'bodyfont',~
-    and~'medium'.
+    'medium',~and~'muted'.
   }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
     'margin'~(normal,~narrow),~
     'paper'~(letter,~a4),~
-    'bodyfont'~(serif,~sans),~and~
-    'medium'~(print,~screen).~Language~and~theme~cannot~be~set~here.
+    'bodyfont'~(serif,~sans),~
+    'medium'~(print,~screen),~and~
+    'muted'~(italic,~gray,~both).~Language~and~theme~cannot~be~set~here.
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
@@ -84,6 +87,13 @@
   {
     The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
     and~'screen'~(neither).
+  }
+
+\msg_new:nnnn { careerdossier-cv } { unknown-muted }
+  { Unknown~'muted'~value~'#1'~for~careerdossier-cv. }
+  {
+    The~accepted~values~are~'italic'~(italic,~black),~
+    'gray'~(upright,~gray~0.30),~and~'both'~(italic~and~gray).
   }
 
 \keys_define:nn { cdossier / cv }
@@ -124,6 +134,12 @@
     medium / unknown .code:n =
       { \msg_error:nnn { careerdossier-cv } { unknown-medium } {#1} } ,
     medium .value_required:n = true ,
+    muted .choices:nn =
+      { italic , gray , both }
+      { \tl_set_eq:NN \l__cdossier_cv_muted_tl \l_keys_choice_tl } ,
+    muted / unknown .code:n =
+      { \msg_error:nnn { careerdossier-cv } { unknown-muted } {#1} } ,
+    muted .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-cv } { unknown-option } { \l_keys_key_str } } ,
   }
@@ -140,12 +156,16 @@
       }
       { careerdossier-tokens }
   }
-%% Issue #184: the class validates the public value; careerdossier-components
-%% owns the page furniture and therefore the resulting decision.
+%% Issues #184 and #271: the class validates the public values;
+%% careerdossier-components owns the page furniture and the de-emphasis role,
+%% and therefore owns both resulting decisions.
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
-      { medium = \l__cdossier_cv_medium_tl }
+      {
+        medium = \l__cdossier_cv_medium_tl ,
+        muted  = \l__cdossier_cv_muted_tl
+      }
       { careerdossier-components }
   }
 
