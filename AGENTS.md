@@ -186,16 +186,18 @@ Run the `Makefile` targets rather than hand-written engine invocations, because
 they redirect output to `build/` and keep the source tree free of artifacts:
 
 ```bash
-make check   # lint regression extract-test smoke layout bibliography-test tagging examples
+make check   # lint regression extract-test smoke layout bibliography-test links
+             # metadata tagging examples
 ```
 
 Individual targets: `lint`, `regression`, `smoke`, `layout`, `extract-test`,
-`bibliography-test`, `tagging`, `examples`, and the per-family builds `resume`,
-`letter`, `academic-cv`, `academic-bibliography`, `academic-letter`, and
-`statements`. `review-page-two` and `review-matrix` render pages for visual
-review. Note that the extraction and bibliography targets are `extract-test` and
-`bibliography-test`, while the matching CI jobs are named `extraction` and
-`bibliography`.
+`bibliography-test`, `links`, `metadata`, `tagging`, `examples`, and the
+per-family builds `resume`, `letter`, `academic-cv`, `academic-bibliography`,
+`academic-letter`, and `statements`. `review-page-two` and `review-matrix`
+render pages for visual review. Note that the extraction and bibliography
+targets are `extract-test` and `bibliography-test`, while the matching CI jobs
+are named `extraction` and `bibliography`; every other target and job share a
+name.
 
 Cover the relevant parts of this matrix:
 
@@ -206,6 +208,8 @@ Cover the relevant parts of this matrix:
 - long URL or contact field, and contact-line wrapping
 - two-page output, page furniture, and single-page suppression
 - text extraction and logical reading order, across the supported extractors
+- copy-paste integrity of any URL or e-mail address a change touches: it must
+  extract as one token, not as pieces sharing a baseline (`make links`)
 - unsupported-engine error
 - every option's accepted and rejected values, including the error naming the
   accepted values, and rejection reported exactly once

@@ -707,6 +707,31 @@ columns. Labels such as `Email:` and `Phone:` improve plain-text clarity.
 - Do not use URL shorteners in package examples.
 - Test URLs containing `_`, `-`, `~`, `?`, `&`, `%`, and non-ASCII characters.
 
+#### Copy-paste integrity
+
+A URL or an e-mail address must come out of the PDF as one unbroken token, so
+that a reader who copies it gets something that pastes into a browser or a
+mail client. The character sequence is never the problem; the *typesetting*
+is. Poppler starts a new word wherever an intra-word gap exceeds 0.1 em, so a
+URL whose breakpoints were stretched to justify a line extracts as
+`https : / / example . invalid /` — a text defect produced by a line-breaking
+decision, and invisible in the rendered page.
+
+Two things follow. First, a change that adds stretch at a URL's breakpoints is
+an extraction change even though it touches no text: BibLaTeX's
+`\biburlbigskip` default of `0mu plus 3mu` did exactly this in issue #199, and
+`careerdossier-biblatex.sty` caps it at `0mu plus 1mu` for that reason.
+Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
+additionally immune because each item is measured in its own `\hbox` rather
+than justified.
+
+Second, plain extracted text cannot check this: a legitimate line wrap and a
+split token both read as whitespace. The decision needs word bounding boxes —
+pieces on different baselines are a wrap, pieces sharing one baseline are the
+defect. `make links` (§11) is the assertion, and it carries a negative control
+that restores the BibLaTeX default so the check is re-proved against the real
+failure on every run.
+
 ### Icons
 
 The default output should use no icons for essential information. If an optional
@@ -1216,6 +1241,24 @@ fixture of this kind has to look like:
 Poppler is the discriminating consumer here. The committed `*.pdfkit.txt`
 baselines keep each heading row on one line at every value tested, so they
 record the layout but do not detect the fault.
+
+**Link copy-paste integrity is covered** (issue #294). `tests/links/`
+(`make links`) asserts that no URL or e-mail address is emitted as two or more
+words sharing a baseline — see §6, "Copy-paste integrity", for the mechanism.
+One fixture per link site: the résumé contact line, the CV contact line and its
+manual publication list, both letter families, and the BibLaTeX bibliography.
+
+Three properties of the suite are the point of it:
+
+- **It reads coordinates, not text.** `pdftotext -bbox` is what distinguishes a
+  wrap from a split; the plain text of the two is identical.
+- **It declares its expectations in the fixture.** A `% LINKTOKEN:` line names
+  each token that must stay atomic, and a token that is absent from the PDF
+  fails the run — a fixture that stops rendering its link cannot pass quietly.
+- **It carries a negative control.** `cv-bibliography-urlmuskip-raised.tex`
+  restores BibLaTeX's `0mu plus 3mu` and must be reported as split. It shares
+  its `.bib` with the passing bibliography fixture, so the muskip is the only
+  difference between an intact URL and a spread one.
 
 ### 11.7 Visual regression
 

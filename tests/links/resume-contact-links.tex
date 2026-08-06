@@ -1,0 +1,40 @@
+% resume-contact-links.tex — copy-paste integrity of the résumé contact line
+% (issue #294). Every identifier below is long enough that the contact line
+% wraps, which is the condition under which a justified paragraph would spread
+% a URL. The contact line is not a justified paragraph — each item is set in a
+% natural-width \hbox and whole lines are centred between \hfil — so these must
+% come out atomic; this fixture is what says so.
+%
+% LINKTOKEN: alexandria.montgomery.fitzgerald@a-very-long-department.example.org
+% LINKTOKEN: example.org/alexandria-montgomery-fitzgerald/portfolio
+% LINKTOKEN: linkedin.com/in/alexandria-montgomery-fitzgerald
+% LINKTOKEN: github.com/alexandria-montgomery-fitzgerald
+% LINKTOKEN: scholar.google.com/citations?user=AlexandriaMontgomery
+% LINKTOKEN: 0000-0002-1825-0097
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Alexandria Katherine Montgomery-Fitzgerald},
+  headline = {Principal Data Scientist and Machine Learning Platform Architect},
+  email    = {alexandria.montgomery.fitzgerald@a-very-long-department.example.org},
+  phone    = {+1 416 555 0142},
+  location = {Greater Toronto Regional Office, Ontario, Canada},
+  website  = {example.org/alexandria-montgomery-fitzgerald/portfolio},
+  linkedin = {linkedin.com/in/alexandria-montgomery-fitzgerald},
+  github   = {github.com/alexandria-montgomery-fitzgerald},
+  scholar  = {scholar.google.com/citations?user=AlexandriaMontgomery},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist},
+  organization = {Example Research Laboratory},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow used across teams.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

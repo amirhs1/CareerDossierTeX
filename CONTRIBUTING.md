@@ -508,7 +508,8 @@ cover the relevant parts of:
 1. each affected document family, and each affected statement `type`;
 2. missing required `name`, per affected class;
 3. missing optional `phone` and `website` without stray separators;
-4. long URL or contact field, and contact-line wrapping;
+4. long URL or contact field, contact-line wrapping, and the copy-paste
+   integrity of any link the change touches;
 5. two-page output, page furniture, and single-page suppression;
 6. text extraction and logical reading order;
 7. the unsupported-engine error;
@@ -560,6 +561,42 @@ baselines on macOS, and review both diffs before committing.
 Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
 [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md).
+
+### Link copy-paste integrity suite
+
+A URL or an e-mail address must survive copy-and-paste out of the PDF as one
+unbroken token:
+
+    make links                 # or: tests/links/run.sh
+
+Whether it does is a typesetting question, not a text one. Poppler starts a new
+word wherever an intra-word gap exceeds 0.1 em, so a URL whose breakpoints were
+stretched to justify a line extracts as `https : / / example . invalid /` while
+the rendered page looks entirely normal. Ordinary extracted text cannot even
+diagnose it: a legitimate line wrap and a split token both appear as whitespace.
+The suite therefore reads `pdftotext -bbox` coordinates — pieces on *different*
+baselines are a wrap, pieces sharing *one* baseline are the defect.
+
+Each fixture declares what must stay atomic in its own header, and the runner
+extracts the directives:
+
+    % LINKTOKEN: example.org/ada-lovelace/portfolio
+    % LINKEXPECT: split          (optional; marks a negative control)
+
+A declared token that is not in the PDF at all fails the run, so a fixture that
+stops rendering its link cannot pass by silence.
+
+One fixture covers each site that renders a link: the résumé contact line, the
+CV contact line and its manual publication list, both letter families, and the
+BibLaTeX bibliography. The bibliography is the only one of them that puts
+stretchable glue at a URL's breakpoints — `\biburlsetup` sets `\Urlmuskip` from
+`\biburlbigskip`, whose BibLaTeX default of `0mu plus 3mu` produced exactly this
+defect in issue #199 — so `cv-bibliography-urlmuskip-raised.tex` restores that
+default deliberately and **must** be reported as split. If that negative control
+ever stops firing, the check has gone blind; fix the check rather than the
+expectation. Because it needs Biber, a run without Biber skips both bibliography
+fixtures, says so in its summary, and exercises neither the stretchable-glue site
+nor the control.
 
 ### Default-path metadata suite
 

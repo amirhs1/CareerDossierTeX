@@ -82,6 +82,10 @@ Thumbs.db
 # Every runner writes *.diff scratch files next to its fixtures, not just the
 # extraction one.
 tests/*/*.diff
+# tests/links/run.sh extracts each fixture's `% LINKTOKEN:` directives into a
+# companion *.tokens file for the checker to read. The directives are the
+# source; the extracted file is scratch.
+tests/*/*.tokens
 
 # veraPDF reports and the toolchain record from tests/tagging/run.sh. These are
 # evidence retained as CI artifacts and reviewed per run, not committed files.

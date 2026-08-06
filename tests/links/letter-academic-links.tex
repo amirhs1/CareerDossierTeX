@@ -1,0 +1,39 @@
+% letter-academic-links.tex — copy-paste integrity for the academic cover
+% letter (issue #294). The academic family has its own letterhead and closing;
+% cover it separately rather than assuming the industry result transfers.
+%
+% LINKTOKEN: ada.lovelace@a-very-long-department.example.org
+% LINKTOKEN: example.org/ada-lovelace/research-and-teaching-materials
+% LINKTOKEN: 0000-0002-1825-0097
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+\documentclass[family=academic]{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Analytical Engine Research},
+  email    = {ada.lovelace@a-very-long-department.example.org},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+  website  = {example.org/ada-lovelace/research-and-teaching-materials},
+  orcid    = {0000-0002-1825-0097},
+}
+\CDossierLetterSetup{
+  recipient-name         = {Professor Grace Hopper},
+  recipient-title        = {Chair, Department of Computational Science},
+  recipient-organization = {Example University},
+  subject                = {Application for Assistant Professor of Computational Science},
+  salutation             = {Dear Professor Hopper,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Assistant Professor position in Computational
+Science. My research combines reliable numerical methods, reproducible
+software, and open teaching materials for interdisciplinary scientific work.
+
+The teaching materials, together with the reproducibility appendix that
+accompanies them, are deposited at
+\url{https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html}
+and remain publicly available.
+
+\MakeCDossierClosing
+\end{document}

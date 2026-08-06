@@ -1,0 +1,44 @@
+% cv-links.tex — copy-paste integrity of the academic CV's two link sites
+% (issue #294): the identity contact line, and the dependency-free manual
+% publication list.
+%
+% The publication URL is deliberately longer than the list measure, so it wraps
+% mid-token. That wrap is legitimate and the checker must say so: the pieces
+% land on different baselines. A spread URL puts them on one baseline instead,
+% which is the defect this suite exists to catch.
+%
+% LINKTOKEN: ada.lovelace@a-very-long-department.example.org
+% LINKTOKEN: example.org/ada-lovelace/publications-and-preprints
+% LINKTOKEN: 0000-0002-1825-0097
+% LINKTOKEN: 10.9999/example.transactions.2026.analytical-engine.appendix-g
+% LINKTOKEN: archive.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Analytical Engine Research},
+  email    = {ada.lovelace@a-very-long-department.example.org},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+  website  = {example.org/ada-lovelace/publications-and-preprints},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace and Grace Hopper},
+    title   = {Notes on the Analytical Engine},
+    venue   = {Transactions of the Example Society},
+    date    = {2026},
+    doi     = {10.9999/example.transactions.2026.analytical-engine.appendix-g}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {An Archived Note},
+    venue   = {Example Archive},
+    date    = {2025},
+    url     = {archive.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html}
+  }
+\end{CDossierPublications}
+\end{document}
