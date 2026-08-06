@@ -210,6 +210,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the same places. This narrows the failure rather than removing it — TeX will
   exceed a stated stretch to set an otherwise underfull line.
 
+- Tagged output now gives the document identity (the name) its own top-level
+  `/H1` heading, so a screen reader navigating by heading level reaches it
+  before any section. ([#267])
+
+  The name was rendered as an ordinary paragraph with no heading role at all,
+  while every résumé/CV section heading and the statement's own title heading
+  resolved to `/H1` in the kernel's default namespace — the document's only
+  heading level in use, sitting one level above the identity it should have
+  followed rather than led. veraPDF UA-2 passed regardless, the same
+  validator-invisible, screen-reader-visible shape as [#161]'s boxed-text
+  defect.
+
+  The name is now depth 1 of the shared tagged-heading primitive, which the
+  kernel's default namespace maps to `/H1`, and it always renders first. Every
+  résumé/CV section heading, the statement's title, and the statement's own
+  `\section`/`\subsection` moved one level down, so the hierarchy underneath
+  the name is unskipped (`/H2`, then `/H3` where a statement uses
+  `\CDossierSubsection`). See
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#74-heading-hierarchy-issue-267)
+  §7.4 for the per-profile hierarchy.
+
+  This is a structure-tree change under the opt-in `tagging=on` path only:
+  rendered layout, extracted text, and the untagged path are all unaffected,
+  and all five named tagged fixtures still pass veraPDF UA-2.
+
+[#267]: https://github.com/amirhs1/CareerDossierTeX/issues/267
 [#269]: https://github.com/amirhs1/CareerDossierTeX/issues/269
 [#270]: https://github.com/amirhs1/CareerDossierTeX/issues/270
 [#271]: https://github.com/amirhs1/CareerDossierTeX/issues/271

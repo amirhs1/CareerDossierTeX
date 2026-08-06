@@ -504,8 +504,8 @@
   { \seq_clear:N \l__cdossier_components_headerstack_seq }
 
 %% The argument is stored unexpanded and re-used once, so a line may carry
-%% structure -- the statement's title line wraps itself in
-%% \__cdossier_typography_heading:n and keeps its heading tagging.
+%% structure -- the name and the statement's title line each wrap themselves in
+%% \__cdossier_typography_heading:nn and keep their heading tagging.
 \NewDocumentCommand \CDossierHeaderLine { m }
   { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
 
@@ -563,15 +563,21 @@
 %% A thin wrapper over the public header stack above: it owns the validation and
 %% the choice of the three lines, and nothing else.
 %% ---------------------------------------------------------------------------
+%% Issue #267: the name is the document identity and outranks every other
+%% heading, so it is depth 1 of the shared heading primitive -- the only line
+%% in this stack that is.
 \NewDocumentCommand \MakeCDossierHeader { }
   {
     \__cdossier_base_require_name:N \MakeCDossierHeader
     \CDossierHeaderBegin
     \CDossierHeaderLine
       {
-        \CDossierNameStyle
-        \CDossierSizeName
-        \CDossierPrintField { name }
+        \__cdossier_typography_heading:nn { 1 }
+          {
+            \CDossierNameStyle
+            \CDossierSizeName
+            \CDossierPrintField { name }
+          }
       }
     \CDossierIfFieldTF { headline }
       {

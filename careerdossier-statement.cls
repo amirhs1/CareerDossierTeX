@@ -256,18 +256,25 @@
 %% The tokens are set well clear of that, and the fixture asserts the bound
 %% rather than clamping it here, so an unusable retune fails loudly.
 %% ---------------------------------------------------------------------------
+%% Issue #267: the kernel's tagging support reads `\@startsection''s numeric
+%% level argument, not its name, to pick the heading's structure depth --
+%% level 1 resolves to `/H1', level 2 to `/H2', and so on. The document
+%% identity (the name) now owns depth 1, so `\section' and `\subsection' move
+%% to depths 2 and 3, keeping the heading hierarchy unskipped underneath it.
+%% Both stay starred-only, so neither ever touches `secnumdepth' or a counter;
+%% the level argument's only remaining job is this tagging depth.
 \ExplSyntaxOff
 \makeatletter
 \renewcommand \section
   {
-    \@startsection {section} {1} {\z@}
+    \@startsection {section} {2} {\z@}
       {-\dimexpr \CDossierProseSectionAboveSkip - \parskip \relax}
       {\dimexpr \CDossierProseSectionBelowSkip - \parskip \relax}
       {\CDossierSectionStyle \CDossierSizeSection}
   }
 \renewcommand \subsection
   {
-    \@startsection {subsection} {2} {\z@}
+    \@startsection {subsection} {3} {\z@}
       {-\dimexpr \CDossierProseSubsectionAboveSkip - \parskip \relax}
       {\dimexpr \CDossierProseSubsectionBelowSkip - \parskip \relax}
       {\CDossierSectionStyle \CDossierSizeBody}
@@ -472,14 +479,20 @@
     \__cdossier_statement_validate:
     \par
     \CDossierHeaderBegin
+    %% Issue #267: the name is the document identity and outranks the
+    %% statement's own title, so it is depth 1 of the shared heading
+    %% primitive and the title moves to depth 2.
     \CDossierHeaderLine
       {
-        \CDossierNameStyle \CDossierSizeName
-        \CDossierPrintField { name }
+        \__cdossier_typography_heading:nn { 1 }
+          {
+            \CDossierNameStyle \CDossierSizeName
+            \CDossierPrintField { name }
+          }
       }
     \CDossierHeaderLine
       {
-        \__cdossier_typography_heading:n
+        \__cdossier_typography_heading:nn { 2 }
           {
             \CDossierSectionStyle \CDossierSizeDocumentTitle
             \tl_use:N \l__cdossier_statement_title_tl

@@ -991,12 +991,17 @@ behaves. It is deliberately **non-blocking**: tagging support inside BibLaTeX
 and Biber is upstream work, so a failure there does not gate the five named
 profiles unless the cause is CareerDossierTeX's own code.
 
-Recorded 2026-07-20, the fixture builds and **passes** veraPDF `ua2`, and the
+Recorded 2026-07-20 and reconfirmed 2026-08-06 against the heading-hierarchy
+change in issue #267, the fixture builds and **passes** veraPDF `ua2`, and the
 bibliography carries real structure rather than flat paragraphs — `/S /list`
 with `/item`, `/itemlabel`, and `/itembody` per entry, `/S /Link` with `/URI`
-for identifiers, and `/S /section` for the list heading. The runner writes the
-observed role counts to `tests/tagging/reports/biblatex-ua2-structure.txt` so
-this claim stays tied to output rather than assumption.
+for identifiers, and `/S /subsection` for the list heading (`\defbibheading`
+renders it through the CV's own `\CDossierSection`, so it moved from `/H1` to
+`/H2` alongside every other résumé/CV section heading — see 7.4). The
+document identity (`\MakeCDossierHeader`) supplies the fixture's one `/S
+/section`. The runner writes the observed role counts to
+`tests/tagging/reports/biblatex-ua2-structure.txt` so this claim stays tied to
+output rather than assumption.
 
 Known limitations, all observed rather than assumed:
 
@@ -1013,6 +1018,347 @@ Known limitations, all observed rather than assumed:
 
 This result is recorded, not advertised. Tagged BibLaTeX is not a supported
 feature of `v0.4.0`; it is a feasibility measurement for a later phase.
+
+### 7.4 Heading hierarchy (issue #267)
+
+Before `v0.8.0`, the document identity (the name) carried no heading role at
+all, while every résumé/CV section heading and the statement's own title
+resolved to `/H1` in the kernel's default namespace — the document's only
+heading level in use, and the level the identity should have occupied instead.
+A screen reader navigating by heading level reached "Experience" or a
+statement's title first, with nothing above it, and never reached the name
+that way at all.
+
+The identity is now the document's one and only depth-1 heading (`/S
+/section`, which the kernel's default namespace maps to `/H1`), and it
+precedes every other heading in source order because it is always the first
+line the shared header stack renders. Everything that used to sit at depth 1
+moved one level down, so the hierarchy is unskipped beneath it:
+
+| Profile | `/H1` | `/H2` | `/H3` |
+| --- | --- | --- | --- |
+| Résumé | the name | each `\CDossierSection` heading | — |
+| Academic CV | the name | each `\CDossierSection` heading (including a `careerdossier-biblatex` bibliography heading, which renders through the same command) | — |
+| Industry and academic letter | the name | — | — |
+| Statement | the name | the statement's title, and each `\CDossierSection`/`\section*` heading | each `\CDossierSubsection`/`\subsection*` heading |
+
+The letter has no `/H2`: it carries no section-heading component, so its
+identity `/H1` is the only heading in the document, which is a valid (if
+trivial) hierarchy rather than a skip.
+
+**How this reaches a screen-reader user.** A tagged PDF's structure tree
+supports two different ways of consuming it: "Say All" walks every leaf in
+document order at any heading level, while jumping by heading (VoiceOver's
+rotor set to "Headings", or the `H` key in NVDA/JAWS) visits only
+`/H1`–`/H6` elements, in order, skipping everything between them. This
+change affects only the second mode — for the résumé fixture:
+
+```text
+"Say All" -- reads every leaf, in document order, at any heading level.
+This is unaffected by #267; the résumé fixture reads the same either way:
+
+  1.  Ada Lovelace                        <- /H1  (the identity)
+  2.  Analytical Engine Programmer
+  3.  ada@example.test . +1 555 0100
+  4.  Experience                          <- /H2
+  5.  Senior Engineer -- Example Labs
+        - shipped the thing
+        - fixed the other thing
+  6.  Education                           <- /H2
+  7.  PhD, Somewhere University
+
+Heading navigation -- visits only /H1-/H6 elements, in that order,
+skipping everything between them (VoiceOver rotor set to "Headings";
+the H key in NVDA/JAWS). This is what #267 changes:
+
+  Before #267                    After #267
+  ---------------------------    ---------------------------
+  H2  Experience                 H1  Ada Lovelace
+  H2  Education                  H2  Experience
+                                  H2  Education
+  (the identity is never
+   reached this way)
+```
+
+Every line on the "Say All" side reaches a screen-reader user either way, in
+the same order — that is what the extraction and word-geometry gates in 7.1
+already cover, and why this change touches none of them. The heading-jump
+list is the part that was silently broken: before #267 it read `H2
+Experience`, `H2 Education` and stopped there, because the identity carried
+no heading role to be listed at all. A screen-reader user who orients by
+heading level, rather than reading straight through, had no way to land on
+whose résumé this was without first "Say All"-ing past it or arrowing past
+the sections one line at a time. `/H1` is what makes the identity a stop on
+that jump list, and the first one.
+
+Mechanically, the shared heading primitive
+(`\__cdossier_typography_heading:nn` in `careerdossier-typography.sty`) takes
+the heading depth as an explicit argument rather than assuming depth 1, and
+the statement's native `\section`/`\subsection` (kept for their `Sect`-opening
+tagging behavior; see `careerdossier-statement.cls`) moved from levels 1/2 to
+2/3. `tests/tagging/run.sh`
+gates this: every one of the five named profiles must carry exactly one `/S
+/section` element, and an `/S /subsubsection` element may appear only where an
+`/S /subsection` element also does.
+
+This is a structure-tree change only. It does not alter rendered layout, and
+the untagged path is unaffected because the heading primitive's untagged
+branch does not depend on the depth argument. `Sect` divisions around
+résumé/CV section headings remain out of scope for this change; see issue
+#268.
+
+### 7.5 Structure tree by profile
+
+The table and diagram above show the heading skeleton only. This section shows
+the **complete** tagged structure of each named fixture — every heading, link,
+list, and paragraph, in document order, with its actual extracted text — so
+the reading and heading-navigation experience is visible for every component,
+not only headings.
+
+Recorded 2026-08-06 at this branch's tip, decoded byte-for-byte from the
+committed fixtures' `/StructTreeRoot` and content streams (`/K` → `/MCR` →
+`/MCID` → the marked-content run's own `Tj`/`TJ` glyph codes, resolved through
+each font's embedded `/ToUnicode` CMap) — not inferred from the source `.tex`.
+`=>` shows the exact text a consumer that reads structure (rather than glyph
+geometry) would receive for that element; an `[annotation: ...]` line is an
+`/OBJR` pointing at a link annotation, not text a screen reader announces on
+its own. Running headers, folios, decorative rules, and separator characters
+are `/Artifact`s and are correctly **absent** below — that is the intended
+result of 7's "mark decorative content as artifact" rule, not an omission.
+
+**Two things are worth reading closely, not just skimming past.**
+
+First, a handful of `/text` leaves below are marked `(no visible text)`. These
+are real, structurally-present elements that carry zero glyphs — they sit at
+the boundary where the shared header stack's closing `\addvspace` (and, in the
+résumé and CV, the section rule's own paragraph) ends one automatically-tagged
+paragraph and starts the next. A screen reader passes over an empty element
+silently, so these are inert, but they are why the tree below has more
+`/text-unit` nodes than a count of visible lines would predict — issue #267's
+own motivating résumé example undercounted them for the same reason.
+
+Second, and more substantively: **a `/text` leaf that contains more than one
+run occasionally concatenates those runs with no separating character at
+all**, which is different from an ordinary sentence that happens to contain a
+link (marked `‖` below; that case is fine — the embedded `/Link` element
+supplies the reading-order gap). The genuine case is a two-column or two-line
+layout built with `\hfill` or `\\` alone: the entry heading's title/dates row,
+its organization/location row, and the letter's stacked recipient name and
+organization all land in **one** marked-content run, because nothing —
+neither a space character nor a second structure element — separates the two
+halves in the content stream. `Engineer` immediately followed by `2024–2026`
+with no space between them is not a transcription artifact of this table; it
+is the literal decoded content a structure-aware consumer receives. This is
+`\hfill`/`\\` positioning glyphs by absolute coordinates rather than by a real
+interword space, the same root cause as 4.5's retired `/ActualText` history,
+in a new location that history did not cover. It has not been reproduced
+against a live screen reader and is not a claim about VoiceOver or NVDA's
+actual output — Poppler's own default extraction already separates these onto
+different lines (see 7.1's baselines), which is why nothing in the existing
+extraction suite catches it — so it is recorded here rather than fixed, for a
+dedicated follow-up.
+
+#### Résumé
+
+```text
+/Document
+  /section                              => 'Tagged Industry Resume'            [/H1]
+  /text-unit
+    /text                                => 'Accessibility Engineer'
+  /Link                                  => 'resume@example.test'   (mailto: link)
+  /text                                  => '+1 555 0100'           (not a link)
+  /Link                                  => 'example.test/resume'   (https: link)
+  /text-unit
+    /text                                (no visible text)
+  /subsection                            => 'Experience'                       [/H2]
+  /text-unit
+    /text                                (no visible text)
+  /text-unit
+    /text                                => 'Engineer2024–2026'      <- no separator; see above
+  /text-unit
+    /text                                => 'Example LabsToronto'    <- no separator; see above
+  /text-unit
+    /itemize
+      /item
+        /itemlabel                       => '•'
+        /itembody
+          /text-unit
+            /text                        => 'First resume achievement in source order.'
+      /item
+        /itemlabel                       => '•'
+        /itembody
+          /text-unit
+            /text                        => 'Second resume achievement with a meaningful ' ‖ '.'
+              /Link                      => 'work link'
+  /subsection                            => 'Additional Experience'            [/H2]
+  /text-unit
+    /text                                (no visible text)
+  /text-unit
+    /text                                => 'Senior Engineer2022–2024'
+  /text-unit
+    /text                                => 'Example ServicesOttawa'
+  /text-unit
+    /itemize
+      /item
+        /itemlabel                       => '•'
+        /itembody
+          /text-unit
+            /text                        => 'Second-page resume content after the shared page furniture.'
+```
+
+#### Academic CV
+
+Identical shape to the résumé — the same `\MakeCDossierHeader` and
+`\CDossierSection` produce it — with its own field values and, on the second
+page, one entry whose `location` is blank (`\tl_if_blank:nF` correctly omits
+the row rather than leaving a stray separator, per rule 5):
+
+```text
+/Document
+  /section                              => 'Tagged Academic CV'               [/H1]
+  /text-unit
+    /text                                => 'Research Engineer'
+  /Link                                  => 'cv@example.test'
+  /text                                  => '+1 555 0101'
+  /Link                                  => 'example.test/cv'
+  /text-unit
+    /text                                (no visible text)
+  /subsection                            => 'Research Experience'             [/H2]
+  /text-unit
+    /text                                (no visible text)
+  /text-unit
+    /text                                => 'Researcher2023–2026'
+  /text-unit
+    /text                                => 'Example UniversityToronto'
+  /text-unit
+    /itemize
+      /item /itemlabel => '•' /itembody /text-unit
+        /text                            => 'First CV achievement in source order.'
+      /item /itemlabel => '•' /itembody /text-unit
+        /text                            => 'Second CV achievement with a meaningful ' ‖ '.'
+          /Link                          => 'research link'
+  /subsection                            => 'Teaching Experience'             [/H2]
+  /text-unit
+    /text                                (no visible text)
+  /text-unit
+    /text                                => 'Instructor2025'
+  /text-unit
+    /text                                => 'Example University'              (location blank, rule 5: no stray separator)
+  /text-unit
+    /itemize
+      /item /itemlabel => '•' /itembody /text-unit
+        /text                            => 'Second-page CV content after the running header.'
+```
+
+#### Industry letter
+
+No section-heading component at all, so nothing below the identity carries a
+heading role — flat prose, in reading order:
+
+```text
+/Document
+  /section                              => 'Tagged Industry Letter'            [/H1]
+  /Link                                  => 'letter@example.test'
+  /text                                  => '+1 555 0102'
+  /text-unit
+    /text                                (no visible text)
+  /text-unit
+    /text                                => 'July 20, 2026'
+  /text-unit
+    /text                                => 'Casey ReaderExample Company'      <- no separator; see above
+  /text-unit
+    /text                                => 'Application for Engineering Role'
+  /text-unit
+    /text                                => 'Dear Casey Reader,'
+  /text-unit
+    /text                                => 'The first industry-letter paragraph precedes the second in source order.'
+  /text-unit
+    /text                                => 'The second industry-letter paragraph contains a meaningful ' ‖ '.'
+      /Link                              => 'letter link'
+  /text-unit
+    /text                                => 'The third industry-letter paragraph appears on page two after the shared running header and above the folio.'
+  /text-unit
+    /text                                => 'Sincerely,'
+  /text-unit
+    /text                                => 'Tagged Industry Letter'
+```
+
+#### Academic letter
+
+Same shape as the industry letter (`family=academic` changes running-head
+wording and closing conventions, not structure):
+
+```text
+/Document
+  /section                              => 'Tagged Academic Letter'            [/H1]
+  /Link                                  => 'academic-letter@example.test'
+  /text                                  => '+1 555 0103'
+  /text-unit
+    /text                                (no visible text)
+  /text-unit
+    /text                                => 'July 20, 2026'
+  /text-unit
+    /text                                => 'Jordan ReaderExample University'   <- no separator; see above
+  /text-unit
+    /text                                => 'Application for Faculty Role'
+  /text-unit
+    /text                                => 'Dear Jordan Reader,'
+  /text-unit
+    /text                                => 'The first academic-letter paragraph appears on page one before the page break.'
+  /text-unit
+    /text                                => 'This page also contains a meaningful ' ‖ '.'
+      /Link                              => 'academic-letter link'
+  /text-unit
+    /text                                => 'The second academic-letter paragraph appears on page two after the repeated footer from page one and before the closing.'
+  /text-unit
+    /text                                => 'Sincerely,'
+  /text-unit
+    /text                                => 'Tagged Academic Letter'
+```
+
+#### Statement
+
+The only profile with a genuine three-level hierarchy in this fixture (`/H1`
+name, `/H2` title and section, and a `/Sect` division per section from the
+kernel's native `\section*`/`\CDossierSection` — see `careerdossier-statement.cls`
+and issue #177). This fixture does not exercise `\CDossierSubsection`, so no
+`/H3` appears here; see 7.4's table for where one would:
+
+```text
+/Document
+  /section                              => 'Tagged Research Statement'         [/H1]
+  /subsection                           => 'Research Statement'                [/H2]  (the title line)
+  /text-unit
+    /text                                => 'Reliable computational inquiry'   (subtitle)
+  /text-unit
+    /text                                => 'Example University'              (affiliation)
+  /text-unit
+    /text                                => 'Application for Faculty Role' ‖ 'Application ID: APP-104'
+  /Link                                  => 'statement@example.test'
+  /text                                  => '+1 555 0104'
+  /Link                                  => 'example.test/statement'
+  /Link                                  => 'ORCID: 0000-0002-1825-0097'
+  /text-unit
+    /text                                (no visible text)
+  /Sect
+    /subsection                         => 'Research Vision'                   [/H2]
+    /text-unit
+      /text                              => 'The first statement paragraph contains a meaningful ' ‖ '.'
+        /Link                            => 'statement link'
+  /Sect
+    /subsection                         => 'Future Programme'                  [/H2]
+    /text-unit
+      /text                              => 'The second statement paragraph appears on page two.'
+```
+
+The context line (`'Application for Faculty Role' ‖ 'Application ID:
+APP-104'`) is structurally two adjacent leaves, not one glued run, because the
+`|` between them is its own `/Artifact` and interrupts the marked-content run
+— unlike the entry-heading and recipient-block cases above, which never open a
+second run at all. Whether two separate accessible elements, read back to
+back with their artifact-only separator invisible to the consumer, are any
+more legible than one glued run is exactly the kind of question 7.2's manual
+screen-reader pass, not a structural count, can actually answer.
 
 ## 8. Class and package architecture
 

@@ -217,6 +217,32 @@ check_structure() {
 
   grep -qa '/Artifact BMC' "$pdf" \
     || record_failure "$base running header/folio are not artifacts"
+
+  check_heading_hierarchy "$base" "$pdf"
+}
+
+# Issue #267: the document identity (the name) is depth 1 of the shared
+# heading primitive -- the kernel's dflt namespace maps that depth to `/H1' --
+# so it must be the document's *only* `/H1', and it must outrank every other
+# heading. Every one of the five named profiles carries exactly one `/S
+# /section' element (the name); a résumé/CV/statement section heading is `/S
+# /subsection' (`/H2') and a statement subsection would be `/S /subsubsection'
+# (`/H3'). These three literal tags cannot collide as substrings of one
+# another once each is anchored to its own `/S ' key, so a plain count is
+# enough to catch both a missing identity heading and a skipped level.
+check_heading_hierarchy() {
+  local base="$1" pdf="$2"
+  local h1 h2 h3
+
+  h1="$(grep -oaF '/S /section' "$pdf" | wc -l | tr -d '[:space:]')"
+  h2="$(grep -oaF '/S /subsection' "$pdf" | wc -l | tr -d '[:space:]')"
+  h3="$(grep -oaF '/S /subsubsection' "$pdf" | wc -l | tr -d '[:space:]')"
+
+  [ "$h1" -eq 1 ] \
+    || record_failure "$base has $h1 /H1-mapped heading(s) (the identity name), expected exactly 1"
+  if [ "$h3" -gt 0 ] && [ "$h2" -eq 0 ]; then
+    record_failure "$base has an /H3-mapped heading with no /H2 beneath /H1 -- a skipped level"
+  fi
 }
 
 check_two_page_furniture() {
