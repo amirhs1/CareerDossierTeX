@@ -8,7 +8,7 @@
 \int_new:N \g__cdossier_test_statement_small_size_int
 
 \cs_new_eq:NN \__cdossier_test_statement_name_size: \CDossierSizeName
-\cs_new_eq:NN \__cdossier_test_statement_title_size: \CDossierSizeTitle
+\cs_new_eq:NN \__cdossier_test_statement_title_size: \CDossierSizeDocumentTitle
 \cs_new_eq:NN \__cdossier_test_statement_headline_size: \CDossierSizeHeadline
 \cs_new_eq:NN \__cdossier_test_statement_body_size: \CDossierSizeBody
 \cs_new_eq:NN \__cdossier_test_statement_small_size: \CDossierSizeSmall
@@ -18,7 +18,7 @@
     \int_gincr:N \g__cdossier_test_statement_name_size_int
     \__cdossier_test_statement_name_size:
   }
-\cs_set_protected:Npn \CDossierSizeTitle
+\cs_set_protected:Npn \CDossierSizeDocumentTitle
   {
     \int_gincr:N \g__cdossier_test_statement_title_size_int
     \__cdossier_test_statement_title_size:

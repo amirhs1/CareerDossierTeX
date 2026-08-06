@@ -481,7 +481,7 @@
       {
         \__cdossier_typography_heading:n
           {
-            \CDossierSectionStyle \CDossierSizeTitle
+            \CDossierSectionStyle \CDossierSizeDocumentTitle
             \tl_use:N \l__cdossier_statement_title_tl
           }
       }

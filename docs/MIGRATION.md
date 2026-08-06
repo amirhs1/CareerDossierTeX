@@ -346,6 +346,38 @@ in this format.
 
 ## [0.8.0] - unreleased
 
+### `\CDossierSizeTitle` renamed to `\CDossierSizeDocumentTitle`
+
+A source edit is required only in a document that reads or sets this token by
+name. Nothing renders differently: the rename moves no value, and no other token
+changes.
+
+Before:
+
+    \CDossierSizeTitle
+
+After:
+
+    \CDossierSizeDocumentTitle
+
+Reason: `Title` meant two unrelated things in one vocabulary. This token is a
+step of the type scale, and its single call site in the whole toolkit sizes a
+statement's document title — the "Statement of Interest" or "Statement of
+Teaching Philosophy" line at the top of the page. `\CDossierEntryTitleStyle` is
+a semantic role for the heading of one job, degree, or project inside a résumé
+or CV. They sit at different levels and are never composed, so they should not
+have shared a word.
+
+`\CDossierEntryTitleStyle` is **not** renamed, and neither is any other size or
+style token. The renamed token keeps its 1.50 ratio and its 15 / 17, 16 / 18,
+and 18 / 20 pt values at `fontsize=10pt`, `11pt`, and `12pt` — see the type
+scale in [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
+
+Note that `\CDossierSizeSection` was **not** a candidate for this rename: it
+already exists as a distinct 1.12 step used for section headings in all three
+classes, and folding the two together would shrink a statement's title from
+16 pt to 12 pt — a retune, not a rename. See issue #269.
+
 ### `\CDossierPrimaryColor` removed
 
 No source edit is required unless a document called `\CDossierPrimaryColor`

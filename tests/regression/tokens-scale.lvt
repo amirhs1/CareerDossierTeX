@@ -29,7 +29,7 @@
     \cdossiertest_dimension:N \CDossierBodySize
     \cdossiertest_dimension:N \CDossierBodyLeading
     \cdossiertest_size:N \CDossierSizeName
-    \cdossiertest_size:N \CDossierSizeTitle
+    \cdossiertest_size:N \CDossierSizeDocumentTitle
     \cdossiertest_size:N \CDossierSizeHeadline
     \cdossiertest_size:N \CDossierSizeSection
     \cdossiertest_size:N \CDossierSizeBody
