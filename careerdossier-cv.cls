@@ -208,11 +208,14 @@
 %% The keep-together penalty (issue #145) after the heading and rule keeps the
 %% title with the content that follows it, so a section heading is never
 %% stranded alone at the foot of a page.
+%% Issue #267: depth 2, not 1 -- the document identity (the name, in
+%% \MakeCDossierHeader) is the document's one depth-1 heading, so every
+%% résumé/CV section heading sits one level under it.
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
     \addvspace { \CDossierRecordSectionAboveSkip }
-    \__cdossier_typography_heading:n
+    \__cdossier_typography_heading:nn { 2 }
       { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
     \__cdossier_components_section_rule:
   }

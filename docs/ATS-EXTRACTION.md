@@ -991,12 +991,17 @@ behaves. It is deliberately **non-blocking**: tagging support inside BibLaTeX
 and Biber is upstream work, so a failure there does not gate the five named
 profiles unless the cause is CareerDossierTeX's own code.
 
-Recorded 2026-07-20, the fixture builds and **passes** veraPDF `ua2`, and the
+Recorded 2026-07-20 and reconfirmed 2026-08-06 against the heading-hierarchy
+change in issue #267, the fixture builds and **passes** veraPDF `ua2`, and the
 bibliography carries real structure rather than flat paragraphs — `/S /list`
 with `/item`, `/itemlabel`, and `/itembody` per entry, `/S /Link` with `/URI`
-for identifiers, and `/S /section` for the list heading. The runner writes the
-observed role counts to `tests/tagging/reports/biblatex-ua2-structure.txt` so
-this claim stays tied to output rather than assumption.
+for identifiers, and `/S /subsection` for the list heading (`\defbibheading`
+renders it through the CV's own `\CDossierSection`, so it moved from `/H1` to
+`/H2` alongside every other résumé/CV section heading — see 7.4). The
+document identity (`\MakeCDossierHeader`) supplies the fixture's one `/S
+/section`. The runner writes the observed role counts to
+`tests/tagging/reports/biblatex-ua2-structure.txt` so this claim stays tied to
+output rather than assumption.
 
 Known limitations, all observed rather than assumed:
 
@@ -1013,6 +1018,49 @@ Known limitations, all observed rather than assumed:
 
 This result is recorded, not advertised. Tagged BibLaTeX is not a supported
 feature of `v0.4.0`; it is a feasibility measurement for a later phase.
+
+### 7.4 Heading hierarchy (issue #267)
+
+Before `v0.8.0`, the document identity (the name) carried no heading role at
+all, while every résumé/CV section heading and the statement's own title
+resolved to `/H1` in the kernel's default namespace — the document's only
+heading level in use, and the level the identity should have occupied instead.
+A screen reader navigating by heading level reached "Experience" or a
+statement's title first, with nothing above it, and never reached the name
+that way at all.
+
+The identity is now the document's one and only depth-1 heading (`/S
+/section`, which the kernel's default namespace maps to `/H1`), and it
+precedes every other heading in source order because it is always the first
+line the shared header stack renders. Everything that used to sit at depth 1
+moved one level down, so the hierarchy is unskipped beneath it:
+
+| Profile | `/H1` | `/H2` | `/H3` |
+| --- | --- | --- | --- |
+| Résumé | the name | each `\CDossierSection` heading | — |
+| Academic CV | the name | each `\CDossierSection` heading (including a `careerdossier-biblatex` bibliography heading, which renders through the same command) | — |
+| Industry and academic letter | the name | — | — |
+| Statement | the name | the statement's title, and each `\CDossierSection`/`\section*` heading | each `\CDossierSubsection`/`\subsection*` heading |
+
+The letter has no `/H2`: it carries no section-heading component, so its
+identity `/H1` is the only heading in the document, which is a valid (if
+trivial) hierarchy rather than a skip.
+
+Mechanically, the shared heading primitive
+(`\__cdossier_typography_heading:nn` in `careerdossier-typography.sty`) takes
+the heading depth as an explicit argument rather than assuming depth 1, and
+the statement's native `\section`/`\subsection` (kept for their `Sect`-opening
+tagging behavior; see `careerdossier-statement.cls`) moved from levels 1/2 to
+2/3. `tests/tagging/run.sh`
+gates this: every one of the five named profiles must carry exactly one `/S
+/section` element, and an `/S /subsubsection` element may appear only where an
+`/S /subsection` element also does.
+
+This is a structure-tree change only. It does not alter rendered layout, and
+the untagged path is unaffected because the heading primitive's untagged
+branch does not depend on the depth argument. `Sect` divisions around
+résumé/CV section headings remain out of scope for this change; see issue
+#268.
 
 ## 8. Class and package architecture
 

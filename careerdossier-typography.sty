@@ -200,22 +200,32 @@
 %% tagged branch temporarily disables automatic paragraph tagging so the line
 %% becomes a heading structure directly, rather than a heading nested inside a
 %% paragraph.  All commands used here are public kernel/tagpdf interfaces.
-\cs_new_protected:Npn \__cdossier_typography_heading:n #1
+%%
+%% Issue #267: the heading level is now a caller-supplied depth rather than a
+%% hard-coded 1, because two things in a document can want a heading role and
+%% they must not collide. `sec/<n>/title' is the kernel's own generic
+%% structure name for a level-<n> sectioning title; its default role mapping
+%% resolves depth 1 to `/H1', depth 2 to `/H2', and so on. Depth 1 is reserved
+%% for the document identity (the name), so every other heading -- a résumé or
+%% CV `\CDossierSection', a statement's title -- passes a depth of 2 or
+%% deeper, keeping the identity the document's one and only `/H1' and the
+%% heading hierarchy unskipped beneath it.
+\cs_new_protected:Npn \__cdossier_typography_heading:nn #1#2
   {
     \tag_if_active:TF
       {
         \UseTaggingSocket { para/off }
         \noindent
-        \tag_struct_begin:n { tag = \UseStructureName { sec/1/title } }
+        \tag_struct_begin:n { tag = \UseStructureName { sec/#1/title } }
         \tag_mc_begin:n { }
-        #1
+        #2
         \tag_mc_end:
         \tag_struct_end:
         \par \nobreak
         \UseTaggingSocket { para/restore }
       }
       {
-        \noindent #1
+        \noindent #2
         \par \nobreak
       }
   }
