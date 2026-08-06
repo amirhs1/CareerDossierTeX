@@ -1,0 +1,110 @@
+% letter-subject-role.lvt — the letter subject line's semantic role (#299).
+%
+% The subject line used to borrow \CDossierEntryTitleStyle, the published role
+% for the heading of one job, degree, or project. Both roles resolve to
+% \rmfamily \bfseries, so nothing on the page distinguished them and no
+% value-echoing test could: the defect was a name, and the coupling it created.
+%
+% `typography-roles' asserts what \CDossierSubjectStyle *resolves to*. That
+% alone would still pass if the letterhead never called it. This file asserts
+% the other half — that the rendered letterhead actually *goes through* the
+% role — with the marker-tracing technique from #271: every semantic role is
+% replaced by a marker, one letterhead is composed into a box, and the baseline
+% records which role each rendered line reaches, in order. \TYPE fires as the
+% box is built, so the markers appear in rendered order; boxing keeps the
+% letterhead off the page being shipped.
+%
+% What the traces are read for:
+%
+%   subject-line-uses-the-subject-role   >subject appears, between the
+%                                        recipient block and the salutation,
+%                                        and >entrytitle appears nowhere
+%   no-subject-omits-the-line            >subject is absent entirely. #299
+%                                        changes which role the line selects,
+%                                        not whether the line exists; the
+%                                        optional-field contract is that an
+%                                        absent subject emits neither the line
+%                                        nor its following block skip. The gap
+%                                        half of that is measured by
+%                                        `letter-block-edges', which reads
+%                                        letterhead-minimal against
+%                                        letterhead-with-subject as heights.
+%
+% The roles are traced, not compared to each other. \CDossierSubjectStyle and
+% \CDossierEntryTitleStyle agree on shape today by coincidence of two
+% independent decisions, so an assertion that the subject line "renders like an
+% entry title" would re-create the coupling this issue removed.
+%
+% This file covers the industry family. The academic family is a separate file,
+% `letter-subject-role-academic', because `family' is a class option and a class
+% takes one set of \documentclass options per document. Setting the key after
+% the class has loaded would not do instead: `family' has exactly one consumer,
+% the load-time branch choosing the PDF document type, so a post-load
+% \keys_set:nn would produce an identical trace whatever the letterhead did with
+% it, and would assert nothing.
+\input{regression-test}
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_letterhead_box
+
+%% Replace every semantic role the letterhead can reach with a marker, so an
+%% unexpected role shows up as a wrong name rather than as identical output.
+%% This is invoked once, before \START and so outside every \TEST group: a
+%% document-command redefinition is undone when its group closes, and a
+%% renewal made inside the first \TEST would leave the later ones tracing the
+%% real roles and reporting nothing at all -- which reads as "no markers", the
+%% same log a genuinely missing subject line produces.
+\cs_new_protected:Npn \cdossiertestTraceRoles
+  {
+    \RenewDocumentCommand \CDossierSubjectStyle    { } { \TYPE{ >subject    } }
+    \RenewDocumentCommand \CDossierEntryTitleStyle { } { \TYPE{ >entrytitle } }
+    \RenewDocumentCommand \CDossierBodyStyle       { } { \TYPE{ >body       } }
+  }
+
+\cs_new_protected:Npn \cdossiertestTraceLetterhead
+  { \vbox_set:Nn \l_cdossiertest_letterhead_box { \MakeCDossierLetterhead } }
+
+%% One letterhead's worth of data, differing only in the subject. Every
+%% recipient key is named so an absent one is the test's choice rather than a
+%% default's.
+\NewDocumentCommand \cdossiertestLetterData { m }
+  {
+    \CDossierLetterSetup
+      {
+        date = {1~January~2026} ,
+        recipient-name = {Grace~Hopper} ,
+        recipient-title = {} ,
+        recipient-organization = {} ,
+        recipient-address = {} ,
+        subject = {#1} ,
+      }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+% As in letter-block-edges: force the math-font loads that \nolinkurl triggers
+% at the contact line's size before the first test, so the font-info lines land
+% outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\cdossiertestTraceRoles
+\START
+
+% The letter data is set inside each test rather than once before them all:
+% \CDossierLetterSetup assigns locally, so values set in one \TEST group are
+% gone by the next, which would silently trace a default letterhead.
+\TEST{subject-line-uses-the-subject-role}{
+  \cdossiertestLetterData{Application for the advertised post}
+  \cdossiertestTraceLetterhead
+}
+
+\TEST{no-subject-omits-the-line}{
+  \cdossiertestLetterData{}
+  \cdossiertestTraceLetterhead
+}
+
+\END

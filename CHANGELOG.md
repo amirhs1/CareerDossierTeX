@@ -61,6 +61,23 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **Test coverage only.** No class, option, key, command, environment, or
   calibrated value changed, and no document renders differently.
 
+- A new semantic role, `\CDossierSubjectStyle`, dresses a cover letter's
+  subject line in both letter families. **No document renders differently** and
+  nothing needs a source edit: the role is new, and the subject line has the
+  same bold serif shape it always had. ([#299])
+
+  The subject line previously borrowed `\CDossierEntryTitleStyle`, the
+  published role for the heading of one job, degree, or project. Both resolve
+  to the same shape, so nothing on the page distinguished them — but one
+  published name then described only one of the two places it applied, and a
+  future change to entry headings would have silently restyled every letter's
+  subject line. The two roles are now defined independently and may diverge.
+
+  `\CDossierEntryTitleStyle` keeps its name, its definition, and its use in
+  entry headings. The published role list in
+  [`docs/API.md`](docs/API.md#typography-roles) now says where each role
+  applies.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -199,6 +216,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 [#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294
+[#299]: https://github.com/amirhs1/CareerDossierTeX/issues/299
 
 ## [0.7.0] - 2026-08-04
 

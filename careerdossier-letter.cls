@@ -351,6 +351,11 @@
 %% \CDossierLetterheadBelowSkip claimed the same boundary immediately
 %% afterwards with a smaller value (0.75 against 0.8125), and `\addvspace'
 %% takes the maximum, so it never reached the page.
+%%
+%% Issue #299: the subject line uses \CDossierSubjectStyle, the role that
+%% describes it. It previously borrowed \CDossierEntryTitleStyle, which names a
+%% résumé or CV entry heading -- a shape that happens to match, attached to a
+%% name that does not describe this line. Nothing on the page moved.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierLetterhead { }
   {
@@ -367,7 +372,7 @@
       }
     \tl_if_blank:VF \l__cdossier_letter_subject_tl
       {
-        \noindent { \CDossierEntryTitleStyle \tl_use:N \l__cdossier_letter_subject_tl }
+        \noindent { \CDossierSubjectStyle \tl_use:N \l__cdossier_letter_subject_tl }
         \par
         \addvspace { \CDossierLetterBlockSkip }
       }

@@ -1,0 +1,66 @@
+% letter-subject-role-academic.lvt — the academic family's subject line (#299).
+%
+% The companion to `letter-subject-role', which carries the full rationale for
+% the marker-tracing instrument and for tracing the roles rather than comparing
+% them to each other. Only the class option differs.
+%
+% This is a separate file rather than a fourth test there because `family' is a
+% class option and a class takes one set of \documentclass options per document.
+% Setting the key afterwards would assert nothing: `family' has exactly one
+% consumer, the load-time branch choosing the PDF document type, so a post-load
+% \keys_set:nn cannot reach the letterhead at all.
+%
+% Both families share one \MakeCDossierLetterhead, so the expected trace is the
+% industry file's, unchanged. That is the point — the assertion is that the two
+% families still agree, which stops a future family-conditional letterhead from
+% giving the academic subject line a different role unnoticed.
+\input{regression-test}
+\documentclass[family=academic]{careerdossier-letter}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_letterhead_box
+
+\cs_new_protected:Npn \cdossiertestTraceRoles
+  {
+    \RenewDocumentCommand \CDossierSubjectStyle    { } { \TYPE{ >subject    } }
+    \RenewDocumentCommand \CDossierEntryTitleStyle { } { \TYPE{ >entrytitle } }
+    \RenewDocumentCommand \CDossierBodyStyle       { } { \TYPE{ >body       } }
+  }
+
+\cs_new_protected:Npn \cdossiertestTraceLetterhead
+  { \vbox_set:Nn \l_cdossiertest_letterhead_box { \MakeCDossierLetterhead } }
+
+\NewDocumentCommand \cdossiertestLetterData { m }
+  {
+    \CDossierLetterSetup
+      {
+        date = {1~January~2026} ,
+        recipient-name = {Grace~Hopper} ,
+        recipient-title = {} ,
+        recipient-organization = {} ,
+        recipient-address = {} ,
+        subject = {#1} ,
+      }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\cdossiertestTraceRoles
+\START
+
+\TEST{academic-subject-line-uses-the-subject-role}{
+  \cdossiertestLetterData{Application for the advertised post}
+  \cdossiertestTraceLetterhead
+}
+
+\TEST{academic-no-subject-omits-the-line}{
+  \cdossiertestLetterData{}
+  \cdossiertestTraceLetterhead
+}
+
+\END

@@ -1069,17 +1069,23 @@ The class must not assume that a displayed URL includes a protocol. The implemen
 
 ## Typography roles
 
-The typography package may expose semantic style commands for internal and advanced use:
+The typography package may expose semantic style commands for internal and advanced use. Each names one place in a document, and the table says which:
 
-```latex
-\CDossierNameStyle
-\CDossierHeadlineStyle
-\CDossierSectionStyle
-\CDossierEntryTitleStyle
-\CDossierBodyStyle
-```
+| Role | Where it applies |
+|---|---|
+| `\CDossierNameStyle` | the profile name at the head of every document |
+| `\CDossierHeadlineStyle` | the optional headline below the name |
+| `\CDossierSectionStyle` | every section heading, in every class; also, composed with a smaller step of the size scale, the statement's subsection headings, and with a larger one its document title |
+| `\CDossierEntryTitleStyle` | the heading of one job, degree, or project — the title line a `CDossierEntry` environment renders, in the résumé and the CV |
+| `\CDossierSubjectStyle` | a cover letter's subject line, between the recipient block and the salutation |
+| `\CDossierBodyStyle` | running prose, and every line set as prose: the contact line, an entry's organization, and the letter's date, recipient block, salutation, closing, and signature name |
 
 These commands describe meaning rather than a particular font family, weight, or size.
+
+`\CDossierEntryTitleStyle` and `\CDossierSubjectStyle` resolve to the same shape
+today. That is two independent decisions agreeing, not one role with two names:
+redefining either leaves the other alone, so restyling entry headings does not
+restyle letter subject lines. Do not define one in terms of the other.
 
 One further role, `\CDossierMutedStyle`, is published by
 `careerdossier-components` rather than by the typography package, because
