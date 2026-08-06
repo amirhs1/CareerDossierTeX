@@ -1046,6 +1046,51 @@ The letter has no `/H2`: it carries no section-heading component, so its
 identity `/H1` is the only heading in the document, which is a valid (if
 trivial) hierarchy rather than a skip.
 
+**How this reaches a screen-reader user.** A tagged PDF's structure tree
+supports two different ways of consuming it: "Say All" walks every leaf in
+document order at any heading level, while jumping by heading (VoiceOver's
+rotor set to "Headings", or the `H` key in NVDA/JAWS) visits only
+`/H1`–`/H6` elements, in order, skipping everything between them. This
+change affects only the second mode — for the résumé fixture:
+
+```text
+"Say All" -- reads every leaf, in document order, at any heading level.
+This is unaffected by #267; the résumé fixture reads the same either way:
+
+  1.  Ada Lovelace                        <- /H1  (the identity)
+  2.  Analytical Engine Programmer
+  3.  ada@example.test . +1 555 0100
+  4.  Experience                          <- /H2
+  5.  Senior Engineer -- Example Labs
+        - shipped the thing
+        - fixed the other thing
+  6.  Education                           <- /H2
+  7.  PhD, Somewhere University
+
+Heading navigation -- visits only /H1-/H6 elements, in that order,
+skipping everything between them (VoiceOver rotor set to "Headings";
+the H key in NVDA/JAWS). This is what #267 changes:
+
+  Before #267                    After #267
+  ---------------------------    ---------------------------
+  H2  Experience                 H1  Ada Lovelace
+  H2  Education                  H2  Experience
+                                  H2  Education
+  (the identity is never
+   reached this way)
+```
+
+Every line on the "Say All" side reaches a screen-reader user either way, in
+the same order — that is what the extraction and word-geometry gates in 7.1
+already cover, and why this change touches none of them. The heading-jump
+list is the part that was silently broken: before #267 it read `H2
+Experience`, `H2 Education` and stopped there, because the identity carried
+no heading role to be listed at all. A screen-reader user who orients by
+heading level, rather than reading straight through, had no way to land on
+whose résumé this was without first "Say All"-ing past it or arrowing past
+the sections one line at a time. `/H1` is what makes the identity a stop on
+that jump list, and the first one.
+
 Mechanically, the shared heading primitive
 (`\__cdossier_typography_heading:nn` in `careerdossier-typography.sty`) takes
 the heading depth as an explicit argument rather than assuming depth 1, and
