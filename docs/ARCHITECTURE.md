@@ -714,7 +714,10 @@ Responsibilities:
 - require LuaLaTeX and fail fatally under any other engine;
 - load `fontspec`;
 - select the portable default fonts and the opt-in sans body family;
-- define semantic styles such as name, headline, section, entry title, and body;
+- define the six semantic styles: name, headline, section, entry title, letter
+  subject, and body. The subject and entry-title roles resolve to the same
+  shape and are defined independently (issue #299), so a change to one cannot
+  move the other;
 - own the cross-class `bodyfont=serif|sans` selection forwarded by each class;
 - provide extension points for future named font combinations;
 - apply the Latin ligature-suppression and lining-numbers defaults;

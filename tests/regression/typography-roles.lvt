@@ -42,7 +42,14 @@
 \TEST{headline-is-sans-medium}{  \cdossiertestRole{\CDossierHeadlineStyle}   }
 \TEST{section-is-sans-bold}{     \cdossiertestRole{\CDossierSectionStyle}    }
 \TEST{entrytitle-is-serif-bold}{ \cdossiertestRole{\CDossierEntryTitleStyle} }
+\TEST{subject-is-serif-bold}{    \cdossiertestRole{\CDossierSubjectStyle}    }
 \TEST{body-is-serif-regular}{    \cdossiertestRole{\CDossierBodyStyle}       }
+
+% Issue #299: the subject role and the entry-title role resolve to the same
+% shape today, and each is asserted on its own line above rather than against
+% the other. The two are independent semantic decisions that happen to agree;
+% an assertion of the form `subject equals entrytitle' would pass for a
+% definition that couples them, which is exactly what this role removes.
 
 % \CDossierMutedStyle is not asserted here. Issue #271 made de-emphasis
 % configurable, and `muted=gray' resolves to a colour, which this package does

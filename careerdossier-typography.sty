@@ -137,7 +137,15 @@
 \NewDocumentCommand \CDossierHeadlineStyle   { } { \sffamily \mdseries }
 \NewDocumentCommand \CDossierSectionStyle    { } { \sffamily \bfseries }
 \NewDocumentCommand \CDossierEntryTitleStyle { } { \rmfamily \bfseries }
+\NewDocumentCommand \CDossierSubjectStyle    { } { \rmfamily \bfseries }
 \NewDocumentCommand \CDossierBodyStyle       { } { \rmfamily \normalfont }
+
+%% Issue #299: \CDossierSubjectStyle and \CDossierEntryTitleStyle resolve to the
+%% same shape, and that is deliberate rather than duplication. A letter's subject
+%% line and a résumé entry's heading are two independent semantic decisions that
+%% currently agree; either may change without the other, and a future retune of
+%% entry headings must not silently restyle every letter. Do not factor one into
+%% the other, and do not define either in terms of the other.
 
 %% \CDossierMutedStyle is deliberately absent here (issue #271). De-emphasis is
 %% configurable through `muted=italic|gray|both', so the role may resolve to a
