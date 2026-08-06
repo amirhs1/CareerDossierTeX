@@ -4,7 +4,6 @@ Don't change this file in any respect.
 TEST 1: monochrome-palette-values
 ============================================================
 cdossier-text={gray}{0}
-cdossier-primary={gray}{0}
 cdossier-muted={gray}{0.3}
 cdossier-rule={gray}{0}
 cdossier-link={gray}{0}
@@ -12,9 +11,24 @@ cdossier-link={gray}{0}
 ============================================================
 TEST 2: public-color-tokens-defined
 ============================================================
-\CDossierPrimaryColor defined
 \CDossierTextColor defined
 \CDossierMutedColor defined
 \CDossierRuleColor defined
 \CDossierLinkColor defined
+============================================================
+============================================================
+TEST 3: link-color-reaches-the-hyperref-hook
+============================================================
+@linkcolor = cdossier-link
+============================================================
+============================================================
+TEST 4: running-head-and-folio-render-through-text-color
+============================================================
+>textcolor
+>textcolor
+============================================================
+============================================================
+TEST 5: section-rule-renders-through-rule-color
+============================================================
+>rulecolor
 ============================================================
