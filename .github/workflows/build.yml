@@ -302,6 +302,40 @@ jobs:
             tests/bibliography/*.diff
           if-no-files-found: warn
 
+  # Copy-paste integrity of URLs and e-mail addresses (issue #294). Its own job
+  # for the same reason `bibliography` is: the property is invisible in the
+  # rendered page and in ordinary extracted text, so a named check is what makes
+  # the coverage findable. It needs Biber as well as poppler — the bibliography
+  # is the only site that puts stretchable glue at a URL's breakpoints, and the
+  # suite's negative control lives there.
+  #
+  # This is a new check: do not add it to the branch ruleset's required list
+  # until it has passed on `main`.
+  links:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # tests/links/run.sh decides split-versus-wrap from `pdftotext -bbox`
+      # coordinates and exits early without it, so poppler is not optional here.
+      - name: Install poppler-utils
+        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
+      - name: Link copy-paste integrity fixtures
+        run: make links
+      # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
+      - name: Upload link fixture PDFs and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: links-artifacts
+          path: |
+            tests/links/*.pdf
+            tests/links/*.log
+            tests/links/*.blg
+            tests/links/*.tokens
+          if-no-files-found: warn
+
   # Default-path PDF metadata (issue #276). Deliberately its own job rather than
   # part of `tagging`, which is the suite it exists to complement: every tagging
   # fixture opts into \DocumentMetadata, and that is precisely what masks the

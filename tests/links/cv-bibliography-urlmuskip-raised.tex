@@ -1,0 +1,28 @@
+% cv-bibliography-urlmuskip-raised.tex — the negative control for issue #294.
+%
+% Identical to cv-bibliography-links.tex except that it puts \biburlbigskip
+% back to BibLaTeX's own 0mu plus 3mu default, undoing the cap
+% careerdossier-biblatex.sty applies. \biburlsetup copies it into \Urlmuskip,
+% so every breakpoint inside the URL gains a sixth of an em of stretch and a
+% justified line spends it there instead of on the word spaces. Current
+% Poppler starts a new word when the spacing between two characters exceeds
+% 0.1x the font size, so the URL extracts as
+% `https : / / records . example . invalid /' — the failure #199 found.
+%
+% This fixture must therefore FAIL the token check, and run.sh asserts exactly
+% that. Without it the suite could pass because it looks in the wrong place, or
+% because the checker cannot see the defect at all; with it, the acceptance
+% criterion "fails when \Urlmuskip is raised to 0mu plus 3mu" is re-verified on
+% every run rather than once by hand.
+%
+% LINKEXPECT: split
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{links.bib}
+\CDossierSetup{name={Ada Lovelace}}
+\biburlbigskip=0mu plus 3mu % undo the cap; see above
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}

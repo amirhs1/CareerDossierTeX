@@ -5,10 +5,12 @@
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
 # pure text processing and needs only bash and awk; l3build for `regression`;
-# pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`, and
-# `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing beyond LuaLaTeX
-# for `metadata`, which reads the PDF catalog itself;
-# BibLaTeX and Biber for `bibliography-test` and `academic-bibliography`.
+# pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
+# `links`, and `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing
+# beyond LuaLaTeX for `metadata`, which reads the PDF catalog itself;
+# BibLaTeX and Biber for `bibliography-test`, `links`, and
+# `academic-bibliography`. `links` skips its two bibliography fixtures with a
+# notice when Biber is absent, and says so in its summary.
 #
 # `tagging` additionally uses veraPDF (PDF/UA-2 validation), mutool (MuPDF
 # extraction), Biber (the BibLaTeX feasibility fixture), and PDFKit via
@@ -43,7 +45,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix extract-test bibliography-test metadata tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix extract-test bibliography-test links metadata tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -78,7 +80,7 @@ statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 # `lint` runs first: it compiles nothing, finishes in well under a second, and
 # what it catches is a source-level omission that every LaTeX-running suite
 # below would report as green.
-check: lint regression extract-test smoke layout bibliography-test metadata tagging examples ## Run the full supported local suite
+check: lint regression extract-test smoke layout bibliography-test links metadata tagging examples ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
 
 test: check ## Alias for check
@@ -107,6 +109,9 @@ extract-test: ## Text-extraction round-trip against committed baselines
 bibliography-test: ## Biber sorting and identifier-precedence fixture
 	tests/bibliography/run.sh
 
+links: ## Copy-paste integrity of URLs and e-mail addresses
+	tests/links/run.sh
+
 metadata: ## Default-path PDF metadata (/Lang) fixtures
 	tests/metadata/run.sh
 
@@ -120,5 +125,5 @@ clean: ## Remove generated documents, logs, and the l3build sandbox
 	@rm -f tests/*/*.aux tests/*/*.log tests/*/*.out tests/*/*.pdf \
 	       tests/*/*.xdv tests/*/*.fls tests/*/*.fdb_latexmk \
 	       tests/*/*.bbl tests/*/*.bcf tests/*/*.blg tests/*/*.run.xml \
-	       tests/*/*.diff tests/*/*.stdout
+	       tests/*/*.diff tests/*/*.stdout tests/*/*.tokens
 	@printf 'Cleaned generated files. Tracked source and .tlg baselines are untouched.\n'

@@ -8,6 +8,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- A new `make links` suite asserts that no URL or e-mail address a document
+  renders picks up extraction whitespace within a visual line — and that one
+  which legitimately wraps reassembles exactly from its line fragments — across
+  the résumé and CV contact lines, the CV's manual publication list, both
+  letter families, and the BibLaTeX bibliography. That pair is the checkable
+  form of "the address survives copy-and-paste". ([#294])
+
+  The property already held; nothing recorded why, and it is easy to break from
+  several directions at once. Whether a URL copies cleanly is decided by
+  typesetting rather than by text: current Poppler starts a new word when the
+  spacing between two characters exceeds 0.1× the font size, so a URL whose
+  breakpoints were stretched to justify a line copies as
+  `https : / / example . invalid /` while the printed page looks untouched.
+  The suite reads word bounding boxes rather than extracted text, because a
+  legitimate line wrap and a split token are indistinguishable in text — the
+  pieces of a wrap sit on different visual lines, the pieces of a split share
+  one. The threshold is an extractor implementation detail, so each run records
+  its `pdftotext` version. The suite carries a negative control that restores
+  BibLaTeX's `0mu plus 3mu` URL stretch, the setting that caused this in #199,
+  so the check is re-proved against the real failure on every run.
+
+  **Test coverage only.** No class, option, key, command, environment, or
+  calibrated value changed, and no document renders differently.
+
 ### Fixed
 
 - `/Lang` no longer depends on package load order. A document that loads
@@ -88,6 +114,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
+[#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294
 
 ## [0.7.0] - 2026-08-04
 

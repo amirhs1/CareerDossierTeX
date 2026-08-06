@@ -1,0 +1,21 @@
+% cv-bibliography-links.tex — copy-paste integrity for the opt-in BibLaTeX
+% bibliography (issue #294). This is the one site in the project that puts
+% stretchable glue at a URL's breakpoints: \biburlsetup sets \Urlmuskip from
+% \biburlbigskip, whose BibLaTeX default of 0mu plus 3mu spread the URL in
+% issue #199. careerdossier-biblatex.sty caps it at 0mu plus 1mu, and this
+% fixture is the assertion that the cap still holds.
+%
+% Its twin, cv-bibliography-urlmuskip-raised.tex, is the same document with the
+% cap removed. The pair shares one .bib, so the only difference between an
+% intact URL and a split one is the muskip.
+%
+% LINKTOKEN: 10.9999/example.transactions.2026.analytical-engine.appendix-g
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{links.bib}
+\CDossierSetup{name={Ada Lovelace}}
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}

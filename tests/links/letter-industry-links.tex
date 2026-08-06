@@ -1,0 +1,43 @@
+% letter-industry-links.tex — copy-paste integrity for the industry cover
+% letter (issue #294): the letterhead contact line, plus a long \url in the
+% body.
+%
+% The body is the one place in this project where a link sits inside a
+% justified paragraph, which is the only mechanism that can spread a URL's
+% breakpoints. \Urlmuskip is 0mu outside the bibliography, so there is no
+% stretchable glue at those breakpoints to spread; this fixture pins that.
+%
+% LINKTOKEN: ada.lovelace@a-very-long-department.example.org
+% LINKTOKEN: example.org/ada-lovelace/portfolio-and-selected-projects
+% LINKTOKEN: linkedin.com/in/ada-lovelace-analytical-engines
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@a-very-long-department.example.org},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+  website  = {example.org/ada-lovelace/portfolio-and-selected-projects},
+  linkedin = {linkedin.com/in/ada-lovelace-analytical-engines},
+}
+\CDossierLetterSetup{
+  recipient-name         = {Hiring Committee},
+  recipient-organization = {Northbridge Research Institute},
+  subject                = {Application for the Senior Data Scientist position},
+  salutation             = {Dear Members of the Hiring Committee,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position in computational
+analytics. My work combines numerical modelling, reproducible reporting
+pipelines, and data-driven analysis in support of large public programs.
+
+The archived record of that work, including the validation notes and the
+reproducibility appendix, is deposited at
+\url{https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html}
+and remains publicly available for review.
+
+\MakeCDossierClosing
+\end{document}
