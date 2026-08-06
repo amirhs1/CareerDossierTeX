@@ -61,6 +61,38 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **Test coverage only.** No class, option, key, command, environment, or
   calibrated value changed, and no document renders differently.
 
+### Changed
+
+- **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
+  `\CDossierSizeDocumentTitle`. A source edit is required only in a document
+  that reads or sets the token by name; **no document renders differently.**
+  ([#269])
+
+  `Title` named two unrelated things in the vocabulary a user is expected to
+  learn. This token is a step of the type scale, and its one call site in the
+  whole toolkit sizes a statement's document title — the literal
+  "Statement of Interest" or "Statement of Teaching Philosophy" at the top of
+  the page. `\CDossierEntryTitleStyle`, unchanged here, is a semantic role for
+  the heading of a single job, degree, or project inside a résumé or CV. The
+  two sit at different levels, are never composed, and now share no word.
+
+  The rename moves no value: the token keeps its 1.50 ratio and its 15 / 17,
+  16 / 18, and 18 / 20 pt sizes. Renaming it to `\CDossierSizeSection` was
+  considered and rejected — that name is already taken by a distinct 1.12 step,
+  and merging them would shrink a statement's title, which is a retune rather
+  than a rename. `Document` rather than `Statement` keeps the size scale free
+  of class names, matching the way the spacing tokens use the shape words
+  `Record` and `Prose` in place of the classes that consume them.
+
+  The rule governing which `Style` pairs with which `Size` — the two namespaces
+  are orthogonal, and `\CDossierSectionStyle` composes with three different
+  sizes — is not settled here; it belongs to the public-name classification in
+  #243.
+
+  A document that calls `\CDossierSizeTitle` now gets an
+  undefined-control-sequence error. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
+
 ### Removed
 
 - **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
@@ -161,6 +193,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the same places. This narrows the failure rather than removing it — TeX will
   exceed a stated stretch to set an otherwise underfull line.
 
+[#269]: https://github.com/amirhs1/CareerDossierTeX/issues/269
 [#270]: https://github.com/amirhs1/CareerDossierTeX/issues/270
 [#271]: https://github.com/amirhs1/CareerDossierTeX/issues/271
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276

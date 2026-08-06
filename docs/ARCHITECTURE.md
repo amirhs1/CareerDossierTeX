@@ -244,7 +244,7 @@ rather than three separately tuned designs.
 | Role | Selector | Ratio | `10pt` | `11pt` | `12pt` |
 |---|---|---:|---:|---:|---:|
 | Name | `\CDossierSizeName` | 1.90 | 19 / 21 | 21 / 23 | 23 / 25 |
-| Statement title | `\CDossierSizeTitle` | 1.50 | 15 / 17 | 16 / 18 | 18 / 20 |
+| Document title | `\CDossierSizeDocumentTitle` | 1.50 | 15 / 17 | 16 / 18 | 18 / 20 |
 | Headline, subtitle | `\CDossierSizeHeadline` | 1.20 | 12 / 14 | 13 / 15 | 14 / 16 |
 | Section heading | `\CDossierSizeSection` | 1.12 | 11 / 13 | 12 / 14 | 13 / 15 |
 | Entry title, body, bullets, dates | `\CDossierSizeBody` | 1.00 | 10 / 12 | 11 / 13.6 | 12 / 14.5 |
