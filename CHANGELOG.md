@@ -61,6 +61,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **Test coverage only.** No class, option, key, command, environment, or
   calibrated value changed, and no document renders differently.
 
+### Removed
+
+- **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
+  component, class, or example ever called it, and its underlying color,
+  `cdossier-primary`, was `gray 0` — the same value as `cdossier-text` under a
+  different name, so **no document that never called it renders
+  differently.** ([#270])
+
+  `theme-tokens.lvt` previously only asserted that the theme's five public
+  color tokens existed, the same shape #255 found in the spacing fixtures,
+  where 17 of 25 tokens were reported rather than rendered. The remaining four
+  tokens now each have a use assertion at their consumer — `\CDossierTextColor`
+  at the running head and folio, `\CDossierRuleColor` at the section rule,
+  `\CDossierMutedColor` at the entry-metadata de-emphasis role ([#271]), and
+  `\CDossierLinkColor` at the `hyperref` color-links hook, which is checked by
+  confirming hyperref's own `\@linkcolor` resolves to the theme's color name —
+  the same class of hook-ordering bug #276 and #277 found nearby.
+
+  A document that calls `\CDossierPrimaryColor` now gets an
+  undefined-control-sequence error; use `\CDossierTextColor` instead. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
 ### Fixed
 
 - `/Lang` no longer depends on package load order. A document that loads
@@ -139,6 +161,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the same places. This narrows the failure rather than removing it — TeX will
   exceed a stated stretch to set an otherwise underfull line.
 
+[#270]: https://github.com/amirhs1/CareerDossierTeX/issues/270
 [#271]: https://github.com/amirhs1/CareerDossierTeX/issues/271
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277

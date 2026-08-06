@@ -1,16 +1,42 @@
 % theme-tokens.lvt — careerdossier-theme monochrome palette and color tokens.
 %
-% Phase 1 is monochrome. This pins the defined colors: text, primary, rule, and
-% link are pure black, and muted is the single de-emphasis grey. The muted value
-% (0.30) is chosen to keep at least 4.5:1 contrast on white, so a change to it is
-% a deliberate, reviewable event, not an accident. Also checks that the public
-% semantic color tokens exist.
+% Phase 1 is monochrome. This pins the defined colors: text, rule, and link are
+% pure black, and muted is the single de-emphasis grey. The muted value (0.30)
+% is chosen to keep at least 4.5:1 contrast on white, so a change to it is a
+% deliberate, reviewable event, not an accident. It also checks that the public
+% semantic color tokens exist, and -- issue #270 -- that each one is actually
+% *used* by a consumer, not only declared.
+%
+% `\CDossierPrimaryColor' is not tested here: it was retired in #270 for
+% reaching no consumer. See docs/MIGRATION.md.
+%
+% Existence alone does not catch a token that nothing calls: #255 found the
+% same shape in the spacing fixtures, where 17 of 25 tokens were reported
+% rather than rendered. Two techniques close that gap, one per token:
+%
+%   - `\CDossierMutedColor' already has a use assertion in
+%     components-muted.lvt (#271), which compares a captured `\current@color'
+%     against the theme token while a rendered entry heading goes through
+%     `\CDossierMutedStyle'. Not duplicated here.
+%   - `\CDossierTextColor' and `\CDossierRuleColor' are renewed to a `\TYPE'
+%     marker and their consumer -- the running head, the folio, and the
+%     section rule -- is built into a discarded box. The marker firing proves
+%     the consumer calls the token; the box is never shipped, so this has no
+%     effect on the real page. The renewals are permanent for the rest of the
+%     run, as in components-muted.lvt, so they are last.
+%   - `\CDossierLinkColor' is never called as a command by its consumer: the
+%     `package/hyperref/after' hook hands `hypersetup' the raw color name,
+%     because `allcolors' takes a color name, not a switch. What "used" means
+%     for this token is that hyperref's own link-color macro, `\@linkcolor',
+%     resolves to that same name -- proving the hook actually fired, which is
+%     exactly the class of bug #276 and #277 found in nearby hooks.
 %
 % \extractcolorspec reports a color's model and specification as {model}{spec};
 % comparing that string is stable across xcolor versions.
 \input{regression-test}
 \documentclass{article}
-\usepackage{careerdossier-theme}
+\usepackage{careerdossier-components}
+\usepackage{hyperref}
 
 \ExplSyntaxOn
 \cs_new_protected:Npn \cdossiertestColor #1
@@ -23,6 +49,30 @@
     \cs_if_exist:NTF #1 { \TYPE{ \token_to_str:N #1 ~defined } }
       { \TYPE{ \token_to_str:N #1 ~MISSING } }
   }
+
+\box_new:N \l_cdossiertest_theme_box
+\cs_new_protected:Npn \cdossiertestTraceTextColor
+  {
+    \RenewDocumentCommand \CDossierTextColor { } { \TYPE{ >textcolor } }
+    \vbox_set:Nn \l_cdossiertest_theme_box
+      { \__cdossier_components_runninghead: }
+    \vbox_set:Nn \l_cdossiertest_theme_box
+      { \__cdossier_components_folio: }
+  }
+\cs_new_protected:Npn \cdossiertestTraceRuleColor
+  {
+    \RenewDocumentCommand \CDossierRuleColor { } { \TYPE{ >rulecolor } }
+    \vbox_set:Nn \l_cdossiertest_theme_box
+      { \__cdossier_components_section_rule: }
+  }
+%% `:' is only catcode-11 while \ExplSyntaxOn is active, and a \TEST{}{} body
+%% is tokenized at the outer catcode regime before it is ever executed, so
+%% \use:c written directly inside a \TEST argument splits back into `\use'
+%% plus the text `:c{...}'. The fix is the same one general expl3 code inside
+%% a document uses: define the probe here, under this file's ExplSyntaxOn, and
+%% call the finished command name from the \TEST body.
+\cs_new_protected:Npn \cdossiertestLinkColorHook
+  { \TYPE{ @linkcolor~=~\use:c{@linkcolor} } }
 \ExplSyntaxOff
 
 \begin{document}
@@ -30,18 +80,30 @@
 
 \TEST{monochrome-palette-values}{
   \cdossiertestColor{cdossier-text}
-  \cdossiertestColor{cdossier-primary}
   \cdossiertestColor{cdossier-muted}
   \cdossiertestColor{cdossier-rule}
   \cdossiertestColor{cdossier-link}
 }
 
 \TEST{public-color-tokens-defined}{
-  \cdossiertestTokenExists\CDossierPrimaryColor
   \cdossiertestTokenExists\CDossierTextColor
   \cdossiertestTokenExists\CDossierMutedColor
   \cdossiertestTokenExists\CDossierRuleColor
   \cdossiertestTokenExists\CDossierLinkColor
+}
+
+\TEST{link-color-reaches-the-hyperref-hook}{
+  \cdossiertestLinkColorHook
+}
+
+% Last: the tracing renewals are deliberately permanent, so nothing after this
+% would still be reporting the real tokens.
+\TEST{running-head-and-folio-render-through-text-color}{
+  \cdossiertestTraceTextColor
+}
+
+\TEST{section-rule-renders-through-rule-color}{
+  \cdossiertestTraceRuleColor
 }
 
 \END

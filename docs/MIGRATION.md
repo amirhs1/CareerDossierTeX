@@ -346,6 +346,24 @@ in this format.
 
 ## [0.8.0] - unreleased
 
+### `\CDossierPrimaryColor` removed
+
+No source edit is required unless a document called `\CDossierPrimaryColor`
+directly — no CareerDossierTeX component, class, or example ever did.
+
+Before:
+
+    {\CDossierPrimaryColor ...}
+
+After:
+
+    {\CDossierTextColor ...}
+
+Reason: `\CDossierPrimaryColor` reached no consuming call site, and its
+underlying color, `cdossier-primary`, was `gray 0` — the same value as
+`cdossier-text`, differing only in name. `\CDossierTextColor` is a drop-in
+replacement with no visual change. See issue #270.
+
 ### `\CDossierMutedStyle` is published by `careerdossier-components`
 
 No source edit is required in any document that uses a CareerDossierTeX class,

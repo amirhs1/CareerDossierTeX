@@ -1767,7 +1767,6 @@ the boundaries they own are.
 The monochrome theme may expose semantic tokens:
 
 ```latex
-\CDossierPrimaryColor
 \CDossierTextColor
 \CDossierMutedColor
 \CDossierRuleColor
@@ -1778,6 +1777,11 @@ The monochrome theme may expose semantic tokens:
 the WCAG 2.1 relative-luminance formula. It is what `muted=gray` and
 `muted=both` render de-emphasised runs in; under the default `muted=italic`
 nothing uses it.
+
+`\CDossierPrimaryColor` was removed: it reached no component, class, or
+example, and its underlying color was `gray 0` — the same value as
+`\CDossierTextColor` under a different name. See
+[`docs/MIGRATION.md`](MIGRATION.md#080---unreleased).
 
 Users should not rely on the underlying color names or values as stable API before `v1.0.0`.
 

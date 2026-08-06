@@ -38,7 +38,6 @@
 %% and their content, and `muted=italic' (the default) reaches the same reader
 %% with no colour at all. See careerdossier-components.sty.
 %% ---------------------------------------------------------------------------
-\definecolor { cdossier-primary } { gray } { 0 }
 \definecolor { cdossier-text }    { gray } { 0 }
 \definecolor { cdossier-muted }   { gray } { 0.30 }
 \definecolor { cdossier-rule }    { gray } { 0 }
@@ -47,8 +46,12 @@
 %% ---------------------------------------------------------------------------
 %% Public semantic colour tokens, usable as grouped switches:
 %%   {\CDossierMutedColor secondary text}
+%%
+%% `\CDossierPrimaryColor' was retired in issue #270: it reached no component,
+%% class, or example, and its colour, `cdossier-primary', was `gray 0' -- the
+%% same value as `cdossier-text' under a different name. See
+%% docs/MIGRATION.md.
 %% ---------------------------------------------------------------------------
-\NewDocumentCommand \CDossierPrimaryColor { } { \color { cdossier-primary } }
 \NewDocumentCommand \CDossierTextColor    { } { \color { cdossier-text }    }
 \NewDocumentCommand \CDossierMutedColor   { } { \color { cdossier-muted }   }
 \NewDocumentCommand \CDossierRuleColor    { } { \color { cdossier-rule }    }
