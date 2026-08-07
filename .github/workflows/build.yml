@@ -284,10 +284,14 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       # tests/bibliography/run.sh diffs extracted text, so pdftotext must be
       # present for the ydnt-ordering and identifier-precedence assertions to
-      # run at all.
+      # run at all. It is also what reads the rendered entry labels for the
+      # shipped-example guard (issue #319).
       - name: Install poppler-utils
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
-      - name: Biber sorting and identifier-precedence fixture
+      # Also builds examples/academic/cv-bibliography.tex from the repository
+      # root and asserts it rendered every entry its database declares, which is
+      # why this job's artifacts reach into build/examples/ as well (#319).
+      - name: Biber fixture and shipped-example bibliography guard
         run: make bibliography-test
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload bibliography fixture logs
@@ -300,6 +304,12 @@ jobs:
             tests/bibliography/*.log
             tests/bibliography/*.blg
             tests/bibliography/*.diff
+            tests/bibliography/*.stdout
+            tests/bibliography/*.guard
+            build/examples/cv-bibliography.pdf
+            build/examples/cv-bibliography.log
+            build/examples/cv-bibliography.blg
+            build/examples/cv-bibliography.bbl
           if-no-files-found: warn
 
   # Copy-paste integrity of URLs and e-mail addresses (issue #294). Its own job

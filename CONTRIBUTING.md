@@ -888,6 +888,42 @@ to compile without loading BibLaTeX or invoking Biber.
 CI runs this fixture in its own `bibliography` job, on the pinned TeX Live
 container, so a local failure can always be checked against a second toolchain.
 
+#### The shipped example renders its entries
+
+The same target additionally builds `examples/academic/cv-bibliography.tex` from
+the repository root and asserts it rendered as many entries as
+`examples/academic/publications.bib` declares. Building it any other way is the
+point: the example writes root-relative include and bibliography paths, and from
+another working directory Biber cannot resolve them — at which point `\nocite{*}`
+against no database is not a LaTeX error, `latexmk -halt-on-error` exits `0`, and
+a PDF ships with the entries silently absent. Measured with the database removed,
+`make academic-bibliography` produces 12297 bytes where a complete build produces
+24514, and reports nothing wrong.
+
+That is not a hypothetical: it is how the figures recorded for #309 came to be
+one hyphenated line end low in every arm, until #316's instrument disagreed with
+them.
+
+The check derives everything from the sources, so adding an entry to the database
+never requires editing it. It asserts four things in order — Biber's log is free
+of warnings and errors, the `.bbl` emits as many `\entry{` as the `.bib`
+declares, the `.log` reports no undefined citation, and the rendered labels are
+exactly `1 … N`. The first three prove Biber succeeded; only the fourth proves
+LaTeX put the entries on the page.
+
+It pins no content, deliberately. The extraction baseline above is measured
+against a fixture this suite owns, precisely so that editing the example's prose,
+profile, or database cannot turn the suite red; a count-equality assertion keeps
+that property because it holds no string, order, field, key, or year.
+
+`missing-bibresource.tex` is the committed negative control, and the guard is
+only worth having because that control fires. It names a database that does not
+exist, `latexmk` exits `0`, and the guard must reject it — if it ever passes,
+the guard has stopped seeing the defect it exists for, and the failure it guards
+is silent, so nothing else would reveal that. The control is handed the *real*
+database rather than the missing one, so it decides on the build's evidence
+instead of short-circuiting on the guard's own input check.
+
 #### Known local failure: Biber rejects every `date` field
 
 If the fixture fails with a Biber log full of
