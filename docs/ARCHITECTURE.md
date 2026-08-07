@@ -585,6 +585,18 @@ frequency, measured alongside the box counts, discriminates nothing between the
 candidates: the pool's size decides whether a paragraph succeeds in the third
 pass, never whether it enters one.
 
+Both sweeps above are reproducible with `make review-linebreak` (#316), the
+committed instrument this measurement was extracted into:
+
+```bash
+make review-linebreak SWEEP_ARGS="--param emergencystretch --values '0pt 22pt'"
+```
+
+Its fixture corpus is the whole discovered set rather than the hand-picked
+subset the original scratch harness listed, so its cell count and absolute box
+counts run higher than the figures recorded above. The comparison between arms,
+which is what decided the question, is unaffected.
+
 The residue the table cannot reach is a property of the fixtures, not of the
 token. Every remaining box belongs to a deliberately extreme stress fixture run
 at a size and margin it is not committed at; the worst, `resume-long-fields` at
