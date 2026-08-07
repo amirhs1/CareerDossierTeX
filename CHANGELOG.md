@@ -262,6 +262,25 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   structurally legal. The per-profile division count in `make tagging` is what
   sees it.
 
+- In tagged output, the document identity (the name) and the statement's title
+  line now record their own text as their heading element's title, as section
+  headings already did. ([#305])
+
+  The previous entry gave résumé and CV section headings a `/T` and left every
+  other heading without one, so a section was titled while the name — the
+  document's `/H1`, and the heading that outranks it — was not. All four
+  families now title their identity heading, and the statement titles its title
+  line as well.
+
+  The `Sect` divisions still carry no title, deliberately: no division in any
+  family has one, including the statement's, which the LaTeX kernel generates,
+  and the kernel records a heading's title on the heading element. Titling the
+  record classes' divisions alone would re-open the divergence [#268] closed.
+
+  This is a structure-tree change under the opt-in `tagging=on` path only: no
+  class, option, key, or command changed, every word in all five tagged
+  fixtures sits where it did before, and all of them still pass veraPDF UA-2.
+
 - In tagged output, an entry heading's title and dates, its organization and
   location, and a cover letter's recipient block are now separated by a real
   space character. They previously reached a consumer that reads the structure
@@ -299,6 +318,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294
 [#299]: https://github.com/amirhs1/CareerDossierTeX/issues/299
 [#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302
+[#305]: https://github.com/amirhs1/CareerDossierTeX/issues/305
 
 ## [0.7.0] - 2026-08-04
 

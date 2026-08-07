@@ -1056,6 +1056,8 @@ Expands to the stored value of a profile field, or to nothing when the field is 
 
 This accessor is expandable and is intended mainly for shared components that need the raw value, for example to build a link target. Prefer `\CDossierPrintField` for ordinary typesetting.
 
+Expandability is what makes it the correct choice anywhere the value is written into the PDF rather than onto the page — a heading's recorded title, or any other PDF string. Such values are purified first, and purification expands what it can and discards what it cannot: `\CDossierPrintField` is protected, so it does not survive as a value but its argument text does, which records a plausible wrong string rather than failing. Nothing on the rendered page reveals that.
+
 ## Hyperlink behavior
 
 When present:

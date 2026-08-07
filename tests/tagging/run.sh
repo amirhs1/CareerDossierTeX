@@ -228,6 +228,7 @@ check_structure() {
 
   check_heading_hierarchy "$base" "$pdf"
   check_section_divisions "$base" "$pdf"
+  check_identity_title "$base" "$pdf"
 }
 
 # Issue #268: a heading element records that some words are a heading. It does
@@ -271,6 +272,38 @@ check_section_divisions() {
     cv)      check_heading_title "$base" "$pdf" 'Teaching Experience' ;;
     statement) check_heading_title "$base" "$pdf" 'Future Programme' ;;
   esac
+}
+
+# Issue #305: the identity heading is the document's /H1 -- it outranks every
+# section heading in every family -- so it must carry a title at least as much
+# as the headings beneath it do. #268 gave section headings their `/T' and left
+# the identity without one, which is the inconsistency this closes.
+#
+# The name is asserted per profile from the fixture's own `name' field rather
+# than from a shared constant, so a fixture that changes its name fails here
+# instead of silently checking someone else's string. The letters carry no
+# section heading at all, which makes their identity the only titled element in
+# the document and this the only check that sees it.
+check_identity_title() {
+  local base="$1" pdf="$2"
+  local name
+
+  case "$base" in
+    resume)          name='Tagged Industry Resume' ;;
+    cv)              name='Tagged Academic CV' ;;
+    letter)          name='Tagged Industry Letter' ;;
+    academic-letter) name='Tagged Academic Letter' ;;
+    statement)       name='Tagged Research Statement' ;;
+    *) return ;;
+  esac
+
+  check_heading_title "$base" "$pdf" "$name"
+
+  # The statement's title line is a depth-2 heading of its own, rendered by the
+  # class rather than by \CDossierSection, so it needs naming separately.
+  if [ "$base" = statement ]; then
+    check_heading_title "$base" "$pdf" 'Research Statement'
+  fi
 }
 
 check_heading_title() {
