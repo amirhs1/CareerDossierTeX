@@ -173,6 +173,61 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   The suite's overfull check passes on both only because the token reaches the
   page.
 
+- `\CDossierEmergencyStretch` keeps its `2.00 ×` body-size derivation, now
+  chosen by measurement rather than inherited for continuity. **No document
+  renders differently.** ([#310])
+
+  #272 picked `2.00` because it reproduced the `2em` the classes already set.
+  The open question was whether the measure was the better quantity to scale
+  with, since a pool is spent on a line and a line has a length. Measurement
+  refuted the question rather than answering it: what a paragraph needs tracks
+  neither quantity. Varying only the measure from 400 pt to 560 pt, the smallest
+  pool that clears every overfull box is a sawtooth with no trend, correlating
+  `+0.417` with the measure on the résumé Summary prose and `−0.568` on the
+  bullet path — opposite signs. What the pool must cover is set by where one
+  paragraph's break points happen to fall.
+
+  Only the magnitude can be chosen, then, and the two forms are
+  indistinguishable wherever their magnitudes match: `1.50 ×` body size and
+  `0.040 ×` measure leave the same five overfull boxes in the same five cells,
+  and `2.50 ×` and `0.050 ×` the same two. So the derivation stays on the type
+  scale beside `\CDossierRuleThickness` and `\CDossierListLabelSep`, and the
+  ratio stays where it was. Raising it would not be free either: 39 paragraphs
+  in that sweep already reach TeX's third pass and set within it, and a larger
+  pool re-breaks them.
+
+  The two fixtures from #272 now prove their own premise on every run. A layout
+  fixture carrying `% STRETCHCONTROL:` is rebuilt with `\emergencystretch` at
+  `0pt` and must go overfull, so a fixture whose text drifted into setting clean
+  either way fails instead of passing while asserting nothing.
+
+- Hyphenation stays at TeX's defaults — `\hyphenpenalty` and `\exhyphenpenalty`
+  are `50` in all four families — and that is now a recorded decision rather
+  than an unexamined inheritance. **No document renders differently.** ([#309])
+
+  The case for discouraging hyphenation more strongly was that a résumé bullet
+  is scanned rather than read, so a hyphen at the end of a short line costs more
+  there than in a page of prose. Measurement located the hyphenation somewhere
+  else: 48 of the 55 hyphenated line ends in the committed examples are in the
+  statements, which are continuous prose. The whole shipped résumé has one, the
+  CV one, and raising the penalty removes neither.
+
+  What raising it does do is trade one flaw for another at about one for one.
+  `\hyphenpenalty=500` removes 18 hyphens across the examples and creates 10
+  lines looser than badness 99 — the worst badness does not move, so the new
+  loose lines are in the same quality band, but they are a real cost paid to fix
+  a problem the record classes do not have. `500` and `1000` are identical, so
+  there is nothing to tune inside the safe band. Forbidding hyphenation outright
+  (`10000`) is decisively wrong: 38 overfull boxes across the stress sweep, one
+  even in the examples, and a worst-case line badness of 2452.
+
+  No committed example changes page count at any value tested, `10000` included.
+
+  Nothing sets these parameters, so there is no new token to learn; the four
+  `tokens-*-defaults` regression baselines record both values instead, which is
+  what makes the decision reviewable — including against a future change that
+  sets them indirectly by loading a language package.
+
 ### Removed
 
 - **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
@@ -421,6 +476,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302
 [#305]: https://github.com/amirhs1/CareerDossierTeX/issues/305
 [#308]: https://github.com/amirhs1/CareerDossierTeX/issues/308
+[#309]: https://github.com/amirhs1/CareerDossierTeX/issues/309
+[#310]: https://github.com/amirhs1/CareerDossierTeX/issues/310
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 
 ## [0.7.0] - 2026-08-04

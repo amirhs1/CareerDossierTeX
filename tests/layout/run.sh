@@ -99,6 +99,9 @@ for tex in *.tex; do
         echo "    zeroed this fixture still sets clean, so its \"no overfull"
         echo "    boxes\" result is no longer evidence that the token reaches"
         echo "    the page. Restore the stress rather than dropping the check."
+        echo "    Check $control.log for font-loading errors first: a run that"
+        echo "    typeset nothing reports no overfull box either, and that"
+        echo "    looks identical to a fixture whose text drifted."
         fail=1
       fi
     fi

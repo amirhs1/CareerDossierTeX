@@ -1079,6 +1079,27 @@ so a page can still break inside an over-long paragraph rather than overflow.
 The letter and statement classes otherwise remain continuous prose with no
 further structural page-break policy.
 
+### Hyphenation
+
+`\hyphenpenalty` and `\exhyphenpenalty` keep TeX's defaults of `50` in all four
+families. No token sets them, and that is a decision rather than an omission
+(#309) — the four `tokens-*-defaults` regression baselines record both values,
+so a change to either is visible in review.
+
+Raising the penalty was measured and rejected. Almost all of the hyphenation in
+the committed examples is in the statements, which are continuous prose and the
+setting TeX's default was calibrated for; the whole committed résumé has one
+hyphenated line end, and raising the penalty does not remove it. Across the
+examples, `\hyphenpenalty=500` removes 18 hyphens and creates 10 lines looser
+than badness 99 — roughly a one-for-one trade, paid to fix a problem the record
+classes do not have. Forbidding hyphenation entirely (`10000`) produces overfull
+boxes and a worst-case line badness of 2452.
+[`ARCHITECTURE.md`](ARCHITECTURE.md) records the full measurement.
+
+A document that wants different behavior can set either parameter in its
+preamble; both are ordinary TeX parameters and nothing in the toolkit overrides
+them.
+
 ## Public field accessors
 
 These commands are intended mainly for advanced users and shared components.

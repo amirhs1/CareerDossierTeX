@@ -14,3 +14,5 @@ paragraph-rhythm=shared
 letter-local-skips=absent
 emergency-stretch=24.0pt
 line-break-flexibility=shared
+hyphen-penalty=50
+ex-hyphen-penalty=50
