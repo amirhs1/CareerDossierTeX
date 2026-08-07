@@ -332,6 +332,32 @@
     %% depends on a font whose quad happens to equal its design size, nor on
     %% which font is current at the point the length is set.
     %%
+    %% Issue #310 asked whether the token should instead scale with the measure,
+    %% since a pool is spent on a line and a line has a length. It was measured
+    %% and it should not, because the quantity it has to cover tracks neither.
+    %% Holding one fixture, its text, and its body size fixed and varying only
+    %% the measure in 8pt steps from 400pt to 560pt, the smallest pool that
+    %% clears every overfull box is a sawtooth with no trend: the résumé Summary
+    %% prose needs 1.00pt at a 440pt measure and 11.25pt at 520pt, then nothing
+    %% at 528pt, and the bullet path needs 33.75pt at 416pt and 0.75pt at 512pt.
+    %% Across the two paths the correlation between measure and required pool
+    %% comes out at +0.417 and -0.568 -- opposite signs, so the requirement is
+    %% not a function of the measure. It is set by where one paragraph's break
+    %% points happen to fall, which no derivation can predict.
+    %%
+    %% What follows is that the *form* cannot be chosen on rescue efficacy, only
+    %% the magnitude can. Sweeping every layout fixture over three body sizes and
+    %% both margins, the two forms match wherever the pools match: 1.50 x body
+    %% size and 0.040 x measure both leave the same five overfull boxes in the
+    %% same five cells, and 2.50 x body size and 0.050 x measure both leave the
+    %% same two. So the tie is broken on the one criterion that does separate
+    %% them -- a measure-derived token would be the only metric here not on the
+    %% type scale, where \CDossierRuleThickness and \CDossierListLabelSep already
+    %% sit -- and the ratio stays at the value #272 preserved. Raising it is not
+    %% free: 39 paragraphs in that sweep reach the third pass and set within it,
+    %% and a larger pool re-breaks them, so a rescue bought for an off-design
+    %% stress fixture is paid for by reflowing documents that already set.
+    %%
     %% It is applied unconditionally, including by the résumé, which is fully
     %% justified and carries the longest unbreakable strings in the toolkit --
     %% technical terms and URLs in bullet text. Extending it there and to the

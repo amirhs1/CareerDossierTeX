@@ -8,6 +8,11 @@
 % page: with the class's setting removed, or the token zeroed, the bullet below
 % sets 8.47 pt over the measure at `fontsize=10pt, margin=narrow`. A fixture
 % that merely reported the token's value could not tell those two states apart.
+%
+% The runner now rebuilds this fixture with the token zeroed and requires that
+% deficit to reappear (issue #310), so the clean setting above keeps being
+% evidence about the token rather than about this particular sentence.
+% STRETCHCONTROL: 8.47 pt
 \documentclass[fontsize=10pt, margin=narrow]{careerdossier-resume}
 \CDossierSetup{
   name  = {Alexandria Montgomery-Fitzgerald},

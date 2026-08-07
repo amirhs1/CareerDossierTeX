@@ -539,6 +539,59 @@ the résumé and to the letter-paper CV cannot loosen a paragraph that already
 sets: TeX consults `\emergencystretch` only in a third line-breaking pass,
 reached only when the second finds no feasible breakpoints within `\tolerance`.
 
+The alternative derivation — a fraction of the measure, the form most other
+implementations use — was measured against this one and rejected. #272 chose
+`2.00` to preserve the value the classes already rendered; #310 asked whether
+the body size was the right quantity at all, since a pool is spent on a line and
+a line has a length. Holding a fixture, its text, and its body size fixed and
+varying only the measure in 8 pt steps from 400 pt to 560 pt, the smallest pool
+that clears every overfull box shows no trend: the résumé Summary prose needs
+1.00 pt at a 440 pt measure, 11.25 pt at 520 pt, and nothing at 528 pt, while
+the bullet path needs 33.75 pt at 416 pt and 0.75 pt at 512 pt. Across the two
+paths the correlation between measure and required pool comes out at `+0.417`
+and `−0.568` — opposite signs. The requirement is set by where one paragraph's
+break points happen to fall, and neither candidate predicts that.
+
+Only the magnitude is left to choose, and the two forms are indistinguishable
+wherever the magnitudes match. Swept over every layout fixture at all three body
+sizes and both margins, `1.50 ×` body size and `0.040 ×` measure leave the same
+five overfull boxes in the same five cells, and `2.50 ×` body size and
+`0.050 ×` measure leave the same two:
+
+| Derivation | Pool at `11pt` | Overfull boxes |
+|---|---:|---:|
+| `0` (negative control) | 0 pt | 47 |
+| `1.50 ×` body size | 16.5 pt | 5 |
+| `2.00 ×` body size (shipped) | 22 pt | 5 |
+| `2.50 ×` body size | 27.5 pt | 2 |
+| `0.030 ×` measure | 14.1 / 16.3 pt | 7 |
+| `0.035 ×` measure | 16.4 / 19.0 pt | 6 |
+| `0.040 ×` measure | 18.8 / 21.7 pt | 5 |
+| `0.045 ×` measure | 21.1 / 24.4 pt | 3 |
+| `0.050 ×` measure | 23.5 / 27.1 pt | 2 |
+
+Measure-derived pools are given at `margin=normal` / `margin=narrow`; a
+body-size-derived pool is the same at both. The tie therefore breaks on the one
+criterion that does separate the forms: a measure-derived token would be the
+only entry in the derived-metrics table above not on the type scale, where
+`\CDossierRuleThickness` and `\CDossierListLabelSep` already sit. The ratio stays
+at `2.00`.
+
+Raising it is not free. 39 paragraphs in that sweep reach the third pass and set
+successfully within it, and a larger pool re-breaks those, so a rescue bought
+for an off-design stress fixture is paid for by reflowing documents that already
+set. That count is `39` at every non-zero pool, which is also why third-pass
+frequency, measured alongside the box counts, discriminates nothing between the
+candidates: the pool's size decides whether a paragraph succeeds in the third
+pass, never whether it enters one.
+
+The residue the table cannot reach is a property of the fixtures, not of the
+token. Every remaining box belongs to a deliberately extreme stress fixture run
+at a size and margin it is not committed at; the worst, `resume-long-fields` at
+`fontsize=12pt, margin=normal`, needs an 83 pt pool — `3.46 ×` its body size, or
+`0.177 ×` its measure. At the combination each fixture is committed at, the
+suite is clean at the shipped ratio, which is what `make layout` asserts.
+
 #### Page-furniture placement
 
 The running header and the folio are the only components positioned by the page

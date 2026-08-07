@@ -1859,6 +1859,14 @@ paragraph's interword glue when it can find no set of breakpoints within
 `fontsize=10pt`, `11pt`, and `12pt` — and it derives from the body size rather
 than the body leading because the quantity is horizontal.
 
+It does not scale with the measure, and deliberately so. Deriving it from
+`\linewidth` instead was measured and rejected: the pool a paragraph needs turns
+out to track neither quantity, because it is decided by where that paragraph's
+break points happen to fall, and the two forms then produce identical
+overfull-box counts wherever their magnitudes match. Keeping the token on the
+type scale, alongside `\CDossierRuleThickness` and `\CDossierListLabelSep`, is
+what settles it. [`ARCHITECTURE.md`](ARCHITECTURE.md) records the measurement.
+
 All four classes set `\emergencystretch` from it, unconditionally and
 identically: one policy, stated once. Raising it lets a paragraph with few break
 points set looser instead of overfull; lowering it to `0pt` restores TeX's
