@@ -102,6 +102,12 @@ while [ "$#" -gt 0 ]; do
     --param)   param="${2:?--param needs a value}"; shift 2 ;;
     --values)  values="${2:?--values needs a value}"; shift 2 ;;
     --corpus)  corpus="${2:?--corpus needs a value}"; shift 2 ;;
+    # Undocumented in the usage block above on purpose: this exists so several
+    # copies of this script can run concurrently, one value each, without
+    # colliding on the shared build/linebreak-sweep/ directory -- not as a
+    # feature an ordinary invocation needs. A caller using it is responsible
+    # for merging the results back together.
+    --output)  output="${2:?--output needs a directory}"; shift 2 ;;
     -h|--help) sed -n '2,81p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
