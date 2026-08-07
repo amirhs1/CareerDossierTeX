@@ -785,6 +785,13 @@ would have mattered most: no committed example changes page count at any of the
 five values, `10000` included. A career document does not grow a page from this
 setting.
 
+Every figure above is reproducible with `make review-linebreak` (#316), the
+committed instrument this measurement was extracted into:
+
+```bash
+make review-linebreak SWEEP_ARGS="--param hyphenation --values '50 200 500 1000 10000'"
+```
+
 ### `careerdossier-base.sty`
 
 Owns shared state and validation.
