@@ -1,0 +1,58 @@
+% resume-body-link.tex — copy-paste integrity of a link in body text
+% (issue #308), the site the #294 suite did not cover: every other fixture here
+% renders its links through the contact line, the publication list, or the
+% bibliography.
+%
+% \CDossierLink extends url.sty's \UrlBreaks with the letters and digits, so a
+% long address may break anywhere rather than only after punctuation. That is
+% what keeps the bullet below off the margin, and it is exactly the kind of
+% break this suite exists to judge: url.sty inserts a penalty and no
+% discretionary hyphen, so the wrapped address must still concatenate back to
+% the original character for character. Bare text would instead *hyphenate* the
+% address and paste back with an inserted hyphen, which no `pdftotext' word
+% check would notice.
+%
+% Both links below are long enough to wrap at `fontsize=12pt, margin=normal',
+% so the VERIFIED lines must report a wrap; a run reporting none has stopped
+% exercising the property.
+%
+% The third token is a real, publicly resolvable address — a Wikipedia
+% advanced-search result, 262 characters, with the query string an ordinary
+% search produces. It is what proves the escaping round-trips: the source writes
+% `\%3A' and `\&', because the argument is ordinary text rather than \url's
+% verbatim argument, and the token below is the unescaped form the page must
+% show and the reader must be able to paste. A source that escaped wrongly would
+% render `\%3A' or drop the parameters and be reported MISSING here.
+%
+% LINKTOKEN: https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html
+% LINKTOKEN: https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation&title=Special%3ASearch&profile=advanced&fulltext=1&ns0=1
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-resume}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada@example.org},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist},
+  organization = {Example Research Laboratory},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Delivered the reproducible archival interoperability framework,
+          documented at
+          \CDossierLink{https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html}
+          for downstream consumers.
+    \item Consulted the published search index at
+          \CDossierLink{https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation\&title=Special\%3ASearch\&profile=advanced\&fulltext=1\&ns0=1}
+          throughout the programme.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+The validation notes and the reproducibility appendix are deposited at
+\CDossierLink{https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html}
+and remain publicly available for review.
+\end{document}

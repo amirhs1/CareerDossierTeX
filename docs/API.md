@@ -979,6 +979,67 @@ When the list crosses a page boundary it is never split so that a single item
 stands alone on either side; a list longer than a page still breaks normally.
 See "Page-break policy" below.
 
+### `\CDossierLink`
+
+```latex
+\CDossierLink{example.org/ada/portfolio}
+\CDossierLink{https://example.org/programs/2024/final-report/notes.html}
+```
+
+The supported way to put a link in body text — a bullet, an entry, a letter
+paragraph, a statement paragraph. The argument is both the text that appears on
+the page and, once normalized, the link target: a value carrying no `://` scheme
+gains `https://`, exactly as the `website`, `linkedin`, `github`, and `scholar`
+profile fields do, and a value that has one keeps it. The displayed text is the
+argument as written, never the normalized target.
+
+Use it for every address in running text. Typing the URL as plain text does not
+work, and neither does `\url`:
+
+| Form | What a long address does |
+|---|---|
+| plain text | no URL break points, so TeX either overruns the margin or hyphenates the address — and the inserted hyphen travels into the pasted URL |
+| `\url` | breaks after punctuation only, so a long segment carrying none stays one unbreakable token: 178.34 pt over the measure in a résumé bullet at `fontsize=10pt, margin=narrow` |
+| `\CDossierLink` | may break after any character, with no inserted hyphen |
+
+`\CDossierEmergencyStretch` cannot rescue either of the first two. It
+redistributes a line's interword glue, and a line holding one over-wide token
+has none to redistribute; see [Line-breaking tokens](#line-breaking-tokens).
+
+`\CDossierLink` extends url.sty's `\UrlBreaks` with the ASCII letters and digits
+for the duration of one link, so the address may break anywhere rather than only
+after punctuation. url.sty inserts a penalty and no discretionary hyphen at a
+break point, so a wrapped address still copies and pastes back character for
+character. The extension is local: the contact line and the bibliography keep
+the punctuation-only breaks they were calibrated with.
+
+The argument is read as ordinary text, exactly as a profile field value is — it
+is not `\url`'s verbatim argument. A target containing a TeX special character
+needs it escaped as it would be anywhere else. A query string is the common
+case: write `\%` for `%` and `\&` for `&`.
+
+```latex
+\CDossierLink{https://example.org/search?q=sound+studies\&profile=advanced\&title=Special\%3ASearch}
+```
+
+Both render as themselves on the page and reach the link target unescaped, so
+the address still pastes and resolves. An unescaped `%` comments out the rest of
+the line and the run stops with an error rather than producing a wrong link.
+
+Keep the address on one source line. A URL cannot contain a literal space, so a
+space in the argument — in practice always a line break inside it — is removed
+from the link target, with a warning naming the repaired target. Without that
+repair the two halves would disagree: url.sty drops the space from the displayed
+address, so the page looks correct, while the target keeps it and the link goes
+somewhere else. Write `%20` if the space is genuinely part of the address.
+
+Without hyperref the command still prints the address as plain visible text, so
+the identifier is never lost; all four classes load hyperref, so the link is
+present in ordinary use.
+
+Introduced in `v0.8.0`
+([#308](https://github.com/amirhs1/CareerDossierTeX/issues/308)).
+
 ## Page-break policy
 
 The résumé and CV classes state where a page may break rather than leaving
@@ -1068,6 +1129,10 @@ When present:
 - URLs should be breakable rather than extending beyond the margin.
 
 The class must not assume that a displayed URL includes a protocol. The implementation should normalize links or clearly document the required input format.
+
+Those fields cover the contact line. A link written into body text is
+[`\CDossierLink`](#cdossierlink); plain text and `\url` both fail on a long
+address, in different ways.
 
 ## Typography roles
 

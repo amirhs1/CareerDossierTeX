@@ -10,6 +10,29 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `\CDossierLink{<url>}` is the supported way to put a link in body text — a
+  bullet, an entry, a letter or statement paragraph. It prints the address as
+  written, links it, and supplies the break points a long address needs; a value
+  with no `://` scheme gains `https://`, exactly as the contact fields do.
+  ([#308])
+
+  Neither existing form works there. Plain text has no URL break points, so TeX
+  either runs the address into the margin or hyphenates it — and that inserted
+  hyphen travels into the pasted URL, where nothing marks it as an artifact.
+  `\url` breaks after punctuation only, so a report or commit identifier
+  carrying none stays a single unbreakable token: 178.34 pt over the measure in
+  a résumé bullet at `fontsize=10pt, margin=narrow`. `\CDossierEmergencyStretch`
+  reaches neither, because it redistributes a line's interword glue and a line
+  holding one over-wide token has none to redistribute.
+
+  `\CDossierLink` extends url.sty's `\UrlBreaks` with the letters and digits for
+  the duration of one link, so the address may break after any character. Those
+  break points carry a penalty and no discretionary hyphen, so a wrapped address
+  still copies and pastes back character for character — the `make links`
+  invariant from #294, which now covers body text as well as the contact line.
+  The extension is local to one link, so the contact line and the bibliography
+  keep the punctuation-only breaks they were calibrated with.
+
 - All four document classes accept `muted=italic|gray|both`, controlling how
   de-emphasized runs are rendered — an entry's dates and location in the résumé
   and CV, and the statement's application-context line. `italic` is the default
@@ -360,6 +383,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#299]: https://github.com/amirhs1/CareerDossierTeX/issues/299
 [#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302
 [#305]: https://github.com/amirhs1/CareerDossierTeX/issues/305
+[#308]: https://github.com/amirhs1/CareerDossierTeX/issues/308
 
 ## [0.7.0] - 2026-08-04
 

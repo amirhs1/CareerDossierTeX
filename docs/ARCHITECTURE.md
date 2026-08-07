@@ -807,7 +807,8 @@ Responsibilities:
   tagged layout-artifact treatment;
 - contact line;
 - optional-field separator handling;
-- hyperlink wrappers;
+- hyperlink wrappers, including `\CDossierLink`, the body-text link, and the
+  scheme normalization it shares with the web-profile contact fields;
 - common entry-heading primitives;
 - date and location primitives;
 - shared letterhead pieces that do not impose full page geometry;

@@ -1,0 +1,38 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: bodylink-gains-https-scheme-when-absent
+============================================================
+[target: https://example.org/ada/portfolio]
+[text: example.org/ada/portfolio]
+breaks-anywhere
+============================================================
+============================================================
+TEST 2: bodylink-preserves-existing-scheme
+============================================================
+[target: https://example.org/ada/portfolio]
+[text: https://example.org/ada/portfolio]
+breaks-anywhere
+============================================================
+============================================================
+TEST 3: bodylink-breaks-are-local-to-one-link
+============================================================
+breaks-at-punctuation-only
+[target: https://example.org/ada/portfolio]
+[text: example.org/ada/portfolio]
+breaks-anywhere
+breaks-at-punctuation-only
+============================================================
+============================================================
+TEST 4: bodylink-strips-a-space-from-the-target
+============================================================
+Package careerdossier-components Warning: Removed a space from the \CDossierLink  target 'example.org/ada/portfolioand-more'.
+[target: https://example.org/ada/portfolioand-more]
+[text: example.org/ada/portfolio and-more]
+breaks-anywhere
+============================================================
+============================================================
+TEST 5: bodylink-degrades-without-hyperref
+============================================================
+degrades-to-plain-text
+============================================================
