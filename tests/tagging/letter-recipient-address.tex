@@ -1,0 +1,18 @@
+% letter-recipient-address.tex — full recipient block, tagged (issue #302).
+%
+% letter.tex and academic-letter.tex set only recipient-name and
+% recipient-organization, so nothing in the tagging suite has ever exercised
+% the other half of the recipient block: recipient-title, and above all
+% recipient-address, whose documented and example-wide form carries the user's
+% own `\\' inside a single field value ("123 Discovery Avenue\\Vancouver, ...").
+%
+% That break never passes through \__cdossier_letter_rcptline:N, so a fix
+% applied only to the four call sites would have left it glued while every
+% fixture here still passed. This fixture is what makes that half assertable.
+%
+% Deliberately one page and outside the five-document loop in run.sh: it has no
+% continuation furniture to check, and its job is the recipient block alone.
+\DocumentMetadata{lang=en,tagging=on}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{letter-recipient-address-body.inc.tex}

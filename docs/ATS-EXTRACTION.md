@@ -290,6 +290,14 @@ Measured against the committed fixtures:
 So the constraint is carried by the vertical gap, and
 `\CDossierRecordListEdgeAboveSkip` is the token that owns it.
 
+Issue #302 does put a real U+0020 between the two cells, and that is not a
+contradiction of the bullet above: it is emitted only on the tagged path, for a
+consumer that reads the structure element's text, and Poppler discards it here
+exactly as recorded — none of the extraction baselines moved. The two problems
+are separate. This one is Poppler's *geometric* block grouping, which no
+character fixes; #302's is the *logical* text of a structure element, which no
+amount of geometry fixes. See 7.5.
+
 #### The measured floor
 
 `\CDossierRecordListEdgeAboveSkip` has an extraction floor of **0.25**. On the
@@ -1115,10 +1123,13 @@ list, and paragraph, in document order, with its actual extracted text — so
 the reading and heading-navigation experience is visible for every component,
 not only headings.
 
-Recorded 2026-08-06 at this branch's tip, decoded byte-for-byte from the
-committed fixtures' `/StructTreeRoot` and content streams (`/K` → `/MCR` →
-`/MCID` → the marked-content run's own `Tj`/`TJ` glyph codes, resolved through
-each font's embedded `/ToUnicode` CMap) — not inferred from the source `.tex`.
+Recorded 2026-08-06, refreshed 2026-08-07 for issue #302's separator fix,
+decoded byte-for-byte from the committed fixtures' `/StructTreeRoot` and
+content streams (`/K` → `/MCR` → `/MCID` → the marked-content run's own
+`Tj`/`TJ` glyph codes, resolved through each font's embedded `/ToUnicode`
+CMap) — not inferred from the source `.tex`. That decoding is no longer a
+one-off: `tests/tagging/structure-text.pl` performs it, and the trees below are
+the committed `tests/tagging/*.structure.txt` baselines it now asserts against.
 `=>` shows the exact text a consumer that reads structure (rather than glyph
 geometry) would receive for that element; an `[annotation: ...]` line is an
 `/OBJR` pointing at a link annotation, not text a screen reader announces on
@@ -1138,25 +1149,61 @@ silently, so these are inert, but they are why the tree below has more
 own motivating résumé example undercounted them for the same reason.
 
 Second, and more substantively: **a `/text` leaf that contains more than one
-run occasionally concatenates those runs with no separating character at
-all**, which is different from an ordinary sentence that happens to contain a
-link (marked `‖` below; that case is fine — the embedded `/Link` element
-supplies the reading-order gap). The genuine case is a two-column or two-line
-layout built with `\hfill` or `\\` alone: the entry heading's title/dates row,
-its organization/location row, and the letter's stacked recipient name and
-organization all land in **one** marked-content run, because nothing —
-neither a space character nor a second structure element — separates the two
-halves in the content stream. `Engineer` immediately followed by `2024–2026`
-with no space between them is not a transcription artifact of this table; it
-is the literal decoded content a structure-aware consumer receives. This is
-`\hfill`/`\\` positioning glyphs by absolute coordinates rather than by a real
-interword space, the same root cause as 4.5's retired `/ActualText` history,
-in a new location that history did not cover. It has not been reproduced
-against a live screen reader and is not a claim about VoiceOver or NVDA's
-actual output — Poppler's own default extraction already separates these onto
-different lines (see 7.1's baselines), which is why nothing in the existing
-extraction suite catches it — so it is recorded here rather than fixed, for a
-dedicated follow-up.
+run used to concatenate those runs with no separating character at all.** This
+is different from an ordinary sentence that happens to contain a link (marked
+`‖` below; that case is fine — the embedded `/Link` element supplies the
+reading-order gap). The genuine case was a two-column or two-line layout built
+with `\hfill` or `\\` alone: the entry heading's title/dates row, its
+organization/location row, and the letter's stacked recipient lines all land in
+**one** marked-content run, and nothing — neither a space character nor a
+second structure element — separated the two halves in the content stream. The
+decoded content a structure-aware consumer received was the literal string
+`Engineer2024–2026`, and, for a letter with a full recipient address,
+`Casey ReaderHead of EngineeringExample Company123 Discovery AvenueVancouver,
+BC V6T 1Z4`. Same root cause as 4.5's retired `/ActualText` history —
+positioning glyphs by absolute coordinates rather than by a real interword
+space — in a location that history did not cover.
+
+Issue #302 fixed this, and the trees below show the fixed output. The remedy is
+tagpdf's own `\pdffakespace`, which emits a real U+0020 into the content stream
+at zero rendered width. Two things make that the right instrument rather than a
+workaround:
+
+- The interword spaces inside ordinary prose already arrive by exactly this
+  route. Tagged output carries real space glyphs where untagged output has only
+  `TJ` kerns; tagpdf inserts them for any glue of positive natural width that
+  sits next to a glyph. `\hfill` has **zero** natural width, and that — not
+  anything about two-column layout — is the whole reason these joins were
+  skipped.
+- Zero rendered width means the fill still absorbs the entire line, so no glyph
+  moves. The untagged example PDFs are byte-identical across the fix apart from
+  their timestamps and `/ID`, and not one of the Poppler, MuPDF, or PDFKit
+  baselines in 7.1 changed.
+
+Two details are worth keeping. In the letter the separator hangs off `\\`
+itself for the length of the recipient block, not off the four field call
+sites: a recipient address carries the user's own `\\` **inside a single field
+value**, so a call-site fix would have left that break glued. And
+`\pdffakespace` expands to a zero-width *skip*, which is discardable on either
+side of a forced line break — placed bare before or after the `\\` it is
+dropped again and no character is emitted at all. It has to be boxed.
+
+**Still not verified against a live screen reader.** Everything above is
+established at the byte level. Whether the glued form actually misread in
+VoiceOver or NVDA — and so whether this was a real defect for a user rather
+than only a structurally wrong one — was never confirmed, and the fix does not
+confirm it retrospectively. 7.2's manual pass is what would.
+
+**Why nothing caught it.** Poppler's default extraction already separates these
+onto different lines (see 7.1's baselines), because it splits on the horizontal
+gap; MuPDF and PDFKit likewise rebuild words from glyph geometry. Every
+extractor in the matrix was therefore structurally incapable of seeing a
+missing character. `make tagging` now decodes the content stream itself
+(`tests/tagging/structure-text.pl`), diffs the result against a committed
+`*.structure.txt` baseline per fixture, and additionally asserts each two-cell
+row's separator by name so the defect cannot be waved through by regenerating a
+baseline. `tests/tagging/letter-recipient-address.tex` exists because no
+previous fixture set `recipient-address` at all.
 
 #### Résumé
 
@@ -1174,9 +1221,9 @@ dedicated follow-up.
   /text-unit
     /text                                (no visible text)
   /text-unit
-    /text                                => 'Engineer2024–2026'      <- no separator; see above
+    /text                                => 'Engineer 2024–2026'
   /text-unit
-    /text                                => 'Example LabsToronto'    <- no separator; see above
+    /text                                => 'Example Labs Toronto'
   /text-unit
     /itemize
       /item
@@ -1194,9 +1241,9 @@ dedicated follow-up.
   /text-unit
     /text                                (no visible text)
   /text-unit
-    /text                                => 'Senior Engineer2022–2024'
+    /text                                => 'Senior Engineer 2022–2024'
   /text-unit
-    /text                                => 'Example ServicesOttawa'
+    /text                                => 'Example Services Ottawa'
   /text-unit
     /itemize
       /item
@@ -1227,9 +1274,9 @@ the row rather than leaving a stray separator, per rule 5):
   /text-unit
     /text                                (no visible text)
   /text-unit
-    /text                                => 'Researcher2023–2026'
+    /text                                => 'Researcher 2023–2026'
   /text-unit
-    /text                                => 'Example UniversityToronto'
+    /text                                => 'Example University Toronto'
   /text-unit
     /itemize
       /item /itemlabel => '•' /itembody /text-unit
@@ -1241,7 +1288,7 @@ the row rather than leaving a stray separator, per rule 5):
   /text-unit
     /text                                (no visible text)
   /text-unit
-    /text                                => 'Instructor2025'
+    /text                                => 'Instructor 2025'
   /text-unit
     /text                                => 'Example University'              (location blank, rule 5: no stray separator)
   /text-unit
@@ -1265,7 +1312,7 @@ heading role — flat prose, in reading order:
   /text-unit
     /text                                => 'July 20, 2026'
   /text-unit
-    /text                                => 'Casey ReaderExample Company'      <- no separator; see above
+    /text                                => 'Casey Reader Example Company'
   /text-unit
     /text                                => 'Application for Engineering Role'
   /text-unit
@@ -1298,7 +1345,7 @@ wording and closing conventions, not structure):
   /text-unit
     /text                                => 'July 20, 2026'
   /text-unit
-    /text                                => 'Jordan ReaderExample University'   <- no separator; see above
+    /text                                => 'Jordan Reader Example University'
   /text-unit
     /text                                => 'Application for Faculty Role'
   /text-unit
@@ -1354,11 +1401,13 @@ and issue #177). This fixture does not exercise `\CDossierSubsection`, so no
 The context line (`'Application for Faculty Role' ‖ 'Application ID:
 APP-104'`) is structurally two adjacent leaves, not one glued run, because the
 `|` between them is its own `/Artifact` and interrupts the marked-content run
-— unlike the entry-heading and recipient-block cases above, which never open a
-second run at all. Whether two separate accessible elements, read back to
-back with their artifact-only separator invisible to the consumer, are any
-more legible than one glued run is exactly the kind of question 7.2's manual
-screen-reader pass, not a structural count, can actually answer.
+— unlike the entry-heading and recipient-block cases above, which never opened
+a second run at all. It is therefore untouched by #302's fix and still carries
+no character between its halves: what separates them is an element boundary,
+not a space. Whether two separate accessible elements, read back to back with
+their artifact-only separator invisible to the consumer, are any more legible
+than one glued run is exactly the kind of question 7.2's manual screen-reader
+pass, not a structural count, can actually answer.
 
 ## 8. Class and package architecture
 
@@ -1636,6 +1685,17 @@ replace text-extraction tests.
 `tests/tagging/run.sh` (`make tagging`) automates every part of that except the
 screen-reader pass, which stays manual by nature. Recorded results and the
 outstanding VoiceOver/NVDA checklists are in sections 7.1 and 7.2.
+
+One check there is not an extraction check and should not be read as one.
+`tests/tagging/structure-text.pl` decodes each marked-content run from the
+content stream and consults no glyph coordinate at all, so what it prints is
+the *logical* text of a structure element rather than an extractor's
+reconstruction of the page. That distinction is the whole reason it exists:
+Poppler, MuPDF, and PDFKit all rebuild words from geometry, so all three were
+blind to two cells joined by nothing but positioning glue (7.5). A defect of
+that shape is invisible to every other check in this document. Its per-fixture
+`*.structure.txt` baselines are assertions, not records — regenerate one only
+for an intended change to the tagged text, and read the diff.
 
 ### 11.9 Real portal acceptance
 

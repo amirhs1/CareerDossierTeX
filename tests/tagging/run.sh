@@ -19,6 +19,14 @@
 #   * A toolchain record, because a validation result is only meaningful
 #     alongside the versions that produced it.
 #
+# Issue #302 adds a check that is not an extraction check at all. All three
+# extractors above rebuild words from glyph geometry, which makes the entire
+# matrix blind to two pieces of content separated by nothing but positioning
+# glue. structure-text.pl decodes the marked-content runs from the content
+# stream instead, consulting no coordinate, so what it reports is the logical
+# text of a structure element. It needs no tool beyond Perl, so unlike the
+# gates below it never skips.
+#
 # Screen-reader review (VoiceOver, NVDA) stays manual and is NOT run here; see
 # docs/ATS-EXTRACTION.md for the checklists and recorded results.
 #
@@ -407,6 +415,68 @@ check_contact_label_tagging() {
   echo "  RECORDED: structure roles (report: $base-structure.txt)"
 }
 
+# Structure-element text (issue #302).
+#
+# Every other extraction check below asks an extractor what the page says, and
+# Poppler, MuPDF, and PDFKit all rebuild words and lines from glyph *geometry*.
+# That makes the whole matrix blind to one class of defect: two pieces of
+# content separated by nothing but positioning glue. `\hfill' and `\\' move the
+# pen by an absolute coordinate jump and emit no character, so an entry
+# heading's title and dates landed in one marked-content run as the literal
+# string `Engineer2024-2026' -- while every baseline here stayed green, because
+# Poppler sees the horizontal gap and splits the two onto separate lines
+# anyway. A consumer that reads the structure tree's own text gets the glued
+# string; the suite never saw it.
+#
+# structure-text.pl decodes the content stream directly and consults no
+# coordinate at all, so what it prints is exactly what such a consumer reads.
+#
+# There are two assertions here and they fail for different reasons on purpose.
+# The committed baseline pins every run, so any change to the tagged text is
+# visible; the explicit separator assertions state the invariant in words, so
+# the specific defect cannot be waved through by regenerating a baseline. A
+# baseline is only as good as the review of its diff, and this defect is a
+# single missing space.
+check_structure_text() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+  local got="$work/$base.structure.got"
+  local expected="$here/$base.structure.txt"
+
+  if ! perl "$here/structure-text.pl" "$pdf" >"$got" 2>"$got.err"; then
+    record_failure "$base structure-element text could not be decoded"
+    sed 's/^/    /' "$got.err"
+    return
+  fi
+
+  check_one_extractor "$base" "structure text" "$expected" "$got"
+}
+
+# Assert that a decoded run contains a real separator between two cells whose
+# only visual separation is glue. The glued form is named explicitly rather
+# than derived, so the failure message says what went wrong.
+#
+# Arguments: base, then "separated form|glued form" pairs.
+check_structure_text_separators() {
+  local base="$1"; shift
+  local got="$work/$base.structure.got"
+  local pair separated glued
+
+  [ -s "$got" ] || return
+
+  for pair in "$@"; do
+    separated="${pair%%|*}"
+    glued="${pair##*|}"
+    if grep -Fq "$glued" "$got"; then
+      record_failure \
+        "$base structure text contains '$glued': the two cells are glued together with no separator"
+    elif ! grep -Fq "$separated" "$got"; then
+      record_failure \
+        "$base structure text has neither '$separated' nor the glued form; the fixture changed"
+    fi
+  done
+}
+
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
 # disagree on how to linearize the two-column entry header, so each owns a
 # baseline; sharing one would only record whichever library ran last.
@@ -633,6 +703,32 @@ for base in resume cv letter academic-letter statement; do
   check_two_page_furniture "$base"
   check_page_two_artifact_stream "$base"
   check_extraction "$base"
+  check_structure_text "$base"
+  # The two-cell rows this profile actually renders, as "separated|glued".
+  # Every one of these passed the extraction baselines above while glued.
+  case "$base" in
+    resume)
+      check_structure_text_separators resume \
+        'Engineer 2024–2026|Engineer2024–2026' \
+        'Example Labs Toronto|Example LabsToronto' \
+        'Senior Engineer 2022–2024|Senior Engineer2022–2024' \
+        'Example Services Ottawa|Example ServicesOttawa'
+      ;;
+    cv)
+      check_structure_text_separators cv \
+        'Researcher 2023–2026|Researcher2023–2026' \
+        'Example University Toronto|Example UniversityToronto' \
+        'Instructor 2025|Instructor2025'
+      ;;
+    letter)
+      check_structure_text_separators letter \
+        'Casey Reader Example Company|Casey ReaderExample Company'
+      ;;
+    academic-letter)
+      check_structure_text_separators academic-letter \
+        'Jordan Reader Example University|Jordan ReaderExample University'
+      ;;
+  esac
   check_untagged "$base"
   check_display_doc_title "$base"
   check_visual_equivalence "$base"
@@ -654,6 +750,25 @@ if compile_fixture resume-contact-labels.tex resume-contact-labels; then
   if [ "$have_verapdf" -eq 1 ]; then
     compile_fixture resume-contact-labels-ua2.tex resume-contact-labels-ua2 \
       && validate_ua2 resume-contact-labels
+  fi
+fi
+
+# The full recipient block (issue #302). Outside the loop because it is a
+# one-page fixture with no continuation furniture, and because the only thing it
+# is here to pin is the recipient block -- including the `\\' the user writes
+# inside recipient-address, which no other fixture sets.
+echo "== letter-recipient-address =="
+if compile_fixture letter-recipient-address.tex letter-recipient-address; then
+  check_structure_text letter-recipient-address
+  check_structure_text_separators letter-recipient-address \
+    'Casey Reader Head of Engineering|Casey ReaderHead of Engineering' \
+    'Head of Engineering Example Company|Head of EngineeringExample Company' \
+    'Example Company 123 Discovery Avenue|Example Company123 Discovery Avenue' \
+    '123 Discovery Avenue Vancouver, BC V6T 1Z4|123 Discovery AvenueVancouver, BC V6T 1Z4'
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture letter-recipient-address-ua2.tex letter-recipient-address-ua2 \
+      && validate_ua2 letter-recipient-address
   fi
 fi
 

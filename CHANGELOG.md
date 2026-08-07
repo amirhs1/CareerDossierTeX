@@ -235,6 +235,33 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   rendered layout, extracted text, and the untagged path are all unaffected,
   and all five named tagged fixtures still pass veraPDF UA-2.
 
+- In tagged output, an entry heading's title and dates, its organization and
+  location, and a cover letter's recipient block are now separated by a real
+  space character. They previously reached a consumer that reads the structure
+  tree as one run-on string — `Engineer2024–2026`, `Example LabsToronto`, and,
+  for a letter with a full address, `Casey ReaderHead of EngineeringExample
+  Company123 Discovery AvenueVancouver, BC V6T 1Z4`. ([#302])
+
+  Those layouts push their second piece into place with `\hfill` or `\\`, which
+  move the pen by a coordinate jump and emit no character at all. Ordinary prose
+  was never affected: tagged output already carries real space glyphs between
+  words, and the gap was that the mechanism only marks glue of positive natural
+  width, which `\hfill` has none of. The separator is emitted at zero rendered
+  width, so nothing on the page moves — the untagged example PDFs are
+  byte-identical across the change, and no extraction baseline moved.
+
+  Whether the run-on form actually misread in VoiceOver or NVDA was never
+  confirmed, and this fix does not confirm it retrospectively; it corrects text
+  that was wrong at the byte level. See
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#75-structure-tree-by-profile)
+  §7.5 for the decoded before-and-after.
+
+  This is a structure-tree change under the opt-in `tagging=on` path only: no
+  class, option, key, or command changed, and all five named tagged fixtures
+  still pass veraPDF UA-2. `make tagging` now decodes each fixture's
+  marked-content text directly and diffs it against a committed baseline, which
+  is the check the whole extraction matrix was structurally unable to perform.
+
 [#267]: https://github.com/amirhs1/CareerDossierTeX/issues/267
 [#269]: https://github.com/amirhs1/CareerDossierTeX/issues/269
 [#270]: https://github.com/amirhs1/CareerDossierTeX/issues/270
@@ -243,6 +270,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 [#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294
 [#299]: https://github.com/amirhs1/CareerDossierTeX/issues/299
+[#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302
 
 ## [0.7.0] - 2026-08-04
 

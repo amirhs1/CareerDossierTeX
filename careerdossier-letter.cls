@@ -305,7 +305,29 @@
 %% it was a bare `\\', which is plain `\baselineskip' -- the only vertical
 %% distance in the letter that the token system did not express. The token
 %% defaults to 0.00, which is that same plain `\baselineskip'.
+%%
+%% Issue #302: the whole block is one paragraph, so a bare `\\' leaves the
+%% consecutive lines with no character between them at all and a consumer that
+%% reads the structure element's logical text gets `Casey ReaderExample
+%% Company'. `\pdffakespace' emits a real, zero-width U+0020 (see
+%% careerdossier-components.sty for the mechanism and the untagged fallback).
+%%
+%% The separator hangs off `\\' itself, for the length of this block only,
+%% rather than off the four call sites below. A recipient address is documented
+%% as taking its own `\\' -- every shipped example uses one, "123 Discovery
+%% Avenue\\Vancouver, BC" -- and that break is inside a *field value*, so it
+%% never passes through \__cdossier_letter_rcptline:N. Attaching the separator
+%% to the call sites would have left the address half of the block still glued
+%% together, which is the same partial fix the fixtures would not have caught:
+%% no tagging fixture sets recipient-address.
+%%
+%% The `\mbox' is load-bearing and not decoration. `\pdffakespace' expands to a
+%% zero-width *skip*, and glue on either side of a forced line break is
+%% discardable -- placed bare before or after the `\\' it is dropped again and
+%% no space is emitted at all. Boxing it makes it survive the break.
 %% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_letter_origcr: { }
+
 \cs_new_protected:Npn \__cdossier_letter_rcptline:N #1
   {
     \tl_if_blank:VF #1
@@ -318,11 +340,20 @@
   }
 \cs_new_protected:Npn \__cdossier_letter_recipient:
   {
-    \bool_set_false:N \l__cdossier_letter_printed_bool
-    \__cdossier_letter_rcptline:N \l__cdossier_letter_rcptname_tl
-    \__cdossier_letter_rcptline:N \l__cdossier_letter_rcpttitle_tl
-    \__cdossier_letter_rcptline:N \l__cdossier_letter_rcptorg_tl
-    \__cdossier_letter_rcptline:N \l__cdossier_letter_rcptaddr_tl
+    \group_begin:
+      %% Captured here, not at load time: \\ is whatever the surrounding
+      %% context has made it, and the redefinition must not outlive the block.
+      %% The saved command keeps the optional-argument scan, so `\\[<skip>]'
+      %% and a user's bare `\\' both still behave exactly as before.
+      \cs_set_eq:NN \__cdossier_letter_origcr: \\
+      \cs_set_protected:Npn \\
+        { \mbox { \pdffakespace } \__cdossier_letter_origcr: }
+      \bool_set_false:N \l__cdossier_letter_printed_bool
+      \__cdossier_letter_rcptline:N \l__cdossier_letter_rcptname_tl
+      \__cdossier_letter_rcptline:N \l__cdossier_letter_rcpttitle_tl
+      \__cdossier_letter_rcptline:N \l__cdossier_letter_rcptorg_tl
+      \__cdossier_letter_rcptline:N \l__cdossier_letter_rcptaddr_tl
+    \group_end:
   }
 
 %% True when at least one recipient field is present.

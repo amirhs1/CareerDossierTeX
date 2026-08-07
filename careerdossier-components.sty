@@ -761,6 +761,27 @@
   }
 
 %% ---------------------------------------------------------------------------
+%% Structure-text separator fallback (issue #302).
+%%
+%% `\pdffakespace' is tagpdf's; it emits a real U+0020 into the content stream
+%% at zero rendered width, so a gap made of glue alone still reads as a word
+%% boundary to a consumer of the structure tree. It exists only when tagpdf is
+%% loaded, which is only when the document asked for tagging. Every call site
+%% in this package is therefore on a path that must also work untagged, and on
+%% that path the command must simply do nothing.
+%%
+%% The fallback is declared at \begin{document} rather than here. tagpdf uses
+%% \NewDocumentCommand, which errors on an existing definition, so a
+%% \providecommand at package-load time would not merely lose the race -- it
+%% would break the tagged build outright. By \begin{document} tagpdf has either
+%% defined the command or is not present at all.
+%%
+%% Shared deliberately: careerdossier-letter.cls needs the same fallback for
+%% its recipient block, and every class loads this package.
+%% ---------------------------------------------------------------------------
+\AddToHook { begindocument } { \providecommand \pdffakespace { } }
+
+%% ---------------------------------------------------------------------------
 %% Entry heading primitive.
 %%
 %% Renders a single entry heading shared by résumé sections (experience,
@@ -793,6 +814,22 @@
 %% 0.25; `tokens-invariants' states it and tests/extraction/ enforces it.
 %% See docs/ATS-EXTRACTION.md 3.4.
 %%
+%% Issue #302: `\hfill' positions the right-hand cell by an absolute coordinate
+%% jump, so no character at all separates the two cells in the content stream.
+%% That is invisible to every extractor in the suite -- each rebuilds words from
+%% glyph geometry and splits on the gap -- but a consumer that reads the
+%% *logical* text of the structure element receives `Engineer2024–2026'.
+%%
+%% `\pdffakespace' is tagpdf's own remedy for exactly this: it marks the
+%% following zero-width skip so the tagging code emits a real U+0020 into the
+%% content stream. Zero width means the fill still absorbs the whole line and
+%% every glyph keeps its position, and on the untagged path the command is the
+%% no-op declared above, so that path is untouched. The interword spaces
+%% inside ordinary prose already arrive by this same route:
+%% tagged output carries real space glyphs where untagged output has only TJ
+%% kerns. The gap here was that tagpdf marks only glue with a positive natural
+%% width, and `\hfill' has none. See docs/ATS-EXTRACTION.md 7.5.
+%%
 %% #1 title (required, nonblank), #2 organization, #3 location, #4 dates.
 %% ---------------------------------------------------------------------------
 \cs_new_protected:Npn \__cdossier_components_entryhead:nnnn #1#2#3#4
@@ -800,7 +837,7 @@
     \noindent
     { \CDossierEntryTitleStyle #1 }
     \tl_if_blank:nF {#4}
-      { \hfill { \CDossierMutedStyle #4 } }
+      { \pdffakespace \hfill { \CDossierMutedStyle #4 } }
     \par
     \bool_lazy_or:nnT
       { ! \tl_if_blank_p:n {#2} }
@@ -812,7 +849,14 @@
         \penalty \CDossierHeadingKeepPenalty
         \noindent
         \tl_if_blank:nF {#2} { { \CDossierBodyStyle #2 } }
-        \tl_if_blank:nF {#3} { \hfill { \CDossierMutedStyle #3 } }
+        \tl_if_blank:nF {#3}
+          {
+            %% Only when something precedes it: an organization-less entry must
+            %% not open its line with a separator, for the same reason rule 5
+            %% forbids a stray "|".
+            \tl_if_blank:nF {#2} { \pdffakespace }
+            \hfill { \CDossierMutedStyle #3 }
+          }
         \par
       }
   }
