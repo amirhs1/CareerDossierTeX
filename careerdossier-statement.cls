@@ -205,7 +205,9 @@
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_statement_paper_tl
 \setlength { \parindent }        { 0pt }
 \setlength { \parskip }          { \CDossierProseParSkip }
-\setlength { \emergencystretch } { 2em }
+%% Issue #272: the shared line-breaking flexibility every family applies. The
+%% policy and its reasoning live with the token in careerdossier-tokens.
+\setlength { \emergencystretch } { \CDossierEmergencyStretch }
 
 %% Typographic page-break penalties (issue #171): see careerdossier-tokens for
 %% the shared values and the reasoning for using one strength across families.

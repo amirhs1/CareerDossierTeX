@@ -38,6 +38,7 @@
     \cdossiertest_dimension:N \CDossierFurnitureLeading
     \cdossiertest_dimension:N \CDossierRuleThickness
     \cdossiertest_dimension:N \CDossierListLabelSep
+    \cdossiertest_dimension:N \CDossierEmergencyStretch
     \cdossiertest_skip:N \CDossierSharedHeaderNameGapSkip
     \cdossiertest_skip:N \CDossierSharedHeaderMetaGapSkip
     \cdossiertest_skip:N \CDossierRecordHeaderBelowSkip

@@ -23,6 +23,14 @@
     \cs_if_exist:NTF \l__cdossier_letter_afterhead_skip
       { \TYPE{letter-local-skips = present} }
       { \TYPE{letter-local-skips = absent} }
+    %% Issue #272: \emergencystretch is one shared policy expressed as one
+    %% token. Pinning the resolved value *and* its identity with the token
+    %% catches both halves of the defect this replaced: a class writing its own
+    %% literal again, and a class silently setting nothing at all.
+    \TYPE{emergency-stretch = \dim_use:N \emergencystretch}
+    \dim_compare:nNnTF { \emergencystretch } = { \CDossierEmergencyStretch }
+      { \TYPE{line-break-flexibility = shared} }
+      { \TYPE{line-break-flexibility = local} }
   }
 \ExplSyntaxOff
 \begin{document}

@@ -110,6 +110,46 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   undefined-control-sequence error. See
   [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
 
+- `\emergencystretch` is one policy behind one named token,
+  `\CDossierEmergencyStretch`, and all four classes now apply it. **No
+  committed example renders differently**, and nothing needs a source edit.
+  ([#272])
+
+  Four classes previously held three policies: the letter and the statement
+  each wrote a bare `2em`, the CV wrote it only at `a4paper`, and the résumé
+  wrote nothing at all. None of them said why it differed from the others, and
+  the omission was the substantive half — the résumé is fully justified and its
+  bullet text carries the toolkit's longest unbreakable strings.
+
+  The token is `2.00 ×` the body size — 20, 22, and 24 pt at `fontsize=10pt`,
+  `11pt`, and `12pt`. It derives from the body size rather than the body
+  leading because emergency stretch is distributed among a line's interword
+  glue, so the quantity is horizontal. The ratio reproduces the previous
+  rendered value exactly: `\fontdimen6` equals the design size for both
+  supported body fonts, so `2em` measured those same three values, and the
+  change is mechanism-only wherever the setting already applied.
+
+  Extending it to the résumé and to the letter-paper CV cannot loosen a
+  paragraph that already sets. TeX consults `\emergencystretch` only in a third
+  line-breaking pass, reached only when the second finds no feasible set of
+  breakpoints within `\tolerance`; it buys back the paragraphs that would
+  otherwise be set overfull, and nothing else. Every committed example was
+  rebuilt and compared byte-for-byte against its previous PDF: all eleven are
+  identical apart from `/CreationDate` and `/ID`, so no line broke differently
+  anywhere in the toolkit.
+
+  The layout fixtures still report zero overfull boxes at 10/11/12 pt across
+  both margin presets, and `tests/regression/tokens-scale.lvt` pins the token's
+  resolved value at each body size while the four `tokens-*-defaults` fixtures
+  pin each class's setting against the token — catching both a class writing a
+  literal again and a class silently setting nothing. Two new layout fixtures
+  make the résumé's setting a *rendered* assertion rather than a reported one,
+  one per path the class actually has: `resume-emergency-stretch` sets 8.47 pt
+  over the measure with the token zeroed, and `resume-summary-prose` — the
+  justified prose paragraph the shipped example opens with — sets 5.62 pt over.
+  The suite's overfull check passes on both only because the token reaches the
+  page.
+
 ### Removed
 
 - **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
@@ -313,6 +353,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#269]: https://github.com/amirhs1/CareerDossierTeX/issues/269
 [#270]: https://github.com/amirhs1/CareerDossierTeX/issues/270
 [#271]: https://github.com/amirhs1/CareerDossierTeX/issues/271
+[#272]: https://github.com/amirhs1/CareerDossierTeX/issues/272
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
 [#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294

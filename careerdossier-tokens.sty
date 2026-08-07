@@ -95,6 +95,11 @@
 \dim_new:N \CDossierFurnitureLeading
 \dim_new:N \CDossierRuleThickness
 \dim_new:N \CDossierListLabelSep
+%% Issue #272: the line-breaking flexibility every family may spend on a
+%% paragraph TeX cannot otherwise set within \tolerance. This module owns it
+%% because line-breaking policy is a shared typographic decision, not a
+%% per-class one; the classes apply the token and none of them names a value.
+\dim_new:N \CDossierEmergencyStretch
 
 %% Keep-together penalties (issue #145). Entry-structured documents (résumé,
 %% CV) state their page-break policy as named, tokenised penalties rather than
@@ -310,6 +315,34 @@
       {
         \fp_to_dim:n
           { 0.5 * \dim_to_fp:n { \CDossierBodySize } }
+      }
+    %% Issue #272: one \emergencystretch policy for all four families. Three
+    %% classes each wrote `2em' -- the letter and the statement unconditionally,
+    %% the CV only at `a4paper' -- and the résumé wrote nothing, so four classes
+    %% held three policies and none of them could say why they differed.
+    %%
+    %% The value is a multiple of \CDossierBodySize rather than of
+    %% \CDossierBodyLeading, because emergency stretch is distributed among the
+    %% interword glue of a line: it is a horizontal quantity, and the horizontal
+    %% unit of the type scale is the body size. 2.00 reproduces the value the
+    %% three classes already rendered exactly -- \fontdimen6 equals the design
+    %% size for both supported body fonts, so `2em' measured 20/22/24pt at
+    %% 10/11/12pt, which is what this ratio gives. The change is therefore
+    %% mechanism-only for the letter and the statement, and the token no longer
+    %% depends on a font whose quad happens to equal its design size, nor on
+    %% which font is current at the point the length is set.
+    %%
+    %% It is applied unconditionally, including by the résumé, which is fully
+    %% justified and carries the longest unbreakable strings in the toolkit --
+    %% technical terms and URLs in bullet text. Extending it there and to the
+    %% letter-paper CV cannot loosen a paragraph that already sets: TeX consults
+    %% \emergencystretch only in a third pass, reached only when the second pass
+    %% finds no feasible set of breakpoints within \tolerance. It buys back the
+    %% paragraphs that would otherwise be set overfull, and nothing else.
+    \dim_set:Nn \CDossierEmergencyStretch
+      {
+        \fp_to_dim:n
+          { 2.00 * \dim_to_fp:n { \CDossierBodySize } }
       }
 
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderNameGapSkip { 0.25 }

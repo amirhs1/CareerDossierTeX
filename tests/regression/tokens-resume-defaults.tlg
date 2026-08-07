@@ -4,3 +4,5 @@ fontsize=11pt
 margin=narrow
 body-size=11.0pt
 page-margin=36.135pt
+emergency-stretch=22.0pt
+line-break-flexibility=shared

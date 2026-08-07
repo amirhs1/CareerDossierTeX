@@ -12,3 +12,5 @@ body-below-skip=9.0625pt
 signature-skip=29.0pt
 paragraph-rhythm=shared
 letter-local-skips=absent
+emergency-stretch=24.0pt
+line-break-flexibility=shared

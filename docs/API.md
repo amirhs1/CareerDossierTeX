@@ -1770,6 +1770,30 @@ Since `v0.7.0`, `\CDossierRecordHeaderBelowSkip`,
 The calibrated *values* are not stable API before `v1.0.0`; the token names and
 the boundaries they own are.
 
+## Line-breaking tokens
+
+```latex
+\CDossierEmergencyStretch
+```
+
+`\CDossierEmergencyStretch` is the extra flexibility TeX may distribute among a
+paragraph's interword glue when it can find no set of breakpoints within
+`\tolerance`. It is `2.00 ×` the body size — 20 pt, 22 pt, and 24 pt at
+`fontsize=10pt`, `11pt`, and `12pt` — and it derives from the body size rather
+than the body leading because the quantity is horizontal.
+
+All four classes set `\emergencystretch` from it, unconditionally and
+identically: one policy, stated once. Raising it lets a paragraph with few break
+points set looser instead of overfull; lowering it to `0pt` restores TeX's
+default behavior, which is to allow the overfull box. Neither direction affects
+a paragraph that already sets within `\tolerance`, because `\emergencystretch`
+is consulted only in a third line-breaking pass that such a paragraph never
+reaches.
+
+Before `v0.8.0` the letter and the statement each set `2em` directly, the CV set
+it only at `a4paper`, and the résumé set nothing; see
+[`CHANGELOG.md`](../CHANGELOG.md).
+
 ## Colors and theme tokens
 
 The monochrome theme may expose semantic tokens:

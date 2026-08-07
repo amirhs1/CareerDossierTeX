@@ -189,11 +189,13 @@
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierRecordParSkip }
 
-%% A4's narrower text block needs a little extra paragraph flexibility for
-%% prose-heavy CV entries. Letter output retains its established line-breaking
-%% behavior; this does not alter margins, type size, or page furniture.
-\str_if_eq:VnT \l__cdossier_cv_paper_tl { a4paper }
-  { \setlength { \emergencystretch } { 2em } }
+%% Issue #272: the shared line-breaking flexibility every family applies. This
+%% was previously spent only at `a4paper', on the reasoning that A4's narrower
+%% text block needs more paragraph flexibility for prose-heavy CV entries --
+%% true, but not a reason to withhold it from letter paper, which is only less
+%% likely to need it, never harmed by having it. The policy and its reasoning
+%% live with the token in careerdossier-tokens.
+\setlength { \emergencystretch } { \CDossierEmergencyStretch }
 
 \__cdossier_components_runninglabel:n { Curriculum~Vitae }
 \__cdossier_components_apply_page_furniture:

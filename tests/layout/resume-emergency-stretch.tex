@@ -1,0 +1,32 @@
+% resume-emergency-stretch.tex — layout stress: a bullet whose only break
+% points are long unbreakable strings. Issue #272 gave the résumé the shared
+% \emergencystretch every other family already had; before it, the résumé set
+% none at all.
+%
+% This fixture is the rendered assertion for that. The runner's "no overfull
+% boxes" check passes here only because \CDossierEmergencyStretch reaches the
+% page: with the class's setting removed, or the token zeroed, the bullet below
+% sets 8.47 pt over the measure at `fontsize=10pt, margin=narrow`. A fixture
+% that merely reported the token's value could not tell those two states apart.
+\documentclass[fontsize=10pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name  = {Alexandria Montgomery-Fitzgerald},
+  email = {alexandria@example.org},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist},
+  organization = {Digital Services Laboratory},
+  location     = {Ontario, Canada},
+  dates        = {September 2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Delivered the ReproducibleArchivalInteroperabilityFramework across
+          the InterdepartmentalDataModernizationProgramme, documented at
+          https://example.org/programs/analytics-modernization/2024/final-report/appendix-b-supplementary-materials
+          for downstream consumers.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
