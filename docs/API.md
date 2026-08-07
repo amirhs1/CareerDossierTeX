@@ -1362,12 +1362,24 @@ as a block ahead of the entry text. `\CDossierListLabelSep` is half the body
 size, so the gap clears that threshold at every supported `fontsize`. When the
 host class does not provide the token, BibLaTeX's own default is left in place.
 
-URLs printed in a bibliography keep BibLaTeX's break points but use a reduced
-stretch at each of them, so a justified line ending in a URL spreads its word
-spaces rather than the URL itself. A stretched URL extracts as separate tokens
+URLs printed in a bibliography carry no stretch at their break points, so a
+justified line ending in a URL spreads its word spaces rather than the URL
+itself. A stretched URL extracts as separate tokens
 (`https : / / example . invalid /`) and is then neither searchable nor
-copyable. This narrows the failure considerably but cannot rule it out: TeX
-will exceed a stated stretch to set an otherwise underfull line.
+copyable. A reduced stretch was used until v0.8.0 and only narrowed the
+failure — TeX exceeds a stated stretch to set an otherwise underfull line, and
+a 262-character query-string URL was long enough to make it do so. Rigid glue
+rules it out instead, at any measure or URL length.
+
+Rigid glue leaves a line no way to absorb a shortfall, so the profile also
+enables BibLaTeX's three URL break penalties, which are disabled by default:
+without them a long URL overruns the margin rather than spreading. Two visible
+results follow, both intended. A URL breaks where the line ends rather than at
+the nearest earlier punctuation, so an address may wrap in the middle of a run
+of letters or digits; and a line holding nothing but URL is set ragged-right
+and reported underfull, since it has no glue to justify with. A wrapped address
+still concatenates back exactly — these break points insert a penalty and no
+discretionary hyphen, as `\CDossierLink`'s do.
 
 `\CDossierHighlightAuthor` may be repeated for spelling or initial variants.
 It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and

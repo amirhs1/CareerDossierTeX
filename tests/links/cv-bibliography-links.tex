@@ -2,15 +2,23 @@
 % bibliography (issue #294). This is the one site in the project that puts
 % stretchable glue at a URL's breakpoints: \biburlsetup sets \Urlmuskip from
 % \biburlbigskip, whose BibLaTeX default of 0mu plus 3mu spread the URL in
-% issue #199. careerdossier-biblatex.sty caps it at 0mu plus 1mu, and this
-% fixture is the assertion that the cap still holds.
+% issue #199. careerdossier-biblatex.sty sets it rigid, and this fixture is the
+% assertion that no URL picks up stretch.
+%
+% The third token is the one that matters (issue #312). Under the earlier
+% 0mu plus 1mu cap the two short addresses stayed intact, so this fixture
+% passed while a 262-character query-string URL split at the CV's own defaults
+% — the cap was never a guarantee, only a length the suite did not reach.
+% Rigid glue makes the property hold by construction rather than by length, and
+% this token is what would notice if it stopped.
 %
 % Its twin, cv-bibliography-urlmuskip-raised.tex, is the same document with the
-% cap removed. The pair shares one .bib, so the only difference between an
-% intact URL and a split one is the muskip.
+% glue widened past the extractor's threshold. The pair shares one .bib, so the
+% only difference between an intact URL and a split one is the muskip.
 %
 % LINKTOKEN: 10.9999/example.transactions.2026.analytical-engine.appendix-g
 % LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+% LINKTOKEN: https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation&title=Special%3ASearch&profile=advanced&fulltext=1&ns0=1
 \documentclass{careerdossier-cv}
 \usepackage{careerdossier-biblatex}
 \addbibresource{links.bib}

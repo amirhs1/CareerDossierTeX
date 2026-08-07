@@ -1189,8 +1189,9 @@ Responsibilities:
   horizontal gap between an entry number and its entry, for the same reason and
   on the same terms, so the label geometry matches `CDossierPublications`
   rather than BibLaTeX's wider `2\labelsep` default;
-- keep printed URLs extractable by capping the stretch BibLaTeX applies at each
-  URL break point, without removing the break points themselves; and
+- keep printed URLs extractable by removing the stretch BibLaTeX applies at each
+  URL break point, and supply the additional break points that rigid glue then
+  needs, so a URL can still reach the end of a line without overrunning it; and
 - report an actionable optional-dependency error when BibLaTeX is unavailable.
 
 It must not:

@@ -656,9 +656,26 @@ extractor, and both are horizontal rather than vertical:
 - **URLs.** Poppler splits a word wherever an intra-word gap exceeds 0.1 em.
   BibLaTeX stretches URLs at their break points to justify a line, which can
   push a URL past that and extract it as `https : / / example . invalid /`.
-  The profile caps that stretch. Treat this as a mitigation: TeX will exceed a
-  stated stretch to set an otherwise underfull line, so a narrow measure can
-  still spread a URL.
+  The profile removes that stretch entirely rather than capping it. Capping was
+  the original fix and it was only a mitigation, for a reason that turned out
+  to be reachable with an ordinary address: TeX exceeds a stated stretch to set
+  an otherwise underfull line. A 262-character query-string URL — a Wikipedia
+  advanced-search result, not a contrived one — split at the CV's own
+  `fontsize=12pt, margin=normal` with the cap in place (issue #312). Rigid glue
+  is a guarantee where a cap was not, because TeX cannot stretch what has no
+  stretch component, at any measure or URL length.
+
+  Rigid glue has to be paid for in break points, exactly as body-text links are
+  (below). With nothing to absorb the remainder of a line, TeX set the same URL
+  5.09 pt into the margin instead; the profile therefore enables BibLaTeX's
+  three `biburl*penalty` counters, which are 0 by default, so a URL may break
+  inside a run of letters or digits when punctuation offers nowhere. Two
+  visible consequences, both intended: URLs now break where the line ends
+  rather than at the nearest earlier punctuation, so an address can wrap
+  mid-run; and a line holding nothing but URL has no glue to justify with, so
+  it is reported underfull and set ragged-right. Neither costs anything a
+  reader pastes, and the tidier break they replace was bought by stretching the
+  URL — which is the defect.
 
 `tests/bibliography/run.sh` checks both the extracted text and, separately, the
 label/entry baseline pairing read from `pdftotext -bbox`. The second check is
@@ -733,8 +750,9 @@ line-breaking decision, and invisible in the rendered page.
 Two things follow. First, a change that adds stretch at a URL's breakpoints is
 an extraction change even though it touches no text: BibLaTeX's
 `\biburlbigskip` default of `0mu plus 3mu` did exactly this in issue #199, and
-`careerdossier-biblatex.sty` caps it at `0mu plus 1mu` for that reason.
-Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
+`careerdossier-biblatex.sty` sets it rigid for that reason (§5.4 — it capped it
+at `0mu plus 1mu` until issue #312 found a real URL long enough to defeat the
+cap). Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
 additionally immune because each item is measured in its own `\hbox` rather
 than justified.
 
@@ -753,8 +771,13 @@ Second, plain extracted text cannot check this: a legitimate line wrap and a
 split token both read as whitespace. The decision needs word bounding boxes —
 pieces on different visual lines are a wrap, pieces sharing one line are the
 defect. `make links` (§11) is the assertion, and it carries a negative control
-that restores the BibLaTeX default so the check is re-proved against the real
-failure on every run. Because the word-break threshold is an extractor
+— a fixture that widens the bibliography's URL glue past the threshold on
+purpose and must be reported as split — so the checker is re-proved against a
+genuinely broken PDF on every run. The control sets that gap directly rather
+than provoking justification into producing one: a stretch reaches the
+threshold only when the line it lands on happens to need enough of it, which
+put the same fixture on opposite sides of the threshold on the two supported
+toolchains (issue #312). Because the word-break threshold is an extractor
 implementation detail, each run records its `pdftotext` version, and the
 guarantee is scoped to that extraction model — the PDFKit baselines in
 `tests/extraction/` remain the second consumer the project checks.

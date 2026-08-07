@@ -14,8 +14,13 @@ expected="$base.expected.txt"
 update=0
 [ "${1:-}" = "--update" ] && update=1
 
+# Every latexmk call here passes -g. Without it latexmk treats an existing
+# up-to-date PDF as done, so a run in a directory holding an earlier build
+# judges that PDF and reports on the previous state of the package rather than
+# the current one — including its Biber warnings, which is how a stale build
+# survived a package change during issue #312.
 echo "== $base.tex (latexmk + Biber) =="
-if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error "$base.tex" > "$base.stdout" 2>&1; then
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error "$base.tex" > "$base.stdout" 2>&1; then
   echo "  BUILD FAILED (see $base.log and $base.blg)"
   exit 1
 fi
@@ -136,7 +141,7 @@ fi
 # token instead of drifting back to a fixed length. The fixture raises its own
 # package error on a mismatch, so a clean build is the assertion.
 echo "== bibitemsep-token.tex (bibitemsep tracks CDossierRecordItemSepSkip) =="
-if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error \
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
     "bibitemsep-token.tex" > "bibitemsep-token.stdout" 2>&1; then
   echo "  \\bibitemsep does not track \\CDossierRecordItemSepSkip"
   echo "  (see bibitemsep-token.log)"
@@ -148,7 +153,7 @@ echo "  bibitemsep tracks CDossierRecordItemSepSkip"
 # drifting back to BibLaTeX's 2\labelsep, which lands it on the threshold where
 # pdftotext's default mode splits the numbers into their own column (#199).
 echo "== biblabelsep-token.tex (biblabelsep tracks CDossierListLabelSep) =="
-if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error \
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
     "biblabelsep-token.tex" > "biblabelsep-token.stdout" 2>&1; then
   echo "  \\biblabelsep does not track \\CDossierListLabelSep"
   echo "  (see biblabelsep-token.log)"

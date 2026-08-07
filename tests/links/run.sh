@@ -20,7 +20,11 @@
 #
 # `LINKEXPECT: split` marks a negative control — a fixture built to break the
 # property on purpose, which must be reported as split. It is what keeps the
-# rest of the suite from passing vacuously.
+# rest of the suite from passing vacuously. It manufactures the over-threshold
+# gap with a rigid muskip rather than by provoking justification into producing
+# one, because the latter lands within a point or two of the threshold and fell
+# on opposite sides of it on the two supported toolchains; see the fixture's own
+# header for the measurements (issue #312).
 #
 # The decision is made from `pdftotext -bbox` coordinates by link-token-check.awk,
 # which is where the wrap-versus-split distinction lives; see its header for why
@@ -72,7 +76,12 @@ for tex in *.tex; do
         skipped="$skipped $base"
         continue
       fi
-      if ! latexmk -lualatex -interaction=nonstopmode -halt-on-error "$tex" \
+      # -g forces a rebuild even when latexmk judges the PDF up to date. These
+      # two fixtures are the only ones latexmk builds, and without it a run in
+      # a directory holding an earlier PDF judges that PDF: the suite would
+      # report on the previous state of the package rather than the current one
+      # (issue #312).
+      if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error "$tex" \
            > "$base.stdout" 2>&1; then
         echo "  BUILD FAILED (see $base.log and $base.blg)"; fail=1; continue
       fi
