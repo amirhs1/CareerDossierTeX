@@ -738,6 +738,17 @@ Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
 additionally immune because each item is measured in its own `\hbox` rather
 than justified.
 
+A link in body text is the third case, and it fails the other way round. It sits
+in a justified paragraph with nothing measuring it, so a long address written as
+plain text is *hyphenated*: the pasted URL then carries an inserted hyphen that
+was never part of it, and no word-boundary check sees anything wrong, because
+the hyphen is a legitimate character in a legitimate word.
+[`\CDossierLink`](API.md#cdossierlink) is the supported form (issue #308). It
+extends url.sty's `\UrlBreaks` with the letters and digits for one link, and
+url.sty's break points carry a penalty and no discretionary hyphen, so a wrapped
+address concatenates back exactly. `tests/links/resume-body-link.tex` pins that
+for a bullet and for a prose paragraph.
+
 Second, plain extracted text cannot check this: a legitimate line wrap and a
 split token both read as whitespace. The decision needs word bounding boxes —
 pieces on different visual lines are a wrap, pieces sharing one line are the

@@ -242,6 +242,82 @@
   { \cs_if_exist:NTF \href { \href {#1} { \nolinkurl {#2} } } { #2 } }
 \cs_generate_variant:Nn \__cdossier_components_link:nn { VV }
 
+%% Body-text link (issue #308). The contact line's items are packed as atomic
+%% boxes, so its links only ever break at url.sty's own punctuation points. A
+%% link inside running prose or a bullet has no such packer behind it: it is
+%% one long token in a justified paragraph, and the three available forms all
+%% fail differently.
+%%
+%%   - plain text has no URL breakpoints at all, so TeX either overruns the
+%%     margin or *hyphenates* the address -- which sets an inserted hyphen that
+%%     copy-and-paste then carries into the pasted URL;
+%%   - \url breaks at punctuation only, so a long segment carrying none (a
+%%     repository or report identifier) is still one unbreakable token: measured
+%%     at 178.34 pt over the measure in a resume bullet at fontsize=10pt,
+%%     margin=narrow, and worse at the larger sizes;
+%%   - \emergencystretch cannot reach either case. It redistributes interword
+%%     glue on the offending line, and a line holding one over-wide token has
+%%     none to redistribute. See \CDossierEmergencyStretch (issue #272).
+%%
+%% So the break points have to be supplied. \UrlBreaks is extended, for the
+%% duration of one link, with every ASCII letter and digit, which lets the
+%% address break anywhere rather than only after punctuation. url.sty inserts a
+%% penalty and no discretionary hyphen at these points, so a wrapped address
+%% still reassembles exactly -- the copy-paste invariant of issue #294, which
+%% tests/links now pins for body text as well as the contact line.
+%%
+%% The extension is local to the group below rather than a global change to
+%% \UrlBreaks, so the contact line and the bibliography keep the punctuation-only
+%% breaks they were measured with.
+\tl_const:Nn \c__cdossier_components_anybreak_tl
+  {
+    \do \a \do \b \do \c \do \d \do \e \do \f \do \g \do \h \do \i
+    \do \j \do \k \do \l \do \m \do \n \do \o \do \p \do \q \do \r
+    \do \s \do \t \do \u \do \v \do \w \do \x \do \y \do \z
+    \do \A \do \B \do \C \do \D \do \E \do \F \do \G \do \H \do \I
+    \do \J \do \K \do \L \do \M \do \N \do \O \do \P \do \Q \do \R
+    \do \S \do \T \do \U \do \V \do \W \do \X \do \Y \do \Z
+    \do \0 \do \1 \do \2 \do \3 \do \4
+    \do \5 \do \6 \do \7 \do \8 \do \9
+  }
+
+%% Normalize a link target in place: supply https:// when the value carries no
+%% scheme of its own. Shared by the web-profile fields and by \CDossierLink so
+%% both accept the same input, `example.org/path' as readily as a full URL.
+%%
+%% Detect an existing scheme by string, not by token list: the value's colon is
+%% an ordinary character (catcode 12) while a literal colon in this package is a
+%% letter (catcode 11) under expl3, so a catcode-sensitive \tl_if_in: would never
+%% match and would double the scheme.
+\cs_new_protected:Npn \__cdossier_components_scheme:N #1
+  {
+    \str_set:NV \l__cdossier_components_scheme_str #1
+    \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
+      { \tl_put_left:Nn #1 { https:// } }
+  }
+
+%% \CDossierLink{<url>}: the supported way to put a link in body text. The
+%% argument is both the displayed text and, once normalized, the link target.
+%%
+%% The argument is read as ordinary text, exactly as a profile field value is,
+%% so a target containing TeX special characters needs them escaped. It is not
+%% \url's verbatim argument.
+\cs_new_protected:Npn \__cdossier_components_bodylink:n #1
+  {
+    \group_begin:
+      \tl_set:Nn \l__cdossier_components_disp_tl {#1}
+      \tl_set:Nn \l__cdossier_components_url_tl  {#1}
+      \__cdossier_components_scheme:N \l__cdossier_components_url_tl
+      \cs_if_exist:NT \UrlBreaks
+        { \tl_put_right:NV \UrlBreaks \c__cdossier_components_anybreak_tl }
+      \__cdossier_components_link:VV
+        \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
+    \group_end:
+  }
+
+\NewDocumentCommand \CDossierLink { m }
+  { \__cdossier_components_bodylink:n {#1} }
+
 %% Email: a mailto: link over the visible address.
 \cs_new_protected:Npn \__cdossier_components_mail:n #1
   {
@@ -257,13 +333,7 @@
   {
     \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
     \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-    %% Detect an existing scheme by string, not by token list: the value's colon
-    %% is an ordinary character (catcode 12) while a literal colon in this
-    %% package is a letter (catcode 11) under expl3, so a catcode-sensitive
-    %% \tl_if_in: would never match and would double the scheme.
-    \str_set:NV \l__cdossier_components_scheme_str \l__cdossier_components_url_tl
-    \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
-      { \tl_put_left:Nn \l__cdossier_components_url_tl { https:// } }
+    \__cdossier_components_scheme:N \l__cdossier_components_url_tl
     \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
   }
 

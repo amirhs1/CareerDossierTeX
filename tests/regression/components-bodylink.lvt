@@ -1,0 +1,81 @@
+% components-bodylink.lvt — \CDossierLink, the body-text link (issue #308).
+%
+% Three properties, none of which a rendered page reveals:
+%
+%   - the displayed text is the argument exactly as given, while the link
+%     target gains an https:// scheme only when the argument carries none —
+%     the same normalization the website/linkedin/github/scholar fields use,
+%     which \CDossierLink now shares with them rather than repeating;
+%   - the extra break points are installed for the duration of one link and
+%     are gone afterwards, so the contact line and the bibliography keep the
+%     punctuation-only \UrlBreaks they were measured with;
+%   - without hyperref the command still emits the visible address.
+%
+% url.sty is loaded on its own here: it owns \UrlBreaks, and loading hyperref
+% instead would also bring \href, which the last test needs absent. Whether
+% \CDossierLink's breaks actually keep a long address inside the measure is a
+% rendered question and belongs to tests/layout/resume-body-link*.tex; whether
+% a wrapped address still pastes back exactly belongs to
+% tests/links/resume-body-link.tex.
+%
+% Each helper is defined under \ExplSyntaxOn so the private names tokenize
+% correctly; catcodes cannot be switched inside a \TEST body.
+\input{regression-test}
+\documentclass{article}
+\usepackage{url}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+%% Is the any-character break set in force right now?
+\cs_new_protected:Npn \cdossiertestBreaks
+  {
+    \tl_if_in:NnTF \UrlBreaks { \do \Z }
+      { \TYPE{ breaks-anywhere } }
+      { \TYPE{ breaks-at-punctuation-only } }
+  }
+%% Report what \CDossierLink hands the link wrapper, and the break state at the
+%% moment it does, without rendering anything. Redefining the wrapper is undone
+%% at the \TEST boundary, so every test that needs it installs it again.
+\cs_new_protected:Npn \cdossiertestTrace
+  {
+    \cs_set_protected:Npn \__cdossier_components_link:nn ##1##2
+      {
+        \TYPE{ [target:~##1] }
+        \TYPE{ [text:~##2] }
+        \cdossiertestBreaks
+      }
+  }
+\cs_new_protected:Npn \cdossiertestHrefBranch
+  {
+    \cs_if_exist:NTF \href
+      { \TYPE{ href-present } }
+      { \TYPE{ degrades-to-plain-text } }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{bodylink-gains-https-scheme-when-absent}{
+  \cdossiertestTrace
+  \CDossierLink{example.org/ada/portfolio}
+}
+
+\TEST{bodylink-preserves-existing-scheme}{
+  \cdossiertestTrace
+  \CDossierLink{https://example.org/ada/portfolio}
+}
+
+\TEST{bodylink-breaks-are-local-to-one-link}{
+  \cdossiertestBreaks
+  \cdossiertestTrace
+  \CDossierLink{example.org/ada/portfolio}
+  \cdossiertestBreaks
+}
+
+\TEST{bodylink-degrades-without-hyperref}{
+  \cdossiertestHrefBranch
+  \CDossierLink{example.org/ada/portfolio}
+}
+
+\END
