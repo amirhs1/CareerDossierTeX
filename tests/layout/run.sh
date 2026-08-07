@@ -13,6 +13,17 @@
 #     no letter or statement fixture strands a single line of a paragraph at a
 #     page boundary (issue #171, via page-break-check.awk).
 #
+# A fixture carrying
+#
+#   % STRETCHCONTROL: <pt> pt
+#
+# additionally declares that its clean setting is bought by
+# \CDossierEmergencyStretch, and states the deficit it sets with that token
+# zeroed. The runner rebuilds it with the token at 0pt and requires the
+# overfull box to appear: for such a fixture, "no overfull boxes" above is the
+# assertion, and this is the proof that the assertion is still testing the
+# token rather than passing for some unrelated reason (issue #310).
+#
 # Final visual correctness (spacing, balance, typographic detail) remains a
 # human review of the rendered PDF; this runner guards the properties a machine
 # can check reliably without freezing an unsettled design.
@@ -25,7 +36,11 @@ set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 cd "$here"
-export TEXINPUTS="$root:${TEXINPUTS:-}"
+# $here joins TEXINPUTS so a zero-stretch control wrapper resolves the fixture
+# it \inputs by search path and not only by the working directory it inherits.
+export TEXINPUTS="$here:$root:${TEXINPUTS:-}"
+control_dir="$(mktemp -d "${TMPDIR:-/tmp}/careerdossier-layout-control.XXXXXX")"
+trap 'rm -rf "$control_dir"' EXIT
 fail=0
 
 for tex in *.tex; do
@@ -46,6 +61,47 @@ for tex in *.tex; do
     grep -E 'Overfull \\hbox' "$base.log" | sed 's/^/    /' | head -5; fail=1
   else
     echo "  no overfull boxes"
+  fi
+
+  # Negative control for the two fixtures that exist to keep
+  # \CDossierEmergencyStretch honest (issues #272, #310). Rebuilt with the
+  # token zeroed, each must go overfull; a fixture whose text drifted far
+  # enough to set clean either way would otherwise keep passing the check
+  # above while asserting nothing. The declared deficit is reported next to
+  # the measured one rather than compared, because the exact figure moves with
+  # the font version and the engine, while its presence does not.
+  declared="$(sed -n 's/^% STRETCHCONTROL:[[:space:]]*//p' "$tex" | head -1)"
+  if [ -n "$declared" ]; then
+    # The control wrapper is built outside this directory: the fixture loop
+    # globbed *.tex before its first iteration, so a wrapper written here
+    # would escape this run and then be compiled as a fixture by the next one.
+    # \AddToHook, unlike \AtBeginDocument, is a format-level command and may
+    # precede \documentclass, which is what lets the wrapper reach into a
+    # fixture that carries its own class line.
+    control="$control_dir/$base-zero-stretch"
+    {
+      printf '\\AddToHook{begindocument/before}'
+      printf '{\\setlength{\\emergencystretch}{0pt}}\n'
+      printf '\\input{%s}\n' "$tex"
+    } > "$control.tex"
+    if ! lualatex -halt-on-error -interaction=nonstopmode \
+         -output-directory="$control_dir" "$control.tex" \
+         > "$control.stdout" 2>&1; then
+      echo "  ZERO-STRETCH CONTROL FAILED TO COMPILE (see $control.log)"; fail=1
+    else
+      measured="$(grep -oE 'Overfull \\hbox \([0-9.]+pt' "$control.log" \
+                  | sed 's/.*(//' | head -1)"
+      if [ -n "$measured" ]; then
+        echo "  negative control fired: ${measured} over with the token zeroed"
+        echo "    (fixture declares $declared)"
+      else
+        echo "  NEGATIVE CONTROL DID NOT FIRE: with \\CDossierEmergencyStretch"
+        echo "    zeroed this fixture still sets clean, so its \"no overfull"
+        echo "    boxes\" result is no longer evidence that the token reaches"
+        echo "    the page. Restore the stress rather than dropping the check."
+        fail=1
+      fi
+    fi
   fi
 
   # Page count from the "Output written ... (N page[s])" line.
