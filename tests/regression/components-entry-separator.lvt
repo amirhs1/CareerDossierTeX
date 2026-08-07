@@ -1,0 +1,102 @@
+% components-entry-separator.lvt — the entry heading's structure-text separator (#302).
+%
+% An entry heading's two cells are pushed apart by `\hfill', which is pure glue:
+% it emits no character, so the title and the dates arrive in one
+% marked-content run as the literal string `Engineer2024-2026'. Nothing in the
+% extraction suite could see it — Poppler, MuPDF, and PDFKit all rebuild words
+% from glyph geometry and split on the gap — so the defect shipped. The
+% rendered proof now lives in tests/tagging (the committed *.structure.txt
+% baselines decode the content stream directly). This file asserts the two
+% properties of the *code* that no decoded PDF can state:
+%
+%   1. \pdffakespace exists on the untagged path. It is tagpdf's command and
+%      exists only when the document asked for tagging; careerdossier-components
+%      declares a no-op fallback at \begin{document} so every untagged document
+%      does not stop with an undefined control sequence. This file is untagged,
+%      so the assertion is simply that the command is there — which is the exact
+%      failure the fallback prevents, and one a tagged fixture can never catch.
+%
+%   2. the separator is emitted once per join and *only* at a real join. The
+%      role-marker technique from #271: \pdffakespace is replaced by a marker
+%      and an entry heading is typeset, so the baseline records where a
+%      separator reaches the page, in rendered order. Boxing keeps the heading
+%      off the page being shipped; \TYPE fires as the box is built.
+%
+% The four shapes below are the optional-field matrix, and the fourth is the
+% one worth reading closely. An entry with a location but no organization opens
+% its second line with the location, so a separator emitted unconditionally
+% would put one at the start of a line with nothing before it — the same stray
+% separator rule 5 forbids for the contact line's `|'. That shape must report no
+% marker for its second line.
+%
+% Why the marker and not the character: \pdffakespace's own effect is a real
+% U+0020 in the *PDF content stream*, which no .tlg can observe. What this file
+% pins is that the call site is reached and correctly guarded. That the call
+% then produces the character is what tests/tagging/*.structure.txt records.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_entry_box
+
+\cs_new_protected:Npn \cdossiertestReportFallback
+  {
+    \cs_if_exist:NTF \pdffakespace
+      { \TYPE{ pdffakespace ~ = ~ defined-on-the-untagged-path } }
+      { \TYPE{ pdffakespace ~ = ~ MISSING } }
+  }
+
+%% Replace the separator and the three semantic roles with markers, so the
+%% baseline shows both which cells rendered and where a separator fell between
+%% them. Re-invoked inside every \TEST that traces, deliberately: a document
+%% command renewed inside one \TEST is undone at that test's boundary, so a
+%% single renewal before the first one would leave every later test tracing the
+%% real commands and reporting nothing — a log indistinguishable from a
+%% separator that is genuinely absent.
+\cs_new_protected:Npn \cdossiertestTraceSeparator
+  {
+    \RenewDocumentCommand \CDossierEntryTitleStyle { } { \TYPE{ >entrytitle } }
+    \RenewDocumentCommand \CDossierBodyStyle       { } { \TYPE{ >body       } }
+    \RenewDocumentCommand \CDossierMutedStyle      { } { \TYPE{ >muted      } }
+    \RenewDocumentCommand \pdffakespace            { } { \TYPE{ >separator  } }
+  }
+
+\cs_new_protected:Npn \cdossiertestEntryHead #1#2#3#4
+  {
+    \vbox_set:Nn \l_cdossiertest_entry_box
+      { \__cdossier_components_entryhead:nnnn {#1} {#2} {#3} {#4} }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{untagged-path-has-the-fallback}{
+  \cdossiertestReportFallback
+}
+
+\TEST{title-and-dates-are-separated}{
+  \cdossiertestTraceSeparator
+  \cdossiertestEntryHead{Research Engineer}{}{}{2020--2024}
+}
+
+\TEST{organization-and-location-are-separated}{
+  \cdossiertestTraceSeparator
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+\TEST{title-alone-emits-no-separator}{
+  \cdossiertestTraceSeparator
+  \cdossiertestEntryHead{Research Engineer}{}{}{}
+}
+
+% Rule 5, on the horizontal axis: nothing precedes the location on that line, so
+% a separator here would be the stray-separator defect, not a fix for it.
+\TEST{location-without-organization-emits-no-separator}{
+  \cdossiertestTraceSeparator
+  \cdossiertestEntryHead{Research Engineer}{}{Berlin, DE}{}
+}
+
+\END
+\end{document}

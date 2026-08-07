@@ -385,7 +385,7 @@ means depends on what the module owns, so match the test type to the concern:
   behavior is added, in the same rhythm as writing a `test_*.py` beside each
   Python module. This is where a pre-implementation failing test is usually
   practical and most valuable. **No module is exempt.** Every shared package and
-  every class already has such coverage — 28 `.lvt`/`.tlg` pairs — so extend the
+  every class already has such coverage — 36 `.lvt`/`.tlg` pairs — so extend the
   existing file for that module rather than assuming a class does not need one.
 - **Layout behavior** — the visual result the classes own — is what no log diff
   fully captures, and it takes coverage *in addition to* the regression test:
@@ -647,6 +647,21 @@ each probed once; when a tool is missing that gate is skipped and named in the
 closing `GATES NOT RUN` summary. A green run on a partial environment is
 therefore *not* evidence that everything passed — read the summary. Only
 LuaLaTeX and Poppler are hard requirements.
+
+One check in the suite is deliberately *not* an extraction check.
+`tests/tagging/structure-text.pl` decodes each marked-content run straight out
+of the content stream — `BDC`/`EMC`, then the enclosed `Tj`/`TJ` glyph codes
+through each font's `/ToUnicode` CMap — and consults no glyph coordinate at
+all. What it prints is the logical text of a structure element, which is what a
+consumer that walks the structure tree receives, not what an extractor
+reconstructs from the page. Poppler, MuPDF, and PDFKit all rebuild words from
+geometry, so all three were blind to two cells joined by nothing but
+positioning glue; that is how issue #302 shipped. Each fixture has a committed
+`<name>.structure.txt` baseline, and `run.sh` additionally asserts the
+separator in each two-cell row by name, so the specific defect cannot be waved
+through by regenerating a baseline. The script needs the fixtures'
+`compresslevel=0`/`objcompresslevel=0`, and says so rather than silently
+decoding nothing.
 
 The MuPDF baselines are compared with blank lines removed. `mutool`'s blank-line
 placement inside a two-column entry header differs between its macOS and Debian

@@ -788,7 +788,20 @@ Responsibilities:
 - common entry-heading primitives;
 - date and location primitives;
 - shared letterhead pieces that do not impose full page geometry;
-- PDF document metadata derived from the profile.
+- PDF document metadata derived from the profile;
+- the no-op `\pdffakespace` fallback every class relies on when untagged.
+
+That last one is a one-line declaration but it belongs here rather than in a
+class. `\pdffakespace` is tagpdf's; it puts a real, zero-width U+0020 into the
+content stream so a gap made of pure positioning glue still reads as a word
+boundary to a consumer of the structure tree (issue #302). It exists only when
+the document asked for tagging, and both call sites — this package's entry
+heading and `careerdossier-letter.cls`'s recipient block — are on paths that
+must also work untagged. Every class loads this package, so one fallback here
+covers both. It is declared at `\begin{document}`, not at load time: tagpdf
+declares the real command with `\NewDocumentCommand`, which errors on an
+existing definition, so a `\providecommand` at load time would break the tagged
+build rather than merely lose to it.
 
 The component layer also owns the shared bullet-list page-break and
 trailing-space policy. Closing a list discards the space that ends its final
@@ -1031,6 +1044,15 @@ Responsibilities:
 The letter class should not reuse résumé geometry merely because both documents
 share a header, and the family choice should not introduce family-conditional
 geometry or spacing.
+
+The recipient block additionally scopes its own `\\`. For the length of that
+block, and no longer, `\\` carries the structure-text separator described under
+`careerdossier-components.sty` above. Attaching it to `\\` rather than to the
+four field-joining call sites is the point: `recipient-address` is documented as
+taking a multi-line value with the user's own `\\` inside it, and that break
+never passes through `\__cdossier_letter_rcptline:N`. The redefinition is
+undone when the block closes, because past that point `\\` is the document
+author's ordinary line break again.
 
 ### `careerdossier-statement.cls` (`v0.5.0`, calibrated in `v0.6.0`)
 

@@ -1,0 +1,140 @@
+% letter-recipient-separator.lvt — the recipient block's structure-text separator (#302).
+%
+% The recipient block is one paragraph whose lines are split by `\\'. A forced
+% line break emits no character, so the block arrived in one marked-content run
+% as `Casey ReaderExample Company' — and, with a full address, as
+% `Casey ReaderHead of EngineeringExample Company123 Discovery AvenueVancouver,
+% BC V6T 1Z4'. The decoded proof is in tests/tagging/*.structure.txt. This file
+% asserts the three properties of the *code* that no decoded PDF can state.
+%
+%   1. \pdffakespace exists on the untagged path. It is tagpdf's command and
+%      exists only when the document asked for tagging; careerdossier-components
+%      declares a no-op fallback at \begin{document}. A .lvt is untagged, so
+%      this is the one place the fallback is exercised at all — without it every
+%      untagged letter would stop with an undefined control sequence, which no
+%      tagged fixture would ever notice.
+%
+%   2. `\\' is restored when the block closes. The separator is attached to
+%      `\\' itself for the length of the block, rather than to the four call
+%      sites, because a recipient address carries the user's own `\\' inside a
+%      single field value and that break never passes through
+%      \__cdossier_letter_rcptline:N. A redefinition of `\\' that outlived the
+%      block would then follow the document into its body, where `\\' is the
+%      user's ordinary line break. \meaning is compared before and after.
+%
+%   3. the separator is emitted at every join, including the one inside
+%      recipient-address. The role-marker technique from #271: \pdffakespace is
+%      replaced by a marker and one letterhead is composed into a box, so the
+%      baseline records how many separators the block reaches and in what
+%      order. Boxing keeps the letterhead off the page being shipped; \TYPE
+%      fires as the box is built.
+%
+% The shapes below are chosen so the marker count is the assertion. One present
+% field is zero joins; four fields with a two-line address is four. A fix
+% applied to the call sites alone would report three for the last shape and
+% pass every other check in the repository.
+%
+% Why markers and not characters: \pdffakespace's effect is a real U+0020 in
+% the PDF content stream, which no .tlg can observe. That the emitted character
+% actually arrives is what tests/tagging/letter-recipient-address.structure.txt
+% records.
+\input{regression-test}
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_letterhead_box
+\tl_new:N \g_cdossiertest_cr_before_tl
+\tl_new:N \g_cdossiertest_cr_after_tl
+
+\cs_new_protected:Npn \cdossiertestReportFallback
+  {
+    \cs_if_exist:NTF \pdffakespace
+      { \TYPE{ pdffakespace ~ = ~ defined-on-the-untagged-path } }
+      { \TYPE{ pdffakespace ~ = ~ MISSING } }
+  }
+
+%% Replace the separator with a marker. Re-invoked inside every \TEST that
+%% traces, deliberately: a document command renewed inside one \TEST is undone
+%% at that test's boundary, so a single renewal before the first would leave
+%% every later test tracing the real command and reporting nothing — a log
+%% indistinguishable from a separator that is genuinely absent.
+\cs_new_protected:Npn \cdossiertestTraceSeparator
+  { \RenewDocumentCommand \pdffakespace { } { \TYPE{ >separator } } }
+
+\NewDocumentCommand \cdossiertestLetterData { mmmm }
+  {
+    \CDossierLetterSetup
+      {
+        date = {1~January~2026} ,
+        recipient-name = {#1} ,
+        recipient-title = {#2} ,
+        recipient-organization = {#3} ,
+        recipient-address = {#4} ,
+        subject = {} ,
+      }
+  }
+
+\cs_new_protected:Npn \cdossiertestTraceLetterhead
+  { \vbox_set:Nn \l_cdossiertest_letterhead_box { \MakeCDossierLetterhead } }
+
+%% \\ is captured on both sides of a composed letterhead. The comparison is of
+%% meanings, not of a literal expansion, so it survives any change to what \\
+%% is in this context as long as the block leaves it alone.
+\cs_new_protected:Npn \cdossiertestReportCrScope
+  {
+    \tl_gset:Nx \g_cdossiertest_cr_before_tl { \token_to_meaning:N \\ }
+    \cdossiertestTraceLetterhead
+    \tl_gset:Nx \g_cdossiertest_cr_after_tl { \token_to_meaning:N \\ }
+    \tl_if_eq:NNTF \g_cdossiertest_cr_before_tl \g_cdossiertest_cr_after_tl
+      { \TYPE{ cr ~ = ~ restored-after-the-block } }
+      { \TYPE{ cr ~ = ~ LEAKED-out-of-the-block } }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+% As in letter-block-edges: force the math-font loads that \nolinkurl triggers
+% at the contact line's size before the first test, so the font-info lines land
+% outside every \TEST group.
+\setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
+\START
+
+\TEST{untagged-path-has-the-fallback}{
+  \cdossiertestReportFallback
+}
+
+% The letter data is set inside each test rather than once before them all:
+% \CDossierLetterSetup assigns locally, so values set in one \TEST group are
+% gone by the next, which would silently trace a default letterhead.
+\TEST{one-recipient-line-has-no-join}{
+  \cdossiertestTraceSeparator
+  \cdossiertestLetterData{Grace Hopper}{}{}{}
+  \cdossiertestTraceLetterhead
+}
+
+\TEST{two-recipient-lines-have-one-join}{
+  \cdossiertestTraceSeparator
+  \cdossiertestLetterData{Grace Hopper}{}{Example University}{}
+  \cdossiertestTraceLetterhead
+}
+
+% The address carries its own \\ inside one field value. Four separators, not
+% three: the join before the address and the join inside it both count.
+\TEST{address-line-break-is-separated-too}{
+  \cdossiertestTraceSeparator
+  \cdossiertestLetterData{Grace Hopper}{Chair}{Example University}%
+    {100 Academic Avenue\\Toronto, Ontario M5S 1A1}
+  \cdossiertestTraceLetterhead
+}
+
+\TEST{cr-is-restored-when-the-block-closes}{
+  \cdossiertestLetterData{Grace Hopper}{Chair}{Example University}%
+    {100 Academic Avenue\\Toronto, Ontario M5S 1A1}
+  \cdossiertestReportCrScope
+}
+
+\END
+\end{document}

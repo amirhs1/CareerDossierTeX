@@ -1,0 +1,12 @@
+% letter-recipient-address-ua2.tex — PDF/UA-2 validation variant.
+%
+% Same body as the tagged fixture; only the declared standard differs, so a
+% veraPDF result here describes the tagged output the structure-text assertions
+% are made against. Issue #302 inserts real U+0020 characters into the
+% recipient block's content stream, and this is what states that doing so left
+% the fixture conforming. Declaring pdfstandard=ua-2 evaluates this named
+% artifact only and is not a conformance claim for arbitrary user documents.
+\DocumentMetadata{lang=en,tagging=on,pdfstandard=ua-2}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{letter-recipient-address-body.inc.tex}
