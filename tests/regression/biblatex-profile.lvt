@@ -54,6 +54,29 @@
   \cdossiertestBibFormatting{bibliography}
 }
 
+% The URL glue policy of issue #312. The PDF-level assertion lives in
+% tests/links, which needs Biber and Poppler and is therefore skippable; this
+% one is the cheap, always-run statement of what the package sets, and it is
+% what would notice a value drifting back toward a stretchable cap.
+%
+% \biburlbigskip must have no stretch component at all. A cap merely bounds the
+% stretch, and TeX exceeds a stated stretch to set an otherwise underfull line,
+% which is how a 262-character URL split under the earlier 0mu plus 1mu. Rigid
+% glue is the guarantee: there is nothing to stretch.
+\TEST{url-glue-is-rigid}{
+  \showthe\biburlbigskip
+}
+
+% Rigid glue alone leaves TeX no way to absorb the remainder of a line, so it
+% overran the margin instead. These three permit a break inside a run of
+% letters or digits when punctuation offers none; BibLaTeX disables all three
+% by default, so a zero here would restore the overfull lines.
+\TEST{url-break-penalties-are-enabled}{
+  \showthe\value{biburlnumpenalty}
+  \showthe\value{biburlucpenalty}
+  \showthe\value{biburllcpenalty}
+}
+
 \TEST{citation-name-is-not-emphasized}{
   \cdossiertestBibFormatting{citation}
 }

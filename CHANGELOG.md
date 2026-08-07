@@ -197,6 +197,43 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A long URL in a bibliography entry now copies and pastes back exactly. A
+  262-character query-string address — a Wikipedia advanced-search result, not a
+  contrived one — extracted as `silencing + diasporic + futurism` at the CV's
+  own `fontsize=12pt, margin=normal`, so pasting it yielded a URL with spaces
+  sprinkled through it. The rendered page looked entirely normal, which is why
+  it went unnoticed. ([#312])
+
+  BibLaTeX puts stretchable glue at every break point inside a URL, and a
+  justified line spends that stretch on the URL rather than on the word spaces.
+  #199 capped the stretch; a cap is not a guarantee, because TeX exceeds a
+  stated stretch to set an otherwise underfull line, and this address was long
+  enough to make it do so. The optional `careerdossier-biblatex` integration now
+  removes the stretch instead of bounding it, which TeX cannot overrule, and
+  enables BibLaTeX's URL break penalties so a URL still has somewhere to break
+  without them.
+
+  Two visible changes, both confined to bibliographies and intended: a URL now
+  breaks where the line ends rather than at the nearest earlier punctuation, so
+  an address can wrap mid-run; and a line holding nothing but URL is set
+  ragged-right and reported underfull, because it has no glue left to justify
+  with. Documents without the optional bibliography integration are unaffected —
+  contact-line and `\CDossierLink` addresses were never exposed to this.
+
+- `make links` no longer passes or fails depending on the toolchain. Its
+  negative control — the fixture that must be reported as split, and which is
+  what keeps the rest of the suite from passing vacuously — reproduced the
+  defect by raising the URL stretch, which put the realized gap within a point
+  or two of the extractor's threshold: it fired on CI and not on a clean local
+  build of the same commit, so `make links` was red locally while CI was green.
+  The control now sets that gap directly, so the fixture decides the outcome
+  rather than the toolchain. ([#312])
+
+  Every `latexmk` build in `make links` and `make bibliography-test` now forces
+  a rebuild. `latexmk` treats an up-to-date PDF as done, so a run in a directory
+  holding an earlier build was judging that PDF — reporting on the previous
+  state of the package rather than the current one.
+
 - `/Lang` no longer depends on package load order. A document that loads
   `careerdossier-components` directly, after `hyperref`, produced a PDF with no
   language declaration at all — silently, with nothing in the log. The four
@@ -384,6 +421,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302
 [#305]: https://github.com/amirhs1/CareerDossierTeX/issues/305
 [#308]: https://github.com/amirhs1/CareerDossierTeX/issues/308
+[#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 
 ## [0.7.0] - 2026-08-04
 

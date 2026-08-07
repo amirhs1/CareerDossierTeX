@@ -75,20 +75,63 @@
 \cs_if_exist:NT \CDossierListLabelSep
   { \setlength { \biblabelsep } { \CDossierListLabelSep } }
 
-%% Cap the stretch BibLaTeX puts at each URL breakpoint. \biburlbigskip is
-%% 0mu plus 3mu by default -- one sixth of an em per breakpoint -- so a
-%% justified line ending in a URL spreads the URL rather than the word spaces.
-%% Poppler splits a word wherever the gap exceeds 0.1em, so a stretched URL
-%% extracts as `https : / / example . invalid /', which is neither searchable
-%% nor copyable. 1mu is 1/18em, keeping a realized breakpoint gap under that
-%% threshold while leaving the line enough flexibility to avoid an overfull
-%% box; the breakpoints themselves come from the penalties \biburlsetup
-%% installs and are unaffected, so URLs still break in the same places.
+%% Remove the stretch BibLaTeX puts at each URL breakpoint. \biburlbigskip is
+%% 0mu plus 3mu by default -- one sixth of an em per breakpoint -- and
+%% \biburlsetup copies it into \Urlmuskip, so a justified line ending in a URL
+%% spreads the URL rather than the word spaces. Poppler splits a word wherever
+%% the gap exceeds 0.1em, so a stretched URL extracts as
+%% `https : / / example . invalid /', which is neither searchable nor copyable.
+%% This is the only site in the project with stretchable glue inside a URL: the
+%% contact line measures each item in its own box, and body text goes through
+%% \CDossierLink, whose break points carry a penalty and no glue.
 %%
-%% This is a mitigation rather than a guarantee: TeX will exceed a stated
-%% stretch to set an otherwise underfull line, and a sufficiently narrow
-%% measure can still spread a URL past the threshold.
-\muskip_set:Nn \biburlbigskip { 0mu plus 1mu }
+%% Capping the stretch was the earlier fix (0mu plus 1mu, issue #199), and it
+%% was a mitigation rather than a guarantee for a reason that turned out to be
+%% reachable with an ordinary address: TeX exceeds a stated stretch to set an
+%% otherwise underfull line, so a long enough URL split anyway. A 262-character
+%% query-string URL in an @online entry, at the CV's own fontsize=12pt,
+%% margin=normal, extracted as `silencing + diasporic + futurism' with the cap
+%% in place (issue #312). Rigid glue is the guarantee the cap was not: TeX
+%% cannot stretch what has no stretch component, at any measure or length.
+\muskip_set:Nn \biburlbigskip { 0mu }
+
+%% Rigid glue on its own moves the failure rather than removing it. url.sty
+%% breaks a URL only at punctuation, so a query string's long `+'-joined runs
+%% leave breakpoints ~10 characters apart; with no stretch to absorb the
+%% remainder, TeX set the line 5.09pt and 4.79pt into the margin instead. The
+%% missing ingredient is breakpoint density, exactly as in issue #308, where
+%% \CDossierLink extends \UrlBreaks with the letters and digits so a body-text
+%% address can break anywhere. BibLaTeX exposes the same capability for its own
+%% URLs through three penalties, all 0 (disabled) by default. Raising them lets
+%% a URL break inside a run of letters or digits when punctuation will not do,
+%% which is what removes the overfull lines. As with \UrlBreaks, these break
+%% points insert a penalty and no discretionary hyphen, so a wrapped address
+%% still concatenates back exactly -- the copy-paste invariant of issue #294.
+%%
+%% 9000 ranks an intra-run break below url.sty's punctuation break points,
+%% which cost \UrlBreakPenalty (100), so where both would fit the line TeX
+%% prefers the punctuation. Do not read more into the value than that: with
+%% rigid glue a line has no way to absorb a shortfall, so badness decides
+%% almost every break and the penalty rarely gets a vote. Measured on
+%% tests/bibliography/cv-bibliography.tex, 100 and 9000 chose the identical
+%% break; what is not interchangeable is zero, which is BibLaTeX's default and
+%% brings the overfull lines back.
+%%
+%% One consequence is visible and intended: URLs now break where the line ends
+%% rather than at the nearest earlier punctuation, so an address can wrap
+%% mid-run (`.../visib' + `le-url'). That is what filling the measure honestly
+%% looks like. The tidier punctuation break it replaces was not free -- it was
+%% bought by stretching the URL to justify the short line, which is the defect.
+%%
+%% The cost is in the log, not on the page: a line holding nothing but URL has
+%% no glue to justify with, so TeX reports it underfull and sets it
+%% ragged-right. That is the same warning \CDossierLink already produces for a
+%% long body-text address (tests/links/resume-body-link.tex), and the same
+%% trade -- a few points of white at the right edge, against an address that
+%% pastes.
+\setcounter { biburlnumpenalty } { 9000 }
+\setcounter { biburlucpenalty  } { 9000 }
+\setcounter { biburllcpenalty  } { 9000 }
 
 %% The trailing space is inside the measured label box and does not widen the
 %% gap; \biblabelsep above is what separates the label from the entry.

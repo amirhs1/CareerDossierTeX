@@ -1,27 +1,47 @@
-% cv-bibliography-urlmuskip-raised.tex — the negative control for issue #294.
+% cv-bibliography-urlmuskip-raised.tex — the negative control for issue #294,
+% made toolchain-independent by issue #312.
 %
-% Identical to cv-bibliography-links.tex except that it puts \biburlbigskip
-% back to BibLaTeX's own 0mu plus 3mu default, undoing the cap
-% careerdossier-biblatex.sty applies. \biburlsetup copies it into \Urlmuskip,
-% so every breakpoint inside the URL gains a sixth of an em of stretch and a
-% justified line spends it there instead of on the word spaces. Current
-% Poppler starts a new word when the spacing between two characters exceeds
-% 0.1x the font size, so the URL extracts as
+% Identical to cv-bibliography-links.tex except that it raises \biburlbigskip,
+% which \biburlsetup copies into \Urlmuskip, so every breakpoint inside a URL
+% gains measurable width. Current Poppler starts a new word when the spacing
+% between two characters exceeds 0.1x the font size, so the URL extracts as
 % `https : / / records . example . invalid /' — the failure #199 found.
 %
 % This fixture must therefore FAIL the token check, and run.sh asserts exactly
 % that. Without it the suite could pass because it looks in the wrong place, or
-% because the checker cannot see the defect at all; with it, the acceptance
-% criterion "fails when \Urlmuskip is raised to 0mu plus 3mu" is re-verified on
-% every run rather than once by hand.
+% because the checker cannot see the defect at all.
+%
+% Why a rigid 4mu rather than BibLaTeX's own 0mu plus 3mu, which is what this
+% fixture used until #312: a *stretch* only reaches the extractor's threshold
+% when the line it lands on happens to need enough stretch, and the realized
+% per-breakpoint gap then sits within a point or two of 0.1 em. That is not an
+% assertion, it is a coin toss. Measured from a clean tree, the 0mu plus 3mu
+% form split on CI (texlive/texlive, Debian) and did NOT split locally (TeX
+% Live 2026, macOS), so `make links' was red on a clean checkout of main while
+% CI was green — and CONTRIBUTING.md then told the contributor who hit it that
+% the check had gone blind. Lengthening the URL does not fix this: swept across
+% all six fontsize x margin combinations, 0mu plus 3mu on the 262-character URL
+% split at two of them and stayed intact at four.
+%
+% 4mu is 2/9 em, more than twice the threshold, and it is rigid: the gap is
+% decided by this file, not by how much stretch a particular line happened to
+% need on a particular toolchain. It splits at every fontsize x margin
+% combination. What it gives up is that it no longer reproduces the *mechanism*
+% of #199 (justification spending its stretch inside the URL); what it keeps is
+% the thing a negative control is for — a PDF whose URL really is set as
+% several words on one baseline, so a checker that has stopped being able to
+% see that cannot pass. The mechanism no longer needs a fixture: after #312 the
+% package's glue is rigid, and TeX cannot stretch what has no stretch
+% component, so there is nothing left for a measurement to confirm.
 %
 % LINKEXPECT: split
 % LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
+% LINKTOKEN: https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation&title=Special%3ASearch&profile=advanced&fulltext=1&ns0=1
 \documentclass{careerdossier-cv}
 \usepackage{careerdossier-biblatex}
 \addbibresource{links.bib}
 \CDossierSetup{name={Ada Lovelace}}
-\biburlbigskip=0mu plus 3mu % undo the cap; see above
+\biburlbigskip=4mu % widen every URL breakpoint past 0.1em; see above
 \begin{document}
 \nocite{*}
 \printbibliography[title={Publications}]
