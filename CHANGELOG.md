@@ -235,6 +235,33 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   rendered layout, extracted text, and the untagged path are all unaffected,
   and all five named tagged fixtures still pass veraPDF UA-2.
 
+- In tagged output, each résumé and CV section heading now opens a `Sect`
+  division enclosing the heading and the content it introduces, and records its
+  own text as that heading element's title. ([#268])
+
+  A heading element says that some words are a heading; it says nothing about
+  where the section it names ends. Without the enclosing division, every
+  heading and every paragraph in the tree was a flat sibling of every other,
+  and assistive technology had no way to tell which entries belonged to
+  "Experience" and which to "Education". The statement already had the
+  divisions, for a purely mechanical reason: it kept the kernel's
+  `\@startsection`, which opens them for it, while the résumé and CV render
+  their headings through the shared display primitive, which opened a bare
+  heading element and nothing else. Both families now produce the same shape.
+
+  The CV's manual publication list needs no division of its own — it sits under
+  an ordinary `\CDossierSection`, so that section's division encloses it — and
+  the section rule remains an artifact, contributing nothing to the tree. See
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#75-section-divisions-issue-268)
+  §7.5.
+
+  This is a structure-tree change under the opt-in `tagging=on` path only: no
+  class, option, key, or command changed, the tagged résumé and CV place every
+  word exactly where they did before, and all five named tagged fixtures still
+  pass veraPDF UA-2 — which passed before the change too, since a flat tree is
+  structurally legal. The per-profile division count in `make tagging` is what
+  sees it.
+
 - In tagged output, an entry heading's title and dates, its organization and
   location, and a cover letter's recipient block are now separated by a real
   space character. They previously reached a consumer that reads the structure
@@ -253,8 +280,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   Whether the run-on form actually misread in VoiceOver or NVDA was never
   confirmed, and this fix does not confirm it retrospectively; it corrects text
   that was wrong at the byte level. See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#75-structure-tree-by-profile)
-  §7.5 for the decoded before-and-after.
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#76-structure-tree-by-profile)
+  §7.6 for the decoded before-and-after.
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
   class, option, key, or command changed, and all five named tagged fixtures
@@ -263,6 +290,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   is the check the whole extraction matrix was structurally unable to perform.
 
 [#267]: https://github.com/amirhs1/CareerDossierTeX/issues/267
+[#268]: https://github.com/amirhs1/CareerDossierTeX/issues/268
 [#269]: https://github.com/amirhs1/CareerDossierTeX/issues/269
 [#270]: https://github.com/amirhs1/CareerDossierTeX/issues/270
 [#271]: https://github.com/amirhs1/CareerDossierTeX/issues/271

@@ -1,0 +1,55 @@
+% resume-section-structure.lvt — issue #268 the résumé section's tagged shape.
+%
+% A section heading has to do two things: name the section, and open the `Sect'
+% division that encloses the heading and everything under it until the next
+% section. The tagging runner asserts the *result* by counting divisions in a
+% built PDF, which needs a PDF toolchain; this asserts the *contract* between
+% \CDossierSection and the two typography primitives, and needs nothing.
+%
+% Three things are pinned, and each of them is a way the fix has broken before
+% or could break silently:
+%
+%   * the division is opened at all, at the same depth as the heading;
+%   * it is opened *before* the heading, so the heading is the division's first
+%     child rather than a preceding sibling;
+%   * the heading carries the section's plain title, which becomes the
+%     element's `/T'. A heading rendered without it still typesets identically.
+%
+% Both stubs are installed once, before \START, and are never restored. A
+% redefinition made inside a \TEST body is undone at that test's boundary, so a
+% trace set up in the first test would log nothing in the second — which reads
+% exactly like a section that opens no division at all.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_set_protected:Npn \__cdossier_typography_division_begin:n #1
+  { \TYPE{ division~begin:~depth~=~#1 } }
+\cs_set_protected:Npn \__cdossier_typography_heading:nnn #1#2#3
+  { \TYPE{ heading:~depth~=~#1,~title~=~#2 } }
+
+% The trace is the whole assertion, so the material is composed into a box that
+% is then discarded rather than shipped out: a stubbed heading leaves the
+% section rule with nothing under it, and what reaches the page from that is
+% not something this fixture should be pinning.
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertestQuiet #1
+  { \vbox_set:Nn \l_cdossiertest_box {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{section-opens-its-division-first}{
+  \cdossiertestQuiet{\CDossierSection{Experience}}
+}
+
+\TEST{every-section-opens-its-own}{
+  \cdossiertestQuiet{\CDossierSection{Education}}
+}
+
+\END

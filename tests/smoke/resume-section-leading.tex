@@ -8,7 +8,7 @@
 \cs_new_eq:NN \__cdossier_test_saved_par: \par
 \msg_new:nnn { cdossier-test } { wrong-section-leading }
   { Section~paragraph~ended~at~\dim_use:N \baselineskip;~expected~14pt. }
-\cs_set_protected:Npn \__cdossier_typography_heading:nn #1#2
+\cs_set_protected:Npn \__cdossier_typography_heading:nnn #1#2#3
   {
     \group_begin:
       \cs_set_protected:Npn \par
@@ -21,7 +21,7 @@
             }
           \__cdossier_test_saved_par:
         }
-      \noindent #2
+      \noindent #3
       \par
     \group_end:
   }
@@ -30,8 +30,9 @@
 \CDossierSection{Experience}
 \ExplSyntaxOn
 %% A macro-name rename that stops this stub from ever firing must fail loudly
-%% rather than pass by never running its check (issue #267 renamed the
-%% patched primitive from :n to :nn).
+%% rather than pass by never running its check. This has already caught two
+%% renames: #267 took the patched primitive from :n to :nn, and #268 from :nn
+%% to :nnn.
 \bool_if:NF \g__cdossier_test_section_par_checked_bool
   { \msg_error:nn { cdossier-test } { wrong-section-leading } }
 \ExplSyntaxOff

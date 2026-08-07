@@ -227,6 +227,59 @@ check_structure() {
     || record_failure "$base running header/folio are not artifacts"
 
   check_heading_hierarchy "$base" "$pdf"
+  check_section_divisions "$base" "$pdf"
+}
+
+# Issue #268: a heading element records that some words are a heading. It does
+# not record where the section it names begins or ends -- that is the enclosing
+# `Sect' division, and without one every heading and every paragraph is a flat
+# sibling with nothing tying content to the heading that introduces it.
+#
+# veraPDF UA-2 passes either way, so this count is the only thing that sees it.
+# Before the fix, résumé and CV emitted zero divisions around two headings each
+# while the statement, which keeps the kernel's `\@startsection', emitted two.
+#
+# The expected number is per profile and is stated rather than derived, so a
+# fixture that loses a section fails here instead of quietly lowering the bar.
+# `/Sect' is anchored to its own `/S ' key, and no other structure name in this
+# suite has it as a prefix, so a plain count is exact.
+check_section_divisions() {
+  local base="$1" pdf="$2"
+  local expected sections
+
+  case "$base" in
+    resume|cv|statement) expected=2 ;;
+    # The letters are continuous prose with no sectioning at all.
+    letter|academic-letter) expected=0 ;;
+    *) return ;;
+  esac
+
+  sections="$(grep -oaF '/S /Sect' "$pdf" | wc -l | tr -d '[:space:]')"
+  [ "$sections" -eq "$expected" ] \
+    || record_failure \
+      "$base has $sections Sect division(s) around its section headings, expected $expected"
+
+  # Each heading must record its own text as the element's `/T', as the
+  # statement's kernel headings already do -- a division that encloses the
+  # right content but names nothing would otherwise pass the count above.
+  #
+  # A PDF text string is stored as UTF-16BE hex with a byte-order mark, not as
+  # readable characters, so the expected form is encoded rather than written
+  # out; grepping for the plain words would match nothing and pass vacuously.
+  case "$base" in
+    resume)  check_heading_title "$base" "$pdf" 'Additional Experience' ;;
+    cv)      check_heading_title "$base" "$pdf" 'Teaching Experience' ;;
+    statement) check_heading_title "$base" "$pdf" 'Future Programme' ;;
+  esac
+}
+
+check_heading_title() {
+  local base="$1" pdf="$2" title="$3"
+  local hex
+
+  hex="$(perl -e 'use Encode; print uc unpack("H*", encode("UTF-16", $ARGV[0]))' "$title")"
+  grep -Fqa "/T <$hex>" "$pdf" \
+    || record_failure "$base does not record '$title' as its heading element's title"
 }
 
 # Issue #267: the document identity (the name) is depth 1 of the shared

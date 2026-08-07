@@ -210,22 +210,82 @@
 %% CV `\CDossierSection', a statement's title -- passes a depth of 2 or
 %% deeper, keeping the identity the document's one and only `/H1' and the
 %% heading hierarchy unskipped beneath it.
+%%
+%% Issue #268: the primitive also accepts the heading's plain title text, so a
+%% caller that has it can record it as the heading element's `/T'. That is what
+%% the kernel's own sectioning does -- `title-o' on the `sec/<n>/title'
+%% element -- and it is what lets a consumer show the heading in a document
+%% outline without re-reading the page. The text is purified first, because a
+%% `/T' string carries no formatting and an unpurified argument would put font
+%% and size commands into the PDF. An empty title omits the key entirely: a
+%% caller whose heading has no separable plain text says so by passing nothing
+%% rather than by writing an empty PDF string.
 \cs_new_protected:Npn \__cdossier_typography_heading:nn #1#2
+  { \__cdossier_typography_heading:nnn { #1 } { } { #2 } }
+
+\tl_new:N \l__cdossier_typography_heading_title_tl
+
+\cs_new_protected:Npn \__cdossier_typography_heading:nnn #1#2#3
   {
     \tag_if_active:TF
       {
+        \pdf_purify:nN { #2 } \l__cdossier_typography_heading_title_tl
         \UseTaggingSocket { para/off }
         \noindent
-        \tag_struct_begin:n { tag = \UseStructureName { sec/#1/title } }
+        \tl_if_empty:NTF \l__cdossier_typography_heading_title_tl
+          { \tag_struct_begin:n { tag = \UseStructureName { sec/#1/title } } }
+          {
+            \tag_struct_begin:n
+              {
+                tag = \UseStructureName { sec/#1/title } ,
+                title-o = { \l__cdossier_typography_heading_title_tl }
+              }
+          }
         \tag_mc_begin:n { }
-        #2
+        #3
         \tag_mc_end:
         \tag_struct_end:
         \par \nobreak
         \UseTaggingSocket { para/restore }
       }
       {
-        \noindent #2
+        \noindent #3
         \par \nobreak
+      }
+  }
+
+%% ---------------------------------------------------------------------------
+%% \__cdossier_typography_division_begin:n {depth} -- start the `Sect' division
+%% that a heading at that depth introduces (issue #268).
+%%
+%% A heading element on its own says only "these words are a heading". It does
+%% not say where the section it names begins or ends, so assistive technology
+%% reading the structure tree finds every heading and every paragraph as flat
+%% siblings, with nothing recording which content belongs to which heading.
+%% The enclosing division is what carries that, and `careerdossier-statement.cls'
+%% already had it for free by keeping the kernel's `\@startsection'. The record
+%% classes render their headings through the primitive above instead, so they
+%% have to open the division themselves.
+%%
+%% They open it through the kernel's own tagging sockets rather than a private
+%% pair of `\tag_struct_begin:n'/`\tag_struct_end:' calls. The sockets keep the
+%% kernel's section stack, so three things follow that hand-rolled calls would
+%% each have had to reimplement: `sec/end' closes every division at this depth
+%% or deeper before a sibling opens, a deeper heading nests inside its parent
+%% instead of replacing it, and the divisions still open at the end of the
+%% document are closed by the kernel's own `tagpdf/finish/before' hook. This is
+%% also exactly the mechanism the statement gets from `\@startsection', so both
+%% families produce the same shape.
+%%
+%% This emits no typeset material in either branch, so it cannot move a word;
+%% callers still place it after their `\addvspace' so that no structure whatsit
+%% can land between the skip and the vertical list it inspects.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_typography_division_begin:n #1
+  {
+    \tag_if_active:T
+      {
+        \UseTaggingSocket { sec/end } { #1 }
+        \UseTaggingSocket { sec/begin } { { #1 } { } }
       }
   }
