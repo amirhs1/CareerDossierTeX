@@ -519,10 +519,25 @@ extraction floor.
 |---|---|---:|---:|---:|
 | `\CDossierRuleThickness` | 0.04 × body size | 0.4 pt | 0.44 pt | 0.48 pt |
 | `\CDossierListLabelSep` | 0.50 × body size | 5.0 pt | 5.5 pt | 6.0 pt |
+| `\CDossierEmergencyStretch` | 2.00 × body size | 20 pt | 22 pt | 24 pt |
 | `\CDossierFurnitureLeading` | leading of `\CDossierSizeFurniture` | 10 pt | 11 pt | 12 pt |
 
 `\CDossierPageMargin` is 72.27 pt (1 in) for `margin=normal` and 36.135 pt
 (0.5 in) for `margin=narrow`, independent of `fontsize`.
+
+`\CDossierEmergencyStretch` is the one `\emergencystretch` policy, and all four
+classes apply it unconditionally (#272). It derives from the body size rather
+than the body leading because emergency stretch is distributed among a line's
+interword glue: it is a horizontal quantity, and the horizontal unit of the type
+scale is the body size. Before #272 the letter and the statement each wrote
+`2em`, the CV wrote `2em` at `a4paper` only, and the résumé wrote nothing — four
+classes holding three policies, none of which stated why it differed from the
+others. The `2.00` ratio reproduces the rendered value exactly, because
+`\fontdimen6` equals the design size for both supported body fonts, so the
+change is mechanism-only wherever the setting already applied. Extending it to
+the résumé and to the letter-paper CV cannot loosen a paragraph that already
+sets: TeX consults `\emergencystretch` only in a third line-breaking pass,
+reached only when the second finds no feasible breakpoints within `\tolerance`.
 
 #### Page-furniture placement
 

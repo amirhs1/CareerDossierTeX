@@ -206,6 +206,11 @@
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierRecordParSkip }
+%% Issue #272: the shared line-breaking flexibility every family applies. The
+%% résumé set none until then, though it is fully justified and its bullet text
+%% carries the toolkit's longest unbreakable strings. The policy and its
+%% reasoning live with the token in careerdossier-tokens.
+\setlength { \emergencystretch } { \CDossierEmergencyStretch }
 \CDossierApplyPageBreakPenalties
 
 %% Issue #223: the shared header stack ends at a boundary against whatever the

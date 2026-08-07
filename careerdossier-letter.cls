@@ -220,10 +220,12 @@
 
 %% Block format: no paragraph indentation, paragraphs separated by the shared
 %% prose token. \emergencystretch keeps justified prose from producing overfull
-%% boxes when a paragraph has few break points.
+%% boxes when a paragraph has few break points; issue #272 made it the shared
+%% token every family applies, so the reasoning now lives with the value in
+%% careerdossier-tokens.
 \setlength { \parindent }       { 0pt }
 \setlength { \parskip }         { \CDossierLetterParSkip }
-\setlength { \emergencystretch }{ 2em }
+\setlength { \emergencystretch }{ \CDossierEmergencyStretch }
 
 %% Typographic page-break penalties (issue #171): see careerdossier-tokens for
 %% the shared values and the reasoning for using one strength across families.
