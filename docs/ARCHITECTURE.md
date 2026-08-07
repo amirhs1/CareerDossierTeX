@@ -718,6 +718,14 @@ Responsibilities:
   subject, and body. The subject and entry-title roles resolve to the same
   shape and are defined independently (issue #299), so a change to one cannot
   move the other;
+- render a display heading at a caller-supplied depth (issue #267) and, in
+  tagged output, record the heading's plain text as its element's title;
+- open the `Sect` division that a heading at that depth introduces (issue
+  #268), so a record class's section encloses the content it names. This uses
+  the kernel's own `sec/begin`/`sec/end` tagging sockets, and therefore the
+  kernel's section stack, rather than a private structure-element pair — which
+  is what makes a sibling heading close the previous division and an unclosed
+  one close at the end of the document. It emits no typeset material;
 - own the cross-class `bodyfont=serif|sans` selection forwarded by each class;
 - provide extension points for future named font combinations;
 - apply the Latin ligature-suppression and lining-numbers defaults;

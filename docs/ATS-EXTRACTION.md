@@ -296,7 +296,7 @@ consumer that reads the structure element's text, and Poppler discards it here
 exactly as recorded — none of the extraction baselines moved. The two problems
 are separate. This one is Poppler's *geometric* block grouping, which no
 character fixes; #302's is the *logical* text of a structure element, which no
-amount of geometry fixes. See 7.5.
+amount of geometry fixes. See 7.6.
 
 #### The measured floor
 
@@ -1112,10 +1112,60 @@ gates this: every one of the five named profiles must carry exactly one `/S
 This is a structure-tree change only. It does not alter rendered layout, and
 the untagged path is unaffected because the heading primitive's untagged
 branch does not depend on the depth argument. `Sect` divisions around
-résumé/CV section headings remain out of scope for this change; see issue
-#268.
+résumé/CV section headings were out of scope for this change and are covered
+in 7.5 below.
 
-### 7.5 Structure tree by profile
+### 7.5 Section divisions (issue #268)
+
+A heading element records that some words are a heading. On its own it records
+nothing about *extent* — where the section it names begins and ends. That is
+the enclosing `Sect` division, and without one every heading and every
+paragraph in the tree is a flat sibling of every other, with nothing tying a
+section's content to the heading that introduces it.
+
+Before `v0.8.0`, the résumé and the academic CV emitted **zero** `Sect`
+divisions around two headings each, while the statement emitted one per
+section. The difference was purely mechanical: `careerdossier-statement.cls`
+kept the kernel's `\@startsection`, whose tagging support opens the division
+for it, and the record classes render their headings through the shared
+display primitive, which opens a bare heading element and nothing else. The
+statement's own source comment had described that primitive as deficient for
+exactly this reason since issue #177; the record classes had simply never been
+brought over.
+
+`\CDossierSection` in `careerdossier-resume.cls` and `careerdossier-cv.cls` now
+opens the division itself, through
+`\__cdossier_typography_division_begin:n` in `careerdossier-typography.sty`.
+That primitive uses the kernel's own `sec/begin` and `sec/end` tagging
+sockets rather than a private `\tag_struct_begin:n`/`\tag_struct_end:` pair, so
+it shares the kernel's section stack: a sibling heading closes the previous
+division before opening its own, and any division still open at the end of the
+document is closed by the kernel's existing `tagpdf/finish/before` hook. This
+is the same mechanism `\@startsection` gives the statement, so both families
+now produce the same shape. Each heading additionally records its own plain
+text as the element's `/T`, which is what the kernel already did for the
+statement.
+
+A CV's manual publication list needs no division of its own: it is a list
+placed under an ordinary `\CDossierSection`, so the section's division already
+encloses it. The section rule stays an `/Artifact` and contributes nothing to
+the tree.
+
+This too is a structure-tree change only. The division primitive emits no
+typeset material in either branch, and callers open the division *after* their
+`\addvspace` so that no structure node can land between the skip and the
+vertical list it inspects. Two measurements back that: `make tagging`'s
+tagged-versus-untagged word geometry gate, and a direct `pdftotext -bbox`
+comparison of the tagged résumé and CV fixtures against their pre-change
+builds, in which every word box is identical. `tests/tagging/run.sh` gates the
+result: a per-profile `/S /Sect` count, and the heading title, which a PDF
+stores as UTF-16BE hex rather than as readable characters.
+
+Like #267, veraPDF UA-2 passed on both fixtures before and after — a flat tree
+is structurally legal — so the count in the runner is the only thing that sees
+this.
+
+### 7.6 Structure tree by profile
 
 The table and diagram above show the heading skeleton only. This section shows
 the **complete** tagged structure of each named fixture — every heading, link,
@@ -1217,41 +1267,48 @@ previous fixture set `recipient-address` at all.
   /Link                                  => 'example.test/resume'   (https: link)
   /text-unit
     /text                                (no visible text)
-  /subsection                            => 'Experience'                       [/H2]
-  /text-unit
-    /text                                (no visible text)
-  /text-unit
-    /text                                => 'Engineer 2024–2026'
-  /text-unit
-    /text                                => 'Example Labs Toronto'
-  /text-unit
-    /itemize
-      /item
-        /itemlabel                       => '•'
-        /itembody
-          /text-unit
-            /text                        => 'First resume achievement in source order.'
-      /item
-        /itemlabel                       => '•'
-        /itembody
-          /text-unit
-            /text                        => 'Second resume achievement with a meaningful ' ‖ '.'
-              /Link                      => 'work link'
-  /subsection                            => 'Additional Experience'            [/H2]
-  /text-unit
-    /text                                (no visible text)
-  /text-unit
-    /text                                => 'Senior Engineer 2022–2024'
-  /text-unit
-    /text                                => 'Example Services Ottawa'
-  /text-unit
-    /itemize
-      /item
-        /itemlabel                       => '•'
-        /itembody
-          /text-unit
-            /text                        => 'Second-page resume content after the shared page furniture.'
+  /Sect
+    /subsection                          => 'Experience'                       [/H2]  (also its /T)
+    /text-unit
+      /text                              (no visible text)
+    /text-unit
+      /text                              => 'Engineer 2024–2026'
+    /text-unit
+      /text                              => 'Example Labs Toronto'
+    /text-unit
+      /itemize
+        /item
+          /itemlabel                     => '•'
+          /itembody
+            /text-unit
+              /text                      => 'First resume achievement in source order.'
+        /item
+          /itemlabel                     => '•'
+          /itembody
+            /text-unit
+              /text                      => 'Second resume achievement with a meaningful ' ‖ '.'
+                /Link                    => 'work link'
+  /Sect
+    /subsection                          => 'Additional Experience'            [/H2]  (also its /T)
+    /text-unit
+      /text                              (no visible text)
+    /text-unit
+      /text                              => 'Senior Engineer 2022–2024'
+    /text-unit
+      /text                              => 'Example Services Ottawa'
+    /text-unit
+      /itemize
+        /item
+          /itemlabel                     => '•'
+          /itembody
+            /text-unit
+              /text                      => 'Second-page resume content after the shared page furniture.'
 ```
+
+The two `/Sect` divisions are issue #268's (7.5). Everything a section
+introduces is now inside the division its heading opens, and the heading's own
+text is repeated as the division-opening element's `/T` — the same shape the
+statement below has had since #177.
 
 #### Academic CV
 
@@ -1365,11 +1422,14 @@ wording and closing conventions, not structure):
 
 #### Statement
 
-The only profile with a genuine three-level hierarchy in this fixture (`/H1`
-name, `/H2` title and section, and a `/Sect` division per section from the
-kernel's native `\section*`/`\CDossierSection` — see `careerdossier-statement.cls`
-and issue #177). This fixture does not exercise `\CDossierSubsection`, so no
-`/H3` appears here; see 7.4's table for where one would:
+The profile with the most heading roles in one document: an `/H1` name, an
+`/H2` for both the title line and each section, and a `/Sect` division per
+section. The divisions come from the kernel's native
+`\section*`/`\CDossierSection` — see `careerdossier-statement.cls` and issue
+#177 — where the résumé and CV above open theirs explicitly (7.5); the
+resulting shape is the same. This fixture does not exercise
+`\CDossierSubsection`, so no `/H3` appears here; see 7.4's table for where one
+would:
 
 ```text
 /Document
@@ -1692,7 +1752,7 @@ content stream and consults no glyph coordinate at all, so what it prints is
 the *logical* text of a structure element rather than an extractor's
 reconstruction of the page. That distinction is the whole reason it exists:
 Poppler, MuPDF, and PDFKit all rebuild words from geometry, so all three were
-blind to two cells joined by nothing but positioning glue (7.5). A defect of
+blind to two cells joined by nothing but positioning glue (7.6). A defect of
 that shape is invisible to every other check in this document. Its per-fixture
 `*.structure.txt` baselines are assertions, not records — regenerate one only
 for an intended change to the tagged text, and read the diff.

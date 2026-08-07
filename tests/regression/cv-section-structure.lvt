@@ -1,0 +1,61 @@
+% cv-section-structure.lvt — issue #268 the CV section's tagged shape.
+%
+% The CV's \CDossierSection is a separate definition from the résumé's, in a
+% separate class, so it gets its own fixture rather than being assumed to
+% follow. See resume-section-structure.lvt for what the three assertions are
+% and why both stubs are installed before \START rather than inside a \TEST.
+%
+% The publication list has no section of its own: it is placed under an
+% ordinary \CDossierSection, so the division opened here is what encloses it.
+% That is asserted by the third test, which opens a section and then a
+% publication list and shows no second division between them.
+\input{regression-test}
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_set_protected:Npn \__cdossier_typography_division_begin:n #1
+  { \TYPE{ division~begin:~depth~=~#1 } }
+\cs_set_protected:Npn \__cdossier_typography_heading:nnn #1#2#3
+  { \TYPE{ heading:~depth~=~#1,~title~=~#2 } }
+
+% The trace is the whole assertion, so the material is composed into a box that
+% is then discarded rather than shipped out. Stubbing the heading leaves each
+% section's rule with nothing under it, and a publication list set that way
+% overflows the page and writes the offending \vbox into the log — pages of
+% node dump that say nothing about section structure and would have to be
+% regenerated on any unrelated spacing change.
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertestQuiet #1
+  { \vbox_set:Nn \l_cdossiertest_box {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{section-opens-its-division-first}{
+  \cdossiertestQuiet{\CDossierSection{Research Experience}}
+}
+
+\TEST{every-section-opens-its-own}{
+  \cdossiertestQuiet{\CDossierSection{Teaching Experience}}
+}
+
+\TEST{publication-list-opens-no-division-of-its-own}{
+  \cdossiertestQuiet{
+    \CDossierSection{Publications}
+    \begin{CDossierPublications}
+      \CDossierPublication{
+        authors = {A. Lovelace},
+        title   = {Notes on the Analytical Engine},
+        venue   = {Scientific Memoirs},
+        date    = {1843},
+      }
+    \end{CDossierPublications}
+  }
+}
+
+\END

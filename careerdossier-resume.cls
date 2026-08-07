@@ -224,12 +224,21 @@
 %% Issue #267: depth 2, not 1 -- the document identity (the name, in
 %% \MakeCDossierHeader) is the document's one depth-1 heading, so every
 %% résumé/CV section heading sits one level under it.
+%%
+%% Issue #268: the heading also opens the division that encloses it and the
+%% entries it introduces, and passes its plain title so the heading element
+%% records it. The division opens *after* the `\addvspace' so that the skip is
+%% still contributed against the previous section's vertical list, and *before*
+%% the heading so the heading is the division's first child. The rule that
+%% follows is drawn inside the division but stays a layout artifact, so it adds
+%% nothing to the structure tree.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
     \addvspace { \CDossierRecordSectionAboveSkip }
-    \__cdossier_typography_heading:nn { 2 }
+    \__cdossier_typography_division_begin:n { 2 }
+    \__cdossier_typography_heading:nnn { 2 } { #1 }
       { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
     \__cdossier_components_section_rule:
   }
