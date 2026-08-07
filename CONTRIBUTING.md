@@ -484,11 +484,19 @@ than asserting it:
 
 The command forces the parameter to each candidate, rebuilds both corpora, and
 reports overfull boxes, hyphenated line ends, lines looser than badness 99, the
-worst line badness, and page counts. `--param emergencystretch` takes
-dimensions rather than integers; `--corpus fixtures|examples` restricts the run,
-which is worth doing because the full default sweep takes several minutes.
+worst line badness, paragraphs that reached TeX's third line-breaking pass, and
+page counts. `--corpus fixtures|examples` restricts the run, which is worth
+doing because the full default sweep over the fixture corpus takes several
+minutes.
 
-Two rules for reading it, both learned the hard way in #309:
+A value is any TeX `<dimen>` or `<integer>` the parameter accepts — a plain
+number for a penalty, or for `--param emergencystretch` a coefficient times a
+length register, e.g. `--values '1.50\CDossierBodySize 0.040\textwidth'`. The
+register form is what lets a derivation that varies per body size and margin be
+swept at all: a fixed dimension cannot express it. Single-quote a value carrying
+a backslash so the shell keeps it, and quote it again through `SWEEP_ARGS`.
+
+Three rules for reading it, learned the hard way in #309 and #310:
 
 1. **Never sum the two corpora, and decide policy on `examples`.** The stress
    fixtures exist to find what breaks, and their content is deliberately
@@ -500,11 +508,41 @@ Two rules for reading it, both learned the hard way in #309:
    raising a penalty look free. `loose`, `worst`, and `pages` are the other side
    of the trade, and a value that removes hyphens while adding gappy lines or a
    page has not improved anything.
+3. **`third` decides whether a paragraph enters the emergency pass, not whether
+   it succeeds there.** #310 found this count identical across every candidate
+   `\emergencystretch` derivation at a non-zero pool, which is why it cannot by
+   itself discriminate between them — `overfull` still can.
 
 The instrument carries no baseline and is not part of `make check`. It produces
 evidence for a human; the decisions it informs are pinned by `.tlg` baselines
 and layout fixtures. Its output under `build/linebreak-sweep/` is generated
 evidence and must not be committed.
+
+For a large sweep, `make review-linebreak-parallel` takes the same arguments and
+runs one sweep per value concurrently, merging the results into the same place:
+
+    make review-linebreak-parallel SWEEP_ARGS="--jobs 4 --corpus fixtures \
+      --param emergencystretch --values '1.50\CDossierBodySize 0.040\textwidth'"
+
+It matters at scale rather than for a spot check. One value against the fixture
+corpus is 36 discovered fixtures × 3 body sizes × 2 margins = 216 builds; the
+nine-arm sweep behind the `\CDossierEmergencyStretch` table in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) is 1,944, which is roughly 40
+minutes serially and around 10 in parallel. Parallelism is across values, not
+within one, so more workers than values buys nothing.
+
+**Do not run either script under a restricted sandbox.** LuaLaTeX needs to write
+luaotfload's font cache; where it cannot, fontspec falls back to `nullfont`,
+every document typesets empty, and the sweep reports zero overfull boxes
+everywhere — a failure indistinguishable from a clean result. If an arm comes
+back implausibly clean, grep a `.log` in the scratch directory for
+`not loadable: metric data not found` before believing it.
+
+If a long run measures everything but fails while merging, do not repeat it:
+
+    make review-linebreak-parallel SWEEP_ARGS="--merge-only /path/from/the/failed/run"
+
+The failed run prints that path as `Per-value console output kept at:`.
 
 ### Baselines are load-bearing
 
