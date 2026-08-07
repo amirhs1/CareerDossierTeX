@@ -1015,7 +1015,16 @@ the punctuation-only breaks they were calibrated with.
 
 The argument is read as ordinary text, exactly as a profile field value is — it
 is not `\url`'s verbatim argument. A target containing a TeX special character
-needs it escaped as it would be anywhere else.
+needs it escaped as it would be anywhere else. A query string is the common
+case: write `\%` for `%` and `\&` for `&`.
+
+```latex
+\CDossierLink{https://example.org/search?q=sound+studies\&profile=advanced\&title=Special\%3ASearch}
+```
+
+Both render as themselves on the page and reach the link target unescaped, so
+the address still pastes and resolves. An unescaped `%` comments out the rest of
+the line and the run stops with an error rather than producing a wrong link.
 
 Without hyperref the command still prints the address as plain visible text, so
 the identifier is never lost; all four classes load hyperref, so the link is

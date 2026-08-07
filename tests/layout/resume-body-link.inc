@@ -12,8 +12,18 @@
 % 318.15 pt at 12pt/normal. The same string inside \url is still overfull,
 % because url.sty breaks at punctuation only.
 %
-% The link appears twice: in a bullet inside an entry, and in a prose paragraph.
-% Those are the two places a user writes one.
+% The link appears in a bullet inside an entry and in a prose paragraph: the two
+% places a user writes one.
+%
+% The second bullet is a real, publicly resolvable address rather than a
+% constructed one — a Wikipedia advanced-search result, 262 characters, with the
+% query string an ordinary search produces. It covers what the constructed URLs
+% above do not: `+' separators, a `%'-escaped octet, and `&' between parameters.
+% The first two are ordinary characters here, but `%' and `&' are TeX's, so the
+% source escapes them as `\%' and `\&' exactly as it would anywhere else — the
+% argument is read as ordinary text, not as \url's verbatim argument. Both
+% render as themselves and reach the link target unescaped;
+% tests/links/resume-body-link.tex asserts that end to end.
 \CDossierSetup{
   name  = {Alexandria Montgomery-Fitzgerald},
   email = {alexandria@example.org},
@@ -32,6 +42,9 @@
           documented at
           \CDossierLink{https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html}
           for downstream consumers.
+    \item Consulted the published search index at
+          \CDossierLink{https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation\&title=Special\%3ASearch\&profile=advanced\&fulltext=1\&ns0=1}
+          throughout the programme.
   \end{CDossierItemize}
 \end{CDossierEntry}
 

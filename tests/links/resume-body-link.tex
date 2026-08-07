@@ -16,8 +16,17 @@
 % so the VERIFIED lines must report a wrap; a run reporting none has stopped
 % exercising the property.
 %
+% The third token is a real, publicly resolvable address — a Wikipedia
+% advanced-search result, 262 characters, with the query string an ordinary
+% search produces. It is what proves the escaping round-trips: the source writes
+% `\%3A' and `\&', because the argument is ordinary text rather than \url's
+% verbatim argument, and the token below is the unescaped form the page must
+% show and the reader must be able to paste. A source that escaped wrongly would
+% render `\%3A' or drop the parameters and be reported MISSING here.
+%
 % LINKTOKEN: https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html
 % LINKTOKEN: https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html
+% LINKTOKEN: https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation&title=Special%3ASearch&profile=advanced&fulltext=1&ns0=1
 \documentclass[fontsize=12pt, margin=normal]{careerdossier-resume}
 \CDossierSetup{
   name  = {Ada Lovelace},
@@ -37,6 +46,9 @@
           documented at
           \CDossierLink{https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html}
           for downstream consumers.
+    \item Consulted the published search index at
+          \CDossierLink{https://en.wikipedia.org/w/index.php?search=research-creation+sound-producing+Iranian+adornments+museum+conservation+archival+silencing+diasporic+futurism+embodied+performance+sound+studies+material+culture+museum+collections+classification+preservation\&title=Special\%3ASearch\&profile=advanced\&fulltext=1\&ns0=1}
+          throughout the programme.
   \end{CDossierItemize}
 \end{CDossierEntry}
 
