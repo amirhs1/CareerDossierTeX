@@ -133,6 +133,34 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   undefined-control-sequence error. See
   [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
 
+- `\CDossierEmergencyStretch` keeps its `2.00 ×` body-size derivation, now
+  chosen by measurement rather than inherited for continuity. **No document
+  renders differently.** ([#310])
+
+  #272 picked `2.00` because it reproduced the `2em` the classes already set.
+  The open question was whether the measure was the better quantity to scale
+  with, since a pool is spent on a line and a line has a length. Measurement
+  refuted the question rather than answering it: what a paragraph needs tracks
+  neither quantity. Varying only the measure from 400 pt to 560 pt, the smallest
+  pool that clears every overfull box is a sawtooth with no trend, correlating
+  `+0.417` with the measure on the résumé Summary prose and `−0.568` on the
+  bullet path — opposite signs. What the pool must cover is set by where one
+  paragraph's break points happen to fall.
+
+  Only the magnitude can be chosen, then, and the two forms are
+  indistinguishable wherever their magnitudes match: `1.50 ×` body size and
+  `0.040 ×` measure leave the same five overfull boxes in the same five cells,
+  and `2.50 ×` and `0.050 ×` the same two. So the derivation stays on the type
+  scale beside `\CDossierRuleThickness` and `\CDossierListLabelSep`, and the
+  ratio stays where it was. Raising it would not be free either: 39 paragraphs
+  in that sweep already reach TeX's third pass and set within it, and a larger
+  pool re-breaks them.
+
+  The two fixtures from #272 now prove their own premise on every run. A layout
+  fixture carrying `% STRETCHCONTROL:` is rebuilt with `\emergencystretch` at
+  `0pt` and must go overfull, so a fixture whose text drifted into setting clean
+  either way fails instead of passing while asserting nothing.
+
 - `\emergencystretch` is one policy behind one named token,
   `\CDossierEmergencyStretch`, and all four classes now apply it. **No
   committed example renders differently**, and nothing needs a source edit.
@@ -449,6 +477,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#305]: https://github.com/amirhs1/CareerDossierTeX/issues/305
 [#308]: https://github.com/amirhs1/CareerDossierTeX/issues/308
 [#309]: https://github.com/amirhs1/CareerDossierTeX/issues/309
+[#310]: https://github.com/amirhs1/CareerDossierTeX/issues/310
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 
 ## [0.7.0] - 2026-08-04
