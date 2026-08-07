@@ -296,6 +296,27 @@
       { \tl_put_left:Nn #1 { https:// } }
   }
 
+%% A URL cannot contain a literal space, so one in the argument is a mistake --
+%% and in practice always the same mistake: the address was broken across two
+%% source lines, and the line end became a space.
+%%
+%% It has to be removed rather than merely reported, because the two halves of
+%% \CDossierLink treat it differently. url.sty discards spaces, so the *displayed*
+%% address closes up and the page looks correct; \href's target is not processed
+%% by url.sty and keeps the space, so the link silently points somewhere else.
+%% Stripping the target restores the agreement the page already implies.
+%%
+%% Warn anyway. The removal is a repair, not a supported input format: the
+%% author still wants to know, and %20 is what a genuine space is written as.
+\msg_new:nnnn { careerdossier-components } { link-target-space }
+  { Removed~a~space~from~the~\CDossierLink\ target~'#1'. }
+  {
+    A~URL~cannot~contain~a~literal~space,~and~the~displayed~address~drops~it~
+    while~the~link~target~would~have~kept~it~--~so~the~text~and~the~link~would~
+    disagree.~The~usual~cause~is~a~line~break~inside~the~argument:~keep~the~
+    address~on~one~source~line.~Write~%20~if~the~space~is~real.
+  }
+
 %% \CDossierLink{<url>}: the supported way to put a link in body text. The
 %% argument is both the displayed text and, once normalized, the link target.
 %%
@@ -307,6 +328,12 @@
     \group_begin:
       \tl_set:Nn \l__cdossier_components_disp_tl {#1}
       \tl_set:Nn \l__cdossier_components_url_tl  {#1}
+      \tl_remove_all:Nn \l__cdossier_components_url_tl { ~ }
+      \tl_if_eq:NNF \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
+        {
+          \msg_warning:nnV { careerdossier-components } { link-target-space }
+            \l__cdossier_components_url_tl
+        }
       \__cdossier_components_scheme:N \l__cdossier_components_url_tl
       \cs_if_exist:NT \UrlBreaks
         { \tl_put_right:NV \UrlBreaks \c__cdossier_components_anybreak_tl }

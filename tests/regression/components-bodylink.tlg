@@ -24,7 +24,15 @@ breaks-anywhere
 breaks-at-punctuation-only
 ============================================================
 ============================================================
-TEST 4: bodylink-degrades-without-hyperref
+TEST 4: bodylink-strips-a-space-from-the-target
+============================================================
+Package careerdossier-components Warning: Removed a space from the \CDossierLink  target 'example.org/ada/portfolioand-more'.
+[target: https://example.org/ada/portfolioand-more]
+[text: example.org/ada/portfolio and-more]
+breaks-anywhere
+============================================================
+============================================================
+TEST 5: bodylink-degrades-without-hyperref
 ============================================================
 degrades-to-plain-text
 ============================================================

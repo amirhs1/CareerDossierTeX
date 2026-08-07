@@ -1026,6 +1026,13 @@ Both render as themselves on the page and reach the link target unescaped, so
 the address still pastes and resolves. An unescaped `%` comments out the rest of
 the line and the run stops with an error rather than producing a wrong link.
 
+Keep the address on one source line. A URL cannot contain a literal space, so a
+space in the argument — in practice always a line break inside it — is removed
+from the link target, with a warning naming the repaired target. Without that
+repair the two halves would disagree: url.sty drops the space from the displayed
+address, so the page looks correct, while the target keeps it and the link goes
+somewhere else. Write `%20` if the space is genuinely part of the address.
+
 Without hyperref the command still prints the address as plain visible text, so
 the identifier is never lost; all four classes load hyperref, so the link is
 present in ordinary use.

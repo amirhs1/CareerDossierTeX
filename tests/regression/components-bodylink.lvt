@@ -73,6 +73,16 @@
   \cdossiertestBreaks
 }
 
+%% A space reaches the target only by mistake -- almost always a source line
+%% break inside the argument. url.sty drops it from the displayed address while
+%% \href keeps it in the target, so the page looks right and the link is wrong.
+%% Both halves are checked here: the target loses the space, the displayed text
+%% is reported unchanged, and the warning fires.
+\TEST{bodylink-strips-a-space-from-the-target}{
+  \cdossiertestTrace
+  \CDossierLink{example.org/ada/portfolio and-more}
+}
+
 \TEST{bodylink-degrades-without-hyperref}{
   \cdossiertestHrefBranch
   \CDossierLink{example.org/ada/portfolio}
