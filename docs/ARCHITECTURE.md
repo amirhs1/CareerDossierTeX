@@ -558,44 +558,55 @@ sizes and both margins, `1.50 ×` body size and `0.040 ×` measure leave the sam
 five overfull boxes in the same five cells, and `2.50 ×` body size and
 `0.050 ×` measure leave the same two:
 
-| Derivation | Pool at `11pt` | Overfull boxes |
-|---|---:|---:|
-| `0` (negative control) | 0 pt | 47 |
-| `1.50 ×` body size | 16.5 pt | 5 |
-| `2.00 ×` body size (shipped) | 22 pt | 5 |
-| `2.50 ×` body size | 27.5 pt | 2 |
-| `0.030 ×` measure | 14.1 / 16.3 pt | 7 |
-| `0.035 ×` measure | 16.4 / 19.0 pt | 6 |
-| `0.040 ×` measure | 18.8 / 21.7 pt | 5 |
-| `0.045 ×` measure | 21.1 / 24.4 pt | 3 |
-| `0.050 ×` measure | 23.5 / 27.1 pt | 2 |
+| Derivation | Pool at `11pt` | Overfull boxes | Third pass |
+|---|---:|---:|---:|
+| `0` (negative control) | 0 pt | 60 | 0 |
+| `1.50 ×` body size | 16.5 pt | 5 | 51 |
+| `2.00 ×` body size (shipped) | 22 pt | 5 | 51 |
+| `2.50 ×` body size | 27.5 pt | 2 | 51 |
+| `0.030 ×` measure | 14.1 / 16.3 pt | 7 | 51 |
+| `0.035 ×` measure | 16.4 / 19.0 pt | 6 | 51 |
+| `0.040 ×` measure | 18.8 / 21.7 pt | 5 | 51 |
+| `0.045 ×` measure | 21.1 / 24.4 pt | 3 | 51 |
+| `0.050 ×` measure | 23.5 / 27.1 pt | 2 | 51 |
 
 Measure-derived pools are given at `margin=normal` / `margin=narrow`; a
-body-size-derived pool is the same at both. The tie therefore breaks on the one
-criterion that does separate the forms: a measure-derived token would be the
-only entry in the derived-metrics table above not on the type scale, where
-`\CDossierRuleThickness` and `\CDossierListLabelSep` already sit. The ratio stays
-at `2.00`.
+body-size-derived pool is the same at both. 216 cells per arm — 36 discovered
+fixtures at three body sizes and both margins.
 
-Raising it is not free. 39 paragraphs in that sweep reach the third pass and set
+"The same five cells" is meant literally, and is checked rather than inferred
+from the counts matching. At `1.50 ×` body size and at `0.040 ×` measure the
+overflowing cells are the same five: `resume-long-fields` at `12pt/normal` and
+at `12pt/narrow`, `resume-emergency-stretch` at `11pt/narrow` and `12pt/narrow`,
+and `letter-long-fields` at `12pt/narrow`. At `2.50 ×` and `0.050 ×` they are
+the same two, both `resume-long-fields` at `12pt`. Two derivations that agree on
+a count could still disagree on which paragraph they rescue; these do not.
+
+The tie therefore breaks on the one criterion that does separate the forms: a
+measure-derived token would be the only entry in the derived-metrics table above
+not on the type scale, where `\CDossierRuleThickness` and
+`\CDossierListLabelSep` already sit. The ratio stays at `2.00`.
+
+Raising it is not free. 51 paragraphs in that sweep reach the third pass and set
 successfully within it, and a larger pool re-breaks those, so a rescue bought
 for an off-design stress fixture is paid for by reflowing documents that already
-set. That count is `39` at every non-zero pool, which is also why third-pass
-frequency, measured alongside the box counts, discriminates nothing between the
-candidates: the pool's size decides whether a paragraph succeeds in the third
-pass, never whether it enters one.
+set. That count is `51` at every non-zero pool and `0` at none, which is also
+why third-pass frequency, measured alongside the box counts, discriminates
+nothing between the candidates: the pool's size decides whether a paragraph
+succeeds in the third pass, never whether it enters one.
 
-Both sweeps above are reproducible with `make review-linebreak` (#316), the
+Every figure above is reproducible with `make review-linebreak` (#316), the
 committed instrument this measurement was extracted into:
 
 ```bash
-make review-linebreak SWEEP_ARGS="--param emergencystretch --values '0pt 22pt'"
+make review-linebreak SWEEP_ARGS="--corpus fixtures --param emergencystretch --values '0pt 1.50\CDossierBodySize 2.00\CDossierBodySize 2.50\CDossierBodySize 0.030\textwidth 0.035\textwidth 0.040\textwidth 0.045\textwidth 0.050\textwidth'"
 ```
 
-Its fixture corpus is the whole discovered set rather than the hand-picked
-subset the original scratch harness listed, so its cell count and absolute box
-counts run higher than the figures recorded above. The comparison between arms,
-which is what decided the question, is unaffected.
+Expressing an arm as a length register rather than a fixed dimension is what
+makes the comparison statable at all: both candidates vary per body size and
+margin, so neither can be swept as a constant. The per-document rows the
+instrument writes under `build/linebreak-sweep/` are what the same-cells check
+above reads.
 
 The residue the table cannot reach is a property of the fixtures, not of the
 token. Every remaining box belongs to a deliberately extreme stress fixture run
