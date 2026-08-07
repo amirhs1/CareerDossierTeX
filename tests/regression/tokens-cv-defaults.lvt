@@ -16,6 +16,16 @@
     \dim_compare:nNnTF { \emergencystretch } = { \CDossierEmergencyStretch }
       { \TYPE{line-break-flexibility = shared} }
       { \TYPE{line-break-flexibility = local} }
+    %% Issue #309: hyphenation is a decided policy, and the decision was to
+    %% keep TeX's defaults (50/50) in all four families. Only a recorded
+    %% baseline can express that: in the source, a parameter nobody thought
+    %% about and a parameter deliberately left alone look identical, which is
+    %% how this went unowned long enough to need an issue. Pinning both values
+    %% turns the decision into something a later change has to argue with --
+    %% including a change that sets them indirectly, by loading a language
+    %% package rather than by writing the parameter.
+    \TYPE{hyphen-penalty = \int_use:N \tex_hyphenpenalty:D}
+    \TYPE{ex-hyphen-penalty = \int_use:N \tex_exhyphenpenalty:D}
   }
 \ExplSyntaxOff
 \begin{document}

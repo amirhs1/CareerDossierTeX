@@ -725,6 +725,54 @@ first and last line of a paragraph as legal break points, and every interior
 line break is still available, so an over-long paragraph still paginates
 rather than overflows.
 
+#### Hyphenation
+
+`\hyphenpenalty` and `\exhyphenpenalty` are **deliberately left at TeX's
+defaults of `50`**, in all four families, and there is no token for them
+(issue #309). This is a decision, not the absence of one: the four
+`tokens-*-defaults` baselines record both values, so a later change — including
+one that sets them indirectly by loading a language package — has to argue with
+a reviewable diff rather than pass unnoticed.
+
+The case for raising the penalty was that a résumé bullet is scanned rather
+than read, so a hyphen at the end of a short line costs more there than in
+continuous prose. Measurement did not support it, and located the hyphenation
+somewhere else entirely. Across the committed examples at their shipped
+settings:
+
+| `\hyphenpenalty` | Hyphenated line ends | Lines looser than badness 99 | Worst badness | Overfull |
+|---:|---:|---:|---:|---:|
+| `50` (shipped) | 56 | 2 | 232 | 0 |
+| `200` | 42 | 8 | 232 | 0 |
+| `500` | 38 | 12 | 232 | 0 |
+| `1000` | 38 | 12 | 232 | 0 |
+| `10000` | 0 | 72 | 2452 | 1 |
+
+Three things decide it. First, the motivating case is not where the
+hyphenation is: **48 of those 56 hyphens are in the statements**, which are
+continuous prose, while the whole committed résumé has one and the CV one. On
+the realistic two-page record fixtures, raising the penalty to `500` removes
+about half a hyphen per rendered document — `resume-two-page` goes from 19
+hyphens to 15 across its six size/margin combinations, `cv-two-page` from 21 to
+19. Second, the trade is roughly one for one against: `50 → 500` removes 18
+hyphens from the examples and creates 10 lines looser than badness 99. The
+worst badness does not move, so the new loose lines sit in the same quality
+band, but they are a real cost paid to fix a problem the record classes do not
+have. Third, there is nothing to tune inside the safe band — `500` and `1000`
+give identical output, both in the examples and across the 216-cell stress
+sweep.
+
+Forbidding hyphenation outright is decisively wrong, and worth recording so it
+is not revisited: `10000` produces 68 overfull boxes across the stress sweep,
+one even in the committed examples, 72 loose lines, and a worst badness of
+2452. That is the failure the issue anticipated — removing break points is what
+sends a paragraph to the third line-breaking pass and then past the margin.
+
+One worry did not materialise and is worth stating, because it is the cost that
+would have mattered most: no committed example changes page count at any of the
+five values, `10000` included. A career document does not grow a page from this
+setting.
+
 ### `careerdossier-base.sty`
 
 Owns shared state and validation.

@@ -173,6 +173,33 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   The suite's overfull check passes on both only because the token reaches the
   page.
 
+- Hyphenation stays at TeX's defaults — `\hyphenpenalty` and `\exhyphenpenalty`
+  are `50` in all four families — and that is now a recorded decision rather
+  than an unexamined inheritance. **No document renders differently.** ([#309])
+
+  The case for discouraging hyphenation more strongly was that a résumé bullet
+  is scanned rather than read, so a hyphen at the end of a short line costs more
+  there than in a page of prose. Measurement located the hyphenation somewhere
+  else: 48 of the 56 hyphenated line ends in the committed examples are in the
+  statements, which are continuous prose. The whole shipped résumé has one, the
+  CV one, and raising the penalty removes neither.
+
+  What raising it does do is trade one flaw for another at about one for one.
+  `\hyphenpenalty=500` removes 18 hyphens across the examples and creates 10
+  lines looser than badness 99 — the worst badness does not move, so the new
+  loose lines are in the same quality band, but they are a real cost paid to fix
+  a problem the record classes do not have. `500` and `1000` are identical, so
+  there is nothing to tune inside the safe band. Forbidding hyphenation outright
+  (`10000`) is decisively wrong: 68 overfull boxes across the stress sweep, one
+  even in the examples, and a worst-case line badness of 2452.
+
+  No committed example changes page count at any value tested, `10000` included.
+
+  Nothing sets these parameters, so there is no new token to learn; the four
+  `tokens-*-defaults` regression baselines record both values instead, which is
+  what makes the decision reviewable — including against a future change that
+  sets them indirectly by loading a language package.
+
 ### Removed
 
 - **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
@@ -421,6 +448,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302
 [#305]: https://github.com/amirhs1/CareerDossierTeX/issues/305
 [#308]: https://github.com/amirhs1/CareerDossierTeX/issues/308
+[#309]: https://github.com/amirhs1/CareerDossierTeX/issues/309
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 
 ## [0.7.0] - 2026-08-04
