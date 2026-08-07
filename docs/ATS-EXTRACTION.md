@@ -1100,7 +1100,7 @@ the sections one line at a time. `/H1` is what makes the identity a stop on
 that jump list, and the first one.
 
 Mechanically, the shared heading primitive
-(`\__cdossier_typography_heading:nn` in `careerdossier-typography.sty`) takes
+(`\__cdossier_typography_heading:nnn` in `careerdossier-typography.sty`) takes
 the heading depth as an explicit argument rather than assuming depth 1, and
 the statement's native `\section`/`\subsection` (kept for their `Sect`-opening
 tagging behavior; see `careerdossier-statement.cls`) moved from levels 1/2 to
@@ -1164,6 +1164,29 @@ stores as UTF-16BE hex rather than as readable characters.
 Like #267, veraPDF UA-2 passed on both fixtures before and after — a flat tree
 is structurally legal — so the count in the runner is the only thing that sees
 this.
+
+**Heading titles (issue #305).** #268 gave section headings a `/T` and left
+every other heading without one, so a résumé section was titled while the
+applicant's name — the document's `/H1`, and the heading that outranks it — was
+not. Every heading now records its own text: the identity in all four families,
+and the statement's title line as well. Two notes on the shape this took:
+
+- **The `Sect` divisions still carry no `/T`, deliberately.** #268's acceptance
+  criterion read "recorded as the division's title, as it is in the statement",
+  and those halves contradict each other — no `Sect` in any family has a `/T`,
+  including the statement's, which the kernel generates. The kernel puts
+  `title-o` on the `sec/<n>/title` element, so that is where all four families
+  put it. Titling the record classes' divisions would re-open exactly the
+  résumé/CV-versus-statement divergence #268 closed.
+- **A protected command in the title argument records the wrong title, not no
+  title.** The title is purified before it is written, and purification expands
+  what it can and discards what it cannot. `\CDossierPrintField` is protected,
+  so it was stripped and its *argument* text survived: the first attempt
+  recorded the literal string `name` for every profile. Nothing on the rendered
+  page shows this, and veraPDF is indifferent to the value of a `/T`. The
+  identity call sites use the expandable `\CDossierFieldValue` instead, and the
+  tagging fixture asserts the decoded value per profile rather than merely
+  asserting that some title exists.
 
 ### 7.6 Structure tree by profile
 
@@ -1259,7 +1282,7 @@ previous fixture set `recipient-address` at all.
 
 ```text
 /Document
-  /section                              => 'Tagged Industry Resume'            [/H1]
+  /section                              => 'Tagged Industry Resume'            [/H1]  (also its /T)
   /text-unit
     /text                                => 'Accessibility Engineer'
   /Link                                  => 'resume@example.test'   (mailto: link)
@@ -1433,8 +1456,8 @@ would:
 
 ```text
 /Document
-  /section                              => 'Tagged Research Statement'         [/H1]
-  /subsection                           => 'Research Statement'                [/H2]  (the title line)
+  /section                              => 'Tagged Research Statement'         [/H1]  (also its /T)
+  /subsection                           => 'Research Statement'                [/H2]  (the title line; also its /T)
   /text-unit
     /text                                => 'Reliable computational inquiry'   (subtitle)
   /text-unit

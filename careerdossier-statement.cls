@@ -484,7 +484,13 @@
     %% primitive and the title moves to depth 2.
     \CDossierHeaderLine
       {
-        \__cdossier_typography_heading:nn { 1 }
+        %% Issue #305: as in \MakeCDossierHeader, the unformatted text is
+        %% passed alongside the rendered line so the heading records a `/T'.
+        %% \CDossierFieldValue, not \CDossierPrintField -- see the note there
+        %% for why a protected command in this argument records the wrong
+        %% title rather than no title.
+        \__cdossier_typography_heading:nnn { 1 }
+          { \CDossierFieldValue { name } }
           {
             \CDossierNameStyle \CDossierSizeName
             \CDossierPrintField { name }
@@ -492,7 +498,8 @@
       }
     \CDossierHeaderLine
       {
-        \__cdossier_typography_heading:nn { 2 }
+        \__cdossier_typography_heading:nnn { 2 }
+          { \tl_use:N \l__cdossier_statement_title_tl }
           {
             \CDossierSectionStyle \CDossierSizeDocumentTitle
             \tl_use:N \l__cdossier_statement_title_tl

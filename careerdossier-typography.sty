@@ -217,12 +217,19 @@
 %% element -- and it is what lets a consumer show the heading in a document
 %% outline without re-reading the page. The text is purified first, because a
 %% `/T' string carries no formatting and an unpurified argument would put font
-%% and size commands into the PDF. An empty title omits the key entirely: a
-%% caller whose heading has no separable plain text says so by passing nothing
-%% rather than by writing an empty PDF string.
-\cs_new_protected:Npn \__cdossier_typography_heading:nn #1#2
-  { \__cdossier_typography_heading:nnn { #1 } { } { #2 } }
-
+%% and size commands into the PDF. An empty title omits the key entirely, so a
+%% title that purifies away leaves no `/T' rather than an empty PDF string.
+%%
+%% Issue #268 kept a two-argument wrapper that passed no title, so that the
+%% call sites it did not touch needed no edit. #305 gave the remaining three --
+%% the document identity and the statement's title line -- their titles too,
+%% which left the wrapper with no callers, so it is gone. Every heading in
+%% every family now names itself.
+%%
+%% The title argument must be expandable. Purification expands what it can and
+%% *discards* what it cannot, so a protected command is stripped while its
+%% argument text survives: passing `\CDossierPrintField {name}' here recorded
+%% the literal string `name'. Use `\CDossierFieldValue' or a token list.
 \tl_new:N \l__cdossier_typography_heading_title_tl
 
 \cs_new_protected:Npn \__cdossier_typography_heading:nnn #1#2#3

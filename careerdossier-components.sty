@@ -505,7 +505,7 @@
 
 %% The argument is stored unexpanded and re-used once, so a line may carry
 %% structure -- the name and the statement's title line each wrap themselves in
-%% \__cdossier_typography_heading:nn and keep their heading tagging.
+%% \__cdossier_typography_heading:nnn and keep their heading tagging.
 \NewDocumentCommand \CDossierHeaderLine { m }
   { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
 
@@ -572,7 +572,21 @@
     \CDossierHeaderBegin
     \CDossierHeaderLine
       {
-        \__cdossier_typography_heading:nn { 1 }
+        %% Issue #305: the name is passed twice on purpose. The second group is
+        %% the rendered line; the first is the same text unformatted, which
+        %% becomes the heading element's `/T'. Both read the same field, so
+        %% they cannot drift.
+        %%
+        %% The title argument uses \CDossierFieldValue, not
+        %% \CDossierPrintField. The title is purified before it is written, and
+        %% purification expands what it can and *discards* what it cannot:
+        %% \CDossierPrintField is protected, so it survives as a stripped
+        %% command whose argument text remains, and the recorded title came out
+        %% as the literal string `name' rather than as the applicant's. A wrong
+        %% title is worse than none, and nothing about the rendered page shows
+        %% it, so the tagging fixture asserts the value.
+        \__cdossier_typography_heading:nnn { 1 }
+          { \CDossierFieldValue { name } }
           {
             \CDossierNameStyle
             \CDossierSizeName
