@@ -474,6 +474,38 @@ pull request:
 The PDFs, logs, and review record are generated evidence under the gitignored
 `build/` directory. They must not be committed.
 
+### Line-breaking calibration sweep
+
+When a change proposes a different value for a line-breaking parameter —
+`\emergencystretch`, `\hyphenpenalty`, `\exhyphenpenalty` — measure it rather
+than asserting it:
+
+    make review-linebreak SWEEP_ARGS="--param hyphenation --values '50 200 500'"
+
+The command forces the parameter to each candidate, rebuilds both corpora, and
+reports overfull boxes, hyphenated line ends, lines looser than badness 99, the
+worst line badness, and page counts. `--param emergencystretch` takes
+dimensions rather than integers; `--corpus fixtures|examples` restricts the run,
+which is worth doing because the full default sweep takes several minutes.
+
+Two rules for reading it, both learned the hard way in #309:
+
+1. **Never sum the two corpora, and decide policy on `examples`.** The stress
+   fixtures exist to find what breaks, and their content is deliberately
+   hostile. Measured over them the résumé family hyphenates more than any
+   other, which is an artifact of the keep-together fixtures repeating filler
+   bullets — and it argues the exact opposite of what the committed examples
+   show.
+2. **Read the cost columns, not only the benefit.** A hyphen count alone makes
+   raising a penalty look free. `loose`, `worst`, and `pages` are the other side
+   of the trade, and a value that removes hyphens while adding gappy lines or a
+   page has not improved anything.
+
+The instrument carries no baseline and is not part of `make check`. It produces
+evidence for a human; the decisions it informs are pinned by `.tlg` baselines
+and layout fixtures. Its output under `build/linebreak-sweep/` is generated
+evidence and must not be committed.
+
 ### Baselines are load-bearing
 
 A saved baseline (an `l3build` `.tlg`, or the committed extraction reference) is
