@@ -180,7 +180,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   The case for discouraging hyphenation more strongly was that a résumé bullet
   is scanned rather than read, so a hyphen at the end of a short line costs more
   there than in a page of prose. Measurement located the hyphenation somewhere
-  else: 48 of the 55 hyphenated line ends in the committed examples are in the
+  else: 48 of the 56 hyphenated line ends in the committed examples are in the
   statements, which are continuous prose. The whole shipped résumé has one, the
   CV one, and raising the penalty removes neither.
 
@@ -190,7 +190,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   loose lines are in the same quality band, but they are a real cost paid to fix
   a problem the record classes do not have. `500` and `1000` are identical, so
   there is nothing to tune inside the safe band. Forbidding hyphenation outright
-  (`10000`) is decisively wrong: 38 overfull boxes across the stress sweep, one
+  (`10000`) is decisively wrong: 68 overfull boxes across the stress sweep, one
   even in the examples, and a worst-case line badness of 2452.
 
   No committed example changes page count at any value tested, `10000` included.

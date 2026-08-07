@@ -742,14 +742,14 @@ settings:
 
 | `\hyphenpenalty` | Hyphenated line ends | Lines looser than badness 99 | Worst badness | Overfull |
 |---:|---:|---:|---:|---:|
-| `50` (shipped) | 55 | 2 | 232 | 0 |
-| `200` | 41 | 8 | 232 | 0 |
-| `500` | 37 | 12 | 232 | 0 |
-| `1000` | 37 | 12 | 232 | 0 |
-| `10000` | 0 | 71 | 2452 | 1 |
+| `50` (shipped) | 56 | 2 | 232 | 0 |
+| `200` | 42 | 8 | 232 | 0 |
+| `500` | 38 | 12 | 232 | 0 |
+| `1000` | 38 | 12 | 232 | 0 |
+| `10000` | 0 | 72 | 2452 | 1 |
 
 Three things decide it. First, the motivating case is not where the
-hyphenation is: **48 of those 55 hyphens are in the statements**, which are
+hyphenation is: **48 of those 56 hyphens are in the statements**, which are
 continuous prose, while the whole committed résumé has one and the CV one. On
 the realistic two-page record fixtures, raising the penalty to `500` removes
 about half a hyphen per rendered document — `resume-two-page` goes from 19
@@ -759,12 +759,12 @@ hyphens from the examples and creates 10 lines looser than badness 99. The
 worst badness does not move, so the new loose lines sit in the same quality
 band, but they are a real cost paid to fix a problem the record classes do not
 have. Third, there is nothing to tune inside the safe band — `500` and `1000`
-give identical output, both in the examples and across the 156-cell stress
+give identical output, both in the examples and across the 216-cell stress
 sweep.
 
 Forbidding hyphenation outright is decisively wrong, and worth recording so it
-is not revisited: `10000` produces 38 overfull boxes across the stress sweep,
-one even in the committed examples, 71 loose lines, and a worst badness of
+is not revisited: `10000` produces 68 overfull boxes across the stress sweep,
+one even in the committed examples, 72 loose lines, and a worst badness of
 2452. That is the failure the issue anticipated — removing break points is what
 sends a paragraph to the third line-breaking pass and then past the margin.
 
