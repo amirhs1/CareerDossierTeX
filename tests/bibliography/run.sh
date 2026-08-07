@@ -1,7 +1,27 @@
 #!/usr/bin/env bash
 # Build the focused Biber fixture, compare its extracted text, and reject Biber
 # warnings/errors. The baseline pins ydnt ordering and DOI -> e-print -> URL
-# precedence without treating the user-facing example as the test assertion.
+# precedence against a fixture this suite owns, and deliberately does not pin
+# the user-facing example: a baseline extracted from `examples/academic/' would
+# turn red on any edit to that example's prose, profile, or database, and the
+# test's meaning would decay from "sorting and precedence are correct" to "the
+# example is unchanged".
+#
+# The final section is the complement of that rule rather than an exception to
+# it (issue #319). It builds the shipped example and asserts only that it
+# rendered as many entries as its database declares. It pins no string, no
+# order, no field, no key, and no year, so adding a fourth entry keeps it green
+# and the example stays free to change; it cannot become a content baseline
+# because it holds no content.
+#
+# That check has to build the example, because the fixture here cannot exhibit
+# the defect it guards. The fixture resolves a directory-local
+# `\addbibresource{publications.bib}' with cwd=tests/bibliography, while the
+# example writes a root-relative path. When that path does not resolve, Biber
+# fails, `\nocite{*}' against no database is not a LaTeX error, latexmk exits 0,
+# and a PDF ships with the entries silently missing. Measured: with
+# `publications.bib' removed, `make academic-bibliography' exits 0 and produces
+# 12297 bytes where a complete build produces 24514.
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -132,7 +152,11 @@ pairing="$(pdftotext -bbox "$base.pdf" - \
         if (n == 0) print "NO LABELS FOUND"
       }')"
 printf '%s\n' "$pairing" | sed 's/^/    /'
-if printf '%s\n' "$pairing" | grep -qE '^(UNPAIRED|NO LABELS FOUND)'; then
+# Here-string, not `printf | grep -q'. Under `pipefail' grep exits on its first
+# match and the producer can die of SIGPIPE, so the pipeline reports failure
+# precisely when the pattern *did* match — an inverted gate. tests/links/run.sh
+# documents the same trap.
+if grep -qE '^(UNPAIRED|NO LABELS FOUND)' <<< "$pairing"; then
   echo "  ENTRY NUMBER NOT PAIRED WITH ITS ENTRY"
   exit 1
 fi
@@ -160,3 +184,146 @@ if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
   exit 1
 fi
 echo "  biblabelsep tracks CDossierListLabelSep"
+
+# --------------------------------------------------------------------------
+# The shipped example rendered its entries (issue #319).
+#
+# Four tiers, cheapest first, all derived from the sources so that adding an
+# entry to a database never requires editing this check. The first three prove
+# Biber succeeded; only the fourth proves LaTeX put the entries on the page,
+# which is the distinction issue #161 taught this repository to make.
+#
+# Returns 0 when the build rendered every entry its database declares, and 1
+# with a diagnosis otherwise. The negative control below calls this same
+# function: a control that exercised a different code path would prove nothing.
+check_bibliography_render() { # <build-base-without-extension> <bib-path>
+  local build="$1" bib="$2" declared rendered labels
+
+  # Entry count from the database. The trailing comma requirement excludes
+  # @string{k = {v}}, @preamble, and @comment, which declare no entry.
+  if [ ! -f "$bib" ]; then
+    echo "    database not found: $bib"; return 1
+  fi
+  declared="$(grep -cE '^[[:space:]]*@[[:alnum:]]+[[:space:]]*\{[^,{}]+,' "$bib")"
+  if [ "$declared" -lt 1 ]; then
+    echo "    database declares no entries: $bib"
+    echo "    (a zero count would let an empty render match, so this is fatal)"
+    return 1
+  fi
+
+  # Tier 1: Biber's own log.
+  if [ ! -f "$build.blg" ]; then
+    echo "    missing Biber log $build.blg"; return 1
+  fi
+  if grep -Eiq '(^| - )(WARN|ERROR) -' "$build.blg"; then
+    grep -Ei '(^| - )(WARN|ERROR) -' "$build.blg" | sed 's/^/      /' | head -5
+    echo "    Biber reported warnings or errors"; return 1
+  fi
+
+  # Tier 2: what Biber emitted, before any typesetting. This is the floor that
+  # needs no Poppler.
+  if [ ! -f "$build.bbl" ]; then
+    echo "    missing $build.bbl: Biber wrote no bibliography at all"; return 1
+  fi
+  rendered="$(grep -c '^[[:space:]]*\\entry{' "$build.bbl")"
+  if [ "$rendered" -ne "$declared" ]; then
+    echo "    Biber emitted $rendered entries, database declares $declared"
+    return 1
+  fi
+
+  # Tier 3: LaTeX resolved every citation.
+  if grep -qE 'Citation .* undefined|Empty bibliography' "$build.log"; then
+    grep -E 'Citation .* undefined|Empty bibliography' "$build.log" \
+      | sed 's/^/      /' | head -5
+    echo "    LaTeX reported undefined citations or an empty bibliography"
+    return 1
+  fi
+
+  # Tier 4: the entries reached the page. Labels are read from the PDF's own
+  # word geometry and must be exactly 1..N.
+  #
+  # A label is a word of the shape `N)'. The academic profile carries no phone
+  # number today; one written `(555) 123-4567' would extract a word `555)' that
+  # matches the shape and would break contiguity here. That fails loudly with
+  # the labels listed rather than drifting silently, and the entry-pairing awk
+  # above carries the same exposure, so this is consistent rather than novel.
+  if ! command -v pdftotext >/dev/null 2>&1; then
+    echo "    pdftotext absent: cannot confirm the entries reached the page"
+    return 1
+  fi
+  labels="$(pdftotext -bbox "$build.pdf" - \
+    | sed -n 's/.*<word [^>]*>\([0-9]\{1,\})\)<\/word>.*/\1/p' \
+    | tr -d ')' | sort -n | tr '\n' ' ')"
+  local expected="" i
+  for (( i = 1; i <= declared; i++ )); do expected="$expected$i "; done
+  if [ "$labels" != "$expected" ]; then
+    echo "    rendered entry labels [$labels] do not match expected [$expected]"
+    return 1
+  fi
+
+  echo "    $declared entries declared, $declared emitted, $declared rendered"
+  return 0
+}
+
+echo "== examples/academic/cv-bibliography.tex (the shipped example renders its entries) =="
+example_build="$root/build/examples/cv-bibliography"
+mkdir -p "$root/build/examples"
+# Built from the repository root, as the Makefile's own target does: the example
+# writes root-relative include and bibliography paths, and any other working
+# directory resolves them only by accident of the search path. -g for the same
+# reason as every other build here (#312), and doubly so because `make examples'
+# may have left an up-to-date PDF beside this one.
+if ! (cd "$root" && latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
+      -output-directory=build/examples examples/academic/cv-bibliography.tex) \
+     > "$here/example-cv-bibliography.stdout" 2>&1; then
+  echo "  EXAMPLE BUILD FAILED (see build/examples/cv-bibliography.log)"
+  exit 1
+fi
+if ! check_bibliography_render "$example_build" \
+     "$root/examples/academic/publications.bib"; then
+  echo "  THE SHIPPED EXAMPLE LOST ITS BIBLIOGRAPHY"
+  echo "  This is not a formatting difference. The example builds, exits 0, and"
+  echo "  ships a PDF; the entries are simply absent. See the diagnosis above."
+  exit 1
+fi
+echo "  the shipped example renders every entry its database declares"
+
+# --------------------------------------------------------------------------
+# Negative control (issue #319). The guard above is only worth having if it
+# fires, and the failure it guards is silent by construction, so the control
+# has to be committed rather than performed once by hand.
+echo "== missing-bibresource.tex (negative control: the guard must fire) =="
+control="missing-bibresource"
+control_exit=0
+latexmk -g -lualatex -interaction=nonstopmode \
+  "$control.tex" > "$control.stdout" 2>&1 || control_exit=$?
+if [ "$control_exit" -eq 0 ]; then
+  echo "  latexmk exited 0 on an unresolvable database, as it does today"
+else
+  echo "  note: latexmk exited $control_exit on an unresolvable database."
+  echo "  That is a stricter toolchain than the one this control was written"
+  echo "  against; the guard's verdict below is still the assertion."
+fi
+# The database handed to the guard is the real one, not the missing one the
+# control document names. Passing the missing path would short-circuit on the
+# guard's own input check, proving only that it notices an absent argument;
+# passing a database that declares three entries, against a build that produced
+# none, makes it decide on the build's evidence instead.
+#
+# It fires on the first tier, and that is the correct tier: when the resource
+# cannot be resolved, latexmk never runs Biber at all, so the absent .blg *is*
+# the signature of this defect. The later tiers cover narrower failures — Biber
+# ran but emitted fewer entries, or LaTeX did not place them — which cannot be
+# reached from here. An empty-but-present database was tried as a way to reach
+# them and is not silent at all: latexmk exits 12 and no PDF is produced, so it
+# is not the failure this guard exists for.
+if check_bibliography_render "$here/$control" "$here/publications.bib" \
+   > "$control.guard" 2>&1; then
+  echo "  NEGATIVE CONTROL DID NOT FIRE: the guard passed a document whose"
+  echo "    bibliography cannot have rendered, so it can no longer see the"
+  echo "    defect it exists for. Do not relax it."
+  sed 's/^/    /' "$control.guard"
+  exit 1
+fi
+echo "  negative control fired: the guard rejects an unresolvable database"
+sed 's/^/    /' "$control.guard"

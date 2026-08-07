@@ -86,6 +86,10 @@ tests/*/*.diff
 # companion *.tokens file for the checker to read. The directives are the
 # source; the extracted file is scratch.
 tests/*/*.tokens
+# tests/bibliography/run.sh captures the guard's diagnosis for its negative
+# control in a *.guard file so the runner can report it after deciding the
+# verdict. Generated evidence, like the two above.
+tests/*/*.guard
 
 # veraPDF reports and the toolchain record from tests/tagging/run.sh. These are
 # evidence retained as CI artifacts and reviewed per run, not committed files.

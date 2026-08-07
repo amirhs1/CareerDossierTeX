@@ -1,0 +1,38 @@
+% missing-bibresource.tex — negative control for issue #319.
+%
+% This document names a database that does not exist. It is the smallest
+% reproduction of a failure that is otherwise invisible: Biber cannot resolve
+% the resource, `\nocite{*}' against no database is not a LaTeX error, latexmk
+% exits 0, and a PDF ships with the bibliography simply absent.
+%
+% The runner builds it and requires `check_bibliography_render' to REJECT it.
+% Without that, the guard on the shipped example would pass whether or not it
+% could still see the defect — and the defect is silent, so nothing else would
+% reveal a guard that had stopped working.
+%
+% The real-world shape this stands in for is a path that does not resolve rather
+% than a file that does not exist. `examples/academic/cv-bibliography.tex' writes
+% `\addbibresource{examples/academic/publications.bib}', a repository-root
+% relative path, as the Makefile's targets assume. A build launched from
+% `examples/academic/' cannot resolve it, so the example renders with no
+% bibliography — which is how the figures recorded for issue #309 came to be one
+% hyphenated line end low in every arm before #316's instrument disagreed with
+% them.
+%
+% A missing file is used here instead of the wrong working directory because the
+% runner exports TEXINPUTS with the repository root on it and Biber resolves
+% through kpathsea, so a wrong-cwd reproduction might still find the database
+% and the control would pass vacuously. An absent file cannot be found by any
+% search path.
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{no-such-database.bib}
+\CDossierSetup{
+  name        = {Ada Lovelace},
+  email       = {ada.lovelace@example.com},
+  affiliation = {Analytical Society},
+}
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}
