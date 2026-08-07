@@ -61,6 +61,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Body font | Serif (default) and opt-in sans |
 | Output medium | `medium=print` (default) or `medium=screen` |
 | Entry-metadata de-emphasis | `muted=italic` (default), `muted=gray`, or `muted=both` |
+| Entry-metadata placement | `entrymeta=column` (default) or `entrymeta=inline`, résumé and CV |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
 | Résumé class | `careerdossier-resume` |
@@ -151,7 +152,8 @@ actually been verified.
   paper=letter,
   bodyfont=serif,
   medium=print,
-  muted=italic
+  muted=italic,
+  entrymeta=column
 ]{careerdossier-resume}
 ```
 
@@ -169,7 +171,7 @@ report an unsupported value the same way:
 |---|---|---|
 | `careerdossier-tokens` | `fontsize`, `margin` | `fontsize=12pt`, `margin=normal` |
 | `careerdossier-typography` | `bodyfont` | `bodyfont=serif` |
-| `careerdossier-components` | `medium`, `muted` | `medium=print`, `muted=italic` |
+| `careerdossier-components` | `medium`, `muted`, `entrymeta` | `medium=print`, `muted=italic`, `entrymeta=column` |
 
 **A package default is not a class default.** Loading `careerdossier-tokens`
 directly gives `12pt`/`normal`, while `\documentclass{careerdossier-resume}`
@@ -356,6 +358,112 @@ is never the only carrier of meaning. All three values are visual only: no
 extractor sees a difference, and the reading order is identical under each.
 
 Unsupported values produce a class error naming the accepted values.
+
+#### `entrymeta`
+
+The résumé and CV classes accept:
+
+```text
+column
+inline
+```
+
+`entrymeta` is new after `v0.7.0`. The letter and statement classes do not
+accept it: neither has entry headings.
+
+`entrymeta` decides where an entry's dates and location sit. Under the default
+`column` they are set flush right, opposite the title and organization:
+
+```text
+Senior Engineer                                          2024–Present
+Example Labs                                              Toronto, ON
+  • First achievement in source order.
+```
+
+Under `inline` they follow the title and organization on the same line, joined
+by `\CDossierEntryMetaSeparator`:
+
+```text
+Senior Engineer | 2024–Present
+Example Labs | Toronto, ON
+  • First achievement in source order.
+```
+
+`column` reproduces the previous behaviour exactly. Nothing else changes under
+either value: the cells keep their order, their semantic roles, and the
+page-break penalty that holds the two heading lines together, and a missing
+`organization`, `location`, or `dates` leaves no stray separator under `inline`
+just as it leaves no empty column under `column`.
+
+**What the option is for.** `\CDossierRecordListEdgeAboveSkip` carries a lower
+bound of `0.25` that is an extraction constraint rather than a design
+preference — see [`CDossierItemize`](#cdossieritemize) and
+[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#34-dates-and-right-alignment) section
+3.4. The bound exists because
+the flush-right column makes each heading row a two-column region for a
+geometric extractor, and only enough vertical separation below the heading keeps
+the dates from being read after the bullets. `inline` has no column, so no such
+region arises and the bound does not apply to a document that selects it. This
+is the only supported way to set a list edge below `0.25` without breaking
+reading order.
+
+The bound is not lifted, and the token's calibrated default does not move. A
+document that wants the tighter edge selects `inline` **and** sets the token
+itself:
+
+```latex
+\documentclass[entrymeta=inline]{careerdossier-resume}
+\ExplSyntaxOn
+\skip_set:Nn \CDossierRecordListEdgeAboveSkip
+  { \fp_to_dim:n { 0.125 * \dim_to_fp:n { \CDossierBodyLeading } } }
+\ExplSyntaxOff
+```
+
+Under `column` that override still breaks reading order, and nothing detects it
+for you.
+
+`inline` is not the default because it is a visible design change — it discards
+the column the résumé's layout is built around — and because making it the
+default would reflow every existing document to buy a constraint only some
+documents care about. Design, a clean text layer, and a sub-`0.25` list edge are
+mutually exclusive; any two are available.
+
+Both values are equivalent on the tagged path. The separator is emitted as a
+layout artifact, exactly as the contact line's `|` is, so a consumer reading the
+structure tree receives the same logical text under either value and assistive
+technology is not made to announce a vertical bar. Both validate as PDF/UA-2 in
+the repository's tagging fixtures.
+
+Unsupported values produce a class error naming the accepted values.
+
+#### `\CDossierEntryMetaSeparator`
+
+The mark `entrymeta=inline` places between two cells, with its surrounding
+space. The default is `~|~` — the same mark the contact line uses, so a document
+has one field separator rather than two.
+
+It is emitted only between two cells that are both present, so redefining it
+cannot introduce a stray separator. Two properties of the default are worth
+preserving in a replacement:
+
+- The mark is wrapped as a **layout artifact**, which is what keeps it out of
+  the structure tree on the tagged path. A replacement that sets the mark as
+  ordinary text will render identically and will also be announced by a screen
+  reader and appear in the structure element's text.
+- The **leading** space is ordinary content glue and the **trailing** one sits
+  inside the artifact. That asymmetry is deliberate: an artifact interrupts the
+  enclosing run, so only the leading space survives as the word boundary between
+  the two cells, and a second content space would show up as a doubled gap in
+  the extracted logical text.
+
+Keep the mark out of the muted role as well. The cell that follows it on the
+second heading line is set in `\CDossierMutedStyle`, which is italic under
+`muted=italic` and `muted=both`, and an italic separator reads as a glyph
+belonging to the metadata rather than as the boundary between two fields. The
+default wraps the mark in `\CDossierBodyStyle` for this reason, which resets
+shape as well as family.
+
+Under `entrymeta=column` the token is not used at all.
 
 ### Fixed settings
 

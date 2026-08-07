@@ -1,0 +1,85 @@
+% resume-entry-inline-optional.tex — optional entry fields under `entrymeta=inline'.
+%
+% Purpose (issue #230)
+%   Rule 5 of AGENTS.md on the horizontal axis. `entrymeta=inline' introduces
+%   the first separator that falls *inside* a line of the entry heading, and a
+%   separator emitted unconditionally would put a `|' at the start of a line, or
+%   at the end of one, whenever a cell it was meant to join is absent.
+%
+%   The column form cannot have this defect, because `\hfill' is not a
+%   separator: with an empty left cell it simply puts the surviving cell at the
+%   right margin. So the entire optional-field question is new under `inline',
+%   and it is answered here rather than only in the regression suite because a
+%   .tlg records that the separator *code* was not reached, while this records
+%   that no `|' reached the page.
+%
+%   Every shape the four fields can take, minus the full one (which
+%   resume-entry-inline-order.tex covers):
+%
+%     1. title + organization + location, no dates
+%     2. title + dates, no organization or location
+%     3. title + location, no organization  — the stray-separator shape: nothing
+%        precedes the location on its line, so it must open flush left with no
+%        mark before it
+%     4. title + organization, no location or dates
+%     5. title alone — no second heading line at all
+%
+%   The assertion is the whole baseline, but the property to read it for is
+%   simple: no line begins with `|', no line ends with `|', and no `|' appears
+%   with nothing on one side of it.
+%
+%   The committed baseline (resume-entry-inline-optional.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-entry-inline-optional.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[entrymeta=inline]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Accessibility Engineer},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Dateless Engineer},
+  organization = {Example Labs},
+  location     = {Toronto, ON}
+]
+  \begin{CDossierItemize}
+    \item An entry whose dates are absent keeps its title line unseparated.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title = {Independent Consultant},
+  dates = {2021--2023}
+]
+  \begin{CDossierItemize}
+    \item An entry with dates and no second heading line.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title    = {Volunteer Reviewer},
+  location = {Remote}
+]
+  \begin{CDossierItemize}
+    \item A location with no organization opens its line with no separator.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Workshop Facilitator},
+  organization = {Example Trust}
+]
+  \begin{CDossierItemize}
+    \item An organization with no location ends its line with no separator.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title = {Title Only}
+]
+  \begin{CDossierItemize}
+    \item A title alone emits no second heading line and no separator.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

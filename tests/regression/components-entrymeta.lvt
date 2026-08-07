@@ -1,0 +1,174 @@
+% components-entrymeta.lvt — entry-metadata placement, `entrymeta' (#230).
+%
+% `\CDossierRecordListEdgeAboveSkip' carries a floor of 0.25 that is not a
+% rhythm decision: it is the vertical separation Poppler needs to stop grouping
+% an entry's left column with the bullet list beneath it and reading the dates
+% last (#219). The gap that forces the grouping is the flush-right column's own,
+% so removing the column removes the constraint. `entrymeta=inline' is that
+% removal, offered per document; `column' stays the default.
+%
+% Four independent properties are asserted here, because each would pass while
+% another was broken:
+%
+%   1. which join mechanism fires under each value. `column' pushes the cells
+%      apart with `\hfill', which emits no character, so \pdffakespace stands in
+%      for the word boundary (#302); `inline' emits the visible separator, whose
+%      surrounding glue is real. The two markers are mutually exclusive, so a
+%      baseline showing both would mean the branch leaks.
+%   2. the optional-field matrix under `inline'. A separator is punctuation
+%      *between* two present cells; an entry with a location and no organization
+%      must not open its second line with one. That is rule 5 of AGENTS.md on
+%      the horizontal axis, and it is the shape most likely to regress.
+%   3. that the separator is never italic. The cell it precedes on the second
+%      line is set in \CDossierMutedStyle, which is italic under `muted=italic'
+%      (the default) and under `muted=both'. An italic `|' is a visibly slanted
+%      rule, which reads as a glyph belonging to the metadata rather than as the
+%      boundary between two fields, so the separator takes the body role on both
+%      heading lines. Asserted under both italic-bearing `muted' values, because
+%      a separator that inherited the surrounding shape would look correct under
+%      `muted=gray' and wrong under the default.
+%   4. the option's error paths — an unrecognised value and a missing one.
+%
+% What is *not* asserted here: that `column' renders identically to the tree
+% before this option existed. That is the extraction and layout suites' job, and
+% tests/extraction/resume-entry-dates-order.tex is the one that would catch a
+% change of column geometry. Rendered appearance of `inline' is a visual check
+% (make review-matrix).
+%
+% The values are set through \keys_set:nn rather than \usepackage, which takes
+% one set of options per document; the class option, the package option, and
+% this call all reach the same key.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_entry_box
+
+\cs_new_protected:Npn \cdossiertestSetOption #1
+  { \keys_set:nn { cdossier / components } {#1} }
+
+%% Replace the three semantic roles and both join mechanisms with markers, so
+%% the baseline shows which cells rendered and what fell between them, in
+%% rendered order.
+%%
+%% Re-invoked inside every \TEST that traces, deliberately: a command renewed
+%% inside one \TEST is undone at that test's boundary, so a single renewal
+%% before the first one would leave every later test tracing the real commands
+%% and reporting nothing — a log indistinguishable from a join that is genuinely
+%% absent.
+\cs_new_protected:Npn \cdossiertestTraceJoin
+  {
+    \RenewDocumentCommand \CDossierEntryTitleStyle { } { \TYPE{ >entrytitle } }
+    \RenewDocumentCommand \CDossierBodyStyle       { } { \TYPE{ >body       } }
+    \RenewDocumentCommand \CDossierMutedStyle      { } { \TYPE{ >muted      } }
+    \RenewDocumentCommand \pdffakespace            { } { \TYPE{ >fakespace  } }
+    \cs_set_protected:Npn \__cdossier_typography_layout_artifact:n ##1
+      { \TYPE{ >separator(##1) } }
+  }
+
+%% The shape probe. The separator is reached through the same artifact helper,
+%% but here the helper reports the font in force at the moment the mark is set
+%% rather than a bare marker — which is the only place the question can be
+%% asked, since the mark is emitted inside \CDossierEntryMetaSeparator's own
+%% group. The roles are left real so the surrounding shape is the real one.
+\cs_new_protected:Npn \cdossiertestTraceSeparatorShape
+  {
+    \cs_set_protected:Npn \__cdossier_typography_layout_artifact:n ##1
+      {
+        \TYPE{ >separator(##1) ~ shape = \use:c { f@shape } ,
+               ~ series = \use:c { f@series } }
+      }
+  }
+
+\cs_new_protected:Npn \cdossiertestEntryHead #1#2#3#4
+  {
+    \vbox_set:Nn \l_cdossiertest_entry_box
+      { \__cdossier_components_entryhead:nnnn {#1} {#2} {#3} {#4} }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+% ---------------------------------------------------------------------------
+% 1. the join mechanism under each value
+% ---------------------------------------------------------------------------
+
+\TEST{column-is-the-default-and-joins-with-the-fake-space}{
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+\TEST{inline-joins-with-the-visible-separator}{
+  \cdossiertestSetOption{entrymeta=inline}
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+\TEST{column-restores-the-fake-space-join}{
+  \cdossiertestSetOption{entrymeta=column}
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+% ---------------------------------------------------------------------------
+% 2. the optional-field matrix under `inline'
+% ---------------------------------------------------------------------------
+
+\TEST{inline-title-and-dates-are-separated}{
+  \cdossiertestSetOption{entrymeta=inline}
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{}{}{2020--2024}
+}
+
+\TEST{inline-title-alone-emits-no-separator}{
+  \cdossiertestSetOption{entrymeta=inline}
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{}{}{}
+}
+
+% Rule 5 on the horizontal axis: nothing precedes the location on that line, so
+% a separator here would be the stray-separator defect, not a fix for it.
+\TEST{inline-location-without-organization-emits-no-separator}{
+  \cdossiertestSetOption{entrymeta=inline}
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{}{Berlin, DE}{}
+}
+
+\TEST{inline-organization-without-location-emits-no-separator}{
+  \cdossiertestSetOption{entrymeta=inline}
+  \cdossiertestTraceJoin
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{}{}
+}
+
+% ---------------------------------------------------------------------------
+% 3. the separator is never italic
+% ---------------------------------------------------------------------------
+
+\TEST{separator-is-upright-under-muted-italic}{
+  \cdossiertestSetOption{entrymeta=inline, muted=italic}
+  \cdossiertestTraceSeparatorShape
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+\TEST{separator-is-upright-under-muted-both}{
+  \cdossiertestSetOption{entrymeta=inline, muted=both}
+  \cdossiertestTraceSeparatorShape
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+% ---------------------------------------------------------------------------
+% 4. error paths
+% ---------------------------------------------------------------------------
+
+\TEST{unknown-entrymeta-value-is-rejected}{
+  \cdossiertestSetOption{entrymeta=flush}
+}
+
+\TEST{entrymeta-requires-a-value}{
+  \cdossiertestSetOption{entrymeta}
+}
+
+\END
+\end{document}

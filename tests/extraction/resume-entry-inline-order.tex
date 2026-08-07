@@ -1,0 +1,87 @@
+% resume-entry-inline-order.tex — extraction fixture for `entrymeta=inline'.
+%
+% Purpose (issue #230)
+%   Demonstrate what the option is for. This is resume-entry-dates-order.tex —
+%   same profile, same two entries, same bullet lists — with exactly two
+%   changes: `entrymeta=inline', and `\CDossierRecordListEdgeAboveSkip' lowered
+%   to 0.125, half its committed floor.
+%
+%   Read the two baselines side by side. In resume-entry-dates-order.expected.txt
+%   each entry's dates and location extract as a block of their own, after the
+%   heading text and separated from it by a blank line, because they are a
+%   geometric column that Poppler resolves separately; on the *last* entry that
+%   block sorts after the bullets. Here they extract on the heading lines
+%   themselves, joined by `|', in source order, and there is no separate block
+%   to sort anywhere.
+%
+%   That is the whole mechanism (#219). Poppler splits a line at a large
+%   horizontal gap first, groups fragments into blocks by vertical proximity
+%   second, and orders blocks third. The flush-right column guarantees the gap on
+%   every heading row, so the only thing keeping the dates with their entry is
+%   enough vertical separation below the heading to stop the grouping — which is
+%   why `\CDossierRecordListEdgeAboveSkip' carries a 0.25 floor that is an
+%   extraction constraint rather than a rhythm decision (PR #229). Remove the
+%   column and there is no gap, no split, and nothing for the floor to protect.
+%
+%   The 0.125 override is the assertion, not incidental. At that value the
+%   column form reorders — resume-entry-dates-order.tex exists to pin exactly
+%   that — and this fixture must not. Do not raise it back to 0.25 to make a
+%   failure go away: a failure here means the inline form has stopped being
+%   independent of the floor, which is the entire justification for the option.
+%
+%   Two entries, not one, for the same reason as the column fixture: the last
+%   entry on a page trails its own column at every list-edge value, so a
+%   one-entry fixture cannot discriminate. The *first* entry's dates are the
+%   assertion.
+%
+%   The floor itself is untouched by this fixture. `entrymeta=column' remains
+%   the default, tokens-invariants still guards the committed 0.25, and a
+%   document buys the lower edge only by choosing `inline' for itself.
+%
+%   The committed baseline (resume-entry-inline-order.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-entry-inline-order.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[entrymeta=inline]{careerdossier-resume}
+
+% Half the committed floor. Written as the ratio the token is calibrated in
+% rather than as a raw dimension, so it stays half the floor at every body size
+% instead of silently becoming some other fraction at 11pt and 12pt.
+\ExplSyntaxOn
+\skip_set:Nn \CDossierRecordListEdgeAboveSkip
+  { \fp_to_dim:n { 0.125 * \dim_to_fp:n { \CDossierBodyLeading } } }
+\ExplSyntaxOff
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Accessibility Engineer},
+  email    = {ada@example.com},
+  phone    = {+1 416 555 0142},
+  website  = {example.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Engineer},
+  organization = {Example Labs},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First achievement in source order.
+    \item Second achievement with a measurable reporting outcome.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Engineer},
+  organization = {Example Services},
+  location     = {Ottawa, ON},
+  dates        = {2022--2024}
+]
+  \begin{CDossierItemize}
+    \item Later achievement that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

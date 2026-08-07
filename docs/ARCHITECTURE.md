@@ -148,9 +148,10 @@ document class  (resume / letter / cv / statement)
     ├── passes bodyfont           ─────▶ careerdossier-typography.sty
     │                                       ├── engine guard
     │                                       └── fonts, semantic roles
-    ├── passes medium, muted      ─────▶ careerdossier-components.sty
-    │                                       ├── furniture on / off
-    │                                       └── de-emphasis role
+    ├── passes medium, muted,     ─────▶ careerdossier-components.sty
+    │           entrymeta                   ├── furniture on / off
+    │                                       ├── de-emphasis role
+    │                                       └── entry-metadata placement
     ├── colour and rule tokens    ─────▶ careerdossier-theme.sty
     └── owns document structure and the running label
             │
@@ -354,6 +355,18 @@ fixtures enforce it. See `ATS-EXTRACTION.md` section 3.4 for the measurements.
 Since #206 the token ships *at* that floor rather than above it, so a further
 tightening of the list's opening edge is not available without first solving the
 extraction fault the floor stands in for.
+
+#230 solved it for a document willing to give up the column. `entrymeta=inline`
+sets the dates and location on the heading lines themselves, which leaves no
+two-column region for Poppler to find, so the floor has nothing to protect and
+does not apply. This does *not* move the token: the default is still `column`,
+the committed 0.25 is unchanged, and `tokens-invariants` still guards it. What
+changed is that a per-document escape now exists, and the
+`*-entry-inline-*` extraction fixtures hold the escape open by setting the token
+to 0.125 — half the floor — and asserting correct reading order there. Owning
+the option in the component rather than the token package is the same boundary
+as before: the component owns where the cells go, and the token package owns
+the gap. #230 changes the first, which is why the second is untouched.
 
 The split itself was a mechanism change alone: both ratios started at the single
 value #176 calibrated, so no list moved when #191 landed. #206 then retuned them
@@ -934,6 +947,9 @@ Responsibilities:
 - the `medium=print|screen` decision of whether any furniture is emitted;
 - the `muted=italic|gray|both` de-emphasis role, `\CDossierMutedStyle`, and the
   decision of what it resolves to;
+- the `entrymeta=column|inline` placement of an entry's dates and location, and
+  the separator token `\CDossierEntryMetaSeparator` the inline form joins them
+  with;
 - shared CV/résumé section rule, including token-owned vertical spacing and
   tagged layout-artifact treatment;
 - contact line;
@@ -1162,9 +1178,10 @@ Responsibilities:
 
 - load an appropriate base class;
 - select Letter or A4 paper and delegate geometry to the shared token package;
-- process `fontsize`, `margin`, `paper`, `bodyfont`, `medium`, and `muted`
-  class options, forwarding `medium` and `muted` to the components module that
-  owns the furniture and de-emphasis decisions;
+- process `fontsize`, `margin`, `paper`, `bodyfont`, `medium`, `muted`, and
+  `entrymeta` class options, forwarding `medium`, `muted`, and `entrymeta` to
+  the components module that owns the furniture, de-emphasis, and
+  entry-metadata decisions;
 - register the `Résumé` running label and enable shared page furniture;
 - render résumé sections, entries, and lists from the shared type, rhythm, rule,
   and list tokens;
@@ -1282,8 +1299,9 @@ Responsibilities:
 
 - select Letter or A4 paper and delegate geometry to the shared token package;
 - process the documented `fontsize`, `margin`, `paper`, `bodyfont`, `medium`,
-  and `muted` options, forwarding `medium` and `muted` to the components module
-  that owns the furniture and de-emphasis decisions;
+  `muted`, and `entrymeta` options, forwarding `medium`, `muted`, and
+  `entrymeta` to the components module that owns the furniture, de-emphasis,
+  and entry-metadata decisions;
 - render the first-page identity in the body;
 - register the `Curriculum Vitae` running label and enable shared page
   furniture without making contact details running-only content;

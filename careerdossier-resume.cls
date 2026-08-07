@@ -43,20 +43,23 @@
 \tl_set:Nn \l__cdossier_resume_medium_tl { print }
 \tl_new:N \l__cdossier_resume_muted_tl
 \tl_set:Nn \l__cdossier_resume_muted_tl { italic }
+\tl_new:N \l__cdossier_resume_entrymeta_tl
+\tl_set:Nn \l__cdossier_resume_entrymeta_tl { column }
 
 \msg_new:nnnn { careerdossier-resume } { unknown-option }
   {
     Unknown~class~option~'#1'~for~careerdossier-resume.~
     Supported~options~are~'fontsize',~'margin',~'paper',~'bodyfont',~
-    'medium',~and~'muted'.
+    'medium',~'muted',~and~'entrymeta'.
   }
   {
     Supported~options~are~'fontsize'~(10pt,~11pt,~12pt),~
     'margin'~(normal,~narrow),~
     'paper'~(letter,~a4),~
     'bodyfont'~(serif,~sans),~
-    'medium'~(print,~screen),~and~
-    'muted'~(italic,~gray,~both).~Language~and~theme~cannot~be~set~here.
+    'medium'~(print,~screen),~
+    'muted'~(italic,~gray,~both),~and~
+    'entrymeta'~(column,~inline).~Language~and~theme~cannot~be~set~here.
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
@@ -97,6 +100,14 @@
   {
     The~accepted~values~are~'italic'~(italic,~black),~
     'gray'~(upright,~gray~0.30),~and~'both'~(italic~and~gray).
+  }
+
+\msg_new:nnnn { careerdossier-resume } { unknown-entrymeta }
+  { Unknown~'entrymeta'~value~'#1'~for~careerdossier-resume. }
+  {
+    The~accepted~values~are~'column'~(dates~and~location~flush~right)~
+    and~'inline'~(dates~and~location~on~the~same~line~as~the~title~
+    and~organization).
   }
 
 \keys_define:nn { cdossier / resume }
@@ -143,6 +154,12 @@
     muted / unknown .code:n =
       { \msg_error:nnn { careerdossier-resume } { unknown-muted } {#1} } ,
     muted .value_required:n = true ,
+    entrymeta .choices:nn =
+      { column , inline }
+      { \tl_set_eq:NN \l__cdossier_resume_entrymeta_tl \l_keys_choice_tl } ,
+    entrymeta / unknown .code:n =
+      { \msg_error:nnn { careerdossier-resume } { unknown-entrymeta } {#1} } ,
+    entrymeta .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-resume } { unknown-option }
           { \l_keys_key_str } } ,
@@ -160,15 +177,17 @@
       }
       { careerdossier-tokens }
   }
-%% Issues #184 and #271: the class validates the public values;
-%% careerdossier-components owns the page furniture and the de-emphasis role,
-%% and therefore owns both resulting decisions.
+%% Issues #184, #271, and #230: the class validates the public values;
+%% careerdossier-components owns the page furniture, the de-emphasis role, and
+%% the entry-heading primitive, and therefore owns all three resulting
+%% decisions.
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
       {
-        medium = \l__cdossier_resume_medium_tl ,
-        muted  = \l__cdossier_resume_muted_tl
+        medium    = \l__cdossier_resume_medium_tl ,
+        muted     = \l__cdossier_resume_muted_tl ,
+        entrymeta = \l__cdossier_resume_entrymeta_tl
       }
       { careerdossier-components }
   }

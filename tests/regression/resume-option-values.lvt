@@ -46,5 +46,9 @@
   \cdossiertestSetOption{muted=grey}
 }
 
+\TEST{unknown-entrymeta-value-is-rejected}{
+  \cdossiertestSetOption{entrymeta=flush}
+}
+
 \END
 \end{document}

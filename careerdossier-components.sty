@@ -60,8 +60,9 @@
 \msg_new:nnnn { careerdossier-components } { unknown-option }
   { Unknown~package~option~'#1'~for~careerdossier-components. }
   {
-    Supported~options~are~'medium'~(print,~screen)~
-    and~'muted'~(italic,~gray,~both).
+    Supported~options~are~'medium'~(print,~screen),~
+    'muted'~(italic,~gray,~both),~and~
+    'entrymeta'~(column,~inline).
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
@@ -107,8 +108,70 @@
     'gray'~(upright,~gray~0.30),~and~'both'~(italic~and~gray).
   }
 
+%% ---------------------------------------------------------------------------
+%% Entry-metadata placement (issue #230).
+%%
+%%   entrymeta = column  dates/location flush right, in their own column  (default)
+%%   entrymeta = inline  dates/location follow title/organization on the line
+%%
+%% This option exists to buy back one number, and it is worth stating which.
+%% `\CDossierRecordListEdgeAboveSkip' carries a measured floor of 0.25 that is
+%% not a rhythm decision at all: it is an *extraction* constraint (issue #219,
+%% PR #229). Poppler splits a line at a large horizontal gap first, groups the
+%% resulting fragments into blocks by vertical proximity second, and orders the
+%% blocks third. A flush-right column guarantees that gap on every heading row,
+%% so once a bullet list closes up against the heading Poppler groups the
+%% heading's left column with the list and reads the whole thing before the
+%% dates. Enough vertical separation below the heading is the only thing that
+%% keeps the two bands apart -- hence the floor on a spacing token.
+%%
+%% #219 measured every alternative that keeps the column. Restructuring the
+%% heading does not reach it, because the heading row is already one line box in
+%% source order and that is not what Poppler groups on. Invisible bridge glyphs
+%% do not reach it either, at any code point or position, because the line is
+%% split at the gap *before* the fragments are grouped, so a right-margin glyph
+%% is simply absorbed into the dates block. A dense soft-hyphen run and a
+%% TOC-style leader fill both work, and both put visible ink across the heading.
+%% Removing the column is the one mechanism that removes the gap.
+%%
+%% So it is offered as a choice rather than taken as a default. Design, a clean
+%% text layer, and a sub-0.25 list edge are mutually exclusive; any two are
+%% available. `column' stays the default because it is the layout every existing
+%% document was written against and the one the résumé's visual identity rests
+%% on, and because making `inline' the default would reflow every document in
+%% the world to buy a number that only some of them care about.
+%%
+%% Under `inline' the floor is *inapplicable*, not lifted. There is no column,
+%% so there is no gap for Poppler to split on and the constraint never arises;
+%% the committed default of the token is unchanged and `tokens-invariants' still
+%% guards it. A document that wants a tighter list edge sets both, per document.
+%%
+%% The separator is a public token rather than a literal so it can be restyled,
+%% and it is emitted only between two cells that are both present -- an entry
+%% with no organization must not open its second line with one, which is rule 5
+%% of AGENTS.md on the horizontal axis.
+%% ---------------------------------------------------------------------------
+\bool_new:N \l__cdossier_components_entrymeta_inline_bool
+
+\msg_new:nnnn { careerdossier-components } { unknown-entrymeta }
+  { Unknown~'entrymeta'~value~'#1'. }
+  {
+    The~accepted~values~are~'column'~(dates~and~location~flush~right)~
+    and~'inline'~(dates~and~location~on~the~same~line~as~the~title~
+    and~organization).
+  }
+
 \keys_define:nn { cdossier / components }
   {
+    entrymeta .choices:nn =
+      { column , inline }
+      {
+        \bool_set:Nn \l__cdossier_components_entrymeta_inline_bool
+          { \str_if_eq_p:Vn \l_keys_choice_tl { inline } }
+      } ,
+    entrymeta / unknown .code:n =
+      { \msg_error:nnn { careerdossier-components } { unknown-entrymeta } {#1} } ,
+    entrymeta .value_required:n = true ,
     medium .choices:nn =
       { print , screen }
       {
@@ -153,6 +216,53 @@
 %% Declared before the options are read so the default is the same statement as
 %% every other value, and \RenewDocumentCommand above always has a target.
 \NewDocumentCommand \CDossierMutedStyle { } { \CDossierBodyStyle \itshape }
+
+%% The `entrymeta=inline' separator (issue #230). `|' is the same mark the
+%% contact line uses for the same job, so a document has one field separator
+%% rather than two.
+%%
+%% Three properties are deliberate and each is pinned by a test.
+%%
+%% The rendered mark is wrapped in \CDossierBodyStyle, in its own group. The
+%% cell that follows it on the second line is set in \CDossierMutedStyle, which
+%% under `muted=italic' or `muted=both' is italic -- and an italic `|' is a
+%% visibly slanted rule between two upright-and-slanted runs, which reads as a
+%% glyph belonging to the metadata rather than as the boundary between two
+%% fields. The separator is not metadata; it is punctuation between cells, so it
+%% takes the body role on both lines and never the muted one. \CDossierBodyStyle
+%% resets shape as well as family, so this holds under every `muted' value and
+%% under `bodyfont=sans'.
+%%
+%% The mark is a layout artifact, exactly as the contact line's `|' is. It is
+%% ink that separates two fields, not content of either, so assistive technology
+%% is not made to announce a vertical bar between an entry's title and its
+%% dates, and a consumer reading the structure text receives the same logical
+%% string the `column' form produces.
+%%
+%% The two spaces are not symmetric, and the asymmetry is the point. An artifact
+%% interrupts the enclosing marked-content run, so the heading arrives as two
+%% runs rather than one, and whatever falls *outside* the artifact is what a
+%% consumer concatenating them sees. The leading space is therefore ordinary
+%% content glue -- it is the word boundary, and it is unbreakable so the mark
+%% stays with the cell it follows. The trailing space sits inside the artifact,
+%% because a second content space would concatenate to `Engineer  2024-2026'
+%% with a doubled gap where `column' has one.
+%%
+%% That leading space is also why the inline form needs no \pdffakespace. tagpdf
+%% marks only glue with a positive natural width; `column's `\hfill' has none,
+%% which is the whole of issue #302, and an interword space has plenty.
+%%
+%% Breaking still works: the trailing space is real glue whether or not it is
+%% marked as an artifact, so a long heading may break after the separator, and
+%% a break there discards the trailing space as TeX discards any other.
+\NewDocumentCommand \CDossierEntryMetaSeparator { }
+  {
+    \nobreakspace
+    {
+      \CDossierBodyStyle
+      \__cdossier_typography_layout_artifact:n { | \space }
+    }
+  }
 
 \ProcessKeysPackageOptions { cdossier / components }
 
@@ -892,6 +1002,24 @@
 %% ---------------------------------------------------------------------------
 \AddToHook { begindocument } { \providecommand \pdffakespace { } }
 
+%% The join between a heading line's left cell and its right cell. Under
+%% `column' the cells are pushed to opposite margins by `\hfill', which emits no
+%% character at all, so \pdffakespace supplies the word boundary the structure
+%% text would otherwise lack (issue #302). Under `inline' they are adjacent and
+%% the visible separator supplies it as ordinary glue (issue #230).
+%%
+%% Named rather than written out because the join is the *whole* of what
+%% `entrymeta' changes: neither value may differ in cell order, in the semantic
+%% roles the cells take, in the page-break penalty between the two lines, or in
+%% the conditions under which a cell or a line is emitted at all. The second
+%% heading line guards the join itself and so does not call this -- see there.
+\cs_new_protected:Npn \__cdossier_components_entryjoin:
+  {
+    \bool_if:NTF \l__cdossier_components_entrymeta_inline_bool
+      { \CDossierEntryMetaSeparator }
+      { \pdffakespace \hfill }
+  }
+
 %% ---------------------------------------------------------------------------
 %% Entry heading primitive.
 %%
@@ -925,6 +1053,12 @@
 %% 0.25; `tokens-invariants' states it and tests/extraction/ enforces it.
 %% See docs/ATS-EXTRACTION.md 3.4.
 %%
+%% Issue #230 does not repair that from inside this macro either -- it removes
+%% the column the fault needs. Under `entrymeta=inline' the heading rows carry
+%% no large horizontal gap, so Poppler never splits them and the floor has
+%% nothing to protect. That is a per-document choice and does not move the
+%% token: `column' remains the default and ships at the floor.
+%%
 %% Issue #302: `\hfill' positions the right-hand cell by an absolute coordinate
 %% jump, so no character at all separates the two cells in the content stream.
 %% That is invisible to every extractor in the suite -- each rebuilds words from
@@ -948,7 +1082,7 @@
     \noindent
     { \CDossierEntryTitleStyle #1 }
     \tl_if_blank:nF {#4}
-      { \pdffakespace \hfill { \CDossierMutedStyle #4 } }
+      { \__cdossier_components_entryjoin: { \CDossierMutedStyle #4 } }
     \par
     \bool_lazy_or:nnT
       { ! \tl_if_blank_p:n {#2} }
@@ -962,11 +1096,22 @@
         \tl_if_blank:nF {#2} { { \CDossierBodyStyle #2 } }
         \tl_if_blank:nF {#3}
           {
-            %% Only when something precedes it: an organization-less entry must
-            %% not open its line with a separator, for the same reason rule 5
-            %% forbids a stray "|".
-            \tl_if_blank:nF {#2} { \pdffakespace }
-            \hfill { \CDossierMutedStyle #3 }
+            %% The join is guarded here rather than taken from
+            %% \__cdossier_components_entryjoin:, because this is the one place
+            %% where the two values need differently shaped guards.
+            %%
+            %% An organization-less entry must not open its line with a
+            %% separator -- rule 5's stray "|", on the horizontal axis -- so the
+            %% visible mark and the fake space are both conditional on #2. But
+            %% `column's `\hfill' is not a separator at all: it is what puts a
+            %% lone location at the right margin, which is exactly where the
+            %% column form wants it whether or not an organization precedes it.
+            %% Hoisting it into the guard would move that location to the left
+            %% margin, so it stays unconditional.
+            \bool_if:NTF \l__cdossier_components_entrymeta_inline_bool
+              { \tl_if_blank:nF {#2} { \CDossierEntryMetaSeparator } }
+              { \tl_if_blank:nF {#2} { \pdffakespace } \hfill }
+            { \CDossierMutedStyle #3 }
           }
         \par
       }

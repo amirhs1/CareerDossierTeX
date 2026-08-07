@@ -1,0 +1,9 @@
+% resume-bad-entrymeta.tex — smoke fixture: an unsupported `entrymeta' value must
+% be rejected with a message naming the accepted values (issues #212, #230).
+% `flush' is a plausible wrong guess: the column form is described as flush
+% right everywhere, so it is the value a reader is most likely to try.
+\documentclass[entrymeta=flush]{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+\begin{document}
+\MakeCDossierHeader
+\end{document}

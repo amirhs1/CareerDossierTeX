@@ -1,0 +1,41 @@
+% cv-entrymeta-inline.tex — smoke fixture: entrymeta=inline is a supported
+% value and must build cleanly (issue #230). The entries cover the joins and the
+% optional-field shapes that could put a separator next to an absent cell; what
+% reaches the page is asserted by tests/extraction, what the option resolves to
+% by tests/regression/components-entrymeta, and how it looks is a visual check.
+\documentclass[fontsize=10pt, margin=normal, entrymeta=inline]{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Corp},
+  location     = {Berlin, DE},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title    = {Volunteer Reviewer},
+  location = {Remote}
+]
+  \begin{CDossierItemize}
+    \item A location with no organization opens its line with no separator.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Workshop Facilitator},
+  organization = {Example Trust}
+]
+  \begin{CDossierItemize}
+    \item An organization with no location ends its line with no separator.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
