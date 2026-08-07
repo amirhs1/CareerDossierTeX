@@ -142,11 +142,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   both margin presets, and `tests/regression/tokens-scale.lvt` pins the token's
   resolved value at each body size while the four `tokens-*-defaults` fixtures
   pin each class's setting against the token — catching both a class writing a
-  literal again and a class silently setting nothing. A new layout fixture,
-  `resume-emergency-stretch`, makes the résumé's setting a *rendered* assertion
-  rather than a reported one: its bullet sets 8.47 pt over the measure with the
-  token zeroed, so the suite's overfull check passes there only because the
-  token reaches the page.
+  literal again and a class silently setting nothing. Two new layout fixtures
+  make the résumé's setting a *rendered* assertion rather than a reported one,
+  one per path the class actually has: `resume-emergency-stretch` sets 8.47 pt
+  over the measure with the token zeroed, and `resume-summary-prose` — the
+  justified prose paragraph the shipped example opens with — sets 5.62 pt over.
+  The suite's overfull check passes on both only because the token reaches the
+  page.
 
 ### Removed
 
