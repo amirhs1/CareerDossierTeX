@@ -484,11 +484,19 @@ than asserting it:
 
 The command forces the parameter to each candidate, rebuilds both corpora, and
 reports overfull boxes, hyphenated line ends, lines looser than badness 99, the
-worst line badness, and page counts. `--param emergencystretch` takes
-dimensions rather than integers; `--corpus fixtures|examples` restricts the run,
-which is worth doing because the full default sweep takes several minutes.
+worst line badness, paragraphs that reached TeX's third line-breaking pass, and
+page counts. `--corpus fixtures|examples` restricts the run, which is worth
+doing because the full default sweep over the fixture corpus takes several
+minutes.
 
-Two rules for reading it, both learned the hard way in #309:
+A value is any TeX `<dimen>` or `<integer>` the parameter accepts — a plain
+number for a penalty, or for `--param emergencystretch` a coefficient times a
+length register, e.g. `--values '1.50\CDossierBodySize 0.040\textwidth'`. The
+register form is what lets a derivation that varies per body size and margin be
+swept at all: a fixed dimension cannot express it. Single-quote a value carrying
+a backslash so the shell keeps it, and quote it again through `SWEEP_ARGS`.
+
+Three rules for reading it, learned the hard way in #309 and #310:
 
 1. **Never sum the two corpora, and decide policy on `examples`.** The stress
    fixtures exist to find what breaks, and their content is deliberately
@@ -500,6 +508,10 @@ Two rules for reading it, both learned the hard way in #309:
    raising a penalty look free. `loose`, `worst`, and `pages` are the other side
    of the trade, and a value that removes hyphens while adding gappy lines or a
    page has not improved anything.
+3. **`third` decides whether a paragraph enters the emergency pass, not whether
+   it succeeds there.** #310 found this count identical across every candidate
+   `\emergencystretch` derivation at a non-zero pool, which is why it cannot by
+   itself discriminate between them — `overfull` still can.
 
 The instrument carries no baseline and is not part of `make check`. It produces
 evidence for a human; the decisions it informs are pinned by `.tlg` baselines
