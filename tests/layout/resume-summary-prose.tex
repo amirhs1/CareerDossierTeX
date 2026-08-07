@@ -1,0 +1,45 @@
+% resume-summary-prose.tex — layout stress: the résumé's prose Summary section.
+%
+% The résumé is not entries and bullets alone. It opens with a justified prose
+% paragraph — `examples/industry/resume-english.tex' does exactly this — and
+% until #272 that paragraph was the only prose in the toolkit with no
+% \emergencystretch behind it: the letter and the statement both set one, and
+% the CV set one on A4.
+%
+% This fixture covers that path, and it is a rendered assertion rather than a
+% reported one. At `fontsize=12pt, margin=normal' the paragraph below reaches
+% TeX's third line-breaking pass and sets clean; with \CDossierEmergencyStretch
+% zeroed it stops at the second pass and sets 5.62 pt over the measure. The
+% companion fixture `resume-emergency-stretch.tex' asserts the same token on the
+% bullet path, where the deficit is 8.47 pt.
+%
+% The long compound names are what put the break points far enough apart to
+% reach the third pass; they stand in for the product, framework, and programme
+% names a real summary carries.
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Alexandria Montgomery-Fitzgerald},
+  headline = {Principal Data Scientist},
+  email    = {alexandria@example.org},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Summary}
+
+Specialist in ReproducibleArchivalInteroperabilityFramework delivery,
+InterdepartmentalDataModernizationProgramme governance, and
+BiodiversityInformaticsStandardizationInitiative reporting, with
+ComputationalReliabilityInstrumentation experience throughout.
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist},
+  organization = {Digital Services Laboratory},
+  location     = {Ontario, Canada},
+  dates        = {September 2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Led the analytics modernization programme.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
