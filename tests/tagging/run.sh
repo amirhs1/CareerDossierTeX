@@ -563,6 +563,65 @@ check_structure_text_separators() {
   done
 }
 
+# The `entrymeta=inline' form of the assertion above (issue #230).
+#
+# It needs its own function because the inline separator is a marked-content
+# artifact, and an artifact interrupts the enclosing run: `Engineer | 2024-2026'
+# decodes as the two runs `Engineer ' and `2024-2026' rather than as one. The
+# per-line grep above would therefore find neither the separated form nor the
+# glued one and report the fixture as changed, which is not what happened. So
+# the runs are concatenated in document order first, which is exactly what a
+# consumer reading the structure tree's logical text does, and the assertions
+# are made against that string.
+#
+# Three forms per join, and all three are named rather than derived, because
+# each fails for a different reason:
+#
+#   separated  what the joined text must be — and it is character-for-character
+#              what the `column' form of the same heading produces, which is the
+#              claim `entrymeta' rests on: it moves ink, not structure.
+#   glued      issue #302 all over again. It would mean the leading space is not
+#              reaching the content stream as a real U+0020, so the two cells
+#              arrive as one word.
+#   barred     the `|' itself reaching the structure tree. It would mean the
+#              mark is being emitted as content rather than as a layout
+#              artifact, and assistive technology would announce a vertical bar
+#              between an entry's title and its dates.
+#
+# Fields are delimited by `::' rather than by `|', which is the delimiter the
+# function above uses: the barred form contains a literal `|'.
+#
+# Arguments: base, then "separated::glued::barred" triples.
+check_structure_text_inline_joins() {
+  local base="$1"; shift
+  local got="$work/$base.structure.got"
+  local joined="$work/$base.structure.joined"
+  local triple separated glued barred rest
+
+  [ -s "$got" ] || return
+
+  # Field 4 is the decoded text of one structure element. Concatenated with
+  # nothing between them, in file order, which is document order.
+  awk -F'\t' '{ printf "%s", $4 } END { printf "\n" }' "$got" >"$joined"
+
+  for triple in "$@"; do
+    separated="${triple%%::*}"
+    rest="${triple#*::}"
+    glued="${rest%%::*}"
+    barred="${rest#*::}"
+    if grep -Fq "$barred" "$joined"; then
+      record_failure \
+        "$base joined structure text contains '$barred': the inline separator is reaching the structure tree as content instead of as a layout artifact"
+    elif grep -Fq "$glued" "$joined"; then
+      record_failure \
+        "$base joined structure text contains '$glued': the two cells are glued together with no separator"
+    elif ! grep -Fq "$separated" "$joined"; then
+      record_failure \
+        "$base joined structure text has none of '$separated', the glued form, or the barred form; the fixture changed"
+    fi
+  done
+}
+
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
 # disagree on how to linearize the two-column entry header, so each owns a
 # baseline; sharing one would only record whichever library ran last.
@@ -836,6 +895,27 @@ if compile_fixture resume-contact-labels.tex resume-contact-labels; then
   if [ "$have_verapdf" -eq 1 ]; then
     compile_fixture resume-contact-labels-ua2.tex resume-contact-labels-ua2 \
       && validate_ua2 resume-contact-labels
+  fi
+fi
+
+# Entry metadata set inline (issue #230). Outside the five-document loop for the
+# same reason as the fixture above: it is a one-page document with no
+# continuation furniture. The option's rendered and extracted output is pinned
+# by tests/extraction; what only this suite can see is what `inline' does to the
+# tagged path, which is supposed to be nothing a consumer can tell apart from
+# `column' — one artifact per join, and the same logical text either way.
+echo "== resume-entrymeta-inline =="
+if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
+  check_structure_text resume-entrymeta-inline
+  check_structure_text_inline_joins resume-entrymeta-inline \
+    'Engineer 2024–2026::Engineer2024–2026::Engineer | 2024–2026' \
+    'Example Labs Toronto::Example LabsToronto::Example Labs | Toronto' \
+    'Example Services Ottawa::Example ServicesOttawa::Example Services | Ottawa'
+  check_extraction resume-entrymeta-inline
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture resume-entrymeta-inline-ua2.tex resume-entrymeta-inline-ua2 \
+      && validate_ua2 resume-entrymeta-inline
   fi
 fi
 

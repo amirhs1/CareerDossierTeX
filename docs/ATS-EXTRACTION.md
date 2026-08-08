@@ -263,6 +263,10 @@ Its `-bbox-layout` tree shows the whole mechanism:
 | wide (`0.3125`) | `[Senior Engineer / Example Labs]`, `[2024–Present / Toronto, ON]`, `[bullets]` — one flow, sorted top-to-bottom then left-to-right, so the column lands in place |
 | tight (`0.125`) | `[Senior Engineer / Example Labs / bullets]`, then `[2024–Present / Toronto, ON]` — the heading and the list merge into one *tall* block |
 
+`0.3125` is the value the token carried when #219 took this measurement, not
+today's default; #206 later retuned it to `0.25`, which is where the floor
+below now sits.
+
 A tall left block that spans the entire vertical band of a short right-hand one
 is Poppler's signature for a two-column page, so it emits the whole left column
 before the right. The trigger is therefore page-level, not local to the heading:
@@ -303,14 +307,56 @@ amount of geometry fixes. See 7.6.
 `\CDossierRecordListEdgeAboveSkip` has an extraction floor of **0.25**. On the
 `*-entry-dates-*` fixtures the column extracts with its entry at `0.25` and
 reorders at `0.1875`, identically for the résumé and CV classes at 10 pt, 11 pt,
-and 12 pt — so the floor is a property of the ratio, not of any body size. The
-committed default is `0.3125`, one sixteenth clear of it.
+and 12 pt — so the floor is a property of the ratio, not of any body size. Since
+#206 the committed default sits exactly *at* the floor rather than clear of it.
 
 Any retune of this token must respect the floor. `tokens-invariants` states it
 as a relation, and the three `*-entry-dates-*` fixtures fail if it is breached.
 Note that it interacts with the design rule that a list sits nearer the entry
 above it than the material below (`ListEdgeAbove < RecordEntryAboveSkip`):
 holding both at once forces `RecordEntryAboveSkip` above `0.25` as well.
+
+#### The escape: `entrymeta=inline`
+
+Everything above says the floor cannot be removed *while the column exists*.
+Issue #230 takes the remaining option and removes the column, behind a key:
+
+```latex
+\documentclass[entrymeta=inline]{careerdossier-resume}
+```
+
+Under `inline` the dates and location follow the title and organization on the
+same line, joined by `\CDossierEntryMetaSeparator` (`~|~`). There is then no
+horizontal gap on any heading row, so Poppler never splits the row, never builds
+a short right-hand block, and never has two blocks to mistake for two columns.
+The floor is not lifted under `inline` — it is inapplicable, because the fault
+it stands in for cannot arise.
+
+Measured on the committed `*-entry-inline-*` fixtures at `0.125`, half the
+floor and the value at which the column form reorders:
+
+| form | list edge | first entry's dates | last entry's dates |
+|---|---|---|---|
+| `column` | `0.25` | in place | after its bullets (a property of being the last block, at every value) |
+| `column` | `0.125` | after its bullets | after its bullets |
+| `inline` | `0.125` | in place | in place |
+
+The last row is the result. `inline` at half the floor extracts *both* entries'
+metadata in place, including the final one that no value of the list edge ever
+fixed under `column`.
+
+This does not change the calibration. `column` is the default, the committed
+`0.25` is unchanged, and `tokens-invariants` still guards it; a document buys
+the lower edge by selecting `inline` and setting the token itself, and gets no
+warning if it sets the token without the option. See
+[`API.md`](API.md) for the option and the separator token.
+
+On the tagged path the two values are equivalent. The separator is emitted as a
+layout artifact, as the contact line's `|` is, so the structure element text
+reads `Engineer 2024–2026` under both — the same string, with the word boundary
+coming from a real interword space under `inline` and from `\pdffakespace`
+under `column` (see 7.6). `tests/tagging/resume-entrymeta-inline` pins that and
+validates as PDF/UA-2.
 
 ### 3.5 Headers, footers, and page numbers
 

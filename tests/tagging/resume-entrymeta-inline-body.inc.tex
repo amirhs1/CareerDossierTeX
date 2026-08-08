@@ -1,0 +1,63 @@
+% resume-entrymeta-inline-body.inc.tex — shared body for the `entrymeta=inline'
+% tagging fixtures (issue #230).
+%
+% Deliberately one page. This fixture sits outside the five-document loop in
+% run.sh, which asserts two-page continuation furniture; what is under test here
+% is the entry heading, and page furniture would only add noise to the decoded
+% structure text.
+%
+% The first entry carries all four fields, so both heading lines join. The
+% remaining three are the optional-field shapes that can put a separator next to
+% an absent cell: no dates, a location with no organization, and an organization
+% with no location. A stray `|' in any of them is visible in the Poppler
+% baseline, and a `|' that reached the *structure tree* in any of them is
+% visible in the structure baseline.
+\documentclass[entrymeta=inline]{careerdossier-resume}
+\CDossierSetup{
+  name={Tagged Inline Resume},
+  headline={Accessibility Engineer},
+  email={inline@example.test},
+  phone={+1 555 0104},
+  website={example.test/inline}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title={Engineer},
+  organization={Example Labs},
+  location={Toronto},
+  dates={2024--2026}
+]
+\begin{CDossierItemize}
+  \item First inline achievement in source order.
+  \item Second inline achievement with a meaningful
+        \href{https://example.test/work}{work link}.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Dateless Engineer},
+  organization={Example Services},
+  location={Ottawa}
+]
+\begin{CDossierItemize}
+  \item An entry with no dates joins only its second heading line.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Volunteer Reviewer},
+  location={Remote}
+]
+\begin{CDossierItemize}
+  \item A location with no organization opens its line with no separator.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Workshop Facilitator},
+  organization={Example Trust}
+]
+\begin{CDossierItemize}
+  \item An organization with no location ends its line with no separator.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

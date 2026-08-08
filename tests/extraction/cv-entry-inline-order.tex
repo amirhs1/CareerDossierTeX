@@ -1,0 +1,62 @@
+% cv-entry-inline-order.tex — extraction fixture for `entrymeta=inline'.
+%
+% Purpose (issue #230)
+%   The CV half of the demonstration. resume-entry-inline-order.tex carries the
+%   full explanation of the mechanism; this file exists because the option is
+%   declared on both record classes and the acceptance criterion is stated for
+%   both, and because the CV reaches the same component through its own
+%   \CDossierEntry with its own surrounding spacing.
+%
+%   This is cv-entry-dates-order.tex with `entrymeta=inline' and
+%   `\CDossierRecordListEdgeAboveSkip' at 0.125, half its committed floor. The
+%   column baseline extracts each entry's dates and location as a separate block
+%   after the heading; here they extract on the heading lines, joined by `|', in
+%   source order.
+%
+%   The 0.125 override is the assertion. Do not raise it to make a failure go
+%   away — see resume-entry-inline-order.tex.
+%
+%   The committed baseline (cv-entry-inline-order.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode cv-entry-inline-order.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[entrymeta=inline]{careerdossier-cv}
+
+\ExplSyntaxOn
+\skip_set:Nn \CDossierRecordListEdgeAboveSkip
+  { \fp_to_dim:n { 0.125 * \dim_to_fp:n { \CDossierBodyLeading } } }
+\ExplSyntaxOff
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Research Engineer},
+  email    = {ada@example.edu},
+  phone    = {+1 416 555 0142},
+  website  = {example.edu/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research Experience}
+\begin{CDossierEntry}[
+  title        = {Postdoctoral Researcher},
+  organization = {Example University},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First research contribution in source order.
+    \item Second research contribution with a reproducible analysis pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Graduate Researcher},
+  organization = {Example Institute},
+  location     = {Ottawa, ON},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Later contribution that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

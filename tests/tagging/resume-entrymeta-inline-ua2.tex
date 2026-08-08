@@ -1,0 +1,11 @@
+% resume-entrymeta-inline-ua2.tex — PDF/UA-2 validation variant.
+%
+% Same body as the tagged fixture; only the declared standard differs, so a
+% veraPDF result here describes the tagged output the other fixtures assert on.
+% `entrymeta=inline' introduces one new marked-content artifact per join, which
+% is exactly the kind of thing UA-2 has an opinion about, so the option is
+% validated rather than assumed.
+\DocumentMetadata{lang=en,tagging=on,pdfstandard=ua-2}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{resume-entrymeta-inline-body.inc.tex}

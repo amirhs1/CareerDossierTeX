@@ -33,6 +33,43 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   The extension is local to one link, so the contact line and the bibliography
   keep the punctuation-only breaks they were calibrated with.
 
+- The résumé and CV classes accept `entrymeta=column|inline`, choosing where an
+  entry's dates and location sit. `column` is the default and renders exactly as
+  before — title and organization left, dates and location flush right. `inline`
+  sets them on the heading lines instead, joined by `\CDossierEntryMetaSeparator`
+  (`~|~`): `Senior Engineer | 2024–Present`. ([#230])
+
+  The option exists to buy back one number. `\CDossierRecordListEdgeAboveSkip`
+  carries a lower bound of `0.25` that is not a rhythm decision at all — it is
+  the vertical separation Poppler needs before it stops reading an entry's
+  bullets ahead of its dates (#219). The flush-right column is what creates that
+  hazard: Poppler splits a heading row at the large horizontal gap first, groups
+  the fragments into blocks second, and a tall left block spanning a short right
+  one is its signature for a two-column page. `inline` leaves no gap to split
+  on, so the bound has nothing to protect and does not apply to a document that
+  selects it. On the committed fixtures `inline` extracts both entries' metadata
+  in place at `0.125` — half the floor, and the value at which `column` reorders
+  — including the last entry on the page, which no value of the list edge ever
+  fixed under `column`.
+
+  Nothing is retuned. `column` stays the default, the token's calibrated `0.25`
+  is unchanged, and the invariant that guards it is unchanged; a document that
+  wants the tighter edge selects `inline` and sets the token itself. `inline` is
+  not the default because it discards the column the résumé's layout is built
+  around, and would reflow every existing document.
+
+  Missing fields behave as they do everywhere else: an entry with no
+  `organization`, `location`, or `dates` leaves no stray separator under
+  `inline`, just as it leaves no empty column under `column`. On the opt-in
+  tagged path the two values are indistinguishable — the separator is emitted as
+  a layout artifact, as the contact line's `|` is, so the structure element text
+  reads `Engineer 2024–2026` under both and assistive technology is not made to
+  announce a vertical bar. Both validate as PDF/UA-2 in the repository's tagging
+  fixtures. See [`docs/API.md`](docs/API.md) for the option and the separator
+  token, and
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#34-dates-and-right-alignment)
+  §3.4 for the measurements.
+
 - All four document classes accept `muted=italic|gray|both`, controlling how
   de-emphasized runs are rendered — an entry's dates and location in the résumé
   and CV, and the statement's application-context line. `italic` is the default
@@ -463,6 +500,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   marked-content text directly and diffs it against a committed baseline, which
   is the check the whole extraction matrix was structurally unable to perform.
 
+[#230]: https://github.com/amirhs1/CareerDossierTeX/issues/230
 [#267]: https://github.com/amirhs1/CareerDossierTeX/issues/267
 [#268]: https://github.com/amirhs1/CareerDossierTeX/issues/268
 [#269]: https://github.com/amirhs1/CareerDossierTeX/issues/269

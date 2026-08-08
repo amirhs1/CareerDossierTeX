@@ -1,0 +1,17 @@
+Tagged Inline Resume
+Accessibility Engineer
+inline@example.test | +1 555 0104 | example.test/inline
+Experience
+Engineer | 2024–2026
+Example Labs | Toronto
+• First inline achievement in source order.
+• Second inline achievement with a meaningful work link.
+Dateless Engineer
+Example Services | Ottawa
+• An entry with no dates joins only its second heading line.
+Volunteer Reviewer
+Remote
+• A location with no organization opens its line with no separator.
+Workshop Facilitator
+Example Trust
+• An organization with no location ends its line with no separator.

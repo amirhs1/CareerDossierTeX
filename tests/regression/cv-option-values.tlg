@@ -54,3 +54,12 @@ For immediate help type H <return>.
 l. ...}
 The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), and 'both' (italic and gray).
 ============================================================
+============================================================
+TEST 7: unknown-entrymeta-value-is-rejected
+============================================================
+! Package careerdossier-cv Error: Unknown 'entrymeta' value 'flush' for careerdossier-cv.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'column' (dates and location flush right) and 'inline' (dates and location on the same line as the title and organization).
+============================================================

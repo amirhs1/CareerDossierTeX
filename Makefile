@@ -18,6 +18,9 @@
 # absent, and the runner reports which gates did not run — so `make tagging`
 # succeeding locally does not by itself mean every gate was exercised.
 #
+# `review-entrymeta-muted` needs only LuaLaTeX: it renders the entry heading's
+# two semantic options against each other for visual review and asserts nothing.
+#
 # `resume`, `letter`, `academic-cv`, `academic-bibliography`, `academic-letter`,
 # and `statements` write their PDFs, logs, and other latexmk output under the
 # gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
@@ -45,7 +48,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -102,6 +105,9 @@ review-page-two: ## Render five-family and all statement page-two reviews
 
 review-matrix: ## Render the normal/narrow x 10/11/12pt reference matrix (#147)
 	tests/layout/render-size-margin-matrix.sh
+
+review-entrymeta-muted: ## Render the column/inline x italic/gray/both matrix (#230)
+	tests/layout/render-entrymeta-muted-matrix.sh
 
 review-linebreak: ## Sweep a line-breaking parameter over both corpora (#316)
 	tests/layout/sweep-linebreak.sh $(SWEEP_ARGS)

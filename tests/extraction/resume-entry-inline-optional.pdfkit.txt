@@ -1,0 +1,17 @@
+Ada Lovelace
+Accessibility Engineer
+ada@example.com
+Experience
+Dateless Engineer
+Example Labs | Toronto, ON
+• An entry whose dates are absent keeps its title line unseparated.
+Independent Consultant | 2021–2023
+• An entry with dates and no second heading line.
+Volunteer Reviewer
+Remote
+• A location with no organization opens its line with no separator.
+Workshop Facilitator
+Example Trust
+• An organization with no location ends its line with no separator.
+Title Only
+• A title alone emits no second heading line and no separator.

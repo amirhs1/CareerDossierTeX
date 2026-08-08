@@ -1,0 +1,90 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: column-is-the-default-and-joins-with-the-fake-space
+============================================================
+>entrytitle
+>fakespace
+>muted
+>body
+>fakespace
+>muted
+============================================================
+============================================================
+TEST 2: inline-joins-with-the-visible-separator
+============================================================
+>entrytitle
+>body
+>separator(| )
+>muted
+>body
+>body
+>separator(| )
+>muted
+============================================================
+============================================================
+TEST 3: column-restores-the-fake-space-join
+============================================================
+>entrytitle
+>fakespace
+>muted
+>body
+>fakespace
+>muted
+============================================================
+============================================================
+TEST 4: inline-title-and-dates-are-separated
+============================================================
+>entrytitle
+>body
+>separator(| )
+>muted
+============================================================
+============================================================
+TEST 5: inline-title-alone-emits-no-separator
+============================================================
+>entrytitle
+============================================================
+============================================================
+TEST 6: inline-location-without-organization-emits-no-separator
+============================================================
+>entrytitle
+>muted
+============================================================
+============================================================
+TEST 7: inline-organization-without-location-emits-no-separator
+============================================================
+>entrytitle
+>body
+============================================================
+============================================================
+TEST 8: separator-is-upright-under-muted-italic
+============================================================
+>separator(| ) shape=n,series=m
+>separator(| ) shape=n,series=m
+============================================================
+============================================================
+TEST 9: separator-is-upright-under-muted-both
+============================================================
+>separator(| ) shape=n,series=m
+>separator(| ) shape=n,series=m
+============================================================
+============================================================
+TEST 10: unknown-entrymeta-value-is-rejected
+============================================================
+! Package careerdossier-components Error: Unknown 'entrymeta' value 'flush'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'column' (dates and location flush right) and 'inline' (dates and location on the same line as the title and organization).
+============================================================
+============================================================
+TEST 11: entrymeta-requires-a-value
+============================================================
+! LaTeX Error: The key 'cdossier/components/entrymeta' requires a value.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The key 'cdossier/components/entrymeta' must have a value.
+No value was present: the key will be ignored.
+============================================================
