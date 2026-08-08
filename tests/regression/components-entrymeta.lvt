@@ -21,12 +21,13 @@
 %      the horizontal axis, and it is the shape most likely to regress.
 %   3. that the separator is never italic. The cell it precedes on the second
 %      line is set in \CDossierMutedStyle, which is italic under `muted=italic'
-%      (the default) and under `muted=both'. An italic `|' is a visibly slanted
-%      rule, which reads as a glyph belonging to the metadata rather than as the
-%      boundary between two fields, so the separator takes the body role on both
-%      heading lines. Asserted under both italic-bearing `muted' values, because
-%      a separator that inherited the surrounding shape would look correct under
-%      `muted=gray' and wrong under the default.
+%      and under `muted=both'. An italic `|' is a visibly slanted rule, which
+%      reads as a glyph belonging to the metadata rather than as the boundary
+%      between two fields, so the separator takes the body role on both heading
+%      lines. Asserted under both italic-bearing `muted' values, because a
+%      separator that inherited the surrounding shape would look correct under
+%      `muted=plain' (the default) and under `muted=gray', and wrong under the
+%      two values that are the reason the rule exists.
 %   4. the option's error paths — an unrecognised value and a missing one.
 %
 % What is *not* asserted here: that `column' renders identically to the tree

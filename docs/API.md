@@ -60,7 +60,7 @@ The API is intentionally small. Internal helper commands are not public merely b
 | Margins | `margin=normal` (1 in) or `margin=narrow` (0.5 in), per-class default |
 | Body font | Serif (default) and opt-in sans |
 | Output medium | `medium=print` (default) or `medium=screen` |
-| Entry-metadata de-emphasis | `muted=italic` (default), `muted=gray`, or `muted=both` |
+| Entry-metadata de-emphasis | `muted=plain` (default), `muted=italic`, `muted=gray`, or `muted=both` |
 | Entry-metadata placement | `entrymeta=column` (default) or `entrymeta=inline`, résumé and CV |
 | Theme | Monochrome |
 | Tagged structure | Opt-in, off by default |
@@ -152,7 +152,7 @@ actually been verified.
   paper=letter,
   bodyfont=serif,
   medium=print,
-  muted=italic,
+  muted=plain,
   entrymeta=column
 ]{careerdossier-resume}
 ```
@@ -171,7 +171,7 @@ report an unsupported value the same way:
 |---|---|---|
 | `careerdossier-tokens` | `fontsize`, `margin` | `fontsize=12pt`, `margin=normal` |
 | `careerdossier-typography` | `bodyfont` | `bodyfont=serif` |
-| `careerdossier-components` | `medium`, `muted`, `entrymeta` | `medium=print`, `muted=italic`, `entrymeta=column` |
+| `careerdossier-components` | `medium`, `muted`, `entrymeta` | `medium=print`, `muted=plain`, `entrymeta=column` |
 
 **A package default is not a class default.** Loading `careerdossier-tokens`
 directly gives `12pt`/`normal`, while `\documentclass{careerdossier-resume}`
@@ -329,32 +329,51 @@ class error naming the accepted values.
 Every CareerDossierTeX document class accepts:
 
 ```text
+plain
 italic
 gray
 both
 ```
 
-`muted` is new after `v0.7.0`. Note the spelling: `gray`, not `grey`.
+`muted` is new after `v0.7.0`; `plain`, and `plain` as the default, are new
+after that again. Note the spelling: `gray`, not `grey`.
 
 `muted` decides how de-emphasised runs are rendered — an entry's dates and
 location in the résumé and CV, and the statement's application-context line.
-The default is `italic`, which reproduces the previous behaviour exactly:
-italic in the body family, in the ordinary black text token. `gray` renders the
-same runs upright in the muted token instead, and `both` applies the italic and
-the muted token together.
+The default is `plain`, which applies no de-emphasis: upright, in the body
+family, in the ordinary black text token. `italic` slants the same runs,
+`gray` sets them upright in the muted token instead, and `both` applies the
+italic and the muted token together.
+
+| value | shape | colour |
+|---|---|---|
+| `plain` (default) | upright | text token (black) |
+| `italic` | italic | text token (black) |
+| `gray` | upright | muted token (gray 0.30) |
+| `both` | italic | muted token (gray 0.30) |
 
 The muted token is `gray 0.30`, which measures 8.52:1 against white under the
 WCAG 2.1 relative-luminance formula — well above the 4.5:1 normal-text floor.
 
-Which value to choose is a genuine trade-off, which is why it is an option:
+Which styling to want is a genuine trade-off, which is why it is an option:
 
 - italic at small sizes is harder to read for low-vision and dyslexic readers
   than a high-contrast gray, and this metadata is scanned rather than read;
 - shape, unlike a gray level, survives a fax, a photocopy, and a 1-bit print.
 
+`plain` is the default because both halves of that trade-off are real, and a
+reader affected by both would otherwise have nothing to select. Being body text
+in the ordinary text token, it is also the one value that cannot fail the
+contrast floor `gray` has to be measured against. What it gives up is a
+redundant signal rather than the only one: under `plain` the dates and location
+are distinguished by their position and their content alone — which is the
+design's standing claim under every value rather than a new one, and under
+`entrymeta=inline` the separator identifies them as well. A document that wants
+the styling asks for it by name.
+
 Under every value the de-emphasis is reinforced by position and content — the
 dates sit in their own flush-right column and read as a date range — so colour
-is never the only carrier of meaning. All three values are visual only: no
+is never the only carrier of meaning. All four values are visual only: no
 extractor sees a difference, and the reading order is identical under each.
 
 Unsupported values produce a class error naming the accepted values.
@@ -523,7 +542,7 @@ the required rerun.
   paper=letter,
   bodyfont=serif,
   medium=print,
-  muted=italic
+  muted=plain
 ]{careerdossier-letter}
 ```
 
@@ -531,7 +550,8 @@ the required rerun.
 uses the shared `letter|a4` contract above and defaults to `letter`. `bodyfont`
 uses the shared `serif|sans` contract above and defaults to `serif`. `medium`
 uses the shared `print|screen` contract above and defaults to `print`. `muted`
-uses the shared `italic|gray|both` contract above and defaults to `italic`.
+uses the shared `italic|gray|both|plain` contract above and defaults to
+`plain`.
 `fontsize` and `margin` use the shared contracts above and default to `12pt`
 and `normal`.
 
@@ -1323,7 +1343,7 @@ Load the academic CV with:
   paper=letter,
   bodyfont=serif,
   medium=print,
-  muted=italic
+  muted=plain
 ]{careerdossier-cv}
 ```
 
@@ -1336,7 +1356,7 @@ The class accepts the same value sets as the résumé class:
 | `paper` | `letter`, `a4` | `letter` |
 | `bodyfont` | `serif`, `sans` | `serif` |
 | `medium` | `print`, `screen` | `print` |
-| `muted` | `italic`, `gray`, `both` | `italic` |
+| `muted` | `italic`, `gray`, `both`, `plain` | `plain` |
 
 English and the monochrome theme remain fixed. Unsupported options or values
 must produce a class error rather than being ignored, and the error for an
@@ -1592,7 +1612,7 @@ shared `fontsize`, `margin`, `paper`, `bodyfont`, and `medium` settings:
   paper=letter,
   bodyfont=serif,
   medium=print,
-  muted=italic
+  muted=plain
 ]{careerdossier-statement}
 ```
 
@@ -2021,8 +2041,8 @@ The monochrome theme may expose semantic tokens:
 
 `\CDossierMutedColor` is `gray 0.30`, measured at 8.52:1 against white under
 the WCAG 2.1 relative-luminance formula. It is what `muted=gray` and
-`muted=both` render de-emphasised runs in; under the default `muted=italic`
-nothing uses it.
+`muted=both` render de-emphasised runs in; under `muted=plain` (the default) or
+`muted=italic` nothing uses it.
 
 `\CDossierPrimaryColor` was removed: it reached no component, class, or
 example, and its underlying color was `gray 0` — the same value as

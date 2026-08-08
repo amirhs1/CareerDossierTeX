@@ -1,0 +1,25 @@
+% resume-muted-italic.tex — smoke fixture: muted=italic must build cleanly
+% (issues #271, #324). The entry carries both metadata cells, so the
+% de-emphasis role renders twice; what it resolves to is asserted by
+% tests/regression/components-muted, and how it looks is a visual check.
+% `italic' is a styled value rather than the default, which is `plain'.
+\documentclass[fontsize=10pt, margin=normal, muted=italic]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Corp},
+  location     = {Berlin, DE},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
