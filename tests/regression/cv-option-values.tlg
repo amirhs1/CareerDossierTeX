@@ -52,7 +52,7 @@ TEST 6: unknown-muted-value-is-rejected
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), and 'both' (italic and gray).
+The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), 'both' (italic and gray), and 'plain' (upright, black: no de-emphasis).
 ============================================================
 ============================================================
 TEST 7: unknown-entrymeta-value-is-rejected

@@ -1,0 +1,27 @@
+% resume-muted-plain.tex — smoke fixture: muted=plain is a supported value and
+% must build cleanly (issue #324). The entry carries both metadata cells, so
+% the de-emphasis role renders twice; what it resolves to is asserted by
+% tests/regression/components-muted, and how it looks is a visual check.
+% `plain' applies no de-emphasis at all, so the two cells are ordinary body
+% text and are identified by their position and content alone. It is also the
+% class default, so this fixture is the one that builds the shipped appearance.
+\documentclass[fontsize=10pt, margin=normal, muted=plain]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Corp},
+  location     = {Berlin, DE},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

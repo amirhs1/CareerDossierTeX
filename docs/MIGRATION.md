@@ -396,15 +396,46 @@ underlying color, `cdossier-primary`, was `gray 0` — the same value as
 `cdossier-text`, differing only in name. `\CDossierTextColor` is a drop-in
 replacement with no visual change. See issue #270.
 
+### Entry metadata is no longer italic by default
+
+**This changes rendered output in every existing document.** An entry's dates
+and location in the résumé and CV, and the statement's application-context
+line, were italic; they are now upright black body text. No source edit is
+required, no command, option, or key is renamed, and the text layer and reading
+order are unchanged — but a document that wants the previous appearance must now
+ask for it:
+
+Before:
+
+    \documentclass{careerdossier-resume}
+
+After:
+
+    \documentclass[muted=italic]{careerdossier-resume}
+
+The same one-word addition restores it in `careerdossier-cv`,
+`careerdossier-letter`, and `careerdossier-statement`, which all default to
+`muted=plain` as well.
+
+Reason: the new `muted=plain` value applies no de-emphasis at all, and it is the
+only one of the four that both halves of the underlying trade-off can live with.
+Italic at small sizes is harder to read for low-vision and dyslexic readers than
+a high-contrast gray; a gray level is the thing that disappears on a fax, a
+photocopy, or a 1-bit print. A reader affected by both had nothing to select.
+Being body text in the ordinary text token, `plain` is also the one value that
+cannot fail a contrast floor. What it drops is a redundant signal rather than
+the only one: the dates are still identified by their position and by their
+content, and under `entrymeta=inline` by the separator as well. See
+[`API.md`](API.md#muted).
+
 ### `\CDossierMutedStyle` is published by `careerdossier-components`
 
-No source edit is required in any document that uses a CareerDossierTeX class,
-and nothing renders differently by default.
+No source edit is required in any document that uses a CareerDossierTeX class.
 
 Before, the role was defined by `careerdossier-typography` and was fixed at
 `\rmfamily \itshape`. It is now defined by `careerdossier-components` and
-resolved by the new `muted=italic|gray|both` class option, whose default,
-`italic`, renders exactly as before.
+resolved by the `muted=italic|gray|both|plain` class option, whose default is
+`plain` — see the entry above for the rendered change that follows from it.
 
 Every document class loads `careerdossier-components`, so `\CDossierMutedStyle`
 is available in all of them as it always was. The one case that changes is a

@@ -70,28 +70,45 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#34-dates-and-right-alignment)
   §3.4 for the measurements.
 
-- All four document classes accept `muted=italic|gray|both`, controlling how
-  de-emphasized runs are rendered — an entry's dates and location in the résumé
-  and CV, and the statement's application-context line. `italic` is the default
-  and renders exactly as before. `gray` sets the same runs upright in the muted
-  color token instead, and `both` applies the italic and the color together.
-  ([#271])
+- All four document classes accept `muted=plain|italic|gray|both`, controlling
+  how de-emphasized runs are rendered — an entry's dates and location in the
+  résumé and CV, and the statement's application-context line. `plain` is the
+  default and applies no de-emphasis: upright, in the ordinary black text token.
+  `italic` slants the same runs, `gray` sets them upright in the muted color
+  token instead, and `both` applies the italic and the color together.
+  ([#271], [#324])
 
-  Which one to want is a real trade-off, which is why it is a choice. Italic at
-  small sizes is harder to read for low-vision and dyslexic readers than a
+  **BREAKING (rendered output): entry metadata is no longer italic by default.**
+  Every existing document renders differently — the dates and location of every
+  résumé and CV entry, and the statement's application-context line, are now
+  upright black body text. Nothing is renamed and no source edit is required;
+  a document that wants the previous appearance adds `muted=italic` to its
+  `\documentclass` options. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
+
+  Which styling to want is a real trade-off, which is why it is a choice. Italic
+  at small sizes is harder to read for low-vision and dyslexic readers than a
   high-contrast gray, and this metadata is scanned rather than read; but shape,
-  unlike a gray level, survives a fax, a photocopy, and a 1-bit print. Under
-  every value the dates are identified by their position and content as well, so
-  color is never the only carrier of meaning, and the muted token measures
-  8.52:1 against white under the WCAG 2.1 relative-luminance formula — the
-  source previously estimated "about 8.5:1" and nothing rendered it.
+  unlike a gray level, survives a fax, a photocopy, and a 1-bit print. The muted
+  token measures 8.52:1 against white under the WCAG 2.1 relative-luminance
+  formula — the source previously estimated "about 8.5:1" and nothing rendered
+  it.
 
-  All three values are visual only: no extractor sees a difference and the
-  reading order is identical under each.
+  `plain` is the default because both halves of that trade-off are real, and a
+  reader affected by both would otherwise have had nothing to select. Being body
+  text in the ordinary text token, it is also the one value that cannot fail a
+  contrast floor. What it gives up is a redundant signal rather than the only
+  one: under every value the dates are identified by their position and their
+  content as well — and under `entrymeta=inline` by the separator — so the
+  styling was never the only carrier of meaning.
+
+  All four values are visual only: no extractor sees a difference and the
+  reading order is identical under each, so no extraction, link, metadata, or
+  tagging baseline moves.
 
   **Breaking for direct package users:** `\CDossierMutedStyle` is now published
   by `careerdossier-components` rather than `careerdossier-typography`, because
-  two of the three values resolve it to a color and the typography package owns
+  two of the four values resolve it to a color and the typography package owns
   no color. Every document class loads components, so no document built on a
   CareerDossierTeX class needs an edit; a document that loads
   `careerdossier-typography` on its own should load `careerdossier-components`
@@ -517,6 +534,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#309]: https://github.com/amirhs1/CareerDossierTeX/issues/309
 [#310]: https://github.com/amirhs1/CareerDossierTeX/issues/310
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
+[#324]: https://github.com/amirhs1/CareerDossierTeX/issues/324
 
 ## [0.7.0] - 2026-08-04
 

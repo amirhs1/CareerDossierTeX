@@ -47,7 +47,7 @@
 \tl_new:N \l__cdossier_letter_medium_tl
 \tl_set:Nn \l__cdossier_letter_medium_tl { print }
 \tl_new:N \l__cdossier_letter_muted_tl
-\tl_set:Nn \l__cdossier_letter_muted_tl { italic }
+\tl_set:Nn \l__cdossier_letter_muted_tl { plain }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
@@ -56,7 +56,7 @@
     'fontsize'~(10pt,~11pt,~12pt),~'margin'~(normal,~narrow),~
     'paper'~(letter,~a4),~'bodyfont'~(serif,~sans),~
     'medium'~(print,~screen),~and~
-    'muted'~(italic,~gray,~both).~Language~and~theme~cannot~be~set~here.
+    'muted'~(italic,~gray,~both,~plain).~Language~and~theme~cannot~be~set~here.
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
@@ -103,7 +103,8 @@
   { Unknown~'muted'~value~'#1'~for~careerdossier-letter. }
   {
     The~accepted~values~are~'italic'~(italic,~black),~
-    'gray'~(upright,~gray~0.30),~and~'both'~(italic~and~gray).
+    'gray'~(upright,~gray~0.30),~'both'~(italic~and~gray),~and~
+    'plain'~(upright,~black:~no~de-emphasis).
   }
 
 \keys_define:nn { cdossier / letter }
@@ -151,7 +152,7 @@
       { \msg_error:nnn { careerdossier-letter } { unknown-medium } {#1} } ,
     medium .value_required:n = true ,
     muted .choices:nn =
-      { italic , gray , both }
+      { italic , gray , both , plain }
       { \tl_set_eq:NN \l__cdossier_letter_muted_tl \l_keys_choice_tl } ,
     muted / unknown .code:n =
       { \msg_error:nnn { careerdossier-letter } { unknown-muted } {#1} } ,

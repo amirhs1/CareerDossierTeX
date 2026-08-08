@@ -45,7 +45,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Paper size | US Letter and A4 | `paper=letter` remains the default; `paper=a4` is opt-in |
 | Body font | Serif and sans | `bodyfont=serif` remains the default; `bodyfont=sans` is opt-in |
 | Output medium | Print and screen | `medium=print` remains the default; `medium=screen` drops the running header and folio |
-| Entry-metadata de-emphasis | Italic, gray, or both | `muted=italic` remains the default; `muted=gray` and `muted=both` opt into the muted color token |
+| Entry-metadata de-emphasis | None, italic, gray, or both | `muted=plain` is the default and applies no de-emphasis; `muted=italic`, `muted=gray`, and `muted=both` opt into the styling |
 | Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
 
@@ -100,7 +100,7 @@ Optional fields may be omitted. Contact separators should adjust automatically w
   paper=letter,
   bodyfont=serif,
   medium=print,
-  muted=italic
+  muted=plain
 ]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}
@@ -128,7 +128,7 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 
 Every document class accepts `fontsize=10pt|11pt|12pt`,
 `margin=normal|narrow`, `paper=letter|a4`, `bodyfont=serif|sans`,
-`medium=print|screen`, and `muted=italic|gray|both`. US Letter remains the
+`medium=print|screen`, and `muted=plain|italic|gray|both`. US Letter remains the
 default.
 The résumé defaults to `11pt,narrow`; the CV, letter, and statement classes
 default to `12pt,normal`. `normal` is one inch and `narrow` is half an inch.

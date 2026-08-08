@@ -106,7 +106,7 @@ review-page-two: ## Render five-family and all statement page-two reviews
 review-matrix: ## Render the normal/narrow x 10/11/12pt reference matrix (#147)
 	tests/layout/render-size-margin-matrix.sh
 
-review-entrymeta-muted: ## Render the column/inline x italic/gray/both matrix (#230)
+review-entrymeta-muted: ## Render the column/inline x italic/gray/both/plain matrix (#230, #324)
 	tests/layout/render-entrymeta-muted-matrix.sh
 
 review-linebreak: ## Sweep a line-breaking parameter over both corpora (#316)

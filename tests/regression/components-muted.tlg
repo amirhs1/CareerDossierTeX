@@ -1,44 +1,51 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: italic-is-the-default
+TEST 1: plain-is-the-default
+============================================================
+serif
+series=m, shape=n
+colour=theme-text-token
+============================================================
+============================================================
+TEST 2: italic-is-italic-in-the-theme-text-token
 ============================================================
 serif
 series=m, shape=it
 colour=theme-text-token
 ============================================================
 ============================================================
-TEST 2: gray-is-upright-in-the-theme-muted-token
+TEST 3: gray-is-upright-in-the-theme-muted-token
 ============================================================
 serif
 series=m, shape=n
 colour=theme-muted-token
 ============================================================
 ============================================================
-TEST 3: both-is-italic-in-the-theme-muted-token
+TEST 4: both-is-italic-in-the-theme-muted-token
 ============================================================
 serif
 series=m, shape=it
 colour=theme-muted-token
 ============================================================
 ============================================================
-TEST 4: italic-restores-the-black-italic-role
+TEST 5: plain-restores-the-undecorated-role
 ============================================================
 serif
-series=m, shape=it
+series=m, shape=n
 colour=theme-text-token
 ============================================================
 ============================================================
-TEST 5: unknown-muted-value-is-rejected
+TEST 6: unknown-muted-value-is-rejected
 ============================================================
 ! Package careerdossier-components Error: Unknown 'muted' value 'grey'.
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), and 'both' (italic and gray).
+The accepted values are 'italic' (italic, black), 'gray' (upright, gray 0.30), 'both' (italic and gray), and 'plain' (upright, black: no de-emphasis).
 ============================================================
 ============================================================
-TEST 6: muted-requires-a-value
+TEST 7: muted-requires-a-value
 ============================================================
 ! LaTeX Error: The key 'cdossier/components/muted' requires a value.
 For immediate help type H <return>.
@@ -48,7 +55,15 @@ The key 'cdossier/components/muted' must have a value.
 No value was present: the key will be ignored.
 ============================================================
 ============================================================
-TEST 7: entry-dates-and-location-render-through-the-role
+TEST 8: entry-dates-and-location-render-through-the-role
+============================================================
+>entrytitle
+>muted
+>body
+>muted
+============================================================
+============================================================
+TEST 9: styled-metadata-renders-through-the-same-role
 ============================================================
 >entrytitle
 >muted

@@ -26,7 +26,7 @@ TEST 4: unknown-package-option-is-rejected
 For immediate help type H <return>.
  ...                                              
 l. ...}
-Supported options are 'medium' (print, screen), 'muted' (italic, gray, both), and 'entrymeta' (column, inline).
+Supported options are 'medium' (print, screen), 'muted' (italic, gray, both, plain), and 'entrymeta' (column, inline).
 ============================================================
 ============================================================
 TEST 5: unknown-medium-value-is-rejected

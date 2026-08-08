@@ -61,7 +61,7 @@
   { Unknown~package~option~'#1'~for~careerdossier-components. }
   {
     Supported~options~are~'medium'~(print,~screen),~
-    'muted'~(italic,~gray,~both),~and~
+    'muted'~(italic,~gray,~both,~plain),~and~
     'entrymeta'~(column,~inline).
   }
 
@@ -75,23 +75,34 @@
   }
 
 %% ---------------------------------------------------------------------------
-%% Entry-metadata de-emphasis (issue #271).
+%% Entry-metadata de-emphasis (issues #271, #324).
 %%
 %% `Muted' used to name two mechanisms in two modules -- a gray in the theme and
 %% an italic in typography -- and only the italic reached the page. It now names
 %% one rendered result, chosen by the document:
 %%
-%%   muted = italic  the run is italic and black                    (default)
+%%   muted = italic  the run is italic and black
 %%   muted = gray    the run is upright in cdossier-muted, gray 0.30
 %%   muted = both    the run is italic *and* gray
+%%   muted = plain   the run is upright and black: none of it     (default)
 %%
-%% There is a real trade-off behind the choice, which is why it is an option
-%% rather than a fixed decision. Italic at small sizes is harder for low-vision
-%% and dyslexic readers than a high-contrast gray, and entry metadata is scanned
-%% rather than read. But shape is the only de-emphasis that survives output that
-%% loses gray levels -- a fax, a photocopy, a 1-bit print -- and it is the
-%% appearance every document written before this option carried, so it stays the
-%% default.
+%% The first three values are the three corners of shape-by-colour that apply
+%% *some* de-emphasis; `plain' is the fourth, which applies none.
+%%
+%% There is a real trade-off behind the styled values, which is why they are an
+%% option rather than a fixed decision. Italic at small sizes is harder for
+%% low-vision and dyslexic readers than a high-contrast gray, and entry metadata
+%% is scanned rather than read. But shape is the only de-emphasis that survives
+%% output that loses gray levels -- a fax, a photocopy, a 1-bit print.
+%%
+%% `plain' is the default because both halves of that trade-off are real, and a
+%% reader affected by both would otherwise have nothing to select. Applying no
+%% de-emphasis is defensible rather than a loss of meaning: it was never the
+%% only carrier, since the dates are identified by their position and by their
+%% content -- they read as a date range -- and under `entrymeta=inline' the
+%% separator identifies them too. Being body text in the ordinary text token, it
+%% is also the one value that cannot fail a contrast floor. A document that
+%% wants the styling asks for it by name.
 %%
 %% The role lives here because it is the only place it can. careerdossier-theme
 %% owns the colour and careerdossier-typography owns the shape, and neither may
@@ -105,7 +116,8 @@
   { Unknown~'muted'~value~'#1'. }
   {
     The~accepted~values~are~'italic'~(italic,~black),~
-    'gray'~(upright,~gray~0.30),~and~'both'~(italic~and~gray).
+    'gray'~(upright,~gray~0.30),~'both'~(italic~and~gray),~and~
+    'plain'~(upright,~black:~no~de-emphasis).
   }
 
 %% ---------------------------------------------------------------------------
@@ -182,7 +194,7 @@
       { \msg_error:nnn { careerdossier-components } { unknown-medium } {#1} } ,
     medium .value_required:n = true ,
     muted .choices:nn =
-      { italic , gray , both }
+      { italic , gray , both , plain }
       { \__cdossier_components_set_muted:V \l_keys_choice_tl } ,
     muted / unknown .code:n =
       { \msg_error:nnn { careerdossier-components } { unknown-muted } {#1} } ,
@@ -195,7 +207,9 @@
 %% The role is redefined rather than branched at each use, so a de-emphasised
 %% run costs the same as before the option existed and there is exactly one
 %% definition to read. \CDossierBodyStyle carries the family and resets the
-%% shape, so `gray' is upright without saying so twice.
+%% shape, so `gray' is upright without saying so twice -- and it is what makes
+%% `plain' the body role itself rather than \normalfont, which would drop back
+%% to the document family and be wrong under `bodyfont=sans'.
 \cs_new_protected:Npn \__cdossier_components_set_muted:n #1
   {
     \str_case:nn {#1}
@@ -209,13 +223,16 @@
         { both }
           { \RenewDocumentCommand \CDossierMutedStyle { }
               { \CDossierBodyStyle \itshape \CDossierMutedColor } }
+        { plain }
+          { \RenewDocumentCommand \CDossierMutedStyle { }
+              { \CDossierBodyStyle } }
       }
   }
 \cs_generate_variant:Nn \__cdossier_components_set_muted:n { V }
 
 %% Declared before the options are read so the default is the same statement as
 %% every other value, and \RenewDocumentCommand above always has a target.
-\NewDocumentCommand \CDossierMutedStyle { } { \CDossierBodyStyle \itshape }
+\NewDocumentCommand \CDossierMutedStyle { } { \CDossierBodyStyle }
 
 %% The `entrymeta=inline' separator (issue #230). `|' is the same mark the
 %% contact line uses for the same job, so a document has one field separator

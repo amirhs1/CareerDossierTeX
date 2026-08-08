@@ -1,8 +1,13 @@
-% components-muted.lvt — the entry-metadata de-emphasis role (#271).
+% components-muted.lvt — the entry-metadata de-emphasis role (#271, #324).
 %
 % `Muted' named two mechanisms in two modules before this: a gray in the theme
 % and an italic in typography, of which only the italic ever reached the page.
-% It now names one rendered result, chosen by `muted=italic|gray|both'.
+% It now names one rendered result, chosen by `muted=italic|gray|both|plain'.
+% `plain' applies no de-emphasis at all and is the default, so it is the one
+% value where the role must report the *body* shape and the *body* colour
+% together; every other value differs from the body role in at least one of the
+% two. Reading only one of the two would let the default pass while it silently
+% resolved to `gray' or to `italic'.
 %
 % Two separate things are asserted here, because either one alone would pass
 % while the feature was broken:
@@ -96,7 +101,14 @@
 \begin{document}
 \START
 
-\TEST{italic-is-the-default}{
+% The default must report the body shape *and* the body colour. Reading only one
+% of the two would let it pass while it resolved to `gray' or to `italic'.
+\TEST{plain-is-the-default}{
+  \cdossiertestReportMuted
+}
+
+\TEST{italic-is-italic-in-the-theme-text-token}{
+  \cdossiertestSetOption{muted=italic}
   \cdossiertestReportMuted
 }
 
@@ -110,8 +122,10 @@
   \cdossiertestReportMuted
 }
 
-\TEST{italic-restores-the-black-italic-role}{
-  \cdossiertestSetOption{muted=italic}
+% Selecting `plain' explicitly must reach the same role the default resolves to,
+% and must clear both the shape and the colour left by `both' above.
+\TEST{plain-restores-the-undecorated-role}{
+  \cdossiertestSetOption{muted=plain}
   \cdossiertestReportMuted
 }
 
@@ -126,6 +140,17 @@
 % Last: the tracing renewals are deliberately permanent, so nothing after this
 % would still be reporting the real roles.
 \TEST{entry-dates-and-location-render-through-the-role}{
+  \cdossiertestTraceEntryHead
+}
+
+% The trace above runs under the default, `plain', which removes the
+% de-emphasis but not the role: the two metadata cells must still be routed
+% through \CDossierMutedStyle rather than emitted as body text by a component
+% that reads the option itself. This repeats it under a styled value, so the
+% routing is pinned from both sides. Setting the option redefines the role away
+% from the marker, so the renewals are applied again after it.
+\TEST{styled-metadata-renders-through-the-same-role}{
+  \cdossiertestSetOption{muted=both}
   \cdossiertestTraceEntryHead
 }
 

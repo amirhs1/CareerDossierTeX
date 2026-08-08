@@ -945,7 +945,7 @@ Responsibilities:
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
 - the `medium=print|screen` decision of whether any furniture is emitted;
-- the `muted=italic|gray|both` de-emphasis role, `\CDossierMutedStyle`, and the
+- the `muted=italic|gray|both|plain` de-emphasis role, `\CDossierMutedStyle`, and the
   decision of what it resolves to;
 - the `entrymeta=column|inline` placement of an entry's dates and location, and
   the separator token `\CDossierEntryMetaSeparator` the inline form joins them
@@ -1208,7 +1208,7 @@ Responsibilities:
 - process `family=industry|academic` as a label- and metadata-only choice while
   preserving `industry` as the default;
 - process `paper=letter|a4` while preserving Letter as the default;
-- process `medium=print|screen` and `muted=italic|gray|both`, forwarding both
+- process `medium=print|screen` and `muted=italic|gray|both|plain`, forwarding both
   to the components module that owns the furniture and de-emphasis decisions;
 - register the `Cover Letter` running label and enable shared page furniture;
 - support one-page and multi-page letters without résumé-specific compression.
@@ -1244,7 +1244,7 @@ Responsibilities:
 - keep the full meaningful title in the page-one body and PDF metadata while a
   separately bounded running title identifies continuation pages;
 - register that short running title with the shared page-furniture component,
-  and forward `medium=print|screen` and `muted=italic|gray|both` to it;
+  and forward `medium=print|screen` and `muted=italic|gray|both|plain` to it;
 - reuse component-owned link normalization and separator-safe contact output;
 - derive every header size and gap plus prose paragraph rhythm from the shared
   token package;
