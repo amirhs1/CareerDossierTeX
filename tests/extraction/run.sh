@@ -224,5 +224,41 @@ EOF
   fi
 done
 
+# Cross-medium identity (issue #278).
+#
+# The two fixtures below share one body include and differ in one class option,
+# `medium'. Under `screen' a rule is drawn beneath author-written \href anchor
+# text; under `print' nothing is. The rule is ink, and ink is all it may be — an
+# ATS, a recruiter's copy-paste, and a screen reader must read the identical
+# document either way.
+#
+# Each fixture is already gated against its own baseline above. This compares
+# the two baselines to each other, so the property survives the one thing a
+# per-fixture check cannot catch: an intended-looking change regenerated into
+# both files at once. The names are listed rather than derived, because the
+# claim is about this specific pair.
+echo
+echo "== cross-medium identity =="
+for extractor in expected pdfkit; do
+  a="$here/resume-link-decoration-print.$extractor.txt"
+  b="$here/resume-link-decoration-screen.$extractor.txt"
+  if [ ! -f "$a" ] || [ ! -f "$b" ]; then
+    if [ "$extractor" = "pdfkit" ] && [ "$pdfkit" -eq 0 ]; then
+      echo "  skipped ($extractor baselines are macOS-only)"
+    else
+      echo "  MISSING one of the $extractor baselines for the medium pair"; fail=1
+    fi
+    continue
+  fi
+  if diff -u "$a" "$b" > "$here/medium-pair.$extractor.diff"; then
+    echo "  print and screen extract identically ($extractor)"
+    rm -f "$here/medium-pair.$extractor.diff"
+  else
+    echo "  MEDIUM PAIR MISMATCH ($extractor): the screen decoration reached the text layer"
+    sed 's/^/    /' "$here/medium-pair.$extractor.diff"
+    fail=1
+  fi
+done
+
 echo; [ "$fail" -eq 0 ] && echo "ALL EXTRACTION FIXTURES PASSED" || echo "EXTRACTION FIXTURES FAILED"
 exit "$fail"

@@ -1,0 +1,18 @@
+1	0	section	Tagged Screen Resume
+1	1	text	Accessibility Engineer
+1	2	Link	resume@example.test
+1	3	text	+1 555 0100
+1	4	Link	example.test/resume
+1	5	subsection	Experience
+1	6	text	
+1	7	text	
+1	8	text	Engineer 2024–2026
+1	9	text	Example Labs Toronto
+1	10	itemlabel	•
+1	11	text	Shipped the analytical engine, documented in a 
+1	12	Link	public write-up
+1	13	text	 that a reader can follow.
+1	14	itemlabel	•
+1	15	text	An address the reader sees in full: 
+1	16	Link	example.test/notes
+1	17	text	.

@@ -1,0 +1,26 @@
+\documentclass[medium=screen]{careerdossier-resume}
+\CDossierSetup{
+  name={Tagged Screen Resume},
+  headline={Accessibility Engineer},
+  email={resume@example.test},
+  phone={+1 555 0100},
+  website={example.test/resume}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title={Engineer},
+  organization={Example Labs},
+  location={Toronto},
+  dates={2024--2026}
+]
+\begin{CDossierItemize}
+  \item Shipped the analytical engine, documented in a
+        \href{https://example.test/work}{public write-up} that a reader
+        can follow.
+  \item An address the reader sees in full:
+        \CDossierLink{example.test/notes}.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

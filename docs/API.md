@@ -319,10 +319,43 @@ PDF viewer already shows page position, so the folio is redundant chrome; on
 paper a loose page has no such affordance, and the folio is what keeps a
 multi-page dossier in order after it is put down.
 
-The option changes only whether furniture is emitted. Page geometry is
-unchanged, so the text block sits in exactly the same place under both values
-and switching `medium` cannot reflow a document. Unsupported values produce a
-class error naming the accepted values.
+`medium` also decides whether a link carries a visible decoration:
+
+| Value | Author-written `\href` anchor text |
+|---|---|
+| `print` | undecorated — reads as ordinary body text |
+| `screen` | underlined |
+
+Links are drawn in body black with no border under both values, which is the
+print-safe treatment this toolkit has always had. Where a link's visible text is
+the address — the contact line, [`\CDossierLink`](#cdossierlink), an ORCID iD, a
+bibliography DOI — that costs a reader nothing, because the text announces
+itself. Where an author supplies their own anchor text there is otherwise no cue
+of any kind:
+
+```latex
+Shipped the analytical engine, documented in a
+\href{https://example.org/work}{public write-up}.
+```
+
+Under `medium=screen` `public write-up` is underlined; under `medium=print` it
+is not. The decoration is applied to anchor text an author writes, and
+deliberately not to the address-as-text links this toolkit renders itself — a
+rule under a contact line's e-mail and website but not under its phone or
+location reads as emphasis rather than as linking. `\CDossierPlainLinks`
+suppresses the decoration for a region; see
+[`\CDossierPlainLinks`](#cdossierplainlinks).
+
+The link *annotation* is emitted under both media. It is invisible on paper and
+costs nothing there, and stripping it would hand dead links to anyone who opens
+a `medium=print` file on screen.
+
+The option changes only whether furniture and link decoration are emitted. Page
+geometry is unchanged, so the text block sits in exactly the same place under
+both values and switching `medium` cannot reflow a document — the underline is
+drawn from a node attribute at shipout, so it adds no box and moves no break
+point. Extracted text is identical under both values, on every supported
+extractor. Unsupported values produce a class error naming the accepted values.
 
 #### `muted`
 
@@ -1165,8 +1198,36 @@ Without hyperref the command still prints the address as plain visible text, so
 the identifier is never lost; all four classes load hyperref, so the link is
 present in ordinary use.
 
+A `\CDossierLink` is never underlined, under either `medium`: its visible text
+is the address, so it already announces itself. See
+[`medium`](#medium) and [`\CDossierPlainLinks`](#cdossierplainlinks).
+
 Introduced in `v0.8.0`
 ([#308](https://github.com/amirhs1/CareerDossierTeX/issues/308)).
+
+### `\CDossierPlainLinks`
+
+```latex
+{\CDossierPlainLinks
+ Read the \href{https://example.org/report}{annual report}.}
+```
+
+A declaration that turns off link decoration for the rest of the enclosing
+group. Under `medium=print` it changes nothing, because nothing is decorated
+there; under `medium=screen` an `\href` inside its scope is set without the
+underline while still emitting its link annotation.
+
+Use it where a link's visible text is already the address, or where a passage
+carries so many links that ruling each one would be noise. The toolkit applies
+it to its own address-as-text links — the contact line, `\CDossierLink`, the
+ORCID iD, the CV's manual publication identifiers, and the whole bibliography —
+so those need nothing from a document.
+
+There is no matching command to turn decoration back on. Scope it with a group,
+as above, or with the environment it belongs to.
+
+Introduced in `v0.8.0`
+([#278](https://github.com/amirhs1/CareerDossierTeX/issues/278)).
 
 ## Page-break policy
 
@@ -1310,6 +1371,14 @@ owns no colour. It behaves like the roles above and is available in every
 document class; only a document loading `careerdossier-typography` on its own
 does not get it. See [`muted`](#muted) and
 [`MIGRATION.md`](MIGRATION.md#080---unreleased).
+
+A second such role, `\CDossierLinkStyle{<text>}`, is published by
+`careerdossier-components` for the same reason: it resolves to a rule, and the
+decision to draw it belongs to `medium`, which that package owns. It is what
+decorates author-written `\href` anchor text under `medium=screen`, and it is
+the identity under `medium=print` and inside `\CDossierPlainLinks`. A document
+that wants a different affordance — a different weight, a different rule
+position — redefines this one command. See [`medium`](#medium).
 
 Their visual definitions may evolve before `v1.0.0`.
 

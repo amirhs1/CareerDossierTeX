@@ -944,7 +944,11 @@ Responsibilities:
 - the public header-stack composition API every header is built from;
 - identity block, including its token-sized text and baseline-derived spacing;
 - shared page-style pair, single-page suppression, running header, and folio;
-- the `medium=print|screen` decision of whether any furniture is emitted;
+- the `medium=print|screen` decision of whether any furniture is emitted, and
+  the same option's decision of whether a link carries a visible decoration;
+- the link-decoration role `\CDossierLinkStyle`, the `\CDossierPlainLinks`
+  suppression declaration, and the `\href` hook that reaches an author's own
+  anchor text;
 - the `muted=italic|gray|both|plain` de-emphasis role, `\CDossierMutedStyle`, and the
   decision of what it resolves to;
 - the `entrymeta=column|inline` placement of an entry's dates and location, and
@@ -962,8 +966,39 @@ Responsibilities:
 - PDF document metadata derived from the profile;
 - the no-op `\pdffakespace` fallback every class relies on when untagged.
 
-That last one is a one-line declaration but it belongs here rather than in a
-class. `\pdffakespace` is tagpdf's; it puts a real, zero-width U+0020 into the
+The link decoration is where this package reaches furthest outside itself, so
+its two hooks are worth stating plainly (issue #278).
+
+`\href` is wrapped by a replacement that grabs **no** arguments: it records a
+flag and hands the untouched token stream to the original. That is not a style
+choice. hyperref re-catcodes a URL argument inside `\hyper@normalise` before
+expanding it, so any wrapper that reads the argument first — an
+`\RenewDocumentCommand\href{omm}`, for instance — fails inside the URL scanner.
+The flag is read once, in hyperref's `\hyper@link@`, which is where the link
+text is in hand and the catcode work is finished; that is also where the
+decoration is applied. The flag is global because it must survive the
+`\begingroup` `\href` opens between the two points, and it is cleared before
+anything is typeset so `\hyperlink` and `\hyperref`, which share
+`\hyper@link@`, never inherit it. Both patches are guarded on the existence of
+what they replace, and `tests/regression/components-linkdecoration.lvt` asserts
+they were installed — a hook that silently failed to apply is indistinguishable
+on the page from `medium=print`.
+
+The rule itself is drawn by `lua-ul`, which is this package's only third-party
+dependency beyond the CareerDossierTeX packages it requires. `ulem` was the
+obvious candidate and was rejected on measurement: `\uline` reboxes its
+argument and rebuilds interword spaces as its own leaders, which passes every
+extraction check — Poppler, MuPDF, and PDFKit all rebuild words from glyph
+geometry and see the gap — while the structure tree loses the space, so a
+consumer reading a Link element's logical text gets `publicwrite-up`. That is
+the defect class of issues #302 and #315 arriving by a third route. `lua-ul`
+attaches a node attribute and lets LuaTeX draw the rule at shipout: nothing is
+reboxed, no glue is touched, no break point moves, and the `/Artifact` hazard of
+issue #161 does not arise because there is no box to be artifacted. It is
+LuaLaTeX-only, which costs nothing here, and LPPL 1.3c.
+
+The `\pdffakespace` fallback below is a one-line declaration but it belongs here
+rather than in a class. `\pdffakespace` is tagpdf's; it puts a real, zero-width U+0020 into the
 content stream so a gap made of pure positioning glue still reads as a word
 boundary to a consumer of the structure tree (issue #302). It exists only when
 the document asked for tagging, and both call sites — this package's entry

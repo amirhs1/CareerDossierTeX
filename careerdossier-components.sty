@@ -57,6 +57,13 @@
 \bool_new:N \l__cdossier_components_furniture_bool
 \bool_set_true:N \l__cdossier_components_furniture_bool
 
+%% `medium' now drives two independent decisions, so each has its own state
+%% rather than one bool read in two senses: the page furniture below, and the
+%% body-copy link decoration of issue #278. They are not each other's negation
+%% by accident -- a third medium, if one is ever added, would have to answer
+%% both questions separately.
+\bool_new:N \l__cdossier_components_screen_bool
+
 \msg_new:nnnn { careerdossier-components } { unknown-option }
   { Unknown~package~option~'#1'~for~careerdossier-components. }
   {
@@ -189,6 +196,8 @@
       {
         \bool_set:Nn \l__cdossier_components_furniture_bool
           { \str_if_eq_p:Vn \l_keys_choice_tl { print } }
+        \bool_set:Nn \l__cdossier_components_screen_bool
+          { \str_if_eq_p:Vn \l_keys_choice_tl { screen } }
       } ,
     medium / unknown .code:n =
       { \msg_error:nnn { careerdossier-components } { unknown-medium } {#1} } ,
@@ -360,13 +369,184 @@
       { \hbox:n { ~|~ } }
   }
 
+%% ---------------------------------------------------------------------------
+%% Link decoration (issue #278).
+%%
+%% careerdossier-theme sets `colorlinks=true, allcolors=cdossier-link' with
+%% `cdossier-link' at gray 0, so a link is drawn in body black with no border.
+%% Where the visible text *is* the address -- the contact line, \CDossierLink,
+%% an ORCID iD, a bibliography DOI -- that costs nothing: the text announces
+%% itself. Where an author writes their own anchor text,
+%%
+%%     documented in a \href{https://example.test/work}{public write-up}
+%%
+%% nothing at all marks `public write-up' as actionable. That is worse than the
+%% colour-only case WCAG 2.1 AA 1.4.1 is about: there is no cue of any kind.
+%%
+%% `medium' already names the reading context, so it carries the decision. On
+%% screen the anchor text is underlined; on paper it is not, which is the
+%% deliberate print treatment this toolkit shipped with. The *annotation* is
+%% emitted under both media: it costs nothing on paper and stripping it would
+%% hand dead links to anyone who opens a `medium=print' file on screen.
+%%
+%% Three findings from issue #278 shape the implementation, and each is a
+%% constraint rather than a preference.
+%%
+%%   - `colorlinks=true' is the only thing suppressing hyperref's default 1pt
+%%     annotation border. Turning it off to make room for a rule brings the
+%%     border back as `/Border [0 0 1]'. So the rule is drawn by us and
+%%     `colorlinks' is never touched.
+%%   - \__cdossier_components_link:nn below is the chokepoint for every link
+%%     this package generates, and it is the wrong hook: a user's \href in body
+%%     copy never reaches it. Patching it decorated exactly the links that
+%%     already announced themselves and left the one that did not byte-identical.
+%%   - \RenewDocumentCommand\href{omm} detonates. hyperref re-catcodes the URL
+%%     argument inside \hyper@normalise before expanding it, and an xparse
+%%     wrapper that grabs the argument first fails in the URL scanner.
+%%
+%% The last one is why the wrapper below grabs *no* arguments. It records that
+%% this link came from \href and hands the untouched token stream straight to
+%% hyperref's own scanner, which then runs exactly as it always did. The flag is
+%% read once, in \hyper@link@, which is where hyperref has the link text in hand
+%% and has finished with catcodes.
+%%
+%% The flag is global because it must survive the \begingroup that \href opens
+%% between setting and reading it. Its lifetime is that single macro hop:
+%% \hyper@link@ clears it before typesetting anything, so \hyperlink and
+%% \hyperref -- which share \hyper@link@ but are not author prose -- are never
+%% decorated by a stale value.
+%% ---------------------------------------------------------------------------
+%% lua-ul draws the rule, and the choice was settled by measurement rather than
+%% by preference. ulem was tried first and rejected.
+%%
+%% \uline reboxes its argument and rebuilds the interword spaces as its own
+%% leaders. That survives every check this project had before issue #302: the
+%% rendered page is correct, veraPDF passes, and Poppler, MuPDF, and PDFKit all
+%% read `public write-up' back intact, because they rebuild words from glyph
+%% geometry and the gap is still there. What changes is the structure tree. A
+%% consumer reading the logical text of the Link element -- which is what a
+%% screen reader announces -- gets `publicwrite-up': tagpdf marks a real space
+%% only where it finds interword glue, and ulem has replaced that glue. The same
+%% class of defect as issues #302 and #315, arriving by a third route.
+%%
+%% lua-ul underlines by attaching a node attribute and letting LuaTeX draw the
+%% rule at shipout. Nothing is reboxed, the glue is untouched, and the space
+%% survives -- tests/tagging/resume-linkdecoration pins that. It is LuaLaTeX-only,
+%% which costs this toolkit nothing: LuaLaTeX is the sole supported engine, and
+%% the classes already error on anything else. LPPL 1.3c, in TeX Live, and it
+%% pulls in luacolor (LPPL 1.3) as its one further dependency.
+%%
+%% Reboxing was also the #161 hazard -- boxed text under tagging can silently
+%% become a bare /Artifact -- so avoiding the rebox removes that risk too rather
+%% than merely testing for it. The test is kept regardless.
+\RequirePackage { lua-ul }
+
+%% Set true for exactly one link, by the \href wrapper installed below.
+\bool_new:N \g__cdossier_components_hrefdeco_bool
+
+%% Suppresses decoration for the links this toolkit renders itself, where the
+%% visible text is the address. Local, so it lasts for one group.
+\bool_new:N \l__cdossier_components_plainlinks_bool
+
+%% \CDossierPlainLinks: a declaration, scoped to the enclosing group, that turns
+%% link decoration off. Public because careerdossier-cv and careerdossier-biblatex
+%% both render address-as-text links that this package cannot reach, and because
+%% a document may legitimately want an undecorated region.
+%%
+%% Every one of those links displays the address through \nolinkurl or url.sty,
+%% so the visible text already announces itself and needs no second cue -- which
+%% is the split issue #278 settled deliberately rather than by default. On the
+%% contact line in particular a rule under the e-mail and the website, but not
+%% under the phone or the location, reads as `these two are emphasised' rather
+%% than `these are links', because every item on that line is an identifier.
+\NewDocumentCommand \CDossierPlainLinks { }
+  { \bool_set_true:N \l__cdossier_components_plainlinks_bool }
+
+%% \CDossierLinkStyle{<text>}: the semantic role. Under `medium=print', and
+%% wherever \CDossierPlainLinks is in force, it is the identity.
+%%
+%% The rule sits at lua-ul's own depth, 0.75ex below the baseline, which is
+%% font-relative and so clears descenders at every `fontsize' and under either
+%% `bodyfont'. Its thickness is this project's shared \CDossierRuleThickness
+%% instead of lua-ul's 0.1ex, so a link rule and a section rule are the same
+%% weight and both scale with the body size.
+%%
+%% lua-ul states the rule as two signed offsets from the baseline, so the top
+%% edge is the bottom edge plus the thickness.
+\cs_new_protected:Npn \__cdossier_components_underline:n #1
+  {
+    \underLine
+      [ bottom = -0.75ex , top = -0.75ex + \CDossierRuleThickness ]
+      {#1}
+  }
+
+\NewDocumentCommand \CDossierLinkStyle { m }
+  {
+    \bool_lazy_and:nnTF
+      { \l__cdossier_components_screen_bool }
+      { ! \l__cdossier_components_plainlinks_bool }
+      { \__cdossier_components_underline:n {#1} }
+      {#1}
+  }
+
+%% Install the \href hook. Guarded on \hyper@link@ so a document without
+%% hyperref, or a future hyperref that renames it, degrades to today's
+%% undecorated output instead of failing; tests/regression asserts the hook is
+%% actually in place, because a silent no-op here looks exactly like
+%% `medium=print'.
+\cs_new_protected:Npn \__cdossier_components_install_link_hook:
+  {
+    \NewCommandCopy \__cdossier_components_href_orig: \href
+    \cs_set_protected:Npn \href
+      {
+        \bool_gset_true:N \g__cdossier_components_hrefdeco_bool
+        \__cdossier_components_href_orig:
+      }
+    \cs_new_eq:Nc \__cdossier_components_hyperlink_orig:w { hyper@link@ }
+    \cs_set_protected:cpn { hyper@link@ } [##1]##2##3##4
+      {
+        \bool_if:NTF \g__cdossier_components_hrefdeco_bool
+          {
+            \bool_gset_false:N \g__cdossier_components_hrefdeco_bool
+            %% A blank argument is passed through untouched so hyperref still
+            %% issues its own "Suppressing empty link" warning, which a
+            %% \CDossierLinkStyle wrapper would make unreachable.
+            \tl_if_blank:nTF {##4}
+              { \__cdossier_components_hyperlink_orig:w [##1] {##2} {##3} {##4} }
+              {
+                \__cdossier_components_hyperlink_orig:w [##1] {##2} {##3}
+                  { \CDossierLinkStyle {##4} }
+              }
+          }
+          { \__cdossier_components_hyperlink_orig:w [##1] {##2} {##3} {##4} }
+      }
+  }
+
+\AddToHook { package/hyperref/after }
+  {
+    \cs_if_exist:cT { hyper@link@ }
+      { \__cdossier_components_install_link_hook: }
+  }
+
 %% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
 %% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
 %% \urlstyle{same} so the text stays in the body font rather than switching to
 %% monospace. Degrades to plain visible text when hyperref is absent, so the
 %% identifier is always present and extractable.
+%%
+%% The visible text here is the address, so the link is left plain under both
+%% media -- see \CDossierPlainLinks above.
 \cs_new_protected:Npn \__cdossier_components_link:nn #1#2
-  { \cs_if_exist:NTF \href { \href {#1} { \nolinkurl {#2} } } { #2 } }
+  {
+    \cs_if_exist:NTF \href
+      {
+        \group_begin:
+          \CDossierPlainLinks
+          \href {#1} { \nolinkurl {#2} }
+        \group_end:
+      }
+      { #2 }
+  }
 \cs_generate_variant:Nn \__cdossier_components_link:nn { VV }
 
 %% Body-text link (issue #308). The contact line's items are packed as atomic
@@ -507,8 +687,11 @@
       }
     \cs_if_exist:NTF \href
       {
-        \href { \l__cdossier_components_url_tl }
-          { ORCID:\nobreakspace \nolinkurl { \l__cdossier_components_disp_tl } }
+        \group_begin:
+          \CDossierPlainLinks
+          \href { \l__cdossier_components_url_tl }
+            { ORCID:\nobreakspace \nolinkurl { \l__cdossier_components_disp_tl } }
+        \group_end:
       }
       { ORCID:\nobreakspace \l__cdossier_components_disp_tl }
   }

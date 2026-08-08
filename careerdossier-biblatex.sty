@@ -150,6 +150,19 @@
     \newunit \newblock
   }
 
+%% Every link a bibliography entry emits displays its own address -- a DOI, an
+%% e-print identifier, a URL -- so none of them is the undecorated-anchor-text
+%% problem that issue #278 addresses, and the body-copy underline must not reach
+%% them. It would also undo the work directly above: ulem breaks an underlined
+%% run at its spaces only, so an underlined address would become one
+%% unbreakable box and the intra-URL break points calibrated here would never
+%% be offered to TeX at all.
+%%
+%% \AtBeginBibliography's code runs inside the bibliography's own group, so the
+%% declaration is scoped to the bibliography and reaches nothing after it.
+\cs_if_exist:NT \CDossierPlainLinks
+  { \AtBeginBibliography { \CDossierPlainLinks } }
+
 %% Use the CV's semantic section command for the bibliography heading when the
 %% package is loaded with careerdossier-cv. Other document classes retain
 %% BibLaTeX's own default heading and no unrelated heading is redefined.
