@@ -155,6 +155,38 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   [`docs/API.md`](docs/API.md#typography-roles) now says where each role
   applies.
 
+- Under `medium=screen`, a link an author writes with their own anchor text is
+  now underlined. Under `medium=print` — the default — nothing changes: links
+  stay black, unruled, and unbordered, exactly as before. The new declaration
+  `\CDossierPlainLinks` turns the decoration off for a group. ([#278])
+
+  The gap was body copy. In `documented in a \href{...}{public write-up}`,
+  nothing told a sighted reader that `public write-up` was actionable — not
+  colour, not weight, not a rule. That is worse than the colour-only case WCAG
+  2.1 AA 1.4.1 describes: there was no cue at all. Where a link's visible text
+  *is* the address — the contact line, `\CDossierLink`, an ORCID iD, a
+  bibliography DOI — it announced itself already, and those stay undecorated
+  under both media. A rule under a contact line's e-mail and website but not
+  under its phone or location reads as emphasis, not as linking.
+
+  Nothing about the text layer changes. The extraction fixtures for the two
+  media share one body so their committed baselines can be compared directly,
+  and they are identical on every supported extractor; the link annotation is
+  emitted under both media, with no border under either, so a `medium=print`
+  file opened on screen still has live links. Nothing reflows, either: the rule
+  is drawn from a node attribute at shipout, so it adds no box and moves no line
+  break.
+
+  That last property is why `lua-ul` is now a dependency of
+  `careerdossier-components` rather than the more familiar `ulem`. `\uline`
+  reboxes what it underlines and rebuilds interword spaces as its own leaders.
+  Every extractor still reads `public write-up` correctly, because all of them
+  rebuild words from glyph geometry, and PDF/UA-2 validation still passes — but
+  the tagged structure tree loses the space, so a screen reader announces
+  `publicwrite-up`. `lua-ul` is LuaLaTeX-only, which costs nothing here, and
+  LPPL 1.3c. See [`docs/API.md`](docs/API.md#medium) for the option and
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) for the measurements.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -526,6 +558,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#272]: https://github.com/amirhs1/CareerDossierTeX/issues/272
 [#276]: https://github.com/amirhs1/CareerDossierTeX/issues/276
 [#277]: https://github.com/amirhs1/CareerDossierTeX/issues/277
+[#278]: https://github.com/amirhs1/CareerDossierTeX/issues/278
 [#294]: https://github.com/amirhs1/CareerDossierTeX/issues/294
 [#299]: https://github.com/amirhs1/CareerDossierTeX/issues/299
 [#302]: https://github.com/amirhs1/CareerDossierTeX/issues/302

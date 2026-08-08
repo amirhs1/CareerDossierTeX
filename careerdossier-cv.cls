@@ -471,10 +471,17 @@
           }
           { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https:// } }
       }
+    %% The visible text is the identifier itself, so this link needs no
+    %% decoration under `medium=screen' -- and must not get one: ulem would
+    %% rebox the \nolinkurl into a single unbreakable token. See
+    %% \CDossierPlainLinks in careerdossier-components (issue #278).
     \cs_if_exist:NTF \href
       {
-        \href { \l__cdossier_cv_publication_target_tl }
-          { #1:\nobreakspace \nolinkurl {#2} }
+        \group_begin:
+          \CDossierPlainLinks
+          \href { \l__cdossier_cv_publication_target_tl }
+            { #1:\nobreakspace \nolinkurl {#2} }
+        \group_end:
       }
       { #1:\nobreakspace #2 }
   }

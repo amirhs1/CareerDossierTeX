@@ -48,7 +48,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -108,6 +108,9 @@ review-matrix: ## Render the normal/narrow x 10/11/12pt reference matrix (#147)
 
 review-entrymeta-muted: ## Render the column/inline x italic/gray/both/plain matrix (#230, #324)
 	tests/layout/render-entrymeta-muted-matrix.sh
+
+review-link-decoration: ## Render the print/screen link-decoration pair (#278)
+	tests/layout/render-link-decoration.sh
 
 review-linebreak: ## Sweep a line-breaking parameter over both corpora (#316)
 	tests/layout/sweep-linebreak.sh $(SWEEP_ARGS)

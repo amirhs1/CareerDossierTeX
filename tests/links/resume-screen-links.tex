@@ -1,0 +1,57 @@
+% resume-screen-links.tex — copy-paste integrity under `medium=screen'
+% (issue #278).
+%
+% Every other fixture in this suite renders under the default `medium=print',
+% where no link carries a decoration at all. #278 added one under `screen', and
+% it added it to a document class whose whole link story is that a wrapped
+% address pastes back character for character.
+%
+% The decoration is deliberately *not* applied to any address shown as its own
+% text — the contact line, \CDossierLink, an ORCID iD, a bibliography DOI — and
+% this fixture is where that suppression is checked rather than asserted. If it
+% ever lapsed, an underline drawn by reboxing (ulem, the vehicle #278 first
+% tried) would collapse each address into a single box and throw away the
+% intra-URL break points of issues #294 and #308; an underline drawn by
+% attribute (lua-ul, the vehicle it ships with) would leave them alone. The
+% tokens below wrap at this size and margin either way, so what this suite
+% decides from geometry is whether the wrapped halves still concatenate.
+%
+% The profile is the one tests/links/resume-contact-links.tex uses, so a
+% difference between the two runs is a difference of medium and nothing else.
+%
+% LINKTOKEN: alexandria.montgomery.fitzgerald@a-very-long-department.example.org
+% LINKTOKEN: example.org/alexandria-montgomery-fitzgerald/portfolio
+% LINKTOKEN: linkedin.com/in/alexandria-montgomery-fitzgerald
+% LINKTOKEN: 0000-0002-1825-0097
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html
+\documentclass[medium=screen, fontsize=12pt, margin=normal]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Alexandria Katherine Montgomery-Fitzgerald},
+  headline = {Principal Data Scientist and Machine Learning Platform Architect},
+  email    = {alexandria.montgomery.fitzgerald@a-very-long-department.example.org},
+  phone    = {+1 416 555 0142},
+  location = {Greater Toronto Regional Office, Ontario, Canada},
+  website  = {example.org/alexandria-montgomery-fitzgerald/portfolio},
+  linkedin = {linkedin.com/in/alexandria-montgomery-fitzgerald},
+  orcid    = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist},
+  organization = {Example Research Laboratory},
+  location     = {Toronto, Ontario},
+  dates        = {September 2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Rebuilt the reporting pipeline, described in
+          \href{https://example.org/programs/analytics-modernization}{a public
+          write-up} that downstream teams still consult. This anchor is the one
+          link on the page that the screen medium does decorate.
+    \item Deposited the validation notes at
+          \CDossierLink{https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html}
+          for public review.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

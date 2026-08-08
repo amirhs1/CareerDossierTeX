@@ -1,0 +1,51 @@
+% resume-link-decoration-screen.tex — line breaking with `medium=screen' link
+% decoration (issue #278).
+%
+% The decoration is a rule drawn under author-written anchor text, and the
+% failure it has to be checked against is a line-breaking one. ulem, the obvious
+% vehicle, reboxes what it underlines and breaks the result at its spaces only:
+% an underlined run either loses its interior break points or becomes one
+% unbreakable box. lua-ul attaches an attribute and leaves the node list alone,
+% so TeX breaks a decorated paragraph exactly as it breaks an undecorated one.
+%
+% This fixture states that as a rendered assertion. The first bullet's anchor
+% text is long enough to wrap mid-phrase at this size and margin, and the prose
+% paragraph's anchor sits at the end of a line; the runner's "no overfull boxes"
+% check is what fails if the decoration ever starts constraining the break.
+%
+% The address links are here for the other half of the split: `\CDossierLink'
+% and the contact line render the address as its own visible text, and issue
+% #278 settled deliberately that those stay undecorated. Underlining them would
+% throw away the intra-URL break points of issues #294 and #308, and the
+% overfull check would report it here.
+\documentclass[medium=screen, fontsize=10pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name    = {Alexandria Montgomery-Fitzgerald},
+  email   = {alexandria@example.org},
+  website = {example.org/alexandria-montgomery-fitzgerald/portfolio},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Principal Data Scientist},
+  organization = {Digital Services Laboratory},
+  location     = {Ontario, Canada},
+  dates        = {September 2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Rebuilt the analytical engine's reporting pipeline, described in
+          \href{https://example.org/programs/analytics-modernization/2024/final-report/notes.html}{a
+          long public write-up of the modernization programme and its
+          reproducibility appendix} that downstream teams still consult.
+    \item Deposited the validation notes at
+          \CDossierLink{https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html}
+          for public review.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+The programme's methodology, its evaluation criteria, and the reviewer guidance
+issued alongside it are collected in the
+\href{https://example.org/programs/analytics-modernization/handbook}{programme
+handbook}, which is maintained separately from this record.
+\end{document}

@@ -1,0 +1,28 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: hook-is-installed-on-hyperref
+============================================================
+href-hook=installed
+link-hook=installed
+============================================================
+============================================================
+TEST 2: screen-decorates-anchor-text
+============================================================
+medium=screen
+decoration=underline over 'anchor text'
+============================================================
+============================================================
+TEST 3: plainlinks-suppresses-and-is-group-scoped
+============================================================
+decoration=none
+decoration=underline over 'anchor text'
+============================================================
+============================================================
+TEST 4: print-leaves-anchor-text-undecorated
+============================================================
+medium=print
+decoration=none
+medium=screen
+decoration=underline over 'anchor text'
+============================================================

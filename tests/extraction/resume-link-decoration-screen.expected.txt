@@ -1,0 +1,13 @@
+Ada Lovelace
+Data Scientist
+
+ada@example.com | +1 416 555 0142 | example.com/ada
+
+Experience
+Senior Data Scientist
+Example Research Laboratory
+• Shipped the analytical engine, documented in a public write-up that a reader can follow.
+• An address the reader sees in full: example.com/notes.
+
+2024–Present
+Toronto, ON

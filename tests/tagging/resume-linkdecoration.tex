@@ -1,0 +1,13 @@
+% resume-linkdecoration.tex — tagged output with `medium=screen' link
+% decoration (issue #278).
+%
+% \uline reboxes its argument, and boxed text under tagging can silently become
+% a bare /Artifact — hidden from assistive technology while veraPDF and every
+% extractor still pass. That is the v0.6.0 regression of issue #161, and it is
+% the one hazard that decided whether this feature could use ulem at all. This
+% fixture is where the answer is checked on a real document rather than on a
+% probe.
+\DocumentMetadata{lang=en,tagging=on}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{resume-linkdecoration-body.inc.tex}

@@ -813,6 +813,30 @@ url.sty's break points carry a penalty and no discretionary hyphen, so a wrapped
 address concatenates back exactly. `tests/links/resume-body-link.tex` pins that
 for a bullet and for a prose paragraph.
 
+`medium=screen` underlines author-written `\href` anchor text (issue #278), and
+that decoration was chosen against exactly the constraints in this document. It
+is drawn by `lua-ul` as a node attribute resolved at shipout, so it adds no box,
+touches no glue, and moves no break point; `tests/links/resume-screen-links.tex`
+pins the copy-paste invariant under `screen` as the fixtures above pin it under
+`print`, and `tests/extraction/resume-link-decoration-{print,screen}.tex` share
+one body so their committed baselines can be diffed against each other — the
+text layer must be identical under both media, on every supported extractor.
+
+`ulem` was tried first and is worth recording as a negative result, because it
+passes everything except the check this project added in issue #302. `\uline`
+reboxes its argument and rebuilds interword spaces as its own leaders. Poppler,
+MuPDF, and PDFKit all read `public write-up` back correctly, because they
+rebuild words from glyph geometry and the visual gap is still there; veraPDF
+validates; no `/Artifact` appears. The structure tree is where it fails — the
+Link element's logical text becomes `publicwrite-up`, so a screen reader
+announces one word. Only `structure-text.pl` can see this, which is precisely
+why it exists.
+
+The address-as-text links this toolkit renders — the contact line,
+`\CDossierLink`, an ORCID iD, a bibliography DOI — are never decorated, under
+either medium. That is a legibility decision (see `docs/API.md`), and under a
+reboxing underline it would also have been a correctness one.
+
 Second, plain extracted text cannot check this: a legitimate line wrap and a
 split token both read as whitespace. The decision needs word bounding boxes —
 pieces on different visual lines are a wrap, pieces sharing one line are the

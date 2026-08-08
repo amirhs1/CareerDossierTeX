@@ -1,0 +1,110 @@
+% components-linkdecoration.lvt — the `medium=screen' link decoration (#278).
+%
+% careerdossier-components owns `medium', owns the rendered link parts, and
+% therefore owns the decision to decorate an author's \href anchor text. This
+% file asserts the resolved state and the emitted decoration at the component;
+% the rendered pages, the text layer, and the structure tree are covered by the
+% layout, extraction, and tagging suites.
+%
+% `screen' is the value under test, so it is the one the package is loaded with;
+% `print' is the default and is reached below by setting the key directly.
+\input{regression-test}
+\documentclass{article}
+\usepackage[medium=screen]{careerdossier-components}
+\usepackage{hyperref}
+
+\ExplSyntaxOn
+
+%% The hook is installed by patching two of hyperref's own control sequences,
+%% and a patch that silently fails to apply is indistinguishable on the page
+%% from `medium=print'. Assert both saved originals exist: if a future hyperref
+%% renames \hyper@link@, or \href stops being copyable, this is what reports it
+%% rather than a reference PDF quietly losing its underlines.
+\cs_new_protected:Npn \cdossiertestReportHook
+  {
+    \cs_if_exist:NTF \__cdossier_components_href_orig:
+      { \TYPE{href-hook=installed} }
+      { \TYPE{href-hook=missing} }
+    \cs_if_exist:NTF \__cdossier_components_hyperlink_orig:w
+      { \TYPE{link-hook=installed} }
+      { \TYPE{link-hook=missing} }
+  }
+
+\cs_new_protected:Npn \cdossiertestReportMedium
+  {
+    \bool_if:NTF \l__cdossier_components_screen_bool
+      { \TYPE{medium=screen} }
+      { \TYPE{medium=print} }
+  }
+
+%% Observe the branch that actually ran rather than re-stating the condition the
+%% implementation tests. lua-ul draws its rule at shipout from a node attribute
+%% and reboxes nothing, so an underlined run is dimensionally identical to a
+%% plain one and no measurement of the result can tell them apart -- which is
+%% the whole reason it was chosen over ulem. What can be observed is the call.
+%%
+%% \RenewDocumentCommand is deliberate: it errors if \underLine is absent, so a
+%% future lua-ul that renamed or re-signed the command fails here loudly instead
+%% of leaving \CDossierLinkStyle silently drawing nothing. The argument is
+%% echoed so a stub that swallowed the text would also be visible.
+%%
+%% The flag is set globally because \hbox_set:Nn types the probe inside a group,
+%% which would restore a local one before it could be read.
+\bool_new:N \g__cdossiertest_underlined_bool
+\tl_new:N \g__cdossiertest_text_tl
+
+\RenewDocumentCommand \underLine { o +m }
+  {
+    \bool_gset_true:N \g__cdossiertest_underlined_bool
+    \tl_gset:Nn \g__cdossiertest_text_tl {#2}
+    #2
+  }
+
+\cs_new_protected:Npn \cdossiertestReportDecoration
+  {
+    \bool_gset_false:N \g__cdossiertest_underlined_bool
+    \tl_gclear:N \g__cdossiertest_text_tl
+    \hbox_set:Nn \l_tmpa_box { \CDossierLinkStyle { anchor~text } }
+    \bool_if:NTF \g__cdossiertest_underlined_bool
+      { \TYPE{decoration=underline~over~'\g__cdossiertest_text_tl'} }
+      { \TYPE{decoration=none} }
+  }
+
+\cs_new_protected:Npn \cdossiertestSetOption #1
+  { \keys_set:nn { cdossier / components } {#1} }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{hook-is-installed-on-hyperref}{
+  \cdossiertestReportHook
+}
+
+\TEST{screen-decorates-anchor-text}{
+  \cdossiertestReportMedium
+  \cdossiertestReportDecoration
+}
+
+%% \CDossierPlainLinks is group-scoped, so the same fixture can assert both the
+%% suppression and its release. A leak here would silently undecorate every link
+%% after the first contact line.
+\TEST{plainlinks-suppresses-and-is-group-scoped}{
+  \begingroup
+    \CDossierPlainLinks
+    \cdossiertestReportDecoration
+  \endgroup
+  \cdossiertestReportDecoration
+}
+
+\TEST{print-leaves-anchor-text-undecorated}{
+  \cdossiertestSetOption{medium=print}
+  \cdossiertestReportMedium
+  \cdossiertestReportDecoration
+  \cdossiertestSetOption{medium=screen}
+  \cdossiertestReportMedium
+  \cdossiertestReportDecoration
+}
+
+\END
+\end{document}

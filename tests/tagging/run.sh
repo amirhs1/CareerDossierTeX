@@ -501,6 +501,68 @@ check_contact_label_tagging() {
   echo "  RECORDED: structure roles (report: $base-structure.txt)"
 }
 
+# Underlined link text under `medium=screen' (issue #278).
+#
+# The decoration is drawn by ulem, and \uline reboxes what it underlines. Boxed
+# text under tagging is exactly how the v0.6.0 regression of issue #161
+# happened: the run became a bare /Artifact, invisible to assistive technology,
+# while veraPDF validated it and all three extractors read it back intact. So
+# neither veraPDF nor the extraction matrix can be the guard here.
+#
+# Two assertions, and the second is the one that would have caught #161:
+#
+#   1. The anchor text reaches the structure tree as content. check_structure_text
+#      pins the full decoded run set; this names the decorated run specifically,
+#      so a diff that loses it cannot be waved through by regenerating a baseline.
+#   2. No text object sits inside a bare /Artifact BMC. The fixture is one page
+#      and `medium=screen' emits no furniture at all, so it has no legitimate
+#      text artifact of any kind — the count must be exactly zero. The " | "
+#      contact separators are /Artifact<</Type /Layout>> BDC, a different
+#      operator, and are not counted.
+check_link_decoration_tagging() {
+  local base="$1"
+  local anchor="$2"
+  local pdf="$work/$base.pdf"
+  local got="$work/$base.structure.got"
+  local pages text_artifacts
+
+  pages="$(pdfinfo "$pdf" | awk '/^Pages:/ { print $2 }')"
+  if [ "$pages" -ne 1 ]; then
+    record_failure \
+      "$base must stay one page so the artifact count has no page furniture in it (got $pages)"
+    return
+  fi
+
+  grep -qa 'StructTreeRoot' "$pdf" || record_failure "$base has no structure tree"
+
+  if [ -s "$got" ]; then
+    if grep -Fq "$anchor" "$got"; then
+      echo "  VERIFIED: underlined anchor text '$anchor' is structure content"
+    else
+      record_failure \
+        "$base structure text has no '$anchor': the underlined anchor text is not reaching the structure tree"
+    fi
+  fi
+
+  if [ "$have_mutool" -eq 1 ]; then
+    text_artifacts="$(
+      mutool show "$pdf" pages/1/Contents \
+        | awk '
+            /^\/Artifact BMC$/ { in_artifact = 1; next }
+            in_artifact && /^BT$/ { count++; in_artifact = 0; next }
+            in_artifact && /^EMC$/ { in_artifact = 0 }
+            END { print count + 0 }
+          '
+    )"
+    if [ "$text_artifacts" -eq 0 ]; then
+      echo "  VERIFIED: no text run is a bare artifact (issue #161 hazard)"
+    else
+      record_failure \
+        "$base marks $text_artifacts text run(s) as bare artifacts; underlined link text must stay content"
+    fi
+  fi
+}
+
 # Structure-element text (issue #302).
 #
 # Every other extraction check below asks an extractor what the page says, and
@@ -916,6 +978,22 @@ if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
   if [ "$have_verapdf" -eq 1 ]; then
     compile_fixture resume-entrymeta-inline-ua2.tex resume-entrymeta-inline-ua2 \
       && validate_ua2 resume-entrymeta-inline
+  fi
+fi
+
+# Link decoration under `medium=screen' (issue #278). Outside the five-document
+# loop for the same reason as the two fixtures above: one page, no continuation
+# furniture. What only this suite can see is whether ulem's rebox pushed the
+# underlined anchor text out of the structure tree.
+echo "== resume-linkdecoration =="
+if compile_fixture resume-linkdecoration.tex resume-linkdecoration; then
+  check_structure_text resume-linkdecoration
+  check_link_decoration_tagging resume-linkdecoration 'public write-up'
+  check_extraction resume-linkdecoration
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture resume-linkdecoration-ua2.tex resume-linkdecoration-ua2 \
+      && validate_ua2 resume-linkdecoration
   fi
 fi
 
