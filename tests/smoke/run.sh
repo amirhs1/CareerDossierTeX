@@ -166,6 +166,7 @@ cases=(
   "cv-bad-paper fail|Unknown 'paper' value 'legal' for careerdossier-cv."
   "cv-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-cv."
   "cv-bad-medium fail|Unknown 'medium' value 'paper' for careerdossier-cv."
+  "cv-bad-muted fail|Unknown 'muted' value 'grey' for careerdossier-cv."
   "cv-bad-entrymeta fail|Unknown 'entrymeta' value 'flush' for careerdossier-cv."
   "cv-unknown-option fail|Unknown class option 'format'"
   "cv-unknown-entry-key fail|Unknown CDossierEntry key 'employer'"

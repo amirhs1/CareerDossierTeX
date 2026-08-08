@@ -263,6 +263,10 @@ Its `-bbox-layout` tree shows the whole mechanism:
 | wide (`0.3125`) | `[Senior Engineer / Example Labs]`, `[2024–Present / Toronto, ON]`, `[bullets]` — one flow, sorted top-to-bottom then left-to-right, so the column lands in place |
 | tight (`0.125`) | `[Senior Engineer / Example Labs / bullets]`, then `[2024–Present / Toronto, ON]` — the heading and the list merge into one *tall* block |
 
+`0.3125` is the value the token carried when #219 took this measurement, not
+today's default; #206 later retuned it to `0.25`, which is where the floor
+below now sits.
+
 A tall left block that spans the entire vertical band of a short right-hand one
 is Poppler's signature for a two-column page, so it emits the whole left column
 before the right. The trigger is therefore page-level, not local to the heading:
