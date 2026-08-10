@@ -676,20 +676,62 @@ parameters are all preserved:
 | `linkedin.com/in/ada-lovelace` | as written | `https://linkedin.com/in/ada-lovelace` |
 | `https://www.linkedin.com/in/ada-lovelace/` | as written | as written |
 
-Supplying the bare identifier is the better choice for `scholar` for a second
-reason: a copied Google Scholar URL often carries `&hl=en`, and a field value is
-read as ordinary text rather than as `\url`'s verbatim argument, so its `&` is a
-TeX alignment character and stops the build. The identifier has no such
-character.
-
 `website` has no canonical host by definition and is never expanded; a value
 with no `/` or `.` is displayed and linked exactly as written. `orcid` keeps its
 own normalization and its `ORCID:` label, described under
 [Academic profile metadata](#academic-profile-metadata).
 
-Bare identifiers are not validated. Nothing in LaTeX can dereference an address,
-so a misspelled handle produces a well-formed link to a page that does not
-exist.
+#### Forms that work
+
+Every row below produces a working link. Give either the identifier alone or a
+complete address; the forms in between are what go wrong.
+
+| Key | Write | Displayed and linked as |
+|---|---|---|
+| `linkedin` | `ada-lovelace` | `linkedin.com/in/ada-lovelace` |
+| `linkedin` | `linkedin.com/in/ada-lovelace` | unchanged |
+| `linkedin` | `www.linkedin.com/in/ada-lovelace` | unchanged, `www.` kept |
+| `linkedin` | `https://www.linkedin.com/in/ada-lovelace/` | unchanged, scheme and trailing slash kept |
+| `github` | `ada-lovelace` | `github.com/ada-lovelace` |
+| `github` | `github.com/ada-lovelace` | unchanged |
+| `github` | `https://github.com/ada-lovelace` | unchanged |
+| `scholar` | `kukA0LcAAAAJ` | `scholar.google.com/citations?user=kukA0LcAAAAJ` |
+| `scholar` | `scholar.google.com/citations?user=kukA0LcAAAAJ` | unchanged |
+| `scholar` | `https://scholar.google.com/citations?user=kukA0LcAAAAJ` | unchanged |
+
+A Google Scholar identifier containing `_` needs no escape.
+
+#### Forms to avoid
+
+These build successfully and produce a broken link, which is the case worth
+knowing about: the page looks correct, and nothing in the log says otherwise.
+Bare identifiers are not validated, because nothing in LaTeX can dereference an
+address.
+
+| Written | You get | Why |
+|---|---|---|
+| `linkedin = {in/ada-lovelace}` | `https://in/ada-lovelace` | half a path: the `/` makes it read as an address, so it is left alone |
+| `linkedin = {ada.lovelace}` | `https://ada.lovelace` | the `.` makes it read as a host — and no LinkedIn slug contains one |
+| `linkedin = {Ada Lovelace}` | `linkedin.com/in/Ada Lovelace` | a display name, not a handle; note the space inside the address |
+| `github = {@ada-lovelace}` | `github.com/@ada-lovelace` | `@` is a social-media convention, not part of a GitHub address |
+| `github = {ada-lovelace/some-repo}` | `https://ada-lovelace/some-repo` | a repository, not a profile — put repository links in body text with [`\CDossierLink`](#cdossierlink) |
+| `scholar = {citations?user=kukA0LcAAAAJ}` | `scholar.google.com/citations?user=citations?user=kukA0LcAAAAJ` | the query rather than the identifier, so the prefix is added on top of it |
+| `scholar = {user=kukA0LcAAAAJ}` | `scholar.google.com/citations?user=user=kukA0LcAAAAJ` | the same, doubling `user=` |
+
+#### Characters that stop the build
+
+A field value is read as ordinary text, not as `\url`'s verbatim argument, so
+two characters are consumed by TeX before the link machinery ever sees them and
+must be escaped. This applies to every profile field, not only these three.
+
+| Written | Result | Write instead |
+|---|---|---|
+| `github.com/ada#about` | build fails | `github.com/ada\#about` |
+| `example.com/a%b` | build fails | `example.com/a\%b` |
+| `example.com/a%25b` | build fails | `example.com/a\%25b` — percent-encoding does not help, the `%` is still a comment character |
+
+`&` needs no escape. A pasted Google Scholar address carrying `&hl=en` builds
+and renders correctly in every class.
 
 ### Contact-field labels (`contact-labels`)
 

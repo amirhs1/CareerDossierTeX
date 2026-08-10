@@ -15,6 +15,13 @@
   phone    = {+1 416 555 0142},
   location = {Toronto, Ontario, Canada},
   website  = {example.com},
-  linkedin = {linkedin.com/in/ada-lovelace},
+  %% linkedin, github, and scholar accept either form, and the two below are
+  %% deliberately written differently to show both. A bare handle is expanded
+  %% to the service's canonical address, so `ada-lovelace' and
+  %% `linkedin.com/in/ada-lovelace' produce the same page and the same link;
+  %% a value that already carries a `/' or a `.' is used exactly as written.
+  %% See docs/API.md, "Accepted forms for the web-profile keys", for the forms
+  %% that build but link nowhere.
+  linkedin = {ada-lovelace},
   github   = {github.com/ada-lovelace},
 }

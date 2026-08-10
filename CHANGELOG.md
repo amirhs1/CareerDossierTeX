@@ -196,11 +196,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   This is the form authors actually hold. Writing the natural value used to
   produce a link to `https://ada-lovelace` — broken, unwarned, and on a page
   that looked entirely correct, since the only place the expected
-  `linkedin.com/in/…` form was recorded was a source comment. Supplying the
-  bare identifier is also the way to avoid a build failure on `scholar`: a
-  copied Google Scholar URL often carries `&hl=en`, and a field value is read as
-  ordinary text rather than as `\url`'s verbatim argument, so that `&` is a TeX
-  alignment character.
+  `linkedin.com/in/…` form was recorded was a source comment.
 
   Nothing that works today changes. A value containing a `/` or a `.` is used
   exactly as written, scheme supplied only when absent, so a `www.` host, a
@@ -210,7 +206,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the address still reassembles by copy-paste under `make links`. `website` has
   no canonical host and is untouched, and `orcid` keeps its own `ORCID:` label
   and bare-iD display. See [`docs/API.md`](docs/API.md) for the accepted forms
-  per key.
+  per key, the forms that build but produce a broken link, and the two
+  characters — `#` and `%` — that must be escaped in any profile value.
 
 ### Changed
 
