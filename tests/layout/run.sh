@@ -407,6 +407,60 @@ EOF
         else
           fail=1
         fi
+
+        # Negative control for the club/widow check itself (issue #348).
+        #
+        # A clean result above is evidence only if the check can report a dirty
+        # one, and for most of this suite's life it could not: its paragraph
+        # boundary threshold sat above the gap `\parskip` actually produces, so
+        # it saw each page as one paragraph and never fired. Nothing failed,
+        # because the penalties were forbidding the breaks anyway — a detector
+        # that cannot detect and a document with nothing to detect print the
+        # same thing.
+        #
+        # A fixture carrying
+        #
+        #   % CLUBWIDOWCONTROL: <KIND>
+        #
+        # declares that permitting the break — \clubpenalty and \widowpenalty
+        # at 0, which is every value below 10000, since the penalty is a
+        # boolean here (#342) — strands a line it names. The runner rebuilds it
+        # that way and requires <KIND> to be reported. The shipped classes are
+        # untouched: the control sets the parameters in a wrapper.
+        #
+        # This is what makes the threshold in page-break-check.awk owned rather
+        # than merely present. At the old 1.35 the declared CLUB is not
+        # reported and this control fails.
+        cw_declared="$(sed -n 's/^% CLUBWIDOWCONTROL:[[:space:]]*//p' "$tex" | head -1)"
+        if [ -n "$cw_declared" ] && [ "$prose" -eq 1 ]; then
+          cwc="$control_dir/$base-club-widow"
+          {
+            printf '\\AddToHook{begindocument/before}'
+            printf '{\\clubpenalty=0 \\widowpenalty=0 }\n'
+            printf '\\input{%s}\n' "$tex"
+          } > "$cwc.tex"
+          if ! lualatex -halt-on-error -interaction=nonstopmode \
+               -output-directory="$control_dir" "$cwc.tex" \
+               > "$cwc.stdout" 2>&1; then
+            echo "  CLUB/WIDOW CONTROL FAILED TO COMPILE (see $cwc.log)"; fail=1
+          else
+            cw_seen="$(pdftotext -bbox "$cwc.pdf" - \
+              | awk -v furniture="$furniture_label" -v prose=1 \
+                    -f "$here/page-break-check.awk" | cut -f1 | sort -u)"
+            if printf '%s\n' "$cw_seen" | grep -qx "$cw_declared"; then
+              echo "  negative control fired: $cw_declared with the penalties permitted"
+            else
+              echo "  CLUB/WIDOW NEGATIVE CONTROL DID NOT FIRE: this fixture"
+              echo "    declares $cw_declared with \\clubpenalty and \\widowpenalty"
+              echo "    at 0, and the check reported '${cw_seen:-nothing}'. Its clean"
+              echo "    result above is therefore not evidence of anything."
+              echo "    Check the paragraph-gap threshold in page-break-check.awk"
+              echo "    first: raising it past the gap \\parskip produces makes"
+              echo "    every paragraph boundary invisible and every fixture pass."
+              fail=1
+            fi
+          fi
+        fi
       else
         echo "  (pdftotext absent: skipped typographic page-break check)"
       fi
