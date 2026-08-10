@@ -336,6 +336,36 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   undefined-control-sequence error; use `\CDossierTextColor` instead. See
   [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
+### Changed
+
+- The section heading's page-break keep is now a bound rather than a
+  prohibition. A section heading is placed only when at least
+  `\CDossierSectionNeedLines` (default `4`) lines remain on the page; otherwise
+  the page breaks before it and the heading opens the next one. The penalty that
+  previously sat after the section rule is gone. ([#333], [#340])
+
+  Read literally, that penalty did not say "keep the heading with its first few
+  lines" — it said "keep the heading with everything up to the next legal
+  breakpoint", which is unbounded, and it made the heading hostage to whatever
+  the section happened to contain. Because every vertical token is rigid and all
+  four classes are `\raggedbottom`, page badness is constant, so the page builder
+  could never weigh that keep against the hole it opened; the penalty only ever
+  deleted candidates.
+
+  It also leaked. With no content to bind to, the penalty was left immediately
+  before the gap glue under the rule, and a break at glue is legal only when a
+  non-discardable item precedes it — so a section with no content made its own
+  closing boundary impossible to break at, cumulatively across a run. Three
+  consecutive empty sections left no legal breakpoint at all.
+
+  **Pagination may change**, which is the point: the boundaries inside a section
+  are legal breaks again, so a page fills to the last entry that fits instead of
+  carrying the whole section to the next one. Measured blank space at the foot of
+  page one, on the committed two-page fixtures: résumé 19.39 pt → 16.14 pt
+  (2.7% → 2.2%), CV 15.73 pt → 8.80 pt (2.4% → 1.4%). The letter and statement
+  families are unchanged — they have no section rule and their remaining slack
+  comes from the club/widow policy, which this does not touch.
+
 ### Fixed
 
 - A run of entries with no body no longer strands the rest of a page. An
@@ -620,6 +650,9 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 [#324]: https://github.com/amirhs1/CareerDossierTeX/issues/324
 [#328]: https://github.com/amirhs1/CareerDossierTeX/issues/328
+[#332]: https://github.com/amirhs1/CareerDossierTeX/issues/332
+[#333]: https://github.com/amirhs1/CareerDossierTeX/issues/333
+[#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340
 
 ## [0.7.0] - 2026-08-04
 

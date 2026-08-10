@@ -243,6 +243,10 @@
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
+    %% Issue #333: the section keep, applied before the heading contributes
+    %% anything, so the bound is on what the heading commits rather than a
+    %% prohibition on breaking after it.
+    \__cdossier_components_section_need:
     \addvspace { \CDossierRecordSectionAboveSkip }
     \__cdossier_typography_division_begin:n { 2 }
     \__cdossier_typography_heading:nnn { 2 } { #1 }

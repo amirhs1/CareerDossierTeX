@@ -108,10 +108,22 @@
 %% ordinary \widowpenalty/\clubpenalty handling.
 %%
 %% CDossierHeadingKeepPenalty is a hard \nobreak-strength value (10000). It
-%% guards the boundaries that must never be broken: a section heading and its
-%% rule, an entry heading's own two lines, and the two list boundaries that
-%% would leave a single bullet stranded. Each spans a bounded amount of
-%% material, so forbidding the break cannot overflow a page.
+%% guards the boundaries that must never be broken: an entry heading's own two
+%% lines, the entry heading and the first line of its body, and the two list
+%% boundaries that would leave a single bullet stranded. Each spans a bounded
+%% amount of material, so forbidding the break cannot overflow a page.
+%%
+%% Issue #333: the section heading is deliberately *not* in that list any more.
+%% Read literally, a penalty after the section rule does not say "keep the
+%% heading with its first few lines" -- it says "keep the heading with
+%% everything up to the next legal breakpoint", which is unbounded and makes the
+%% heading hostage to whatever the section happens to contain. Because every
+%% vertical token here is rigid and all four classes are \raggedbottom, page
+%% badness is constant, so the page builder cannot weigh that keep against the
+%% hole it opens; the penalty only ever deletes candidates. The section keep is
+%% now expressed as a requirement before the heading -- see
+%% CDossierSectionNeedLines -- which bounds it and leaves the boundaries inside
+%% the section legal.
 %%
 %% CDossierListOrphanPenalty guards every interior list boundary and is
 %% deliberately below 10000, so a list longer than a page still breaks
@@ -122,6 +134,25 @@
 \int_set:Nn \CDossierHeadingKeepPenalty { 10000 }
 \int_new:N \CDossierListOrphanPenalty
 \int_set:Nn \CDossierListOrphanPenalty { 9997 }
+
+%% CDossierSectionNeedLines is the section heading's keep, expressed as a bound
+%% instead of a prohibition (issue #333). A section heading is placed only when
+%% at least this many lines of body leading remain on the page; otherwise the
+%% page breaks *before* the heading and the heading opens the next one.
+%%
+%% Four lines is what the heading actually needs to introduce anything: the
+%% heading and its rule, the two lines of the first entry heading, and that
+%% entry's first line of body. Fewer strands the heading in the sense issue #145
+%% forbids; more would start pushing headings to the next page for no gain,
+%% since a section is free to break immediately after its first entry.
+%%
+%% This replaces a keep with no ceiling at all, so it can only commit less
+%% material to a page than the penalty it succeeds, never more. It is a count of
+%% lines rather than a dimension because it is a statement about content -- the
+%% same four lines at every fontsize -- and \CDossierBodyLeading supplies the
+%% measure at the point of use.
+\int_new:N \CDossierSectionNeedLines
+\int_set:Nn \CDossierSectionNeedLines { 4 }
 
 %% Typographic page-break penalties (issue #171). These control hyphenation
 %% and paragraph-remnant breaks at page boundaries, complementing the
