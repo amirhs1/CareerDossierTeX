@@ -1,0 +1,35 @@
+% resume-contact-bare-actions.tex — the action type of a link whose address the
+% package synthesized (issue #330).
+%
+% A bare handle in `linkedin', `github', or `scholar' is expanded to the
+% service's canonical address, so the whole target — host, path, and scheme —
+% comes from the package rather than from the document. That is the input the
+% catcode defect behind #328 would hit hardest, and the companion fixture cannot
+% reach it: every value there is at least domain-qualified. What must come out
+% is an ordinary URI action, identical to the one the domain-qualified spelling
+% of the same profile produces.
+%
+% The three fields sit in their own fixture rather than beside the companion's
+% because a synthesized Scholar address is long: adding it there would wrap the
+% contact line, and a wrapped link is emitted as two annotations sharing one
+% action, which the runner's multiset comparison would report as an unexplained
+% duplicate. Only the two short handles share a line here for the same reason.
+%
+% URIEXPECT: mailto:ada@example.test
+% URIEXPECT: https://linkedin.com/in/ada
+% URIEXPECT: https://github.com/ada
+% URIEXPECT: https://scholar.google.com/citations?user=kukA0LcAAAAJ
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  email    = {ada@example.test},
+  linkedin = {ada},
+  github   = {ada},
+  scholar  = {kukA0LcAAAAJ},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Notes}
+A paragraph, so the document has a body.
+\end{document}

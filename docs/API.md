@@ -633,9 +633,9 @@ remain compatible with the released industry classes.
 | `phone` | No | Released | Telephone number |
 | `location` | No | Released | City, region, or country |
 | `website` | No | Released | Personal or professional website |
-| `linkedin` | No | Released | LinkedIn URL or profile path |
-| `github` | No | Released | GitHub URL or profile path |
-| `scholar` | No | Released | Google Scholar profile URL or identifier |
+| `linkedin` | No | Released | LinkedIn handle, profile path, or URL |
+| `github` | No | Released | GitHub handle, profile path, or URL |
+| `scholar` | No | Released | Google Scholar identifier, profile path, or URL |
 | `orcid` | No | `v0.2.0` | ORCID identifier or profile URL |
 | `affiliation` | Conditional | `v0.5.0` | Current institution, organization, studio, or independent-practice description |
 
@@ -647,6 +647,103 @@ for every statement, `affiliation` for `type=research`, and `website` for
 `type=artist`. "Conditional" in the table above means exactly that: the key is
 optional to the profile and required by some documents that use it. See
 "Required profile fields and displayed contacts" for the statement rules.
+
+### Accepted forms for the web-profile keys
+
+`linkedin`, `github`, and `scholar` name a service with a documented canonical
+address, so each accepts a bare identifier as well as an address. A bare
+identifier is expanded to the canonical address — for the displayed text and for
+the link target alike, so the address on the page is the address the link goes
+to:
+
+| Key | Written | Displayed | Link target |
+|---|---|---|---|
+| `linkedin` | `ada-lovelace` | `linkedin.com/in/ada-lovelace` | `https://linkedin.com/in/ada-lovelace` |
+| `github` | `ada-lovelace` | `github.com/ada-lovelace` | `https://github.com/ada-lovelace` |
+| `scholar` | `kukA0LcAAAAJ` | `scholar.google.com/citations?user=kukA0LcAAAAJ` | `https://scholar.google.com/citations?user=kukA0LcAAAAJ` |
+
+A value is read as a bare identifier when it contains neither `/` nor `.`.
+Those two characters are what every address form carries — with a scheme,
+without one, or with a `www.` host — and what none of these three services
+permits in an identifier.
+
+Any other value is used exactly as written, with only the `https://` scheme
+supplied when it carries none. A `www.` host, a trailing slash, and query
+parameters are all preserved:
+
+| Written | Displayed | Link target |
+|---|---|---|
+| `linkedin.com/in/ada-lovelace` | as written | `https://linkedin.com/in/ada-lovelace` |
+| `https://www.linkedin.com/in/ada-lovelace/` | as written | as written |
+
+`website` has no canonical host by definition and is never expanded; a value
+with no `/` or `.` is displayed and linked exactly as written. `orcid` keeps its
+own normalization and its `ORCID:` label, described under
+[Academic profile metadata](#academic-profile-metadata).
+
+#### Forms that work
+
+Every row below produces a working link. Give either the identifier alone or a
+complete address; the forms in between are what go wrong.
+
+| Key | Write | Displayed and linked as |
+|---|---|---|
+| `linkedin` | `ada-lovelace` | `linkedin.com/in/ada-lovelace` |
+| `linkedin` | `linkedin.com/in/ada-lovelace` | unchanged |
+| `linkedin` | `www.linkedin.com/in/ada-lovelace` | unchanged, `www.` kept |
+| `linkedin` | `https://www.linkedin.com/in/ada-lovelace/` | unchanged, scheme and trailing slash kept |
+| `github` | `ada-lovelace` | `github.com/ada-lovelace` |
+| `github` | `github.com/ada-lovelace` | unchanged |
+| `github` | `https://github.com/ada-lovelace` | unchanged |
+| `scholar` | `kukA0LcAAAAJ` | `scholar.google.com/citations?user=kukA0LcAAAAJ` |
+| `scholar` | `scholar.google.com/citations?user=kukA0LcAAAAJ` | unchanged |
+| `scholar` | `https://scholar.google.com/citations?user=kukA0LcAAAAJ` | unchanged |
+
+A Google Scholar identifier containing `_` needs no escape.
+
+#### Forms to avoid
+
+These build successfully and produce a broken link, which is the case worth
+knowing about: the page looks correct, and nothing in the log says otherwise.
+Bare identifiers are not validated, because nothing in LaTeX can dereference an
+address.
+
+| Written | You get | Why |
+|---|---|---|
+| `linkedin = {in/ada-lovelace}` | `https://in/ada-lovelace` | half a path: the `/` makes it read as an address, so it is left alone |
+| `linkedin = {ada.lovelace}` | `https://ada.lovelace` | the `.` makes it read as a host — and no LinkedIn slug contains one |
+| `linkedin = {Ada Lovelace}` | `linkedin.com/in/Ada Lovelace` | a display name, not a handle; note the space inside the address |
+| `github = {@ada-lovelace}` | `github.com/@ada-lovelace` | `@` is a social-media convention, not part of a GitHub address |
+| `github = {ada-lovelace/some-repo}` | `https://ada-lovelace/some-repo` | a repository, not a profile — put repository links in body text with [`\CDossierLink`](#cdossierlink) |
+| `scholar = {citations?user=kukA0LcAAAAJ}` | `scholar.google.com/citations?user=citations?user=kukA0LcAAAAJ` | the query rather than the identifier, so the prefix is added on top of it |
+| `scholar = {user=kukA0LcAAAAJ}` | `scholar.google.com/citations?user=user=kukA0LcAAAAJ` | the same, doubling `user=` |
+
+#### Characters that stop the build
+
+A field value is read as ordinary text, not as `\url`'s verbatim argument, so
+two characters are consumed by TeX before the link machinery ever sees them and
+must be escaped. This applies to every profile field, not only these three.
+
+| Written | Result | Write instead |
+|---|---|---|
+| `github.com/ada#about` | build fails | `github.com/ada\#about` |
+| `example.com/a%b` | build fails | `example.com/a\%b` |
+| `example.com/a%25b` | build fails | `example.com/a\%25b` — percent-encoding does not help, the `%` is still a comment character |
+
+Nothing else needs escaping. `&`, `_`, `~`, `$`, and `^` all build and render
+correctly, so a pasted Google Scholar address carrying `&hl=en` is fine in every
+class.
+
+**Escaping them anyway is harmless**, which makes the rule safe to apply
+defensively: `example.com/a&b` and `example.com/a\&b` produce a byte-identical
+`/URI(https://example.com/a&b)` action in the PDF, and likewise for the others.
+So the whole rule an author needs is *escape `#` and `%`; escaping anything else
+changes nothing.* Over-escaping cannot silently break a link.
+
+In practice this affects `website` and [`\CDossierLink`](#cdossierlink) far more
+than the three keys above: a LinkedIn or GitHub handle and a Google Scholar
+identifier are restricted to letters, digits, hyphens, and underscores, so
+neither character occurs in one.
 
 ### Contact-field labels (`contact-labels`)
 
@@ -668,9 +765,10 @@ fields whose nature the value itself does not convey:
 | `website` | `Website: example.test/resume` |
 
 The remaining fields stay unlabelled by design: `linkedin`, `github`, and
-`scholar` values begin with their service's domain, `orcid` always carries its
-own `ORCID:` label, and a `location` value is a place name. Labels are fixed
-English strings; the project is English-only.
+`scholar` values display beginning with their service's domain — including when
+the author supplied a bare identifier, since that is expanded to the canonical
+address — `orcid` always carries its own `ORCID:` label, and a `location` value
+is a place name. Labels are fixed English strings; the project is English-only.
 
 **Accessibility rationale.** In the default rendering, a screen reader
 announces the email and the website as links, so their nature is conveyed —
@@ -1154,9 +1252,14 @@ See "Page-break policy" below.
 The supported way to put a link in body text — a bullet, an entry, a letter
 paragraph, a statement paragraph. The argument is both the text that appears on
 the page and, once normalized, the link target: a value carrying no `://` scheme
-gains `https://`, exactly as the `website`, `linkedin`, `github`, and `scholar`
-profile fields do, and a value that has one keeps it. The displayed text is the
-argument as written, never the normalized target.
+gains `https://`, exactly as the `website` profile field does, and a value that
+has one keeps it. The displayed text is the argument as written, never the
+normalized target.
+
+`\CDossierLink` takes no bare identifier. Body text has no service to expand one
+against; the canonical-address expansion belongs to the `linkedin`, `github`,
+and `scholar` profile keys, which name one. See
+[Accepted forms for the web-profile keys](#accepted-forms-for-the-web-profile-keys).
 
 Use it for every address in running text. Typing the URL as plain text does not
 work, and neither does `\url`:
@@ -1550,8 +1653,13 @@ The shared profile gains one key:
 
 ORCID must be displayed as ordinary text with a descriptive `ORCID:` label and
 a web link. A bare identifier is normalized to an `https://orcid.org/` target;
-a complete URL is used as supplied. Scholar and ORCID are omitted independently
-when blank and must not leave separators, blank lines, or icon-only content.
+a complete URL is used as supplied. ORCID is the one web-profile key whose
+displayed text stays the bare identifier: its label supplies the meaning that
+the other three take from the domain, so it does not adopt the canonical-address
+display described under
+[Accepted forms for the web-profile keys](#accepted-forms-for-the-web-profile-keys).
+Scholar and ORCID are omitted independently when blank and must not leave
+separators, blank lines, or icon-only content.
 
 The CV derives `/Title` as `Curriculum Vitae – <name>`, `/Author` from `name`,
 and `/Lang` as `en`, subject to the existing `\hypersetup` precedence rule.

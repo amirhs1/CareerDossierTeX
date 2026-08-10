@@ -187,6 +187,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   LPPL 1.3c. See [`docs/API.md`](docs/API.md#medium) for the option and
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) for the measurements.
 
+- The `linkedin`, `github`, and `scholar` profile keys accept a bare handle or
+  identifier. `linkedin = {ada-lovelace}` now displays and links
+  `linkedin.com/in/ada-lovelace`, `github = {ada-lovelace}` gives
+  `github.com/ada-lovelace`, and `scholar = {kukA0LcAAAAJ}` gives
+  `scholar.google.com/citations?user=kukA0LcAAAAJ`. ([#330])
+
+  This is the form authors actually hold. Writing the natural value used to
+  produce a link to `https://ada-lovelace` — broken, unwarned, and on a page
+  that looked entirely correct, since the only place the expected
+  `linkedin.com/in/…` form was recorded was a source comment.
+
+  Nothing that works today changes. A value containing a `/` or a `.` is used
+  exactly as written, scheme supplied only when absent, so a `www.` host, a
+  trailing slash, and query parameters all survive; every shipped example and
+  fixture uses such a value and renders byte-for-byte as before. The synthesized
+  address is the displayed text as well as the link target, so the two agree and
+  the address still reassembles by copy-paste under `make links`. `website` has
+  no canonical host and is untouched, and `orcid` keeps its own `ORCID:` label
+  and bare-iD display. See [`docs/API.md`](docs/API.md) for the accepted forms
+  per key, the forms that build but produce a broken link, and the two
+  characters — `#` and `%` — that must be escaped in any profile value.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -650,6 +672,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 [#324]: https://github.com/amirhs1/CareerDossierTeX/issues/324
 [#328]: https://github.com/amirhs1/CareerDossierTeX/issues/328
+[#330]: https://github.com/amirhs1/CareerDossierTeX/issues/330
 [#332]: https://github.com/amirhs1/CareerDossierTeX/issues/332
 [#333]: https://github.com/amirhs1/CareerDossierTeX/issues/333
 [#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340

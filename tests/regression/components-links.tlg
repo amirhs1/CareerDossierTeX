@@ -30,3 +30,53 @@ TEST 6: link-degrades-without-hyperref
 ============================================================
 degrades-to-plain-text
 ============================================================
+============================================================
+TEST 7: linkedin-bare-handle-gains-canonical-address
+============================================================
+[linkedin.com/in/ada-lovelace] -> [https://linkedin.com/in/ada-lovelace]
+============================================================
+============================================================
+TEST 8: linkedin-domain-qualified-value-unchanged
+============================================================
+[linkedin.com/in/ada-lovelace] -> [https://linkedin.com/in/ada-lovelace]
+============================================================
+============================================================
+TEST 9: linkedin-written-out-address-unchanged
+============================================================
+[https://www.linkedin.com/in/ada-lovelace/] -> [https://www.linkedin.com/in/ada-lovelace/]
+============================================================
+============================================================
+TEST 10: github-bare-handle-gains-canonical-address
+============================================================
+[github.com/ada-lovelace] -> [https://github.com/ada-lovelace]
+============================================================
+============================================================
+TEST 11: github-domain-qualified-value-unchanged
+============================================================
+[github.com/ada-lovelace] -> [https://github.com/ada-lovelace]
+============================================================
+============================================================
+TEST 12: github-written-out-address-unchanged
+============================================================
+[https://github.com/ada-lovelace] -> [https://github.com/ada-lovelace]
+============================================================
+============================================================
+TEST 13: scholar-bare-identifier-gains-canonical-address
+============================================================
+[scholar.google.com/citations?user=kukA0LcAAAAJ] -> [https://scholar.google.com/citations?user=kukA0LcAAAAJ]
+============================================================
+============================================================
+TEST 14: scholar-domain-qualified-value-unchanged
+============================================================
+[scholar.google.com/citations?user=kukA0LcAAAAJ] -> [https://scholar.google.com/citations?user=kukA0LcAAAAJ]
+============================================================
+============================================================
+TEST 15: scholar-written-out-address-unchanged
+============================================================
+[https://scholar.google.com/citations?user=kukA0LcAAAAJ] -> [https://scholar.google.com/citations?user=kukA0LcAAAAJ]
+============================================================
+============================================================
+TEST 16: website-bare-value-is-not-canonicalized
+============================================================
+[example] -> [https://example]
+============================================================

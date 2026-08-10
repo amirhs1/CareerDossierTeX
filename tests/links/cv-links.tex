@@ -7,8 +7,14 @@
 % land on different baselines. A spread URL puts them on one baseline instead,
 % which is the defect this suite exists to catch.
 %
+% The scholar value is a bare identifier (issue #330), so its displayed address
+% is synthesized by the package rather than written here. That is the case worth
+% covering: the copy-paste invariant has to hold for an address no source line
+% contains, and the identifier carries the `?' and `=' that a Scholar URL needs.
+%
 % LINKTOKEN: ada.lovelace@a-very-long-department.example.org
 % LINKTOKEN: example.org/ada-lovelace/publications-and-preprints
+% LINKTOKEN: scholar.google.com/citations?user=kukA0LcAAAAJ
 % LINKTOKEN: 0000-0002-1825-0097
 % LINKTOKEN: 10.9999/example.transactions.2026.analytical-engine.appendix-g
 % LINKTOKEN: archive.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
@@ -20,6 +26,7 @@
   phone    = {+1 416 555 0142},
   location = {Toronto, Ontario, Canada},
   website  = {example.org/ada-lovelace/publications-and-preprints},
+  scholar  = {kukA0LcAAAAJ},
   orcid    = {0000-0002-1825-0097},
 }
 \begin{document}

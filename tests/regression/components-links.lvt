@@ -7,6 +7,12 @@
 % ORCID identifiers gain their canonical resolver URL, and the link wrapper
 % degrades to plain visible text when hyperref is absent.
 %
+% The linkedin, github, and scholar cases (issue #330) pin the displayed text as
+% well as the target, in the form `[display] -> [target]'. Normalization is
+% visible, so those two must agree: a bare identifier is expanded to the
+% service's canonical address for both, and every value already carrying a `/'
+% or a `.' must come out byte-identical to what was written.
+%
 % Each helper is defined under \ExplSyntaxOn so the private names tokenize
 % correctly; catcodes cannot be switched inside a \TEST body. A field is cleared
 % to empty (which removes it, without warning) before each fresh value, so
@@ -22,6 +28,13 @@
     \CDossierSetup{ website = {#1} }
     \__cdossier_components_web:n { website }
     \TYPE{ [\l__cdossier_components_url_tl] }
+  }
+\cs_new_protected:Npn \cdossiertestProfile #1#2
+  {
+    \CDossierSetup{ #1 = {} }
+    \CDossierSetup{ #1 = {#2} }
+    \__cdossier_components_web:n {#1}
+    \TYPE{ [\l__cdossier_components_disp_tl] ~ -> ~ [\l__cdossier_components_url_tl] }
   }
 \cs_new_protected:Npn \cdossiertestMailTarget #1
   {
@@ -70,6 +83,51 @@
 
 \TEST{link-degrades-without-hyperref}{
   \cdossiertestHrefBranch
+}
+
+%% Issue #330. Three input forms per key: the bare identifier, which is the one
+%% that changes; the domain-qualified form every shipped profile uses; and the
+%% fully written-out address. Only the first may differ from its input.
+\TEST{linkedin-bare-handle-gains-canonical-address}{
+  \cdossiertestProfile{linkedin}{ada-lovelace}
+}
+
+\TEST{linkedin-domain-qualified-value-unchanged}{
+  \cdossiertestProfile{linkedin}{linkedin.com/in/ada-lovelace}
+}
+
+\TEST{linkedin-written-out-address-unchanged}{
+  \cdossiertestProfile{linkedin}{https://www.linkedin.com/in/ada-lovelace/}
+}
+
+\TEST{github-bare-handle-gains-canonical-address}{
+  \cdossiertestProfile{github}{ada-lovelace}
+}
+
+\TEST{github-domain-qualified-value-unchanged}{
+  \cdossiertestProfile{github}{github.com/ada-lovelace}
+}
+
+\TEST{github-written-out-address-unchanged}{
+  \cdossiertestProfile{github}{https://github.com/ada-lovelace}
+}
+
+\TEST{scholar-bare-identifier-gains-canonical-address}{
+  \cdossiertestProfile{scholar}{kukA0LcAAAAJ}
+}
+
+\TEST{scholar-domain-qualified-value-unchanged}{
+  \cdossiertestProfile{scholar}{scholar.google.com/citations?user=kukA0LcAAAAJ}
+}
+
+\TEST{scholar-written-out-address-unchanged}{
+  \cdossiertestProfile{scholar}{https://scholar.google.com/citations?user=kukA0LcAAAAJ}
+}
+
+%% website has no canonical host, so it must keep taking the old path: the
+%% displayed text stays as written even when it looks exactly like a handle.
+\TEST{website-bare-value-is-not-canonicalized}{
+  \cdossiertestProfile{website}{example}
 }
 
 \END
