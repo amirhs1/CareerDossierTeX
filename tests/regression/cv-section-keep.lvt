@@ -10,6 +10,10 @@
 %    The keep is now a requirement applied *before* the heading — see
 %    \CDossierSectionNeedLines — which bounds it and leaves the boundaries inside
 %    the section legal.
+%    That \raggedbottom is inherited from `article.cls' rather than set by the
+%    toolkit, and is asserted per class by the `tokens-*-defaults' baselines; the
+%    comment at \CDossierClubPenalty in careerdossier-tokens.sty is where it is
+%    sourced (#335).
 %
 % 2. An empty section leaks nothing (#340). Emitted with no content to bind to,
 %    that penalty was left immediately before the gap glue below the rule, and a
