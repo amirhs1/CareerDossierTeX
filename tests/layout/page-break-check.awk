@@ -51,6 +51,23 @@
 # Prints one `TYPE<TAB>PAGE<TAB>TEXT` line per finding; prints nothing when
 # the document has none.
 
+# How much larger than the leading a gap must be to count as a paragraph
+# boundary. This is the whole sensitivity of the CLUB/WIDOW check, and it was
+# wrong until issue #348: at 1.35 no ordinary paragraph boundary in this corpus
+# was ever recognized, so the check reported "no widow or club line" on every
+# prose fixture by never looking.
+#
+# The signal is `\parskip`, which both prose families set to 0.25 x the body
+# leading, so a paragraph boundary measures 1.25-1.29 x the modal gap against
+# 1.0 x for ordinary leading. Measured on the committed fixtures at class
+# defaults: 18.06pt against a 14pt modal, or 1.290 x, in both families. 1.15
+# sits between the two populations with margin on each side.
+#
+# Do not raise this without re-running the negative control in run.sh, which
+# exists because this exact value went unowned: at 1.35 the control's declared
+# CLUB is not reported, and the whole check silently passes on everything.
+BEGIN { PARA_GAP = 1.15 }
+
 function is_folio_or_header(t) {
   if (t ~ /^Page [0-9]+ of [0-9]+$/) return 1
   if (furniture != "" && index(t, furniture) > 0) return 1
@@ -95,7 +112,7 @@ function process_page(   i, g, key, modal, bestcount, gapfreq, para, firstlines,
   para[1] = 1
   for (i = 2; i <= n; i++) {
     g = ytab[i] - ytab[i-1]
-    if (g > modal * 1.35) para[i] = para[i-1] + 1
+    if (g > modal * PARA_GAP) para[i] = para[i-1] + 1
     else para[i] = para[i-1]
   }
   firstlines = 0
