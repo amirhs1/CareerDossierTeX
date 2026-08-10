@@ -272,7 +272,7 @@
       { \msg_error:nnx { careerdossier-cv } { unknown-entry-key } { \l_keys_key_str } } ,
   }
 
-\NewDocumentEnvironment { CDossierEntry } { O{} }
+\NewDocumentEnvironment { CDossierEntry } { O{} +b }
   {
     \tl_clear:N \l__cdossier_cv_entry_title_tl
     \tl_clear:N \l__cdossier_cv_entry_org_tl
@@ -290,13 +290,23 @@
       \l__cdossier_cv_entry_dates_tl
     %% Issue #145: keep the entry heading with the first line of its body, so
     %% the heading cannot be stranded alone at the foot of a page.
-    \penalty \CDossierHeadingKeepPenalty
+    %%
+    %% Issue #332: guarded on a non-empty body, for the reasons set out at the
+    %% matching guard in careerdossier-resume.cls. In short: emitted with no body
+    %% to bind to, the penalty is left immediately before the gap glue, which
+    %% makes that boundary unbreakable, and the next entry's `\addvspace'
+    %% collapses rather than intervening -- so a run of body-less entries welds
+    %% into one block. The body is taken as a `+b' argument only so this test can
+    %% be made, at the cost of catcode-sensitive content in an entry body.
+    \tl_if_blank:nF {#2}
+      { \penalty \CDossierHeadingKeepPenalty }
     %% Issue #204: `\addvspace', not `\vspace'. As a `\vspace' this was extra
     %% space that added to whatever the entry body opened with, so a bullet list
     %% sat further from the entry heading that owns it than from the next entry.
     %% As an `\addvspace' the token is the *floor* for the heading -> body
     %% boundary, which a list overrides with its own edge.
     \addvspace { \CDossierRecordEntryGapSkip }
+    #2
   }
   {
     %% Issue #204: the entry's closing boundary is owned by whatever opens next

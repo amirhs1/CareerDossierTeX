@@ -1,0 +1,73 @@
+% cv-entry-keep-penalty.lvt — issue #332, the CV half.
+%
+% careerdossier-cv declares its own CDossierEntry rather than sharing the
+% résumé's, so the guard that decides whether the keep penalty is emitted exists
+% twice and can drift. resume-entry-edges.lvt asserts the résumé copy; this file
+% asserts the CV copy, and exists at all because the CV class had no entry-edge
+% regression of its own.
+%
+% The contract, and why \pagetotal cannot express it, are documented at the
+% matching test in resume-entry-edges.lvt. In short: an entry with a body emits
+% \CDossierHeadingKeepPenalty between its heading and that body so the two
+% cannot be split; an entry without a body emits nothing, because a penalty left
+% sitting before the gap glue makes the following boundary unbreakable and a run
+% of bodiless entries then welds into a single block. A penalty contributes 0pt,
+% so no page-total measurement distinguishes those cases.
+%
+% Consecutive glue collapses to a single `g': the assertion is where the penalty
+% sits relative to the heading box and the body's first box, not how much space
+% surrounds it.
+\input{regression-test}
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\makeatletter
+\newcommand\cdossiertestNodes[1]{%
+  \TYPE{#1 nodes = \directlua{
+    local t = {}
+    local lastglue = false
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("penalty") then
+        table.insert(t, "P" .. n.penalty) lastglue = false
+      elseif n.id == node.id("glue") then
+        if not lastglue then table.insert(t, "g") end
+        lastglue = true
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "H") lastglue = false
+      else
+        table.insert(t, node.type(n.id)) lastglue = false
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+\makeatother
+
+\begin{document}
+\START
+
+% Bodied entry: the penalty sits between the heading box and the body's first
+% box. Bare entry: no penalty at all, so the boundary after it stays legal.
+\TEST{cv-entry-keep-penalty}{
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Bodied Entry}]Prose body, no
+    list.\end{CDossierEntry}}
+  \cdossiertestNodes{bodied}
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Bare Entry}]\end{CDossierEntry}}
+  \cdossiertestNodes{bare}
+}
+
+% A bullet-list body reaches the same guard through a different first token, and
+% CDossierItemize carries its own `beginpenalty'. Both penalties must be present:
+% the entry's guard binds the heading to the list, and the list's beginpenalty
+% binds the first bullet to what precedes it.
+\TEST{cv-entry-keep-penalty-list}{
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Listed Entry}]%
+    \begin{CDossierItemize}\item First bullet.\item Second
+    bullet.\end{CDossierItemize}\end{CDossierEntry}}
+  \cdossiertestNodes{listed}
+}
+
+\END

@@ -50,7 +50,77 @@
   }
 \NewDocumentCommand \cdossiertestMark { m } { \cdossiertest_mark:n {#1} }
 \NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
+
+%% Issue #332: the keep penalty itself, asserted rather than observed.
+%%
+%% \pagetotal cannot see a penalty -- it contributes 0pt -- so every assertion
+%% above this point holds equally whether the penalty is emitted, misplaced, or
+%% absent. That is precisely how a change that altered page-break legality
+%% passed the whole regression suite.
+%%
+%% The probe reads the built vertical list itself rather than \lastpenalty. On
+%% the main vertical list the page builder may already have migrated material
+%% beyond \unpenalty's reach, and even inside a \vbox the penalty is not the
+%% item \unskip uncovers: four glue items separate it from the body's first box,
+%% so a \lastpenalty probe reports 0 whether the penalty is there or not.
+%%
+%% Consecutive glue collapses to a single `g' in the signature. The assertion is
+%% where the penalty sits relative to the heading box and the body's first box;
+%% freezing the glue count as well would make every spacing retune rewrite this
+%% baseline for no gain, and the surrounding \pagetotal tests already own the
+%% spacing.
 \ExplSyntaxOff
+\makeatletter
+\newcommand\cdossiertestNodes[1]{%
+  \TYPE{#1 nodes = \directlua{
+    local t = {}
+    local lastglue = false
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("penalty") then
+        table.insert(t, "P" .. n.penalty) lastglue = false
+      elseif n.id == node.id("glue") then
+        if not lastglue then table.insert(t, "g") end
+        lastglue = true
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "H") lastglue = false
+      else
+        table.insert(t, node.type(n.id)) lastglue = false
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+
+%% Issue #332: the consequence, counted. The signature above says where the
+%% penalty sits; this says what that does to the page builder, which is the
+%% property the issue is actually about.
+%%
+%% A vertical break is legal at glue whose predecessor is non-discardable, and
+%% at a penalty below 10000. The issue's own evidence was a \tracingpages run,
+%% but its `% t=' lines carry exact dimensions that every spacing retune would
+%% rewrite; counting the breakpoints in a \vbox asserts the same property
+%% without freezing a single measurement.
+\newcommand\cdossiertestBreaks[1]{%
+  \TYPE{#1 legal-breakpoints = \directlua{
+    local legal = 0
+    local prev = nil
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("glue") then
+        if prev ~= nil
+           and prev.id ~= node.id("glue")
+           and prev.id ~= node.id("penalty")
+           and prev.id ~= node.id("kern") then
+          legal = legal + 1
+        end
+      elseif n.id == node.id("penalty") then
+        if n.penalty < 10000 then legal = legal + 1 end
+      end
+      prev = n
+    end
+    tex.sprint(legal)
+  }}%
+}
+\makeatother
 
 \begin{document}
 \setbox0=\hbox{\CDossierSizeSmall\nolinkurl{ada@example.com}}
@@ -117,6 +187,38 @@
     \end{CDossierItemize}
     \cdossiertestMark{after-two-item-list}
   \end{CDossierEntry}
+}
+
+% Issue #332: an entry with a body emits the keep penalty that binds its heading
+% to that body's first line; an entry without one emits nothing, so the boundary
+% after it stays a legal breakpoint. Probed at the two points where the answer
+% differs -- at the start of the body, and after a bodiless entry has closed.
+%
+% The bodied probe reads 10000 and the bare probe reads 0. Deleting the penalty
+% outright turns the first into 0, which is what makes an entry heading
+% separable from a prose body; emitting it unconditionally turns the second into
+% 10000, which is issue #332 itself. Neither failure is visible in \pagetotal.
+\TEST{entry-keep-penalty}{
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Bodied Entry}]Prose body, no
+    list.\end{CDossierEntry}}
+  \cdossiertestNodes{bodied}
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Bare Entry}]\end{CDossierEntry}}
+  \cdossiertestNodes{bare}
+}
+
+% Issue #332: a run of bodiless entries, as an Education or Certificates section
+% is written. Every inter-entry boundary must remain a legal breakpoint. With the
+% penalty emitted unconditionally the count collapses, because each leaked
+% penalty sits immediately before the glue that would otherwise carry the break
+% and the next entry's \addvspace collapses into that same glue rather than
+% putting a box between them.
+\TEST{bare-entry-breakpoints}{
+  \setbox9=\vbox{%
+    \begin{CDossierEntry}[title = {Ph.D. in Computer Science}]\end{CDossierEntry}%
+    \begin{CDossierEntry}[title = {M.Sc. in Software Engineering}]\end{CDossierEntry}%
+    \begin{CDossierEntry}[title = {B.A.Sc. in Computer Engineering}]\end{CDossierEntry}%
+  }
+  \cdossiertestBreaks{bare-run}
 }
 
 \END

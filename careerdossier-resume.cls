@@ -303,7 +303,7 @@
           { \l_keys_key_str } } ,
   }
 
-\NewDocumentEnvironment { CDossierEntry } { O{} }
+\NewDocumentEnvironment { CDossierEntry } { O{} +b }
   {
     \tl_clear:N \l__cdossier_resume_entry_title_tl
     \tl_clear:N \l__cdossier_resume_entry_org_tl
@@ -321,13 +321,39 @@
       \l__cdossier_resume_entry_dates_tl
     %% Issue #145: keep the entry heading with the first line of its body, so
     %% the heading cannot be stranded alone at the foot of a page.
-    \penalty \CDossierHeadingKeepPenalty
+    %%
+    %% Issue #332: guarded on a non-empty body. Emitted unconditionally, this
+    %% penalty outlives the heading it was meant to bind: with no body there is
+    %% no first line to bind to, so it is left sitting immediately before the
+    %% gap glue. A break at glue is legal only when a non-discardable item
+    %% precedes it, and a penalty is discardable, so the boundary stops being a
+    %% breakpoint at all -- and because the next entry opens with `\addvspace',
+    %% which collapses into the skip already present rather than appending after
+    %% a box, nothing ever intervenes to restore it. Chained across the body-less
+    %% entries that make up a normal Education or Certificates section, the
+    %% effect accumulates into one unbreakable block.
+    %%
+    %% The body is taken as a `+b' argument purely so this test can be made. The
+    %% issue proposed contributing the penalty at the start of the body instead,
+    %% but no start-of-body hook can do it: `\everypar' fires in horizontal mode
+    %% while the breakpoint being guarded is in the vertical list, and removing
+    %% the penalty afterwards is not reliable either, because the page builder
+    %% may already have migrated the material off the contribution list where
+    %% `\unpenalty' can no longer reach it.
+    %%
+    %% The cost is that the body is read as an argument, so catcode-sensitive
+    %% content -- `\verb', `listings' -- cannot appear directly in an entry body.
+    %% Neither the classes nor the examples use any, and a v0.8.0 entry body is
+    %% prose or a CDossierItemize.
+    \tl_if_blank:nF {#2}
+      { \penalty \CDossierHeadingKeepPenalty }
     %% Issue #204: `\addvspace', not `\vspace'. As a `\vspace' this was extra
     %% space that added to whatever the entry body opened with, so a bullet list
     %% sat further from the entry heading that owns it than from the next entry.
     %% As an `\addvspace' the token is the *floor* for the heading -> body
     %% boundary, which a list overrides with its own edge.
     \addvspace { \CDossierRecordEntryGapSkip }
+    #2
   }
   {
     %% Issue #204: the entry's closing boundary is owned by whatever opens next

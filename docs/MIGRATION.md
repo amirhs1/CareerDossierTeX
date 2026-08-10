@@ -346,6 +346,45 @@ in this format.
 
 ## [0.8.0] - unreleased
 
+### `CDossierEntry` reads its body as an argument
+
+No source edit is required unless an entry body contains catcode-sensitive
+content. Nothing renders differently, and no vertical token changed.
+
+`CDossierEntry` now takes its body as a `+b` argument in both the résumé and the
+CV class. The consequence is the usual one for an environment that grabs its
+body: characters are tokenized when the body is read, so anything that depends
+on rescanning them no longer works directly inside an entry.
+
+Before, this typeset:
+
+    \begin{CDossierEntry}[title = {Tooling}]
+      Maintains \verb|make check| across the suite.
+    \end{CDossierEntry}
+
+After, define the fragment outside the entry and use it inside:
+
+    \newcommand\makecheck{\texttt{make check}}
+    \begin{CDossierEntry}[title = {Tooling}]
+      Maintains \makecheck{} across the suite.
+    \end{CDossierEntry}
+
+This affects `\verb`, `listings` environments, and anything else built on
+rescanning. Ordinary prose, `\texttt`, `\CDossierLink`, and `CDossierItemize`
+are unaffected; no example or template in this repository used a form that
+breaks.
+
+Reason: the environment has to know whether its body is empty. An entry whose
+body is empty — the normal shape of an `Education` or `Certificates` section —
+was emitting the penalty that binds a heading to the first line of its body with
+no body to bind to, which made every following inter-entry boundary illegal to
+break at and left up to 19.4% of the text block blank (#332). No start-of-body
+hook can carry that test: `\everypar` fires in horizontal mode while the
+breakpoint being guarded lives in the vertical list, and removing the penalty
+afterwards is unreliable because the page builder may already have moved the
+material beyond `\unpenalty`'s reach. Reading the body is what makes the
+emptiness test possible.
+
 ### `\CDossierSizeTitle` renamed to `\CDossierSizeDocumentTitle`
 
 A source edit is required only in a document that reads or sets this token by
