@@ -759,7 +759,11 @@ the two-page corpus. `\raggedbottom` on all four classes is what makes the
 full-strength value safe: forbidding the club/widow break only removes the
 first and last line of a paragraph as legal break points, and every interior
 line break is still available, so an over-long paragraph still paginates
-rather than overflows.
+rather than overflows. Nothing in the toolkit sets that `\raggedbottom`: it is
+inherited from `article.cls`, which selects it for a one-side, one-column
+document and `\flushbottom` otherwise. Because a penalty calibration depends on
+it, the four `tokens-*-defaults` regressions assert the effective bottom-fill
+state per class rather than leaving the assumption to prose (#335).
 
 #### Hyphenation
 

@@ -118,10 +118,11 @@
 %% heading with its first few lines" -- it says "keep the heading with
 %% everything up to the next legal breakpoint", which is unbounded and makes the
 %% heading hostage to whatever the section happens to contain. Because every
-%% vertical token here is rigid and all four classes are \raggedbottom, page
-%% badness is constant, so the page builder cannot weigh that keep against the
-%% hole it opens; the penalty only ever deletes candidates. The section keep is
-%% now expressed as a requirement before the heading -- see
+%% vertical token here is rigid and all four classes are \raggedbottom -- an
+%% inherited state, sourced and guarded below, where the club/widow values rely
+%% on it too -- page badness is constant, so the page builder cannot weigh that
+%% keep against the hole it opens; the penalty only ever deletes candidates.
+%% The section keep is now expressed as a requirement before the heading -- see
 %% CDossierSectionNeedLines -- which bounds it and leaves the boundaries inside
 %% the section legal.
 %%
@@ -172,6 +173,18 @@
 %% off the first and last line of a paragraph as break points — interior line
 %% breaks remain available, so a page can still break inside an over-long
 %% paragraph rather than overflow.
+%%
+%% Issue #335: that \raggedbottom is inherited, not set here. It comes from
+%% `article.cls', which issues it in the \if@twoside false branch and switches
+%% to \flushbottom for \if@twocolumn; the four classes get it only because each
+%% loads `article' one-side and one-column. Under \flushbottom the justification
+%% above stops holding -- the short pages these penalties produce would be
+%% stretched to the full text height, or reported as `Underfull \vbox', instead
+%% of ending in white space -- and nothing about that failure would point back
+%% here. The `tokens-*-defaults' regressions therefore assert the effective
+%% bottom-fill state of each of the four classes, so a class that later takes
+%% `twoside' or `twocolumn' fails a baseline rather than changing the page
+%% silently.
 \int_new:N \CDossierBrokenPenalty
 \int_set:Nn \CDossierBrokenPenalty { 10000 }
 \int_new:N \CDossierClubPenalty

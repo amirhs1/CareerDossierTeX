@@ -28,7 +28,38 @@
     \TYPE{ex-hyphen-penalty = \int_use:N \tex_exhyphenpenalty:D}
   }
 \ExplSyntaxOff
+\makeatletter
+%% Issue #335: the bottom-fill state this class actually ends up in. Nothing in
+%% the toolkit sets it -- \raggedbottom is inherited from `article.cls', which
+%% issues it only in the \if@twoside false branch and switches to \flushbottom
+%% for \if@twocolumn. The club/widow penalties in careerdossier-tokens.sty are
+%% calibrated on that state (see the comment at \CDossierClubPenalty), so a
+%% class that later took `twoside' or `twocolumn' would change how every short
+%% page renders with nothing pointing back at the decision it invalidated.
+%%
+%% The two reference meanings are captured from the kernel commands themselves
+%% rather than written out, so the probe states which command is in force and
+%% does not fail on a kernel that respells either definition. Everything is
+%% local to the group, so asserting the state does not set it.
+\newcommand\cdossiertestBottomFill{%
+  \begingroup
+    \let\cdossiertest@actual\@textbottom
+    \raggedbottom \let\cdossiertest@ragged\@textbottom
+    \flushbottom \let\cdossiertest@flush\@textbottom
+    \ifx\cdossiertest@actual\cdossiertest@ragged
+      \TYPE{bottom-fill=raggedbottom}%
+    \else
+      \ifx\cdossiertest@actual\cdossiertest@flush
+        \TYPE{bottom-fill=flushbottom}%
+      \else
+        \TYPE{bottom-fill=other}%
+      \fi
+    \fi
+  \endgroup
+}
+\makeatother
 \begin{document}
 \START
 \cdossiertestDefaults
+\cdossiertestBottomFill
 \END
