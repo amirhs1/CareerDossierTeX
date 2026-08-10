@@ -338,6 +338,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A web-profile link written without a scheme now opens in a browser. `website`,
+  `linkedin`, `github`, `scholar`, `orcid`, and the CV's manual publication DOIs
+  and URLs are all documented as accepting the short form — `github.com/ada`
+  rather than `https://github.com/ada` — and every one of them was emitted as a
+  *remote-PDF* link instead of a web link, with `.pdf` appended to an address
+  that has none. A reader following one got an error rather than the page. The
+  shipped `profile-english.tex` was affected on three fields, and so was
+  `\CDossierLink` in body text. ([#328])
+
+  Nothing about the document gave this away. The page, the extracted text, the
+  tagged structure, and the copy-paste integrity of the address were all
+  correct; only the annotation's action type in the PDF was wrong, and no
+  warning was issued. A value the document wrote out in full was never affected,
+  which is why the defect survived the examples. `mailto:` links took the same
+  wrong path and produced the right result by accident; they no longer depend on
+  that.
+
+  A new `make annotations` suite asserts the action type of every link the
+  toolkit emits, in both spellings. No existing suite could see it: `make links`,
+  `make extract-test`, and `make tagging` all read the text layer, and the text
+  layer was never wrong.
+
 - A long URL in a bibliography entry now copies and pastes back exactly. A
   262-character query-string address — a Wikipedia advanced-search result, not a
   contrived one — extracted as `silencing + diasporic + futurism` at the CV's
@@ -568,6 +590,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#310]: https://github.com/amirhs1/CareerDossierTeX/issues/310
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 [#324]: https://github.com/amirhs1/CareerDossierTeX/issues/324
+[#328]: https://github.com/amirhs1/CareerDossierTeX/issues/328
 
 ## [0.7.0] - 2026-08-04
 

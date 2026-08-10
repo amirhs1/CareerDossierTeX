@@ -997,6 +997,26 @@ reboxed, no glue is touched, no break point moves, and the `/Artifact` hazard of
 issue #161 does not arise because there is no box to be artifacted. It is
 LuaLaTeX-only, which costs nothing here, and LPPL 1.3c.
 
+Scheme normalization has a catcode requirement of its own, and it belongs with
+the hooks above because it is the same class of problem: a link that is wrong
+only in the PDF. A colon written literally inside `\ExplSyntaxOn` is a letter,
+catcode 11. `hyperref` finds an `\href` target's scheme by splitting the target
+on a catcode-12 colon (`\@hyper@readexternallink`), so a scheme the package
+supplies with `\tl_put_left:Nn` is invisible to that split: `hyperref` concludes
+the target is a local file, appends `.pdf`, and emits a `GoToR` "open page 1 of
+a remote PDF" action instead of a `URI` action. Nothing is logged, and the
+rendered page, the extracted text, and the copy-paste invariant of `make links`
+are all unaffected — the only wrong thing in the file is the annotation's action
+type. Every scheme insertion therefore goes in through `\tl_put_left:Ne` with
+`\tl_to_str:n`, which produces the catcode-12 form a document that wrote the
+address out in full would have given (issue #328). The comment above
+`\__cdossier_components_scheme:N` already warned about the catcode for
+*detecting* an existing scheme; the insertion on the next line had the bug the
+comment described, and the same insertion in
+`careerdossier-cv.cls`'s publication list had it at three more sites.
+`tests/annotations/` is what asserts the action type, since no text-layer suite
+can see it.
+
 The `\pdffakespace` fallback below is a one-line declaration but it belongs here
 rather than in a class. `\pdffakespace` is tagpdf's; it puts a real, zero-width U+0020 into the
 content stream so a gap made of pure positioning glue still reads as a word
@@ -1845,7 +1865,9 @@ All automated test material belongs under `tests/`:
 - `tests/bibliography/` — Biber-backed sorting and rendered identifier
   precedence;
 - `tests/metadata/` — PDF metadata on the default (untagged) build path, where
-  no `\DocumentMetadata` is in play; and
+  no `\DocumentMetadata` is in play;
+- `tests/annotations/` — the action type of each emitted link annotation, the
+  one link property no text-layer suite can see; and
 - `tests/tagging/` — tagged structure, the untagged path, and the extractor
   matrix.
 

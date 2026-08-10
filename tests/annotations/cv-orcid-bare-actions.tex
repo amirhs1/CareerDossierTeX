@@ -1,0 +1,24 @@
+% cv-orcid-bare-actions.tex — the ORCID field's first insertion branch
+% (issue #328).
+%
+% A bare identifier has a documented canonical destination, so the module
+% supplies the whole `https://orcid.org/' prefix rather than just a scheme.
+% That is a second literal-colon site with the same catcode defect, and it is
+% not reachable from the web-profile fixture: a document has one ORCID, so each
+% branch needs its own document. The companion fixture covers the `orcid.org/'
+% spelling.
+%
+% URIEXPECT: mailto:ada@example.test
+% URIEXPECT: https://orcid.org/0000-0002-1825-0097
+\documentclass{careerdossier-cv}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada@example.test},
+  orcid = {0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research}
+A paragraph, so the document has a body.
+\end{document}

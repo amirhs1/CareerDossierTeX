@@ -428,7 +428,7 @@ make check
 
 Individual suites are available as `make lint`, `make regression`,
 `make extract-test`, `make smoke`, `make layout`, `make bibliography-test`,
-`make links`, `make metadata`, and `make tagging`;
+`make links`, `make metadata`, `make annotations`, and `make tagging`;
 `make clean` removes the generated files afterwards. Each target runs the same
 command as the matching CI job.
 

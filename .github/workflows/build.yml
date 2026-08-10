@@ -369,6 +369,27 @@ jobs:
       # fixture that fails, so the job log already carries what a reviewer
       # needs. An upload step here would only ever report no files found.
 
+  # Link-annotation action types (issue #328). Its own job for the same reason
+  # `metadata` is: every other link-facing suite reads the text layer, and the
+  # defect this one exists to catch — a scheme-less profile link emitted as a
+  # GoToR remote-PDF action — leaves the page, the extracted text, and the
+  # `links` copy-paste invariant all correct. Folding it into `links` would put
+  # a text-layer verdict and an annotation verdict behind one check name. Like
+  # `metadata` it needs no PDF tooling: the fixtures build uncompressed and the
+  # runner reads the annotations itself.
+  #
+  # This is a new check: do not add it to the branch ruleset's required list
+  # until it has passed on `main`.
+  annotations:
+    runs-on: ubuntu-latest
+    container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Link-annotation action-type fixtures
+        run: make annotations
+      # No artifact upload, for the reason given under `metadata` above.
+
   cv:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373

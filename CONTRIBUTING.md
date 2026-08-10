@@ -716,6 +716,36 @@ subject: every tagging fixture passes `\DocumentMetadata`, which supplies
 catalog entries itself and therefore cannot show what the package contributes on
 its own.
 
+### Link-annotation suite
+
+Every other link-facing suite reads the *text* layer. `links` decides
+copy-paste integrity from word bounding boxes; `extraction` and `tagging`
+compare extracted strings. None of them can see what a link annotation actually
+*does*, which is how issue #328 survived: every scheme-less profile link was
+emitted as a `GoToR` remote-PDF action with `.pdf` appended, while the page, the
+extracted text, and the copy-paste invariant were all correct. That is the gap
+this suite closes:
+
+    make annotations           # or: tests/annotations/run.sh
+
+Each fixture declares one `% URIEXPECT:` directive per link it renders, and the
+runner requires the declared multiset and the emitted one to match exactly —
+not "contains", since an extra annotation is as much a defect as a missing one.
+It additionally fails any fixture whose PDF carries a `GoToR` action at all, so
+a regression names the actual symptom rather than showing an opaque multiset
+difference. It needs only LuaLaTeX.
+
+Two things it borrows from the metadata suite are worth keeping. Its fixtures
+build uncompressed, because link annotations otherwise sit inside a compressed
+object stream where a text search of the file finds nothing whether or not the
+annotation is there. And every assertion is paired with a positive control
+(`/Subtype /Link`, found by the same method on the same file), so a fixture that
+stopped emitting links cannot pass by silence.
+
+When you add a fixture, keep its addresses short enough that no link wraps: a
+wrapped link is emitted as two annotations sharing one action, which the
+comparison would report as an unexplained duplicate.
+
 ### Tagged-PDF suite
 
 Opt-in tagged output has its own suite covering five profiles — industry
