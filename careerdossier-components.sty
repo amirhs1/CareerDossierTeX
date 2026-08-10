@@ -677,12 +677,63 @@
     \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
   }
 
-%% Web profile: a link over the visible URL/identifier. The href target is
-%% normalized to include a scheme; the displayed text is left exactly as given.
-%% Input is expected as a full path such as github.com/name (not a bare handle).
+%% Services whose bare identifier has a documented canonical address, and the
+%% prefix that produces it (issue #330). Authors hold a LinkedIn or GitHub
+%% handle, not a profile path, and a Scholar identifier rather than the query
+%% string around it -- so the natural value used to produce https://<handle>,
+%% a broken link with no warning and a page that looked correct.
+%%
+%% The prefix carries no scheme: it is prepended to the *displayed* text, which
+%% then becomes the target in the ordinary way, so the visible address and the
+%% link agree by construction rather than by a second rule. `website' has no
+%% canonical host by definition and is deliberately absent, which leaves its
+%% behaviour exactly as before.
+%%
+%% Each value is braced because it is keyval input and two of them contain the
+%% `=' that would otherwise be read as the item's own separator.
+\prop_const_from_keyval:Nn \c__cdossier_components_canonical_prop
+  {
+    linkedin = {linkedin.com/in/} ,
+    github   = {github.com/} ,
+    scholar  = {scholar.google.com/citations?user=} ,
+  }
+
+\tl_new:N   \l__cdossier_components_canonical_tl
+\str_new:N  \l__cdossier_components_value_str
+
+%% A value is a bare identifier when it contains neither `/' nor `.'. Those two
+%% characters are what every address form has -- with a scheme, without one, or
+%% with a `www.' host -- and what none of these three services allows in an
+%% identifier, so the test needs no list of hosts to keep current and no guess
+%% about which address form was written. Anything holding either is passed
+%% through untouched: canonicalizing `www.' or a trailing slash away would
+%% change the output of documents that already work.
+\cs_new_protected:Npn \__cdossier_components_canonical:n #1
+  {
+    \prop_get:NnNT \c__cdossier_components_canonical_prop {#1}
+      \l__cdossier_components_canonical_tl
+      {
+        \str_set:NV \l__cdossier_components_value_str
+          \l__cdossier_components_disp_tl
+        \str_if_in:NnF \l__cdossier_components_value_str { / }
+          {
+            \str_if_in:NnF \l__cdossier_components_value_str { . }
+              {
+                \tl_put_left:NV \l__cdossier_components_disp_tl
+                  \l__cdossier_components_canonical_tl
+              }
+          }
+      }
+  }
+
+%% Web profile: a link over the visible address. A bare identifier for a service
+%% with a canonical address is expanded to that address first, so the displayed
+%% text is the value as given for every other input and the canonical form for
+%% that one. The href target is then normalized to include a scheme.
 \cs_new_protected:Npn \__cdossier_components_web:n #1
   {
     \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
+    \__cdossier_components_canonical:n {#1}
     \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
     \__cdossier_components_scheme:N \l__cdossier_components_url_tl
     \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl

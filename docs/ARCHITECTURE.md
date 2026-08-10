@@ -1051,6 +1051,21 @@ comment described, and the same insertion in
 `tests/annotations/` is what asserts the action type, since no text-layer suite
 can see it.
 
+The canonical-address expansion for `linkedin`, `github`, and `scholar` (issue
+#330) sits on that same path and deliberately does not repeat the pattern. It
+prepends its prefix to the *displayed* value, before the scheme insertion runs
+at all, so the package contributes only `linkedin.com/in/`-shaped text with no
+colon in it and the one colon in the final target still arrives through
+`\__cdossier_components_scheme:N`. Two properties follow, and both are the
+reason for the ordering rather than consequences of it: there is exactly one
+scheme-insertion site to keep correct, and the visible address and the link
+target cannot disagree, because the second is derived from the first instead of
+being built by a parallel rule. `\CDossierLink` shares the scheme insertion but
+not the expansion — body text names no service to expand a handle against. Which
+values are expanded is a `\prop_const` keyed by field name, so `website`, which
+has no canonical host, is absent from it and keeps its previous behaviour by
+having no entry rather than by an exception in the code.
+
 The `\pdffakespace` fallback below is a one-line declaration but it belongs here
 rather than in a class. `\pdffakespace` is tagpdf's; it puts a real, zero-width U+0020 into the
 content stream so a gap made of pure positioning glue still reads as a word

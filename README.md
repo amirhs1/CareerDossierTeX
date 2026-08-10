@@ -91,6 +91,8 @@ Save personal metadata in `examples/profiles/profile-english.tex`:
 
 Optional fields may be omitted. Contact separators should adjust automatically when a field is missing.
 
+`linkedin`, `github`, and `scholar` also accept a bare handle — `linkedin = {example}` displays and links `linkedin.com/in/example`. See [`docs/API.md`](docs/API.md) for the accepted forms per key.
+
 ### 2. Create a résumé
 
 ```latex
