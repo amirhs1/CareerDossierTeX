@@ -1175,6 +1175,41 @@
 %% ---------------------------------------------------------------------------
 \dim_new:N \l__cdossier_components_headingdepth_dim
 
+%% ---------------------------------------------------------------------------
+%% \__cdossier_components_section_need: -- the section heading's keep, as a
+%% bound (issue #333).
+%%
+%% Called in vertical mode immediately before a section heading contributes
+%% anything. If fewer than \CDossierSectionNeedLines lines of body leading remain
+%% on the current page, the page ends here and the heading opens the next one.
+%% Otherwise nothing is contributed at all, and every boundary the section goes
+%% on to create stays a legal breakpoint.
+%%
+%% `\pagegoal' is `\maxdimen' until the first box lands on a page, which is both
+%% the start of the document and the moment after a page break. Testing the
+%% remaining space then would compare against an effectively infinite goal and
+%% always succeed, which is harmless -- but the guard is written explicitly
+%% because the failure it prevents is the opposite one: were the comparison
+%% inverted or the sentinel forgotten, every section would force a page break and
+%% every document would become one section per page. The smoke and layout
+%% fixtures would catch that, but not as directly as this reads.
+%%
+%% `\penalty -\CDossierHeadingKeepPenalty' rather than `\newpage': this runs
+%% before the section's own `\addvspace', so the forced break discards the glue
+%% at the boundary in the ordinary way, and the heading arrives at the top of the
+%% next page with no leading skip. `\newpage' would contribute a `\vfil' first.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_components_section_need:
+  {
+    \dim_compare:nNnF { \tex_pagegoal:D } = { \c_max_dim }
+      {
+        \dim_compare:nNnT
+          { \tex_pagegoal:D - \tex_pagetotal:D } <
+          { \CDossierSectionNeedLines \CDossierBodyLeading }
+          { \penalty -\CDossierHeadingKeepPenalty }
+      }
+  }
+
 \cs_new_protected:Npn \__cdossier_components_section_rule:
   {
     \dim_set:Nn \l__cdossier_components_headingdepth_dim { \tex_prevdepth:D }
@@ -1192,7 +1227,23 @@
       }
     \par
     \nointerlineskip
-    \penalty \CDossierHeadingKeepPenalty
+    %% Issue #333: no penalty here any more. A `\penalty
+    %% \CDossierHeadingKeepPenalty' at this point forbids the break after the
+    %% rule without bounding what it thereby commits to the page -- the keep
+    %% runs to the next legal breakpoint, wherever that happens to fall.
+    %%
+    %% Issue #340: it also leaked. With no content after it, the penalty was
+    %% left sitting immediately before the gap glue below, and a break at glue is
+    %% legal only when a non-discardable item precedes it; the next section's
+    %% `\addvspace' collapses into that same glue rather than putting a box
+    %% between them, so an empty section made its own closing boundary illegal to
+    %% break at. Three consecutive empty sections left zero legal breakpoints.
+    %%
+    %% The keep now sits *before* the heading, as a requirement rather than a
+    %% prohibition: \__cdossier_components_section_need: refuses to place the
+    %% heading unless \CDossierSectionNeedLines lines remain. That bounds it, and
+    %% it leaves every boundary inside the section legal, so a page fills to the
+    %% last entry that fits instead of dumping the whole section.
     %% Issue #168: the rule-to-content gap must be *this* token, not this token
     %% plus whatever leading space the following block contributes. `\vspace'
     %% cannot deliver that: `\@vspace' appends `\vskip\z@skip', so the following

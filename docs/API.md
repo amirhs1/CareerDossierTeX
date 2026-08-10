@@ -1238,14 +1238,45 @@ Introduced in `v0.8.0`
 The résumé and CV classes state where a page may break rather than leaving
 every break to LaTeX's defaults:
 
-- a section heading stays with the entry it introduces;
+- a section heading is placed only when it has room to introduce something;
 - an entry heading stays with its own second line and with the first line of
   its body;
 - a bullet list is never split leaving one item alone on either side.
 
 The policy uses page-break penalties, not boxing, so material that genuinely
 does not fit still breaks: an entry or bullet list longer than a page
-paginates normally rather than overflowing. Because a list must know its own
+paginates normally rather than overflowing.
+
+#### `\CDossierSectionNeedLines`
+
+The section heading's keep, expressed as a bound. A section heading is placed
+only when at least this many lines of body leading remain on the page; otherwise
+the page breaks before the heading and the heading opens the next one. Defaults
+to `4`, which is what the heading needs to introduce anything: the heading and
+its rule, the two lines of the first entry heading, and that entry's first line
+of body.
+
+It is a count of lines rather than a dimension, because it is a statement about
+content — the same four lines at every `fontsize` — and `\CDossierBodyLeading`
+supplies the measure at the point of use.
+
+```latex
+\int_set:Nn \CDossierSectionNeedLines { 6 }
+```
+
+Before `v0.8.0` this was a `\penalty \CDossierHeadingKeepPenalty` emitted *after*
+the section rule. Read literally that did not say "keep the heading with its
+first few lines" but "keep the heading with everything up to the next legal
+breakpoint", which is unbounded: the heading became hostage to whatever the
+section happened to contain, and because every vertical token is rigid and all
+four classes are `\raggedbottom`, page badness is constant, so the page builder
+could not weigh that keep against the hole it opened. It also leaked — with no
+content after it the penalty made an empty section's own closing boundary
+illegal to break at. Stating the keep as a requirement before the heading bounds
+it and leaves every boundary inside the section a legal break, so a page fills to
+the last entry that fits instead of dumping the whole section
+([#333](https://github.com/amirhs1/CareerDossierTeX/issues/333),
+[#340](https://github.com/amirhs1/CareerDossierTeX/issues/340)). Because a list must know its own
 length before it is typeset, each list records that count in the auxiliary
 file — so a résumé or CV needs the same second LaTeX pass it already requires
 for the `Page N of M` folio. On a first clean pass the breaks are provisional.

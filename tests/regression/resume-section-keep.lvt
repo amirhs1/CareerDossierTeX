@@ -1,0 +1,124 @@
+% resume-section-keep.lvt — issues #333 and #340, the section heading's keep.
+%
+% Two contracts, neither visible in any gap measurement.
+%
+% 1. Nothing is emitted after the section rule (#333). The penalty that used to
+%    sit there forbade the break without bounding what it committed: the keep ran
+%    to the next legal breakpoint, wherever that fell, and because every vertical
+%    token is rigid and the classes are \raggedbottom, page badness is constant,
+%    so the page builder could not weigh that keep against the hole it opened.
+%    The keep is now a requirement applied *before* the heading — see
+%    \CDossierSectionNeedLines — which bounds it and leaves the boundaries inside
+%    the section legal.
+%
+% 2. An empty section leaks nothing (#340). Emitted with no content to bind to,
+%    that penalty was left immediately before the gap glue below the rule, and a
+%    break at glue is legal only when a non-discardable item precedes it; the
+%    next section's \addvspace collapses into the same glue rather than putting a
+%    box between them, so an empty section made its own closing boundary illegal
+%    to break at, cumulatively across a run.
+%
+% \pagetotal cannot express either one: a penalty contributes 0pt, so every gap
+% assertion in the suite holds identically whether the penalty is present,
+% misplaced, or absent. The probes below read the built vertical list instead.
+% Consecutive glue collapses to a single `g', because the assertion is structural
+% — what lies between the boxes — and the spacing is owned by other fixtures.
+%
+% The breakpoint counter is the consequence, and it is the number that regressed:
+% a vertical break is legal at glue whose predecessor is non-discardable, and at
+% a penalty below 10000. Three consecutive empty sections scored 0 before #340.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\makeatletter
+\newcommand\cdossiertestNodes[1]{%
+  \TYPE{#1 nodes = \directlua{
+    local t = {}
+    local lastglue = false
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("penalty") then
+        table.insert(t, "P" .. n.penalty) lastglue = false
+      elseif n.id == node.id("glue") then
+        if not lastglue then table.insert(t, "g") end
+        lastglue = true
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "H") lastglue = false
+      elseif n.id == node.id("rule") then
+        table.insert(t, "R") lastglue = false
+      else
+        table.insert(t, node.type(n.id)) lastglue = false
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+\newcommand\cdossiertestBreaks[1]{%
+  \TYPE{#1 legal-breakpoints = \directlua{
+    local legal = 0
+    local prev = nil
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("glue") then
+        if prev ~= nil
+           and prev.id ~= node.id("glue")
+           and prev.id ~= node.id("penalty")
+           and prev.id ~= node.id("kern") then
+          legal = legal + 1
+        end
+      elseif n.id == node.id("penalty") then
+        if n.penalty < 10000 then legal = legal + 1 end
+      end
+      prev = n
+    end
+    tex.sprint(legal)
+  }}%
+}
+\makeatother
+
+\begin{document}
+\START
+
+% The rule is drawn inside an \hbox, so the heading and the rule are the two
+% boxes here. What matters is that nothing separates the rule from the glue that
+% follows it: no penalty is emitted after the rule in either shape.
+\TEST{section-rule-emits-no-penalty}{
+  \setbox9=\vbox{\CDossierSection{Education}}
+  \cdossiertestNodes{empty-section}
+  \setbox9=\vbox{\CDossierSection{Education}%
+    \begin{CDossierEntry}[title = {Ph.D. in Computer Science}]\end{CDossierEntry}}
+  \cdossiertestNodes{section-with-entry}
+}
+
+% Issue #340: three consecutive empty sections. Every inter-section boundary must
+% remain a legal breakpoint; with the penalty emitted after each rule the count
+% was 0, because each leaked penalty sat immediately before the glue that would
+% otherwise have carried the break.
+\TEST{empty-section-breakpoints}{
+  \setbox9=\vbox{\CDossierSection{Education}\CDossierSection{Certificates}%
+    \CDossierSection{Awards}}
+  \cdossiertestBreaks{three-empty-sections}
+}
+
+% Issue #333: the boundaries *inside* a section are legal again, which is what
+% lets a page fill to the last entry that fits instead of dumping the section.
+\TEST{section-interior-breakpoints}{
+  \setbox9=\vbox{\CDossierSection{Education}%
+    \begin{CDossierEntry}[title = {Ph.D.}]\end{CDossierEntry}%
+    \CDossierSection{Certificates}%
+    \begin{CDossierEntry}[title = {Cert}]\end{CDossierEntry}%
+    \CDossierSection{Awards}%
+    \begin{CDossierEntry}[title = {Award}]\end{CDossierEntry}}
+  \cdossiertestBreaks{three-sections-with-entries}
+}
+
+% \CDossierSectionNeedLines is the bound that replaced the penalty. It is a line
+% count, not a dimension, so it reads the same at every fontsize; the measure
+% comes from \CDossierBodyLeading at the point of use.
+\TEST{section-need-token}{
+  \TYPE{section-need-lines = \the\CDossierSectionNeedLines}
+}
+
+\END

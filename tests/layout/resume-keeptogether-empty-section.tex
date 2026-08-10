@@ -1,0 +1,96 @@
+% resume-keeptogether-empty-section.tex — issues #340 and #333: a section with no
+% content, and a section heading arriving with too little room to introduce
+% anything.
+%
+% No fixture in any family rendered an empty section before this one, which is
+% why the leak in #340 survived: the penalty after the section rule had nothing
+% to bind to, was left immediately before the gap glue, and made the boundary
+% after an empty section illegal to break at — cumulatively across a run.
+%
+% "Placeholder" and "Reserved" are genuinely empty. They are unusual in a
+% finished résumé and entirely normal in one being drafted, which is the case
+% that has to keep working.
+%
+% The document runs to two pages so the bounded keep from #333 is exercised on a
+% real page rather than only in a \vbox: a section heading is placed only when
+% \CDossierSectionNeedLines lines remain, and the boundaries inside a section
+% stay legal, so the page fills to the last entry that fits instead of dumping
+% the whole section.
+%
+% The directives below are the issue-#145 guarantees that had to survive removing
+% the penalty after the rule — a section heading still reaches the first entry it
+% introduces, and an entry heading's two lines still travel together.
+% KEEPTOGETHER: Certificates ||| Professional Certificate in Accessible Document Production
+% KEEPTOGETHER: Ph.D. in Computer Science ||| University of Toronto
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Placeholder}
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Principal Data Scientist}, organization = {Digital Services Laboratory}, location = {Ottawa, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Civic Technology Research Group}, location = {Toronto, ON}, dates = {2021--2024}]
+  \begin{CDossierItemize}
+    \item Designed models and processing pipelines that improved reliability during seasonal demand peaks and large reporting cycles.
+    \item Introduced contract tests, deployment checks, and operational dashboards that reduced production regressions.
+    \item Led technical discovery with program managers, documented trade-offs, and delivered phased modernization plans.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Scientist}, organization = {Public Data Analytics Incorporated}, location = {Waterloo, ON}, dates = {2018--2021}]
+  \begin{CDossierItemize}
+    \item Built data-import services and validation tools for public reporting datasets in CSV, JSON, and XML formats.
+    \item Improved processing performance through batching, indexing, and query optimization while preserving auditability.
+    \item Created internal libraries for schema validation, error reporting, and automated documentation generation.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Analytics Engineer}, organization = {Regional Data Cooperative}, location = {Kitchener, ON}, dates = {2016--2018}]
+  \begin{CDossierItemize}
+    \item Implemented schema validation, duplicate detection, detailed error reports, and resumable processing.
+    \item Added administrative review tools and audit records to support corrections, approvals, and publication.
+    \item Replaced spreadsheet-driven monthly reporting with a governed pipeline and reproducible publication process.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Junior Analyst}, organization = {Lakeshore Analytics Group}, location = {Hamilton, ON}, dates = {2014--2016}]
+  \begin{CDossierItemize}
+    \item Maintained ingestion pipelines for weekly public-facing statistical releases.
+    \item Wrote regression fixtures covering the reporting service's most commonly requested exports.
+    \item Documented operational runbooks for on-call incident response.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Research Assistant}, organization = {Institute for Applied Statistics}, location = {Toronto, ON}, dates = {2012--2014}]
+  \begin{CDossierItemize}
+    \item Prepared reproducible analyses and archival datasets for published statistical releases.
+    \item Built validation tooling for survey instruments and longitudinal record linkage.
+    \item Supported peer review by documenting methodology and data provenance end to end.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Reserved}
+
+\CDossierSection{Education}
+\begin{CDossierEntry}[title = {Ph.D. in Computer Science}, organization = {University of Toronto}, location = {Toronto, ON}, dates = {2021--2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {M.Sc. in Software Engineering}, organization = {McGill University}, location = {Montréal, QC}, dates = {2019--2021}]
+\end{CDossierEntry}
+
+\CDossierSection{Certificates}
+\begin{CDossierEntry}[title = {Professional Certificate in Accessible Document Production}, organization = {Standards and Accessibility Institute}, dates = {2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Cloud Architecture and Reliability Engineering}, organization = {Canadian Technology Learning Consortium}, dates = {2025}]
+\end{CDossierEntry}
+
+\end{document}
