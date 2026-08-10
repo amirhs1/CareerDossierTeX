@@ -1098,6 +1098,10 @@ Missing optional keys must be omitted without leaving visible punctuation or spa
 
 The environment controls the entry heading and local spacing but does not force bullet content.
 
+An entry body may be empty. A body-less entry — the normal shape for an `Education` or `Certificates` section, where the heading carries the degree, institution, and dates and there is nothing to add — renders its heading and contributes nothing further, and the boundary after it stays a legal page break. (Before `v0.8.0` it did not: the penalty that binds a heading to its body was emitted even with no body to bind to, and a run of body-less entries became unbreakable. See #332.)
+
+The body is read as an argument, so catcode-sensitive content cannot appear directly inside an entry. `\verb`, `listings` environments, and anything else that depends on rescanning characters must be wrapped in a macro defined outside the entry, or placed outside it.
+
 ### `CDossierItemize`
 
 ```latex

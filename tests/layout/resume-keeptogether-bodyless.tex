@@ -1,0 +1,91 @@
+% resume-keeptogether-bodyless.tex — issue #332: a run of bodiless entries under
+% page-break pressure.
+%
+% An Education or Certificates section is written as entries with a heading and
+% no body, and that is the shape that leaked the keep penalty: with no first body
+% line to bind to, the penalty was left sitting before the gap glue, so no
+% inter-entry boundary in the run stayed a legal breakpoint and the page builder
+% fell back to the last candidate before the run — emptying the foot of the page.
+%
+% The fixture is sized so the break falls *inside* the bodiless run rather than
+% before it. That is the point: were the run pushed wholly onto one page, the
+% fixture would pass however the penalty behaves.
+%
+% What this fixture asserts, and what it does not. The runner's keep-together
+% checks are the issue-#145 guarantees that had to survive the fix: an entry
+% heading's two lines stay together, and a section heading stays with the first
+% entry it introduces. They do not detect issue #332 on their own — the leak
+% still yields two pages, it merely empties the foot of the first one, and
+% nothing here asserts that a page is not half blank. That gap is #334.
+%
+% The #332 assertion itself lives in tests/regression: resume-entry-edges.lvt
+% counts the legal breakpoints across a bodiless run (3 with the fix, 0 without)
+% and records where the penalty sits. This fixture's job is to hold the shape
+% under page-break pressure so those guarantees are exercised on a real page.
+% KEEPTOGETHER: Ph.D. in Computer Science ||| University of Toronto
+% KEEPTOGETHER: Certificates ||| Professional Certificate in Accessible Document Production
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Principal Data Scientist}, organization = {Digital Services Laboratory}, location = {Ottawa, ON}, dates = {2024--Present}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Civic Technology Research Group}, location = {Toronto, ON}, dates = {2021--2024}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Scientist}, organization = {Public Data Analytics Incorporated}, location = {Waterloo, ON}, dates = {2018--2021}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Analytics Engineer}, organization = {Regional Data Cooperative}, location = {Kitchener, ON}, dates = {2016--2018}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Junior Analyst}, organization = {Lakeshore Analytics Group}, location = {Hamilton, ON}, dates = {2014--2016}]
+  \begin{CDossierItemize}
+    \item Led the delivery of reporting services supporting high-volume public programs and internal operational dashboards.
+    \item Consolidated several ad hoc analyses into a shared, governed pipeline, reducing duplicated maintenance across program teams.
+    \item Established automated validation for data quality, reproducibility, and archival output across every published dataset.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Education}
+\begin{CDossierEntry}[title = {Ph.D. in Computer Science}, organization = {University of Toronto}, location = {Toronto, ON}, dates = {2021--2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {M.Sc. in Software Engineering}, organization = {McGill University}, location = {Montréal, QC}, dates = {2019--2021}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {B.A.Sc. in Computer Engineering, Honours}, organization = {University of Waterloo}, location = {Waterloo, ON}, dates = {2014--2019}]
+\end{CDossierEntry}
+
+\CDossierSection{Certificates}
+\begin{CDossierEntry}[title = {Professional Certificate in Accessible Document Production}, organization = {Standards and Accessibility Institute}, dates = {2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Cloud Architecture and Reliability Engineering}, organization = {Canadian Technology Learning Consortium}, dates = {2025}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Advanced Data Stewardship and Governance}, organization = {Public Sector Data Institute}, dates = {2024}]
+\end{CDossierEntry}
+
+\end{document}

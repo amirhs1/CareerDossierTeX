@@ -338,6 +338,35 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A run of entries with no body no longer strands the rest of a page. An
+  `Education` or `Certificates` section is normally written as entries whose
+  heading carries everything — degree, institution, dates — and whose body is
+  empty. Each of those emitted the penalty that binds an entry heading to the
+  first line of its body, with no body to bind to, and a penalty sitting
+  immediately before the gap glue makes that boundary illegal to break at. The
+  next entry opens with `\addvspace`, which collapses into the glue already
+  present rather than putting a box between them, so nothing restored the
+  breakpoint and the effect accumulated across the run. In
+  `tests/layout/resume-two-page.tex` the result was a 213.09 pt stretch with no
+  legal breakpoint anywhere in it, and 140.05 pt — 1.94 in, or 19.4% of the text
+  block — left blank at the foot of page one. ([#332])
+
+  The penalty is now emitted only when the entry has a body. An entry with a
+  body is bound to it exactly as before, including a prose body and not only a
+  bullet list; an entry without one contributes no penalty, so every inter-entry
+  boundary in the run stays a legal breakpoint. Both record classes changed
+  together, since each declares its own `CDossierEntry`.
+
+  This is a page-break fix, not a spacing change: no vertical token moved, and
+  the `\pagetotal` measurements in `tests/regression/resume-entry-edges.tlg` are
+  unchanged. Restoring the breakpoints does not by itself decide where the break
+  should fall; that is #333, for which this is the prerequisite.
+
+  One consequence is visible to documents: an entry body is now read as an
+  argument, so catcode-sensitive content — `\verb`, `listings` — cannot appear
+  directly inside `CDossierEntry` and must be wrapped in a macro defined outside
+  it. This is what makes the emptiness test possible at all.
+
 - A web-profile link written without a scheme now opens in a browser. `website`,
   `linkedin`, `github`, `scholar`, `orcid`, and the CV's manual publication DOIs
   and URLs are all documented as accepting the short form — `github.com/ada`
