@@ -311,6 +311,41 @@ EOF
         fi
         ;;
     esac
+
+    # Issue #333: no page may end with a section heading. The penalty that used
+    # to forbid the break after the section rule is gone, replaced by a bound
+    # applied before the heading, so this is the failure mode that bound exists
+    # to prevent and it needs asserting rather than eyeballing.
+    #
+    # This runs for every fixture, not only the *keeptogether* ones, and needs no
+    # per-fixture bookkeeping: the section titles are read out of the fixture's
+    # own source, so a fixture that gains a section is covered the moment it does.
+    # The KEEPTOGETHER directives cannot do this job — they assert the particular
+    # pairs a fixture happens to declare, and a heading stranded at the foot of a
+    # page is a property of every page boundary in every fixture.
+    sections="$(sed -n 's/.*\\CDossierSection{\([^}]*\)}.*/\1/p' "$tex")"
+    if [ -n "$sections" ] && [ "$pages" -gt 1 ]; then
+      strand_fail=0
+      for (( n = 1; n < pages; n++ )); do
+        last_line="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
+                     | sed '/^\f/d' | grep -v '^[[:space:]]*$' \
+                     | grep -Ev 'Page [0-9]+ of [0-9]+' | tail -1)"
+        while IFS= read -r sec; do
+          [ -n "$sec" ] || continue
+          if [ "$last_line" = "$sec" ]; then
+            echo "  STRANDED SECTION HEADING: page $n ends with '$sec'"
+            strand_fail=1
+          fi
+        done <<EOF
+$sections
+EOF
+      done
+      if [ "$strand_fail" -ne 0 ]; then
+        fail=1
+      else
+        echo "  no page ends with a section heading"
+      fi
+    fi
   else
     echo "  (pdftotext absent: skipped folio check)"
   fi
