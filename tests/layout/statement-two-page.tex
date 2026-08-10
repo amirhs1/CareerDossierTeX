@@ -1,5 +1,11 @@
 % statement-two-page.tex — layout stress for the statement continuation header,
 % Page N of M folio, ordinary headings, and natural prose page breaking.
+%
+% Negative control for the club/widow check (issue #348). With
+% \clubpenalty and \widowpenalty permitted, page two of this fixture opens
+% on the last line of a paragraph. The runner rebuilds it that way and
+% requires the check to say so; see run.sh and page-break-check.awk.
+% CLUBWIDOWCONTROL: WIDOW
 \documentclass[type=research]{careerdossier-statement}
 \CDossierSetup{
   name={Ada Lovelace},
