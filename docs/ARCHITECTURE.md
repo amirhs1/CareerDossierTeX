@@ -765,6 +765,36 @@ document and `\flushbottom` otherwise. Because a penalty calibration depends on
 it, the four `tokens-*-defaults` regressions assert the effective bottom-fill
 state per class rather than leaving the assumption to prose (#335).
 
+That inherited `\raggedbottom` also decides the *shape* of the club and widow
+values, not merely their safety (#342). A page under construction has no stretch
+to be judged on, so every candidate short of the goal scores badness `10000` and
+cost `deplorable`; they all tie, the last one that fits wins, and the penalty's
+magnitude is never consulted. The parameter is therefore binary — `10000`
+forbids, every other value permits — and a sweep over
+`10000, 4000, 1000, 300, 150, 50, 0` produces exactly two distinct paginations,
+with `9999` matching `0`. Under `\flushbottom` badness would vary with the fill
+and intermediate values would genuinely trade off; this conclusion is downstream
+of the state #335 guards.
+
+The trade-off was then measured on the committed corpus. Forbidding costs 13.1%
+of page one on `statement-two-page` and 2.4–3.1% on the two letter fixtures that
+respond; permitting recovers all of it and introduces one club line and two widow
+lines, one per fixture recovered. Because the two move together with no value in
+between, the choice is the rule itself rather than its strength, and the project
+keeps the white space. A `\raggedbottom` document ending a page short is the
+posture the toolkit already takes everywhere else. The alternative that would
+dominate both — requiring two lines on each side of the break — is not blocked by
+a missing primitive. eTeX's `\clubpenalties` and `\widowpenalties` take a count
+and that many per-line values, and both work under LuaTeX. What blocks it is the
+constant badness above: with every value below 10000 meaning "permitted", a
+graduated list can only state a *stricter* minimum, which fills less rather than
+more. Making the rule conditional — fill the page unless doing so strands a line
+— requires the page builder to see two different costs, so it requires stretch in
+the vertical list while the page is being built, which the rigid-token rule above
+rules out. That makes it a change to the vertical rhythm rather than to the
+penalties, which is why it is tracked separately as #351 and not as planned work
+here.
+
 #### Hyphenation
 
 `\hyphenpenalty` and `\exhyphenpenalty` are **deliberately left at TeX's

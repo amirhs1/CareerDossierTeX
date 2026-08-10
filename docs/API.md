@@ -1310,6 +1310,27 @@ produce would be stretched to the full text height, or reported as
 bottom-fill state of each class, so a class that later took `twoside` or
 `twocolumn` fails a baseline rather than changing the page silently.
 
+These two tokens are **booleans, not dials** (#342). Under `\raggedbottom` a page
+being built carries no stretch, so every break candidate short of the goal scores
+badness `10000` — `inf_bad` — and cost `deplorable`. All candidates tie, the page
+builder keeps the last one that fits, and the penalty's magnitude never enters
+the comparison. Only `p >= 10000` changes anything, by removing the breakpoint
+from consideration altogether. Measured across every letter and statement fixture
+at `10000, 4000, 1000, 300, 150, 50, 0`, the results form a step function with a
+single step: `9999` paginates identically to `0`. Setting either token to a
+"discounted" value does not soften the rule, it switches it off — which is why
+`4000` behaved exactly like `0` and let a club line through.
+
+The cost of that rule was measured rather than assumed, and accepted. Forbidding
+these breaks leaves 13.1% of page one blank on `statement-two-page`, against 2.4%
+and 3.1% on the two letter fixtures that move at all; permitting them closes
+those holes to 1.4%, 0.1% and 0.5%. But the correspondence is one-to-one — each
+of the three fixtures that gains fill gains a club or widow line, and no fixture
+gains fill without one. There is no value, and no per-family split, that buys the
+space without the defect, so the toolkit keeps the space. Improving fill without
+stranding a line is a mechanism rather than a value, and is not part of this
+design; see #351.
+
 The letter and statement classes otherwise remain continuous prose with no
 further structural page-break policy.
 
