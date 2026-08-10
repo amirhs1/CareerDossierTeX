@@ -1328,9 +1328,8 @@ those holes to 1.4%, 0.1% and 0.5%. But the correspondence is one-to-one — eac
 of the three fixtures that gains fill gains a club or widow line, and no fixture
 gains fill without one. There is no value, and no per-family split, that buys the
 space without the defect, so the toolkit keeps the space. Improving fill without
-stranding a line needs a rule TeX cannot express directly — a minimum of two
-lines on each side of the break — which is a mechanism rather than a value and is
-not part of this design.
+stranding a line is a mechanism rather than a value, and is not part of this
+design; see #351.
 
 The letter and statement classes otherwise remain continuous prose with no
 further structural page-break policy.

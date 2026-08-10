@@ -783,9 +783,17 @@ lines, one per fixture recovered. Because the two move together with no value in
 between, the choice is the rule itself rather than its strength, and the project
 keeps the white space. A `\raggedbottom` document ending a page short is the
 posture the toolkit already takes everywhere else. The alternative that would
-dominate both — requiring two lines on each side of the break — has no direct
-expression in TeX's page builder and would need paragraph-level intervention; it
-is recorded here as the only route worth revisiting, not as planned work.
+dominate both — requiring two lines on each side of the break — is not blocked by
+a missing primitive. eTeX's `\clubpenalties` and `\widowpenalties` take a count
+and that many per-line values, and both work under LuaTeX. What blocks it is the
+constant badness above: with every value below 10000 meaning "permitted", a
+graduated list can only state a *stricter* minimum, which fills less rather than
+more. Making the rule conditional — fill the page unless doing so strands a line
+— requires the page builder to see two different costs, so it requires stretch in
+the vertical list while the page is being built, which the rigid-token rule above
+rules out. That makes it a change to the vertical rhythm rather than to the
+penalties, which is why it is tracked separately as #351 and not as planned work
+here.
 
 #### Hyphenation
 
