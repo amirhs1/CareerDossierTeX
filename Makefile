@@ -7,7 +7,8 @@
 # pure text processing and needs only bash and awk; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
 # `links`, and `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing
-# beyond LuaLaTeX for `metadata`, which reads the PDF catalog itself;
+# beyond LuaLaTeX for `metadata` and `annotations`, which read the PDF's own
+# catalog and link annotations;
 # BibLaTeX and Biber for `bibliography-test`, `links`, and
 # `academic-bibliography`. `links` skips its two bibliography fixtures with a
 # notice when Biber is absent, and says so in its summary.
@@ -48,7 +49,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -83,7 +84,7 @@ statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 # `lint` runs first: it compiles nothing, finishes in well under a second, and
 # what it catches is a source-level omission that every LaTeX-running suite
 # below would report as green.
-check: lint regression extract-test smoke layout bibliography-test links metadata tagging examples ## Run the full supported local suite
+check: lint regression extract-test smoke layout bibliography-test links metadata annotations tagging examples ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
 
 test: check ## Alias for check
@@ -129,6 +130,9 @@ links: ## Copy-paste integrity of URLs and e-mail addresses
 
 metadata: ## Default-path PDF metadata (/Lang) fixtures
 	tests/metadata/run.sh
+
+annotations: ## Link-annotation action types (/S/URI, never /S/GoToR)
+	tests/annotations/run.sh
 
 tagging: ## Opt-in tagged-PDF structure fixtures
 	tests/tagging/run.sh

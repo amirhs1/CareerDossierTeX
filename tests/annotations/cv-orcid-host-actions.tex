@@ -1,0 +1,21 @@
+% cv-orcid-host-actions.tex — the ORCID field's second insertion branch
+% (issue #328).
+%
+% The value already names the host, so only the scheme is missing and the
+% module supplies `https://' alone. Companion to cv-orcid-bare-actions.tex;
+% both spellings must land on the same address and the same action type.
+%
+% URIEXPECT: mailto:ada@example.test
+% URIEXPECT: https://orcid.org/0000-0002-1825-0097
+\documentclass{careerdossier-cv}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada@example.test},
+  orcid = {orcid.org/0000-0002-1825-0097},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research}
+A paragraph, so the document has a body.
+\end{document}

@@ -1,0 +1,42 @@
+% resume-contact-actions.tex — the action type of every annotation the résumé
+% contact line and \CDossierLink emit (issue #328).
+%
+% The three web-profile values below are given in the documented convenience
+% form, without a scheme, and `github' is written out in full. Both spellings
+% have to reach the PDF as the same kind of annotation: an ordinary URI action
+% carrying the address unchanged. Before #328 the scheme-less ones came out as
+% GoToR — "open page 1 of a remote PDF" — with `.pdf' appended, because the
+% inserted `https://' carried a catcode-11 colon that hyperref's scheme split
+% could not see.
+%
+% `mailto:' is here for the same reason: it took the same wrong branch and was
+% rescued only by \@hyper@linkfile mistaking `example.test' for a file
+% extension. That is luck, not behaviour, and this fixture pins the result.
+%
+% Keep every address short enough that its line does not wrap. A wrapped link
+% is emitted as two annotations sharing one action, and the runner compares
+% multisets — a wrap would show up as an unexplained duplicate rather than as
+% the defect this suite is about.
+%
+% URIEXPECT: mailto:ada@example.test
+% URIEXPECT: https://example.org/ada
+% URIEXPECT: https://linkedin.com/in/ada
+% URIEXPECT: https://github.com/ada
+% URIEXPECT: https://example.invalid/body
+% URIEXPECT: https://example.invalid/written
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  email    = {ada@example.test},
+  website  = {example.org/ada},
+  linkedin = {linkedin.com/in/ada},
+  github   = {https://github.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Notes}
+A scheme-less body link: \CDossierLink{example.invalid/body}.
+
+A written-out body link: \CDossierLink{https://example.invalid/written}.
+\end{document}

@@ -456,6 +456,14 @@
 
 %% Normalize a DOI or fallback URL target while leaving the displayed value
 %% unchanged. A DOI may be a bare identifier, doi.org path, or complete URL.
+%%
+%% The scheme goes in with :Ne and \tl_to_str:n so its colon is an ordinary
+%% character. A literal colon here is a letter under expl3, and hyperref finds
+%% an \href target's scheme by splitting on a catcode-12 colon: a catcode-11
+%% one is invisible to that split, so hyperref takes the target for a local
+%% file, appends `.pdf', and emits a GoToR "open a remote PDF" action rather
+%% than a URI action -- silently, and only in the annotation. See the same note
+%% at \__cdossier_components_scheme:N in careerdossier-components (issue #328).
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
     \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
@@ -466,10 +474,13 @@
         \str_if_eq:nnTF {#1} { DOI }
           {
             \str_if_in:NnTF \l__cdossier_cv_publication_target_str { doi.org/ }
-              { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https:// } }
-              { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https://doi.org/ } }
+              { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
+                  { \tl_to_str:n { https:// } } }
+              { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
+                  { \tl_to_str:n { https://doi.org/ } } }
           }
-          { \tl_put_left:Nn \l__cdossier_cv_publication_target_tl { https:// } }
+          { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
+              { \tl_to_str:n { https:// } } }
       }
     %% The visible text is the identifier itself, so this link needs no
     %% decoration under `medium=screen' -- and must not get one: ulem would

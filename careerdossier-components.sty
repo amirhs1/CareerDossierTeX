@@ -596,11 +596,21 @@
 %% an ordinary character (catcode 12) while a literal colon in this package is a
 %% letter (catcode 11) under expl3, so a catcode-sensitive \tl_if_in: would never
 %% match and would double the scheme.
+%%
+%% The same catcode difference decides what the *inserted* scheme becomes, and
+%% getting it wrong is silent. hyperref splits an \href target on a catcode-12
+%% colon to find its scheme (\@hyper@readexternallink); a catcode-11 colon is
+%% invisible to that split, so hyperref takes the target for a local file,
+%% appends `.pdf', and emits a GoToR "open a remote PDF" action instead of a
+%% URI action -- with no warning, and with the page, the extracted text, and
+%% copy-paste integrity all still correct. Hence :Ne and \tl_to_str:n, which
+%% put the scheme in at catcode 12, exactly as a document that wrote the
+%% address out in full would (issue #328).
 \cs_new_protected:Npn \__cdossier_components_scheme:N #1
   {
     \str_set:NV \l__cdossier_components_scheme_str #1
     \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
-      { \tl_put_left:Nn #1 { https:// } }
+      { \tl_put_left:Ne #1 { \tl_to_str:n { https:// } } }
   }
 
 %% A URL cannot contain a literal space, so one in the argument is a mistake --
@@ -653,10 +663,17 @@
   { \__cdossier_components_bodylink:n {#1} }
 
 %% Email: a mailto: link over the visible address.
+%%
+%% \tl_to_str:n for the scheme, for the reason given at
+%% \__cdossier_components_scheme:N. This one used to escape the consequences by
+%% luck: it took the same wrong branch, but \@hyper@linkfile saw what looked
+%% like an extension in the address's domain and fell back to a URL, so no
+%% `.pdf' was appended. That is not something to rely on (issue #328).
 \cs_new_protected:Npn \__cdossier_components_mail:n #1
   {
     \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
-    \tl_set:Nx \l__cdossier_components_url_tl  { mailto: \l__cdossier_components_disp_tl }
+    \tl_set:Nx \l__cdossier_components_url_tl
+      { \tl_to_str:n { mailto: } \l__cdossier_components_disp_tl }
     \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
   }
 
@@ -681,9 +698,14 @@
     \str_set:NV \l__cdossier_components_scheme_str \l__cdossier_components_url_tl
     \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
       {
+        %% :Ne and \tl_to_str:n for the reason given at
+        %% \__cdossier_components_scheme:N -- a catcode-11 colon here would
+        %% make the ORCID link a GoToR action (issue #328).
         \str_if_in:NnTF \l__cdossier_components_scheme_str { orcid.org/ }
-          { \tl_put_left:Nn \l__cdossier_components_url_tl { https:// } }
-          { \tl_put_left:Nn \l__cdossier_components_url_tl { https://orcid.org/ } }
+          { \tl_put_left:Ne \l__cdossier_components_url_tl
+              { \tl_to_str:n { https:// } } }
+          { \tl_put_left:Ne \l__cdossier_components_url_tl
+              { \tl_to_str:n { https://orcid.org/ } } }
       }
     \cs_if_exist:NTF \href
       {
