@@ -1300,6 +1300,16 @@ forbidding a club or widow break only closes off the first and last line of a
 paragraph as a break point, and every interior line break remains available,
 so a page can still break inside an over-long paragraph rather than overflow.
 
+That `\raggedbottom` is inherited rather than set here (#335). It comes from
+`article.cls`, which issues it only for a one-side, one-column document and
+selects `\flushbottom` otherwise, so the four classes hold it only because each
+loads `article` that way. Under `\flushbottom` the short pages these penalties
+produce would be stretched to the full text height, or reported as
+`Underfull \vbox`, instead of ending in white space. The four
+`tokens-*-defaults` regression baselines therefore record the effective
+bottom-fill state of each class, so a class that later took `twoside` or
+`twocolumn` fails a baseline rather than changing the page silently.
+
 The letter and statement classes otherwise remain continuous prose with no
 further structural page-break policy.
 
