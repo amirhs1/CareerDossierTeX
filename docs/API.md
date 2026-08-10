@@ -730,8 +730,20 @@ must be escaped. This applies to every profile field, not only these three.
 | `example.com/a%b` | build fails | `example.com/a\%b` |
 | `example.com/a%25b` | build fails | `example.com/a\%25b` — percent-encoding does not help, the `%` is still a comment character |
 
-`&` needs no escape. A pasted Google Scholar address carrying `&hl=en` builds
-and renders correctly in every class.
+Nothing else needs escaping. `&`, `_`, `~`, `$`, and `^` all build and render
+correctly, so a pasted Google Scholar address carrying `&hl=en` is fine in every
+class.
+
+**Escaping them anyway is harmless**, which makes the rule safe to apply
+defensively: `example.com/a&b` and `example.com/a\&b` produce a byte-identical
+`/URI(https://example.com/a&b)` action in the PDF, and likewise for the others.
+So the whole rule an author needs is *escape `#` and `%`; escaping anything else
+changes nothing.* Over-escaping cannot silently break a link.
+
+In practice this affects `website` and [`\CDossierLink`](#cdossierlink) far more
+than the three keys above: a LinkedIn or GitHub handle and a Google Scholar
+identifier are restricted to letters, digits, hyphens, and underscores, so
+neither character occurs in one.
 
 ### Contact-field labels (`contact-labels`)
 
