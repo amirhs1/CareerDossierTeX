@@ -331,8 +331,54 @@ A local check and the matching CI job are equivalent, but not textually
 identical. Most jobs run the same `make` target you would; `extraction`,
 `tagging`, `smoke`, and `layout` invoke `tests/<suite>/run.sh` directly and
 `regression` runs a bare `l3build check` — in each case the same command the
-target itself wraps. If you change a command in one place, change it in the
-other.
+target itself wraps, with the empty selector described below. If you change a
+command in one place, change it in the other.
+
+### Scoping a suite while you iterate
+
+A suite that only runs whole is a suite you pay for whole. A failure in the
+fiftieth of fifty-four layout fixtures used to cost the forty-nine compiles
+ahead of it — the whole suite's wall time to learn one thing — and that cost is
+what pushes a development loop towards guessing instead of checking.
+
+Four targets take an optional selector:
+
+```bash
+make regression TEST=base-diagnostics
+make smoke FIXTURE=bad-medium
+make layout FIXTURE=resume-two-page
+make extract-test FIXTURE=statement
+```
+
+`TEST` is passed through to `l3build check <name>` and is an exact test name.
+`FIXTURE` is a shell glob matched anywhere in a fixture's basename, so a plain
+word behaves as a substring search (`bad-medium` selects four smoke fixtures)
+and a wildcard anchors it (`FIXTURE='resume-*'`). List the names without
+compiling anything:
+
+```bash
+tests/layout/run.sh --list
+tests/layout/run.sh --list two-page
+```
+
+Three properties make this safe to trust:
+
+- **With no selector, nothing changed.** `make check` and every CI job invoke
+  the suites unscoped and run exactly what they ran before.
+- **A selector that matches nothing fails the run.** Every assertion these
+  suites make is made per fixture, so a run that selected no fixture passes all
+  of them — "0 fixtures, all passed" and "the suite is clean" print the same
+  thing otherwise.
+- **A scoped run says so.** Its closing line carries the filter, the count, and
+  `NOT a full run`, so a filtered transcript cannot be pasted into a PR as
+  evidence of a full one.
+
+Scoping is a development-loop convenience and nothing more. `make check` before
+you push is still the gate, and a scoped run is not a test result for the PR
+body.
+
+`tests/lint/run-fixture-filter.sh` holds this contract to account and runs in
+the `lint` slot; see "Option lint" below.
 
 The underlying invocation, if you prefer to run it directly or need to build a
 single document:
@@ -816,6 +862,12 @@ to output is intended and reviewed:
 On Linux this refreshes only the Poppler baselines. Regenerate the PDFKit
 baselines on macOS, and review both diffs before committing.
 
+`--update` composes with a fixture pattern, and narrowing it is the safer
+default — it rewrites only the baselines the change was meant to move, so a
+regeneration cannot quietly absorb a second, unrelated output change:
+
+    tests/extraction/run.sh --update statement
+
 Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
 [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md).
@@ -1043,6 +1095,36 @@ checks itself against them every run, so a lint that stopped detecting anything
 fails rather than passing everything. They are lint input, never compiled, and
 not part of the Work.
 
+The `lint` target runs a second script in the same slot:
+
+```bash
+tests/lint/run-fixture-filter.sh
+```
+
+It holds the fixture-selection contract from "Scoping a suite while you iterate"
+to account. Selection is the one part of a test runner whose own failure mode is
+a *pass* — a suite that selects nothing asserts nothing and reports every
+assertion clean — so it gets a check rather than a convention. For each scopable
+runner it asserts that `--list` names exactly the `*.tex` files in that
+directory, that a matching pattern selects a proper non-empty subset of them,
+that a non-matching pattern exits nonzero, that the empty pattern (what `make`
+passes when `FIXTURE` is unset) selects everything, and that an unrecognised
+option is rejected instead of taken for a pattern. It also greps the `Makefile`
+for the four pass-through recipes, because a recipe that dropped its variable
+would leave every other check passing while the selector silently did nothing.
+
+It belongs here, with the option lint, because it compiles nothing: every
+invocation is in `--list` mode, so it needs no TeX and adds no measurable time
+to the sub-second `lint` job. It checks the runner sources for a `--list` branch
+*before* invoking them — without one, `--list` is read as a fixture pattern and
+the checks would compile all three suites on a runner that may have no TeX at
+all.
+
+The universe check is not a formality for the smoke suite in particular, whose
+fixture list is a hand-written `cases` array rather than a glob: a `cases` entry
+with no fixture, or a fixture no entry names, is caught here rather than at the
+next full run.
+
 ### Module regression suite (l3build)
 
 The logic-bearing packages are covered by an `l3build` regression suite. Each
@@ -1057,7 +1139,7 @@ make regression            # or: l3build check
 Run a single test by name (without the `.lvt` extension):
 
 ```bash
-l3build check base-diagnostics
+make regression TEST=base-diagnostics    # or: l3build check base-diagnostics
 ```
 
 A failing check writes the difference to `build/test/<name>.luatex.diff`; read it

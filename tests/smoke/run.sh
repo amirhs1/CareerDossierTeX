@@ -21,6 +21,13 @@
 #
 # Requirements: lualatex, xelatex, and pdflatex. Run from anywhere; the
 # repository root is put on TEXINPUTS so the root classes and packages resolve.
+#
+# Usage:
+#   ./run.sh                    every fixture — the full suite, and what CI runs
+#   ./run.sh <pattern>          only the fixtures matching <pattern>
+#   ./run.sh --list [<pattern>] print the selection and compile nothing
+#
+# or, through the Makefile:  make smoke FIXTURE=<pattern>
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -29,73 +36,38 @@ cd "$here"
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 fail=0
 
-# Prove the supported-engine contract independently from class behavior. The
-# same minimal source must build with LuaLaTeX and fail at the package guard
-# (rather than later in fontspec) under both unsupported engines.
-engine_fixture="engine-contract"
-engine_needle="Compile with lualatex, not"
-echo "== $engine_fixture.tex (engine contract) =="
-if ! lualatex -halt-on-error -interaction=nonstopmode "$engine_fixture.tex" \
-    > "$engine_fixture-lualatex.stdout" 2>&1; then
-  echo "  LuaLaTeX EXPECTED PASS but compile failed"
-  fail=1
-else
-  echo "  LuaLaTeX build OK"
-fi
-for engine in xelatex pdflatex; do
-  job="$engine_fixture-$engine"
-  "$engine" -halt-on-error -interaction=nonstopmode -jobname="$job" \
-    "$engine_fixture.tex" > "$job.stdout" 2>&1
-  rc=$?
-  if [ "$rc" -eq 0 ]; then
-    echo "  $engine EXPECTED FAILURE but compile succeeded"
-    fail=1
-  elif ! tr '\n' ' ' < "$job.log" | tr -s ' ' | grep -qF "$engine_needle"; then
-    echo "  $engine FAILED for the wrong reason: expected '$engine_needle'"
-    fail=1
-  else
-    echo "  $engine failed at the LuaLaTeX guard as intended"
-  fi
-done
-echo
-
-# Issue #252: the header-stack fixture below compiles the worked example
-# published in docs/API.md, so it is only worth compiling while the two are the
-# same text. Nothing else notices when a documented example is edited and its
-# fixture is not -- the fixture keeps building, and the promise it was added to
-# keep quietly stops being kept. Compare them before compiling anything.
+# Fixture selection (issue #359).
 #
-# The documented block is found by its content (the fenced `latex' block that
-# declares a document *and* opens a header stack), not by the prose around it,
-# so rewording the paragraph above the example does not break this.
-doc_source="$root/docs/API.md"
-doc_fixture="$here/components-header-stack-doc.tex"
-echo "== docs/API.md worked example == components-header-stack-doc.tex =="
-awk '
-  /^```latex$/          { inblock = 1; buf = ""; next }
-  inblock && /^```$/    {
-                          inblock = 0
-                          if (buf ~ /CDossierHeaderBegin/ && buf ~ /documentclass/)
-                            { found++; out = buf }
-                          next
-                        }
-  inblock               { buf = buf $0 "\n" }
-  END                   { if (found != 1) exit 1; printf "%s", out }
-' "$doc_source" > "$here/doc-example.stdout"
-if [ $? -ne 0 ]; then
-  echo "  FAILED to locate exactly one worked example in docs/API.md"
-  fail=1
-else
-  awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/doc-fixture.stdout"
-  if diff -u "$here/doc-example.stdout" "$here/doc-fixture.stdout" > "$here/doc-example.diff"; then
-    echo "  documented example and fixture are identical"
-  else
-    echo "  DRIFTED — the fixture no longer compiles what docs/API.md publishes:"
-    sed 's/^/    /' "$here/doc-example.diff"
-    fail=1
-  fi
-fi
-echo
+# With no pattern every fixture runs and nothing about this suite has changed;
+# that is the invocation CI makes and the one `make check' makes. A pattern
+# selects a subset, so a development loop can re-run the one fixture that failed
+# instead of paying for the hundred-odd compiles ahead of it.
+#
+# The pattern is a shell glob matched anywhere in the basename, so `bad-medium'
+# behaves as a substring search while `letter-*' anchors at the start. It is
+# left unquoted in the `case' below for exactly that reason.
+#
+# A pattern that selects nothing exits nonzero rather than reporting a clean
+# run. Every assertion here is made per fixture, so a run with no fixtures
+# passes all of them, and that is indistinguishable from a suite that checked
+# something.
+fixture_filter=""
+list_only=0
+for arg in "$@"; do
+  case "$arg" in
+    --list) list_only=1 ;;
+    -*)     echo "unknown option: $arg" >&2; exit 2 ;;
+    *)      fixture_filter="$arg" ;;
+  esac
+done
+
+fixture_matches() {
+  [ -z "$fixture_filter" ] && return 0
+  case "$1" in
+    *$fixture_filter*) return 0 ;;
+  esac
+  return 1
+}
 
 # Warnings tolerated in a "pass" build. Kept short and justified; mirrors the
 # extraction runner. hyperref/geometry are expected loads; the ...Off ligature
@@ -234,7 +206,126 @@ cases=(
   "statement-artist-missing-website fail|required profile field 'website'"
 )
 
+# The engine contract is a fixture of this suite like any other — it has its own
+# engine-contract.tex — but it is not a `cases' entry, because its expectation
+# is one per engine rather than a single pass/fail. It joins the universe here
+# so a filter can select it and `--list' can name it.
+engine_fixture="engine-contract"
+engine_needle="Compile with lualatex, not"
+
+selected_cases=()
+engine_selected=0
+fixture_matches "$engine_fixture" && engine_selected=1
 for entry in "${cases[@]}"; do
+  fixture_matches "${entry%% *}" && selected_cases+=("$entry")
+done
+total=$(( ${#cases[@]} + 1 ))
+n_selected=$(( ${#selected_cases[@]} + engine_selected ))
+
+if [ "$n_selected" -eq 0 ]; then
+  echo "NO FIXTURE MATCHES '$fixture_filter' (of $total in $here)."
+  echo "  ./run.sh --list  prints every available fixture name."
+  exit 1
+fi
+
+if [ "$list_only" -eq 1 ]; then
+  [ "$engine_selected" -eq 1 ] && echo "$engine_fixture"
+  # Guarded rather than expanded unconditionally: an empty array expansion is an
+  # unbound-variable error under `set -u' in bash 3.2, and a filter matching
+  # only the engine contract leaves this array empty.
+  if [ "${#selected_cases[@]}" -gt 0 ]; then
+    for entry in "${selected_cases[@]}"; do echo "${entry%% *}"; done
+  fi
+  exit 0
+fi
+
+# Appended to the closing verdict so a filtered run can never be read as a full
+# one. Empty for a full run, which keeps that line byte-identical to before.
+scope_note=""
+if [ -n "$fixture_filter" ]; then
+  scope_note=" (filter '$fixture_filter': $n_selected of $total fixtures — NOT a full run)"
+  echo "filter '$fixture_filter': $n_selected of $total fixtures selected"
+  echo
+fi
+
+# Prove the supported-engine contract independently from class behavior. The
+# same minimal source must build with LuaLaTeX and fail at the package guard
+# (rather than later in fontspec) under both unsupported engines.
+if [ "$engine_selected" -eq 1 ]; then
+  echo "== $engine_fixture.tex (engine contract) =="
+  if ! lualatex -halt-on-error -interaction=nonstopmode "$engine_fixture.tex" \
+      > "$engine_fixture-lualatex.stdout" 2>&1; then
+    echo "  LuaLaTeX EXPECTED PASS but compile failed"
+    fail=1
+  else
+    echo "  LuaLaTeX build OK"
+  fi
+  for engine in xelatex pdflatex; do
+    job="$engine_fixture-$engine"
+    "$engine" -halt-on-error -interaction=nonstopmode -jobname="$job" \
+      "$engine_fixture.tex" > "$job.stdout" 2>&1
+    rc=$?
+    if [ "$rc" -eq 0 ]; then
+      echo "  $engine EXPECTED FAILURE but compile succeeded"
+      fail=1
+    elif ! tr '\n' ' ' < "$job.log" | tr -s ' ' | grep -qF "$engine_needle"; then
+      echo "  $engine FAILED for the wrong reason: expected '$engine_needle'"
+      fail=1
+    else
+      echo "  $engine failed at the LuaLaTeX guard as intended"
+    fi
+  done
+  echo
+fi
+
+# Issue #252: the header-stack fixture below compiles the worked example
+# published in docs/API.md, so it is only worth compiling while the two are the
+# same text. Nothing else notices when a documented example is edited and its
+# fixture is not -- the fixture keeps building, and the promise it was added to
+# keep quietly stops being kept. Compare them before compiling anything.
+#
+# The documented block is found by its content (the fenced `latex' block that
+# declares a document *and* opens a header stack), not by the prose around it,
+# so rewording the paragraph above the example does not break this.
+#
+# It is gated on its own fixture being selected (issue #359): the claim it makes
+# is about that fixture, and a run that does not compile it has no business
+# reporting on it.
+if fixture_matches components-header-stack-doc; then
+  doc_source="$root/docs/API.md"
+  doc_fixture="$here/components-header-stack-doc.tex"
+  echo "== docs/API.md worked example == components-header-stack-doc.tex =="
+  awk '
+    /^```latex$/          { inblock = 1; buf = ""; next }
+    inblock && /^```$/    {
+                            inblock = 0
+                            if (buf ~ /CDossierHeaderBegin/ && buf ~ /documentclass/)
+                              { found++; out = buf }
+                            next
+                          }
+    inblock               { buf = buf $0 "\n" }
+    END                   { if (found != 1) exit 1; printf "%s", out }
+  ' "$doc_source" > "$here/doc-example.stdout"
+  if [ $? -ne 0 ]; then
+    echo "  FAILED to locate exactly one worked example in docs/API.md"
+    fail=1
+  else
+    awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/doc-fixture.stdout"
+    if diff -u "$here/doc-example.stdout" "$here/doc-fixture.stdout" > "$here/doc-example.diff"; then
+      echo "  documented example and fixture are identical"
+    else
+      echo "  DRIFTED — the fixture no longer compiles what docs/API.md publishes:"
+      sed 's/^/    /' "$here/doc-example.diff"
+      fail=1
+    fi
+  fi
+  echo
+fi
+
+# A filter selecting only the engine contract leaves this array empty, and a
+# bare "${selected_cases[@]}" would then be an unbound-variable error under
+# `set -u' in bash 3.2. The ${a[@]+"${a[@]}"} form expands to nothing instead.
+for entry in ${selected_cases[@]+"${selected_cases[@]}"}; do
   base="${entry%% *}"; rest="${entry#* }"
   expect="${rest%%|*}"; needle=""; once=""
   [ "$rest" != "$expect" ] && needle="${rest#*|}"
@@ -305,5 +396,7 @@ for entry in "${cases[@]}"; do
   esac
 done
 
-echo; [ "$fail" -eq 0 ] && echo "ALL SMOKE FIXTURES PASSED" || echo "SMOKE FIXTURES FAILED"
+echo
+[ "$fail" -eq 0 ] && echo "ALL SMOKE FIXTURES PASSED$scope_note" \
+                  || echo "SMOKE FIXTURES FAILED$scope_note"
 exit "$fail"
