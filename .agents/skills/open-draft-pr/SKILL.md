@@ -18,23 +18,30 @@ Read and follow, in order:
 1. Confirm the current branch is focused and is not `main`.
 2. Review `git status --short` and the complete branch-versus-base diff.
 3. Run relevant tests and record exact outcomes.
-4. Build the PR title from `docs/NAMING-CONVENTION.md` and the PR body from the
+4. Update the documentation the change requires, and `CHANGELOG.md` when the
+   change is user-visible.
+5. Build the PR title from `docs/NAMING-CONVENTION.md` and the PR body from the
    template below.
-5. Complete the AI-assistance section from the branch's actual commit trailers.
-6. If no focused issue exists, stop before pushing and obtain the maintainer's
+6. Complete the AI-assistance section from the branch's actual commit trailers.
+7. If no focused issue exists, stop before pushing and obtain the maintainer's
    explicit decision about issue creation and release metadata.
-7. Push only the focused feature branch.
-8. Open or update the PR as a draft.
-9. Assign `amirhs1`.
-10. Add the PR to the `CareerDossierTeX Development` Project.
-11. Apply one existing primary `type:*` label and all relevant `area:*` labels.
-12. Inherit the focused issue's milestone, Phase, and Priority.
-13. Set Status to the Project's in-progress option.
-14. Estimate Size from the actual completed scope.
-15. Read every field back from GitHub, fill anything still blank, and read back
+8. Confirm the branch is close-out-complete against `reference.md` ("Before
+   opening a draft PR"). Steps 2–6 are that gate; nothing on it may be deferred
+   to a commit after the push, and green CI does not discharge any of it.
+9. Push only the focused feature branch.
+10. Open or update the PR as a draft.
+11. Assign `amirhs1`.
+12. Add the PR to the `CareerDossierTeX Development` Project.
+13. Apply one existing primary `type:*` label and all relevant `area:*` labels.
+14. Inherit the focused issue's milestone, Phase, and Priority.
+15. Set Status to the Project's in-progress option.
+16. Estimate Size from the actual completed scope.
+17. Read every field back from GitHub, fill anything still blank, and read back
     again. A blank is unfinished work, not a reporting line. `reference.md`
     ("Verification") says which fields have no legitimate blank value and holds
     the queries.
+18. Close the report with the single completion verdict `AGENTS.md`
+    ("Completion report") requires, covering the branch as a whole.
 
 `docs/NAMING-CONVENTION.md` section 9 defines which `Status` to use and section
 10 the `Phase` numbering; `reference.md` ("Project field values") covers the
@@ -53,6 +60,11 @@ deleting the ones that seem empty. In order:
 
 `reference.md` states what belongs in each section.
 **`AI assistance` is always last.**
+
+The `Testing` section carries no `GitHub Actions passes` checkbox. Do not add
+one: the body is written before the first push, so no workflow has run when it
+is composed, and the line could only be left unticked or ticked against
+`AGENTS.md` rule 2. The real check-run status is already on the PR.
 
 When writing the body to a file for `gh pr create --body-file`, start from a
 copy of the committed template so a section is never silently dropped, and keep

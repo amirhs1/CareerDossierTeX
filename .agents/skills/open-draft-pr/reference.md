@@ -52,6 +52,10 @@ and preserve the existing remote value until the maintainer decides.
 
 ## Before opening a draft PR
 
+The branch must be **close-out-complete** before the first push — see
+`AGENTS.md` "The first push is a commitment", which is the canonical statement
+of this gate. The list below is that gate applied to opening a PR.
+
 Confirm:
 
 - the branch is not `main`;
@@ -61,10 +65,18 @@ Confirm:
 - the diff is limited to the issue;
 - behavior changes include their focused committed tests under `tests/` rather
   than deferring them to a later milestone task;
-- relevant tests and checks were run;
+- relevant tests and checks were run, and their exact outcomes recorded;
+- the documentation those changes require is updated in the same change;
+- `CHANGELOG.md` is updated when the change is user-visible;
+- the PR body is written in full, including its `AI assistance` section built
+  from the branch's real trailers;
 - no generated artifacts, secrets, private data, or unrelated changes are included;
 - API, docs, design, and accessibility impacts are documented;
 - the PR title follows `docs/NAMING-CONVENTION.md`.
+
+Nothing on this list may be deferred to a follow-up commit after the push.
+Green CI does not discharge any of it: no check reads the `AI assistance`
+section, `CHANGELOG.md`, the documentation, or the Project fields.
 
 ## PR body
 
@@ -90,6 +102,13 @@ section order and fill every section. In order:
   ```bash
   git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
   ```
+
+The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
+not be added by hand. The body is written before the first push, so no workflow
+has run when it is composed — the box could only be left unticked or ticked
+against `AGENTS.md` rule 2 (verification honesty). The live check-run status is
+already on the PR, and green CI is not a completion signal, so it is not
+something the author attests to.
 
 Do not close the parent epic from a focused implementation PR.
 
@@ -231,6 +250,11 @@ that silently pulls postponed work into a release.
 If Project API access is unavailable, still create the authorized draft PR and
 set all supported ordinary PR metadata. Report the exact fields that could not
 be updated rather than claiming completion.
+
+Close the report to the maintainer with the single verdict `AGENTS.md`
+"Completion report" requires — *complete, nothing further, safe to approve on
+green*, or *not complete, the following remain* — covering the branch as a
+whole, not only its metadata.
 
 ## Appendix: gh command reference
 
