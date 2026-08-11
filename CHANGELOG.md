@@ -10,6 +10,46 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `make review-pagefill` reports how full every page of the layout corpus is,
+  and what forced each page break: the page goal, the height used, the fill
+  percentage, the penalty at the break taken, and the size of the atom that
+  would not fit. `make layout` now *asserts* on the same measurement — no page a
+  policy governs may fall below 90% of its goal. ([#334])
+
+  The page-break policy had two halves and only one of them was measured. The
+  layout suite asserts that material stays *together* — no list split leaving
+  one item behind, no heading separated from what it introduces, no page ending
+  on a section heading — and not one of those assertions can fail on a page that
+  is half empty. In documents whose entire constraint is a page limit that is
+  the more important half, and nothing anywhere measured it. Every other spacing
+  decision in this project was settled by measurement; page fill could not be.
+
+  The figures come from `\tracingpages` output parsed out of the log, so the
+  target needs only LuaLaTeX and awk — no poppler, which CI's texlive image does
+  not have. What it reports per page is `kind`: `overflow` when the next atom
+  did not fit, `keep` when `\CDossierSectionNeedLines` ended the page early, and
+  `eject` when the fixture source ended it with `\newpage`. Both forced kinds
+  print the same penalty and mean opposite things; only the fil stretch on the
+  taken candidate tells them apart, and getting that wrong would have flagged
+  five fixtures for behaving exactly as their source says.
+
+  The 90% floor is a ratchet rather than a fill policy. *How full should a page
+  be* belongs to #333 and its successor #351, and neither has answered it; the
+  floor asks only whether a page may get worse than anything the project has
+  deliberately accepted. One governed page sits at 86.9% and every other at
+  92.9% or above, so it runs through the gap. Measured at `8212a0f`, the commit
+  before #332, `resume-two-page` filled 80.6% of its goal and left a 140.04pt
+  hole — the defect that produced this check — and the floor fails it.
+
+  A fixture whose accepted state sits lower declares `% PAGEFILLFLOOR: <pct>` in
+  its own source, as `statement-two-page` does at 85% for the prose-family hole
+  #342 closed as a decision record. When such a declaration is no longer needed
+  the run fails asking for its removal, so a stale exemption cannot go on
+  suppressing the floor silently.
+
+  **Test and build tooling only.** No class, option, key, command, environment,
+  or calibrated value changed, and no document renders differently.
+
 - `\CDossierLink{<url>}` is the supported way to put a link in body text — a
   bullet, an entry, a letter or statement paragraph. It prints the address as
   written, links it, and supplies the break points a long address needs; a value
@@ -675,6 +715,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#330]: https://github.com/amirhs1/CareerDossierTeX/issues/330
 [#332]: https://github.com/amirhs1/CareerDossierTeX/issues/332
 [#333]: https://github.com/amirhs1/CareerDossierTeX/issues/333
+[#334]: https://github.com/amirhs1/CareerDossierTeX/issues/334
 [#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340
 
 ## [0.7.0] - 2026-08-04

@@ -544,6 +544,110 @@ If a long run measures everything but fails while merging, do not repeat it:
 
 The failed run prints that path as `Per-value console output kept at:`.
 
+### Page fill
+
+Measure how full each page is, and what forced each page break, across every
+committed layout fixture that renders more than one page:
+
+    make review-pagefill
+
+This is the other half of the page-break policy. `make layout` asserts that
+material stays *together* — no list split leaving one item behind, no heading
+separated from what it introduces, no page ending on a section heading — and
+not one of those assertions can fail on a page that is half empty. In documents
+whose entire constraint is a page limit, that is the more important half, and it
+went unmeasured until this target existed.
+
+The measurement is `\tracingpages` output parsed out of the log by
+[`tests/layout/page-fill.awk`](tests/layout/page-fill.awk), not a reading of the
+PDF, so it needs only LuaLaTeX and awk. That is deliberate: CI's texlive image
+has no poppler.
+
+Review the artifacts under `build/pagefill-review/`:
+
+- `pagefill-report.txt` — per fixture and per page: `\pagegoal`, the height
+  used, the fill percentage, the penalty at the break taken, and the size of the
+  atom that forced it;
+- `baseline.md` — the same figures as one table, regenerated on every run so the
+  numbers are reproducible rather than transcribed;
+- `pagefill.tsv` and each fixture's `.log` — the raw record and its source.
+
+The column that decides how to read a row is `kind`:
+
+| kind | what ended the page | fill means |
+|---|---|---|
+| `overflow` | the next atom did not fit | a policy question; `atom` says how large it was |
+| `keep` | `\CDossierSectionNeedLines`, the bounded section keep (#333) | a policy question |
+| `eject` | the fixture source: `\newpage`, `\vfill`, the `\end{document}` flush | nothing — the source decided it |
+
+Both forced kinds print `p=-10000`; only the fil stretch on the taken candidate
+tells them apart. Five committed fixtures eject, and their page-one fill runs
+from 26% to 54% purely because their source says so — a threshold that counted
+them would fail five fixtures for behaving exactly as written. A short *last*
+page is normal for the same reason and is excluded too.
+
+#### The floor `make layout` enforces
+
+`make layout` carries the same measurement as an assertion, reported per fixture
+as a `page fill:` line and enforced against a floor held in `run.sh`.
+
+**The floor is a ratchet, not a fill policy.** *How full should a page be* is a
+design question; it belongs to #333 and its successor #351, and neither has
+answered it. The floor asks the narrower question the committed corpus already
+answers: may a page get worse than anything the project has deliberately
+accepted? One governed page sits at 86.9% and every other at 92.9% or above, so
+the floor runs through the gap between the single accepted outlier and the rest.
+
+It is a real guard rather than a formality. Measured at `8212a0f`, the commit
+before #332, `resume-two-page` filled 80.6% of its goal and left a 140.04pt hole
+— the defect that produced #332, #333, and this check — and the floor fails it.
+
+A fixture whose accepted state sits below the floor declares its own:
+
+```text
+% PAGEFILLFLOOR: <pct>
+```
+
+`statement-two-page` is the only one that does. Its 86.9% is the prose-family
+hole #342 swept over seven penalty values and closed with no change, and which
+#351 now owns; the fixture carries the reasoning at the directive. Putting the
+exemption in the fixture means whoever next changes that family's pagination
+sees it, instead of it hiding inside a global number chosen low enough to
+accommodate it.
+
+**A declaration that is no longer needed fails the run.** When every governed
+page of a declaring fixture clears the *global* floor, the runner reports
+`EXPIRED PAGE-FILL FLOOR` and asks for the line's removal — so a stale exemption
+cannot go on silently suppressing the floor for its fixture. Nothing has to
+remember to delete it when #351 lands.
+
+To explore a candidate value against the corpus, or to re-prove either failure
+mode:
+
+```bash
+CDOSSIER_PAGE_FILL_MIN=94 make layout
+```
+
+At 94 four pages fail — `resume-a4-two-page` (93.0%), `resume-section-need`
+(93.6%), `resume-a4-sans-body-two-page` (93.9%), `statement-a4-sans-body-two-page`
+(92.9%) — while the declared exemption correctly holds `statement-two-page` at
+its own 85. At 80 nothing fails the floor and the expiry check fires instead.
+Setting the variable empty measures and reports without asserting.
+
+#### Two more things the fixture list and the parser are held to
+
+The fixture list is a glob, not a register, and it is wider than `*two-page*` on
+purpose: `resume-section-need` renders two pages without saying so in its name,
+so a list that trusted the name would have left a governed page out of the
+baseline — and out of the count above.
+
+The parser identifies a page by TeX's own shipout marker, and every run checks
+the count it found against the log's `Output written on ... (N pages)`. To
+re-prove that check, break the marker rule in `page-fill.awk` and run
+`make layout`: it must report `PAGE-FILL PARSE MISMATCH` rather than passing.
+A parser that finds no page reports no hole, which reads exactly like a corpus
+that has none.
+
 ### Baselines are load-bearing
 
 A saved baseline (an `l3build` `.tlg`, or the committed extraction reference) is

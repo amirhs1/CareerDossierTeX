@@ -11,7 +11,19 @@
 #   - a fixture named *two-page* actually spans at least two pages;
 #   - no *two-page* fixture splits a hyphenated word across a page break, and
 #     no letter or statement fixture strands a single line of a paragraph at a
-#     page boundary (issue #171, via page-break-check.awk).
+#     page boundary (issue #171, via page-break-check.awk);
+#   - no page a policy governs falls below `$page_fill_min` of its goal, read
+#     from `\tracingpages` output via page-fill.awk (issue #334). Everything
+#     above asserts only that material stays *together*, and all of it passes on
+#     a half-empty page. `make review-pagefill` is the same measurement as a
+#     full report.
+#
+# A fixture carrying
+#
+#   % PAGEFILLFLOOR: <pct>
+#
+# declares an accepted fill below the global floor, and the runner fails when
+# that declaration is no longer needed. See the page-fill block below.
 #
 # A fixture carrying
 #
@@ -43,14 +55,44 @@ control_dir="$(mktemp -d "${TMPDIR:-/tmp}/careerdossier-layout-control.XXXXXX")"
 trap 'rm -rf "$control_dir"' EXIT
 fail=0
 
+# Minimum page fill, as a percentage of `\pagegoal`, for every page the check
+# governs — see the page-fill block below for which pages those are.
+#
+# 90 is a ratchet, not a fill policy. "How full should a page be" is a design
+# question; it belongs to #333 and its successor #351, and neither has answered
+# it. This asks the narrower question the committed corpus already answers: may
+# a page get worse than anything the project has deliberately accepted? Measured
+# across the 25 governed pages, one sits at 86.9% and every other at 92.9% or
+# above, so 90 runs through the gap between the single accepted outlier and the
+# rest of the corpus.
+#
+# It is a real guard rather than a formality. Measured at `8212a0f`, the commit
+# before #332, `resume-two-page` filled 80.6% of its goal and left a 140.04pt
+# hole — the defect that produced #332, #333, and this check — and 90 fails it.
+#
+# A fixture whose own accepted state sits below this declares its own floor; see
+# `% PAGEFILLFLOOR:` below. Setting `CDOSSIER_PAGE_FILL_MIN=` empty measures and
+# reports without asserting, which is how a candidate value is explored.
+page_fill_min="${CDOSSIER_PAGE_FILL_MIN-90}"
+
 for tex in *.tex; do
   base="${tex%.tex}"
   echo "== $tex =="
 
-  if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1; then
+  # `\tracingpages=1` goes on the command line rather than into a rebuild of
+  # its own. It changes nothing but the log — the PDF is byte-identical — and
+  # this way the page-fill measurement below reads the same run the rest of the
+  # assertions are made against, instead of a second compile that has to be
+  # argued to be equivalent. `-jobname` keeps the artifact names the fixture
+  # would have produced on its own. The space after `1` terminates the number
+  # scan before `\input`, which is an expandable macro in LaTeX and would
+  # otherwise be expanded while TeX looked for another digit.
+  if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
+       "\\tracingpages=1 \\input{$tex}" > "$base.stdout" 2>&1; then
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue
   fi
-  if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1; then
+  if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
+       "\\tracingpages=1 \\input{$tex}" >> "$base.stdout" 2>&1; then
     echo "  RERUN FAILED (see $base.log)"; fail=1; continue
   fi
 
@@ -348,6 +390,98 @@ EOF
     fi
   else
     echo "  (pdftotext absent: skipped folio check)"
+  fi
+
+  # Page fill — the other half of the page-break policy (issue #334).
+  #
+  # Everything above asserts that material stays *together*. Not one of those
+  # assertions can fail on a page that is half empty, and for documents whose
+  # entire constraint is a page limit that is the more important half. It sits
+  # here, beside the keeps, so the two halves are read and maintained together.
+  #
+  # The measurement comes from `\tracingpages` in the log rather than from the
+  # PDF, so it needs no poppler and runs wherever this suite runs. page-fill.awk
+  # documents the trace and the two non-obvious things about reading it.
+  #
+  # Two page kinds are skipped, and skipping them is not a weakening:
+  #   - the last page, because a short last page is normal and says nothing;
+  #   - an `eject` page, one the fixture source ended itself with `\newpage`.
+  #     Five committed fixtures do that, and their page-one fill runs from 26%
+  #     to 54% purely because their source says so. A threshold that counted
+  #     them would fail five fixtures for behaving exactly as written.
+  fill_records="$(awk -f "$here/page-fill.awk" "$base.log")"
+  fill_pages="$(printf '%s\n' "$fill_records" | grep -c '.' || true)"
+  if [ "$fill_pages" -ne "$pages" ]; then
+    echo "  PAGE-FILL PARSE MISMATCH: $fill_pages record(s) for $pages page(s)."
+    echo "    page-fill.awk identifies a page by TeX's own shipout marker, and"
+    echo "    that rule no longer matches this log. Fix the parser rather than"
+    echo "    relaxing the check: a parser that finds no page reports no hole,"
+    echo "    which looks identical to a corpus that has none."
+    fail=1
+  else
+    echo "  page fill: $(printf '%s\n' "$fill_records" | awk -F'\t' '
+      { tag = $6; if ($10 == 1) tag = tag ",last"
+        printf "%s%s %.1f%% (%s)", (NR > 1 ? ", " : ""), $1, $4, tag }
+      END { print "" }')"
+
+    # The enforcement hook. `$page_fill_min` above carries the global floor and
+    # the reasoning for its value.
+    #
+    # A fixture may declare an accepted state below that floor with
+    #
+    #   % PAGEFILLFLOOR: <pct>
+    #
+    # the way fixtures already declare STRETCHCONTROL and CLUBWIDOWCONTROL. The
+    # exemption then lives in the fixture that owns it, where whoever next
+    # changes that family's pagination will see it, rather than inside a global
+    # number quietly chosen low enough to accommodate it.
+    #
+    # A declaration nobody needs any more is a hole in the guard that reports
+    # nothing, so it is held to account the same way its neighbours are: when
+    # every governed page of a declaring fixture clears the *global* floor, the
+    # declaration has expired and the run fails asking for its removal.
+    fixture_floor="$(sed -n 's/^% PAGEFILLFLOOR:[[:space:]]*//p' "$tex" | head -1)"
+    effective_floor="${fixture_floor:-$page_fill_min}"
+    if [ -n "$fixture_floor" ]; then
+      echo "  declared page-fill floor: ${fixture_floor}% (global ${page_fill_min:-none})"
+    fi
+
+    fill_fail=0
+    floor_still_needed=0
+    while IFS="$(printf '\t')" read -r pg goal used pct pen kind nxt atom blank last; do
+      [ -n "$pg" ] || continue
+      if [ "$last" -eq 1 ] || [ "$kind" = "eject" ]; then continue; fi
+      [ -n "$page_fill_min" ] || continue
+      if awk -v a="$pct" -v b="$page_fill_min" 'BEGIN { exit !(a < b) }'; then
+        floor_still_needed=1
+      fi
+      if awk -v a="$pct" -v b="$effective_floor" 'BEGIN { exit !(a < b) }'; then
+        echo "  PAGE UNDERFILLED: page $pg is ${pct}% of its goal (${blank}pt blank),"
+        echo "    below the ${effective_floor}% floor. Break kind '$kind' at penalty $pen."
+        if [ "$atom" != "-" ]; then
+          echo "    The next candidate was ${atom}pt further on: that is the atom"
+          echo "    that did not fit, and the size any fix has to find room for."
+        else
+          echo "    Nothing was rejected, so the hole is not an atom that did not"
+          echo "    fit — a policy rule ended this page early."
+        fi
+        fill_fail=1
+      fi
+    done <<EOF
+$fill_records
+EOF
+
+    if [ -n "$page_fill_min" ] && [ -n "$fixture_floor" ] \
+       && [ "$floor_still_needed" -eq 0 ]; then
+      echo "  EXPIRED PAGE-FILL FLOOR: this fixture declares ${fixture_floor}%, but"
+      echo "    every page it governs now clears the ${page_fill_min}% global floor."
+      echo "    Delete the % PAGEFILLFLOOR line rather than leaving it in place: a"
+      echo "    declared exemption nobody needs still suppresses the global floor"
+      echo "    for this fixture, and suppresses it silently."
+      fill_fail=1
+    fi
+
+    [ "$fill_fail" -eq 0 ] || fail=1
   fi
 
   case "$base" in
