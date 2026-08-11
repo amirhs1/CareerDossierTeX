@@ -318,9 +318,6 @@ jobs:
   # the coverage findable. It needs Biber as well as poppler — the bibliography
   # is the only site that puts stretchable glue at a URL's breakpoints, and the
   # suite's negative control lives there.
-  #
-  # This is a new check: do not add it to the branch ruleset's required list
-  # until it has passed on `main`.
   links:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
@@ -353,9 +350,6 @@ jobs:
   # checks list, the way `bibliography` does. It needs no PDF tooling — the
   # fixtures build uncompressed and the runner reads the catalog itself — so it
   # is the cheapest job in this workflow.
-  #
-  # This is a new check: do not add it to the branch ruleset's required list
-  # until it has passed on `main`.
   metadata:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
@@ -377,9 +371,6 @@ jobs:
   # a text-layer verdict and an annotation verdict behind one check name. Like
   # `metadata` it needs no PDF tooling: the fixtures build uncompressed and the
   # runner reads the annotations itself.
-  #
-  # This is a new check: do not add it to the branch ruleset's required list
-  # until it has passed on `main`.
   annotations:
     runs-on: ubuntu-latest
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373

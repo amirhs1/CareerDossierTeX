@@ -78,7 +78,8 @@ branches. They exist so the history explains itself: every change should be
 traceable to a release, to a written rationale, and to a reviewable diff.
 
 These three rules are documentation, not enforcement. What actually gates a
-merge to `main` is the `Protect Main` ruleset; see "CI expectations".
+merge to `main` is the `Protect Main` ruleset; see "What actually gates a merge"
+under "CI expectations".
 
 ### 1. Every issue carries a milestone
 
@@ -305,9 +306,10 @@ Build every supported example:
 make
 ```
 
-Run every suite CI runs — the option lint, regression, extraction, smoke,
-layout, the focused BibLaTeX/Biber fixture, and the tagged-structure fixtures —
-plus all supported example builds:
+Run every suite CI runs — the option lint, the module regression suite,
+extraction, smoke, layout, the focused BibLaTeX/Biber fixture, the link
+copy-paste, default-path metadata, and link-annotation suites, and the
+tagged-structure fixtures — plus all supported example builds:
 
 ```bash
 make check
@@ -319,10 +321,18 @@ Clean generated files afterwards:
 make clean
 ```
 
-Run `make help` for the full target list. Every target runs the same command as
-the matching job in `.github/workflows/build.yml`, so a local check and a CI
-check cannot silently diverge. If you change a command in one place, change it
-in the other.
+`make help` is the authoritative target list, and the `check` prerequisites at
+`Makefile:92` are the authoritative suite list. Prefer both to any prose
+enumeration, here or elsewhere. A hand-maintained copy of either will drift, and
+a drifted copy is how the `annotations` suite came to be omitted from a run that
+was then reported clean.
+
+A local check and the matching CI job are equivalent, but not textually
+identical. Most jobs run the same `make` target you would; `extraction`,
+`tagging`, `smoke`, and `layout` invoke `tests/<suite>/run.sh` directly and
+`regression` runs a bare `l3build check` — in each case the same command the
+target itself wraps. If you change a command in one place, change it in the
+other.
 
 The underlying invocation, if you prefer to run it directly or need to build a
 single document:
@@ -362,6 +372,9 @@ tests/
 ├── smoke/        # supported document builds and failure-path fixtures
 ├── extraction/   # text-layer and reading-order round trips
 ├── layout/       # long-value, multi-page, and page-break stress sources
+├── links/        # copy-paste integrity of URLs and e-mail addresses
+├── metadata/     # default-path PDF catalog metadata, /Lang included
+├── annotations/  # link-annotation action types (/S/URI, never /S/GoToR)
 ├── bibliography/ # Biber-backed sorting and rendered identifier precedence
 └── tagging/      # tagged structure, the untagged path, and the extractor matrix
 ```
@@ -385,8 +398,10 @@ means depends on what the module owns, so match the test type to the concern:
   behavior is added, in the same rhythm as writing a `test_*.py` beside each
   Python module. This is where a pre-implementation failing test is usually
   practical and most valuable. **No module is exempt.** Every shared package and
-  every class already has such coverage — 36 `.lvt`/`.tlg` pairs — so extend the
-  existing file for that module rather than assuming a class does not need one.
+  every class already has such coverage — 46 `.lvt`/`.tlg` pairs when this line
+  was last derived, and `ls tests/regression/*.lvt | wc -l` is the live count —
+  so extend the existing file for that module rather than assuming a class does
+  not need one.
 - **Layout behavior** — the visual result the classes own — is what no log diff
   fully captures, and it takes coverage *in addition to* the regression test:
   smoke tests (compiles clean, expected diagnostics), extraction tests (text
@@ -403,7 +418,9 @@ extraction, and layout coverage for both classes.
 
 Build the repeatable page-two review set from the repository root:
 
-    make review-page-two
+```bash
+make review-page-two
+```
 
 The command compiles the canonical two-page résumé, industry-letter, academic
 CV, academic-letter, and research-statement fixtures. It renders page two for
@@ -442,7 +459,9 @@ the gitignored `build/` directory. They must not be committed.
 Build the `{normal,narrow} x {10pt,11pt,12pt}` reference matrix across all four
 document classes from the repository root:
 
-    make review-matrix
+```bash
+make review-matrix
+```
 
 The command compiles the canonical two-page résumé, CV, industry-letter, and
 research-statement fixtures — the same ones `review-page-two` uses — at every
@@ -474,13 +493,70 @@ pull request:
 The PDFs, logs, and review record are generated evidence under the gitignored
 `build/` directory. They must not be committed.
 
+### Entry-metadata placement and de-emphasis matrix
+
+Build the `{column,inline} x {italic,gray,both,plain}` matrix for the two record
+classes from the repository root:
+
+```bash
+make review-entrymeta-muted
+```
+
+`entrymeta` and `muted` both land on the same piece of the page — the entry
+heading's dates and location — so the pair has to be reviewed as a grid rather
+than one option at a time. The command compiles the canonical two-page résumé
+and CV fixtures at all sixteen combinations, leaving every other option at its
+class default, so each visible difference is attributable to the two options in
+the filename (`<type>-<entrymeta>-<muted>.pdf`). This is what separates it from
+`review-matrix`, which sweeps size and margin with the semantic options fixed.
+
+Review the PDFs under `build/entrymeta-muted-matrix/` and record the result in
+the pull request. Two cells carry most of the weight: `*-column-plain`, because
+`muted=plain` under `entrymeta=column` is what a document setting neither option
+gets, and `inline` with an italic-bearing `muted`, because that is the only
+place a de-emphasised run sits beside the — deliberately never italic — entry
+metadata separator.
+
+### Link decoration under `medium`
+
+Build the print/screen link-decoration pair:
+
+```bash
+make review-link-decoration
+```
+
+`medium=screen` rules author-written `\href` anchor text and `medium=print`
+does not. What that branch *does* is already pinned by the regression,
+extraction, tagging, and links suites; what no suite can decide is whether the
+rule is the right weight, sits at the right depth, and reads as a link rather
+than as emphasis.
+
+Review the pair under `build/link-decoration-review/` and record the result in
+the pull request:
+
+1. under `screen` the anchor text is unmistakably actionable; under `print` it
+   is indistinguishable from body text;
+2. the rule's weight against the section rule above it, its clearance under
+   descenders, and its behaviour where an anchor wraps across a line break; and
+3. the contact line, which #278 settled as **not** decorated under either
+   medium, still reads as a set of links — that reading is what the decision
+   rests on. The letter fixture is in the set because it carries the one case
+   the résumé does not: an author's own `\href` whose anchor text is itself an
+   address, which *is* decorated.
+
+Neither target carries a baseline or belongs to `make check`; both produce
+evidence for a human, under the gitignored `build/` directory, and must not be
+committed.
+
 ### Line-breaking calibration sweep
 
 When a change proposes a different value for a line-breaking parameter —
 `\emergencystretch`, `\hyphenpenalty`, `\exhyphenpenalty` — measure it rather
 than asserting it:
 
-    make review-linebreak SWEEP_ARGS="--param hyphenation --values '50 200 500'"
+```bash
+make review-linebreak SWEEP_ARGS="--param hyphenation --values '50 200 500'"
+```
 
 The command forces the parameter to each candidate, rebuilds both corpora, and
 reports overfull boxes, hyphenated line ends, lines looser than badness 99, the
@@ -521,8 +597,10 @@ evidence and must not be committed.
 For a large sweep, `make review-linebreak-parallel` takes the same arguments and
 runs one sweep per value concurrently, merging the results into the same place:
 
-    make review-linebreak-parallel SWEEP_ARGS="--jobs 4 --corpus fixtures \
-      --param emergencystretch --values '1.50\CDossierBodySize 0.040\textwidth'"
+```bash
+make review-linebreak-parallel SWEEP_ARGS="--jobs 4 --corpus fixtures \
+  --param emergencystretch --values '1.50\CDossierBodySize 0.040\textwidth'"
+```
 
 It matters at scale rather than for a spot check. One value against the fixture
 corpus is 36 discovered fixtures × 3 body sizes × 2 margins = 216 builds; the
@@ -540,7 +618,9 @@ back implausibly clean, grep a `.log` in the scratch directory for
 
 If a long run measures everything but fails while merging, do not repeat it:
 
-    make review-linebreak-parallel SWEEP_ARGS="--merge-only /path/from/the/failed/run"
+```bash
+make review-linebreak-parallel SWEEP_ARGS="--merge-only /path/from/the/failed/run"
+```
 
 The failed run prints that path as `Per-value console output kept at:`.
 
@@ -549,7 +629,9 @@ The failed run prints that path as `Per-value console output kept at:`.
 Measure how full each page is, and what forced each page break, across every
 committed layout fixture that renders more than one page:
 
-    make review-pagefill
+```bash
+make review-pagefill
+```
 
 This is the other half of the page-break policy. `make layout` asserts that
 material stays *together* — no list split leaving one item behind, no heading
@@ -708,7 +790,9 @@ Inspect the output for logical reading order.
 Beyond eyeballing reading order, run the automated extraction fixture, which
 compiles a torture document and checks its text layer three ways:
 
-    make extract-test          # or: tests/extraction/run.sh
+```bash
+make extract-test          # or: tests/extraction/run.sh
+```
 
 1. **Poppler** — diffs `pdftotext` output against the committed
    `*.expected.txt` baseline.
@@ -742,7 +826,9 @@ A URL or an e-mail address must not pick up extraction whitespace within a
 visual line, and one that legitimately wraps must reassemble exactly from its
 ordered line fragments — the checkable form of "it survives copy-and-paste":
 
-    make links                 # or: tests/links/run.sh
+```bash
+make links                 # or: tests/links/run.sh
+```
 
 Whether it does is a typesetting question, not a text one. Current Poppler
 starts a new word when the spacing between two characters exceeds 0.1× the
@@ -800,7 +886,9 @@ the package rather than the current one.
 The PDF metadata a document gets when it does *not* opt into tagging has its own
 small suite:
 
-    make metadata              # or: tests/metadata/run.sh
+```bash
+make metadata              # or: tests/metadata/run.sh
+```
 
 It builds each class on the default path and checks the catalog's `/Lang`, plus
 a document that sets `pdflang` itself and one that loads
@@ -830,7 +918,9 @@ emitted as a `GoToR` remote-PDF action with `.pdf` appended, while the page, the
 extracted text, and the copy-paste invariant were all correct. That is the gap
 this suite closes:
 
-    make annotations           # or: tests/annotations/run.sh
+```bash
+make annotations           # or: tests/annotations/run.sh
+```
 
 Each fixture declares one `% URIEXPECT:` directive per link it renders, and the
 runner requires the declared multiset and the emitted one to match exactly —
@@ -855,7 +945,9 @@ comparison would report as an unexplained duplicate.
 Opt-in tagged output has its own suite covering five profiles — industry
 résumé, industry letter, academic CV, academic letter, and research statement:
 
-    make tagging               # or: tests/tagging/run.sh
+```bash
+make tagging               # or: tests/tagging/run.sh
+```
 
 Each profile has three fixtures sharing one body include: `<name>.tex`
 (`tagging=on`), `<name>-untagged.tex`, and `<name>-ua2.tex` (adds
@@ -929,7 +1021,9 @@ The lint derives the expected set from the source instead. For each
 `\keys_define:nn` block and the same file, each naming the module the filename
 implies:
 
-    make lint                  # or: tests/lint/run.sh
+```bash
+make lint                  # or: tests/lint/run.sh
+```
 
 It compiles nothing, needs no TeX installation, and finishes in under a second,
 so run it first. A failure names the module, the key, and which half is missing.
@@ -956,18 +1050,24 @@ The logic-bearing packages are covered by an `l3build` regression suite. Each
 log is diffed against a committed `.tlg` baseline. Run the whole suite from the
 repository root:
 
-    make regression            # or: l3build check
+```bash
+make regression            # or: l3build check
+```
 
 Run a single test by name (without the `.lvt` extension):
 
-    l3build check base-diagnostics
+```bash
+l3build check base-diagnostics
+```
 
 A failing check writes the difference to `build/test/<name>.luatex.diff`; read it
 to see the intended baseline versus the actual log. When an output change is
 intended and understood, re-save the baseline, then review the diff before
 committing it (see "Baselines are load-bearing" above):
 
-    l3build save base-diagnostics
+```bash
+l3build save base-diagnostics
+```
 
 The harness is configured in `build.lua` (`tests/regression/`, LuaTeX, LaTeX
 format). Writing a test: `\input{regression-test}`, load the package under test,
@@ -1052,7 +1152,9 @@ The optional integration has a focused multi-pass fixture that runs Biber,
 rejects Biber warnings/errors, and diffs extracted output to pin `ydnt` ordering
 and DOI → e-print → URL precedence:
 
-    make bibliography-test     # or: tests/bibliography/run.sh
+```bash
+make bibliography-test     # or: tests/bibliography/run.sh
+```
 
 The ordinary academic CV smoke/example path remains separate and must continue
 to compile without loading BibLaTeX or invoking Biber.
@@ -1100,8 +1202,10 @@ instead of short-circuiting on the guard's own input check.
 
 If the fixture fails with a Biber log full of
 
-    WARN - article entry 'newest' (publications.bib): Invalid format '2026' of
-    date field 'date' - ignoring
+```text
+WARN - article entry 'newest' (publications.bib): Invalid format '2026' of
+date field 'date' - ignoring
+```
 
 then Biber dropped the dates, every year disappeared from the rendered
 bibliography, and the `ydnt` sort order came out wrong (issue #211). The tell is
@@ -1115,8 +1219,10 @@ periodically. Only the `date` path needs the bundled DateTime modules, so an
 incomplete cache breaks `date` while leaving `year` intact. Clear the cache and
 let Biber unpack itself again:
 
-    rm -rf "${TMPDIR:-/tmp}"/par-*
-    biber --version
+```bash
+rm -rf "${TMPDIR:-/tmp}"/par-*
+biber --version
+```
 
 Two fixes that look tempting are both wrong. Switching the fixture to `year=`
 turns the suite green while hiding a genuinely wrong bibliography, and makes the
@@ -1417,7 +1523,21 @@ The build workflow should:
 - upload PDFs and logs as artifacts;
 - pin every container and third-party action to an immutable reference.
 
-Do not require a status check in branch protection until that check has completed successfully at least once.
+### What actually gates a merge
+
+Branch protection on `main` is the `Protect Main` **ruleset**, not classic
+branch protection, so read it with `gh api repos/<owner>/<repo>/rulesets` rather
+than from the older branch-protection endpoint or from this paragraph. As last
+derived, it requires a pull request, allows all three merge methods, requires
+**zero** approving reviews, forbids deletion and non-fast-forward pushes, and
+requires every one of the workflow's sixteen job contexts to pass against an
+up-to-date branch. Green CI is therefore the merge gate; a branch that is not
+close-out complete when it goes green is one that can be merged incomplete.
+
+Do not require a status check in the ruleset until that check has completed
+successfully at least once. Once it has, delete the "this is a new check"
+comment that guarded it in `.github/workflows/build.yml` — a comment that
+outlives its condition reads as current policy.
 
 ### Pinned dependencies
 

@@ -186,19 +186,20 @@ Run the `Makefile` targets rather than hand-written engine invocations, because
 they redirect output to `build/` and keep the source tree free of artifacts:
 
 ```bash
-make check   # lint regression extract-test smoke layout bibliography-test links
-             # metadata tagging examples
+make check
 ```
 
-Individual targets: `lint`, `regression`, `smoke`, `layout`, `extract-test`,
-`bibliography-test`, `links`, `metadata`, `tagging`, `examples`, and the
-per-family builds `resume`, `letter`, `academic-cv`, `academic-bibliography`,
-`academic-letter`, and `statements`. `review-page-two` and `review-matrix`
-render pages for visual review, and `review-pagefill` reports how full each
-page is and what forced its break. Note that the extraction and bibliography
-targets are `extract-test` and `bibliography-test`, while the matching CI jobs
-are named `extraction` and `bibliography`; every other target and job share a
-name.
+**`make help` is the authoritative list of individual targets.** This file does
+not restate it: a hand-maintained copy drifts, and the copy that used to sit
+here omitted `annotations`. Two things `make help` will not tell you:
+
+- the extraction and bibliography *targets* are `extract-test` and
+  `bibliography-test`, while the matching CI *jobs* are named `extraction` and
+  `bibliography`;
+- target and job names otherwise overlap but are not in bijection. Job `cv` runs
+  `make academic-cv academic-bibliography`, job `statement` runs
+  `make statements`, and `examples`, `check`, `test`, `clean`, and every
+  `review-*` target have no job at all.
 
 Cover the relevant parts of this matrix:
 
@@ -212,6 +213,10 @@ Cover the relevant parts of this matrix:
 - copy-paste integrity of any URL or e-mail address a change touches: no
   pieces sharing one visual line, and a wrapped address reassembles exactly
   (`make links`)
+- link-annotation action types after any change that emits a link: every
+  annotation carries a `/S/URI` action and never a `/S/GoToR` remote-PDF one
+  (`make annotations`). The page, the extracted text, and the `links`
+  invariant all stay correct when this one is wrong, so no other suite covers it
 - unsupported-engine error
 - every option's accepted and rejected values, including the error naming the
   accepted values, and rejection reported exactly once

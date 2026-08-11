@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a reproducible LaTeX, layout, or build problem
-title: "[bug] "
+title: "[area] "
 labels: "type:bug"
 assignees: ""
 ---
