@@ -19,7 +19,8 @@
 # baseline, it writes only under the gitignored `build/`, and it commits
 # nothing. The assertion side of the same measurement lives in run.sh, where it
 # sits beside the keep assertions it complements — see the page-fill block
-# there and `CDOSSIER_PAGE_FILL_MIN`.
+# there for the floor, its reasoning, and the `% PAGEFILLFLOOR:` directive.
+# This script does not restate the floor's value, so the two cannot drift.
 #
 # Method: rebuild every committed layout fixture with `\tracingpages=1`, parse
 # the log with page-fill.awk — which documents the trace format and the two
@@ -219,11 +220,15 @@ worst="$(awk -F'\t' '$12 == 0 && $8 != "eject" { printf "%s\t%s\t%s\t%s\n", $6, 
     "$(printf '%s' "$worst" | cut -f3)" \
     "$(printf '%s' "$worst" | cut -f4)"
   printf '\n'
-  printf 'No threshold is applied here, and none is applied by default in\n'
-  printf 'run.sh either: #333 closed on the bounded section keep without\n'
-  printf 'setting a minimum fill, and after #332/#339 the record families sit\n'
-  printf 'at ordinary raggedbottom slack. Re-prove the enforcement hook with\n'
-  printf '`CDOSSIER_PAGE_FILL_MIN=<pct> tests/layout/run.sh`.\n'
+  printf 'This report asserts nothing; it is an instrument. The floor that does\n'
+  printf 'assert lives in tests/layout/run.sh, together with the reasoning for\n'
+  printf 'its value and the `%% PAGEFILLFLOOR:` directive a fixture uses to\n'
+  printf 'declare an accepted state below it. The value is deliberately not\n'
+  printf 'restated here: one copy cannot drift from the other.\n'
+  printf '\n'
+  printf 'Explore a candidate value against this corpus with\n'
+  printf '`CDOSSIER_PAGE_FILL_MIN=<pct> tests/layout/run.sh`, or with the\n'
+  printf 'variable set empty to measure without asserting.\n'
 } >>"$report"
 
 if [ "$fail" -ne 0 ]; then

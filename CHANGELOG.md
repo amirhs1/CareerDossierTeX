@@ -13,8 +13,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 - `make review-pagefill` reports how full every page of the layout corpus is,
   and what forced each page break: the page goal, the height used, the fill
   percentage, the penalty at the break taken, and the size of the atom that
-  would not fit. `make layout` carries the same measurement as an enforcement
-  hook, `CDOSSIER_PAGE_FILL_MIN`. ([#334])
+  would not fit. `make layout` now *asserts* on the same measurement — no page a
+  policy governs may fall below 90% of its goal. ([#334])
 
   The page-break policy had two halves and only one of them was measured. The
   layout suite asserts that material stays *together* — no list split leaving
@@ -33,10 +33,19 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   taken candidate tells them apart, and getting that wrong would have flagged
   five fixtures for behaving exactly as their source says.
 
-  The hook is wired and disabled: #333, which owns the fill policy, closed on
-  the bounded section keep without setting a threshold. `CDOSSIER_PAGE_FILL_MIN=90`
-  turns it on and fails one page — `statement-two-page` at 86.9%, the prose-family
-  hole #342 settled and #351 now owns.
+  The 90% floor is a ratchet rather than a fill policy. *How full should a page
+  be* belongs to #333 and its successor #351, and neither has answered it; the
+  floor asks only whether a page may get worse than anything the project has
+  deliberately accepted. One governed page sits at 86.9% and every other at
+  92.9% or above, so it runs through the gap. Measured at `8212a0f`, the commit
+  before #332, `resume-two-page` filled 80.6% of its goal and left a 140.04pt
+  hole — the defect that produced this check — and the floor fails it.
+
+  A fixture whose accepted state sits lower declares `% PAGEFILLFLOOR: <pct>` in
+  its own source, as `statement-two-page` does at 85% for the prose-family hole
+  #342 closed as a decision record. When such a declaration is no longer needed
+  the run fails asking for its removal, so a stale exemption cannot go on
+  suppressing the floor silently.
 
   **Test and build tooling only.** No class, option, key, command, environment,
   or calibrated value changed, and no document renders differently.

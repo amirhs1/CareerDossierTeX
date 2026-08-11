@@ -586,19 +586,55 @@ from 26% to 54% purely because their source says so — a threshold that counted
 them would fail five fixtures for behaving exactly as written. A short *last*
 page is normal for the same reason and is excluded too.
 
-`make layout` carries the same measurement as an enforcement hook, reported per
-fixture as a `page fill:` line. It is disabled by default: #333, which owns the
-fill policy, closed on the bounded section keep without setting a threshold, and
-after #332 the record families sit at ordinary `\raggedbottom` slack. Supply one
-to turn it on, and to re-prove that it fires:
+#### The floor `make layout` enforces
 
-    CDOSSIER_PAGE_FILL_MIN=90 make layout
+`make layout` carries the same measurement as an assertion, reported per fixture
+as a `page fill:` line and enforced against a floor held in `run.sh`.
 
-At 90 that fails exactly one page — `statement-two-page` page 1 at 86.9% — which
-is the prose-family hole #342 measured and closed as a decision, and which #351
-now owns. At 94 four more join it: `resume-a4-two-page` (93.0%),
-`resume-section-need` (93.6%), `resume-a4-sans-body-two-page` (93.9%), and
-`statement-a4-sans-body-two-page` (92.9%).
+**The floor is a ratchet, not a fill policy.** *How full should a page be* is a
+design question; it belongs to #333 and its successor #351, and neither has
+answered it. The floor asks the narrower question the committed corpus already
+answers: may a page get worse than anything the project has deliberately
+accepted? One governed page sits at 86.9% and every other at 92.9% or above, so
+the floor runs through the gap between the single accepted outlier and the rest.
+
+It is a real guard rather than a formality. Measured at `8212a0f`, the commit
+before #332, `resume-two-page` filled 80.6% of its goal and left a 140.04pt hole
+— the defect that produced #332, #333, and this check — and the floor fails it.
+
+A fixture whose accepted state sits below the floor declares its own:
+
+```text
+% PAGEFILLFLOOR: <pct>
+```
+
+`statement-two-page` is the only one that does. Its 86.9% is the prose-family
+hole #342 swept over seven penalty values and closed with no change, and which
+#351 now owns; the fixture carries the reasoning at the directive. Putting the
+exemption in the fixture means whoever next changes that family's pagination
+sees it, instead of it hiding inside a global number chosen low enough to
+accommodate it.
+
+**A declaration that is no longer needed fails the run.** When every governed
+page of a declaring fixture clears the *global* floor, the runner reports
+`EXPIRED PAGE-FILL FLOOR` and asks for the line's removal — so a stale exemption
+cannot go on silently suppressing the floor for its fixture. Nothing has to
+remember to delete it when #351 lands.
+
+To explore a candidate value against the corpus, or to re-prove either failure
+mode:
+
+```bash
+CDOSSIER_PAGE_FILL_MIN=94 make layout
+```
+
+At 94 four pages fail — `resume-a4-two-page` (93.0%), `resume-section-need`
+(93.6%), `resume-a4-sans-body-two-page` (93.9%), `statement-a4-sans-body-two-page`
+(92.9%) — while the declared exemption correctly holds `statement-two-page` at
+its own 85. At 80 nothing fails the floor and the expiry check fires instead.
+Setting the variable empty measures and reports without asserting.
+
+#### Two more things the fixture list and the parser are held to
 
 The fixture list is a glob, not a register, and it is wider than `*two-page*` on
 purpose: `resume-section-need` renders two pages without saying so in its name,

@@ -6,6 +6,19 @@
 % on the last line of a paragraph. The runner rebuilds it that way and
 % requires the check to say so; see run.sh and page-break-check.awk.
 % CLUBWIDOWCONTROL: WIDOW
+%
+% Accepted page fill below the global floor (issue #334). Page one fills 86.9%
+% of its goal and leaves 85.51pt blank, against a corpus whose every other
+% governed page reaches 92.9% or better. The cause is the \clubpenalty and
+% \widowpenalty pair at 10000, which leaves a paragraph of three lines or fewer
+% with no legal interior break at all. #342 swept that pair over seven values
+% and closed with no change: below 10000 the fill gained is paid one for one in
+% stranded lines. The successor question is a vertical-rhythm change, open as
+% #351, and this figure is what it has to move.
+%
+% Delete this line when it does. The runner fails a declaration that is no
+% longer needed, so nothing has to remember to.
+% PAGEFILLFLOOR: 85
 \documentclass[type=research]{careerdossier-statement}
 \CDossierSetup{
   name={Ada Lovelace},
