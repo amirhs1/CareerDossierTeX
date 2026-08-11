@@ -428,18 +428,18 @@ but examples do not replace focused regression, smoke, error-path, extraction,
 or layout-stress tests.
 
 Run everything CI runs — the option lint, regression, extraction, smoke,
-layout, bibliography, link-integrity, metadata, and tagging suites plus every
-supported example build — with:
+layout, bibliography, link-integrity, metadata, link-annotation, and tagging
+suites plus every supported example build — with:
 
 ```bash
 make check
 ```
 
-Individual suites are available as `make lint`, `make regression`,
-`make extract-test`, `make smoke`, `make layout`, `make bibliography-test`,
-`make links`, `make metadata`, `make annotations`, and `make tagging`;
-`make clean` removes the generated files afterwards. Each target runs the same
-command as the matching CI job.
+`make help` lists every individual target, `make clean` removes the generated
+files afterwards, and the `check` prerequisites in the `Makefile` are the
+authoritative suite list. A local suite and its CI job are equivalent, though a
+few jobs invoke the suite runner under `tests/` directly rather than through the
+target that wraps it.
 
 The full suite requires `l3build` and `pdftotext` (Poppler) in addition to
 LuaLaTeX and `latexmk`. Because `make check` exercises the optional bibliography

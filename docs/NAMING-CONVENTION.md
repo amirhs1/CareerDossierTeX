@@ -160,20 +160,28 @@ Use the scope to identify the part of the repository affected:
 ```text
 api
 core
-i18n
+tokens
 typography
 theme
 components
 resume
 letter
-examples
+cv
+statement
+layout
+i18n
+test
 build
 github
+agents
 release
 ```
 
 Rules:
 
+- The list above is illustrative, not closed. It was derived from the scopes in
+  use on `main`; `git log --format='%s' main` reports the live set. Prefer an
+  existing scope over coining a synonym for one.
 - Write the summary in the imperative mood: `add`, `define`, `fix`, `prepare`.
 - Keep the first line short.
 - Do not combine unrelated changes in one commit.
@@ -242,8 +250,10 @@ area:core
 area:resume
 area:letter
 area:cv
+area:statement
 area:bibliography
 area:i18n
+area:tokens
 area:typography
 area:theme
 area:components
@@ -251,6 +261,12 @@ area:build
 area:documentation
 area:agents
 ```
+
+Unlike the scope list above, this one *is* closed: `scripts/setup-labels.sh` is
+the definition, and a label absent from it does not exist on the repository. The
+block above was derived from that script and must be re-derived from it, never
+extended by hand — an incomplete copy silently removes a label from use, which
+is how `area:statement` and `area:tokens` went unapplied.
 
 ### State and contributor labels
 
