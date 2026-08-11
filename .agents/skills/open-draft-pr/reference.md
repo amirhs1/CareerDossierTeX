@@ -20,10 +20,9 @@ Before setting metadata, inspect:
 
 1. the focused issue;
 2. `docs/NAMING-CONVENTION.md`;
-3. `scripts/setup-labels.sh`;
-4. the issue's milestone;
-5. the issue's current Project fields;
-6. existing PR metadata when updating a PR.
+3. the issue's milestone;
+4. the issue's current Project fields;
+5. existing PR metadata when updating a PR.
 
 Do not invent labels, milestones, field names, or single-select values. Preserve
 existing remote metadata unless the current work clearly requires a change.
@@ -154,7 +153,12 @@ missing, leave the corresponding PR field unset and report it.
 
 ## Label selection
 
-Use only labels already defined by `scripts/setup-labels.sh`.
+Use only labels that already exist on the repository. Read them live rather than
+from any list in the tree:
+
+```bash
+gh label list --limit 100
+```
 
 | Change | Labels |
 | --- | --- |
@@ -273,7 +277,7 @@ gh auth refresh -s read:project,project
 gh pr create --draft --base main --head <branch> \
   --title "type(scope): imperative summary" --body-file <body.md>
 
-# Assignee, labels, milestone (labels must already exist in setup-labels.sh)
+# Assignee, labels, milestone (labels must already exist — see `gh label list`)
 gh pr edit <pr-number> --add-assignee amirhs1 \
   --add-label type:docs --add-label area:documentation \
   --milestone "v0.1.0 — English Industry Dossier"

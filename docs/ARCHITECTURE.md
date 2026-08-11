@@ -1800,9 +1800,6 @@ CareerDossierTeX/
 │   ├── extraction/
 │   ├── bibliography/
 │   └── tagging/
-├── scripts/
-│   ├── setup-labels.sh
-│   └── create-phase-1-issues.sh
 ├── .agents/
 │   └── skills/
 │       ├── open-draft-pr/
