@@ -12,3 +12,11 @@ TEST 2: every-section-opens-its-own
 division begin: depth = 2
 heading: depth = 2, title = Education
 ============================================================
+============================================================
+TEST 3: subsection-opens-a-deeper-division
+============================================================
+division begin: depth = 2
+heading: depth = 2, title = Experience
+division begin: depth = 3
+heading: depth = 3, title = Industry
+============================================================

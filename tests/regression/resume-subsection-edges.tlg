@@ -1,0 +1,39 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: subsection-tokens
+============================================================
+section-below = 5.95pt
+subsection-above = 10.20001pt
+subsection-below = 5.1pt
+entry-above = 4.25pt
+list-edge-above = 3.4pt
+subsection-need-lines = 3
+section-need-lines = 4
+============================================================
+============================================================
+TEST 2: guard-verdict-by-neighbour
+============================================================
+after-section-rule section-is-empty = true
+after-entry section-is-empty = false
+after-list section-is-empty = false
+after-prose section-is-empty = false
+============================================================
+============================================================
+TEST 3: opening-gap-by-shape
+============================================================
+section-then-subsection list = userskip:11.9pt parskip:0.0pt parskip:0.0pt box penalty:10000 userskip:4.11pt parskip:0.0pt parskip:0.0pt box userskip:5.95pt parskip:0.0pt parskip:0.0pt box penalty:10000 penalty:0 userskip:5.1pt
+section-then-entry list = userskip:11.9pt parskip:0.0pt parskip:0.0pt box penalty:10000 userskip:4.11pt parskip:0.0pt parskip:0.0pt box userskip:5.95pt parskip:0.0pt parskip:0.0pt box userskip:0.85pt
+entry-then-subsection list = userskip:4.25pt parskip:0.0pt parskip:0.0pt box userskip:0.85pt userskip:-0.85pt userskip:10.2pt parskip:0.0pt parskip:0.0pt baselineskip:3.32pt box penalty:10000 penalty:0 userskip:5.1pt
+============================================================
+============================================================
+TEST 4: below-skip-owns-both-neighbours
+============================================================
+subsection-then-entry list = box penalty:10000 penalty:0 userskip:5.1pt parskip:0.0pt parskip:0.0pt baselineskip:6.04pt box userskip:0.85pt
+subsection-then-list list = box penalty:10000 penalty:0 userskip:5.1pt userskip:-5.1pt penalty:10000 userskip:5.1pt parskip:0.0pt parskip:0.0pt baselineskip:6.09pt box penalty:-51 userskip:6.8pt
+============================================================
+============================================================
+TEST 5: empty-subsection-run-breakpoints
+============================================================
+empty-run legal-breakpoints = 3
+============================================================

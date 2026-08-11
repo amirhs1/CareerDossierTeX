@@ -254,6 +254,19 @@
     \__cdossier_components_section_rule:
   }
 
+%% \CDossierSubsection {title} -- the level between a section and an entry
+%% (issue #337). A CV is where the need is sharpest: Publications split into
+%% journal, conference, and preprint, Experience into industry and academic.
+%% Both of those groupings are served by one pair of tokens, because the
+%% subsection's below-skip wins the `\addvspace' maximum against an entry run and
+%% against a CDossierPublications list alike -- see careerdossier-tokens.
+%%
+%% The renderer is shared with the résumé in careerdossier-components; the name
+%% matches the résumé and the statement so one profile's documents are written
+%% the same way.
+\NewDocumentCommand \CDossierSubsection { m }
+  { \__cdossier_components_subsection:n {#1} }
+
 \tl_new:N \l__cdossier_cv_entry_title_tl
 \tl_new:N \l__cdossier_cv_entry_org_tl
 \tl_new:N \l__cdossier_cv_entry_loc_tl

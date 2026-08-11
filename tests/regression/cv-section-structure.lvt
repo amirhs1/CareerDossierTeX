@@ -44,6 +44,17 @@
   \cdossiertestQuiet{\CDossierSection{Teaching Experience}}
 }
 
+% Issue #337: the second heading level opens a depth-3 division before its
+% heading, exactly as the section opens a depth-2 one. On this class that also
+% answers where a grouped publication list sits in the tree: the subsection's
+% division encloses it, and the section's encloses the subsection.
+\TEST{subsection-opens-a-deeper-division}{
+  \cdossiertestQuiet{
+    \CDossierSection{Publications}
+    \CDossierSubsection{Journal Articles}
+  }
+}
+
 \TEST{publication-list-opens-no-division-of-its-own}{
   \cdossiertestQuiet{
     \CDossierSection{Publications}

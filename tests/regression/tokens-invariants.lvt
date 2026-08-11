@@ -94,6 +94,18 @@
             { \CDossierRecordSectionAboveSkip + 2sp }
             < { \CDossierRecordSectionBelowSkip * 2 }
       }
+    %% Issue #337. The record subsection pair is the reason its above-ratio is
+    %% 0.75 and not the prose pair's 0.625: the below-ratio is pinned at 0.375 by
+    %% the two reachability relations further down, and 0.625 against 0.375 is
+    %% 1.67:1, which would have made this the first heading pair to report
+    %% `violated'.
+    \cdossiertest_invariant:nn
+      { RecordSubsectionAboveSkip >= 2 ~ x ~ RecordSubsectionBelowSkip }
+      {
+        ! \dim_compare_p:nNn
+            { \CDossierRecordSubsectionAboveSkip + 2sp }
+            < { \CDossierRecordSubsectionBelowSkip * 2 }
+      }
     \cdossiertest_invariant:nn
       { ProseSectionAboveSkip >= 2 ~ x ~ ProseSectionBelowSkip }
       {
@@ -122,6 +134,50 @@
         \dim_compare_p:nNn
           { \CDossierProseSubsectionBelowSkip }
           < { \CDossierProseSectionBelowSkip }
+      }
+    %% Issue #337: a record subsection is a child of its section on both edges,
+    %% exactly as the prose pair is of the prose section above.
+    \cdossiertest_invariant:nn
+      { RecordSubsectionAboveSkip < RecordSectionAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordSubsectionAboveSkip }
+          < { \CDossierRecordSectionAboveSkip }
+      }
+    \cdossiertest_invariant:nn
+      { RecordSubsectionBelowSkip < RecordSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordSubsectionBelowSkip }
+          < { \CDossierRecordSectionBelowSkip }
+      }
+    %% Issue #337: the two reachability relations, and the reason the record
+    %% below-ratio could not be ported from the prose pair. A subsection
+    %% introduces either a run of entries or -- in the CV -- a CDossierPublications
+    %% list, and `\addvspace' takes the maximum, so a below-token that merely tied
+    %% either opening claim would never reach the page at any value: changing it
+    %% would move nothing and emit no diagnostic, which is what issue #204
+    %% retired \CDossierRecordEntryBelowSkip for. \CDossierProseSubsectionBelowSkip
+    %% is 0.3125 and so is \CDossierRecordEntryAboveSkip, so porting it would have
+    %% produced exactly that dead token.
+    %%
+    %% Both are strict. Equality is the failure being excluded, not the boundary
+    %% case, so unlike the pair floors above these carry no rounding tolerance --
+    %% one token is 0.375 of the leading and the others are 0.3125 and 0.25, and
+    %% no rounding brings those within a scaled point of each other.
+    \cdossiertest_invariant:nn
+      { RecordSubsectionBelowSkip > RecordEntryAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordSubsectionBelowSkip }
+          > { \CDossierRecordEntryAboveSkip }
+      }
+    \cdossiertest_invariant:nn
+      { RecordSubsectionBelowSkip > RecordListEdgeAboveSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordSubsectionBelowSkip }
+          > { \CDossierRecordListEdgeAboveSkip }
       }
     %% Two entries must not sit further apart than an entry and the section
     %% heading above it, or the section boundary stops reading as the stronger.

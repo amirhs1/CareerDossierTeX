@@ -155,6 +155,21 @@
 \int_new:N \CDossierSectionNeedLines
 \int_set:Nn \CDossierSectionNeedLines { 4 }
 
+%% CDossierSubsectionNeedLines is the same bound for the record classes' second
+%% heading level (issue #337), and it is smaller because a subsection commits
+%% less: its own heading line and the two lines of the first entry heading it
+%% introduces. There is no rule between them, and the entry heading carries its
+%% own keep down to its first body line (issue #145), so the subsection does not
+%% have to require that line a second time.
+%%
+%% A subsection that opens its section directly is exempt from this check
+%% altogether -- see \__cdossier_components_subsection:n. The section's own
+%% four-line bound already placed that material, so re-testing here could only
+%% break the page between a section heading and the subsection immediately under
+%% it, which is the stranding issue #145 forbids.
+\int_new:N \CDossierSubsectionNeedLines
+\int_set:Nn \CDossierSubsectionNeedLines { 3 }
+
 %% Typographic page-break penalties (issue #171). These control hyphenation
 %% and paragraph-remnant breaks at page boundaries, complementing the
 %% structural keep-together penalties above.
@@ -239,6 +254,8 @@
 \skip_new:N \CDossierRecordSectionAboveSkip
 \skip_new:N \CDossierRecordSectionRuleGapSkip
 \skip_new:N \CDossierRecordSectionBelowSkip
+\skip_new:N \CDossierRecordSubsectionAboveSkip
+\skip_new:N \CDossierRecordSubsectionBelowSkip
 \skip_new:N \CDossierProseSectionAboveSkip
 \skip_new:N \CDossierProseSectionBelowSkip
 \skip_new:N \CDossierProseSubsectionAboveSkip
@@ -447,6 +464,45 @@
     %% step is unavailable.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionRuleGapSkip { 0.3125 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.4375 }
+    %% Issue #337: the record classes' second heading level. The pair is not the
+    %% prose subsection pair under another name, and only the above-ratio could
+    %% have been ported.
+    %%
+    %% The below-ratio is pinned from both sides. Record boundaries compose with
+    %% `\addvspace', which takes the maximum, so a below-token that only ties the
+    %% opening claim of what follows never reaches the page: it would be the dead
+    %% token issue #204 retired \CDossierRecordEntryBelowSkip for. The two blocks
+    %% a record subsection introduces open at 0.3125
+    %% (\CDossierRecordEntryAboveSkip, an entry run) and 0.25
+    %% (\CDossierRecordListEdgeAboveSkip, the CV's CDossierPublications list), so
+    %% the value must exceed 0.3125 to be reachable at all, and must stay under
+    %% \CDossierRecordSectionBelowSkip (0.4375) to read as tighter than the
+    %% section it sits inside. On the sixteenth grid that leaves exactly 0.375.
+    %%
+    %% One pair therefore serves both cases, which is the product question #337
+    %% asked. 0.375 wins the maximum against an entry run and against the
+    %% publication list alike, so the gap below a subsection is the same gap in
+    %% both -- the two neighbours differ, but neither of them owns the boundary.
+    %%
+    %% The above-ratio is 0.75, not the prose pair's 0.625. Every heading pair in
+    %% the toolkit satisfies `above >= 2 x below', which
+    %% `tests/regression/tokens-invariants.lvt' asserts at 10/11/12pt; with the
+    %% below-ratio pinned at 0.375, 0.625 would render 1.67:1 and be the first
+    %% pair to violate it. 0.75 meets the floor exactly, the same way
+    %% \CDossierRecordSectionAboveSkip is exactly twice its own below-token, and
+    %% stays under 0.875 so the subsection is still a child of its section on
+    %% both edges.
+    %%
+    %% The above-token is *not* what a section opening directly with a subsection
+    %% renders. There \__cdossier_components_subsection:n suppresses it and
+    %% \CDossierRecordSectionBelowSkip (0.4375) owns the boundary alone, so that
+    %% gap is the same whether the section opens with a subsection or with an
+    %% entry. This is the record equivalent of `\@startsection''s `\if@nobreak'
+    %% guard, which gives the statement class the same result -- see the note on
+    %% \CDossierProseSubsectionAboveSkip below and the mechanism in
+    %% careerdossier-components.
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSubsectionAboveSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSubsectionBelowSkip { 0.375 }
     %% Issue #177: the heading rhythm of a continuous-prose document -- today
     %% the statement class, the only one with headings and prose paragraph
     %% spacing at once. It cannot reuse the four tokens above, which are

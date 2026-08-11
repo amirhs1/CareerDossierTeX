@@ -1,0 +1,84 @@
+% resume-subsection-need.tex — issue #337: a subsection heading arriving with
+% too little room to introduce anything.
+%
+% \CDossierSubsectionNeedLines is the second heading level's half of the bound
+% issue #333 introduced, and like that bound it does something at exactly one
+% moment: when a subsection heading reaches the page with fewer than that many
+% lines left. resume-section-need.tex reaches that moment for a section; nothing
+% reached it for a subsection, and the two are separate code paths with separate
+% counts (4 lines against 3, because a subsection has no rule and the entry
+% heading under it carries its own keep down to its first body line).
+%
+% The filler is bodiless entries in two-line steps, as in resume-section-need.tex
+% and for the same reason: bullet lists break internally, so a heading filled up
+% to with them never arrives at the page edge at all.
+%
+% The entry count is not arbitrary. At this count and
+% \CDossierSubsectionNeedLines = 0, "Academic" is the last line on page one — a
+% stranded heading, the thing issue #145 forbids and this bound exists to
+% prevent. At the committed value of 3 it moves to page two with its entry.
+% The runner's "no page ends with a section heading" check reads
+% \CDossierSubsection titles too, so that two-sided behaviour is what makes this
+% an assertion rather than a rendering.
+%
+% Re-derive the count if the filler, the fontsize, or the margin changes; the
+% figure is a property of this exact content.
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+  phone    = {+1 416 555 0142},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+\CDossierSubsection{Industry}
+\begin{CDossierEntry}[title = {Data Role 1}, organization = {Organization 1}, location = {Toronto, ON}, dates = {2011--2012}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 2}, organization = {Organization 2}, location = {Toronto, ON}, dates = {2012--2013}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 3}, organization = {Organization 3}, location = {Toronto, ON}, dates = {2013--2014}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 4}, organization = {Organization 4}, location = {Toronto, ON}, dates = {2014--2015}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 5}, organization = {Organization 5}, location = {Toronto, ON}, dates = {2015--2016}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 6}, organization = {Organization 6}, location = {Toronto, ON}, dates = {2016--2017}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 7}, organization = {Organization 7}, location = {Toronto, ON}, dates = {2017--2018}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 8}, organization = {Organization 8}, location = {Toronto, ON}, dates = {2018--2019}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 9}, organization = {Organization 9}, location = {Toronto, ON}, dates = {2010--2011}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 10}, organization = {Organization 10}, location = {Toronto, ON}, dates = {2011--2012}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 11}, organization = {Organization 11}, location = {Toronto, ON}, dates = {2012--2013}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 12}, organization = {Organization 12}, location = {Toronto, ON}, dates = {2013--2014}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 13}, organization = {Organization 13}, location = {Toronto, ON}, dates = {2014--2015}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 14}, organization = {Organization 14}, location = {Toronto, ON}, dates = {2015--2016}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 15}, organization = {Organization 15}, location = {Toronto, ON}, dates = {2016--2017}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 16}, organization = {Organization 16}, location = {Toronto, ON}, dates = {2017--2018}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 17}, organization = {Organization 17}, location = {Toronto, ON}, dates = {2018--2019}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 18}, organization = {Organization 18}, location = {Toronto, ON}, dates = {2010--2011}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Data Role 19}, organization = {Organization 19}, location = {Toronto, ON}, dates = {2011--2012}]
+\end{CDossierEntry}
+
+\CDossierSubsection{Academic}
+\begin{CDossierEntry}[title = {Postdoctoral Fellow}, organization = {University of Toronto}, location = {Toronto, ON}, dates = {2024--2026}]
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Doctoral Researcher}, organization = {McGill University}, location = {Montréal, QC}, dates = {2021--2024}]
+\end{CDossierEntry}
+
+\end{document}

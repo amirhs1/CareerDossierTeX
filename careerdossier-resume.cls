@@ -273,6 +273,21 @@
   }
 
 %% ---------------------------------------------------------------------------
+%% \CDossierSubsection {title} -- the level between a section and an entry
+%% (issue #337), for a section with natural groupings that are not themselves
+%% sections: Experience split into industry and academic, say. Promoting such a
+%% group to a full ruled section is what this replaces, and it flattened the
+%% hierarchy it was meant to show.
+%%
+%% The name matches `careerdossier-statement.cls' and `careerdossier-cv.cls', so
+%% one profile's documents are written the same way. The renderer is shared with
+%% the CV in careerdossier-components, which is where the depth, the rule-less
+%% styling, and the section-opens-with-a-subsection guard are all explained.
+%% ---------------------------------------------------------------------------
+\NewDocumentCommand \CDossierSubsection { m }
+  { \__cdossier_components_subsection:n {#1} }
+
+%% ---------------------------------------------------------------------------
 %% CDossierEntry -- one résumé entry (job, degree, project, ...). Named keys are
 %% self-documenting and extensible; only title is required. The heading itself
 %% is rendered by the shared components primitive so the optional-field and

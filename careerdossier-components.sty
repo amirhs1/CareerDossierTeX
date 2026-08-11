@@ -1250,15 +1250,80 @@
 %% at the boundary in the ordinary way, and the heading arrives at the top of the
 %% next page with no leading skip. `\newpage' would contribute a `\vfil' first.
 %% ---------------------------------------------------------------------------
-\cs_new_protected:Npn \__cdossier_components_section_need:
+%% Issue #337 generalised the body to take the bound as an argument, so the
+%% second heading level states its own line count (\CDossierSubsectionNeedLines)
+%% through the same code rather than through a second copy of it. The
+%% section-specific name is kept because both record classes call it.
+\cs_new_protected:Npn \__cdossier_components_heading_need:N #1
   {
     \dim_compare:nNnF { \tex_pagegoal:D } = { \c_max_dim }
       {
         \dim_compare:nNnT
           { \tex_pagegoal:D - \tex_pagetotal:D } <
-          { \CDossierSectionNeedLines \CDossierBodyLeading }
+          { #1 \CDossierBodyLeading }
           { \penalty -\CDossierHeadingKeepPenalty }
       }
+  }
+
+\cs_new_protected:Npn \__cdossier_components_section_need:
+  { \__cdossier_components_heading_need:N \CDossierSectionNeedLines }
+
+%% ---------------------------------------------------------------------------
+%% \__cdossier_components_section_is_empty:TF -- "nothing has been typeset since
+%% the section heading" (issue #337).
+%%
+%% A section that opens directly with a subsection must not show a wider gap than
+%% the same section opening with an entry. `careerdossier-statement.cls' gets
+%% that from `\@startsection', which guards its before-skip with `\if@nobreak';
+%% the record classes render their headings through the shared primitive instead,
+%% so they need their own answer to the same question.
+%%
+%% The answer is `\prevdepth', read in vertical mode, and it is a *derived* fact
+%% rather than a flag anything has to maintain. `\prevdepth' is the depth of the
+%% last box on the current vertical list, and the only thing in this toolkit that
+%% sets it to the -1000pt sentinel is the `\nointerlineskip' that closes
+%% \__cdossier_components_section_rule: below. Any box at all after that -- an
+%% entry heading line, a list item's first line, a line of free prose -- replaces
+%% the sentinel with a real depth. So the sentinel means exactly "the section
+%% rule was the last thing contributed", which is the condition being tested.
+%%
+%% Three mechanisms were tried and rejected before this one, and the reasons are
+%% worth keeping because each looks correct until it is built:
+%%
+%%   * the kernel's own `@nobreak'. `\@item' reads that flag: with it true, a
+%%     list opening a section takes `\@nbitem' instead of `\addvspace\@topsep',
+%%     which would silently replace \CDossierRecordListEdgeAboveSkip for every
+%%     list that opens a section -- and `\CDossierSection{Publications}' followed
+%%     straight by CDossierPublications is a committed example.
+%%   * a private boolean armed as an `\everypar', which is how `\@afterheading'
+%%     carries the kernel's version. Assigning `\everypar' discards whatever the
+%%     kernel already has there, and a list started afterwards then fails with
+%%     "Something's wrong--perhaps a missing \item": `\@item''s own
+%%     `\global\@newlistfalse' never runs for the first item. Restoring the
+%%     previous value in turn needs a token register and an unexpanded round
+%%     trip, which is a lot of machinery for a fact `\prevdepth' already holds.
+%%   * the `para/begin' paragraph hook, which is the tidiest signal of all and
+%%     is off unless a document enables the paragraph hooks, so it cannot carry
+%%     a default-path guard.
+%%
+%% The one other state that reads as the sentinel is the very start of the main
+%% vertical list, where a subsection would be the document's first material. Both
+%% things the test guards are already right there: leading glue at the top of a
+%% page is discarded, and `\pagegoal' is still `\maxdimen', so the need-check
+%% below would decline to fire anyway.
+%%
+%% This couples the subsection to the last line of the section rule. That is a
+%% real coupling and it is deliberate -- the alternatives above all couple to
+%% something less stable -- so `tests/regression/resume-subsection-edges.lvt'
+%% reports this verdict in every position a subsection can arrive at, and pins
+%% the glue each branch actually leaves on the vertical list.
+%% ---------------------------------------------------------------------------
+\prg_new_protected_conditional:Npnn \__cdossier_components_section_is_empty:
+  { T , F , TF }
+  {
+    \dim_compare:nNnTF { \tex_prevdepth:D } < { -999pt }
+      { \prg_return_true: }
+      { \prg_return_false: }
   }
 
 \cs_new_protected:Npn \__cdossier_components_section_rule:
@@ -1302,7 +1367,77 @@
     %% collapsing. `\addvspace' leaves the skip visible, so LaTeX's usual
     %% collapsing rule applies and the gap is the larger of the two -- never
     %% their sum -- for entry-led, list-led, and prose-led sections alike.
+    %% Issue #337: the `\nointerlineskip' above is also what
+    %% \__cdossier_components_section_is_empty:TF reads. `\addvspace' does not
+    %% touch `\prevdepth', so the sentinel survives to the next block and a
+    %% subsection arriving with nothing in between can recognise itself as the
+    %% section's opening material. Anything contributed here that sets
+    %% `\prevdepth' would break that; the fixture named there catches it.
     \addvspace { \CDossierRecordSectionBelowSkip }
+  }
+
+%% ---------------------------------------------------------------------------
+%% \__cdossier_components_subsection:n {title} -- the record classes' second
+%% heading level (issue #337).
+%%
+%% One renderer, shared by both record classes, for the reason
+%% `careerdossier-statement.cls' gives for wrapping one `\@startsection' twice:
+%% the tokens and the tagged structure cannot then drift between the two
+%% spellings. The classes' own `\CDossierSection' is hand-rolled twice already;
+%% a second hand-rolled heading is the point at which that risk doubles.
+%%
+%% Depth 3. Issue #267 fixed the document identity as the one depth-1 heading
+%% and a section at depth 2, so `sec/3/title' is the level under a section and
+%% maps to `/H3' the same way `sec/2/title' maps to `/H2'. The division
+%% machinery needs nothing new: `sec/end' closes every division at this depth or
+%% deeper before a sibling opens, and a depth-3 division nests inside the
+%% depth-2 one its section opened.
+%%
+%% No rule, and no size of its own. The full-width rule is the section's mark and
+%% repeating it at the second level flattens the hierarchy the level exists to
+%% show; \CDossierSectionStyle at \CDossierSizeBody is the statement's precedent
+%% for the same level, and the type scale has nothing between
+%% \CDossierSizeSection and \CDossierSizeBody to reach for.
+%%
+%% Two things are conditional on "nothing has been typeset since the section
+%% heading" -- \__cdossier_components_section_is_empty:TF -- and they stand or
+%% fall together:
+%%
+%%   * the above-skip, so the boundary is \CDossierRecordSectionBelowSkip alone
+%%     and a section opening with a subsection leaves the same gap as one
+%%     opening with an entry;
+%%   * the need-check, because the section's own four-line bound already placed
+%%     this material and re-testing it here could only break the page between a
+%%     section heading and the subsection under it -- the stranding issue #145
+%%     forbids.
+%%
+%% Nothing else is conditional. The division, the heading, the penalty, and the
+%% below-skip are emitted the same way in both branches.
+%%
+%% Issue #340: the `\penalty` after the heading. The shared heading primitive
+%% ends `\par \nobreak', and a break at glue is legal only when a non-discardable
+%% item precedes it, so the below-skip that follows an infinite penalty is not a
+%% breakpoint at all. A section survives this because its rule puts a box between
+%% the two; a subsection has no rule, so without this penalty a run of empty
+%% subsections would leave no legal breakpoint anywhere in it -- exactly the
+%% failure #340 fixed for empty sections. Zero, not a discount: under the
+%% `\raggedbottom' every class inherits, short-page candidates all cost the same,
+%% so this restores the breakpoint without making it attractive, and the
+%% need-check above is what bounds the heading.
+%% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_components_subsection:n #1
+  {
+    \par
+    \__cdossier_components_section_is_empty:F
+      {
+        \__cdossier_components_heading_need:N \CDossierSubsectionNeedLines
+        \addvspace { \CDossierRecordSubsectionAboveSkip }
+      }
+    \__cdossier_typography_division_begin:n { 3 }
+    \__cdossier_typography_heading:nnn { 3 } { #1 }
+      { { \CDossierSectionStyle \CDossierSizeBody #1 \par } }
+    \penalty \c_zero_int
+    \addvspace { \CDossierRecordSubsectionBelowSkip }
   }
 
 %% ---------------------------------------------------------------------------

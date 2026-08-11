@@ -8,10 +8,15 @@ RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
 ProseHeaderBelowSkip>ProseSectionAboveSkip => holds
 LetterHeaderBelowSkip>LetterBlockSkip => holds
 RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => holds
+RecordSubsectionAboveSkip>=2 x RecordSubsectionBelowSkip => holds
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => holds
 ProseSubsectionAboveSkip<ProseSectionAboveSkip => holds
 ProseSubsectionBelowSkip<ProseSectionBelowSkip => holds
+RecordSubsectionAboveSkip<RecordSectionAboveSkip => holds
+RecordSubsectionBelowSkip<RecordSectionBelowSkip => holds
+RecordSubsectionBelowSkip>RecordEntryAboveSkip => holds
+RecordSubsectionBelowSkip>RecordListEdgeAboveSkip => holds
 RecordEntryAboveSkip<=RecordSectionBelowSkip => holds
 RecordEntryGapSkip<=RecordListEdgeAboveSkip => holds
 RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => holds
@@ -27,10 +32,15 @@ RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
 ProseHeaderBelowSkip>ProseSectionAboveSkip => holds
 LetterHeaderBelowSkip>LetterBlockSkip => holds
 RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => holds
+RecordSubsectionAboveSkip>=2 x RecordSubsectionBelowSkip => holds
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => holds
 ProseSubsectionAboveSkip<ProseSectionAboveSkip => holds
 ProseSubsectionBelowSkip<ProseSectionBelowSkip => holds
+RecordSubsectionAboveSkip<RecordSectionAboveSkip => holds
+RecordSubsectionBelowSkip<RecordSectionBelowSkip => holds
+RecordSubsectionBelowSkip>RecordEntryAboveSkip => holds
+RecordSubsectionBelowSkip>RecordListEdgeAboveSkip => holds
 RecordEntryAboveSkip<=RecordSectionBelowSkip => holds
 RecordEntryGapSkip<=RecordListEdgeAboveSkip => holds
 RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => holds
@@ -46,10 +56,15 @@ RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
 ProseHeaderBelowSkip>ProseSectionAboveSkip => holds
 LetterHeaderBelowSkip>LetterBlockSkip => holds
 RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => holds
+RecordSubsectionAboveSkip>=2 x RecordSubsectionBelowSkip => holds
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => holds
 ProseSubsectionAboveSkip<ProseSectionAboveSkip => holds
 ProseSubsectionBelowSkip<ProseSectionBelowSkip => holds
+RecordSubsectionAboveSkip<RecordSectionAboveSkip => holds
+RecordSubsectionBelowSkip<RecordSectionBelowSkip => holds
+RecordSubsectionBelowSkip>RecordEntryAboveSkip => holds
+RecordSubsectionBelowSkip>RecordListEdgeAboveSkip => holds
 RecordEntryAboveSkip<=RecordSectionBelowSkip => holds
 RecordEntryGapSkip<=RecordListEdgeAboveSkip => holds
 RecordListEdgeAboveSkip<RecordListEdgeBelowSkip => holds
