@@ -262,11 +262,19 @@ area:documentation
 area:agents
 ```
 
-Unlike the scope list above, this one *is* closed: `scripts/setup-labels.sh` is
-the definition, and a label absent from it does not exist on the repository. The
-block above was derived from that script and must be re-derived from it, never
-extended by hand — an incomplete copy silently removes a label from use, which
-is how `area:statement` and `area:tokens` went unapplied.
+Unlike the scope list above, this one *is* closed — but the block above is a
+**derived illustration, not the definition**. The definition is the live
+repository label set:
+
+```bash
+gh label list --limit 100
+```
+
+A label absent from that set does not exist, and applying it fails. Re-derive
+the block above from the live set when it changes; never extend it by hand — an
+incomplete copy silently removes a label from use, which is how `area:statement`
+and `area:tokens` went unapplied. Check the live set rather than this block
+whenever a label is actually being applied.
 
 ### State and contributor labels
 
