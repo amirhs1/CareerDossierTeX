@@ -273,10 +273,8 @@ Use `docs/NAMING-CONVENTION.md` for names.
 - Every PR comes from a focused branch merged or rebased onto `main` within
   three days. Split work that will not land in that window.
 - Routine local commits on a focused branch do not require separate approval.
-- Before the first push, inspect `git status --short`, review the complete
-  branch-versus-base diff, check for unrelated files, generated artifacts,
-  secrets, private data, and accidental deletions, and run relevant tests.
-- Push only the focused non-`main` branch.
+- Push only the focused non-`main` branch, and only when it is close-out-complete
+  — see "The first push is a commitment" below.
 - After maintainer review begins, do not amend published commits, rebase, or
   force-push unless requested or explicitly approved.
 - Do not add agent/tool prefixes to commit or PR titles.
@@ -284,6 +282,42 @@ Use `docs/NAMING-CONVENTION.md` for names.
 `CONTRIBUTING.md` "Work item structure" is the canonical statement of the
 milestone, linked-issue, and branch-lifetime rules above; the bullets here are
 the short agent-facing form.
+
+### The first push is a commitment
+
+The maintainer's merge trigger is green CI. A branch that arrives incomplete is
+therefore either approved before its missing parts land, or loses them with the
+deleted branch. Push only a **close-out-complete** branch — one that needs
+nothing further before it could be approved. Complete means all of:
+
+- `git status --short` inspected and the complete branch-versus-base diff
+  reviewed, with no unrelated files, generated artifacts, secrets, private data,
+  or accidental deletions;
+- the relevant tests actually run, with their exact outcomes recorded;
+- the documentation rule 7 requires updated in the same change;
+- `CHANGELOG.md` updated when the change is user-visible;
+- the PR body written in full, including its `AI assistance` section built from
+  the branch's real trailers.
+
+An agent that wants early signal runs `make check` locally. It does not push a
+partial branch to borrow CI.
+
+One narrow exception: a fact that can only be read from a CI artifact — the
+TeX Live release behind a newly pinned digest, per `CONTRIBUTING.md` "Bumping
+the pinned TeX Live image" — is recorded in the PR after the run. The branch
+still arrives complete in every other respect; the exception is the one
+recorded value, not the close-out.
+
+**Green CI is not a completion signal.** The checks build and test LaTeX. No
+check reads the PR body's `AI assistance` section, `CHANGELOG.md`, the
+documentation rule 7 requires, or the Project fields — precisely the items most
+likely to be missing. A green run therefore carries no information about them,
+and it is not the author's attestation that they are done.
+
+Anything genuinely discovered after a push — a CI-only failure, a real defect —
+goes in the **first line of the next message**, not its last paragraph. A
+discovery that falls outside the issue's scope becomes a follow-up issue rather
+than extra commits that move the branch's endpoint.
 
 ### AI attribution and disclosure
 
@@ -399,7 +433,17 @@ Before finishing, confirm:
 - canonical docs were updated when required
 - draft PR metadata matches the focused issue and Project
 
-Report:
+Open the report with exactly one verdict, and state it nowhere else:
+
+- **Complete — nothing further, safe to approve on green.**
+- **Not complete — the following remain:** followed by what is outstanding.
+
+A remaining item may not be buried mid-report; if anything is outstanding, the
+verdict itself says so. The verdict is the author's attestation that the
+close-out in "The first push is a commitment" is done. Green CI is not that
+attestation and does not substitute for it.
+
+Then report:
 
 - what changed
 - files changed
