@@ -241,6 +241,7 @@ It also provides a dependency-free manual publication list:
 \end{CDossierEntry}
 
 \CDossierSection{Selected Publications}
+\CDossierSubsection{Journal Articles}
 \begin{CDossierPublications}
   \CDossierPublication{
     authors = {Ada Lovelace and Grace Hopper},
@@ -252,6 +253,12 @@ It also provides a dependency-free manual publication list:
 \end{CDossierPublications}
 \end{document}
 ```
+
+`\CDossierSubsection` is optional. It is the level between a section and an
+entry, for groups that are not themselves sections — `Publications` split into
+journal, conference, and preprint, or `Experience` into industry and academic —
+so a group need not be promoted to a ruled section of its own. It works the same
+way in the résumé class.
 
 The complete no-BibLaTeX example is
 [`examples/academic/cv-academic.tex`](examples/academic/cv-academic.tex).

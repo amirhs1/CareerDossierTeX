@@ -40,7 +40,12 @@
   Dissertation: Reliable numerical methods for coupled nonlinear systems.
 \end{CDossierEntry}
 
+% \CDossierSubsection is the level between a section and an entry. Grouping a
+% section this way keeps one ruled heading for the section and marks the groups
+% under it, instead of promoting each group to a section of its own — which
+% would flatten exactly the hierarchy the grouping exists to show.
 \CDossierSection{Teaching}
+\CDossierSubsection{Course Instruction}
 \begin{CDossierEntry}[
   title        = {Sessional Instructor},
   organization = {MATH 2410: Differential Equations},
@@ -50,7 +55,21 @@
   Designed accessible assessments and supported a diverse cohort of students.
 \end{CDossierEntry}
 
+\CDossierSubsection{Graduate Supervision}
+\begin{CDossierEntry}[
+  title        = {Co-supervisor, M.Sc. Thesis},
+  organization = {Example University},
+  location     = {Toronto, Ontario},
+  dates        = {2025--Present}
+]
+  Numerical stability of coupled solvers under sparse observational data.
+\end{CDossierEntry}
+
+% The same command groups a publication list, which is where an academic CV
+% needs it most. The gap under the heading is the same in both cases: one pair
+% of tokens serves an entry run and a CDossierPublications list alike.
 \CDossierSection{Selected Publications}
+\CDossierSubsection{Journal Articles}
 \begin{CDossierPublications}
   \CDossierPublication{
     authors = {Ada Lovelace and Grace Hopper},
@@ -59,6 +78,18 @@
     date    = {2026},
     doi     = {10.9999/jec.2026.101},
     url     = {https://example.invalid/articles/reliable-engines},
+    note    = {Fictional example publication}
+  }
+\end{CDossierPublications}
+
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {Programmable Looms as a Model for Reproducible Pipelines},
+    venue   = {Proceedings of the Example Symposium on Scientific Computing},
+    date    = {2025},
+    url     = {https://example.invalid/proceedings/programmable-looms},
     note    = {Fictional example publication}
   }
 \end{CDossierPublications}

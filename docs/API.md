@@ -1168,6 +1168,55 @@ there as well, but a statement is prose: the heading is set without a rule and
 on the prose heading rhythm. See "Author content and headings" for that class's
 two heading levels.
 
+### `\CDossierSubsection`
+
+```latex
+\CDossierSection{Experience}
+\CDossierSubsection{Industry}
+```
+
+Creates a second-level heading inside a résumé or CV section, for a section with
+natural groupings that are not themselves sections — `Experience` split into
+industry and academic, `Publications` split into journal, conference, and
+preprint. Without it such a group has to be promoted to a full ruled section,
+which flattens the hierarchy it was meant to show.
+
+The heading carries no rule and no size of its own: it is
+`\CDossierSectionStyle` at `\CDossierSizeBody`, so the level is marked by weight,
+face, and spacing rather than by a second rule. The rule belongs to the section.
+
+The gap **below** the heading is `\CDossierRecordSubsectionBelowSkip`, and it is
+the same gap whether the next block is a run of `CDossierEntry` or a
+`CDossierPublications` list: the token is calibrated to exceed both of their
+opening claims, so one pair of tokens serves both groupings.
+
+The gap **above** the heading is `\CDossierRecordSubsectionAboveSkip`, with one
+deliberate exception. A section that opens *directly* with a subsection does not
+take that gap; the boundary is `\CDossierRecordSectionBelowSkip` alone, which is
+the same gap the section would leave before an entry. This matches the statement
+class, where `\@startsection`'s own `\if@nobreak` guard produces the same result.
+Anything typeset in between — an entry, a bullet list, a paragraph — ends the
+exception.
+
+A subsection heading is placed only when at least
+`\CDossierSubsectionNeedLines` lines of body leading remain on the page;
+otherwise the page ends and the heading opens the next one, so it is never left
+alone at the foot of a page introducing nothing. The bound is smaller than
+`\CDossierSectionNeedLines` because a subsection commits less: its own heading
+line and the first entry heading, with no rule between them. The exception above
+applies here too — a subsection opening its section is placed by the section's
+own bound and does not test a second one.
+
+Under `\DocumentMetadata{tagging=on}` the heading is a depth-3 heading element,
+role-mapped to `/H3`, and it opens a depth-3 `Sect` division that nests inside
+its section's. Untagged output is unaffected.
+
+The argument is user-visible text. The command does not automatically translate
+arbitrary subsection titles.
+
+The statement class defines `\CDossierSubsection` too, on its own prose heading
+rhythm; see "Author content and headings".
+
 ### `CDossierEntry`
 
 ```latex
@@ -1383,6 +1432,24 @@ the last entry that fits instead of dumping the whole section
 length before it is typeset, each list records that count in the auxiliary
 file — so a résumé or CV needs the same second LaTeX pass it already requires
 for the `Page N of M` folio. On a first clean pass the breaks are provisional.
+
+#### `\CDossierSubsectionNeedLines`
+
+The same bound for `\CDossierSubsection`, defaulting to `3`. It is smaller than
+`\CDossierSectionNeedLines` because a subsection commits less to the page: its
+own heading line and the two lines of the first entry heading, with no rule
+between them. It does not additionally require that entry's first line of body,
+because the entry heading already carries its own keep down to it.
+
+```latex
+\int_set:Nn \CDossierSubsectionNeedLines { 4 }
+```
+
+A subsection that opens its section directly is exempt from this bound. The
+section's own four-line requirement already placed that material, and testing it
+a second time could only break the page between a section heading and the
+subsection immediately under it — the stranded heading the bound exists to
+prevent ([#337](https://github.com/amirhs1/CareerDossierTeX/issues/337)).
 
 ### Typographic page-break penalties
 
@@ -2016,10 +2083,17 @@ Two unnumbered heading levels are available, and each has two spellings:
 \CDossierSubsection{A Narrower Theme}
 ```
 
-`\CDossierSection` matches the name the résumé and CV use, so one profile's
-documents are written the same way. It is a wrapper over standard LaTeX
-`\section*`, and `\CDossierSubsection` over `\subsection*`; both spellings
+Both names match the résumé and the CV, so one profile's documents are written
+the same way. (`\CDossierSubsection` was the statement's alone until `v0.8.0`;
+the record classes gained it in
+[#337](https://github.com/amirhs1/CareerDossierTeX/issues/337).) Here they are
+wrappers over standard LaTeX `\section*` and `\subsection*`; both spellings
 remain supported and render identically, because there is one renderer.
+
+The rhythm is this class's own. A statement separates its paragraphs by a
+visible `\CDossierProseParSkip`, so its heading gaps are calibrated against that
+and use the `\CDossierProse…` tokens rather than the record classes'
+`\CDossierRecord…` ones. The two families are not interchangeable.
 
 Since `v0.6.0` the rendering is part of the calibrated design system rather
 than `article`'s heading defaults:
@@ -2199,7 +2273,7 @@ resolved values at each `fontsize` are tabulated in
 | Family | Tokens |
 |---|---|
 | Shared (all four classes) | `\CDossierSharedHeaderNameGapSkip`, `\CDossierSharedHeaderMetaGapSkip` |
-| Record (résumé, CV) | `\CDossierRecordHeaderBelowSkip`, `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
+| Record (résumé, CV) | `\CDossierRecordHeaderBelowSkip`, `\CDossierRecordSectionAboveSkip`, `\CDossierRecordSectionRuleGapSkip`, `\CDossierRecordSectionBelowSkip`, `\CDossierRecordSubsectionAboveSkip`, `\CDossierRecordSubsectionBelowSkip`, `\CDossierRecordEntryAboveSkip`, `\CDossierRecordEntryGapSkip`, `\CDossierRecordListEdgeAboveSkip`, `\CDossierRecordListEdgeBelowSkip`, `\CDossierRecordItemSepSkip`, `\CDossierRecordParSkip` |
 | Prose (statement) | `\CDossierProseHeaderBelowSkip`, `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
 | Letter | `\CDossierLetterHeaderBelowSkip`, `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
 
