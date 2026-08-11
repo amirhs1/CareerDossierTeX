@@ -544,6 +544,74 @@ If a long run measures everything but fails while merging, do not repeat it:
 
 The failed run prints that path as `Per-value console output kept at:`.
 
+### Page fill
+
+Measure how full each page is, and what forced each page break, across every
+committed layout fixture that renders more than one page:
+
+    make review-pagefill
+
+This is the other half of the page-break policy. `make layout` asserts that
+material stays *together* — no list split leaving one item behind, no heading
+separated from what it introduces, no page ending on a section heading — and
+not one of those assertions can fail on a page that is half empty. In documents
+whose entire constraint is a page limit, that is the more important half, and it
+went unmeasured until this target existed.
+
+The measurement is `\tracingpages` output parsed out of the log by
+[`tests/layout/page-fill.awk`](tests/layout/page-fill.awk), not a reading of the
+PDF, so it needs only LuaLaTeX and awk. That is deliberate: CI's texlive image
+has no poppler.
+
+Review the artifacts under `build/pagefill-review/`:
+
+- `pagefill-report.txt` — per fixture and per page: `\pagegoal`, the height
+  used, the fill percentage, the penalty at the break taken, and the size of the
+  atom that forced it;
+- `baseline.md` — the same figures as one table, regenerated on every run so the
+  numbers are reproducible rather than transcribed;
+- `pagefill.tsv` and each fixture's `.log` — the raw record and its source.
+
+The column that decides how to read a row is `kind`:
+
+| kind | what ended the page | fill means |
+|---|---|---|
+| `overflow` | the next atom did not fit | a policy question; `atom` says how large it was |
+| `keep` | `\CDossierSectionNeedLines`, the bounded section keep (#333) | a policy question |
+| `eject` | the fixture source: `\newpage`, `\vfill`, the `\end{document}` flush | nothing — the source decided it |
+
+Both forced kinds print `p=-10000`; only the fil stretch on the taken candidate
+tells them apart. Five committed fixtures eject, and their page-one fill runs
+from 26% to 54% purely because their source says so — a threshold that counted
+them would fail five fixtures for behaving exactly as written. A short *last*
+page is normal for the same reason and is excluded too.
+
+`make layout` carries the same measurement as an enforcement hook, reported per
+fixture as a `page fill:` line. It is disabled by default: #333, which owns the
+fill policy, closed on the bounded section keep without setting a threshold, and
+after #332 the record families sit at ordinary `\raggedbottom` slack. Supply one
+to turn it on, and to re-prove that it fires:
+
+    CDOSSIER_PAGE_FILL_MIN=90 make layout
+
+At 90 that fails exactly one page — `statement-two-page` page 1 at 86.9% — which
+is the prose-family hole #342 measured and closed as a decision, and which #351
+now owns. At 94 four more join it: `resume-a4-two-page` (93.0%),
+`resume-section-need` (93.6%), `resume-a4-sans-body-two-page` (93.9%), and
+`statement-a4-sans-body-two-page` (92.9%).
+
+The fixture list is a glob, not a register, and it is wider than `*two-page*` on
+purpose: `resume-section-need` renders two pages without saying so in its name,
+so a list that trusted the name would have left a governed page out of the
+baseline — and out of the count above.
+
+The parser identifies a page by TeX's own shipout marker, and every run checks
+the count it found against the log's `Output written on ... (N pages)`. To
+re-prove that check, break the marker rule in `page-fill.awk` and run
+`make layout`: it must report `PAGE-FILL PARSE MISMATCH` rather than passing.
+A parser that finds no page reports no hole, which reads exactly like a corpus
+that has none.
+
 ### Baselines are load-bearing
 
 A saved baseline (an `l3build` `.tlg`, or the committed extraction reference) is

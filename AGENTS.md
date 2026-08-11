@@ -194,7 +194,8 @@ Individual targets: `lint`, `regression`, `smoke`, `layout`, `extract-test`,
 `bibliography-test`, `links`, `metadata`, `tagging`, `examples`, and the
 per-family builds `resume`, `letter`, `academic-cv`, `academic-bibliography`,
 `academic-letter`, and `statements`. `review-page-two` and `review-matrix`
-render pages for visual review. Note that the extraction and bibliography
+render pages for visual review, and `review-pagefill` reports how full each
+page is and what forced its break. Note that the extraction and bibliography
 targets are `extract-test` and `bibliography-test`, while the matching CI jobs
 are named `extraction` and `bibliography`; every other target and job share a
 name.

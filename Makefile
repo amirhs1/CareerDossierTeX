@@ -22,6 +22,11 @@
 # `review-entrymeta-muted` needs only LuaLaTeX: it renders the entry heading's
 # two semantic options against each other for visual review and asserts nothing.
 #
+# `review-pagefill` needs only LuaLaTeX and awk. It measures how full each page
+# is by parsing `\tracingpages` output from the log rather than the PDF, which
+# is what keeps it free of the poppler dependency the rest of the layout work
+# carries.
+#
 # `resume`, `letter`, `academic-cv`, `academic-bibliography`, `academic-letter`,
 # and `statements` write their PDFs, logs, and other latexmk output under the
 # gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
@@ -49,7 +54,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -118,6 +123,9 @@ review-linebreak: ## Sweep a line-breaking parameter over both corpora (#316)
 
 review-linebreak-parallel: ## review-linebreak with one sweep per value in parallel (#316)
 	tests/layout/sweep-linebreak-parallel.sh $(SWEEP_ARGS)
+
+review-pagefill: ## Report page fill and the atom forcing each break (#334)
+	tests/layout/report-pagefill.sh
 
 extract-test: ## Text-extraction round-trip against committed baselines
 	tests/extraction/run.sh

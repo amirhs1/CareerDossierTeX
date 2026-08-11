@@ -11,7 +11,13 @@
 #   - a fixture named *two-page* actually spans at least two pages;
 #   - no *two-page* fixture splits a hyphenated word across a page break, and
 #     no letter or statement fixture strands a single line of a paragraph at a
-#     page boundary (issue #171, via page-break-check.awk).
+#     page boundary (issue #171, via page-break-check.awk);
+#   - every page reports how full it is and what ended it, read from
+#     `\tracingpages` output via page-fill.awk (issue #334). Everything above
+#     asserts only that material stays *together*, and all of it passes on a
+#     half-empty page. `CDOSSIER_PAGE_FILL_MIN` turns the measurement into an
+#     assertion; it is unset by default, because no threshold has been decided.
+#     `make review-pagefill` is the same measurement as a full report.
 #
 # A fixture carrying
 #
@@ -43,14 +49,29 @@ control_dir="$(mktemp -d "${TMPDIR:-/tmp}/careerdossier-layout-control.XXXXXX")"
 trap 'rm -rf "$control_dir"' EXIT
 fail=0
 
+# Minimum page fill, as a percentage of `\pagegoal`, for every page a policy
+# governs — see the page-fill block below for what that excludes and for why
+# this is empty. Empty means measure and report without asserting.
+page_fill_min="${CDOSSIER_PAGE_FILL_MIN:-}"
+
 for tex in *.tex; do
   base="${tex%.tex}"
   echo "== $tex =="
 
-  if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1; then
+  # `\tracingpages=1` goes on the command line rather than into a rebuild of
+  # its own. It changes nothing but the log — the PDF is byte-identical — and
+  # this way the page-fill measurement below reads the same run the rest of the
+  # assertions are made against, instead of a second compile that has to be
+  # argued to be equivalent. `-jobname` keeps the artifact names the fixture
+  # would have produced on its own. The space after `1` terminates the number
+  # scan before `\input`, which is an expandable macro in LaTeX and would
+  # otherwise be expanded while TeX looked for another digit.
+  if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
+       "\\tracingpages=1 \\input{$tex}" > "$base.stdout" 2>&1; then
     echo "  COMPILE FAILED (see $base.log)"; fail=1; continue
   fi
-  if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1; then
+  if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
+       "\\tracingpages=1 \\input{$tex}" >> "$base.stdout" 2>&1; then
     echo "  RERUN FAILED (see $base.log)"; fail=1; continue
   fi
 
@@ -348,6 +369,73 @@ EOF
     fi
   else
     echo "  (pdftotext absent: skipped folio check)"
+  fi
+
+  # Page fill — the other half of the page-break policy (issue #334).
+  #
+  # Everything above asserts that material stays *together*. Not one of those
+  # assertions can fail on a page that is half empty, and for documents whose
+  # entire constraint is a page limit that is the more important half. It sits
+  # here, beside the keeps, so the two halves are read and maintained together.
+  #
+  # The measurement comes from `\tracingpages` in the log rather than from the
+  # PDF, so it needs no poppler and runs wherever this suite runs. page-fill.awk
+  # documents the trace and the two non-obvious things about reading it.
+  #
+  # Two page kinds are skipped, and skipping them is not a weakening:
+  #   - the last page, because a short last page is normal and says nothing;
+  #   - an `eject` page, one the fixture source ended itself with `\newpage`.
+  #     Five committed fixtures do that, and their page-one fill runs from 26%
+  #     to 54% purely because their source says so. A threshold that counted
+  #     them would fail five fixtures for behaving exactly as written.
+  fill_records="$(awk -f "$here/page-fill.awk" "$base.log")"
+  fill_pages="$(printf '%s\n' "$fill_records" | grep -c '.' || true)"
+  if [ "$fill_pages" -ne "$pages" ]; then
+    echo "  PAGE-FILL PARSE MISMATCH: $fill_pages record(s) for $pages page(s)."
+    echo "    page-fill.awk identifies a page by TeX's own shipout marker, and"
+    echo "    that rule no longer matches this log. Fix the parser rather than"
+    echo "    relaxing the check: a parser that finds no page reports no hole,"
+    echo "    which looks identical to a corpus that has none."
+    fail=1
+  else
+    echo "  page fill: $(printf '%s\n' "$fill_records" | awk -F'\t' '
+      { tag = $6; if ($10 == 1) tag = tag ",last"
+        printf "%s%s %.1f%% (%s)", (NR > 1 ? ", " : ""), $1, $4, tag }
+      END { print "" }')"
+
+    # The enforcement hook. It is wired, exercised on every run by the loop
+    # below, and DISABLED by default because no threshold has been decided:
+    # #333 — the issue that owns the fill policy — closed on the bounded
+    # section keep without setting one, and after #332/#339 the record families
+    # sit at ordinary `\raggedbottom` slack rather than at a defect. The one
+    # remaining large hole belongs to the prose families and is open as #351.
+    # Set a threshold to turn it on and to re-prove it fires:
+    #
+    #   CDOSSIER_PAGE_FILL_MIN=90 tests/layout/run.sh
+    #
+    # Given as a percentage of `\pagegoal`. Replace the default with a literal
+    # here when the policy lands.
+    fill_fail=0
+    while IFS="$(printf '\t')" read -r pg goal used pct pen kind nxt atom blank last; do
+      [ -n "$pg" ] || continue
+      if [ "$last" -eq 1 ] || [ "$kind" = "eject" ]; then continue; fi
+      if [ -n "$page_fill_min" ] \
+         && awk -v a="$pct" -v b="$page_fill_min" 'BEGIN { exit !(a < b) }'; then
+        echo "  PAGE UNDERFILLED: page $pg is ${pct}% of its goal (${blank}pt blank),"
+        echo "    below the ${page_fill_min}% floor. Break kind '$kind' at penalty $pen."
+        if [ "$atom" != "-" ]; then
+          echo "    The next candidate was ${atom}pt further on: that is the atom"
+          echo "    that did not fit, and the size any fix has to find room for."
+        else
+          echo "    Nothing was rejected, so the hole is not an atom that did not"
+          echo "    fit — a policy rule ended this page early."
+        fi
+        fill_fail=1
+      fi
+    done <<EOF
+$fill_records
+EOF
+    [ "$fill_fail" -eq 0 ] || fail=1
   fi
 
   case "$base" in
