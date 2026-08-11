@@ -52,4 +52,21 @@
   \cdossiertestQuiet{\CDossierSection{Education}}
 }
 
+% Issue #337: the second heading level, in the same contract and in the same
+% order. Depth 3, not a repeat of 2 -- issue #267 fixed the identity at depth 1
+% and a section at depth 2, so `sec/3/title' is what maps to `/H3' and keeps the
+% hierarchy unskipped. The division is opened before the heading here too, so a
+% subsection encloses the entries under it rather than sitting beside them, and
+% the kernel's `sec/end' closes it when the next section at depth 2 opens.
+%
+% The subsection is stated in the same run as the section above it because the
+% depths are only meaningful relative to each other: two headings that both
+% reported depth 2 would look correct read one line at a time.
+\TEST{subsection-opens-a-deeper-division}{
+  \cdossiertestQuiet{
+    \CDossierSection{Experience}
+    \CDossierSubsection{Industry}
+  }
+}
+
 \END

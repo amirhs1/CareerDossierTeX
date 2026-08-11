@@ -1,0 +1,51 @@
+% cv-subsection-body.inc.tex -- shared body for the tagged subsection fixtures
+% (issue #337).
+%
+% The record classes gained a second heading level, and the only thing that can
+% see what it does to the structure tree is this suite. Two properties matter and
+% neither is visible in the rendered page: the heading is role-mapped to /H3, and
+% the division it opens nests inside its section's rather than replacing it.
+%
+% It groups a publication list and an entry run, because those are the two
+% neighbours \CDossierSubsection was added for and they reach the vertical list
+% by different routes. Deliberately one page with no continuation furniture, so
+% it stays outside the five-document loop in run.sh.
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name={Tagged Subsection CV},
+  headline={Research Engineer},
+  email={subsection@example.test}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\CDossierSubsection{Journal Articles}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors={A. Lovelace},
+    title={Notes on the Analytical Engine},
+    venue={Scientific Memoirs},
+    date={1843}
+  }
+\end{CDossierPublications}
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors={A. Lovelace},
+    title={On Programmable Looms},
+    venue={Example Symposium},
+    date={1842}
+  }
+\end{CDossierPublications}
+\CDossierSection{Experience}
+\CDossierSubsection{Academic}
+\begin{CDossierEntry}[
+  title={Researcher},
+  organization={Example University},
+  dates={2023--2026}
+]
+\begin{CDossierItemize}
+  \item Grouped under a subsection rather than under a section of its own.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

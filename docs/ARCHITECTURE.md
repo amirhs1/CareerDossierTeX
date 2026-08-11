@@ -273,6 +273,8 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierRecordSectionAboveSkip` | 0.875 | 10.5 pt | 11.9 pt | 12.6875 pt |
 | `\CDossierRecordSectionRuleGapSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
 | `\CDossierRecordSectionBelowSkip` | 0.4375 | 5.25 pt | 5.95 pt | 6.34375 pt |
+| `\CDossierRecordSubsectionAboveSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
+| `\CDossierRecordSubsectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierProseSectionAboveSkip` | 0.875 | 10.5 pt | 11.9 pt | 12.6875 pt |
 | `\CDossierProseSectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierProseSubsectionAboveSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
@@ -518,13 +520,26 @@ so the split moved nothing; #206 then raised all three together to 0.9375.
 `tests/regression/tokens-invariants.lvt` records the ordering relations these
 rules imply, one line per relation, at all three supported sizes. The baseline is
 the assertion: a ratio change that makes a token unreachable, or that repairs
-one, shows up there as a reviewable diff. All eighteen relations hold at the
-`v0.7.0` defaults, at `10pt`, `11pt`, and `12pt` alike — #204 made them
-expressible and #206 assigned the ratios that satisfy them, so the baseline's
-remaining job is to catch a later ratio change that breaks one. Two of the
-eighteen hold with no margin at all: `RecordSectionAboveSkip` is exactly twice
-`RecordSectionBelowSkip`, and `RecordListEdgeAboveSkip` sits exactly on its
-extraction floor.
+one, shows up there as a reviewable diff. All twenty-three relations hold, at
+`10pt`, `11pt`, and `12pt` alike — #204 made them expressible, #206 assigned the
+ratios that satisfy the first eighteen, and #337 added five for the record
+subsection pair, so the baseline's remaining job is to catch a later ratio change
+that breaks one. Three of the twenty-three hold with no margin at all:
+`RecordSectionAboveSkip` is exactly twice `RecordSectionBelowSkip`,
+`RecordSubsectionAboveSkip` is exactly twice `RecordSubsectionBelowSkip`, and
+`RecordListEdgeAboveSkip` sits exactly on its extraction floor.
+
+The record subsection pair is where those relations decided a value rather than
+recording one (#337). Its below-ratio is pinned from both sides: it must exceed
+both claims a subsection can meet below it — `RecordEntryAboveSkip` (0.3125) for
+an entry run and `RecordListEdgeAboveSkip` (0.25) for the CV's publication
+list — or `\addvspace` would never let it reach the page, and it must stay under
+`RecordSectionBelowSkip` (0.4375) to read as tighter than its section. On the
+sixteenth grid that leaves exactly 0.375, which is also why one pair serves both
+groupings: neither neighbour owns the boundary in either case. The above-ratio is
+then 0.75 rather than the prose pair's 0.625, because 0.625 against a pinned
+0.375 is 1.67:1 and would have been the first heading pair to fail the
+`above >= 2 x below` floor.
 
 #### Derived metrics
 
@@ -990,6 +1005,12 @@ Responsibilities:
   with;
 - shared CV/résumé section rule, including token-owned vertical spacing and
   tagged layout-artifact treatment;
+- the shared record subsection renderer (#337) — the second heading level both
+  record classes expose as `\CDossierSubsection`, including its depth-3 division
+  and heading, its two tokens, its own needs-N-lines bound, and the test for
+  whether a section has typeset anything yet. The classes hand-roll
+  `\CDossierSection` twice already; one renderer here is what keeps the tokens
+  and the tagged structure from drifting between the two spellings;
 - contact line;
 - optional-field separator handling;
 - hyperlink wrappers, including `\CDossierLink`, the body-text link, and the
@@ -1288,7 +1309,9 @@ Responsibilities:
   entry-metadata decisions;
 - register the `Résumé` running label and enable shared page furniture;
 - render résumé sections, entries, and lists from the shared type, rhythm, rule,
-  and list tokens;
+  and list tokens, and expose the shared second heading level as
+  `\CDossierSubsection` (#337) — two heading levels, matching the CV and the
+  statement, so one profile's documents are written the same way;
 - preserve logical source and extraction order.
 
 The résumé class may call shared components, but reusable contact or identity logic should not be implemented directly inside the class.
@@ -1410,7 +1433,9 @@ Responsibilities:
 - register the `Curriculum Vitae` running label and enable shared page
   furniture without making contact details running-only content;
 - render the generic section, entry, and item-list interfaces from shared type,
-  rhythm, rule, and list tokens;
+  rhythm, rule, and list tokens, and expose the shared second heading level as
+  `\CDossierSubsection` (#337), which is what lets `Publications` carry journal,
+  conference, and preprint groups without promoting each to a ruled section;
 - own the manual-publication list and its source-order numbering while using
   shared list metrics;
 - keep entries together across page breaks where practical without boxing an

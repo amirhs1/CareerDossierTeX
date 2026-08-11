@@ -365,7 +365,14 @@ EOF
     # The KEEPTOGETHER directives cannot do this job — they assert the particular
     # pairs a fixture happens to declare, and a heading stranded at the foot of a
     # page is a property of every page boundary in every fixture.
-    sections="$(sed -n 's/.*\\CDossierSection{\([^}]*\)}.*/\1/p' "$tex")"
+    #
+    # Issue #337: \CDossierSubsection is collected by the same pattern. It is the
+    # same failure — a heading alone at the foot of a page, introducing nothing —
+    # and \CDossierSubsectionNeedLines is the bound that prevents it, so it needs
+    # the same assertion rather than a second one. The `sub' alternative is
+    # optional in the pattern rather than matched separately so that the two
+    # spellings cannot drift apart here.
+    sections="$(sed -n 's/.*\\CDossier\(Sub\)\{0,1\}section{\([^}]*\)}.*/\2/p' "$tex")"
     if [ -n "$sections" ] && [ "$pages" -gt 1 ]; then
       strand_fail=0
       for (( n = 1; n < pages; n++ )); do

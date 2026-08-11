@@ -3,7 +3,7 @@
 % The supported v0.1.0 English industry résumé example. It is the reference
 % document for careerdossier-resume.cls: a single-column, monochrome, US Letter
 % résumé built entirely from the public API (\CDossierSetup, \MakeCDossierHeader,
-% \CDossierSection, CDossierEntry, CDossierItemize).
+% \CDossierSection, \CDossierSubsection, CDossierEntry, CDossierItemize).
 %
 % Compile with LuaLaTeX:
 %   latexmk -lualatex -interaction=nonstopmode -halt-on-error \
@@ -31,6 +31,13 @@ service standards, and clear technical documentation.
 
 \CDossierSection{Experience}
 
+% \CDossierSubsection is the level between a section and an entry. It groups
+% entries that belong together without promoting each group to a ruled section
+% of its own, which would flatten the hierarchy the grouping is meant to show.
+% A section that opens directly with a subsection, as this one does, leaves the
+% same gap as one opening directly with an entry.
+\CDossierSubsection{Public Sector}
+
 \begin{CDossierEntry}[
   title        = {Senior Data Scientist},
   organization = {Government Digital Services Laboratory},
@@ -46,6 +53,8 @@ service standards, and clear technical documentation.
           archival output.
   \end{CDossierItemize}
 \end{CDossierEntry}
+
+\CDossierSubsection{Research and Nonprofit}
 
 \begin{CDossierEntry}[
   title        = {Data Scientist},

@@ -1,0 +1,120 @@
+% cv-subsection-edges.lvt — issue #337 record subsection boundaries, CV class.
+%
+% \CDossierSubsection is rendered by one shared component, so the four contracts
+% listed in resume-subsection-edges.lvt are stated there and not repeated. This
+% fixture exists for the two things that are genuinely this class's own.
+%
+% 1. The CV's \CDossierSection is a separate definition in a separate class, and
+%    the guard reads what that definition leaves behind — see
+%    cv-section-structure.lvt for the same argument about the division. A
+%    résumé-only fixture would assert nothing about it.
+%
+% 2. CDossierPublications is the second neighbour the single token pair has to
+%    serve, and it exists only here. It is a numbered list rather than an entry
+%    run, so it opens at \CDossierRecordListEdgeAboveSkip (0.25) rather than at
+%    \CDossierRecordEntryAboveSkip (0.3125); \CDossierRecordSubsectionBelowSkip
+%    (0.375) beats both, which is what makes one pair serve
+%    `Publications -> Journal / Conference / Preprint' and
+%    `Experience -> Industry / Academic' alike. It also takes no part in the
+%    shared list policy, so the guard's answer after it is a separate fact from
+%    the answer after a CDossierItemize.
+%
+% The probes are the ones from resume-subsection-edges.lvt: the vertical list
+% with every glue node's width and subtype, and the guard's own verdict.
+\input{regression-test}
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_guard:n #1
+  {
+    \par
+    \__cdossier_components_section_is_empty:TF
+      { \TYPE { #1 ~ section-is-empty~=~ true } }
+      { \TYPE { #1 ~ section-is-empty~=~ false } }
+  }
+\NewDocumentCommand \cdossiertestGuard { m } { \cdossiertest_guard:n {#1} }
+\ExplSyntaxOff
+\makeatletter
+\newcommand\cdossiertestList[1]{%
+  \TYPE{#1 list = \directlua{
+    local t = {}
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("glue") then
+        local pt = math.floor(n.width / 655.36 + 0.5) / 100
+        local kind = node.subtypes("glue")[n.subtype] or "userskip"
+        table.insert(t, kind .. ":" .. tostring(pt) .. "pt")
+      elseif n.id == node.id("penalty") then
+        table.insert(t, "penalty:" .. n.penalty)
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "box")
+      elseif n.id == node.id("rule") then
+        table.insert(t, "rule")
+      else
+        table.insert(t, node.type(n.id))
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+\makeatother
+
+\begin{document}
+\START
+
+% Point 1. The guard's verdict against this class's own section, and against the
+% publication list, which is the one content block in the toolkit that reaches
+% the vertical list without going through the shared list policy.
+\TEST{guard-verdict-by-neighbour}{
+  \CDossierSection{Publications}
+  \cdossiertestGuard{after-section-rule}
+  \begin{CDossierPublications}
+    \CDossierPublication{
+      authors = {A. Lovelace},
+      title   = {Notes on the Analytical Engine},
+      venue   = {Scientific Memoirs},
+      date    = {1843},
+    }
+  \end{CDossierPublications}
+  \cdossiertestGuard{after-publication-list}
+}
+
+% Point 1, measured. A section opening with a subsection must leave the same
+% opening userskip as a section opening with an entry, on this class as on the
+% résumé.
+\TEST{opening-gap-by-shape}{
+  \setbox9=\vbox{\CDossierSection{S}\CDossierSubsection{T}}
+  \cdossiertestList{section-then-subsection}
+  \setbox9=\vbox{\CDossierSection{S}%
+    \begin{CDossierEntry}[title = {Research Fellow}]\end{CDossierEntry}}
+  \cdossiertestList{section-then-entry}
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Research Fellow}]\end{CDossierEntry}%
+    \CDossierSubsection{T}}
+  \cdossiertestList{entry-then-subsection}
+}
+
+% Point 2. The gap under the subsection heading is the same userskip whether a
+% publication list or an entry run opens beneath it. If
+% \CDossierRecordSubsectionBelowSkip were retuned down to
+% \CDossierRecordListEdgeAboveSkip or below, the publication list's own edge
+% would take the boundary over and this pair would stop agreeing.
+\TEST{below-skip-owns-the-publication-list}{
+  \setbox9=\vbox{\CDossierSubsection{Journal Articles}%
+    \begin{CDossierPublications}
+      \CDossierPublication{
+        authors = {A. Lovelace},
+        title   = {Notes on the Analytical Engine},
+        venue   = {Scientific Memoirs},
+        date    = {1843},
+      }
+    \end{CDossierPublications}}
+  \cdossiertestList{subsection-then-publications}
+  \setbox9=\vbox{\CDossierSubsection{Journal Articles}%
+    \begin{CDossierEntry}[title = {Research Fellow}]\end{CDossierEntry}}
+  \cdossiertestList{subsection-then-entry}
+}
+
+\END

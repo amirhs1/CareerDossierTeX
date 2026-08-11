@@ -13,7 +13,15 @@ division begin: depth = 2
 heading: depth = 2, title = Teaching Experience
 ============================================================
 ============================================================
-TEST 3: publication-list-opens-no-division-of-its-own
+TEST 3: subsection-opens-a-deeper-division
+============================================================
+division begin: depth = 2
+heading: depth = 2, title = Publications
+division begin: depth = 3
+heading: depth = 3, title = Journal Articles
+============================================================
+============================================================
+TEST 4: publication-list-opens-no-division-of-its-own
 ============================================================
 division begin: depth = 2
 heading: depth = 2, title = Publications

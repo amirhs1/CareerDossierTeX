@@ -47,6 +47,8 @@
     \cdossiertest_skip:N \CDossierRecordSectionAboveSkip
     \cdossiertest_skip:N \CDossierRecordSectionRuleGapSkip
     \cdossiertest_skip:N \CDossierRecordSectionBelowSkip
+    \cdossiertest_skip:N \CDossierRecordSubsectionAboveSkip
+    \cdossiertest_skip:N \CDossierRecordSubsectionBelowSkip
     \cdossiertest_skip:N \CDossierProseSectionAboveSkip
     \cdossiertest_skip:N \CDossierProseSectionBelowSkip
     \cdossiertest_skip:N \CDossierProseSubsectionAboveSkip

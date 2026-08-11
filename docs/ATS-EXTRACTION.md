@@ -1149,14 +1149,24 @@ moved one level down, so the hierarchy is unskipped beneath it:
 
 | Profile | `/H1` | `/H2` | `/H3` |
 | --- | --- | --- | --- |
-| Résumé | the name | each `\CDossierSection` heading | — |
-| Academic CV | the name | each `\CDossierSection` heading (including a `careerdossier-biblatex` bibliography heading, which renders through the same command) | — |
+| Résumé | the name | each `\CDossierSection` heading | each `\CDossierSubsection` heading |
+| Academic CV | the name | each `\CDossierSection` heading (including a `careerdossier-biblatex` bibliography heading, which renders through the same command) | each `\CDossierSubsection` heading |
 | Industry and academic letter | the name | — | — |
 | Statement | the name | the statement's title, and each `\CDossierSection`/`\section*` heading | each `\CDossierSubsection`/`\subsection*` heading |
 
 The letter has no `/H2`: it carries no section-heading component, so its
 identity `/H1` is the only heading in the document, which is a valid (if
 trivial) hierarchy rather than a skip.
+
+The record classes' `/H3` row is new in #337 and is the reason the level exists
+at all: a group inside a section — journal against conference publications,
+industry against academic experience — was previously expressible only by
+promoting it to a `/H2` of its own, which told a screen reader the group was a
+peer of the section containing it. A `\CDossierSubsection` heading also opens a
+depth-3 `Sect` division nested inside its section's, so the entries beneath it
+belong to the group and not merely to the section. `tests/tagging/cv-subsection`
+asserts the counts and the role mapping, and passes veraPDF UA-2 — a skipped
+heading level is a UA-2 failure, so the validator sees this too.
 
 **How this reaches a screen-reader user.** A tagged PDF's structure tree
 supports two different ways of consuming it: "Say All" walks every leaf in

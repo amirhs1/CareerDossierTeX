@@ -10,6 +10,48 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `\CDossierSubsection{<title>}` gives the résumé and the CV a second heading
+  level, for a section with natural groupings that are not themselves sections —
+  `Experience` split into industry and academic, `Publications` split into
+  journal, conference, and preprint. ([#337])
+
+  Until now the record classes offered one heading level and nothing between it
+  and an entry title, so such a group had to be promoted to a full ruled
+  section — flattening exactly the hierarchy the grouping was meant to show. The
+  statement class has had two levels since it shipped, and its own source
+  described the parity as already true; only the section half of that was.
+
+  The heading carries no rule and no size of its own. The full-width rule is the
+  section's mark, and repeating it one level down flattens the same hierarchy
+  again; the level is carried by weight, face, and spacing instead, which is what
+  the statement class already does at this level. Under
+  `\DocumentMetadata{tagging=on}` it is a depth-3 heading role-mapped to `/H3`,
+  opening a division that nests inside its section's. Untagged output is
+  unchanged.
+
+  Two new tokens, `\CDossierRecordSubsectionAboveSkip` (0.75) and
+  `\CDossierRecordSubsectionBelowSkip` (0.375), and one new bound,
+  `\CDossierSubsectionNeedLines` (3). The below-token is pinned from both sides:
+  boundaries compose with `\addvspace`, which takes the maximum, so it has to
+  exceed both claims a subsection can meet beneath it — an entry run's 0.3125 and
+  the CV publication list's 0.25 — or it would never reach the page at any value,
+  and it has to stay under the section's own 0.4375 to read as tighter than its
+  parent. On the sixteenth grid that leaves exactly 0.375, which is also why one
+  pair of tokens serves both groupings: in neither case does the neighbour own
+  the boundary.
+
+  A section that opens *directly* with a subsection leaves the same gap as one
+  opening with an entry. The record classes render their headings without
+  `\@startsection`, so they get no `\if@nobreak` guard for free; the equivalent
+  is derived from `\prevdepth`, which the section rule leaves at its sentinel
+  until something is typeset. The needs-N-lines bound is suppressed there for the
+  same reason — the section's own bound already placed that material, and testing
+  it twice could only break the page between a section heading and the subsection
+  under it.
+
+  **Additive.** No existing document renders differently: nothing calls the new
+  command, and no existing token or default changed.
+
 - `make review-pagefill` reports how full every page of the layout corpus is,
   and what forced each page break: the page goal, the height used, the fill
   percentage, the penalty at the break taken, and the size of the atom that
@@ -716,6 +758,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#332]: https://github.com/amirhs1/CareerDossierTeX/issues/332
 [#333]: https://github.com/amirhs1/CareerDossierTeX/issues/333
 [#334]: https://github.com/amirhs1/CareerDossierTeX/issues/334
+[#337]: https://github.com/amirhs1/CareerDossierTeX/issues/337
 [#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340
 
 ## [0.7.0] - 2026-08-04

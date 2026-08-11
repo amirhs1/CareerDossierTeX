@@ -339,6 +339,45 @@ check_heading_hierarchy() {
   fi
 }
 
+# Issue #337: the record classes' second heading level, as the structure tree
+# sees it. check_heading_hierarchy above states the rule this enforces — an /H3
+# with no /H2 is a skipped level — but every fixture that runs it has zero /H3
+# elements, so its `h3 > 0' branch has never been reached by anything. This is
+# the fixture that reaches it, and it asserts the positive form rather than the
+# absence of a violation.
+#
+# Three counts, because the failures they separate are different. A subsection
+# that reused depth 2 gives the right total heading count and the wrong shape; a
+# subsection that opened no division encloses nothing; and a subsection whose
+# division replaced its parent's rather than nesting inside it leaves the section
+# count short. The fixture has two sections and three subsections, so the five
+# divisions are what nesting produces and four is what replacement produces.
+check_subsection_hierarchy() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+  local h1 h2 h3 sections
+
+  h1="$(grep -oaF '/S /section' "$pdf" | wc -l | tr -d '[:space:]')"
+  h2="$(grep -oaF '/S /subsection' "$pdf" | wc -l | tr -d '[:space:]')"
+  h3="$(grep -oaF '/S /subsubsection' "$pdf" | wc -l | tr -d '[:space:]')"
+  sections="$(grep -oaF '/S /Sect' "$pdf" | wc -l | tr -d '[:space:]')"
+
+  [ "$h1" -eq 1 ] \
+    || record_failure "$base has $h1 /H1-mapped heading(s) (the identity name), expected exactly 1"
+  [ "$h2" -eq 2 ] \
+    || record_failure "$base has $h2 /H2-mapped section heading(s), expected 2"
+  [ "$h3" -eq 3 ] \
+    || record_failure "$base has $h3 /H3-mapped subsection heading(s), expected 3"
+  [ "$sections" -eq 5 ] \
+    || record_failure \
+      "$base has $sections Sect division(s) around 2 sections and 3 subsections, expected 5"
+
+  grep -Fqa '/subsubsection [/H3' "$pdf" \
+    || record_failure "$base subsection is not role-mapped to H3"
+
+  check_heading_title "$base" "$pdf" 'Conference Papers'
+}
+
 check_two_page_furniture() {
   local base="$1"
   local pdf="$work/$base.pdf"
@@ -1013,6 +1052,24 @@ if compile_fixture letter-recipient-address.tex letter-recipient-address; then
   if [ "$have_verapdf" -eq 1 ]; then
     compile_fixture letter-recipient-address-ua2.tex letter-recipient-address-ua2 \
       && validate_ua2 letter-recipient-address
+  fi
+fi
+
+# The second heading level (issue #337). Outside the five-document loop for the
+# same reason as the fixtures above: one page, no continuation furniture.
+#
+# Everything this fixture is here for is invisible on the rendered page. The
+# heading has no rule and no size of its own, so a subsection that emitted a
+# second /H2 -- or no heading element at all -- would look exactly right and
+# would still flatten the hierarchy for anything reading the structure tree.
+echo "== cv-subsection =="
+if compile_fixture cv-subsection.tex cv-subsection; then
+  check_subsection_hierarchy cv-subsection
+  check_structure_text cv-subsection
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture cv-subsection-ua2.tex cv-subsection-ua2 \
+      && validate_ua2 cv-subsection
   fi
 fi
 

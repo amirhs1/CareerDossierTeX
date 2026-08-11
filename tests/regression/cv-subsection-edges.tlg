@@ -1,0 +1,21 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: guard-verdict-by-neighbour
+============================================================
+after-section-rule section-is-empty = true
+after-publication-list section-is-empty = false
+============================================================
+============================================================
+TEST 2: opening-gap-by-shape
+============================================================
+section-then-subsection list = userskip:12.69pt parskip:0.0pt parskip:0.0pt box penalty:10000 userskip:4.38pt parskip:0.0pt parskip:0.0pt box userskip:6.34pt parskip:0.0pt parskip:0.0pt box penalty:10000 penalty:0 userskip:5.44pt
+section-then-entry list = userskip:12.69pt parskip:0.0pt parskip:0.0pt box penalty:10000 userskip:4.38pt parskip:0.0pt parskip:0.0pt box userskip:6.34pt parskip:0.0pt parskip:0.0pt box userskip:0.91pt
+entry-then-subsection list = userskip:4.53pt parskip:0.0pt parskip:0.0pt box userskip:0.91pt userskip:-0.91pt userskip:10.88pt parskip:0.0pt parskip:0.0pt baselineskip:5.58pt box penalty:10000 penalty:0 userskip:5.44pt
+============================================================
+============================================================
+TEST 3: below-skip-owns-the-publication-list
+============================================================
+subsection-then-publications list = box penalty:10000 penalty:0 userskip:5.44pt userskip:-5.58pt penalty:-51 userskip:0.14pt userskip:5.44pt whatsit penalty:10000 userskip:-5.44pt userskip:5.44pt parskip:0.0pt parskip:0.0pt baselineskip:6.03pt box penalty:-51 userskip:7.25pt
+subsection-then-entry list = box penalty:10000 penalty:0 userskip:5.44pt parskip:0.0pt parskip:0.0pt baselineskip:6.24pt box userskip:0.91pt
+============================================================

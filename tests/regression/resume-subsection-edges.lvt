@@ -1,0 +1,212 @@
+% resume-subsection-edges.lvt — issue #337 record subsection boundaries.
+%
+% \CDossierSubsection is new on this class, and three of its four contracts are
+% invisible in the token values alone.
+%
+% 1. A section that opens *directly* with a subsection leaves the same gap as a
+%    section that opens with an entry: \CDossierRecordSectionBelowSkip, and not
+%    max(that, \CDossierRecordSubsectionAboveSkip). The record classes render
+%    their headings through the shared primitive rather than \@startsection, so
+%    they get no \if@nobreak guard for free and
+%    \__cdossier_components_section_is_empty:TF supplies the equivalent by
+%    reading \prevdepth. Anything at all typeset since the section rule turns
+%    the guard off again.
+%
+% 2. Where the guard is off, \CDossierRecordSubsectionAboveSkip owns the
+%    boundary. It must, or it would be the dead token issue #204 retired two
+%    others for.
+%
+% 3. \CDossierRecordSubsectionBelowSkip owns the boundary under the heading
+%    whether the next block is an entry run (opening at
+%    \CDossierRecordEntryAboveSkip, 0.3125) or a bullet list (opening at
+%    \CDossierRecordListEdgeAboveSkip, 0.25). That is the whole reason one token
+%    pair serves both, and it is why the ratio is 0.375 and could not be ported
+%    from \CDossierProseSubsectionBelowSkip, which ties the entry claim.
+%
+% 4. Issue #340, a second time. The shared heading primitive ends `\par\nobreak',
+%    and a break at glue is legal only when a non-discardable item precedes it,
+%    so glue placed straight after that penalty is not a breakpoint. A section
+%    escapes this because its rule puts a box between the two; a subsection has
+%    no rule, so it emits its own zero penalty instead. Without it a run of empty
+%    subsections has no legal breakpoint anywhere in it.
+%
+% The assertion for 1-3 is the vertical list itself, with every glue node's
+% width, rather than the \pagetotal differences resume-entry-edges.lvt uses.
+% \pagetotal cannot separate the two terms that differ here: a suppressed
+% above-gap leaves \prevdepth at the -1000pt sentinel, which also suppresses the
+% *interline* glue before the heading box, so a guarded and an unguarded opening
+% differ by the token difference plus a baselineskip correction. Reading the glue
+% directly reports each token where it lands and keeps the baselineskip glue
+% visible as its own node instead of folded into a total.
+%
+% The breakpoint counter for 4 is the one from resume-entry-edges.lvt.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertest_tokens:
+  {
+    \TYPE { section-below~=~ \dim_eval:n { \CDossierRecordSectionBelowSkip } }
+    \TYPE { subsection-above~=~
+      \dim_eval:n { \CDossierRecordSubsectionAboveSkip } }
+    \TYPE { subsection-below~=~
+      \dim_eval:n { \CDossierRecordSubsectionBelowSkip } }
+    \TYPE { entry-above~=~ \dim_eval:n { \CDossierRecordEntryAboveSkip } }
+    \TYPE { list-edge-above~=~
+      \dim_eval:n { \CDossierRecordListEdgeAboveSkip } }
+    \TYPE { subsection-need-lines~=~
+      \int_use:N \CDossierSubsectionNeedLines }
+    \TYPE { section-need-lines~=~ \int_use:N \CDossierSectionNeedLines }
+  }
+%% The guard's own verdict, reported where the subsection would read it. The
+%% \pagetotal differences below are the consequence; this is the decision, and
+%% it is stated separately so a future change that breaks the coupling to the
+%% section rule's closing \nointerlineskip fails on the cause rather than only
+%% on a number four lines further down.
+\cs_new_protected:Npn \cdossiertest_guard:n #1
+  {
+    \par
+    \__cdossier_components_section_is_empty:TF
+      { \TYPE { #1 ~ section-is-empty~=~ true } }
+      { \TYPE { #1 ~ section-is-empty~=~ false } }
+  }
+\NewDocumentCommand \cdossiertestGuard { m } { \cdossiertest_guard:n {#1} }
+\NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
+\ExplSyntaxOff
+\makeatletter
+%% The vertical list of \box9, one entry per node. Glue carries its width and
+%% its subtype, because the two glues that meet at a heading boundary are a
+%% `userskip' (the token, via \addvspace) and a `baselineskip' (TeX's own
+%% interline correction), and only the first is a token this project sets.
+%% Widths are reported in points to two decimals: the tokens are exact
+%% sixteenths of the body leading, so two decimals distinguish every one of them
+%% without freezing the scaled-point rounding. The rounding is done in
+%% arithmetic rather than with string.format because a format string needs a
+%% percent sign, which TeX reads as a comment and would silently truncate the
+%% chunk.
+\newcommand\cdossiertestList[1]{%
+  \TYPE{#1 list = \directlua{
+    local t = {}
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("glue") then
+        local pt = math.floor(n.width / 655.36 + 0.5) / 100
+        local kind = node.subtypes("glue")[n.subtype] or "userskip"
+        table.insert(t, kind .. ":" .. tostring(pt) .. "pt")
+      elseif n.id == node.id("penalty") then
+        table.insert(t, "penalty:" .. n.penalty)
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "box")
+      elseif n.id == node.id("rule") then
+        table.insert(t, "rule")
+      else
+        table.insert(t, node.type(n.id))
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+\newcommand\cdossiertestBreaks[1]{%
+  \TYPE{#1 legal-breakpoints = \directlua{
+    local legal = 0
+    local prev = nil
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("glue") then
+        if prev ~= nil
+           and prev.id ~= node.id("glue")
+           and prev.id ~= node.id("penalty")
+           and prev.id ~= node.id("kern") then
+          legal = legal + 1
+        end
+      elseif n.id == node.id("penalty") then
+        if n.penalty < 10000 then legal = legal + 1 end
+      end
+      prev = n
+    end
+    tex.sprint(legal)
+  }}%
+}
+\makeatother
+
+\begin{document}
+\START
+
+% The tokens the differences below resolve, for reading them against.
+\TEST{subsection-tokens}{
+  \cdossiertestTokens
+}
+
+% The guard's verdict in every position a subsection can arrive at. Only the
+% first is the section-opens-with-a-subsection case; an entry, a bullet list, and
+% a line of free prose each end it, and each is a separate mechanism reaching
+% \prevdepth, so each is stated rather than assumed to follow from the others.
+\TEST{guard-verdict-by-neighbour}{
+  \CDossierSection{Experience}
+  \cdossiertestGuard{after-section-rule}
+  \begin{CDossierEntry}[title = {Staff Engineer}]
+  \end{CDossierEntry}
+  \cdossiertestGuard{after-entry}
+  \CDossierSection{Skills}
+  \begin{CDossierItemize}
+    \item Shipped the thing.
+  \end{CDossierItemize}
+  \cdossiertestGuard{after-list}
+  \CDossierSection{Summary}
+  Free prose under a section heading.
+  \cdossiertestGuard{after-prose}
+}
+
+% Contract 1, and the shape it is defined against. `section-then-subsection' and
+% `section-then-entry' must open with the same userskip -- that equality *is* the
+% guard -- and `entry-then-subsection' is the same subsection with the guard off,
+% where \CDossierRecordSubsectionAboveSkip owns the boundary instead (contract 2).
+%
+% Removing the guard turns the first list's opening userskip into the
+% subsection's own above-skip, so it stops matching the second and starts
+% matching the third. Making the guard unconditional does the reverse to the
+% third, which would strand every later subsection against the entry above it.
+\TEST{opening-gap-by-shape}{
+  \setbox9=\vbox{\CDossierSection{S}\CDossierSubsection{T}}
+  \cdossiertestList{section-then-subsection}
+  \setbox9=\vbox{\CDossierSection{S}%
+    \begin{CDossierEntry}[title = {Staff Engineer}]\end{CDossierEntry}}
+  \cdossiertestList{section-then-entry}
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Staff Engineer}]\end{CDossierEntry}%
+    \CDossierSubsection{T}}
+  \cdossiertestList{entry-then-subsection}
+}
+
+% Contract 3. The gap below the heading is the same userskip whichever block
+% opens under it, because \CDossierRecordSubsectionBelowSkip beats both opening
+% claims: an entry run's \CDossierRecordEntryAboveSkip and a bullet list's
+% \CDossierRecordListEdgeAboveSkip. If it ever tied either of them, the token
+% would stop reaching the page and this pair of lists would stop differing when
+% it changed.
+\TEST{below-skip-owns-both-neighbours}{
+  \setbox9=\vbox{\CDossierSubsection{T}%
+    \begin{CDossierEntry}[title = {First Entry}]\end{CDossierEntry}}
+  \cdossiertestList{subsection-then-entry}
+  \setbox9=\vbox{\CDossierSubsection{T}%
+    \begin{CDossierItemize}\item First bullet.\end{CDossierItemize}}
+  \cdossiertestList{subsection-then-list}
+}
+
+% Contract 4. A run of empty subsections, the shape issue #340 filed against
+% empty sections. Every boundary in the run must stay a legal breakpoint; with
+% the subsection's own zero penalty removed the count collapses, because each
+% heading's \nobreak sits immediately before the glue that would otherwise carry
+% the break and the next subsection's \addvspace collapses into that same glue
+% rather than putting a box between them.
+\TEST{empty-subsection-run-breakpoints}{
+  \setbox9=\vbox{%
+    \CDossierSubsection{One}%
+    \CDossierSubsection{Two}%
+    \CDossierSubsection{Three}%
+  }
+  \cdossiertestBreaks{empty-run}
+}
+
+\END

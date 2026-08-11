@@ -291,6 +291,12 @@
 %% thin wrapper over the restyled unnumbered heading above rather than a second
 %% implementation: a statement numbers nothing, and one renderer means the
 %% tokens and the tagged structure cannot drift between the two spellings.
+%%
+%% Issue #337: the parity this claims is now real on both halves. Until then the
+%% record classes offered `\CDossierSection' and nothing between it and an entry,
+%% so only the section half of the sentence above was true. They now render a
+%% second level under the same name, from one shared renderer, for the same
+%% reason this class wraps one `\@startsection' twice.
 \NewDocumentCommand \CDossierSection { m }
   { \section* {#1} }
 \NewDocumentCommand \CDossierSubsection { m }
