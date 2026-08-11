@@ -16,15 +16,32 @@ documents from shared profile data.
 
 ## Establish the current state first
 
-At the start of a task:
+Some of this is unconditional and cheap. The rest scales with the change, and
+running all of it on a one-line docs fix costs more than the fix.
 
-1. Inspect the current branch, `git status --short`, and recent commits.
-2. Inspect the relevant files and available build/test commands.
-3. Identify the focused issue or PR, its milestone, its Project fields, and its
-   parent epic when it has one. Not every issue has a parent, and a small,
-   named set of undecided issues has no milestone either — everything else does.
-4. Confirm the requested work belongs to the active milestone.
-5. State material assumptions and keep the change limited to the requested scope.
+**Always, whatever the size of the change:**
+
+1. Inspect the current branch, `git status --short`, and recent commits. Another
+   session may have committed on the branch you are about to use, and untracked
+   files follow you across a checkout.
+2. Read the focused issue in full, including its acceptance criteria. An issue
+   annotated "partly landed" means part of it is already merged; read the
+   annotations before planning anything.
+3. Inspect the files the change touches and the entry points that cover them
+   (`make help`).
+4. State material assumptions and keep the change limited to the requested scope.
+
+**Scaling with the change:**
+
+5. Milestone, Project fields, and parent epic. These decide release scope and PR
+   metadata, and the `open-draft-pr` skill reads them at step 7 of the work
+   sequence in any case. Read them up front when the release boundary, the
+   public API, or the parent decomposition is genuinely in question; otherwise
+   read them once, at PR time.
+6. Confirm the work belongs to the active milestone whenever it adds, renames,
+   or retires a public name, or could plausibly belong to a later release.
+7. The canonical sources. Read the rows of the reading map below that apply, not
+   the whole list.
 
 The live worktree and current GitHub metadata take precedence over stale prose.
 If sources conflict, report the conflict instead of silently choosing one.
@@ -51,6 +68,38 @@ Use these canonical sources when they exist:
 - `manifest.txt` — the LPPL Work file set, and the complete list of modules
 - `gh label list --limit 100` — the allowed labels. The live repository set is
   the definition; no file in the tree defines it
+
+### Reading map: which of them a given change needs
+
+The list above is roughly 95,000 words. Reading all of it before every change is
+the single largest avoidable cost in this repository, and most rows do not apply
+to most changes: a spacing token has nothing to do with `docs/ATS-EXTRACTION.md`,
+and a tagging change has everything to do with it. Read the rows that apply.
+
+| Change kind | Beyond the always-row, read |
+|---|---|
+| **Always** | `Makefile` (through `make help`); at PR time `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, and `gh label list --limit 100` |
+| Token, spacing, or vertical rhythm | `docs/API.md` (the token tables), `CONTRIBUTING.md` § "Spacing tokens", `CHANGELOG.md` |
+| Layout, page break, or typography | `docs/API.md`, the `CONTRIBUTING.md` § for the review target you use, `CHANGELOG.md` |
+| Tagging or PDF structure | `docs/ATS-EXTRACTION.md`, `docs/API.md`, `CONTRIBUTING.md` § "Tagged-PDF suite" |
+| Extraction or reading order | `docs/ATS-EXTRACTION.md`, `CONTRIBUTING.md` § "Extraction round-trip test" |
+| Bibliography or Biber | `docs/API.md`, `docs/ARCHITECTURE.md` (the BibLaTeX boundary), `CONTRIBUTING.md` § "BibLaTeX/Biber fixture" |
+| Class or package option | `docs/API.md`, `docs/ARCHITECTURE.md`, `CHANGELOG.md`; plus `docs/MIGRATION.md` and `docs/ROADMAP.md` when it renames, retires, or moves a release boundary |
+| New or removed module | `manifest.txt`, `docs/ARCHITECTURE.md`, `README.md` |
+| Documentation only | the document itself; `README.md` when user-facing status changes; `CHANGELOG.md` only when the change is user-visible |
+| Agent tooling, skills, or sandbox | `AI-POLICY.md`, `CLAUDE.md`, `.agents/skills/`, `CONTRIBUTING.md` § "AI-assisted contributions" |
+| Build, test harness, or CI | `Makefile`, `CONTRIBUTING.md` § "Local builds", `.github/workflows/build.yml` |
+| CHANGELOG or release preparation | `.agents/skills/release-notes/reference.md`, `CHANGELOG.md`, `docs/ROADMAP.md` |
+
+Three things the map does not do:
+
+- It does not bound what you **run**. "Build and test" below still governs which
+  suites a change needs, and `make help` still owns the target names.
+- It does not bound which **source files** you read. "Module ownership" below
+  maps a concern to the module that owns it; read that module, not all ten.
+- It does not license reading nothing. A row that turns out to be wrong for a
+  particular change is a finding worth reporting — but "I read everything to be
+  safe" is the cost this map exists to remove.
 
 ## Non-negotiable rules
 
@@ -189,6 +238,22 @@ they redirect output to `build/` and keep the source tree free of artifacts:
 ```bash
 make check
 ```
+
+While iterating, four targets take a selector, so the one fixture that failed
+can be re-run without paying for the fifty ahead of it:
+
+```bash
+make regression TEST=base-diagnostics
+make layout FIXTURE=resume-two-page
+```
+
+`TEST` is an exact `l3build` test name. `FIXTURE` is a glob matched anywhere in
+a fixture's basename, accepted by `smoke`, `layout`, and `extract-test`;
+`tests/<suite>/run.sh --list` prints the available names and compiles nothing. A
+selector matching nothing fails the run rather than reporting a clean one, and a
+scoped run says so in its closing line. This is a development-loop convenience
+only: `make check` before the push is still the gate, and it and CI both invoke
+every suite unscoped.
 
 **`make help` is the authoritative list of individual targets.** This file does
 not restate it: a hand-maintained copy drifts, and the copy that used to sit

@@ -91,7 +91,12 @@ The project uses defense in depth:
   instruction file `CLAUDE.local.md`, which Claude must be able to load; and
 - the project configuration enables Claude Code's sandbox so, when supported
   and active in the effective settings, the same path restrictions also
-  constrain Bash and its child processes.
+  constrain Bash and its child processes — with one declared exclusion, `gh`,
+  which the draft-PR and Project-metadata workflow needs in order to reach
+  GitHub. The exclusion is matched against the command name, so it covers a `gh`
+  call that leads the invocation and not one nested inside a loop, subshell, or
+  command substitution; `CLAUDE.md` ("`gh` must lead the Bash invocation") holds
+  the operational consequence.
 
 These controls have limits. Project instruction files guide model behavior but
 do not provide a security boundary. Claude-specific settings do not constrain
