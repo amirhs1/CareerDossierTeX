@@ -13,13 +13,26 @@ Read and follow, in order:
 4. `scripts/setup-labels.sh`
 5. the focused GitHub issue and its current Project metadata
 
+## When this runs
+
+This skill is entered at step 7 of `AGENTS.md` "Default work sequence" — after
+the change has been implemented, verified, self-reviewed, and committed on a
+focused branch. It opens a pull request; it does not implement anything.
+
+So where a step below says *confirm*, the work itself belongs to the earlier
+sequence and should already be done. A step that turns up undone work is a
+finding: complete it on this branch before pushing, since the branch must be
+close-out-complete at the first push. It is not a licence to start the work
+here.
+
 ## Procedure
 
 1. Confirm the current branch is focused and is not `main`.
 2. Review `git status --short` and the complete branch-versus-base diff.
-3. Run relevant tests and record exact outcomes.
-4. Update the documentation the change requires, and `CHANGELOG.md` when the
-   change is user-visible.
+3. Confirm the relevant tests were run and record their exact outcomes for the
+   PR body. Re-run anything whose recorded result is older than the last commit.
+4. Confirm the documentation the change requires is updated, and `CHANGELOG.md`
+   when the change is user-visible.
 5. Build the PR title from `docs/NAMING-CONVENTION.md` and the PR body from the
    template below.
 6. Complete the AI-assistance section from the branch's actual commit trailers.
