@@ -37,7 +37,7 @@
 # Every combination must actually compile; a genuine compile failure aborts the
 # run. Overfull boxes, missing glyphs, font substitutions, and unresolved
 # references are instead collected as warnings, so one bad combination does not
-# stop the other eleven from being produced for review.
+# stop the other fifteen from being produced for review.
 #
 # Whether the rendered result reads well — whether `|' is the right mark at the
 # default size, whether gray metadata beside an upright separator is legible,
