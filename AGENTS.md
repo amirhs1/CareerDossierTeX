@@ -49,7 +49,8 @@ Use these canonical sources when they exist:
 - `CHANGELOG.md` — user-visible changes
 - `Makefile` — the build and test entry points an agent should actually run
 - `manifest.txt` — the LPPL Work file set, and the complete list of modules
-- `scripts/setup-labels.sh` — allowed labels
+- `gh label list --limit 100` — the allowed labels. The live repository set is
+  the definition; no file in the tree defines it
 
 ## Non-negotiable rules
 
