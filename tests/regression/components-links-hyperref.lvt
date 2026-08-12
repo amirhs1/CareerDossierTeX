@@ -1,0 +1,69 @@
+% components-links-hyperref.lvt — silence when hyperref is present (#329).
+%
+% The other half of tests/regression/components-links, which asserts that the
+% `links-inert' warning fires exactly once when hyperref is absent. The warning
+% must not fire at all when it is present, and that cannot be checked in the
+% same file: hyperref is a preamble decision, and the flag guarding the message
+% is global, so a later group could not distinguish silence-because-linked from
+% silence-because-already-warned.
+%
+% So this file is the same contact line under the supported configuration. It
+% renders five linked fields and one plain one, and its baseline carries the
+% branch marker and nothing else. A warning leaking into the linked branch —
+% or a guard that stopped depending on \href — shows up here as an extra line.
+%
+% Each helper is defined under \ExplSyntaxOn so the private names tokenize
+% correctly; catcodes cannot be switched inside a \TEST body.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+\usepackage{hyperref}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestHrefBranch
+  {
+    \cs_if_exist:NTF \href
+      { \TYPE{ href-present } }
+      { \TYPE{ degrades-to-plain-text } }
+  }
+\cs_new_protected:Npn \cdossiertestContactLine
+  {
+    \clist_map_inline:nn
+      { email , location , website , linkedin , github , orcid }
+      { \CDossierSetup{ ##1 = {} } }
+    \CDossierSetup
+      {
+        email    = {ada@example.com} ,
+        location = {Toronto} ,
+        website  = {ada.example} ,
+        linkedin = {ada-lovelace} ,
+        github   = {ada-lovelace} ,
+        orcid    = {0000-0002-1825-0097}
+      }
+    \__cdossier_components_contactline:
+  }
+\ExplSyntaxOff
+
+\begin{document}
+
+%% Render one contact line before the capture starts. The first typeset
+%% material in a file loads its fonts, and the resulting "External font cmex10"
+%% lines would otherwise sit in the baseline saying nothing about links — and
+%% would have to be regenerated on any unrelated font change.
+\cdossiertestContactLine
+
+\START
+
+\TEST{linked-contact-line-says-nothing}{
+  \cdossiertestHrefBranch
+  \cdossiertestContactLine
+}
+
+%% \CDossierLink and the ORCID iD reach the same guard by different routes, so
+%% both are exercised rather than assumed.
+\TEST{bodylink-says-nothing}{
+  \CDossierLink{example.org/ada/portfolio}
+}
+
+\END
+\end{document}

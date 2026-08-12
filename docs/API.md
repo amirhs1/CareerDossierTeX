@@ -1352,7 +1352,8 @@ somewhere else. Write `%20` if the space is genuinely part of the address.
 
 Without hyperref the command still prints the address as plain visible text, so
 the identifier is never lost; all four classes load hyperref, so the link is
-present in ordinary use.
+present in ordinary use. See
+[Without `hyperref`](#without-hyperref) for the warning that reports it.
 
 A `\CDossierLink` is never underlined, under either `medium`: its visible text
 is the address, so it already announces itself. See
@@ -1579,6 +1580,33 @@ The class must not assume that a displayed URL includes a protocol. The implemen
 Those fields cover the contact line. A link written into body text is
 [`\CDossierLink`](#cdossierlink); plain text and `\url` both fail on a long
 address, in different ways.
+
+### Without `hyperref`
+
+Every link the toolkit emits — the contact fields above, `\CDossierLink`, the
+ORCID iD, and the CV's manual publication identifiers — is emitted only when
+`hyperref` has supplied `\href`. Without it each one degrades to its visible
+address as plain text, so the identifier stays readable, selectable, and
+extractable; nothing in the PDF is clickable.
+
+All four classes load `hyperref`, so a document built on one of them is never in
+this state. It is reachable by loading `careerdossier-components` into another
+class, and there the degradation is otherwise invisible: the page looks
+finished. The package therefore warns once per document, at the first link that
+degrades, naming the cause and the effect:
+
+```text
+Package careerdossier-components Warning: Links are typeset as plain text
+because hyperref is not loaded.
+```
+
+Once, not once per field — a contact line with five linked fields, or a
+publication list with twenty identifiers, has a single cause. Load `hyperref`,
+or use one of the supplied classes, to silence it. Nothing about what is
+typeset changes either way.
+
+Introduced in `v0.8.0`
+([#329](https://github.com/amirhs1/CareerDossierTeX/issues/329)).
 
 ## Typography roles
 
@@ -2398,7 +2426,9 @@ The implementation may warn for:
 - unusually long contact fields;
 - a URL that cannot be normalized;
 - metadata overwritten by a later setup call;
-- fields accepted but not displayed by the active class.
+- fields accepted but not displayed by the active class; and
+- links degraded to plain text because `hyperref` is absent — once per
+  document, see [Without `hyperref`](#without-hyperref).
 
 Warnings should explain the likely effect and corrective action.
 

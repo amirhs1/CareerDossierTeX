@@ -1,82 +1,92 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 ============================================================
-TEST 1: web-gains-https-scheme-when-absent
+TEST 1: links-inert-warns-once-for-a-multi-field-contact-line
 ============================================================
-[https://github.com/ada]
-============================================================
-============================================================
-TEST 2: web-preserves-existing-scheme
-============================================================
-[http://ada.example]
+Package careerdossier-components Warning: Links are typeset as plain text because hyperref is not loaded.
 ============================================================
 ============================================================
-TEST 3: email-becomes-mailto-target
-============================================================
-[mailto:ada@example.com]
-============================================================
-============================================================
-TEST 4: orcid-identifier-gains-canonical-resolver-target
-============================================================
-[https://orcid.org/0000-0002-1825-0097]
-============================================================
-============================================================
-TEST 5: orcid-url-preserves-existing-scheme
-============================================================
-[https://orcid.org/0000-0002-1825-0097]
-============================================================
-============================================================
-TEST 6: link-degrades-without-hyperref
+TEST 2: links-inert-is-not-repeated-by-a-later-contact-line
 ============================================================
 degrades-to-plain-text
 ============================================================
 ============================================================
-TEST 7: linkedin-bare-handle-gains-canonical-address
+TEST 3: web-gains-https-scheme-when-absent
+============================================================
+[https://github.com/ada]
+============================================================
+============================================================
+TEST 4: web-preserves-existing-scheme
+============================================================
+[http://ada.example]
+============================================================
+============================================================
+TEST 5: email-becomes-mailto-target
+============================================================
+[mailto:ada@example.com]
+============================================================
+============================================================
+TEST 6: orcid-identifier-gains-canonical-resolver-target
+============================================================
+[https://orcid.org/0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 7: orcid-url-preserves-existing-scheme
+============================================================
+[https://orcid.org/0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 8: link-degrades-without-hyperref
+============================================================
+degrades-to-plain-text
+============================================================
+============================================================
+TEST 9: linkedin-bare-handle-gains-canonical-address
 ============================================================
 [linkedin.com/in/ada-lovelace] -> [https://linkedin.com/in/ada-lovelace]
 ============================================================
 ============================================================
-TEST 8: linkedin-domain-qualified-value-unchanged
+TEST 10: linkedin-domain-qualified-value-unchanged
 ============================================================
 [linkedin.com/in/ada-lovelace] -> [https://linkedin.com/in/ada-lovelace]
 ============================================================
 ============================================================
-TEST 9: linkedin-written-out-address-unchanged
+TEST 11: linkedin-written-out-address-unchanged
 ============================================================
 [https://www.linkedin.com/in/ada-lovelace/] -> [https://www.linkedin.com/in/ada-lovelace/]
 ============================================================
 ============================================================
-TEST 10: github-bare-handle-gains-canonical-address
+TEST 12: github-bare-handle-gains-canonical-address
 ============================================================
 [github.com/ada-lovelace] -> [https://github.com/ada-lovelace]
 ============================================================
 ============================================================
-TEST 11: github-domain-qualified-value-unchanged
+TEST 13: github-domain-qualified-value-unchanged
 ============================================================
 [github.com/ada-lovelace] -> [https://github.com/ada-lovelace]
 ============================================================
 ============================================================
-TEST 12: github-written-out-address-unchanged
+TEST 14: github-written-out-address-unchanged
 ============================================================
 [https://github.com/ada-lovelace] -> [https://github.com/ada-lovelace]
 ============================================================
 ============================================================
-TEST 13: scholar-bare-identifier-gains-canonical-address
+TEST 15: scholar-bare-identifier-gains-canonical-address
 ============================================================
 [scholar.google.com/citations?user=kukA0LcAAAAJ] -> [https://scholar.google.com/citations?user=kukA0LcAAAAJ]
 ============================================================
 ============================================================
-TEST 14: scholar-domain-qualified-value-unchanged
+TEST 16: scholar-domain-qualified-value-unchanged
 ============================================================
 [scholar.google.com/citations?user=kukA0LcAAAAJ] -> [https://scholar.google.com/citations?user=kukA0LcAAAAJ]
 ============================================================
 ============================================================
-TEST 15: scholar-written-out-address-unchanged
+TEST 17: scholar-written-out-address-unchanged
 ============================================================
 [https://scholar.google.com/citations?user=kukA0LcAAAAJ] -> [https://scholar.google.com/citations?user=kukA0LcAAAAJ]
 ============================================================
 ============================================================
-TEST 16: website-bare-value-is-not-canonicalized
+TEST 18: website-bare-value-is-not-canonicalized
 ============================================================
 [example] -> [https://example]
 ============================================================

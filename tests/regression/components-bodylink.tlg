@@ -35,4 +35,5 @@ breaks-anywhere
 TEST 5: bodylink-degrades-without-hyperref
 ============================================================
 degrades-to-plain-text
+Package careerdossier-components Warning: Links are typeset as plain text because hyperref is not loaded.
 ============================================================

@@ -356,6 +356,27 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   had no form to file from, and the two existing templates were optional because
   a blank issue was always offered alongside them.
 
+- A warning when `hyperref` is absent and the toolkit's links are therefore
+  typeset as plain text: `Links are typeset as plain text because hyperref is
+  not loaded.` ([#329])
+
+  Every link this toolkit emits — the contact fields, `\CDossierLink`, the ORCID
+  iD, and the CV's manual publication identifiers — is guarded on `\href` and
+  degrades to its visible address without it. That degradation is the right
+  behavior, and it was completely silent: no warning, no log line, and a page
+  that looks finished. An author found out by clicking a dead address in the
+  finished PDF.
+
+  It fires once per document, at the first link that degrades, rather than once
+  per field: a contact line with five linked fields and a publication list with
+  twenty identifiers have a single cause between them. All four classes load
+  `hyperref`, so no supported document sees it; it is reachable by loading
+  `careerdossier-components` into another class, which is the configuration the
+  guard already anticipated.
+
+  **No rendered change.** Neither branch typesets anything different from
+  before, and no class, option, key, or command changed.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -819,6 +840,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#312]: https://github.com/amirhs1/CareerDossierTeX/issues/312
 [#324]: https://github.com/amirhs1/CareerDossierTeX/issues/324
 [#328]: https://github.com/amirhs1/CareerDossierTeX/issues/328
+[#329]: https://github.com/amirhs1/CareerDossierTeX/issues/329
 [#330]: https://github.com/amirhs1/CareerDossierTeX/issues/330
 [#332]: https://github.com/amirhs1/CareerDossierTeX/issues/332
 [#333]: https://github.com/amirhs1/CareerDossierTeX/issues/333
