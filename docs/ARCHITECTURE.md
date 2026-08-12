@@ -1815,6 +1815,10 @@ CareerDossierTeX/
 │   └── config.toml
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
+│   │   ├── config.yml
+│   │   ├── bug_report.md
+│   │   ├── feature_request.md
+│   │   └── epic.md
 │   ├── workflows/
 │   │   ├── build.yml
 │   │   └── verapdf-scheduled.yml

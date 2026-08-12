@@ -152,6 +152,11 @@ A good implementation issue explains:
 
 Use focused issues that can be completed on one branch. Split work that becomes too broad.
 
+The templates in `.github/ISSUE_TEMPLATE/` encode that structure —
+`bug_report.md`, `feature_request.md`, and `epic.md`. File from one of them
+rather than a blank body; blank issues are disabled. From the command line:
+`gh issue create --template feature_request.md`.
+
 ### Bug reports
 
 Include:

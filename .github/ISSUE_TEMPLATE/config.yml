@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contribution guide
+    url: https://github.com/amirhs1/CareerDossierTeX/blob/main/CONTRIBUTING.md
+    about: Read the issue, branch, test, and pull-request workflow before filing.
+  - name: Naming convention
+    url: https://github.com/amirhs1/CareerDossierTeX/blob/main/docs/NAMING-CONVENTION.md
+    about: Issue, epic, branch, commit, milestone, and release naming.
