@@ -51,6 +51,7 @@ rows that apply.
 | Change kind | Beyond the always-row, read |
 |---|---|
 | **Always** | `Makefile` (through `make help`); at PR time `AI-POLICY.md` ("Attribution" — every PR discloses), `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, and `gh label list --limit 100` |
+| **Any behavior change** | `CONTRIBUTING.md` § "Coverage expectations" (the test coverage matrix) |
 | Token, spacing, or vertical rhythm | `docs/API.md` (the token tables), `CONTRIBUTING.md` § "Spacing tokens: reporting a value is not rendering a gap", `CHANGELOG.md` |
 | Layout, page break, or typography | `docs/API.md`, the `CONTRIBUTING.md` § for the review target you use, `CHANGELOG.md` |
 | Tagging or PDF structure | `docs/ATS-EXTRACTION.md`, `docs/API.md`, `CONTRIBUTING.md` § "Tagged-PDF suite" |
