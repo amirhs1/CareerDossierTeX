@@ -27,7 +27,7 @@ here.
 ## Procedure
 
 1. Confirm the current branch is focused and is not `main`.
-2. Confirm the close-out inspection `AGENTS.md` ("The first push is a
+2. Confirm the close-out inspection `reference.md` ("The first push is a
    commitment") requires is done: `git status --short` read, and the complete
    branch-versus-base diff reviewed with no unrelated files, generated
    artifacts, secrets, private data, or accidental deletions. Re-read the diff

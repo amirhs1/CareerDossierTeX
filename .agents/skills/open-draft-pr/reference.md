@@ -50,9 +50,35 @@ and preserve the existing remote value until the maintainer decides.
 
 ## Before opening a draft PR
 
-The branch must be **close-out-complete** before the first push — see
-`AGENTS.md` "The first push is a commitment", which is the canonical statement
-of this gate. The list below is that gate applied to opening a PR.
+### The first push is a commitment
+
+The maintainer's merge trigger is green CI. A branch that arrives incomplete is
+therefore either approved before its missing parts land, or loses them with the
+deleted branch. Push only a **close-out-complete** branch — one that needs
+nothing further before it could be approved. This section is the canonical
+statement of that gate, and `AGENTS.md` "Git and draft PR policy" points here.
+
+An agent that wants early signal runs `make check` locally. It does not push a
+partial branch to borrow CI.
+
+One narrow exception: a fact that can only be read from a CI artifact — the
+TeX Live release behind a newly pinned digest, per `CONTRIBUTING.md` "Bumping
+the pinned TeX Live image" — is recorded in the PR after the run. The branch
+still arrives complete in every other respect; the exception is the one
+recorded value, not the close-out.
+
+**Green CI is not a completion signal.** The checks build and test LaTeX. No
+check reads the PR body's `AI assistance` section, `CHANGELOG.md`, the
+documentation rule 7 requires, or the Project fields — precisely the items most
+likely to be missing. A green run therefore carries no information about them,
+and it is not the author's attestation that they are done.
+
+Anything genuinely discovered after a push — a CI-only failure, a real defect —
+goes in the **first line of the next message**, not its last paragraph. A
+discovery that falls outside the issue's scope becomes a follow-up issue rather
+than extra commits that move the branch's endpoint.
+
+### The gate applied to opening a PR
 
 Confirm:
 
@@ -72,9 +98,8 @@ Confirm:
 - API, docs, design, and accessibility impacts are documented;
 - the PR title follows `docs/NAMING-CONVENTION.md`.
 
-Nothing on this list may be deferred to a follow-up commit after the push.
-Green CI does not discharge any of it: no check reads the `AI assistance`
-section, `CHANGELOG.md`, the documentation, or the Project fields.
+Nothing on this list may be deferred to a follow-up commit after the push, and
+green CI discharges none of it.
 
 ## PR body
 

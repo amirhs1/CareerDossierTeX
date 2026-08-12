@@ -1928,7 +1928,7 @@ that affects output.
 ## 13. Documentation requirements
 
 Keep documentation in sync with behaviour, in the same change; `CONTRIBUTING.md`
-("Update … when") and `AGENTS.md` map each kind of change to the doc it belongs
+("Documentation requirements") maps each kind of change to the doc it belongs
 in. This guide owns one of those docs: the font, extraction, and tagging policy
 that `docs/ARCHITECTURE.md` summarizes from here.
 

@@ -288,6 +288,13 @@ identical. Most jobs run the same `make` target you would; `extraction`,
 target itself wraps, with the empty selector described below. If you change a
 command in one place, change it in the other.
 
+Target and job names overlap but are not in bijection, so do not derive one from
+the other. The extraction and bibliography *targets* are `extract-test` and
+`bibliography-test`, while the matching *jobs* are `extraction` and
+`bibliography`; job `cv` runs `make academic-cv academic-bibliography` and job
+`statement` runs `make statements`; and `examples`, `check`, `test`, `clean`,
+and every `review-*` target have no job at all.
+
 ### Scoping a suite while you iterate
 
 A suite that only runs whole is a suite you pay for whole. A failure in the
@@ -765,7 +772,8 @@ records a bug as the expected result. Whenever you save or regenerate a baseline
    change is one you meant to make;
 3. commit the baseline in the same change as the behavior it describes.
 
-Never regenerate a baseline merely to make a red suite green.
+Never regenerate a baseline merely to make a red suite green. A `.tlg` may echo
+the same value several times; regenerate every affected line, not the first one.
 
 ### The harness precedes the tests that need it
 
@@ -782,11 +790,32 @@ Changes affecting a shared package should test every affected class. There are
 four: résumé, cover letter (industry and academic families), academic CV, and
 statement.
 
-`AGENTS.md` ("Build and test") states the coverage matrix — which document
-families, required and optional fields, engine and option errors, extraction,
-tagging, links, and bibliography cases a change has to cover. It is the one
-statement of that matrix and is not summarized here, because a summary is what
-drifts.
+This is the one statement of the coverage matrix — which document families,
+required and optional fields, engine and option errors, extraction, tagging,
+links, and bibliography cases a change has to cover. Nothing summarizes it
+elsewhere, because a summary is what drifts. Cover the relevant parts:
+
+- each affected document family: résumé, industry letter, academic letter,
+  academic CV, and each affected statement `type`;
+- missing required `name` with a clear error, per affected class;
+- missing optional `phone` and `website` without stray separators;
+- long URL or contact field, and contact-line wrapping;
+- two-page output, page furniture, and single-page suppression;
+- text extraction and logical reading order, across the supported extractors;
+- copy-paste integrity of any URL or e-mail address a change touches: no pieces
+  sharing one visual line, and a wrapped address reassembles exactly
+  (`make links`);
+- link-annotation action types after any change that emits a link: every
+  annotation carries a `/S/URI` action and never a `/S/GoToR` remote-PDF one
+  (`make annotations`). The page, the extracted text, and the `links` invariant
+  all stay correct when this one is wrong, so no other suite covers it;
+- unsupported-engine error;
+- every option's accepted and rejected values, including the error naming the
+  accepted values, and rejection reported exactly once;
+- all affected classes after changes to a shared package;
+- tagged and untagged output after changes to tagging or shared packages; and
+- bibliography sorting and field precedence after `careerdossier-biblatex.sty`
+  or Biber-facing changes.
 
 Example extraction command:
 
@@ -1021,7 +1050,8 @@ review is manual by nature and is not automated by this suite.
 veraPDF gate is always skipped there — building it from source costs several
 minutes that a per-push job should not pay. A separate weekly
 `verapdf-scheduled` workflow builds veraPDF from a pinned commit and runs the
-same gate; see "Pinned dependencies" below and
+same gate. Do not describe a pull request as PDF/UA-validated on the strength of
+the PR checks alone; see "Pinned dependencies" below and
 [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) section 7.1.
 
 ### Option lint
@@ -1298,10 +1328,11 @@ Not every warning must become a failing CI check immediately. First determine wh
 
 When layout changes:
 
-- inspect the affected PDFs;
+- inspect the affected PDFs, including rendered pages and any clipping;
 - compare them with the current baseline;
 - check page breaks;
 - check long links and contact lines;
+- check print and grayscale behavior;
 - attach or link a preview in the pull request.
 
 ## Coding conventions
@@ -1330,10 +1361,11 @@ Do not use private commands in examples or documentation.
 
 ### Package responsibility
 
-Place code according to ownership. `AGENTS.md` ("Module ownership") carries the
-concern-to-module map, the dependency direction, and the two standing rules
-about page geometry and the CV's independence from BibLaTeX;
-`docs/ARCHITECTURE.md` has the per-file detail. Neither is reproduced here.
+Place code according to ownership. `docs/ARCHITECTURE.md` ("File
+responsibilities") carries the concern-to-module map and the per-file detail,
+and `AGENTS.md` ("Module ownership") the dependency direction and the two
+standing rules about page geometry and the CV's independence from BibLaTeX.
+Neither is reproduced here.
 
 One rule this guide adds: do not duplicate contact-line logic inside the
 classes.
@@ -1553,6 +1585,7 @@ The build workflow should:
 - compile every supported example;
 - fail when compilation fails;
 - upload PDFs and logs as artifacts;
+- keep its commands locally reproducible where practical;
 - pin every container and third-party action to an immutable reference.
 
 ### What actually gates a merge
