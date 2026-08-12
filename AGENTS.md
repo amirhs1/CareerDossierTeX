@@ -239,21 +239,26 @@ they redirect output to `build/` and keep the source tree free of artifacts:
 make check
 ```
 
-While iterating, four targets take a selector, so the one fixture that failed
+While iterating, five targets take a selector, so the one fixture that failed
 can be re-run without paying for the fifty ahead of it:
 
 ```bash
 make regression TEST=base-diagnostics
 make layout FIXTURE=resume-two-page
+make tagging FIXTURE=cv-subsection
 ```
 
 `TEST` is an exact `l3build` test name. `FIXTURE` is a glob matched anywhere in
-a fixture's basename, accepted by `smoke`, `layout`, and `extract-test`;
-`tests/<suite>/run.sh --list` prints the available names and compiles nothing. A
-selector matching nothing fails the run rather than reporting a clean one, and a
-scoped run says so in its closing line. This is a development-loop convenience
-only: `make check` before the push is still the gate, and it and CI both invoke
-every suite unscoped.
+a fixture's basename, accepted by `smoke`, `layout`, `extract-test`, and
+`tagging`; `tests/<suite>/run.sh --list` prints the available names and compiles
+nothing. A selector matching nothing fails the run rather than reporting a clean
+one, and a scoped run says so in its closing line. This is a development-loop
+convenience only: `make check` before the push is still the gate, and it and CI
+both invoke every suite unscoped.
+
+`tagging` selects by fixture *group* rather than by file, because a group's
+`-untagged` and `-ua2` companions are checked against its base fixture and
+assert nothing apart from it; its twelve groups are backed by 37 `.tex` files.
 
 **`make help` is the authoritative list of individual targets.** This file does
 not restate it: a hand-maintained copy drifts, and the copy that used to sit

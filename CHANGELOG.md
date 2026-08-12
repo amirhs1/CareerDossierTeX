@@ -316,6 +316,38 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   and `NOT a full run`. A new `tests/lint/run-fixture-filter.sh`, in the
   sub-second `lint` slot, holds all of that to account.
 
+- The tagging suite becomes the fifth: `make tagging FIXTURE=<pattern>` runs
+  only the matching fixture groups. ([#367])
+
+  It was left out of [#359] deliberately, and it is the one most worth having.
+  The suite is the second-slowest of the five and the one this repository
+  iterates on most — [#28], [#77], [#161], [#268], [#302], and [#305] all landed
+  against it, each paying the full run per attempt. Measured on one machine:
+  `make tagging` 172 s, `make tagging FIXTURE=cv-subsection` 15.4 s.
+
+  Its selectable unit is the fixture **group**, not the `.tex` file. A group is
+  a base fixture plus the companions that assert nothing on their own — its
+  `-untagged` build, which exists to be compared against the tagged one, and its
+  `-ua2` build, which shares the group's `-body.inc` so a veraPDF verdict
+  describes the output the structural checks assert on. Selecting those apart
+  from each other would let a run assert less than it appears to, so twelve
+  groups are backed by 37 `.tex` files. `tests/tagging/run.sh --list` prints the
+  group names and compiles nothing.
+
+  Because of that shape, the universe check the other four suites get — the
+  selectable names are exactly the `.tex` files in the directory — would assert
+  something false here. `tests/lint/run-fixture-filter.sh` instead requires every
+  group to own a `<group>.tex` and every `.tex` to resolve to exactly one group,
+  which fails on a group added without files, a file added without a group, and
+  a name that resolves two ways.
+
+  A scoped run also distinguishes a gate that is unavailable from a fixture that
+  was never selected: a selected group whose only path is behind a missing tool
+  is reported under `SELECTED BUT NOT RUN`, rather than counting as a pass.
+
+  **No change without a selector.** `make check` and the `tagging` CI job invoke
+  the suite exactly as before, and `.github/workflows/build.yml` is untouched.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -786,6 +818,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#337]: https://github.com/amirhs1/CareerDossierTeX/issues/337
 [#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340
 [#359]: https://github.com/amirhs1/CareerDossierTeX/issues/359
+[#367]: https://github.com/amirhs1/CareerDossierTeX/issues/367
 
 ## [0.7.0] - 2026-08-04
 

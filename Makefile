@@ -29,15 +29,16 @@
 # is what keeps it free of the poppler dependency the rest of the layout work
 # carries.
 #
-# Scoping a suite while developing (issue #359). `regression`, `smoke`,
-# `layout`, and `extract-test` each accept an optional selector, and with no
-# selector run exactly what they ran before — which is what `check` and CI
-# invoke, so neither is affected:
+# Scoping a suite while developing (issues #359 and #367). `regression`,
+# `smoke`, `layout`, `extract-test`, and `tagging` each accept an optional
+# selector, and with no selector run exactly what they ran before — which is
+# what `check` and CI invoke, so neither is affected:
 #
 #   make regression TEST=base-diagnostics     one l3build test, by exact name
 #   make smoke      FIXTURE=bad-muted         every fixture matching the pattern
 #   make layout     FIXTURE='resume-*'        pattern anchored at the start
 #   make extract-test FIXTURE=statement
+#   make tagging    FIXTURE=cv-subsection     one tagged-PDF fixture group
 #
 # The two spellings are not interchangeable, which is why they are not one name.
 # `TEST` is passed through to `l3build check <name>`, which takes an exact test
@@ -45,6 +46,10 @@
 # plain word behaves as a substring search. A `FIXTURE` pattern matching nothing
 # fails the run rather than reporting a clean one; `tests/<suite>/run.sh --list`
 # prints the available names and compiles nothing.
+#
+# `tagging` selects by fixture *group* rather than by file: its 12 groups are
+# backed by 37 .tex files, because a group's `-untagged` and `-ua2` companions
+# are checked against the base fixture and mean nothing apart from it.
 #
 # `resume`, `letter`, `academic-cv`, `academic-bibliography`, `academic-letter`,
 # and `statements` write their PDFs, logs, and other latexmk output under the
@@ -162,8 +167,8 @@ metadata: ## Default-path PDF metadata (/Lang) fixtures
 annotations: ## Link-annotation action types (/S/URI, never /S/GoToR)
 	tests/annotations/run.sh
 
-tagging: ## Opt-in tagged-PDF structure fixtures
-	tests/tagging/run.sh
+tagging: ## Opt-in tagged-PDF structure fixtures; FIXTURE=<pattern> scopes it
+	tests/tagging/run.sh "$(FIXTURE)"
 
 clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@l3build clean >/dev/null 2>&1

@@ -341,13 +341,14 @@ fiftieth of fifty-four layout fixtures used to cost the forty-nine compiles
 ahead of it — the whole suite's wall time to learn one thing — and that cost is
 what pushes a development loop towards guessing instead of checking.
 
-Four targets take an optional selector:
+Five targets take an optional selector:
 
 ```bash
 make regression TEST=base-diagnostics
 make smoke FIXTURE=bad-medium
 make layout FIXTURE=resume-two-page
 make extract-test FIXTURE=statement
+make tagging FIXTURE=cv-subsection
 ```
 
 `TEST` is passed through to `l3build check <name>` and is an exact test name.
@@ -376,6 +377,19 @@ Three properties make this safe to trust:
 Scoping is a development-loop convenience and nothing more. `make check` before
 you push is still the gate, and a scoped run is not a test result for the PR
 body.
+
+`make tagging` is the one whose selectable unit is not the `.tex` file but the
+fixture **group**: `resume`, `cv-subsection`, `biblatex-ua2`. A group is a base
+fixture plus the companions that assert nothing on their own — `-untagged`,
+which exists to be compared against the tagged build, and `-ua2`, which shares
+the group's `-body.inc` so a veraPDF verdict describes the output the structural
+checks assert on. Selecting those separately would let a run assert less than it
+appears to, so the twelve groups are backed by 37 `.tex` files.
+
+That suite also has gates that can be unavailable (veraPDF, MuPDF, Biber,
+PDFKit). A scoped run that selects a group whose only path is behind a missing
+gate reports it under `SELECTED BUT NOT RUN` rather than letting "not selected"
+and "selected, checked nothing" print as the same blank space.
 
 `tests/lint/run-fixture-filter.sh` holds this contract to account and runs in
 the `lint` slot; see "Option lint" below.
