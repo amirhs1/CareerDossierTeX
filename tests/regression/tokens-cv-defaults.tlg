@@ -9,3 +9,6 @@ line-break-flexibility=shared
 hyphen-penalty=50
 ex-hyphen-penalty=50
 bottom-fill=raggedbottom
+top-skip=12.0pt
+page-builder-tolerance=none
+section-penalty=-300

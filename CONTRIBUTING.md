@@ -686,8 +686,9 @@ page is normal for the same reason and is excluded too.
 as a `page fill:` line and enforced against a floor held in `run.sh`.
 
 **The floor is a ratchet, not a fill policy.** *How full should a page be* is a
-design question; it belongs to #333 and its successor #351, and neither has
-answered it. The floor asks the narrower question the committed corpus already
+design question; #333 closed without setting a value, and #351 — which owned the
+one route that would have lifted the outlier — built it, measured it, and
+declined it. The floor asks the narrower question the committed corpus already
 answers: may a page get worse than anything the project has deliberately
 accepted? One governed page sits at 86.9% and every other at 92.9% or above, so
 the floor runs through the gap between the single accepted outlier and the rest.
@@ -704,7 +705,8 @@ A fixture whose accepted state sits below the floor declares its own:
 
 `statement-two-page` is the only one that does. Its 86.9% is the prose-family
 hole #342 swept over seven penalty values and closed with no change, and which
-#351 now owns; the fixture carries the reasoning at the directive. Putting the
+#351 then declined to close by other means; the fixture carries the reasoning at
+the directive, and the figure is accepted rather than pending. Putting the
 exemption in the fixture means whoever next changes that family's pagination
 sees it, instead of it hiding inside a global number chosen low enough to
 accommodate it.
@@ -712,8 +714,9 @@ accommodate it.
 **A declaration that is no longer needed fails the run.** When every governed
 page of a declaring fixture clears the *global* floor, the runner reports
 `EXPIRED PAGE-FILL FLOOR` and asks for the line's removal — so a stale exemption
-cannot go on silently suppressing the floor for its fixture. Nothing has to
-remember to delete it when #351 lands.
+cannot go on silently suppressing the floor for its fixture. #351 has since
+landed and declined the change, so the one declaration stands; the check remains
+for whatever later change does close that hole.
 
 To explore a candidate value against the corpus, or to re-prove either failure
 mode:

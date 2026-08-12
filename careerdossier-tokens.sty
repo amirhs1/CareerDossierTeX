@@ -200,6 +200,23 @@
 %% bottom-fill state of each of the four classes, so a class that later takes
 %% `twoside' or `twocolumn' fails a baseline rather than changing the page
 %% silently.
+%%
+%% Issue #351 asked for the rule that would dominate both outcomes -- fill the
+%% page unless doing so strands a line. It was specified, built, measured, and
+%% declined. What it needs is not a token: LaTeX's \raggedbottom leaves \topskip
+%% rigid and puts its fil in \@textbottom, which the output routine inserts at
+%% shipout, so the page builder never sees it. Plain TeX's \raggedbottom is
+%% `\topskip 10pt plus 60pt' -- the same ragged bottom, with the tolerance where
+%% the builder does see it. One line therefore reopens all of the above, which is
+%% why the state is now guarded rather than assumed: the `tokens-*-defaults'
+%% baselines record \topskip and \@secpenalty beside the bottom-fill state, so a
+%% package that supplies either cannot switch this calibration on in silence.
+%%
+%% Declined because the tolerance does not keep the guarantee, it prices it. The
+%% fill it recovers is still bought one-for-one with a stranded line, and the
+%% same tolerance makes LaTeX's -300 \@secpenalty live, which moves breaks
+%% *earlier* and costs two shipped examples 11.8 points of page-one fill.
+%% docs/ARCHITECTURE.md ("Page-break penalties") holds the measurements.
 \int_new:N \CDossierBrokenPenalty
 \int_set:Nn \CDossierBrokenPenalty { 10000 }
 \int_new:N \CDossierClubPenalty

@@ -797,18 +797,84 @@ respond; permitting recovers all of it and introduces one club line and two wido
 lines, one per fixture recovered. Because the two move together with no value in
 between, the choice is the rule itself rather than its strength, and the project
 keeps the white space. A `\raggedbottom` document ending a page short is the
-posture the toolkit already takes everywhere else. The alternative that would
-dominate both — requiring two lines on each side of the break — is not blocked by
-a missing primitive. eTeX's `\clubpenalties` and `\widowpenalties` take a count
-and that many per-line values, and both work under LuaTeX. What blocks it is the
-constant badness above: with every value below 10000 meaning "permitted", a
-graduated list can only state a *stricter* minimum, which fills less rather than
-more. Making the rule conditional — fill the page unless doing so strands a line
-— requires the page builder to see two different costs, so it requires stretch in
-the vertical list while the page is being built, which the rigid-token rule above
-rules out. That makes it a change to the vertical rhythm rather than to the
-penalties, which is why it is tracked separately as #351 and not as planned work
-here.
+posture the toolkit already takes everywhere else.
+
+**The conditional rule, and why it is declined.** The alternative that would
+dominate both — fill the page unless doing so strands a line — was specified,
+built, and measured (#351). It is declined, and the reasoning is recorded here
+because the change is one line long and will be proposed again.
+
+Two things it does *not* need. It does not need a new primitive: eTeX's
+`\clubpenalties` and `\widowpenalties` take a count and that many per-line
+values and both work under LuaTeX, though on their own they can only state a
+*stricter* minimum, which fills less rather than more. And it does not need a
+stretchable vertical token. The stretch the page builder is missing has a
+simpler source: LaTeX's `\raggedbottom` leaves `\topskip` rigid and puts its
+`plus .0001fil` in `\@textbottom`, which the output routine inserts when the
+column is shipped, so the builder never sees it. Plain TeX's `\raggedbottom` is
+`\topskip 10pt plus 60pt` — the same ragged bottom, with the tolerance where the
+builder *does* see it, and invisible on the page either way because the fil in
+`\@textbottom` still absorbs the whole shortfall at `\vpack` time.
+
+Supplied that way, the mechanism works exactly as the issue predicted. Page
+badness becomes finite — the 85.51pt hole on `statement-two-page` scores `b=4518`
+at 24pt of tolerance against `b=10000` with none — and the club and widow values
+become a genuine dial, whose policy is *strand a line only when refusing would
+leave more than* `S · (p/100)^⅓` *points blank*. Three measurements then decide
+against it.
+
+**One — the tolerance buys nothing by itself.** With the pair still at `10000`
+it never gains a page a single point of fill. Across all twenty committed
+two-page layout fixtures and the shipped examples, nothing fills more than it
+does today, and `statement-two-page` and the two letter fixtures are
+byte-identical. That is structural rather than a tuning result: the set of legal
+breakpoints is unchanged, and the fullest legal break already wins. Tolerance
+only changes how the builder *scores* breaks it was already choosing between, so
+every point of fill still has to be bought by permitting the break — the
+one-for-one trade above, now behind a threshold instead of a switch.
+
+**Two — the tolerance is not free elsewhere.** It also makes `\@secpenalty` live.
+LaTeX puts that `-300` before every `\section`, and under constant badness it is
+inert, because a bonus cannot break a tie in which every candidate already costs
+`deplorable`. Live, it wins whenever the hole it opens scores under badness
+`300`, which is up to `1.44 · S` points. Measured at `S = 60pt`: the shipped
+`artist-statement` and `teaching-philosophy-statement` fall from 98.9% of page
+one to **87.1%**, turning a 7.38pt hole into an 84.01pt one — the same defect the
+route exists to remove, introduced into two user-facing documents. Rescuing it
+means also setting `\@secpenalty` to `0`, so the classes stop preferring a
+section boundary as a page break: a second, unrelated behaviour change bought to
+pay for the first.
+
+**Three — what survives buys one fixture.** With `\@secpenalty` neutralised and
+the threshold at roughly three lines (`S = 60pt`, `p = 30`), across the eight
+documents measured that way exactly one moves: `statement-two-page` goes from
+86.9% of page one to 98.6%, closing 85.51pt of blank to 8.88pt — and gains the
+widow line the rule exists to prevent, reported by the same
+`page-break-check.awk` that `make layout` asserts with. The other seven —
+`letter-two-page`, `letter-a4-two-page`, `statement-a4-two-page`,
+`letter-academic-two-page`, and the `research`, `artist` and
+`teaching-philosophy` statement examples — are byte-identical. That is the
+conditionality working: the guarantee is kept where refusing is cheap and traded
+where it is expensive.
+
+That is the whole gain, and it points the other way once the corpus is read
+properly. On the eleven shipped examples the club/widow rule costs **nothing** —
+permitting the break everywhere leaves every one of them byte-identical. The
+13.1% is a property of a stress fixture built to produce it, not of any document
+the toolkit ships. So the route does not keep the guarantee and stop paying for
+it; it prices the guarantee, and the price list is one stress fixture trading
+white space for a stranded line, against a second behaviour change and two
+coupled parameters neither of which means anything alone.
+
+The toolkit keeps the white space. It is visible, an author can close it
+deliberately with a `\newpage` or a reworded sentence, and it is already guarded
+by a declared page-fill floor; a stranded line is none of those, and the detector
+that would catch it was blind for most of its life (#348). Conditionality would
+also dissolve the negative controls that made it honest: a shipped `\clubpenalty`
+of `30` and a control that sets `0` are the same policy, so the control stops
+being one. The `tokens-*-defaults` baselines now record `\topskip` and
+`\@secpenalty` beside the bottom-fill state, so a package that supplies either
+fails a baseline rather than switching this calibration on in silence.
 
 #### Hyphenation
 

@@ -13,11 +13,16 @@
 % \widowpenalty pair at 10000, which leaves a paragraph of three lines or fewer
 % with no legal interior break at all. #342 swept that pair over seven values
 % and closed with no change: below 10000 the fill gained is paid one for one in
-% stranded lines. The successor question is a vertical-rhythm change, open as
-% #351, and this figure is what it has to move.
+% stranded lines. #351 then built the successor — page-builder tolerance, which
+% turns the pair into a conditional dial — measured it, and declined it: the
+% dial closes this hole to 8.88pt and gains the widow line the rule exists to
+% prevent, while the same tolerance costs two shipped examples 11.8 points of
+% page-one fill. So this figure is accepted rather than pending, and the reason
+% it is not a defect is that the eleven shipped examples lose nothing to the
+% rule at all — see docs/ARCHITECTURE.md, "Page-break penalties".
 %
-% Delete this line when it does. The runner fails a declaration that is no
-% longer needed, so nothing has to remember to.
+% Delete this line if a later change closes the hole anyway. The runner fails a
+% declaration that is no longer needed, so nothing has to remember to.
 % PAGEFILLFLOOR: 85
 \documentclass[type=research]{careerdossier-statement}
 \CDossierSetup{

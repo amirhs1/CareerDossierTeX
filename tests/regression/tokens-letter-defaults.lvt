@@ -72,9 +72,26 @@
     \fi
   \endgroup
 }
+%% Issue #351: the club/widow decision rests on two more inherited quantities,
+%% and the toolkit sets neither of them either. A rigid \topskip is what leaves
+%% the page builder with no stretch to judge a short page on, and \@secpenalty
+%% is the -300 bonus before every section that becomes live, and moves breaks
+%% *earlier*, the moment it gains some. careerdossier-tokens.sty states the
+%% decision at \CDossierClubPenalty; recording both values here is what
+%% stops a later package that supplies either from reopening #342 in silence.
+\newcommand\cdossiertestBuilderTolerance{%
+  \TYPE{top-skip=\the\topskip}%
+  \ifdim\gluestretch\topskip=\z@
+    \TYPE{page-builder-tolerance=none}%
+  \else
+    \TYPE{page-builder-tolerance=present}%
+  \fi
+  \TYPE{section-penalty=\the\@secpenalty}%
+}
 \makeatother
 \begin{document}
 \START
 \cdossiertestDefaults
 \cdossiertestBottomFill
+\cdossiertestBuilderTolerance
 \END
