@@ -523,6 +523,15 @@ class default, so each visible difference is attributable to the two options in
 the filename (`<type>-<entrymeta>-<muted>.pdf`). This is what separates it from
 `review-matrix`, which sweeps size and margin with the semantic options fixed.
 
+A class default is not always what the source fixture declares: the CV fixture
+names `fontsize=11pt` while its class defaults to `12pt`, so the eight `cv-*.pdf`
+are one type size larger than the fixture they are built from and the eight
+`resume-*.pdf` are not. `review-record.txt` therefore names the resolved
+`fontsize`, `margin`, `paper`, and `bodyfont` for each record class — read back
+from the build rather than transcribed — and says explicitly where one differs
+from what the fixture declares. Check that block before comparing a matrix PDF
+against a fixture or a `review-matrix` render.
+
 Review the PDFs under `build/entrymeta-muted-matrix/` and record the result in
 the pull request. Two cells carry most of the weight: `*-column-plain`, because
 `muted=plain` under `entrymeta=column` is what a document setting neither option
