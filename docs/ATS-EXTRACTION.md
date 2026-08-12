@@ -1761,7 +1761,7 @@ defer their creation.
 ### 11.2 `l3build` for package tests **(Phase 1 onward)**
 
 The regression harness is configured in `build.lua` (`tests/regression/`,
-LuaTeX, LaTeX format); `CONTRIBUTING.md` documents how to run and save its
+LuaTeX, LaTeX format); `docs/TESTING.md` documents how to run and save its
 checks. Two disciplines are load-bearing for a text-layer-sensitive package:
 add a regression test for every fixed bug, and inspect every newly saved
 `.tlg` — `l3build` detects change but cannot decide whether the new output is

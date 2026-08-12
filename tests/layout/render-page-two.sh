@@ -125,7 +125,7 @@ fi
   echo "statement-examples: research, teaching, teaching-philosophy, diversity, artist, purpose"
   echo "default-interest-long-fields: statement-interest-long-fields-page-2.png"
   echo
-  echo "Review every *-page-2.png using the checklist in CONTRIBUTING.md."
+  echo "Review every *-page-2.png using the checklist in docs/TESTING.md."
 } >"$output/review-record.txt"
 
 echo

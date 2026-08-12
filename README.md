@@ -465,7 +465,8 @@ gate, not the stage where feature tests are first created. See
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): module boundaries and internal design
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
 - [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
-- [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, test, and pull-request workflow
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, and pull-request workflow
+- [`docs/TESTING.md`](docs/TESTING.md): the test suites, review targets, and coverage expectations
 - [`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md): naming for issues, branches, commits, labels, milestones, and releases
 - [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
 - [`AGENTS.md`](AGENTS.md): the operating contract for coding agents

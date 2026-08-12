@@ -73,7 +73,7 @@ if grep -Eiq '(^| - )(WARN|ERROR) -' "$base.blg"; then
     echo "    rm -rf \"\${TMPDIR:-/tmp}\"/par-*   # drop Biber's unpacked cache"
     echo "    biber --version                   # re-unpack, then re-run"
     echo
-    echo "  If that does not help, see CONTRIBUTING.md (\"BibLaTeX/Biber"
+    echo "  If that does not help, see docs/TESTING.md (\"BibLaTeX/Biber"
     echo "  fixture\"). Do not switch the fixture to 'year=' and do not relax"
     echo "  this gate: either would hide a genuinely wrong bibliography."
   fi
