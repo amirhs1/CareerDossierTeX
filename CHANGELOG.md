@@ -348,6 +348,14 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **No change without a selector.** `make check` and the `tagging` CI job invoke
   the suite exactly as before, and `.github/workflows/build.yml` is untouched.
 
+- An epic issue template, `.github/ISSUE_TEMPLATE/epic.md`, and an
+  `.github/ISSUE_TEMPLATE/config.yml` that disables blank issues and links the
+  contribution guide and the naming convention from the issue chooser. ([#360])
+
+  Epics were prescribed by `docs/NAMING-CONVENTION.md` and `CONTRIBUTING.md` but
+  had no form to file from, and the two existing templates were optional because
+  a blank issue was always offered alongside them.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -818,6 +826,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#337]: https://github.com/amirhs1/CareerDossierTeX/issues/337
 [#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340
 [#359]: https://github.com/amirhs1/CareerDossierTeX/issues/359
+[#360]: https://github.com/amirhs1/CareerDossierTeX/issues/360
 [#367]: https://github.com/amirhs1/CareerDossierTeX/issues/367
 
 ## [0.7.0] - 2026-08-04

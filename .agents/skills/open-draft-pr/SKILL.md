@@ -58,8 +58,10 @@ here.
     again. A blank is unfinished work, not a reporting line. `reference.md`
     ("Verification") says which fields have no legitimate blank value and holds
     the queries.
-18. Close the report with the single completion verdict `AGENTS.md`
-    ("Completion report") requires, covering the branch as a whole.
+18. Close with the completion report `AGENTS.md` ("Completion report")
+    defines, covering the branch as a whole. The step-17 read-back is the
+    metadata payload of that report's `Test criteria` section, not a separate
+    report.
 
 `docs/NAMING-CONVENTION.md` section 9 defines which `Status` to use and section
 10 the `Phase` numbering; `reference.md` ("Project field values") covers the

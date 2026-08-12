@@ -132,7 +132,12 @@ considered ready for the maintainer, and again before any tag is authorized:
 
 ## Verification
 
-After drafting either document, verify and report:
+This list is not a report of its own. `AGENTS.md` "Completion report" defines
+the one report shape and states, under "How the report formats compose", that
+this list is the release payload of its `Test criteria` section. Report it
+there, under the single verdict that report carries.
+
+After drafting either document, verify:
 
 - the `CHANGELOG.md` entry exists under the correct version heading and
   category, with issue reference definitions added;

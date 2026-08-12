@@ -56,6 +56,9 @@ Use these canonical sources when they exist:
   accountability; also the map of this instruction file set
 - `CONTRIBUTING.md` — contribution, test, PR, CI, and release workflow
 - `.github/pull_request_template.md` — the canonical PR section set
+- `.github/ISSUE_TEMPLATE/` — the forms a new issue is filed from
+  (`bug_report.md`, `feature_request.md`, `epic.md`); `CONTRIBUTING.md`
+  "Issue workflow" stays canonical for what a good issue contains
 - `docs/NAMING-CONVENTION.md` — naming for GitHub objects and releases
 - `.agents/skills/open-draft-pr/reference.md` — draft PR and Project metadata workflow
 - `.agents/skills/release-notes/reference.md` — CHANGELOG and GitHub Release workflow
@@ -355,6 +358,11 @@ Use `docs/NAMING-CONVENTION.md` for names.
 - Maintainer authority (rule 11 above) bounds this workflow; it is not
   restated here.
 - Keep one focused issue per meaningful branch where practical.
+- File a new issue from a template rather than a blank body:
+  `gh issue create --template feature_request.md`, or `bug_report.md`, or
+  `epic.md`. The templates encode the structure `CONTRIBUTING.md` "Issue
+  workflow" requires; that section states the rest, including that the web UI
+  offers no blank issue.
 - Every issue carries a milestone, except work whose release is genuinely
   undecided — see the exception in `docs/NAMING-CONVENTION.md` §7, which names
   the issues that currently qualify. An epic parent only when the work genuinely
@@ -502,22 +510,81 @@ Before finishing, confirm:
 - canonical docs were updated when required
 - draft PR metadata matches the focused issue and Project
 
-Open the report with exactly one verdict, and state it nowhere else:
+Then write the report in the shape below — the same shape whatever the change,
+so two reports can be read the same way. A section that does not apply says
+`None`; no section is ever dropped. A missing section is therefore always a
+defect and never an omission.
 
-- **Complete — nothing further, safe to approve on green.**
-- **Not complete — the following remain:** followed by what is outstanding.
+```text
+## <type>(<scope>): <summary> — closes #<issue>
 
-A remaining item may not be buried mid-report; if anything is outstanding, the
-verdict itself says so. The verdict is the author's attestation that the
-close-out in "The first push is a commitment" is done. Green CI is not that
-attestation and does not substitute for it.
+**Verdict: COMPLETE — nothing further, safe to approve on green.**
+(or) **Verdict: NOT COMPLETE — remaining: <what is outstanding>.**
 
-Then report:
+1. Problem
+2. What I changed
+3. Visual impact
+4. Test criteria
+5. Decisions I made that were yours
+6. What I need from you
+7. Close-out actions
+```
 
-- what changed
-- files changed
-- tests and exact outcomes
-- what was not verified
-- draft PR and metadata updates
-- known limitations
-- what the maintainer should review before marking the PR ready
+The title line is the branch's own commit and PR title, in the form
+`docs/NAMING-CONVENTION.md` section 4 defines. This section adds the
+`closes #<issue>` suffix and restates none of that convention.
+
+| Section | Carries |
+|---|---|
+| 1 Problem | the observable symptom first, then the mechanism behind it |
+| 2 What I changed | every file touched, as `path:line`, and the reasoning a reader cannot reconstruct from the diff |
+| 3 Visual impact | `None`, with the evidence establishing it — or what moves, and how that was confirmed |
+| 4 Test criteria | the criteria this change had to meet, the exact commands run and their outcomes, and what was not run and why |
+| 5 Decisions I made that were yours | each call made without asking, the alternative rejected, and what reversing it would cost |
+| 6 What I need from you | blocking input; what is worth knowing but is not blocking; follow-up issues opened or proposed |
+| 7 Close-out actions | approve on green or not; what to do with the branch; anything to preserve before the session ends |
+
+The verdict is stated once, at the top, and nowhere else. A remaining item may
+not be buried mid-report; if anything is outstanding, the verdict itself says
+so. The verdict is the author's attestation that the close-out in "The first
+push is a commitment" is done. Green CI is not that attestation and does not
+substitute for it.
+
+Section 3 exists because the first question after a change is consistently
+*does it look different*. Section 4 is where rule 2 (verification honesty)
+lands, in one fixed place instead of scattered through the report; a criterion
+with no command against it is unmet, not implied. Section 5 exists because the
+expensive failure mode is a silent judgement call, not a bug. Section 7 is
+actionable without reading the six above it.
+
+### How the report formats compose
+
+Two other fixed lists exist, and an agent that implemented behavior, opened a
+PR, and touched `CHANGELOG.md` is subject to all three at once. The report
+above is the outer shape; both lists are payloads of its `Test criteria`
+section, not reports of their own:
+
+- `.agents/skills/open-draft-pr/reference.md` ("Verification") — the metadata
+  read-back, whenever a PR was opened or updated;
+- `.agents/skills/release-notes/reference.md` ("Verification") — the
+  release-notes list, whenever `CHANGELOG.md` or a release was touched.
+
+One report, seven sections, one verdict. Neither skill emits a second report or
+a second verdict, and neither restates this composition.
+
+### Progress reports in autonomous runs
+
+When the maintainer is not at the keyboard, emit one progress line at each
+phase boundary — not per tool call:
+
+```text
+**[n/8] <phase>** — <what just happened, one line>
+Next: <one line>
+Blocked: <only when true>
+```
+
+`n` and `<phase>` are the step number and name from "Default work sequence"
+above, which is the only register of phases; step 3 covers the failing test and
+the implementation together and is reported once. Progress lines do not replace
+the completion report — the run still closes with the seven sections and the
+verdict.
