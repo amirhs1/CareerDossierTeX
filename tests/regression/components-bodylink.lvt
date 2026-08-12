@@ -9,7 +9,9 @@
 %   - the extra break points are installed for the duration of one link and
 %     are gone afterwards, so the contact line and the bibliography keep the
 %     punctuation-only \UrlBreaks they were measured with;
-%   - without hyperref the command still emits the visible address.
+%   - without hyperref the command still emits the visible address, and says
+%     so once (issue #329) — the only test here that reaches the real link
+%     wrapper rather than the tracing stub, so the only one that warns.
 %
 % url.sty is loaded on its own here: it owns \UrlBreaks, and loading hyperref
 % instead would also bring \href, which the last test needs absent. Whether

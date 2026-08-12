@@ -5,7 +5,8 @@
 % instead. Covers: web profiles gain an https:// scheme only when none is
 % present, an existing scheme is preserved, email becomes a mailto: target,
 % ORCID identifiers gain their canonical resolver URL, and the link wrapper
-% degrades to plain visible text when hyperref is absent.
+% degrades to plain visible text when hyperref is absent — announcing that
+% degradation exactly once for the whole document (issue #329).
 %
 % The linkedin, github, and scholar cases (issue #330) pin the displayed text as
 % well as the target, in the form `[display] -> [target]'. Normalization is
@@ -56,10 +57,49 @@
       { \TYPE{ href-present } }
       { \TYPE{ degrades-to-plain-text } }
   }
+%% Five linked fields plus one unlinked one, rendered through the real contact
+%% line rather than through the individual helpers, so the number of warnings is
+%% the number a document would actually see. Every field is cleared first, for
+%% the reason given in the header: a second value over a live one warns about
+%% the overwrite, and this helper is called twice.
+\cs_new_protected:Npn \cdossiertestContactLine
+  {
+    \clist_map_inline:nn
+      { email , location , website , linkedin , github , orcid }
+      { \CDossierSetup{ ##1 = {} } }
+    \CDossierSetup
+      {
+        email    = {ada@example.com} ,
+        location = {Toronto} ,
+        website  = {ada.example} ,
+        linkedin = {ada-lovelace} ,
+        github   = {ada-lovelace} ,
+        orcid    = {0000-0002-1825-0097}
+      }
+    \__cdossier_components_contactline:
+  }
 \ExplSyntaxOff
 
 \begin{document}
 \START
+
+%% Issue #329. The degradation is checked below; this is its signal, and the
+%% property under test is that it appears exactly *once* per document however
+%% many links degrade. So it is asserted first, on a contact line carrying five
+%% linked fields at once — and every later test in this file renders a further
+%% link with hyperref still absent, so the silence in each of their baselines is
+%% the other half of the assertion. tests/regression/components-links-hyperref
+%% holds the case where hyperref is present and nothing is said at all.
+\TEST{links-inert-warns-once-for-a-multi-field-contact-line}{
+  \cdossiertestContactLine
+}
+
+%% Still nothing on a second full contact line: the flag is global, so it
+%% survives the group each contact item is boxed in and the \TEST group above.
+\TEST{links-inert-is-not-repeated-by-a-later-contact-line}{
+  \cdossiertestContactLine
+  \cdossiertestHrefBranch
+}
 
 \TEST{web-gains-https-scheme-when-absent}{
   \cdossiertestWebTarget{github.com/ada}

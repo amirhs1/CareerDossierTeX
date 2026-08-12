@@ -528,6 +528,43 @@
       { \__cdossier_components_install_link_hook: }
   }
 
+%% Every link this package emits is guarded on \href, and the false branch is
+%% the right behavior: the address stays visible, selectable, and extractable.
+%% What the false branch has no way of announcing is that it was taken. The
+%% page looks finished, and the author finds out by clicking a dead address in
+%% the finished PDF. So say it once (issue #329).
+%%
+%% Once per document, not once per field: a contact line renders up to six
+%% linked fields, and the cause is a single missing package, not six mistakes.
+%% The flag is global because each contact item is rendered inside \hbox_set:Nn,
+%% which would restore a local one before the next item could read it.
+%%
+%% Reported where the degradation happens rather than at \begin{document}, so a
+%% document that emits no links at all is not warned about links. That also puts
+%% the message after \START in the regression fixtures, where a baseline can
+%% pin it.
+\msg_new:nnnn { careerdossier-components } { links-inert }
+  { Links~are~typeset~as~plain~text~because~hyperref~is~not~loaded. }
+  {
+    This~package~links~contact~fields~and~\CDossierLink\ with~\href,~which~
+    hyperref~provides.~The~addresses~remain~visible,~selectable,~and~
+    extractable,~but~nothing~in~the~PDF~is~clickable.~Load~hyperref,~or~use~
+    one~of~the~supplied~classes,~which~load~it~for~you.
+  }
+
+\bool_new:N \g__cdossier_components_inertwarned_bool
+
+%% Called from the false branch of every \href guard in the toolkit, including
+%% the manual publication target in careerdossier-cv.
+\cs_new_protected:Npn \__cdossier_components_links_inert:
+  {
+    \bool_if:NF \g__cdossier_components_inertwarned_bool
+      {
+        \bool_gset_true:N \g__cdossier_components_inertwarned_bool
+        \msg_warning:nn { careerdossier-components } { links-inert }
+      }
+  }
+
 %% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
 %% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
 %% \urlstyle{same} so the text stays in the body font rather than switching to
@@ -545,7 +582,7 @@
           \href {#1} { \nolinkurl {#2} }
         \group_end:
       }
-      { #2 }
+      { \__cdossier_components_links_inert: #2 }
   }
 \cs_generate_variant:Nn \__cdossier_components_link:nn { VV }
 
@@ -766,7 +803,10 @@
             { ORCID:\nobreakspace \nolinkurl { \l__cdossier_components_disp_tl } }
         \group_end:
       }
-      { ORCID:\nobreakspace \l__cdossier_components_disp_tl }
+      {
+        \__cdossier_components_links_inert:
+        ORCID:\nobreakspace \l__cdossier_components_disp_tl
+      }
   }
 
 %% Render one contact field: an optional identifying label, then the value —

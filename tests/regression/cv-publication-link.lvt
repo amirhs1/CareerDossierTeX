@@ -1,0 +1,70 @@
+% cv-publication-link.lvt — the manual publication target's \href guard (#329).
+%
+% careerdossier-cv renders a manual publication's DOI or URL through its own
+% \href guard rather than through the components link wrapper, because the
+% visible text carries a label (`DOI: 10.…') that the wrapper does not produce.
+% That is a second false branch, and it must raise the same one-per-document
+% warning the contact line and \CDossierLink raise — otherwise a publication
+% list would be the one place where links go inert silently.
+%
+% The class loads hyperref unconditionally, so the branch is unreachable in a
+% supported document and the absence has to be simulated: \href is let to an
+% undefined name for the duration of a group, which is exactly what
+% \cs_if_exist:NTF reads. The first test establishes that the linked branch
+% says nothing, so the warning in the second is attributable to the guard and
+% not to something earlier in the run.
+%
+% Each helper is defined under \ExplSyntaxOn so the private names tokenize
+% correctly; catcodes cannot be switched inside a \TEST body.
+\input{regression-test}
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+%% The trace is the whole assertion, so the rendered material is composed into
+%% a box and discarded rather than shipped out.
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertestPublicationLink #1
+  {
+    \hbox_set:Nn \l_cdossiertest_box
+      { \__cdossier_cv_publication_link:nn { DOI } {#1} }
+  }
+\cs_new_protected:Npn \cdossiertestWithoutHref #1
+  {
+    \group_begin:
+      \cs_set_eq:NN \href \c_undefined:N
+      #1
+    \group_end:
+  }
+\ExplSyntaxOff
+
+\begin{document}
+
+%% Render one linked target before the capture starts. The first typeset
+%% material in a file loads its fonts, and the resulting "External font cmex10"
+%% lines would otherwise sit in the baseline saying nothing about publication
+%% links — and would have to be regenerated on any unrelated font change.
+\cdossiertestPublicationLink{10.1000/xyz000}
+
+\START
+
+\TEST{linked-publication-target-says-nothing}{
+  \cdossiertestPublicationLink{10.1000/xyz123}
+}
+
+\TEST{unlinked-publication-target-warns}{
+  \cdossiertestWithoutHref{\cdossiertestPublicationLink{10.1000/xyz123}}
+}
+
+%% Once per document, not once per publication: a list of twenty degrades for
+%% one reason.
+\TEST{unlinked-publication-target-warns-only-once}{
+  \cdossiertestWithoutHref{\cdossiertestPublicationLink{10.1000/xyz456}}
+  \cdossiertestPublicationLink{10.1000/xyz789}
+}
+
+\END
+\end{document}

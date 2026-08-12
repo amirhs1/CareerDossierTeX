@@ -521,7 +521,13 @@
             { #1:\nobreakspace \nolinkurl {#2} }
         \group_end:
       }
-      { #1:\nobreakspace #2 }
+      {
+        %% The same warning the contact line and \CDossierLink raise, from the
+        %% package that owns the message: a publication identifier that is not
+        %% a link has the same cause and the same remedy (issue #329).
+        \__cdossier_components_links_inert:
+        #1:\nobreakspace #2
+      }
   }
 
 \cs_new_protected:Npn \__cdossier_cv_publication_render:
