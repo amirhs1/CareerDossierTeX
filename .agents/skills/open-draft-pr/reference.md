@@ -149,7 +149,7 @@ After opening or updating the draft PR:
 For a newly opened draft PR:
 
 - **Status:** the in-progress option — `docs/NAMING-CONVENTION.md` section 9 for
-  what it means, `gh project field-list` for how it is spelled
+  what it means, the appendix's discovery query for how it is spelled
 - **Phase:** inherit from the focused issue
 - **Priority:** inherit from the focused issue
 - **Size:** estimate from the actual completed PR scope
@@ -256,7 +256,10 @@ report what you intended to set — and confirm each of:
 - fields intentionally left unset and why.
 
 A blank field in that read-back is unfinished work, not a reporting line. Fill
-it and read back again. The appendix has the queries.
+it and read back again. The appendix has the queries, and reads the list back in
+one call — as an assertion that each value equals the intended one, not as a
+list to eyeball, because a null field and a wrongly-set field read alike in
+prose.
 
 Which blanks are legitimate:
 
@@ -295,73 +298,227 @@ token scope; Project reads/writes additionally need `read:project` and `project`
 gh auth refresh -s read:project,project
 ```
 
-### Repository metadata (repo scope)
+### The shape of the sequence
+
+The `gh project` sub-commands expose one identifier per invocation — project
+number, then field ids, then item ids, then one write per field — so the
+straightforward path costs sixteen round-trips for one ordinary draft PR. None
+of that is a rule; it is the sub-command surface, and it is paid on every
+branch.
+
+`gh api graphql` removes the id-discovery and per-field calls without removing
+anything the rules require: it batches inside one request, and it still reads
+every id and option string live in the same run, so nothing is cached into the
+tree. `CLAUDE.md` ("`gh` must lead the Bash invocation") is canonical for why
+this is the only form that batches here and why a wrapper script is not; that
+reasoning is not repeated.
+
+The five steps below cost five calls, and with `gh label list` and `gh issue
+view` the whole path from "branch ready" to "metadata verified" is **seven**.
+
+What the collapse does not buy is a shorter verification. Batching four writes
+into one document adds a way for one write to fail among four successes, so
+step 5 is more load-bearing here, not less.
+
+### 1. Discover every id in one query
+
+Project id, every field id, every single-select option id, and the focused
+issue's item id with its current Status, Phase, and Priority:
 
 ```bash
-# Open a draft PR whose title follows docs/NAMING-CONVENTION.md
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
+query($owner:String!,$repo:String!,$issue:Int!){
+  user(login:$owner){
+    projectsV2(first:20){nodes{
+      id number title
+      fields(first:50){nodes{
+        ... on ProjectV2FieldCommon{id name}
+        ... on ProjectV2SingleSelectField{id name options{id name}}
+      }}
+    }}
+  }
+  repository(owner:$owner,name:$repo){
+    issue(number:$issue){
+      id
+      milestone{title}
+      projectItems(first:10){nodes{
+        id
+        project{id title}
+        fieldValues(first:30){nodes{
+          ... on ProjectV2ItemFieldSingleSelectValue{
+            name field{... on ProjectV2FieldCommon{name}}
+          }
+        }}
+      }}
+    }
+  }
+}'
+```
+
+From the `CareerDossierTeX Development` node take the project id and title, the
+`Status`, `Phase`, `Priority`, and `Size` field ids, and the option id of each
+value you intend to set. From the issue's own item take the milestone, Phase,
+and Priority to inherit.
+
+### 2. Open the PR fully configured (repo scope)
+
+Assignee, labels, milestone, and Project membership are all `gh pr create`
+flags, so they cost no call of their own. Use the project title exactly as
+step 1 returned it:
+
+```bash
 gh pr create --draft --base main --head <branch> \
-  --title "type(scope): imperative summary" --body-file <body.md>
-
-# Assignee, labels, milestone (labels must already exist — see `gh label list`)
-gh pr edit <pr-number> --add-assignee amirhs1 \
-  --add-label type:docs --add-label area:documentation \
-  --milestone "v0.1.0 — English Industry Dossier"
+  --title "type(scope): imperative summary" --body-file <body.md> \
+  --assignee amirhs1 --label type:docs --label area:agents \
+  --milestone "<milestone string from step 1>" \
+  --project "<project title from step 1>"
 ```
 
-### Project fields (project scope)
+When updating an existing PR rather than opening one, the same flags are
+`--add-assignee`, `--add-label`, `--milestone`, and `--add-project` on
+`gh pr edit`.
 
-Project v2 fields are edited by ID, so first discover the IDs, then set values:
+### 3. Read the new PR's item id
+
+The PR did not exist when step 1 ran, and a field write addresses an item by id,
+so this read is the one that cannot be folded away:
 
 ```bash
-# 1. Find the Project number and node id
-gh project list --owner amirhs1
-
-# 2. List fields to get each field id and single-select option id
-gh project field-list <project-number> --owner amirhs1
-
-# 3. Add the issue or PR to the Project (returns/stores an item id)
-gh project item-add <project-number> --owner amirhs1 \
-  --url https://github.com/amirhs1/CareerDossierTeX/pull/<pr-number>
-
-# 4. List items to find the item id for this PR
-gh project item-list <project-number> --owner amirhs1
-
-# 5. Set a single-select field (Status / Phase / Priority / Size)
-gh project item-edit --project-id <PVT_...> --id <item-id> \
-  --field-id <field-id> --single-select-option-id <option-id>
-
-# Text, date, and number fields use --text, --date, or --number instead.
-
-# 6. Read the values back. Step 3 populates no field, and step 5 addresses an
-#    item by id, so a wrong id succeeds silently against the wrong row. This
-#    query is the only evidence the values landed.
-#
-#    The field keys are lower-case: status, phase, priority, size. jq's {Status}
-#    shorthand means {Status: .Status} and yields null for every field, which
-#    reads exactly like unset metadata. Spell each mapping out.
-gh project item-list <project-number> --owner amirhs1 --limit 400 --format json \
-  --jq '.items[] | select(.content.number==<pr-number>
-        and .content.type=="PullRequest")
-        | {Status:.status, Phase:.phase, Priority:.priority, Size:.size}'
-
-# Repository metadata reads back separately
-gh pr view <pr-number> --json isDraft,assignees,labels,milestone
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F pr=<pr-number> -f query='
+query($owner:String!,$repo:String!,$pr:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$pr){id projectItems(first:10){nodes{id project{id title}}}}
+  }
+}'
 ```
 
-**Discover option strings from step 2, never from prose.** The live Project is
-authoritative for the exact text of an option; this document and
-`docs/NAMING-CONVENTION.md` are authoritative for *which* option to choose and
-what it means. Those are different questions, and a transcription of the first
-into prose drifts silently.
+An empty `projectItems` means step 2's `--project` matched nothing. Add the PR
+to the Project before writing fields, rather than writing them against a row
+that does not exist.
 
-The casing is the part that bites, because lookup is by name. A `--jq
-'select(.name=="In progress")'` against an option actually called `In Progress`
-yields an empty option id, and the resulting `item-edit` sets nothing while
-reporting no error — a failure with no failing exit status. This exact mismatch
-existed between the Project and `docs/NAMING-CONVENTION.md` section 9 until
-2026-08-04, when the documentation was corrected to match the Project. Assume it
-can recur; read `gh project field-list` output and copy the string it returns.
+### 4. Write every field in one mutation
+
+One aliased `updateProjectV2ItemFieldValue` per value: the PR's Status, Phase,
+Priority, and Size, and the focused issue's move to the in-progress option. Each
+alias selects back the value it just wrote, so the response is evidence rather
+than an exit status:
+
+```bash
+gh api graphql \
+  -f p=<project-id> -f pi=<pr-item-id> -f ii=<issue-item-id> \
+  -f fSt=<status-field-id> -f fPh=<phase-field-id> \
+  -f fPr=<priority-field-id> -f fSz=<size-field-id> \
+  -f oSt=<pr-status-option-id> -f oPh=<phase-option-id> \
+  -f oPr=<priority-option-id> -f oSz=<size-option-id> \
+  -f oIs=<issue-status-option-id> -f query='
+mutation($p:ID!,$pi:ID!,$ii:ID!,$fSt:ID!,$fPh:ID!,$fPr:ID!,$fSz:ID!,
+         $oSt:String!,$oPh:String!,$oPr:String!,$oSz:String!,$oIs:String!){
+  status: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$pi,
+    fieldId:$fSt,value:{singleSelectOptionId:$oSt}}){projectV2Item{
+      fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+  phase: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$pi,
+    fieldId:$fPh,value:{singleSelectOptionId:$oPh}}){projectV2Item{
+      fieldValueByName(name:"Phase"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+  priority: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$pi,
+    fieldId:$fPr,value:{singleSelectOptionId:$oPr}}){projectV2Item{
+      fieldValueByName(name:"Priority"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+  size: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$pi,
+    fieldId:$fSz,value:{singleSelectOptionId:$oSz}}){projectV2Item{
+      fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+  issueStatus: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$ii,
+    fieldId:$fSt,value:{singleSelectOptionId:$oIs}}){projectV2Item{
+      fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+}'
+```
+
+Text, date, and number fields take `text:`, `date:`, or `number:` in `value:`
+instead of `singleSelectOptionId:`.
+
+**A batched write fails per alias, not per call.** When one alias is rejected,
+its entry in `data` is `null`, `errors[].path` names it, and `gh` exits
+non-zero — while the other four have already applied. So a zero exit is not
+five successes, and neither is a response that merely contains data. Read the
+five returned names.
+
+### 5. Read the verification list back in one query
+
+One query covers repository metadata and both items' Project fields:
+
+```bash
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX \
+  -F pr=<pr-number> -F issue=<issue-number> -f query='
+query($owner:String!,$repo:String!,$pr:Int!,$issue:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$pr){
+      url isDraft baseRefName headRefName
+      assignees(first:5){nodes{login}}
+      labels(first:20){nodes{name}}
+      milestone{title}
+      projectItems(first:10){nodes{project{title}
+        status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        phase:fieldValueByName(name:"Phase"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        priority:fieldValueByName(name:"Priority"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+      }}
+    }
+    issue(number:$issue){
+      projectItems(first:10){nodes{project{title}
+        status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+      }}
+    }
+  }
+}'
+```
+
+Reading that output is not the check. **Assert the values**, because a null
+field and a wrongly-set field read alike in prose but not in a comparison. Pipe
+the same call — `gh` still leads a pipeline — through a jq that compares each
+field against what you meant to set and exits non-zero on any mismatch:
+
+```bash
+gh api graphql … -f query='…' \
+| jq --argjson want '{"status":"<intended>","phase":"<intended>",
+                      "priority":"<intended>","size":"<intended>"}' '
+    ( .data.repository.pullRequest.projectItems.nodes
+      | map(select(.project.title | test("CareerDossierTeX")))[0]
+      // halt_error(1) ) as $i
+    | [ $want | to_entries[]
+        | {field:.key, want:.value, got:($i[.key].name // null)} ]
+    | map(. + {ok:(.want == .got)})
+    | if all(.[]; .ok) then . else halt_error(1) end'
+```
+
+Select the item by project rather than taking `nodes[0]`: a PR that ends up in
+two projects would otherwise be checked against whichever row came back first,
+which is the same class of mistake as writing a field to the wrong item.
+
+`halt_error(1)` prints the offending table to stderr and exits 1, so a mismatch
+cannot be read as a pass. Report the printed table; it is the metadata payload
+of the completion report's `Test criteria` section. The issue's own Status comes
+back in the same response and is confirmed the same way.
+
+### Read option strings live, never from prose
+
+The live Project is authoritative for the exact text and id of an option; this
+document and `docs/NAMING-CONVENTION.md` are authoritative for *which* option to
+choose and what it means. Those are different questions, and a transcription of
+the first into prose drifts silently — which is why step 1 exists and why no id
+or option string appears anywhere in this tree.
+
+The casing is the part that bites, because the lookup is by name. A
+`select(.name=="In progress")` against an option actually called `In Progress`
+yields an empty option id. This exact mismatch existed between the Project and
+`docs/NAMING-CONVENTION.md` section 9 until 2026-08-04, when the documentation
+was corrected to match the Project; assume it can recur.
+
+Under `gh project item-edit` that empty id set nothing and reported no error.
+Under step 4 it is a `VALIDATION` error — `The single select option Id does not
+belong to the field` — with the alias `null` and a non-zero exit. That is the
+one behavioral difference between the old sequence and this one, and it is in
+the safe direction: the silent failure became a loud one. It is still not a
+substitute for step 5, which is what catches a *valid* id written to the wrong
+row.
 
 So: take `Status` semantics from `docs/NAMING-CONVENTION.md` section 9 and
 `Phase` from section 10, take `Priority` and `Size` from "Project field values"
-above, and take every literal option string from `field-list`.
+above, and take every literal option string and id from step 1.

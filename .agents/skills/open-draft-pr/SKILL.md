@@ -63,11 +63,15 @@ here.
     metadata payload of that report's `Test criteria` section, not a separate
     report.
 
+Steps 10–16 are the metadata this skill owes, not a count of commands: the
+appendix in `reference.md` sets all of it in three `gh` calls, and step 17 reads
+it back in a fourth. Follow that appendix rather than issuing one call per field.
+
 `docs/NAMING-CONVENTION.md` section 9 defines which `Status` to use and section
 10 the `Phase` numbering; `reference.md` ("Project field values") covers the
-rest. Copy every literal option string from `gh project field-list`, never from
-prose in this file or any other — the transcriptions drift, and a name that does
-not match sets nothing without reporting an error.
+rest. Read every literal option string and id live, from the appendix's
+discovery query, never from prose in this file or any other — the
+transcriptions drift, and a name that does not match resolves to no option id.
 
 ## PR body template
 

@@ -40,7 +40,7 @@ and do not claim OS-level isolation when the sandbox is inactive or unavailable.
 The `gh` exclusion in `.claude/settings.json` is matched against the command
 Claude runs, not against the calls nested inside it. `gh` must therefore be the
 **leading** command; a trailing pipeline is fine, and everything that nests it
-is not. Measured on 2026-08-11 against `gh api rate_limit`:
+is not. Measured, not inferred:
 
 | Form | Result |
 |---|---|
@@ -50,6 +50,7 @@ is not. Measured on 2026-08-11 against `gh api rate_limit`:
 | `( gh api … )` | denied |
 | `V="$(gh api …)"` | denied |
 | `echo x \| xargs gh api …` | denied |
+| `gh api graphql -f query='…multi-line…'` | works — `gh` still leads |
 
 A denied call fails with:
 
@@ -61,12 +62,25 @@ which is a sandbox denial wearing a TLS error's clothes. It reads as a network
 or certificate problem and invites the wrong fix; there is no `gh` outage to
 work around.
 
+The last row was measured on 2026-08-12 against the discovery query in
+`.agents/skills/open-draft-pr/reference.md`; the rest on 2026-08-11 against
+`gh api rate_limit`.
+
 Two consequences worth having in advance. Batching `gh` calls into a loop to
 save round-trips costs a failed run plus a second permission gate — more than
 the round-trips it saves. And capturing output with `V="$(gh …)"` is denied even
 though the same call is fine bare, so read the value from the command's own
 output, or run that one call with the sandbox disabled deliberately rather than
 after a confusing failure.
+
+That leaves exactly one way to batch here, and the table is why. A wrapper
+script — `scripts/pr-metadata.sh` around a sequence of `gh` calls — is the shape
+the loop row already rules out, and buying it back with a permission entry is
+the weakening "Permissions and enforcement" above forbids. `gh api graphql` is
+the form that survives: it leads the invocation, needs no permission change, and
+batches inside one request rather than around several.
+`.agents/skills/open-draft-pr/reference.md` (appendix) is where that is spent,
+and is canonical for the procedure.
 
 ## Git attribution
 
