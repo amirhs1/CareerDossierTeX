@@ -82,6 +82,18 @@
 \msg_new:nnn { careerdossier-base } { overwrite }
   { Profile~field~'#1'~was~already~set;~overwriting~with~the~new~value. }
 
+%% A warning, not an error: see the shape check below for why. Warnings print
+%% only this text, so the expected form belongs here rather than in a fourth
+%% argument no reader would see.
+\msg_new:nnn { careerdossier-base } { orcid-shape }
+  {
+    The~'orcid'~value~'#1'~does~not~look~like~an~ORCID~iD. \\
+    An~ORCID~iD~is~sixteen~digits~in~four~hyphen-separated~groups~with~a~
+    final~digit~or~X,~for~example~0000-0002-1825-0097;~a~complete~
+    https://orcid.org/~URL~is~also~accepted. \\
+    The~value~is~used~as~given,~so~check~it~before~publishing.
+  }
+
 %% ---------------------------------------------------------------------------
 %% Internal: store a field, trimming surrounding spaces and treating a
 %% whitespace-only value as missing.
@@ -95,8 +107,51 @@
         \prop_if_in:NnT \g__cdossier_base_fields_prop {#1}
           { \msg_warning:nnn { careerdossier-base } { overwrite } {#1} }
         \prop_gput:NnV \g__cdossier_base_fields_prop {#1} \l__cdossier_base_value_tl
+        %% Recorded first, then checked: a questionable value is still stored
+        %% and still typeset.
+        \str_if_eq:nnT {#1} { orcid }
+          { \__cdossier_base_orcid_check:V \l__cdossier_base_value_tl }
       }
   }
+
+%% ---------------------------------------------------------------------------
+%% ORCID shape check (issue #331).
+%%
+%% An ORCID iD has a documented shape: sixteen digits in four hyphen-separated
+%% groups, the last character a digit or `X'. Nothing else in this toolkit looks
+%% at the value -- careerdossier-components prefixes anything without a scheme
+%% with `https://orcid.org/' -- so a truncated iD, or a value pasted into the
+%% wrong key, becomes a confident and wrong link that renders like any other.
+%% The check belongs here rather than next to that rendering: it is a question
+%% about the recorded data, answered once when the value is recorded and
+%% independently of which class later prints it.
+%%
+%% It warns and never errors. The author may hold an identifier this check does
+%% not anticipate, and refusing to typeset a document over one would be
+%% disproportionate. Nothing about the stored value, the emitted target, or the
+%% `ORCID:' label changes either way.
+%%
+%% One pattern covers every accepted form: the bare iD, optionally preceded by
+%% an `http://' or `https://' scheme, an optional `www.', and an optional
+%% `orcid.org/' host. A lowercase `x' checksum character and a single trailing
+%% slash are tolerated -- both are what an address bar hands back, and warning
+%% about a value that does resolve is the false alarm that teaches authors to
+%% ignore the real one. Spaces would be significant in the pattern, so it
+%% carries none.
+%% ---------------------------------------------------------------------------
+\regex_const:Nn \c__cdossier_base_orcid_regex
+  { \A(?:https?://)?(?:www\.)?(?:orcid\.org/)?\d{4}-\d{4}-\d{4}-\d{3}[0-9Xx]/?\Z }
+\str_new:N \l__cdossier_base_orcid_str
+
+\cs_new_protected:Npn \__cdossier_base_orcid_check:n #1
+  {
+    %% Compared as a string: the pattern is about characters, and the stored
+    %% value carries whatever catcodes the document gave it.
+    \str_set:Nn \l__cdossier_base_orcid_str {#1}
+    \regex_match:NVF \c__cdossier_base_orcid_regex \l__cdossier_base_orcid_str
+      { \msg_warning:nnn { careerdossier-base } { orcid-shape } {#1} }
+  }
+\cs_generate_variant:Nn \__cdossier_base_orcid_check:n { V }
 
 %% Internal: error out on an unrecognized field name.
 \cs_new_protected:Npn \__cdossier_base_check_known:n #1

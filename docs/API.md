@@ -1760,13 +1760,45 @@ The shared profile gains one key:
 
 ORCID must be displayed as ordinary text with a descriptive `ORCID:` label and
 a web link. A bare identifier is normalized to an `https://orcid.org/` target;
-a complete URL is used as supplied. ORCID is the one web-profile key whose
-displayed text stays the bare identifier: its label supplies the meaning that
-the other three take from the domain, so it does not adopt the canonical-address
-display described under
+a complete URL is used as supplied. Since `v0.8.0` the value is checked against
+the shape of an ORCID iD when it is recorded, and warns when it does not match;
+see [Accepted `orcid` values](#accepted-orcid-values). ORCID is the one
+web-profile key whose displayed text stays the bare identifier: its label
+supplies the meaning that the other three take from the domain, so it does not
+adopt the canonical-address display described under
 [Accepted forms for the web-profile keys](#accepted-forms-for-the-web-profile-keys).
 Scholar and ORCID are omitted independently when blank and must not leave
 separators, blank lines, or icon-only content.
+
+#### Accepted `orcid` values
+
+An ORCID iD is sixteen digits in four hyphen-separated groups whose final
+character is a digit or `X`. Since `v0.8.0` the value is checked against that
+shape when `\CDossierSetup` records it, and a value matching neither the shape
+nor an ORCID address raises the `orcid-shape` warning naming the value and the
+expected form:
+
+| Written | Result |
+|---|---|
+| `0000-0002-1825-0097` | accepted |
+| `0000-0002-1825-009X` | accepted — `X` is the documented checksum character |
+| `orcid.org/0000-0002-1825-0097` | accepted |
+| `https://orcid.org/0000-0002-1825-0097` | accepted |
+| `0000-0002-1825-009` | warns — too short |
+| `0000-0002-1825-009X7` | warns — too long |
+| `https://example.org/ada-lovelace` | warns — not an ORCID address |
+| `scholar.google.com/citations?user=example` | warns — a value in the wrong key |
+
+An optional `www.`, a lowercase `x` checksum character, and one trailing slash
+are accepted without a warning; they resolve, and warning about a working value
+would only teach authors to ignore the warning that matters.
+
+The check never stops the build, and nothing about the stored value, the link
+target, or the `ORCID:` label depends on its outcome — an author holding an
+identifier this check does not anticipate still gets exactly the document they
+wrote. The warning is a shape check only: it does not verify the ISO 7064
+checksum, and it cannot tell whether an iD is registered, since LaTeX has no
+network access.
 
 The CV derives `/Title` as `Curriculum Vitae – <name>`, `/Author` from `name`,
 and `/Lang` as `en`, subject to the existing `\hypersetup` precedence rule.
@@ -2437,6 +2469,8 @@ The implementation may warn for:
 
 - unusually long contact fields;
 - a URL that cannot be normalized;
+- an `orcid` value that does not have the shape of an ORCID iD, see
+  [Accepted `orcid` values](#accepted-orcid-values);
 - metadata overwritten by a later setup call;
 - fields accepted but not displayed by the active class; and
 - links degraded to plain text because `hyperref` is absent — once per

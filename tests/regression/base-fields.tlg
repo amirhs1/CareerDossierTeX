@@ -39,3 +39,55 @@ TEST 7: affiliation-is-a-trimmed-shared-profile-field
 affiliation-present
 [Example University]
 ============================================================
+============================================================
+TEST 8: orcid-bare-identifier-is-accepted
+============================================================
+[0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 9: orcid-checksum-x-is-accepted
+============================================================
+[0000-0002-1825-009X]
+============================================================
+============================================================
+TEST 10: orcid-resolver-url-is-accepted
+============================================================
+[https://orcid.org/0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 11: orcid-host-without-a-scheme-is-accepted
+============================================================
+[orcid.org/0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 12: orcid-truncated-identifier-warns-once
+============================================================
+Package careerdossier-base Warning: The 'orcid' value '0000-0002-1825-009' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+[0000-0002-1825-009]
+============================================================
+============================================================
+TEST 13: orcid-over-long-identifier-warns-once
+============================================================
+Package careerdossier-base Warning: The 'orcid' value '0000-0002-1825-009X7' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+[0000-0002-1825-009X7]
+============================================================
+============================================================
+TEST 14: orcid-non-orcid-url-warns-once
+============================================================
+Package careerdossier-base Warning: The 'orcid' value 'https://example.org/ada-lovelace' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+[https://example.org/ada-lovelace]
+============================================================
+============================================================
+TEST 15: orcid-value-from-another-key-warns-once
+============================================================
+Package careerdossier-base Warning: The 'orcid' value 'scholar.google.com/citations?user=example' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+[scholar.google.com/citations?user=example]
+============================================================
