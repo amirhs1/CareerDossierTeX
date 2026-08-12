@@ -378,6 +378,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **No rendered change.** Neither branch typesets anything different from
   before, and no class, option, key, or command changed.
 
+- A warning when an `orcid` value does not have the shape of an ORCID iD:
+  `The 'orcid' value '...' does not look like an ORCID iD.` The warning names
+  the value and the expected form. ([#331])
+
+  An ORCID iD is sixteen digits in four hyphen-separated groups with a final
+  digit or `X`. Nothing checked that: a value with no scheme was assumed to be a
+  bare iD and prefixed with `https://orcid.org/`, so a truncated iD, or a
+  Scholar profile pasted into the wrong key, became a confident link that
+  rendered like any other. The failure was invisible until a reader clicked it.
+
+  The check runs where the value is recorded, not where it is printed, so it is
+  answered once per document and does not depend on which class prints it. A
+  bare iD, an `orcid.org/` value with or without a scheme, an optional `www.`, a
+  lowercase `x` checksum character, and one trailing slash all pass in silence —
+  warning about a value that does resolve would only teach authors to ignore the
+  warning that matters. `docs/API.md` records the accepted forms.
+
+  It warns and never errors: an author may hold an identifier the check does not
+  anticipate, and refusing to typeset a document over one would be
+  disproportionate. It is a shape check only — it verifies no checksum, and
+  LaTeX cannot ask whether an iD is registered.
+
+  **No rendered change.** The stored value, the link target, and the `ORCID:`
+  label are what they were for every value, valid or not, and no class, option,
+  key, or command changed.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -843,6 +869,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#328]: https://github.com/amirhs1/CareerDossierTeX/issues/328
 [#329]: https://github.com/amirhs1/CareerDossierTeX/issues/329
 [#330]: https://github.com/amirhs1/CareerDossierTeX/issues/330
+[#331]: https://github.com/amirhs1/CareerDossierTeX/issues/331
 [#332]: https://github.com/amirhs1/CareerDossierTeX/issues/332
 [#333]: https://github.com/amirhs1/CareerDossierTeX/issues/333
 [#334]: https://github.com/amirhs1/CareerDossierTeX/issues/334

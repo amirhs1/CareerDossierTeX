@@ -4,9 +4,28 @@
 % trimmed, a whitespace-only value is treated as missing, re-setting a field
 % warns and overwrites, present/absent is reported correctly, and the raw value
 % accessor expands to the stored value (or nothing when absent).
+%
+% The final block covers the `orcid' shape check (issue #331): each accepted
+% form passes in silence, and each rejected one warns exactly once and is stored
+% anyway. The helper is defined under \ExplSyntaxOn because catcodes cannot be
+% switched inside a \TEST body, and it clears the field to empty (which removes
+% it, without warning) before each fresh value, so re-using one field across
+% cases raises no overwrite warnings. The saved baseline is the assertion that
+% the silent cases are silent, so a missing warning line there is a failure and
+% not an omission.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-base}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestOrcid #1
+  {
+    \CDossierSetup{ orcid = {} }
+    \CDossierSetup{ orcid = {#1} }
+    \TYPE{ [\CDossierFieldValue{orcid}] }
+  }
+\ExplSyntaxOff
+
 \begin{document}
 \START
 
@@ -45,6 +64,38 @@
   \CDossierSetup{ affiliation = { Example University } }
   \CDossierIfFieldTF{affiliation}{\TYPE{affiliation-present}}{\TYPE{affiliation-absent}}
   \TYPE{[\CDossierFieldValue{affiliation}]}
+}
+
+\TEST{orcid-bare-identifier-is-accepted}{
+  \cdossiertestOrcid{0000-0002-1825-0097}
+}
+
+\TEST{orcid-checksum-x-is-accepted}{
+  \cdossiertestOrcid{0000-0002-1825-009X}
+}
+
+\TEST{orcid-resolver-url-is-accepted}{
+  \cdossiertestOrcid{https://orcid.org/0000-0002-1825-0097}
+}
+
+\TEST{orcid-host-without-a-scheme-is-accepted}{
+  \cdossiertestOrcid{orcid.org/0000-0002-1825-0097}
+}
+
+\TEST{orcid-truncated-identifier-warns-once}{
+  \cdossiertestOrcid{0000-0002-1825-009}
+}
+
+\TEST{orcid-over-long-identifier-warns-once}{
+  \cdossiertestOrcid{0000-0002-1825-009X7}
+}
+
+\TEST{orcid-non-orcid-url-warns-once}{
+  \cdossiertestOrcid{https://example.org/ada-lovelace}
+}
+
+\TEST{orcid-value-from-another-key-warns-once}{
+  \cdossiertestOrcid{scholar.google.com/citations?user=example}
 }
 
 \END
