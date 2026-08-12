@@ -125,8 +125,10 @@ fail=0
 # governs — see the page-fill block below for which pages those are.
 #
 # 90 is a ratchet, not a fill policy. "How full should a page be" is a design
-# question; it belongs to #333 and its successor #351, and neither has answered
-# it. This asks the narrower question the committed corpus already answers: may
+# question; #333 closed without setting a value, and #351 — which owned the one
+# route that would have lifted the outlier below — built it, measured it, and
+# declined it. So the question is still unanswered, and the outlier is accepted
+# rather than pending. This asks the narrower question the corpus answers: may
 # a page get worse than anything the project has deliberately accepted? Measured
 # across the 25 governed pages, one sits at 86.9% and every other at 92.9% or
 # above, so 90 runs through the gap between the single accepted outlier and the

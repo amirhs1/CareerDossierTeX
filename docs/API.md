@@ -1498,9 +1498,21 @@ and 3.1% on the two letter fixtures that move at all; permitting them closes
 those holes to 1.4%, 0.1% and 0.5%. But the correspondence is one-to-one — each
 of the three fixtures that gains fill gains a club or widow line, and no fixture
 gains fill without one. There is no value, and no per-family split, that buys the
-space without the defect, so the toolkit keeps the space. Improving fill without
-stranding a line is a mechanism rather than a value, and is not part of this
-design; see #351.
+space without the defect, so the toolkit keeps the space.
+
+The mechanism that would make the rule conditional — fill the page unless doing
+so strands a line — was then built and measured, and declined (#351). It needs
+no new token: giving `\topskip` a `plus` component, as plain TeX's own
+`\raggedbottom` does, makes page badness finite and these two values a real dial,
+with no visible change to the page. It is declined because the dial prices the
+guarantee rather than keeping it — the recovered fill is still bought one-for-one
+with a stranded line — and because the same tolerance makes LaTeX's `-300`
+`\@secpenalty` live, which moves breaks earlier and costs two shipped examples
+11.8 points of page-one fill. On the eleven shipped examples this rule costs
+nothing measurable at all: permitting the break everywhere leaves each of them
+byte-identical. `docs/ARCHITECTURE.md` holds the measurements; the
+`tokens-*-defaults` baselines now record `\topskip` and `\@secpenalty` so the
+state the decision rests on cannot change unnoticed.
 
 The letter and statement classes otherwise remain continuous prose with no
 further structural page-break policy.

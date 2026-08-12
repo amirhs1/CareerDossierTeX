@@ -76,12 +76,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   five fixtures for behaving exactly as their source says.
 
   The 90% floor is a ratchet rather than a fill policy. *How full should a page
-  be* belongs to #333 and its successor #351, and neither has answered it; the
-  floor asks only whether a page may get worse than anything the project has
-  deliberately accepted. One governed page sits at 86.9% and every other at
-  92.9% or above, so it runs through the gap. Measured at `8212a0f`, the commit
-  before #332, `resume-two-page` filled 80.6% of its goal and left a 140.04pt
-  hole — the defect that produced this check — and the floor fails it.
+  be* is unanswered: #333 closed without setting a value, and #351 declined the
+  one route that would have lifted the outlier. The floor asks only whether a
+  page may get worse than anything the project has deliberately accepted. One
+  governed page sits at 86.9% and every other at 92.9% or above, so it runs
+  through the gap. Measured at `8212a0f`, the commit before #332,
+  `resume-two-page` filled 80.6% of its goal and left a 140.04pt hole — the
+  defect that produced this check — and the floor fails it.
 
   A fixture whose accepted state sits lower declares `% PAGEFILLFLOOR: <pct>` in
   its own source, as `statement-two-page` does at 85% for the prose-family hole
