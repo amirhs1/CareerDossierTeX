@@ -10,7 +10,7 @@ describes the released interface, not the internals —
 This document records the released public interface:
 
 ```text
-Released: v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership
+Released: v0.8.0 — Semantic Structure and Tagged Output
 ```
 
 Sections that are not explicitly marked as planned describe released behavior.
@@ -18,7 +18,36 @@ Before `v1.0.0` the interface may still change between minor versions; such
 changes are recorded in [`../CHANGELOG.md`](../CHANGELOG.md) and
 [`MIGRATION.md`](MIGRATION.md).
 
-`v0.7.0` changed the interface in four ways:
+`v0.8.0` changed the interface in six ways:
+
+- `\CDossierSubsection{<title>}` gives the résumé and the CV a second heading
+  level, below the ruled section and above an entry. It carries no rule and no
+  size of its own, and under `\DocumentMetadata{tagging=on}` it is a depth-3
+  heading role-mapped to `/H3`.
+- `\CDossierLink{<url>}` is the supported way to put a link in body text, and
+  `\CDossierSubjectStyle` is a semantic role for a cover letter's subject line.
+- All four document classes accept `muted=plain|italic|gray|both`, and the
+  résumé and CV additionally accept `entrymeta=column|inline`. **`muted`
+  defaults to `plain`**, so entry metadata is upright black body text rather
+  than italic; `muted=italic` restores the previous appearance.
+- The `linkedin`, `github`, and `scholar` profile keys accept a bare handle as
+  well as a full URL, and a value that already carries a scheme is used as
+  written. An `orcid` value that is not ORCID-shaped, and a build in which
+  `hyperref` is absent so links degrade to plain text, each now warn once.
+- **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
+  `\CDossierSizeDocumentTitle`. **BREAKING (color token):**
+  `\CDossierPrimaryColor` is removed; `\CDossierTextColor` is an identical
+  drop-in.
+- `CDossierEntry` reads its body as an argument, so catcode-sensitive content
+  such as `\verb` must be defined outside the entry. No other source edit
+  follows from it.
+
+The section-heading keep became a bound (`\CDossierSectionNeedLines`, default
+`4`) rather than an unbounded prohibition, so **pagination may change** in a
+document whose sections previously moved whole to the next page. See
+[`MIGRATION.md`](MIGRATION.md#080---2026-08-12).
+
+`v0.7.0` before it changed the interface in four ways:
 
 - `medium=print|screen` is accepted by all four document classes. `print` is
   the default and reproduces the previous behaviour exactly; `screen` emits no
@@ -41,7 +70,7 @@ The calibrated ratios behind those tokens were also retuned, so **every document
 reflows**, though no supported combination changes its page count. See
 [`MIGRATION.md`](MIGRATION.md#070---2026-08-04).
 
-`v0.6.0` before it removed `density=compact|standard` from the résumé and CV
+`v0.6.0` earlier removed `density=compact|standard` from the résumé and CV
 classes with no replacement, made `fontsize` and `margin` uniform across all
 four classes with per-class defaults, and reduced `family=academic` to a
 label- and metadata-only distinction. A document coming from `v0.5.x` or
@@ -368,8 +397,8 @@ gray
 both
 ```
 
-`muted` is new after `v0.7.0`; `plain`, and `plain` as the default, are new
-after that again. Note the spelling: `gray`, not `grey`.
+`muted` is new in `v0.8.0`, as are `plain` and `plain` as the default. Note the
+spelling: `gray`, not `grey`.
 
 `muted` decides how de-emphasised runs are rendered — an entry's dates and
 location in the résumé and CV, and the statement's application-context line.
@@ -420,7 +449,7 @@ column
 inline
 ```
 
-`entrymeta` is new after `v0.7.0`. The letter and statement classes do not
+`entrymeta` is new in `v0.8.0`. The letter and statement classes do not
 accept it: neither has entry headings.
 
 `entrymeta` decides where an entry's dates and location sit. Under the default
@@ -1646,7 +1675,7 @@ One further role, `\CDossierMutedStyle`, is published by
 owns no colour. It behaves like the roles above and is available in every
 document class; only a document loading `careerdossier-typography` on its own
 does not get it. See [`muted`](#muted) and
-[`MIGRATION.md`](MIGRATION.md#080---unreleased).
+[`MIGRATION.md`](MIGRATION.md#080---2026-08-12).
 
 A second such role, `\CDossierLinkStyle{<text>}`, is published by
 `careerdossier-components` for the same reason: it resolves to a rule, and the
@@ -2436,7 +2465,7 @@ the WCAG 2.1 relative-luminance formula. It is what `muted=gray` and
 `\CDossierPrimaryColor` was removed: it reached no component, class, or
 example, and its underlying color was `gray 0` — the same value as
 `\CDossierTextColor` under a different name. See
-[`docs/MIGRATION.md`](MIGRATION.md#080---unreleased).
+[`docs/MIGRATION.md`](MIGRATION.md#080---2026-08-12).
 
 Users should not rely on the underlying color names or values as stable API before `v1.0.0`.
 
