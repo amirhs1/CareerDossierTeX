@@ -27,7 +27,13 @@ here.
 ## Procedure
 
 1. Confirm the current branch is focused and is not `main`.
-2. Review `git status --short` and the complete branch-versus-base diff.
+2. Confirm the close-out inspection `AGENTS.md` ("The first push is a
+   commitment") requires is done: `git status --short` read, and the complete
+   branch-versus-base diff reviewed with no unrelated files, generated
+   artifacts, secrets, private data, or accidental deletions. Re-read the diff
+   only when commits have landed since — on a shared worktree another session
+   can add one. This step cites that inspection rather than repeating it; step 8
+   is where the whole gate is confirmed.
 3. Confirm the relevant tests were run and record their exact outcomes for the
    PR body. Re-run anything whose recorded result is older than the last commit.
 4. Confirm the documentation the change requires is updated, and `CHANGELOG.md`

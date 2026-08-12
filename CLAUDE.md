@@ -35,6 +35,39 @@ and enables sandbox enforcement for Bash — with `gh` excluded — when the
 effective settings and local installation support it; verify the effective state
 and do not claim OS-level isolation when the sandbox is inactive or unavailable.
 
+### `gh` must lead the Bash invocation
+
+The `gh` exclusion in `.claude/settings.json` is matched against the command
+Claude runs, not against the calls nested inside it. `gh` must therefore be the
+**leading** command; a trailing pipeline is fine, and everything that nests it
+is not. Measured on 2026-08-11 against `gh api rate_limit`:
+
+| Form | Result |
+|---|---|
+| `gh api …` | works |
+| `gh api … \| cat` | works — `gh` still leads |
+| `for i in 1; do gh api …; done` | denied |
+| `( gh api … )` | denied |
+| `V="$(gh api …)"` | denied |
+| `echo x \| xargs gh api …` | denied |
+
+A denied call fails with:
+
+```text
+tls: failed to verify certificate: x509: OSStatus -26276
+```
+
+which is a sandbox denial wearing a TLS error's clothes. It reads as a network
+or certificate problem and invites the wrong fix; there is no `gh` outage to
+work around.
+
+Two consequences worth having in advance. Batching `gh` calls into a loop to
+save round-trips costs a failed run plus a second permission gate — more than
+the round-trips it saves. And capturing output with `V="$(gh …)"` is denied even
+though the same call is fine bare, so read the value from the command's own
+output, or run that one call with the sandbox disabled deliberately rather than
+after a confusing failure.
+
 ## Git attribution
 
 Use Claude Code's current `attribution` configuration. Do not rely on the

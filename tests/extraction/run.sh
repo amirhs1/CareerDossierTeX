@@ -27,6 +27,14 @@
 # Regenerate baselines intentionally with:  ./run.sh --update
 # On Linux, --update refreshes only the Poppler baselines; regenerate the PDFKit
 # ones on macOS.
+#
+# Usage:
+#   ./run.sh                    every fixture — the full suite, and what CI runs
+#   ./run.sh <pattern>          only the fixtures matching <pattern>
+#   ./run.sh --list [<pattern>] print the selection and compile nothing
+#   ./run.sh --update [<pat>]   regenerate the selected baselines
+#
+# or, through the Makefile:  make extract-test FIXTURE=<pattern>
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -35,7 +43,63 @@ cd "$here"
 # classes and packages resolve them; standalone fixtures are unaffected.
 root="$(cd "$here/../.." && pwd)"
 export TEXINPUTS="$root:${TEXINPUTS:-}"
-update=0; [ "${1:-}" = "--update" ] && update=1
+
+# Fixture selection (issue #359). The pattern is a shell glob matched anywhere
+# in the basename, so `resume` behaves as a substring search and `statement-*`
+# anchors at the start; it is left unquoted in the `case` below for that reason.
+# With no pattern every fixture runs, which is what CI and `make check` invoke.
+#
+# A pattern selecting nothing exits nonzero rather than reporting a clean run:
+# every assertion here is made per fixture, so a run with no fixtures passes all
+# of them and looks exactly like a suite that checked something.
+#
+# `--update` composes with a pattern, which is the safer default for a baseline
+# regeneration — it rewrites only the baselines the change was meant to move.
+fixture_filter=""
+list_only=0
+update=0
+for arg in "$@"; do
+  case "$arg" in
+    --update) update=1 ;;
+    --list)   list_only=1 ;;
+    -*)       echo "unknown option: $arg" >&2; exit 2 ;;
+    *)        fixture_filter="$arg" ;;
+  esac
+done
+
+fixtures=()
+total=0
+for tex in *.tex; do
+  total=$(( total + 1 ))
+  if [ -z "$fixture_filter" ]; then
+    fixtures+=("$tex")
+  else
+    case "${tex%.tex}" in
+      *$fixture_filter*) fixtures+=("$tex") ;;
+    esac
+  fi
+done
+
+if [ "${#fixtures[@]}" -eq 0 ]; then
+  echo "NO FIXTURE MATCHES '$fixture_filter' (of $total in $here)."
+  echo "  ./run.sh --list  prints every available fixture name."
+  exit 1
+fi
+
+if [ "$list_only" -eq 1 ]; then
+  for tex in "${fixtures[@]}"; do echo "${tex%.tex}"; done
+  exit 0
+fi
+
+# Appended to the closing verdict so a filtered run can never be read as a full
+# one. Empty for a full run, which keeps that line byte-identical to before.
+scope_note=""
+if [ -n "$fixture_filter" ]; then
+  scope_note=" (filter '$fixture_filter': ${#fixtures[@]} of $total fixtures — NOT a full run)"
+  echo "filter '$fixture_filter': ${#fixtures[@]} of $total fixtures selected"
+  echo
+fi
+
 fail=0
 
 # Build uncompressed so /ActualText is greppable in the PDF without needing
@@ -70,7 +134,7 @@ normalize() {
 #    ligature tables to disable; the common-ligature suppression still applies.
 allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOff|rerun|Reading font info|geometry|hyperref'
 
-for tex in *.tex; do
+for tex in "${fixtures[@]}"; do
   base="${tex%.tex}"; exp="$base.expected.txt"; kexp="$base.pdfkit.txt"
   echo "== $tex =="
   if [ ! -f "$exp" ] && [ "$update" -eq 0 ]; then
@@ -237,9 +301,28 @@ done
 # per-fixture check cannot catch: an intended-looking change regenerated into
 # both files at once. The names are listed rather than derived, because the
 # claim is about this specific pair.
+#
+# Under a fixture filter (issue #359) it runs whenever *either* member is
+# selected, not only when both are. It compares committed baselines rather than
+# fresh output, so one member is enough to make the comparison meaningful — and
+# selecting exactly one is the case that most needs it: `--update` on a single
+# member rewrites that baseline and leaves its sibling's alone, which is
+# precisely how the pair would drift apart.
+medium_pair_selected=0
+for member in resume-link-decoration-print resume-link-decoration-screen; do
+  case " ${fixtures[*]} " in
+    *" $member.tex "*) medium_pair_selected=1 ;;
+  esac
+done
+
 echo
 echo "== cross-medium identity =="
+if [ "$medium_pair_selected" -eq 0 ]; then
+  echo "  skipped: filter '$fixture_filter' selected neither"
+  echo "    resume-link-decoration-print nor resume-link-decoration-screen"
+fi
 for extractor in expected pdfkit; do
+  [ "$medium_pair_selected" -eq 1 ] || continue
   a="$here/resume-link-decoration-print.$extractor.txt"
   b="$here/resume-link-decoration-screen.$extractor.txt"
   if [ ! -f "$a" ] || [ ! -f "$b" ]; then
@@ -260,5 +343,7 @@ for extractor in expected pdfkit; do
   fi
 done
 
-echo; [ "$fail" -eq 0 ] && echo "ALL EXTRACTION FIXTURES PASSED" || echo "EXTRACTION FIXTURES FAILED"
+echo
+[ "$fail" -eq 0 ] && echo "ALL EXTRACTION FIXTURES PASSED$scope_note" \
+                  || echo "EXTRACTION FIXTURES FAILED$scope_note"
 exit "$fail"

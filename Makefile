@@ -4,7 +4,9 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash and awk; l3build for `regression`;
+# pure text processing and needs only bash and awk — both of its scripts, since
+# the second one drives the other runners in their compile-nothing `--list`
+# mode; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
 # `links`, and `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing
 # beyond LuaLaTeX for `metadata` and `annotations`, which read the PDF's own
@@ -26,6 +28,23 @@
 # is by parsing `\tracingpages` output from the log rather than the PDF, which
 # is what keeps it free of the poppler dependency the rest of the layout work
 # carries.
+#
+# Scoping a suite while developing (issue #359). `regression`, `smoke`,
+# `layout`, and `extract-test` each accept an optional selector, and with no
+# selector run exactly what they ran before — which is what `check` and CI
+# invoke, so neither is affected:
+#
+#   make regression TEST=base-diagnostics     one l3build test, by exact name
+#   make smoke      FIXTURE=bad-muted         every fixture matching the pattern
+#   make layout     FIXTURE='resume-*'        pattern anchored at the start
+#   make extract-test FIXTURE=statement
+#
+# The two spellings are not interchangeable, which is why they are not one name.
+# `TEST` is passed through to `l3build check <name>`, which takes an exact test
+# name. `FIXTURE` is a shell glob matched anywhere in a fixture's basename, so a
+# plain word behaves as a substring search. A `FIXTURE` pattern matching nothing
+# fails the run rather than reporting a clean one; `tests/<suite>/run.sh --list`
+# prints the available names and compiles nothing.
 #
 # `resume`, `letter`, `academic-cv`, `academic-bibliography`, `academic-letter`,
 # and `statements` write their PDFs, logs, and other latexmk output under the
@@ -94,17 +113,18 @@ check: lint regression extract-test smoke layout bibliography-test links metadat
 
 test: check ## Alias for check
 
-lint: ## Static option lint (choice-valued options name their accepted values)
+lint: ## Static lint: option values, and the suite fixture-selection contract
 	tests/lint/run.sh
+	tests/lint/run-fixture-filter.sh
 
-regression: ## Module regression suite (l3build check on LuaTeX)
-	l3build check
+regression: ## Module regression suite (l3build check); TEST=<name> runs one test
+	l3build check $(TEST)
 
-smoke: ## Supported builds and required failures
-	tests/smoke/run.sh
+smoke: ## Supported builds and required failures; FIXTURE=<pattern> scopes it
+	tests/smoke/run.sh "$(FIXTURE)"
 
-layout: ## Layout-stress fixtures
-	tests/layout/run.sh
+layout: ## Layout-stress fixtures; FIXTURE=<pattern> scopes it
+	tests/layout/run.sh "$(FIXTURE)"
 
 review-page-two: ## Render five-family and all statement page-two reviews
 	tests/layout/render-page-two.sh
@@ -127,8 +147,8 @@ review-linebreak-parallel: ## review-linebreak with one sweep per value in paral
 review-pagefill: ## Report page fill and the atom forcing each break (#334)
 	tests/layout/report-pagefill.sh
 
-extract-test: ## Text-extraction round-trip against committed baselines
-	tests/extraction/run.sh
+extract-test: ## Extraction round-trip vs baselines; FIXTURE=<pattern> scopes it
+	tests/extraction/run.sh "$(FIXTURE)"
 
 bibliography-test: ## Biber sorting and identifier-precedence fixture
 	tests/bibliography/run.sh

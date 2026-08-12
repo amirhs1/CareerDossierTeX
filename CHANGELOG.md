@@ -291,6 +291,31 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   per key, the forms that build but produce a broken link, and the two
   characters — `#` and `%` — that must be escaped in any profile value.
 
+- Four test targets take an optional selector, so a single fixture can be re-run
+  without the ones ahead of it: `make regression TEST=<name>`, and
+  `FIXTURE=<pattern>` on `make smoke`, `make layout`, and `make extract-test`.
+  ([#359])
+
+  Until now no target accepted one. A failure in the fiftieth of fifty-four
+  layout fixtures cost the forty-nine compiles ahead of it — the whole suite's
+  wall time to learn one thing — which is the kind of price that pushes a
+  development loop towards guessing instead of checking. Measured on one
+  machine: `make layout` 95.1 s, `make layout FIXTURE=resume-two-page` 1.8 s.
+
+  `TEST` is passed to `l3build check <name>` and takes an exact test name.
+  `FIXTURE` is a shell glob matched anywhere in a fixture's basename, so a plain
+  word behaves as a substring search and a wildcard anchors it.
+  `tests/<suite>/run.sh --list` prints the available names and compiles nothing.
+
+  **No change without a selector.** `make check` and every CI job invoke the
+  suites exactly as before, and `.github/workflows/build.yml` is untouched. Two
+  properties keep a scoped run from being mistaken for a full one: a selector
+  matching nothing fails the run rather than reporting a clean one — every
+  assertion these suites make is per fixture, so a run that selected none passes
+  all of them — and a scoped run's closing line carries the filter, the count,
+  and `NOT a full run`. A new `tests/lint/run-fixture-filter.sh`, in the
+  sub-second `lint` slot, holds all of that to account.
+
 ### Changed
 
 - **BREAKING (type-scale token):** `\CDossierSizeTitle` is renamed to
@@ -760,6 +785,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#334]: https://github.com/amirhs1/CareerDossierTeX/issues/334
 [#337]: https://github.com/amirhs1/CareerDossierTeX/issues/337
 [#340]: https://github.com/amirhs1/CareerDossierTeX/issues/340
+[#359]: https://github.com/amirhs1/CareerDossierTeX/issues/359
 
 ## [0.7.0] - 2026-08-04
 

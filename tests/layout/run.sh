@@ -43,11 +43,77 @@
 # Requirements: lualatex, pdftotext (poppler) for the page-number check, and
 # pdfinfo (poppler) for A4 media-box verification.
 # Run from anywhere; the repository root is placed on TEXINPUTS.
+#
+# Usage:
+#   ./run.sh                    every fixture — the full suite, and what CI runs
+#   ./run.sh <pattern>          only the fixtures matching <pattern>
+#   ./run.sh --list [<pattern>] print the selection and compile nothing
+#
+# or, through the Makefile:  make layout FIXTURE=<pattern>
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 cd "$here"
+
+# Fixture selection (issue #359).
+#
+# With no pattern every fixture runs and nothing about this suite has changed;
+# that is the invocation CI makes and the one `make check` makes. A pattern
+# selects a subset, so a development loop can re-run the one fixture that failed
+# instead of paying for the fifty-odd compiles ahead of it.
+#
+# The pattern is a shell glob matched anywhere in the basename, so `two-page`
+# behaves as a substring search while `resume-*` anchors at the start. It is
+# left unquoted in the `case` below for exactly that reason.
+#
+# A pattern that selects nothing exits nonzero rather than reporting a clean
+# run. Every assertion this suite makes is made per fixture, so a run with no
+# fixtures passes all of them, and "0 fixtures, all passed" is indistinguishable
+# from a suite that actually checked something.
+fixture_filter=""
+list_only=0
+for arg in "$@"; do
+  case "$arg" in
+    --list) list_only=1 ;;
+    -*)     echo "unknown option: $arg" >&2; exit 2 ;;
+    *)      fixture_filter="$arg" ;;
+  esac
+done
+
+fixtures=()
+total=0
+for tex in *.tex; do
+  total=$(( total + 1 ))
+  if [ -z "$fixture_filter" ]; then
+    fixtures+=("$tex")
+  else
+    case "${tex%.tex}" in
+      *$fixture_filter*) fixtures+=("$tex") ;;
+    esac
+  fi
+done
+
+if [ "${#fixtures[@]}" -eq 0 ]; then
+  echo "NO FIXTURE MATCHES '$fixture_filter' (of $total in $here)."
+  echo "  ./run.sh --list  prints every available fixture name."
+  exit 1
+fi
+
+if [ "$list_only" -eq 1 ]; then
+  for tex in "${fixtures[@]}"; do echo "${tex%.tex}"; done
+  exit 0
+fi
+
+# Appended to the closing verdict so a filtered run can never be read as a full
+# one. Empty for a full run, which keeps that line byte-identical to before.
+scope_note=""
+if [ -n "$fixture_filter" ]; then
+  scope_note=" (filter '$fixture_filter': ${#fixtures[@]} of $total fixtures — NOT a full run)"
+  echo "filter '$fixture_filter': ${#fixtures[@]} of $total fixtures selected"
+  echo
+fi
+
 # $here joins TEXINPUTS so a zero-stretch control wrapper resolves the fixture
 # it \inputs by search path and not only by the working directory it inherits.
 export TEXINPUTS="$here:$root:${TEXINPUTS:-}"
@@ -75,7 +141,7 @@ fail=0
 # reports without asserting, which is how a candidate value is explored.
 page_fill_min="${CDOSSIER_PAGE_FILL_MIN-90}"
 
-for tex in *.tex; do
+for tex in "${fixtures[@]}"; do
   base="${tex%.tex}"
   echo "== $tex =="
 
@@ -114,8 +180,8 @@ for tex in *.tex; do
   # the font version and the engine, while its presence does not.
   declared="$(sed -n 's/^% STRETCHCONTROL:[[:space:]]*//p' "$tex" | head -1)"
   if [ -n "$declared" ]; then
-    # The control wrapper is built outside this directory: the fixture loop
-    # globbed *.tex before its first iteration, so a wrapper written here
+    # The control wrapper is built outside this directory: the fixture list was
+    # globbed out of *.tex before the loop started, so a wrapper written here
     # would escape this run and then be compiled as a fixture by the next one.
     # \AddToHook, unlike \AtBeginDocument, is a format-level command and may
     # precede \documentclass, which is what lets the wrapper reach into a
@@ -609,5 +675,7 @@ EOF
   esac
 done
 
-echo; [ "$fail" -eq 0 ] && echo "ALL LAYOUT FIXTURES PASSED" || echo "LAYOUT FIXTURES FAILED"
+echo
+[ "$fail" -eq 0 ] && echo "ALL LAYOUT FIXTURES PASSED$scope_note" \
+                  || echo "LAYOUT FIXTURES FAILED$scope_note"
 exit "$fail"
