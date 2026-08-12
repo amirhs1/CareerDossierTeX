@@ -51,8 +51,9 @@ If sources conflict, report the conflict instead of silently choosing one.
 Use these canonical sources when they exist:
 
 - `README.md` — supported behavior and user-facing status
-- `AI-POLICY.md` — AI use, disclosure, attribution, security, accountability,
-  and the map of this instruction file set
+- `AI-POLICY.md` — **normative for all AI use**: disclosure, attribution and
+  commit trailers, review and verification of AI output, security, and
+  accountability; also the map of this instruction file set
 - `CONTRIBUTING.md` — contribution, test, PR, CI, and release workflow
 - `.github/pull_request_template.md` — the canonical PR section set
 - `docs/NAMING-CONVENTION.md` — naming for GitHub objects and releases
@@ -69,6 +70,23 @@ Use these canonical sources when they exist:
 - `gh label list --limit 100` — the allowed labels. The live repository set is
   the definition; no file in the tree defines it
 
+**Precedence.** When two of the sources above seem to answer the same
+question, most specific wins: a skill's own `reference.md`, for its own
+procedure → this file → `CONTRIBUTING.md` → `docs/*`. A source that defers
+canonicity for a named rule says so at the point of deferral — as
+`CONTRIBUTING.md` "Work item structure" already does for the milestone,
+linked-issue, and branch-lifetime rules (see "Git and draft PR policy" below).
+Every rule has exactly one home; every other mention is a pointer, not a
+restatement.
+
+**One domain overrides that order.** `AI-POLICY.md` is normative for every
+question about AI use in this repository — disclosure, attribution and commit
+trailers, review and verification of AI output, security posture, and
+accountability. It outranks this file, `CONTRIBUTING.md`, and any skill on
+those questions, whatever their position in the chain above. Read it before
+acting on an AI-use question, and treat a conflicting statement anywhere else
+as the defect.
+
 ### Reading map: which of them a given change needs
 
 The list above is roughly 95,000 words. Reading all of it before every change is
@@ -78,7 +96,7 @@ and a tagging change has everything to do with it. Read the rows that apply.
 
 | Change kind | Beyond the always-row, read |
 |---|---|
-| **Always** | `Makefile` (through `make help`); at PR time `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, and `gh label list --limit 100` |
+| **Always** | `Makefile` (through `make help`); at PR time `AI-POLICY.md` ("Attribution" — every PR discloses), `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, and `gh label list --limit 100` |
 | Token, spacing, or vertical rhythm | `docs/API.md` (the token tables), `CONTRIBUTING.md` § "Spacing tokens", `CHANGELOG.md` |
 | Layout, page break, or typography | `docs/API.md`, the `CONTRIBUTING.md` § for the review target you use, `CHANGELOG.md` |
 | Tagging or PDF structure | `docs/ATS-EXTRACTION.md`, `docs/API.md`, `CONTRIBUTING.md` § "Tagged-PDF suite" |
@@ -123,11 +141,15 @@ Three things the map does not do:
 10. **No unsupported claims:** do not claim ATS compatibility, WCAG conformance,
    PDF/UA conformance, or broad accessibility without suitable validation.
 11. **Maintainer authority:** never push directly to `main`, mark a PR ready,
-    merge, enable auto-merge, publish a release, or alter repository protections
-    unless the maintainer explicitly authorizes that exact action.
+    approve, merge, enable auto-merge, publish a release, change release scope,
+    or alter Project or repository configuration/protections unless the
+    maintainer explicitly authorizes that exact action. This is the complete
+    action set; every other mention in this file or a skill is a pointer to it,
+    not a restatement.
 12. **AI disclosure:** every PR fills in the `AI assistance` section, and every
     AI co-author trailer on the branch is repeated there verbatim. A commit
-    trailer is not a disclosure. See "AI attribution and disclosure".
+    trailer is not a disclosure. `AI-POLICY.md` is normative for this and for
+    every other AI-use question; it states the rule, and this line is a pointer.
 
 ## Module ownership
 
@@ -321,7 +343,8 @@ constraints, options considered, recommendation, and trade-offs.
 - Preserve logical source and extracted-text reading order.
 - Keep text selectable and searchable.
 - Treat text extraction as a baseline check, not proof of full accessibility.
-- Claim tagged-PDF or PDF/UA conformance only after appropriate validation.
+- Rule 10 (No unsupported claims) governs every conformance claim reachable from
+  this section, tagged-PDF and PDF/UA included; it is not restated here.
 - Tagged structure is opt-in through `\DocumentMetadata{tagging=on}`. Keep the
   untagged path unchanged when editing tagging code.
 
@@ -329,14 +352,13 @@ constraints, options considered, recommendation, and trade-offs.
 
 Use `docs/NAMING-CONVENTION.md` for names.
 
-- Never commit or push directly to `main`.
+- Maintainer authority (rule 11 above) bounds this workflow; it is not
+  restated here.
 - Keep one focused issue per meaningful branch where practical.
 - Every issue carries a milestone, except work whose release is genuinely
   undecided — see the exception in `docs/NAMING-CONVENTION.md` §7, which names
   the issues that currently qualify. An epic parent only when the work genuinely
-  decomposes into several issues; where an epic exists its sub-issue graph is
-  canonical, and a body checklist is a rendering of that graph, not a second
-  register.
+  decomposes into several issues, on the terms `CONTRIBUTING.md` sets out.
 - Every PR links an issue with `Closes #...`, except a revert, a release chore,
   or a CI/tooling repair — which state the problem, proposal, and acceptance
   criteria in the PR body instead.
@@ -350,8 +372,9 @@ Use `docs/NAMING-CONVENTION.md` for names.
 - Do not add agent/tool prefixes to commit or PR titles.
 
 `CONTRIBUTING.md` "Work item structure" is the canonical statement of the
-milestone, linked-issue, and branch-lifetime rules above; the bullets here are
-the short agent-facing form.
+milestone, epic-decomposition, linked-issue, and branch-lifetime rules above;
+the bullets here are the short agent-facing form, and where the two differ the
+canonical statement governs.
 
 ### The first push is a commitment
 
@@ -391,36 +414,12 @@ than extra commits that move the branch's endpoint.
 
 ### AI attribution and disclosure
 
-These are two separate obligations, and the second is the one most often
-missed. Both are required.
-
-1. **Commit trailer.** Attribute only people or tools that materially
-   co-authored that commit. Use the agent's own configured attribution; do not
-   hard-code a vendor or model identity, and do not attribute a tool that did
-   not participate. The identity is not a fixed string — Claude Code's trailer
-   names the session's model, so this repository contains both `Claude Opus 5`
-   and `Claude Sonnet 5 <noreply@anthropic.com>`, while Codex writes
-   `Codex <noreply@openai.com>`.
-2. **PR disclosure.** Every PR fills in the `AI assistance` section of
-   `.github/pull_request_template.md`, which is its last section. Name each tool
-   that materially shaped the work, and repeat the exact identity and email of
-   every AI `Co-authored-by` trailer the branch carries so the commit record and
-   the PR record agree. A trailer does not satisfy this; the disclosure is
-   separate. State `None` when no AI tool materially participated.
-
-Put trailers in one final block, separated from the message body by a blank
-line. Use one `Co-authored-by:` line per actual co-author, with no blank lines
-between trailers, and do not duplicate equivalent attribution.
-
-Read the branch's real trailers before writing the disclosure rather than
-recalling them:
-
-```bash
-git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
-```
-
-`AI-POLICY.md` holds the policy behind both obligations; the `open-draft-pr`
-skill holds the step-by-step procedure.
+`AI-POLICY.md` ("Attribution") is normative for AI attribution and disclosure
+and states both obligations in full: what belongs in the commit trailer, why the
+trailer identity is not a fixed string, what the PR's `AI assistance` section
+must carry, and the command that reads the branch's real trailers. Read it
+before writing either. Nothing in this file or in a skill restates it, and
+where any of them appears to differ, `AI-POLICY.md` governs.
 
 When implementation of a focused issue is authorized, the agent may commit,
 push the focused branch, open or update a draft PR, and populate routine PR and
@@ -432,8 +431,7 @@ Follow:
 - the `open-draft-pr` skill, and `.github/pull_request_template.md` for the PR
   body
 
-The maintainer alone may mark the PR ready, approve, merge, enable auto-merge,
-change release scope, publish releases, or alter Project/repository configuration.
+Rule 11 (Maintainer authority) states the complete boundary on this delegation.
 
 ## High-risk changes
 
@@ -482,12 +480,13 @@ Update only the docs affected by behavior:
 - user-visible changes → `CHANGELOG.md`
 
 Follow `.agents/skills/release-notes/reference.md` (via the `release-notes` skill)
-for `CHANGELOG.md` house style and for drafting GitHub Release notes; tagging
-and publishing a release stay maintainer-only.
+for `CHANGELOG.md` house style and for drafting GitHub Release notes. Rule 11
+bounds what may then be done with them.
 
-Keep `LICENSE` unchanged. Add the required project copyright, license,
-maintenance-status, and maintainer notice to new `.cls` and `.sty` files. Update
-`manifest.txt` when the LPPL Work file set changes. Verify third-party licenses.
+`CONTRIBUTING.md` ("Licensing contributions") states the obligations that
+attach to adding or changing a licensed source file — the untouched `LICENSE`,
+the notices new `.cls` and `.sty` files carry, when `manifest.txt` changes, and
+third-party license checks. They are not repeated here.
 
 ## Completion report
 

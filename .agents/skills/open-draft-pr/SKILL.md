@@ -79,10 +79,9 @@ deleting the ones that seem empty. In order:
 `reference.md` states what belongs in each section.
 **`AI assistance` is always last.**
 
-The `Testing` section carries no `GitHub Actions passes` checkbox. Do not add
-one: the body is written before the first push, so no workflow has run when it
-is composed, and the line could only be left unticked or ticked against
-`AGENTS.md` rule 2. The real check-run status is already on the PR.
+The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
+not be added by hand. `reference.md` ("PR body") gives the reason; it is not
+repeated here.
 
 When writing the body to a file for `gh pr create --body-file`, start from a
 copy of the committed template so a section is never silently dropped, and keep
@@ -92,44 +91,36 @@ that copy outside the repository so it is never staged.
 
 Never leave this section as unfilled template text, and never omit it.
 
-1. Read the branch's real trailers before writing the section:
-
-   ```bash
-   git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
-   ```
-
+1. Read the branch's real trailers before writing the section — the command is
+   in `AI-POLICY.md` ("Attribution"), which is normative for this section.
 2. Name each AI tool that materially shaped the contribution and summarize what
-   it did in one clause. State `None` when no AI tool materially participated.
+   it did in one clause. `AI-POLICY.md` governs what counts as material and what
+   the section says when nothing qualifies.
 3. For every AI `Co-authored-by` trailer the branch commits carry, repeat that
    trailer's exact identity and email in the section so the commit record and
-   the PR record agree. Example shape:
+   the PR record agree — `.github/pull_request_template.md`'s `AI assistance`
+   section has the worked example.
 
-   ```text
-   Claude Code — drafted the token refactor and its regression test.
-   Co-authored-by: Claude Opus 5 <noreply@anthropic.com>
-   ```
-
-   The trailer identity is whatever the agent emitted, and it is not one fixed
-   string. Claude Code's trailer carries the session's model, so this repository
-   already contains both `Claude Opus 5` and `Claude Sonnet 5
-   <noreply@anthropic.com>`; Codex writes `Codex <noreply@openai.com>` and adds
-   `Generated with Codex.` to the PR body. Prose may name the tool loosely; the
-   trailer line must match the commit byte for byte.
+   The trailer identity is whatever the agent emitted, not one fixed string;
+   `AI-POLICY.md` ("Attribution") has the concrete identities, Codex's
+   included. Codex additionally adds `Generated with Codex.` to the PR body.
+   Prose may name the tool loosely; the trailer line must match the commit byte
+   for byte.
 
 4. Copy the identity from the commits, not from an example in this file or in
-   `AGENTS.md`. Do not invent a trailer for a tool that did not participate, do
-   not substitute a hard-coded vendor or model identity for the agent's actual
-   configured attribution, and do not add a second equivalent trailer.
+   `AI-POLICY.md` — the examples drift, the commits do not.
 5. Do not include prompts, private reasoning, secrets, or personal data.
 
-Disclosure does not transfer responsibility for the change. `AI-POLICY.md` holds
-the policy; `AGENTS.md` holds the commit-trailer rules.
+`AI-POLICY.md` ("Attribution") is normative for everything in this section —
+the trailer rules, the disclosure obligation, and the fact that disclosure does
+not transfer responsibility for the change. These steps are the procedure for
+satisfying it, not a second statement of it.
 
 ## Boundaries
 
-Do not mark the PR ready, merge, enable auto-merge, alter Project configuration,
-or change release scope without explicit maintainer authorization.
+`AGENTS.md` rule 11 (Maintainer authority) states the complete boundary on this
+delegation; it is not restated here.
 
-If GitHub Projects access is unavailable (missing `project` token scope or
-identifiers), still open the authorized draft PR, set all supported ordinary PR
-metadata, and report exactly which Project fields could not be set.
+When Project access is unavailable — a missing `project` token scope, or
+missing identifiers — `reference.md` ("Verification") states the fallback; it
+is not restated here.

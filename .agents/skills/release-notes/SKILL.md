@@ -46,9 +46,10 @@ Read and follow, in order:
 
 ## Boundaries
 
-Never tag or publish a release, or run `gh release create`/`gh release edit`
-to a non-draft state, without the maintainer's explicit authorization for
-that exact release. Drafting the CHANGELOG entry and the release-note text is
+Publishing a release is reserved by `AGENTS.md` rule 11 (Maintainer authority),
+which is not restated here. In this skill that reservation reaches tagging and
+any `gh release create` or `gh release edit` that leaves the release in a
+non-draft state. Drafting the CHANGELOG entry and the release-note text is
 routine; tagging and publishing are not.
 
 Do not invent a support claim (ATS, WCAG, PDF/UA, or otherwise) beyond what

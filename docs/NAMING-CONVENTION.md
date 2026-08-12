@@ -63,11 +63,10 @@ Example:
 
 Use lowercase `[epic]` for visual consistency with other bracket prefixes.
 
-Create an epic only for work that genuinely decomposes into several issues. An
-issue does not need a parent, and a placeholder epic created so a lone issue has
-somewhere to sit only reproduces its milestone. Where an epic exists, its
-sub-issue graph is canonical and a body checklist is a rendering of it. See
-"Work item structure" in `CONTRIBUTING.md`.
+`CONTRIBUTING.md` "Work item structure" is the canonical statement of when an
+epic is warranted and of the precedence between its sub-issue graph and its body
+checklist; this section states only the prefix's spelling and does not repeat
+those rules.
 
 ---
 
@@ -215,9 +214,9 @@ Rules:
 
 - A PR title should describe the whole branch, not every small commit.
 - Use `Closes #issue-number` in the PR body when the PR completes an issue.
-  Every PR links an issue except a revert, a release chore, or a CI/tooling
-  repair; those state the problem, proposal, and acceptance criteria in the body
-  instead. See "Work item structure" in `CONTRIBUTING.md`.
+  `CONTRIBUTING.md` "Work item structure" is the canonical statement of when a
+  PR must link an issue and of the exceptions; this section states only the
+  keyword's spelling.
 - Do not close a large epic from an early implementation PR. Close the focused sub-issue instead.
 - Use draft PRs for unfinished branches that need CI or notes.
 
@@ -319,16 +318,10 @@ v1.0.0 — Stable Public API
 Rules:
 
 - Milestones represent releases.
-- **Every issue carries a milestone**, with the one exception below. It is the
-  field that answers "which release", and the Project's `Phase` follows it. A
-  pull request inherits its issue's milestone.
-- **Exception — genuinely undecided work.** An issue whose release is not
-  decided stays unmilestoned rather than take a milestone that would misstate
-  the plan: deferred design work with no scheduled release, or a proposal whose
-  home has not been chosen. Such an issue also carries no Project `Phase`, and
-  it is excluded from release planning until it gets a milestone. Do not create
-  a placeholder milestone to hold it, and do not park it in the furthest-out
-  open milestone.
+- **Every issue carries a milestone**, with one "genuinely undecided work"
+  exception. `CONTRIBUTING.md` "Work item structure" is the canonical statement
+  of that rule and its exception; this section states only the naming
+  residue — which issues currently qualify.
 
   As of 2026-08-05 exactly two issues qualify:
   [#120](https://github.com/amirhs1/CareerDossierTeX/issues/120) (semantic font
@@ -403,7 +396,12 @@ Rules:
 
 - Parent epic can be `In Progress` while the release is active.
 - Sub-issues should move individually through the workflow.
-- PRs usually correspond to `In review`.
+- A newly opened **draft** PR is `In Progress` — it is still active work, not
+  yet a review request. Only once the maintainer marks it ready does it become
+  `In review`. This is the one place the `In Progress` and `In review` meanings
+  above both read as true, and draft status is the tie-breaker. This is the only
+  statement of the rule: `.agents/skills/open-draft-pr/SKILL.md` and its
+  `reference.md` ("Status transitions") both defer here rather than repeat it.
 - Merged PRs and closed issues should become `Done`.
 
 ---
