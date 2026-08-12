@@ -147,7 +147,10 @@ defining the Work remain authoritative.
   including `AGENTS.md`, and a conflicting statement elsewhere is the defect.
 - `AGENTS.md` is the canonical repository-wide operating contract, and holds
   every rule an agent must apply on every task except the AI-use questions
-  reserved above, for which it carries pointers here.
+  reserved above, for which it carries pointers here. Procedure that only
+  matters once a change is under way — how to run a suite, what a change has to
+  cover, the per-file module detail, the push gate — is stated in
+  `CONTRIBUTING.md`, `docs/`, or a skill, and pointed to from there.
 - `CLAUDE.md` is a thin Claude Code adapter and does not duplicate shared policy.
 - `.agents/skills/` holds the one copy of each occasional multi-step procedure:
   a `SKILL.md` and the `reference.md` it loads. This is the vendor-neutral
@@ -161,7 +164,7 @@ defining the Work remain authoritative.
 
 The split is by loading frequency, not by topic: what applies to every task
 belongs in `AGENTS.md`, which is always loaded in full, and what applies
-occasionally belongs in a skill, which is loaded on demand.
+occasionally belongs in the document or skill that owns it, loaded on demand.
 
 **Precedence.** When two of these documents seem to answer the same question,
 the more specific one wins. `AGENTS.md` "Sources of truth" states the order and

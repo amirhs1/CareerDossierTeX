@@ -2039,22 +2039,11 @@ only for an intended, reviewed output change.
 
 ### Coverage matrix
 
-Cover the relevant parts of this matrix, which `AGENTS.md` states in full:
-
-- each affected document family: résumé, industry letter, academic letter,
-  academic CV, and each affected statement `type`;
-- missing required `name` with a clear error, per affected class;
-- missing optional `phone` and `website` without stray separators;
-- long URL or contact field, and contact-line wrapping;
-- two-page output, page furniture, and single-page suppression;
-- text extraction and logical reading order, across the supported extractors;
-- unsupported-engine error;
-- every option's accepted and rejected values, including the error naming the
-  accepted values, and rejection reported exactly once;
-- all affected classes after changes to a shared package;
-- tagged and untagged output after changes to tagging or shared packages; and
-- bibliography sorting and field precedence after `careerdossier-biblatex.sty`
-  or Biber-facing changes.
+Which document families, fields, errors, extraction, tagging, link, and
+bibliography cases a change has to cover is stated once, in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) ("Coverage expectations"). It is not
+summarized here: the copy that used to sit in this section had already drifted,
+omitting the link copy-paste and link-annotation rows.
 
 ### Regression harness
 
