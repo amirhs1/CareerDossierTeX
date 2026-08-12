@@ -1,19 +1,48 @@
 #!/usr/bin/env bash
 # run-fixture-filter.sh — CareerDossierTeX suite fixture-selection contract
 #
-# `make smoke`, `make layout`, and `make extract-test` take an optional
-# `FIXTURE=<pattern>` that scopes the run to the fixtures matching it (issue
-# #359). That selection is the one part of a test runner whose own failure mode
-# is a *pass*: a suite that selects nothing makes none of its assertions and
-# reports every one of them clean. This script is what stops that being silent.
+# `make smoke`, `make layout`, `make extract-test`, and `make tagging` take an
+# optional `FIXTURE=<pattern>` that scopes the run to the fixtures matching it
+# (issues #359 and #367). That selection is the one part of a test runner whose
+# own failure mode is a *pass*: a suite that selects nothing makes none of its
+# assertions and reports every one of them clean. This script is what stops that
+# being silent.
 #
 # For each scopable runner it asserts:
 #
-#   1. `--list` with no pattern names every *.tex fixture in that directory and
-#      nothing else. This is a real check in both directions for the smoke
-#      runner, whose fixture universe is a hand-written `cases' array rather
-#      than a glob — an entry added without a fixture, or a fixture added
-#      without an entry, is caught here rather than at the next full run.
+#   1. `--list` with no pattern names the runner's whole fixture universe and
+#      nothing else — in both directions, so an entry added without a fixture or
+#      a fixture added without an entry is caught here rather than at the next
+#      full run. The universe has two shapes and each gets the check that can
+#      actually fail for it:
+#
+#      `file'  — one selectable name per *.tex in the directory. Equality with
+#               the directory listing is the assertion. Real work for the smoke
+#               runner, whose universe is a hand-written `cases' array.
+#
+#      `group' — tests/tagging only. Its selectable unit is the fixture *group*,
+#               because a group's `-untagged' and `-ua2' companions are checked
+#               against the base fixture (check_untagged and
+#               check_visual_equivalence are claims about the pair) and mean
+#               nothing selected apart from it. So 12 groups are backed by 37
+#               .tex files and the `file' form above would assert something
+#               false.
+#
+#               The obvious substitute is also wrong, and is written down here
+#               so it is not rediscovered: deriving the groups from the
+#               `*-body.inc.tex' files yields 10, not 12, because
+#               `resume-displaydoctitle-off' shares no body with a sibling and
+#               `biblatex-ua2' is a standalone feasibility fixture. A universe
+#               check built that way would under-count by two and pass —
+#               precisely the shape of bug it exists to catch.
+#
+#               What is true of all 12 is that each owns a `<group>.tex`. So the
+#               mapping is asserted in both directions: every listed group has
+#               its own .tex, and every .tex resolves to exactly one listed group
+#               — as that group's own file or as one of its `-untagged',
+#               `-ua2', or `-body.inc' companions. A group added without files,
+#               a file added without a group, and a name that resolves two ways
+#               all fail.
 #   2. A pattern that matches selects a proper, non-empty subset, and every name
 #      in it really does match the pattern.
 #   3. A pattern that matches nothing exits nonzero. Silence here is the whole
@@ -34,15 +63,72 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 fail=0
 
+# Membership without a pipe. `printf ... | grep -q' would exit at the first
+# match, hand the producer a SIGPIPE, and under `pipefail' report the pipeline
+# as failed — a "not found" for something that is there. Every membership test
+# below therefore walks an array.
+listed_groups=()
+group_is_listed() {
+  local candidate
+  for candidate in ${listed_groups[@]+"${listed_groups[@]}"}; do
+    [ "$candidate" = "$1" ] && return 0
+  done
+  return 1
+}
+
+# The `group' universe check: the tagging runner's selectable groups against the
+# .tex files backing them, asserted in both directions. See the header for why
+# equality with the directory listing cannot be the assertion here.
+check_group_universe() {
+  local dir="$1"
+  local bad=0 name base suffix remainder file
+  local resolved
+
+  for name in ${listed_groups[@]+"${listed_groups[@]}"}; do
+    if [ ! -f "$dir/$name.tex" ]; then
+      echo "      selectable group with no $name.tex: $name"
+      bad=1
+    fi
+  done
+
+  for file in "$dir"/*.tex; do
+    base="$(basename "$file" .tex)"
+    resolved=()
+    for suffix in -untagged -ua2 -body.inc; do
+      case "$base" in
+        *"$suffix")
+          remainder="${base%"$suffix"}"
+          group_is_listed "$remainder" && resolved+=("$remainder")
+          ;;
+      esac
+    done
+    group_is_listed "$base" && resolved+=("$base")
+
+    if [ "${#resolved[@]}" -eq 0 ]; then
+      echo "      fixture file belongs to no selectable group: $base.tex"
+      bad=1
+    elif [ "${#resolved[@]}" -gt 1 ]; then
+      echo "      $base.tex resolves to ${#resolved[@]} groups (${resolved[*]}): ambiguous"
+      bad=1
+    fi
+  done
+
+  return "$bad"
+}
+
 # suite | a pattern that must match at least one but not all of its fixtures
+#       | universe shape: `file' (one selectable name per .tex) or `group'
 suites=(
-  "smoke|bad-medium"
-  "layout|two-page"
-  "extraction|statement"
+  "smoke|bad-medium|file"
+  "layout|two-page|file"
+  "extraction|statement|file"
+  "tagging|cv-subsection|group"
 )
 
 for spec in "${suites[@]}"; do
-  suite="${spec%%|*}"; pattern="${spec#*|}"
+  IFS='|' read -r suite pattern universe <<EOF
+$spec
+EOF
   runner="$root/tests/$suite/run.sh"
   echo "== tests/$suite/run.sh =="
 
@@ -65,33 +151,57 @@ for spec in "${suites[@]}"; do
     fail=1; continue
   fi
 
-  # 1. The unfiltered universe is exactly the fixture files on disk.
+  # 1. The unfiltered universe agrees with the fixture files on disk, in the
+  #    form that can actually fail for this runner's universe shape.
   listed="$("$runner" --list)"
-  ondisk="$(cd "$root/tests/$suite" && for f in *.tex; do echo "${f%.tex}"; done)"
   listed_sorted="$(printf '%s\n' "$listed" | sort)"
-  ondisk_sorted="$(printf '%s\n' "$ondisk" | sort)"
-  if [ "$listed_sorted" != "$ondisk_sorted" ]; then
-    echo "  UNIVERSE MISMATCH: --list and tests/$suite/*.tex disagree."
-    while IFS= read -r name; do
-      [ -n "$name" ] || continue
-      if ! printf '%s\n' "$ondisk_sorted" | grep -qxF "$name"; then
-        echo "      selected but no such fixture file: $name"
-      fi
-    done <<EOF
+  listed_groups=()
+  while IFS= read -r name; do
+    [ -n "$name" ] && listed_groups+=("$name")
+  done <<EOF
+$listed
+EOF
+
+  if [ "$universe" = group ]; then
+    universe_out="$(check_group_universe "$root/tests/$suite")"
+    rc=$?
+    if [ "$rc" -eq 0 ]; then
+      n_files="$(cd "$root/tests/$suite" && ls *.tex | wc -l | tr -d '[:space:]')"
+      echo "  --list names all ${#listed_groups[@]} fixture groups, backed by all $n_files .tex files"
+    else
+      echo "  UNIVERSE MISMATCH: --list and tests/$suite/*.tex disagree."
+      printf '%s\n' "$universe_out"
+      fail=1
+    fi
+  else
+    # The `file' shape: the selectable names are exactly the *.tex basenames.
+    # A heredoc terminator has to sit at column 0, which is why the `EOF' lines
+    # below are not indented with the loops that read them.
+    ondisk="$(cd "$root/tests/$suite" && for f in *.tex; do echo "${f%.tex}"; done)"
+    ondisk_sorted="$(printf '%s\n' "$ondisk" | sort)"
+    if [ "$listed_sorted" != "$ondisk_sorted" ]; then
+      echo "  UNIVERSE MISMATCH: --list and tests/$suite/*.tex disagree."
+      while IFS= read -r name; do
+        [ -n "$name" ] || continue
+        if ! printf '%s\n' "$ondisk_sorted" | grep -qxF "$name"; then
+          echo "      selected but no such fixture file: $name"
+        fi
+      done <<EOF
 $listed_sorted
 EOF
-    while IFS= read -r name; do
-      [ -n "$name" ] || continue
-      if ! printf '%s\n' "$listed_sorted" | grep -qxF "$name"; then
-        echo "      fixture file never selected: $name"
-      fi
-    done <<EOF
+      while IFS= read -r name; do
+        [ -n "$name" ] || continue
+        if ! printf '%s\n' "$listed_sorted" | grep -qxF "$name"; then
+          echo "      fixture file never selected: $name"
+        fi
+      done <<EOF
 $ondisk_sorted
 EOF
-    fail=1
-  else
-    n_all="$(printf '%s\n' "$listed" | grep -c . || true)"
-    echo "  --list names all $n_all fixtures and no others"
+      fail=1
+    else
+      n_all="$(printf '%s\n' "$listed" | grep -c . || true)"
+      echo "  --list names all $n_all fixtures and no others"
+    fi
   fi
 
   # 2. A matching pattern selects a proper, non-empty subset, and every selected
@@ -174,7 +284,7 @@ makefile="$root/Makefile"
 # `\t' in an ERE nor a backslash-heavy escaped pattern survives the two greps
 # this suite runs under: local ugrep and GNU grep on the CI runner.
 tab="$(printf '\t')"
-for suite in smoke layout extraction; do
+for suite in smoke layout extraction tagging; do
   # tests/extraction/run.sh is reached through the `extract-test' target.
   if ! grep -qF "${tab}tests/$suite/run.sh \"\$(FIXTURE)\"" "$makefile"; then
     echo "  tests/$suite/run.sh is not invoked with \"\$(FIXTURE)\" in the Makefile"

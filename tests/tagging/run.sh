@@ -40,6 +40,26 @@
 # did not run.
 #
 # Regenerate extraction baselines intentionally with:  ./run.sh --update
+#
+# Usage:
+#   ./run.sh                    every fixture group — the full suite, and what CI runs
+#   ./run.sh <pattern>          only the fixture groups matching <pattern>
+#   ./run.sh --list [<pattern>] print the selection and compile nothing
+#   ./run.sh --update [<pat>]   regenerate the selected baselines
+#
+# or, through the Makefile:  make tagging FIXTURE=<pattern>
+#
+# The selectable unit is the fixture GROUP, not the .tex file (issue #367).
+#
+# A group is a base fixture plus the companions that mean nothing on their own:
+# `<group>-untagged.tex', which exists to be compared against the tagged build,
+# and `<group>-ua2.tex', which shares the group's `<group>-body.inc.tex' so a
+# veraPDF verdict describes the same output the structural checks assert on.
+# check_untagged and check_visual_equivalence are claims about the *pair*, so a
+# selection that could separate the members would let a run assert less than it
+# appears to. Twelve groups are backed by 37 .tex files for that reason, which
+# is also why tests/lint/run-fixture-filter.sh cannot hold this suite to the
+# name-per-file universe check it applies to the other four.
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -59,10 +79,98 @@ export TEXINPUTS="$here:$root:${TEXINPUTS:-}"
 # database rather than duplicating it.
 export BIBINPUTS="$root/tests/bibliography:${BIBINPUTS:-}"
 
+# Fixture-group selection (issue #367), the interface issue #359 gave the other
+# four runners. The pattern is a shell glob matched anywhere in the group name,
+# so `cv' behaves as a substring search and `resume-*' anchors at the start; it
+# is left unquoted in the `case' below for exactly that reason.
+#
+# With no pattern every group runs and nothing about this suite has changed —
+# that is the invocation CI and `make check' make, and the one the closing line
+# must stay byte-identical for.
+#
+# A pattern selecting nothing exits nonzero rather than reporting a clean run.
+# Every assertion here is made per fixture, so a run with no fixtures passes all
+# of them and is indistinguishable from a suite that checked something.
+#
+# `--update' composes with a pattern, as the extraction runner's does: a
+# baseline regeneration should rewrite only the baselines the change was meant
+# to move.
+fixture_filter=""
+list_only=0
 update=0
-[ "${1:-}" = "--update" ] && update=1
+for arg in "$@"; do
+  case "$arg" in
+    --update) update=1 ;;
+    --list)   list_only=1 ;;
+    -*)       echo "unknown option: $arg" >&2; exit 2 ;;
+    *)        fixture_filter="$arg" ;;
+  esac
+done
+
+# The five profiles driven by the shared loop, then the standalone groups in the
+# order they run. This array is the suite's fixture universe: `--list' prints it,
+# every block below is gated on it, and tests/lint/run-fixture-filter.sh asserts
+# it against the .tex files on disk in both directions.
+profiles=(resume cv letter academic-letter statement)
+groups=(
+  "${profiles[@]}"
+  resume-contact-labels
+  resume-entrymeta-inline
+  resume-linkdecoration
+  letter-recipient-address
+  cv-subsection
+  resume-displaydoctitle-off
+  biblatex-ua2
+)
+
+selected=()
+for group in "${groups[@]}"; do
+  if [ -z "$fixture_filter" ]; then
+    selected+=("$group")
+  else
+    case "$group" in
+      *$fixture_filter*) selected+=("$group") ;;
+    esac
+  fi
+done
+
+if [ "${#selected[@]}" -eq 0 ]; then
+  echo "NO FIXTURE MATCHES '$fixture_filter' (of ${#groups[@]} in $here)."
+  echo "  ./run.sh --list  prints every available fixture group name."
+  exit 1
+fi
+
+if [ "$list_only" -eq 1 ]; then
+  printf '%s\n' "${selected[@]}"
+  exit 0
+fi
+
+group_selected() {
+  local group
+  for group in ${selected[@]+"${selected[@]}"}; do
+    [ "$group" = "$1" ] && return 0
+  done
+  return 1
+}
+
+# Appended to the closing verdict so a filtered run can never be read as a full
+# one. Empty for a full run, which keeps that line byte-identical to before.
+scope_note=""
+if [ -n "$fixture_filter" ]; then
+  scope_note=" (filter '$fixture_filter': ${#selected[@]} of ${#groups[@]} fixture groups — NOT a full run)"
+  echo "filter '$fixture_filter': ${#selected[@]} of ${#groups[@]} fixture groups selected"
+  echo
+fi
+
 fail=0
 skipped=()
+# Groups that were selected and then ran nothing at all, because the only gate
+# they have is unavailable here. Without this a scoped run that selected one
+# such group would print the same closing line as a scoped run that checked it
+# (issue #367). Populated only under a filter: unfiltered, a gate that did not
+# run is already named in `skipped', and adding a second notice there would
+# change the full-run output this change is required to leave alone.
+gated_out=()
 
 for command in lualatex pdftotext pdfinfo; do
   if ! command -v "$command" >/dev/null 2>&1; then
@@ -941,7 +1049,8 @@ check_biblatex_feasibility() {
 
 record_toolchain
 
-for base in resume cv letter academic-letter statement; do
+for base in "${profiles[@]}"; do
+  group_selected "$base" || continue
   echo "== $base =="
   compile_fixture "$base.tex" "$base" || continue
   compile_fixture "$base-untagged.tex" "$base-untagged" || continue
@@ -988,6 +1097,7 @@ done
 # sits outside the five-document loop above: that loop asserts two-page
 # continuation furniture, which this fixture must not have. It still runs as
 # part of the ordinary suite rather than as a separate manual step.
+if group_selected resume-contact-labels; then
 echo "== resume-contact-labels =="
 if compile_fixture resume-contact-labels.tex resume-contact-labels; then
   check_contact_label_tagging resume-contact-labels
@@ -998,6 +1108,7 @@ if compile_fixture resume-contact-labels.tex resume-contact-labels; then
       && validate_ua2 resume-contact-labels
   fi
 fi
+fi
 
 # Entry metadata set inline (issue #230). Outside the five-document loop for the
 # same reason as the fixture above: it is a one-page document with no
@@ -1005,6 +1116,7 @@ fi
 # by tests/extraction; what only this suite can see is what `inline' does to the
 # tagged path, which is supposed to be nothing a consumer can tell apart from
 # `column' — one artifact per join, and the same logical text either way.
+if group_selected resume-entrymeta-inline; then
 echo "== resume-entrymeta-inline =="
 if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
   check_structure_text resume-entrymeta-inline
@@ -1019,11 +1131,13 @@ if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
       && validate_ua2 resume-entrymeta-inline
   fi
 fi
+fi
 
 # Link decoration under `medium=screen' (issue #278). Outside the five-document
 # loop for the same reason as the two fixtures above: one page, no continuation
 # furniture. What only this suite can see is whether ulem's rebox pushed the
 # underlined anchor text out of the structure tree.
+if group_selected resume-linkdecoration; then
 echo "== resume-linkdecoration =="
 if compile_fixture resume-linkdecoration.tex resume-linkdecoration; then
   check_structure_text resume-linkdecoration
@@ -1035,11 +1149,13 @@ if compile_fixture resume-linkdecoration.tex resume-linkdecoration; then
       && validate_ua2 resume-linkdecoration
   fi
 fi
+fi
 
 # The full recipient block (issue #302). Outside the loop because it is a
 # one-page fixture with no continuation furniture, and because the only thing it
 # is here to pin is the recipient block -- including the `\\' the user writes
 # inside recipient-address, which no other fixture sets.
+if group_selected letter-recipient-address; then
 echo "== letter-recipient-address =="
 if compile_fixture letter-recipient-address.tex letter-recipient-address; then
   check_structure_text letter-recipient-address
@@ -1054,6 +1170,7 @@ if compile_fixture letter-recipient-address.tex letter-recipient-address; then
       && validate_ua2 letter-recipient-address
   fi
 fi
+fi
 
 # The second heading level (issue #337). Outside the five-document loop for the
 # same reason as the fixtures above: one page, no continuation furniture.
@@ -1062,6 +1179,7 @@ fi
 # heading has no rule and no size of its own, so a subsection that emitted a
 # second /H2 -- or no heading element at all -- would look exactly right and
 # would still flatten the hierarchy for anything reading the structure tree.
+if group_selected cv-subsection; then
 echo "== cv-subsection =="
 if compile_fixture cv-subsection.tex cv-subsection; then
   check_subsection_hierarchy cv-subsection
@@ -1072,18 +1190,29 @@ if compile_fixture cv-subsection.tex cv-subsection; then
       && validate_ua2 cv-subsection
   fi
 fi
+fi
 
 # The DisplayDocTitle override sits outside the five-document loop for the same
 # reason: it is a one-page fixture with no continuation furniture, and it is the
 # only fixture whose preamble contradicts the package on purpose.
+if group_selected resume-displaydoctitle-off; then
 echo "== resume-displaydoctitle-off =="
 if compile_fixture resume-displaydoctitle-off.tex resume-displaydoctitle-off; then
   check_display_doc_title_override resume-displaydoctitle-off
 fi
+fi
 
-if [ "$have_biber" -eq 1 ]; then
-  echo
-  check_biblatex_feasibility
+# The feasibility fixture is a selectable group like any other (issue #367). It
+# is the one group whose *only* path is behind a gate, so selecting it on a
+# machine without Biber runs nothing at all -- recorded below rather than left
+# to print as a pass.
+if group_selected biblatex-ua2; then
+  if [ "$have_biber" -eq 1 ]; then
+    echo
+    check_biblatex_feasibility
+  elif [ -n "$fixture_filter" ]; then
+    gated_out+=("biblatex-ua2 (biber or latexmk missing)")
+  fi
 fi
 
 echo
@@ -1093,14 +1222,36 @@ if [ "${#skipped[@]}" -gt 0 ]; then
   echo
 fi
 
+# A gate that is unavailable and a group that was never selected are different
+# facts, and under a filter they would otherwise reach the reader as the same
+# blank space (issue #367). This names the groups that were asked for and then
+# checked nothing.
+if [ "${#gated_out[@]}" -gt 0 ]; then
+  echo "SELECTED BUT NOT RUN — nothing was checked for:"
+  printf '  - %s\n' "${gated_out[@]}"
+  echo
+fi
+
+# Every group the filter selected was gated out, so not one assertion was made.
+# "All passed" would be true and useless -- it is the same sentence a run that
+# checked twelve groups prints. This is the pattern-matched-nothing failure in
+# another costume, so it fails the same way. Unreachable without a filter, so
+# `make check` and the CI job are unaffected.
+if [ "${#gated_out[@]}" -gt 0 ] && [ "${#gated_out[@]}" -eq "${#selected[@]}" ]; then
+  echo "NO TAGGING FIXTURE RAN$scope_note"
+  echo "  Every selected group needs a tool this machine does not have."
+  echo "Reports: $reports"
+  exit 1
+fi
+
 if [ "$fail" -eq 0 ]; then
   if [ "$update" -eq 1 ]; then
-    echo "BASELINES UPDATED — review the diff before committing."
+    echo "BASELINES UPDATED — review the diff before committing.$scope_note"
   else
-    echo "ALL TAGGING FIXTURES PASSED"
+    echo "ALL TAGGING FIXTURES PASSED$scope_note"
   fi
 else
-  echo "TAGGING FIXTURES FAILED"
+  echo "TAGGING FIXTURES FAILED$scope_note"
 fi
 echo "Reports: $reports"
 exit "$fail"
