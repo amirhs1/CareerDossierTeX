@@ -11,8 +11,8 @@ When implementation of a focused issue is authorized, the agent may create
 feature-branch commits, push that non-`main` branch, open or update a draft PR,
 and populate routine metadata.
 
-The maintainer alone may mark the PR ready, approve, merge, enable auto-merge,
-change release scope, publish releases, or alter Project/repository configuration.
+`AGENTS.md` rule 11 (Maintainer authority) states the complete boundary on this
+delegation; it is not restated here.
 
 ## Sources of truth
 
@@ -31,12 +31,11 @@ If directly authorized work has no focused issue, stop before the first push and
 ask the maintainer whether to create or select one and which release metadata
 applies. Do not invent a milestone, Phase, or Priority to fill the gap.
 
-Three kinds of work are exempt from needing a focused issue, per
-`CONTRIBUTING.md` "Work item structure": a revert of a merged change, a release
-chore, and a CI/tooling repair that restores an existing check. For these,
-proceed without stopping, but state the problem, the proposal, and the
-acceptance criteria in the PR body — the exemption is from the issue object, not
-from the reasoning. Set the milestone from the release the work lands in; leave
+`CONTRIBUTING.md` "Work item structure" names the three kinds of work exempt
+from needing a focused issue, and is not repeated here. For those, proceed
+without stopping, but state the problem, the proposal, and the acceptance
+criteria in the PR body — the exemption is from the issue object, not from the
+reasoning. Set the milestone from the release the work lands in; leave
 Phase and Priority to follow it as usual. Anything outside those three still
 stops for the maintainer.
 
@@ -92,15 +91,9 @@ section order and fill every section. In order:
 - **Visual verification** — visual and accessibility checks when relevant;
 - **Notes for review** — design decisions, known limitations, follow-up work,
   and documentation/changelog impact;
-- **AI assistance** — last, and never omitted or left as template text. Name
-  each AI tool that materially shaped the contribution and its role, or state
-  `None`. When a branch commit carries an AI `Co-authored-by` trailer, repeat
-  that trailer's exact identity and email so the commit and PR records agree.
-  Read the trailers rather than recalling them:
-
-  ```bash
-  git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
-  ```
+- **AI assistance** — last, and never omitted or left as template text.
+  `AI-POLICY.md` ("Attribution") is normative for the obligation and
+  `SKILL.md` ("AI assistance") holds the procedure; neither is repeated here.
 
 The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
 not be added by hand. The body is written before the first push, so no workflow
@@ -181,15 +174,21 @@ permitted to execute, which is closer to build and CI configuration.
 
 ## Status transitions
 
-- focused issue selected and branch created → issue `In Progress`
-- draft PR opened → PR `In Progress`
-- maintainer marks PR ready → PR `In review`
-- PR merged → PR and completed issue `Done`
-- PR closed without merge → restore or preserve the appropriate issue status
-- blocked work → add `blocked` and keep an appropriate non-`Done` status
+`docs/NAMING-CONVENTION.md` section 9 is the canonical statement of the `Status`
+vocabulary and of the issue and PR transitions through it — including which
+value a newly opened draft PR takes and when it changes. Read the value there;
+this skill does not restate it, and an answer derived from anywhere else is
+wrong.
+
+Two cases section 9 leaves to this skill, because they are procedure rather than
+naming:
+
+- PR closed without merge → restore or preserve the appropriate issue status;
+- blocked work → add `blocked` and keep an appropriate non-`Done` status.
 
 Prefer GitHub Project workflows for deterministic transitions such as merged PRs
-and closed issues becoming `Done`.
+and closed issues becoming `Done`. Section 9 also carries the warning about
+transcribing option strings exactly, which applies to every value set here.
 
 ## Routine authorization
 
@@ -206,13 +205,12 @@ Obtain explicit approval before:
 
 - creating, renaming, deleting, or recoloring labels;
 - creating, editing, closing, or deleting milestones;
-- creating or changing Project fields or allowed values;
-- changing Project workflows or views;
-- changing Phase or Priority contrary to the issue;
-- moving work to another release;
-- marking the PR ready;
-- enabling auto-merge or merging;
-- changing repository settings, branch protections, or rulesets.
+- creating or changing Project fields, allowed values, workflows, or views;
+- changing Phase or Priority contrary to the issue.
+
+Everything `AGENTS.md` rule 11 (Maintainer authority) reserves is reserved here
+too. Rule 11 states that action set; this list does not repeat it, and adds only
+the GitHub-object cases an agent meets while populating PR metadata.
 
 ## Verification
 

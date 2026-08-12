@@ -30,13 +30,12 @@ that reason. An AI-assisted contribution is held to the same standard as any
 other contribution.
 
 **Disclose material assistance.** If an agent or model wrote or substantially
-shaped code, tests, documentation, or other submitted content, name the tool and
-summarize its role in the `AI assistance` section of the pull-request template,
-which is its last section. A short statement is enough; do not include prompts,
-private reasoning, secrets, or personal data. Commit attribution does not
-replace the pull-request disclosure — when a commit carries an AI
-`Co-authored-by` trailer, repeat that trailer's exact identity and email in the
-disclosure so the two records agree.
+shaped code, tests, documentation, or other submitted content, fill in the
+`AI assistance` section of the pull-request template. `AI-POLICY.md`
+("Attribution") is normative for what that section must contain and how it
+relates to commit trailers; neither is repeated here. A short statement is
+enough, and it must not include prompts, private reasoning, secrets, or personal
+data.
 
 **Own what you submit.** Before opening the pull request:
 
@@ -67,9 +66,9 @@ Development requires:
 - BibLaTeX and Biber when running the optional bibliography example or the full
   `make check` suite.
 
-The ordinary résumé, letter, and no-BibLaTeX CV paths do not require BibLaTeX or
-Biber. CareerDossierTeX is LuaLaTeX-only; XeLaTeX and pdfLaTeX fail with an
-actionable engine error.
+The ordinary résumé, letter, and no-BibLaTeX CV paths do not require BibLaTeX
+or Biber. Install LuaLaTeX: `AGENTS.md` rule 1 states the engine scope and what
+the unsupported engines do, and is not repeated here.
 
 ## Work item structure
 
@@ -125,8 +124,10 @@ an exception applies, not a form to fill in.
 
 ### 3. Every pull request comes from a focused branch, merged within three days
 
-Branch from an up-to-date `main`, one issue per branch where practical. Never
-commit or push to `main` directly.
+Branch from an up-to-date `main`, one issue per branch where practical. Direct
+commits and pushes to `main` are reserved to the maintainer; `AGENTS.md` rule
+11 (Maintainer authority) states that reservation and the rest of the
+maintainer-only action set, which this guide does not repeat.
 
 Three days is the assessable part of "short-lived". A branch that outlives it is
 rebased onto `main`, split into smaller pieces, or closed — not silently
@@ -189,35 +190,8 @@ Use:
 type/short-description
 ```
 
-Allowed prefixes:
-
-```text
-feat/
-fix/
-docs/
-test/
-ci/
-refactor/
-release/
-chore/
-```
-
-`docs/NAMING-CONVENTION.md` section 3 is the canonical list.
-
-Examples:
-
-```text
-docs/v0.1-api
-feat/shared-foundation
-feat/resume-class
-feat/industry-letter
-fix/contact-separators
-test/regression-harness
-ci/lualatex-build
-release/v0.1.0
-```
-
-Keep branch names short, lowercase, and free of spaces.
+`docs/NAMING-CONVENTION.md` section 3 is the canonical list of allowed prefixes
+and worked examples; it is not reproduced here.
 
 ## Standard branch workflow
 
@@ -257,10 +231,8 @@ git push -u origin feat/resume-class
 
 Open a draft pull request early when the work is incomplete but ready for CI or design discussion.
 
-Keep the branch short-lived. Merge or rebase onto `main` within three days; if
-the work will not land in that window, split it rather than letting the branch
-run. See "Every pull request comes from a focused branch, merged within three
-days".
+Keep the branch short-lived, on the terms "Every pull request comes from a
+focused branch, merged within three days" sets out above.
 
 ## Commit messages
 
@@ -270,31 +242,8 @@ Use a lightweight Conventional Commits format:
 type(scope): imperative summary
 ```
 
-Examples:
-
-```text
-docs(api): define v0.1 metadata keys
-feat(core): add profile metadata storage
-feat(resume): add dossier entry environment
-feat(letter): add recipient address block
-fix(components): omit separators for empty fields
-test(resume): add long URL stress example
-ci(build): compile industry examples with LuaLaTeX
-refactor(theme): centralize monochrome color tokens
-```
-
-Useful types:
-
-```text
-feat
-fix
-docs
-test
-ci
-refactor
-chore
-release
-```
+`docs/NAMING-CONVENTION.md` section 4 is the canonical list of types and
+worked examples; it is not reproduced here.
 
 Each commit should represent one coherent change. Avoid combining unrelated API, typography, CI, and documentation edits in one commit.
 
@@ -474,6 +423,11 @@ When a change spans both — a shared package edit that both classes render — 
 or update the unit-level regression for the shared logic *and* re-run the smoke,
 extraction, and layout coverage for both classes.
 
+Every review target below writes its PDFs, PNGs, logs, and review record under
+the gitignored `build/` directory. That output is generated evidence for a human
+reader: record the result in the pull request, and never commit the artifacts
+themselves. The individual targets do not repeat this.
+
 ### Five-family page-two visual review
 
 Build the repeatable page-two review set from the repository root:
@@ -511,9 +465,6 @@ request:
    overfull boxes); and
 7. links, page breaks, and body content remain visible and unclipped.
 
-The PDFs, page-two PNGs, logs, and review record are generated evidence under
-the gitignored `build/` directory. They must not be committed.
-
 ### Size/margin reference matrix
 
 Build the `{normal,narrow} x {10pt,11pt,12pt}` reference matrix across all four
@@ -549,9 +500,6 @@ pull request:
    the remaining combinations so they can all be reviewed together; and
 6. print and grayscale behaviour, and text extraction and logical reading
    order, are unchanged from the existing per-class coverage.
-
-The PDFs, logs, and review record are generated evidence under the gitignored
-`build/` directory. They must not be committed.
 
 ### Entry-metadata placement and de-emphasis matrix
 
@@ -651,8 +599,7 @@ Three rules for reading it, learned the hard way in #309 and #310:
 
 The instrument carries no baseline and is not part of `make check`. It produces
 evidence for a human; the decisions it informs are pinned by `.tlg` baselines
-and layout fixtures. Its output under `build/linebreak-sweep/` is generated
-evidence and must not be committed.
+and layout fixtures. Its output lands under `build/linebreak-sweep/`.
 
 For a large sweep, `make review-linebreak-parallel` takes the same arguments and
 runs one sweep per value concurrently, merging the results into the same place:
@@ -818,21 +765,11 @@ Changes affecting a shared package should test every affected class. There are
 four: résumé, cover letter (industry and academic families), academic CV, and
 statement.
 
-`AGENTS.md` ("Build and test") states the coverage matrix in full. In summary,
-cover the relevant parts of:
-
-1. each affected document family, and each affected statement `type`;
-2. missing required `name`, per affected class;
-3. missing optional `phone` and `website` without stray separators;
-4. long URL or contact field, contact-line wrapping, and the copy-paste
-   integrity of any link the change touches;
-5. two-page output, page furniture, and single-page suppression;
-6. text extraction and logical reading order;
-7. the unsupported-engine error;
-8. every option's accepted and rejected values, including the error naming the
-   accepted values, and rejection reported exactly once;
-9. tagged and untagged output, after tagging or shared-package changes;
-10. bibliography sorting and field precedence, after Biber-facing changes.
+`AGENTS.md` ("Build and test") states the coverage matrix — which document
+families, required and optional fields, engine and option errors, extraction,
+tagging, links, and bibliography cases a change has to cover. It is the one
+statement of that matrix and is not summarized here, because a summary is what
+drifts.
 
 Example extraction command:
 
@@ -995,12 +932,11 @@ It additionally fails any fixture whose PDF carries a `GoToR` action at all, so
 a regression names the actual symptom rather than showing an opaque multiset
 difference. It needs only LuaLaTeX.
 
-Two things it borrows from the metadata suite are worth keeping. Its fixtures
-build uncompressed, because link annotations otherwise sit inside a compressed
-object stream where a text search of the file finds nothing whether or not the
-annotation is there. And every assertion is paired with a positive control
-(`/Subtype /Link`, found by the same method on the same file), so a fixture that
-stopped emitting links cannot pass by silence.
+It borrows two things from the metadata suite above — build uncompressed for
+the same reason, and pair every assertion with a positive control, here
+`/Subtype /Link` found by the same method on the same file, so a fixture that
+stopped emitting links cannot pass by silence. See "Default-path metadata
+suite" for why both matter; they are not re-explained here.
 
 When you add a fixture, keep its addresses short enough that no link wraps: a
 wrapped link is emitted as two annotations sharing one action, which the
@@ -1377,30 +1313,13 @@ Do not use private commands in examples or documentation.
 
 ### Package responsibility
 
-Place code according to ownership:
+Place code according to ownership. `AGENTS.md` ("Module ownership") carries the
+concern-to-module map, the dependency direction, and the two standing rules
+about page geometry and the CV's independence from BibLaTeX;
+`docs/ARCHITECTURE.md` has the per-file detail. Neither is reproduced here.
 
-- metadata and validation → `careerdossier-base.sty`;
-- type scale, vertical rhythm, list metrics, and page geometry →
-  `careerdossier-tokens.sty`;
-- fonts and semantic text roles → `careerdossier-typography.sty`;
-- colors and visual tokens → `careerdossier-theme.sty`;
-- reusable rendered pieces, page furniture, and PDF metadata →
-  `careerdossier-components.sty`;
-- the BibLaTeX/Biber boundary → `careerdossier-biblatex.sty`;
-- résumé structure and options → `careerdossier-resume.cls`;
-- cover-letter structure and prose behavior → `careerdossier-letter.cls`;
-- academic CV flow and the manual publication list → `careerdossier-cv.cls`;
-- the statement model and its type-specific validation →
-  `careerdossier-statement.cls`.
-
-`AGENTS.md` ("Module ownership") carries the same map with the dependency
-direction; `docs/ARCHITECTURE.md` has the per-file detail.
-
-Page geometry belongs to `careerdossier-tokens.sty`, not to a class: a class
-chooses paper and options and does not set margins itself. Do not duplicate
-contact-line logic inside the classes, and do not load
-`careerdossier-biblatex.sty` from `careerdossier-cv.cls` — the CV must build
-without a bibliography toolchain.
+One rule this guide adds: do not duplicate contact-line logic inside the
+classes.
 
 ### Maintainable LaTeX
 
@@ -1423,16 +1342,16 @@ Avoid:
 
 ### Optional fields
 
-Render optional fields structurally. Build a list of present fields and insert separators between them.
-
-Do not generate every separator first and attempt to remove empty ones later.
+`AGENTS.md` rule 5 states how optional fields are rendered and is not repeated
+here. The implementation consequence: do not generate every separator first and
+attempt to remove the empty ones later.
 
 ### Engine support
 
-CareerDossierTeX is LuaLaTeX-only as of `v0.4.0`. Unsupported engines receive a
-clear package or class error; `careerdossier-typography` owns the guard.
-
-Do not add partial XeLaTeX or pdfLaTeX support without defining, documenting, and testing it.
+`AGENTS.md` rule 1 states the engine scope and is not repeated here. Two things
+specific to writing the code: `careerdossier-typography` owns the guard, and
+partial XeLaTeX or pdfLaTeX support is not to be added without defining,
+documenting, and testing it.
 
 ## Documentation requirements
 

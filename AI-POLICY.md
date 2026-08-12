@@ -31,26 +31,48 @@ is sufficient.
 
 ## Attribution
 
-Disclosure and Git authorship are related but distinct:
+Disclosure and Git authorship are related but distinct. Disclosure is a
+statement in the pull request about how the work was produced; a
+`Co-authored-by` trailer is a claim about who authored a particular commit.
+Neither substitutes for the other. These are **two separate obligations**, the
+second is the one most often missed, and both are required whenever an AI tool
+materially participated.
 
-- Material AI assistance is disclosed in the pull-request description, in the
-  `AI assistance` section of the pull-request template. A commit trailer does
-  not satisfy this, and the section is not left blank.
-- A commit uses a `Co-authored-by` trailer only for a person or tool that
-  materially co-authored that commit.
-- Agents use their current configured attribution rather than a hard-coded
-  vendor or model identity. Do not attribute a tool that did not participate,
-  and do not add duplicate attribution blocks.
-- When a branch carries an AI trailer, the disclosure repeats that trailer's
-  exact identity and email, so the commit record and the PR record agree. The
-  identity is not a fixed string: an agent's trailer may name the specific model
-  that produced the work, and it varies between sessions and tools.
-- Human contributors retain responsibility for the resulting contribution,
-  regardless of any trailer.
+**1. Commit trailer.** Attribute only people or tools that materially
+co-authored that commit. Use the agent's own configured attribution; do not
+hard-code a vendor or model identity, and do not attribute a tool that did not
+participate. The identity is not a fixed string — Claude Code's trailer names
+the session's model, so this repository contains both `Claude Opus 5` and
+`Claude Sonnet 5 <noreply@anthropic.com>`, while Codex writes
+`Codex <noreply@openai.com>`.
 
-The exact commit-message rules live in `AGENTS.md`, and the step-by-step
-procedure lives in the `open-draft-pr` skill. GitHub's trailer format is
-documented in [Creating a commit with multiple authors][github-coauthors].
+Put trailers in one final block, separated from the message body by a blank
+line. Use one `Co-authored-by:` line per actual co-author, with no blank lines
+between trailers, and do not duplicate equivalent attribution.
+
+**2. PR disclosure.** Every PR fills in the `AI assistance` section of
+`.github/pull_request_template.md`, which is its last section. Name each tool
+that materially shaped the work, and repeat the exact identity and email of
+every AI `Co-authored-by` trailer the branch carries so the commit record and
+the PR record agree. A trailer does not satisfy this; the disclosure is
+separate. State `None` when no AI tool materially participated.
+
+Read the branch's real trailers before writing the disclosure rather than
+recalling them:
+
+```bash
+git log --format='%(trailers:key=Co-authored-by)' main..HEAD | sort -u
+```
+
+The policy behind both is that attribution must describe what actually
+happened. Attributing a tool that did not participate and omitting one that did
+are the same kind of error, and both misstate the record. Human contributors
+retain responsibility for the resulting contribution regardless of any trailer;
+disclosure never transfers responsibility to the tool.
+
+The `open-draft-pr` skill holds the step-by-step procedure for satisfying these
+obligations. GitHub's trailer format is documented in
+[Creating a commit with multiple authors][github-coauthors].
 
 ## Review and verification
 
@@ -119,8 +141,13 @@ defining the Work remain authoritative.
 
 ## Agent instruction structure
 
+- **This file is normative for AI use** — disclosure, attribution and commit
+  trailers, review and verification of AI output, security posture, and
+  accountability. On those questions it outranks every other file in this list,
+  including `AGENTS.md`, and a conflicting statement elsewhere is the defect.
 - `AGENTS.md` is the canonical repository-wide operating contract, and holds
-  every rule an agent must apply on every task.
+  every rule an agent must apply on every task except the AI-use questions
+  reserved above, for which it carries pointers here.
 - `CLAUDE.md` is a thin Claude Code adapter and does not duplicate shared policy.
 - `.agents/skills/` holds the one copy of each occasional multi-step procedure:
   a `SKILL.md` and the `reference.md` it loads. This is the vendor-neutral
@@ -136,13 +163,28 @@ The split is by loading frequency, not by topic: what applies to every task
 belongs in `AGENTS.md`, which is always loaded in full, and what applies
 occasionally belongs in a skill, which is loaded on demand.
 
-Two rules are deliberately repeated across these files rather than stated once,
-because an agent that loads only one of them must still be bound: the limits of
-maintainer authority, and the AI-disclosure obligation. Repetition is a hazard —
-copies drift, and that is how the duplicated skill files diverged — so it is
-confined to these two, each is short, and each must be updated everywhere in the
-same change. Everything else has one home. Do not add a third exception without
-deciding that the rule is worth the drift risk.
+**Precedence.** When two of these documents seem to answer the same question,
+the more specific one wins. `AGENTS.md` "Sources of truth" states the order and
+is the only place it is stated; this map cites it rather than repeating it. A
+document that defers canonicity for a named rule says so at the point of
+deferral.
+
+Within this instruction set, every rule has exactly one home, and every other
+mention is a pointer rather than a restatement. Repetition is a hazard —
+copies drift, and that is how the duplicated skill files diverged before this
+layout.
+This supersedes the earlier allowance for two deliberately repeated rules: by
+the time it was audited, maintainer authority had become four incompatible
+action lists and the two "short" sanctioned copies had grown to 32 and 36 lines.
+A rule an agent must always be bound by needs no safety copy — every skill's
+read order loads `AGENTS.md` before its own `reference.md`, so the single copy
+is read first whatever the entry point.
+
+The scope of that claim is this instruction set: `AGENTS.md`, `CLAUDE.md`, this
+file, `CONTRIBUTING.md`, `docs/NAMING-CONVENTION.md`, `.agents/skills/`, and the
+PR template. The reference documentation under `docs/` and `README.md` describes
+the software to its users, and a user-facing fact such as the LuaLaTeX-only
+engine rule is legitimately stated in each document whose readers need it.
 
 Hard requirements should be enforced by tests, linters, permissions, sandboxing,
 hooks, branch protection, or rulesets when practical. Instruction text alone

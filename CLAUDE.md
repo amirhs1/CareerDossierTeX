@@ -70,12 +70,8 @@ after a confusing failure.
 
 ## Git attribution
 
-Use Claude Code's current `attribution` configuration. Do not rely on the
-deprecated `includeCoAuthoredBy` setting, replace configured attribution with a
-hard-coded generic identity, or add a duplicate attribution trailer. Attribute
-Claude only when it materially co-authored the commit, and preserve at most one
-attribution block.
-
-`AGENTS.md` ("AI attribution and disclosure") holds the trailer format, the
-separate PR-disclosure obligation, and why the trailer identity is not a fixed
-string.
+Use Claude Code's current `attribution` configuration, and do not rely on the
+deprecated `includeCoAuthoredBy` setting. That configuration is how this tool
+satisfies `AI-POLICY.md` ("Attribution"), which is normative for the trailer
+format, when a tool may be attributed at all, the separate PR-disclosure
+obligation, and why the trailer identity is not a fixed string.
