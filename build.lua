@@ -3,7 +3,8 @@
 -- This harness runs the module-level regression suite: each `.lvt` source in
 -- tests/regression/ is compiled and its filtered log compared against the saved
 -- `.tlg` baseline. The baseline is the assertion, so regenerate one only for an
--- intended, reviewed output change (see CONTRIBUTING.md, "Saving a baseline").
+-- intended, reviewed output change (see docs/TESTING.md, "Baselines are
+-- load-bearing").
 --
 --   l3build check              run the whole regression suite
 --   l3build check <name>       run one test (name without the .lvt extension)

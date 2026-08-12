@@ -40,11 +40,12 @@ conditions.
 LICENSE                       the LPPL v1.3c licence text (kept unmodified)
 README.md                     overview, supported behaviour, licence, and version
 CHANGELOG.md                  user-visible changes per release
-CONTRIBUTING.md               contribution, test, and release workflow
+CONTRIBUTING.md               contribution and release workflow
 AGENTS.md                     operating contract for coding agents
 build.lua                     l3build configuration for the regression suite
 Makefile                      local build and test entry points
-docs/                         API, architecture, roadmap, migration, design guidance
+docs/                         API, architecture, roadmap, migration, testing,
+                              and design guidance
 examples/                     user-facing example documents
 tests/                        lint, regression, smoke, layout, extraction,
                               bibliography, link-integrity, metadata,

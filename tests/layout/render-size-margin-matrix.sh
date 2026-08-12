@@ -145,7 +145,7 @@ fi
     printf '  %s\n' "${diagnostic_jobs[@]}"
   fi
   echo
-  echo "Review each PDF using the checklist in CONTRIBUTING.md."
+  echo "Review each PDF using the checklist in docs/TESTING.md."
 } >"$output/review-record.txt"
 
 echo

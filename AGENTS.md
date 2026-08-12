@@ -51,17 +51,17 @@ rows that apply.
 | Change kind | Beyond the always-row, read |
 |---|---|
 | **Always** | `Makefile` (through `make help`); at PR time `AI-POLICY.md` ("Attribution" — every PR discloses), `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, and `gh label list --limit 100` |
-| **Any behavior change** | `CONTRIBUTING.md` § "Coverage expectations" (the test coverage matrix) |
-| Token, spacing, or vertical rhythm | `docs/API.md` (the token tables), `CONTRIBUTING.md` § "Spacing tokens: reporting a value is not rendering a gap", `CHANGELOG.md` |
-| Layout, page break, or typography | `docs/API.md`, the `CONTRIBUTING.md` § for the review target you use, `CHANGELOG.md` |
-| Tagging or PDF structure | `docs/ATS-EXTRACTION.md`, `docs/API.md`, `CONTRIBUTING.md` § "Tagged-PDF suite" |
-| Extraction or reading order | `docs/ATS-EXTRACTION.md`, `CONTRIBUTING.md` § "Extraction round-trip test" |
-| Bibliography or Biber | `docs/API.md`, `docs/ARCHITECTURE.md` (the BibLaTeX boundary), `CONTRIBUTING.md` § "BibLaTeX/Biber fixture" |
+| **Any behavior change** | `docs/TESTING.md` § "Coverage expectations" (the test coverage matrix) |
+| Token, spacing, or vertical rhythm | `docs/API.md` (the token tables), `docs/TESTING.md` § "Spacing tokens: reporting a value is not rendering a gap", `CHANGELOG.md` |
+| Layout, page break, or typography | `docs/API.md`, the `docs/TESTING.md` § for the review target you use, `CHANGELOG.md` |
+| Tagging or PDF structure | `docs/ATS-EXTRACTION.md`, `docs/API.md`, `docs/TESTING.md` § "Tagged-PDF suite" |
+| Extraction or reading order | `docs/ATS-EXTRACTION.md`, `docs/TESTING.md` § "Extraction round-trip test" |
+| Bibliography or Biber | `docs/API.md`, `docs/ARCHITECTURE.md` (the BibLaTeX boundary), `docs/TESTING.md` § "BibLaTeX/Biber fixture" |
 | Class or package option | `docs/API.md`, `docs/ARCHITECTURE.md`, `CHANGELOG.md`; plus `docs/MIGRATION.md` and `docs/ROADMAP.md` when it renames, retires, or moves a release boundary |
 | New or removed module | `manifest.txt`, `docs/ARCHITECTURE.md`, `README.md` |
 | Documentation only | the document itself; `README.md` when user-facing status changes; `CHANGELOG.md` only when the change is user-visible |
 | Agent tooling, skills, or sandbox | `AI-POLICY.md`, `CLAUDE.md`, `.agents/skills/`, `CONTRIBUTING.md` § "AI-assisted contributions" |
-| Build, test harness, or CI | `Makefile`, `CONTRIBUTING.md` § "Local builds", `.github/workflows/build.yml` |
+| Build, test harness, or CI | `Makefile`, `CONTRIBUTING.md` § "Local builds", `docs/TESTING.md` (the suite the harness runs), `.github/workflows/build.yml` |
 | CHANGELOG or release preparation | `.agents/skills/release-notes/reference.md`, `CHANGELOG.md`, `docs/ROADMAP.md` |
 
 Three facts no row carries: `gh label list --limit 100` is the *definition* of
@@ -172,13 +172,14 @@ destructive-action, or metadata decision that cannot be resolved from the repo.
 
 ## Build and test
 
-`CONTRIBUTING.md` is the test documentation, and none of it is reproduced here:
-"Local builds" and "Scoping a suite while you iterate" for running a suite and
-for what a target's CI job is called, "Test-driven where practical" for where
-test material lives, "Match the test to the module" for which kind of test a
-concern takes, "Coverage expectations" for the matrix a change has to cover,
-"Baselines are load-bearing" for regenerating a `.tlg` or extraction reference,
-and "Log inspection" and "Visual verification" for what to read afterwards.
+`docs/TESTING.md` is the test documentation, and none of it is reproduced here:
+"Test-driven where practical" for where test material lives, "Match the test to
+the module" for which kind of test a concern takes, "Coverage expectations" for
+the matrix a change has to cover, "Baselines are load-bearing" for regenerating
+a `.tlg` or extraction reference, and "Log inspection" and "Visual verification"
+for what to read afterwards. `CONTRIBUTING.md` keeps the two sections about
+*running* rather than writing a suite — "Local builds" and "Scoping a suite
+while you iterate", for the invocation and for what a target's CI job is called.
 Three rules govern whatever that reading says:
 
 - Every behavior change adds or updates the smallest test that would fail

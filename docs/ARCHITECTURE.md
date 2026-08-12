@@ -1857,7 +1857,8 @@ CareerDossierTeX/
 │   ├── ATS-EXTRACTION.md
 │   ├── MIGRATION.md
 │   ├── NAMING-CONVENTION.md
-│   └── ROADMAP.md
+│   ├── ROADMAP.md
+│   └── TESTING.md
 ├── tests/
 │   ├── lint/
 │   ├── regression/
@@ -2041,7 +2042,7 @@ only for an intended, reviewed output change.
 
 Which document families, fields, errors, extraction, tagging, link, and
 bibliography cases a change has to cover is stated once, in
-[`CONTRIBUTING.md`](../CONTRIBUTING.md) ("Coverage expectations"). It is not
+[`TESTING.md`](TESTING.md) ("Coverage expectations"). It is not
 summarized here: the copy that used to sit in this section had already drifted,
 omitting the link copy-paste and link-annotation rows.
 
