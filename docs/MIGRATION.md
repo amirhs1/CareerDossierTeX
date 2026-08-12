@@ -7,12 +7,24 @@ interface itself is in [`API.md`](API.md).
 
 ## Status
 
-`v0.7.0` is the current published release. It renames public design tokens, adds
-new ones beside them, **retires three**, and retunes the calibrated
-vertical-rhythm ratios. Renamed tokens need a source edit only if a document
-reads or sets them by name, and all three retired tokens rendered nothing at the
-`v0.6.0` defaults — but three mechanism changes do move the page: letter and
-statement headers tighten, the gap above a bullet list inside an entry tightens,
+`v0.8.0` is the current published release. **It changes how every existing
+document renders in one place:** an entry's dates and location, and a statement's
+application-context line, were italic and are now upright black body text. No
+source edit is required for that; `muted=italic` restores the previous
+appearance in any of the four classes. Two public names change and need a source
+edit only in a document that used them by name — `\CDossierSizeTitle` is renamed
+to `\CDossierSizeDocumentTitle`, and `\CDossierPrimaryColor` is removed in favour
+of the identical `\CDossierTextColor`. One further change is invisible in
+ordinary use: `CDossierEntry` now reads its body as an argument, so
+catcode-sensitive content such as `\verb` no longer works directly inside an
+entry. See [`[0.8.0]`](#080---2026-08-12) below.
+
+`v0.7.0` renames public design tokens, adds new ones beside them, **retires
+three**, and retunes the calibrated vertical-rhythm ratios. Renamed tokens need a
+source edit only if a document reads or sets them by name, and all three retired
+tokens rendered nothing at the `v0.6.0` defaults — but three mechanism changes
+do move the page: letter and statement headers tighten, the gap above a bullet
+list inside an entry tightens,
 and a document with no `headline` gains a little space below the name. **The
 retune then reflows every document.** It also makes three undocumented
 class-to-package primitives private, which changes no output and affects no
@@ -21,7 +33,8 @@ numbered `v0.6.1` until 2026-08-01.
 
 `v0.6.0` **removes the `density` option and changes every class's layout
 defaults** — see [Upgrading to `v0.6.0`](#upgrading-to-v060) below. A document
-coming from `v0.5.x` or earlier needs that section as well as the `v0.7.0` one.
+coming from `v0.5.x` or earlier needs that section as well as the `v0.7.0` and
+`v0.8.0` ones.
 
 `v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
@@ -344,7 +357,7 @@ is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
 in this format.
 
-## [0.8.0] - unreleased
+## [0.8.0] - 2026-08-12
 
 ### `CDossierEntry` reads its body as an argument
 
@@ -819,10 +832,10 @@ token for the class being styled, and set all three when styling every class
 from one shared preamble. Retuning any of them is tracked separately under
 issue #206.
 
-Note the intermediate name. Earlier in this same unreleased release the token
-was renamed `\CDossierSharedHeaderBelowSkip`; that name is superseded here and
-was never released, so `v0.6.0` source migrates straight from
-`\CDossierHeaderBelowSkip` to the three tokens above.
+Note the intermediate name. Earlier in this same release the token was renamed
+`\CDossierSharedHeaderBelowSkip`; that name is superseded here and was never
+released, so `v0.6.0` source migrates straight from `\CDossierHeaderBelowSkip`
+to the three tokens above.
 
 ### `careerdossier-tokens` no longer reads global `\documentclass` options
 

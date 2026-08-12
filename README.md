@@ -7,17 +7,26 @@ and the options at a glance. [`docs/API.md`](docs/API.md) is the complete
 interface reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing
 the code.
 
-> **Status:** `v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership`
-> is the current published release. Several vertical placement and spacing
-> decisions were being made by a third-party default or a hard-coded constant
-> rather than by the design system meant to own them; this release hands each
-> one back to a calibrated token, gives the tokens one naming convention, and
-> retunes the ratios now that every gap is expressible. It also adds
-> `medium=print|screen`, which decides whether page furniture is emitted at all.
-> **Breaking:** public design tokens are renamed, split, and retired, and the
-> retune means **every document reflows** — though no supported combination
-> changes its page count. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the
-> upgrade path.
+> **Status:** `v0.8.0 — Semantic Structure and Tagged Output` is the current
+> published release. A document's structure was visible on the page but largely
+> absent from the file: headings carried no heading role, sections opened no
+> division, and the document's own title and language never reached the
+> catalogue. This release gives the structure a name — a document-title heading
+> role, `Sect` divisions around résumé and CV sections, `\CDossierSubsection` as
+> a second heading level, and `/Lang` and `/DisplayDocTitle` on the default
+> build path. It also makes the de-emphasis of entry metadata a decision the
+> author makes, through `muted=italic|gray|both|plain` and
+> `entrymeta=column|inline`, and it stops several classes of silent failure:
+> links that degraded to plain text without `hyperref`, a mistyped `orcid`
+> value, a scheme-less profile link that emitted a remote-PDF action, and a
+> body-less entry that stranded up to a fifth of a page.
+> **Breaking:** entry metadata is **no longer italic by default**, so every
+> existing document renders differently in that one respect; `muted=italic`
+> restores it. `\CDossierSizeTitle` is renamed to `\CDossierSizeDocumentTitle`,
+> `\CDossierPrimaryColor` is removed in favour of the identical
+> `\CDossierTextColor`, and `CDossierEntry` now reads its body as an argument,
+> so `\verb` and other catcode-sensitive content must be defined outside it. See
+> [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -471,7 +480,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership
+v0.8.0 — Semantic Structure and Tagged Output
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.

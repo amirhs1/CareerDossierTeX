@@ -14,11 +14,10 @@ produce one complete, documented, and tested vertical slice. Tests are added
 under `tests/` with the behavior they protect, not collected into a separate
 test pass at the end of a milestone.
 
-> **Current status:** `v0.7.0 — Page Furniture, Output Medium, and Spacing
-> Ownership` is released. `v0.3.0` is dropped. The next planned release is
-> `v0.8.0 — Semantic Structure and Tagged Output`, followed by `v0.9.0 —
-> Documentation, Examples, and Release Readiness` and `v1.0.0 — Stable Public
-> API`.
+> **Current status:** `v0.8.0 — Semantic Structure and Tagged Output` is
+> released. `v0.3.0` is dropped. The next planned release is `v0.9.0 —
+> Documentation, Examples, and Release Readiness`, followed by `v1.0.0 — Stable
+> Public API`.
 >
 > **Renumbered on 2026-08-01.** `v0.7.0` was numbered `v0.6.1` until then. It
 > adds new public API — the `medium` option and new spacing tokens — which is a
@@ -51,7 +50,7 @@ test pass at the end of a milestone.
 | `v0.5.0` | Statement classes and broader customization | Released |
 | `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
 | `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released |
-| `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Planned |
+| `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Released |
 | `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Planned |
 | `v1.0.0` | Stable, documented public API | Planned |
 | `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** |
@@ -694,6 +693,71 @@ and `emergencystretch` is set in more than one place with no named token (#272).
 - the extracted reading order of bibliography entry numbers corrected (#199), a
   follow-up from #196 that `v0.7.0` lists as a non-goal because fixing it means
   changing `biblatex` label geometry.
+
+The eleven items above are the scope this phase was planned with on 2026-08-05.
+The milestone grew to 97 issues, and the additional work falls into five groups
+rather than one expansion:
+
+- **the heading structure completed beyond the `/H1`.** The document identity
+  and the statement title are recorded as heading *titles*, not only as roles
+  (#305), and `\CDossierSubsection` adds the second heading level the record
+  classes lacked, role-mapped to `/H3` (#337). The letter's subject line gets
+  its own semantic role (#299), and `\hfill`-positioned entry and recipient text
+  no longer concatenates in extraction (#302).
+- **the de-emphasis decision grew a fourth value.** #271 settled the role;
+  #324 then added `muted=plain` and made it the default, so entry metadata is no
+  longer italic in any class — the release's one unconditional rendered break.
+- **link correctness, once #278 made links visible.** A scheme-less profile
+  value emitted a remote-PDF action rather than a URI one (#328); the `linkedin`,
+  `github`, and `scholar` keys now accept a bare handle (#330); an `orcid` value
+  that is not ORCID-shaped warns (#331); and a build without `hyperref`, in which
+  every link degrades to plain text, warns once instead of silently (#329).
+- **the page-break policy, which the `emergencystretch` work opened.** A
+  body-less entry (#332) and an empty section (#340) each leaked a keep penalty;
+  the section keep became a bound with a page-fill policy behind it (#333); the
+  club and widow penalties were bounded for the prose families (#342); the
+  hyphenation policy (#309) and the emergency-stretch derivation (#310) were
+  decided by measurement; and #351 declined the page-builder tolerance that
+  would have lifted the one remaining outlier.
+- **the instruments that hold all of it to account.** `make links` guards
+  copy-paste integrity of every URL and e-mail address (#294, #312); `make
+  review-linebreak` (#316, #320) and `make review-pagefill` (#334) report what
+  the layout suite now asserts on; the fixture-selector work scoped five suites
+  (#359, #367); and #348 fixed a club/widow detector that could not see
+  paragraph boundaries in the prose families.
+
+The remainder is documentation and agent-instruction work (#279, #292, #345,
+#347, #357, #358, #360, #364) and test coverage (#319, #335, #336) that changes
+no public behaviour.
+
+### Release criteria
+
+- tagged output from every supported example contains an `/H1` for the document
+  identity (#267, #305), and the résumé and CV open a `Sect` division at each
+  section heading (#268), with `\CDossierSubsection` nesting a depth-3 heading
+  inside it (#337);
+- `/Lang` is present on the default build path (#276) and `DisplayDocTitle` is
+  set so the derived `/Title` reaches the viewer (#277);
+- `muted=plain|italic|gray|both` and `entrymeta=column|inline` are accepted and
+  rejected as documented on every class that takes them, with `muted=plain` the
+  default and `muted=italic` restoring the previous appearance (#271, #324,
+  #230);
+- the `Title` collision is resolved (#269) and no declared semantic colour token
+  is left unconsumed (#270), with a use assertion at each survivor's consumer;
+- every link the toolkit emits carries a `/S/URI` action and never a `/S/GoToR`
+  one (#328), a bare handle and a full URL both resolve (#330), and `make
+  annotations` holds that to account;
+- no URL or e-mail address in any supported example splits so that it fails to
+  reassemble by copy-paste, on every toolchain the suite runs (#294, #312);
+- bibliography entry numbers extract on their entry's line (#199);
+- no page a keep policy governs falls below 90% of its page goal (#333, #334),
+  and no committed fixture strands a club or widow line above the ratchet #348
+  set;
+- `make check` is green — lint, regression, extraction, smoke, layout,
+  bibliography, links, metadata, annotations, tagging, and all eleven examples;
+- `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/ATS-EXTRACTION.md`,
+  `docs/MIGRATION.md`, and `CHANGELOG.md` are updated;
+- tag and GitHub Release `v0.8.0` are published.
 
 ### Explicit non-goals
 

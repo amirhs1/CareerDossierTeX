@@ -8,6 +8,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-12
+
 ### Added
 
 - `\CDossierSubsection{<title>}` gives the résumé and the CV a second heading
@@ -531,30 +533,6 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   what makes the decision reviewable — including against a future change that
   sets them indirectly by loading a language package.
 
-### Removed
-
-- **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
-  component, class, or example ever called it, and its underlying color,
-  `cdossier-primary`, was `gray 0` — the same value as `cdossier-text` under a
-  different name, so **no document that never called it renders
-  differently.** ([#270])
-
-  `theme-tokens.lvt` previously only asserted that the theme's five public
-  color tokens existed, the same shape #255 found in the spacing fixtures,
-  where 17 of 25 tokens were reported rather than rendered. The remaining four
-  tokens now each have a use assertion at their consumer — `\CDossierTextColor`
-  at the running head and folio, `\CDossierRuleColor` at the section rule,
-  `\CDossierMutedColor` at the entry-metadata de-emphasis role ([#271]), and
-  `\CDossierLinkColor` at the `hyperref` color-links hook, which is checked by
-  confirming hyperref's own `\@linkcolor` resolves to the theme's color name —
-  the same class of hook-ordering bug #276 and #277 found nearby.
-
-  A document that calls `\CDossierPrimaryColor` now gets an
-  undefined-control-sequence error; use `\CDossierTextColor` instead. See
-  [`docs/MIGRATION.md`](docs/MIGRATION.md).
-
-### Changed
-
 - The section heading's page-break keep is now a bound rather than a
   prohibition. A section heading is placed only when at least
   `\CDossierSectionNeedLines` (default `4`) lines remain on the page; otherwise
@@ -582,6 +560,28 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   (2.7% → 2.2%), CV 15.73 pt → 8.80 pt (2.4% → 1.4%). The letter and statement
   families are unchanged — they have no section rule and their remaining slack
   comes from the club/widow policy, which this does not touch.
+
+### Removed
+
+- **BREAKING (color token):** `\CDossierPrimaryColor` is removed. No
+  component, class, or example ever called it, and its underlying color,
+  `cdossier-primary`, was `gray 0` — the same value as `cdossier-text` under a
+  different name, so **no document that never called it renders
+  differently.** ([#270])
+
+  `theme-tokens.lvt` previously only asserted that the theme's five public
+  color tokens existed, the same shape #255 found in the spacing fixtures,
+  where 17 of 25 tokens were reported rather than rendered. The remaining four
+  tokens now each have a use assertion at their consumer — `\CDossierTextColor`
+  at the running head and folio, `\CDossierRuleColor` at the section rule,
+  `\CDossierMutedColor` at the entry-metadata de-emphasis role ([#271]), and
+  `\CDossierLinkColor` at the `hyperref` color-links hook, which is checked by
+  confirming hyperref's own `\@linkcolor` resolves to the theme's color name —
+  the same class of hook-ordering bug #276 and #277 found nearby.
+
+  A document that calls `\CDossierPrimaryColor` now gets an
+  undefined-control-sequence error; use `\CDossierTextColor` instead. See
+  [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 ### Fixed
 
@@ -2036,10 +2036,12 @@ in a monochrome theme.
   was already correct, so extraction output is unaffected.
 - Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.1...v0.4.0
 [0.2.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.1.0...v0.1.1

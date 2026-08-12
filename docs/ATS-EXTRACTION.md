@@ -8,18 +8,21 @@ package is built toward. It is **not** documentation of shipped behavior; only
 **Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
 sections that discuss XeTeX behavior are retained as rationale and history, and
 are marked as such.
-**Current published scope (`v0.7.0`):** English industry résumé, industry and academic
+**Current published scope (`v0.8.0`):** English industry résumé, industry and academic
 cover-letter families, academic CV, statement documents, and optional publication
 support; US Letter (default) and opt-in A4, monochrome, LuaLaTeX, and opt-in
 tagged structure. The statement class supports a default statement of interest
 plus six other statement types — see `docs/API.md` and `docs/ROADMAP.md`. Every
 class accepts the calibrated `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`
 options plus `medium=print|screen`, which decides whether page furniture is
-emitted at all, and `muted=italic|gray|both|plain`, which decides how an entry's
-dates and location are de-emphasized; the résumé and CV no longer accept
-`density`. Neither option changes the text layer or the reading order.
+emitted at all, and `muted=plain|italic|gray|both`, which decides how an entry's
+dates and location are de-emphasized; the résumé and CV additionally accept
+`entrymeta=column|inline`, which decides where that metadata is placed, and no
+longer accept `density`. Of these, only `entrymeta=inline` changes the text
+layer — it moves the metadata onto the entry's own line behind a separator — and
+none of them changes the reading order.
 **Maintainer:** Amir Sadeghi
-**Last reviewed:** 2026-08-03
+**Last reviewed:** 2026-08-12
 
 > **Scope banner.** Material tagged **(Phase 1)** records the released `v0.1.x`
 > foundation. Material tagged **(planned — vX.Y.Z)** describes future work
