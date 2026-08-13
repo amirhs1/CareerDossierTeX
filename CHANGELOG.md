@@ -8,6 +8,33 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- `make check-parallel` runs `make check`'s eleven targets concurrently instead
+  of one after another, with `JOBS=N` to choose how many are in flight (default
+  four). `make check` is unchanged and remains the pre-push gate and the
+  CI-aligned entry point. ([#378])
+
+  Both entry points expand one `CHECK_TARGETS` variable, so they cannot dispatch
+  different suites; `make lint` fails if `check` ever stops doing so. The
+  parallel driver counts results and fails when a dispatched target leaves none,
+  because a worker that dies before its suite ran leaves an absence rather than
+  a failure, and it warms luaotfload's font cache with one build required to
+  prove it typeset real glyphs before fanning out. Per-target output is captured
+  and replayed in the Makefile's order.
+
+  The shipped-example bibliography guard in `tests/bibliography/run.sh` now
+  compiles into `build/bibliography-example/` rather than the
+  `academic-bibliography` target's `build/examples/`. Both are reached by `make
+  check`, and concurrently they raced on the same `.aux`, `.bcf`, `.bbl`, and
+  `.pdf`.
+
+  **Contributor tooling only.** No class, option, key, command, token, or
+  rendered output changed, and no suite's verdict changed — only how many of
+  them run at once and where one of them writes its artifacts.
+
+[#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
+
 ## [0.8.0] - 2026-08-12
 
 ### Added

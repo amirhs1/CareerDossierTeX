@@ -276,11 +276,12 @@ Clean generated files afterwards:
 make clean
 ```
 
-`make help` is the authoritative target list, and the `check` prerequisites at
-`Makefile:92` are the authoritative suite list. Prefer both to any prose
-enumeration, here or elsewhere. A hand-maintained copy of either will drift, and
-a drifted copy is how the `annotations` suite came to be omitted from a run that
-was then reported clean.
+`make help` is the authoritative target list, and the `Makefile`'s
+`CHECK_TARGETS` variable — which is what the `check` target expands — is the
+authoritative suite list. Prefer both to any prose enumeration, here or
+elsewhere. A hand-maintained copy of either will drift, and a drifted copy is
+how the `annotations` suite came to be omitted from a run that was then reported
+clean.
 
 A local check and the matching CI job are equivalent, but not textually
 identical. Most jobs run the same `make` target you would; `extraction`,
@@ -293,8 +294,40 @@ Target and job names overlap but are not in bijection, so do not derive one from
 the other. The extraction and bibliography *targets* are `extract-test` and
 `bibliography-test`, while the matching *jobs* are `extraction` and
 `bibliography`; job `cv` runs `make academic-cv academic-bibliography` and job
-`statement` runs `make statements`; and `examples`, `check`, `test`, `clean`,
-and every `review-*` target have no job at all.
+`statement` runs `make statements`; and `examples`, `check`, `check-parallel`,
+`test`, `clean`, and every `review-*` target have no job at all.
+
+### The same suite, faster, before a push
+
+`make check` runs its eleven targets one after another, which on the
+maintainer's machine is several minutes of dead time paid once per branch. The
+same targets can run concurrently instead:
+
+```bash
+make check-parallel            # four at a time
+make check-parallel JOBS=8     # eight at a time
+```
+
+**The gate is still the serial `make check`.** `check-parallel` is a
+convenience, not a substitute: `check` is what CI is aligned to, and a gate
+whose result depends on how work was scheduled is not a gate. Use
+`check-parallel` to find failures quickly, and let the serial run be the thing
+you push behind.
+
+Neither path can run a different set of targets from the other — both expand
+`CHECK_TARGETS`, and `make lint` fails if `check` ever stops doing so. The
+driver is `tests/check-parallel.sh`, whose header explains the two things it
+adds beyond running the same targets: it counts results and fails when a worker
+leaves none, and it warms luaotfload's font cache with one build that has to
+prove it typeset real glyphs before anything fans out. `docs/TESTING.md`
+"Option lint" describes the committed controls behind both. Per-target output is
+captured under `build/check-parallel/` and replayed in the Makefile's order, so
+which suite failed is answerable from the transcript.
+
+It is deliberately not `make -j check`. macOS ships GNU make 3.81, which has no
+`--output-sync`, so the eleven suites would interleave line by line; and `-j`
+would also fan out inside `examples`, whose six sub-targets share one `latexmk`
+output directory.
 
 ### Scoping a suite while you iterate
 

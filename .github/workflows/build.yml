@@ -290,7 +290,10 @@ jobs:
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       # Also builds examples/academic/cv-bibliography.tex from the repository
       # root and asserts it rendered every entry its database declares, which is
-      # why this job's artifacts reach into build/examples/ as well (#319).
+      # why this job's artifacts reach outside tests/bibliography/ as well
+      # (#319). That build has its own output directory rather than the
+      # `academic-bibliography' target's build/examples/, because both are
+      # reached by `make check' and concurrently they would race (#378).
       - name: Biber fixture and shipped-example bibliography guard
         run: make bibliography-test
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
@@ -306,10 +309,10 @@ jobs:
             tests/bibliography/*.diff
             tests/bibliography/*.stdout
             tests/bibliography/*.guard
-            build/examples/cv-bibliography.pdf
-            build/examples/cv-bibliography.log
-            build/examples/cv-bibliography.blg
-            build/examples/cv-bibliography.bbl
+            build/bibliography-example/cv-bibliography.pdf
+            build/bibliography-example/cv-bibliography.log
+            build/bibliography-example/cv-bibliography.blg
+            build/bibliography-example/cv-bibliography.bbl
           if-no-files-found: warn
 
   # Copy-paste integrity of URLs and e-mail addresses (issue #294). Its own job
