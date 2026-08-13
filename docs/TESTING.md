@@ -78,6 +78,36 @@ When a change spans both — a shared package edit that both classes render — 
 or update the unit-level regression for the shared logic *and* re-run the smoke,
 extraction, and layout coverage for both classes.
 
+### Reproduce a mechanism below the level of a suite
+
+The tests above are what a change must *ship*. They are usually the wrong
+instrument for finding out how something behaves in the first place, and
+reaching for a suite to answer that question is the most expensive habit
+available here.
+
+Reproduce a mechanism at the smallest scale that exhibits it, and use a suite
+only to confirm. Issue #392 is the worked example in both directions. The
+question was whether concurrent `biber` invocations corrupt each other's
+unpacked binary; the answer took four `biber --version` calls and five seconds,
+and it refuted the fix the issue prescribed. The same session also spent eight
+200-second full-suite runs, of which two carried information the probe had not
+already given.
+
+Three practical consequences:
+
+- **A probe is not a test and is not committed.** It answers a question, gets
+  quoted in the issue or PR where the number matters, and is thrown away. What
+  ships is the committed test that would fail without the change.
+- **Sequence the expensive runs last.** Finish the design, then run the full
+  campaign. Re-running a suite because the script changed underneath it is the
+  common way a day disappears.
+- **Prefer the scoping the runners already give you** — `FIXTURE=` and `TEST=`,
+  see `CONTRIBUTING.md` "Scoping a suite while you iterate" — over a full run,
+  right up until the run that has to be full.
+
+`CONTRIBUTING.md` "Issue workflow" carries the matching obligation on the other
+side: an issue that prescribes a mechanism records what would refute it.
+
 Every review target below writes its PDFs, PNGs, logs, and review record under
 the gitignored `build/` directory. That output is generated evidence for a human
 reader: record the result in the pull request, and never commit the artifacts
