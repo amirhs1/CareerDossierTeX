@@ -77,9 +77,14 @@
 #
 # USAGE
 #
-#   tests/check-parallel.sh [--jobs N] [--list] [--self-test]
+#   tests/check-parallel.sh [--jobs N] [--inner-jobs N] [--list] [--self-test]
 #
 #   --jobs       concurrent targets; default 4. Capped at the number of targets.
+#   --inner-jobs fixtures in flight inside each target; default 1, meaning each
+#                runner takes its serial path. The two layers multiply, so the
+#                process budget is --jobs x --inner-jobs; see issue #390 and the
+#                comment on `inner_jobs' below for why this is passed explicitly
+#                to every dispatched target rather than left to MAKEFLAGS.
 #   --list       print the target list the run would dispatch, and exit.
 #   --self-test  run the accounting, failure-path, biber-isolation, and
 #                biber-extraction controls; compile nothing.
@@ -96,6 +101,19 @@ root="$(cd "$here/.." && pwd)"
 jobs=4
 mode=run
 
+# Fixtures in flight *inside* each dispatched target (issue #390). One, not
+# `jobs', and the default is the whole of the process budget answer.
+#
+# The two layers compose multiplicatively, and left alone they would compose
+# silently: `make check-parallel JOBS=4' puts JOBS=4 in MAKEFLAGS, every
+# dispatched `make smoke' inherits it as a command-line variable, and four
+# targets each fanning out four fixtures is sixteen LuaLaTeX processes on an
+# eight-core machine — asked for by nobody and reported by nothing. So every
+# dispatched target is given an explicit JOBS below, which overrides the
+# inherited one, and the product is bounded at `jobs' until someone raises it on
+# purpose.
+inner_jobs=1
+
 die() {
   printf 'check-parallel: %s\n' "$*" >&2
   exit 1
@@ -110,6 +128,15 @@ while [ "$#" -gt 0 ]; do
       ;;
     --jobs=*)
       jobs="${1#--jobs=}"
+      shift
+      ;;
+    --inner-jobs)
+      [ "$#" -ge 2 ] || die "--inner-jobs needs a value"
+      inner_jobs="$2"
+      shift 2
+      ;;
+    --inner-jobs=*)
+      inner_jobs="${1#--inner-jobs=}"
       shift
       ;;
     --list)
@@ -141,6 +168,12 @@ case "$jobs" in
   ''|*[!0-9]*) die "--jobs takes a positive integer, got: $jobs" ;;
 esac
 [ "$jobs" -ge 1 ] || die "--jobs takes a positive integer, got: $jobs"
+
+case "$inner_jobs" in
+  ''|*[!0-9]*) die "--inner-jobs takes a positive integer, got: $inner_jobs" ;;
+esac
+[ "$inner_jobs" -ge 1 ] \
+  || die "--inner-jobs takes a positive integer, got: $inner_jobs"
 
 # --------------------------------------------------------------------------
 # The target list.
@@ -186,140 +219,84 @@ read_targets() {
 # --------------------------------------------------------------------------
 # Dispatch and collect.
 #
+# The throttle, the nested subshell, the ordered replay, and the accounting
+# assertion all live in tests/lib/fanout.sh, because the three suite runners
+# that fan out over their own fixtures need exactly the same four things, and a
+# second copy of them is the drift this whole arrangement exists to prevent
+# (issue #390). What stays here is what is specific to dispatching *targets*:
+# the batch_names/batch_cmds spelling --self-test drives, the per-worker biber
+# cache lifecycle, and the summary table.
+#
 # Split in two so that --self-test can drive the collector over a batch whose
 # outcomes it chose. batch_names/batch_cmds are the input; the collector reads
 # only the result files on disk, which is what makes "a worker left no result"
 # a state it can actually observe.
 
+. "$here/lib/fanout.sh"
+
 batch_names=()
 batch_cmds=()
 
-slot_for() { printf '%02d-%s' "$1" "$2"; }
+slot_for() { fanout_slot "$1" "$2"; }
 
 run_batch() {
-  local n i name cmd slot
+  local n i slot
   n="${#batch_names[@]}"
+  fanout_reset
   for (( i = 0; i < n; i++ )); do
-    name="${batch_names[$i]}"
-    cmd="${batch_cmds[$i]}"
-    slot="$(slot_for "$i" "$name")"
-    printf '  dispatch [%d/%d] %s\n' "$((i + 1))" "$n" "$name"
-    (
-      cd "$root" || exit 127
-      # This worker's own biber cache, so no two of them rewrite one unpacked
-      # binary; see "Biber cache isolation" below. Guarded on the directory
-      # because --self-test drives this dispatcher without preparing them.
-      [ -d "$par_root/$slot" ] && export PAR_TMPDIR="$par_root/$slot"
-      start="$SECONDS"
-      # The nested subshell is load-bearing: a command that calls `exit` would
-      # otherwise take the worker with it and skip the result write below,
-      # turning an ordinary failure into a vanished worker. Dispatched targets
-      # are external `make` processes and cannot do that, but --self-test's
-      # controls can, and a machine that behaves differently under test than in
-      # use is not evidence about the machine in use.
-      ( eval "$cmd" ) > "$scratch/$slot.log" 2>&1
-      code="$?"
-      # Written last and in one line, so a half-written result is not a
-      # plausible reading of a missing one.
-      printf '%s %s\n' "$code" "$((SECONDS - start))" > "$scratch/$slot.status"
-      # This worker's biber cache is now dead weight — about 200 MB of unpacked
-      # Perl runtime — and the biber targets finish long before the longest
-      # suite does. Freeing it here rather than at the end of the run makes the
-      # peak follow how much actually overlaps instead of the whole run. After
-      # the status write, never before: the accounting evidence outranks the
-      # disk, and a worker that died leaves its cache for the end-of-run sweep.
-      rm -rf "$par_root/$slot"
-    ) &
-    # Throttle without `wait -n` (bash >= 4.3 only; macOS /bin/bash is 3.2).
-    while [ "$(jobs -rp | wc -l | tr -d ' ')" -ge "$jobs" ]; do
-      sleep 1
-    done
+    # Each target runs from the repository root. The `cd` is inside the unit
+    # rather than around the dispatcher so that a failed one fails that single
+    # worker, with 127 recorded as its status, instead of the whole run.
+    fanout_add "${batch_names[$i]}" \
+      "cd '$root' || exit 127; ${batch_cmds[$i]}" || return 1
   done
-  wait
+  # Each worker gets its own biber cache, so no two of them rewrite one unpacked
+  # binary; see "Biber cache isolation" below. fanout_run applies this only
+  # where the directory exists, which is why --self-test can drive the
+  # dispatcher without preparing them.
+  fanout_par_root="$par_root"
+  fanout_verbose=1
+  fanout_run "$jobs" "$scratch"
+  # Those caches are now dead weight — about 200 MB of unpacked Perl runtime
+  # each. Freed here rather than inside each worker because the accounting
+  # evidence outranks the disk: this sweep runs after every status write, and a
+  # worker that died leaves its cache for it and for the end-of-run one.
+  for (( i = 0; i < n; i++ )); do
+    slot="$(fanout_slot "$i" "${batch_names[$i]}")"
+    rm -rf "$par_root/$slot"
+  done
 }
 
 # Replays every target's captured output in the Makefile's order, then the
 # summary, then the two verdicts. Returns 0 only when every dispatched target
 # left a result and every result is 0.
 collect_batch() {
-  local n i name slot code elapsed completed=0 failed=0 missing=0
-  local -a states times
+  local n i
   n="${#batch_names[@]}"
-  states=()
-  times=()
 
-  for (( i = 0; i < n; i++ )); do
-    name="${batch_names[$i]}"
-    slot="$(slot_for "$i" "$name")"
-    if [ ! -f "$scratch/$slot.status" ]; then
-      states+=("NO-RESULT")
-      times+=("-")
-      missing=$((missing + 1))
-      continue
-    fi
-    completed=$((completed + 1))
-    code=""
-    elapsed=""
-    read -r code elapsed < "$scratch/$slot.status"
-    case "$code" in
-      ''|*[!0-9]*)
-        states+=("NO-RESULT")
-        times+=("-")
-        # A result file that exists but does not parse is an absent result, not
-        # a pass. Counted as missing so the accounting assertion sees it.
-        completed=$((completed - 1))
-        missing=$((missing + 1))
-        continue
-        ;;
-    esac
-    times+=("${elapsed:-?}")
-    if [ "$code" -eq 0 ]; then
-      states+=("ok")
-    else
-      states+=("FAILED($code)")
-      failed=$((failed + 1))
-    fi
-  done
+  fanout_gather "$scratch"
 
   printf '\n'
-  for (( i = 0; i < n; i++ )); do
-    name="${batch_names[$i]}"
-    slot="$(slot_for "$i" "$name")"
-    printf -- '----- %s (%s) -----\n' "$name" "${states[$i]}"
-    if [ -f "$scratch/$slot.log" ]; then
-      cat "$scratch/$slot.log"
-    else
-      printf '  (no output captured; the worker left no log)\n'
-    fi
-    printf '\n'
-  done
+  fanout_replay "$scratch" banner
 
   printf '===== summary =====\n'
   for (( i = 0; i < n; i++ )); do
-    printf '  %-22s %-12s %ss\n' "${batch_names[$i]}" "${states[$i]}" "${times[$i]}"
+    printf '  %-22s %-12s %ss\n' \
+      "${batch_names[$i]}" "${fanout_states[$i]}" "${fanout_times[$i]}"
   done
   printf '  logs: %s/NN-<target>.log\n' "$scratch"
 
   # The accounting assertion. Stated as its own verdict rather than folded into
   # the pass/fail line, because "nothing failed" and "everything ran" are
   # different claims and only the second one is at risk here.
-  printf '\n  dispatched %d, completed %d\n' "$n" "$completed"
-  if [ "$missing" -ne 0 ]; then
-    printf '\nACCOUNTING FAILURE: %d of %d targets left no usable result.\n' \
-      "$missing" "$n"
-    printf 'A worker died before it could record an outcome. These targets did\n'
-    printf 'NOT pass; they did not report:\n'
-    for (( i = 0; i < n; i++ )); do
-      [ "${states[$i]}" = "NO-RESULT" ] && printf '  - %s\n' "${batch_names[$i]}"
-    done
-    return 1
-  fi
+  fanout_account targets || return 1
 
-  if [ "$failed" -ne 0 ]; then
-    printf '\nFAILED: %d of %d targets failed:\n' "$failed" "$n"
+  if [ "$fanout_failed" -ne 0 ]; then
+    printf '\nFAILED: %d of %d targets failed:\n' "$fanout_failed" "$n"
     for (( i = 0; i < n; i++ )); do
-      case "${states[$i]}" in
-        FAILED*) printf '  - %s (%s)\n' "${batch_names[$i]}" "${states[$i]}" ;;
+      case "${fanout_states[$i]}" in
+        FAILED*) printf '  - %s (%s)\n' \
+          "${batch_names[$i]}" "${fanout_states[$i]}" ;;
       esac
     done
     return 1
@@ -339,54 +316,11 @@ collect_batch() {
 # pipe form exits at its first match, hands the producer a SIGPIPE, and under
 # `pipefail` reports "not found" for something that is there.
 
-warm_font_cache() {
-  local warm="$scratch/warm"
-  mkdir -p "$warm" || return 1
-
-  if ! command -v lualatex > /dev/null 2>&1; then
-    printf 'check-parallel: lualatex not found; `make check` cannot run here.\n' >&2
-    return 1
-  fi
-
-  cat > "$warm/warm.tex" <<'WARMTEX'
-% Generated by tests/check-parallel.sh. Not a fixture: it asserts nothing about
-% the classes. It exists to populate luaotfload's cache for the two families
-% careerdossier-typography.sty loads, before eleven suites race to do it at once.
-\documentclass{article}
-\usepackage{fontspec}
-\setmainfont{texgyretermes}
-\setsansfont{texgyreheros}
-\begin{document}
-Warming the font cache. \textsf{Sans as well.}
-\end{document}
-WARMTEX
-
-  if ! (cd "$warm" && lualatex -halt-on-error -interaction=nonstopmode warm.tex) \
-       > "$warm/warm.stdout" 2>&1; then
-    printf 'check-parallel: the font-cache warm-up build FAILED.\n' >&2
-    printf 'Nothing was dispatched. See %s\n' "$warm/warm.stdout" >&2
-    tail -20 "$warm/warm.stdout" 2>/dev/null | sed 's/^/  /' >&2
-    return 1
-  fi
-
-  if [ ! -f "$warm/warm.log" ]; then
-    printf 'check-parallel: the warm-up build wrote no log; refusing to fan out.\n' >&2
-    return 1
-  fi
-
-  if grep 'metric data not found' "$warm/warm.log" > /dev/null 2>&1 \
-     || grep 'nullfont' "$warm/warm.log" > /dev/null 2>&1; then
-    printf 'check-parallel: the warm-up build typeset with NO REAL FONT.\n' >&2
-    printf 'luaotfload could not use its cache, so every suite would compile\n' >&2
-    printf 'empty documents and pass. Nothing was dispatched. Run this from an\n' >&2
-    printf 'ordinary interactive shell rather than a restricted sandbox.\n' >&2
-    printf 'See %s\n' "$warm/warm.log" >&2
-    return 1
-  fi
-
-  printf '  font cache warm (one build, real glyphs confirmed)\n'
-  return 0
-}
+# The build itself, its nullfont check, and its two failure messages live in
+# tests/lib/fanout.sh, because the suite runners that fan out over their own
+# fixtures need the same proof before they do it (issue #390) and two copies of
+# a check against a silent failure is how one of them stops being made.
+warm_font_cache() { fanout_warm_fonts "$scratch"; }
 
 # --------------------------------------------------------------------------
 # Biber cache isolation.
@@ -706,12 +640,20 @@ if [ "$jobs" -gt "${#targets[@]}" ]; then
 fi
 
 printf 'check-parallel: %d targets, %d at a time\n' "${#targets[@]}" "$jobs"
+if [ "$inner_jobs" -gt 1 ]; then
+  printf 'fixture fan-out inside each target: %d (process budget: %d x %d = %d)\n' \
+    "$inner_jobs" "$jobs" "$inner_jobs" "$((jobs * inner_jobs))"
+fi
 printf '(the gate is the serial `make check`; this is the fast pre-push run)\n\n'
 
 batch_names=(${targets[@]+"${targets[@]}"})
 batch_cmds=()
 for target in ${targets[@]+"${targets[@]}"}; do
-  batch_cmds+=("make $target")
+  # JOBS is passed explicitly, always. A command-line variable outranks the one
+  # this run's own MAKEFLAGS would otherwise hand down, so the fan-out inside a
+  # target is what was asked for here and never an accident of how the outer run
+  # was invoked. `JOBS=1' leaves each runner on its serial path.
+  batch_cmds+=("make JOBS=$inner_jobs $target")
 done
 
 warm_font_cache || exit 1
