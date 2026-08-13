@@ -266,17 +266,27 @@ check_bibliography_render() { # <build-base-without-extension> <bib-path>
 }
 
 echo "== examples/academic/cv-bibliography.tex (the shipped example renders its entries) =="
-example_build="$root/build/examples/cv-bibliography"
-mkdir -p "$root/build/examples"
+# This guard builds the same source the `academic-bibliography' Makefile target
+# builds, and both are reached by `make check'. It writes into its own output
+# directory rather than the target's build/examples/ (issue #378). Serially the
+# two only ever overwrote each other's artifacts, which -g already made
+# harmless; concurrently they would race on the same .aux, .bcf, .bbl, and .pdf,
+# and the loser of that race is a corrupt intermediate read as a lost
+# bibliography — this guard's own failure mode, reported against a defect that
+# is not there. Separate directories remove the race rather than ordering the
+# two targets around it, which would have serialised them again.
+example_outdir="$root/build/bibliography-example"
+example_build="$example_outdir/cv-bibliography"
+mkdir -p "$example_outdir"
 # Built from the repository root, as the Makefile's own target does: the example
 # writes root-relative include and bibliography paths, and any other working
 # directory resolves them only by accident of the search path. -g for the same
-# reason as every other build here (#312), and doubly so because `make examples'
-# may have left an up-to-date PDF beside this one.
+# reason as every other build here (#312).
 if ! (cd "$root" && latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
-      -output-directory=build/examples examples/academic/cv-bibliography.tex) \
+      -output-directory=build/bibliography-example \
+      examples/academic/cv-bibliography.tex) \
      > "$here/example-cv-bibliography.stdout" 2>&1; then
-  echo "  EXAMPLE BUILD FAILED (see build/examples/cv-bibliography.log)"
+  echo "  EXAMPLE BUILD FAILED (see build/bibliography-example/cv-bibliography.log)"
   exit 1
 fi
 if ! check_bibliography_render "$example_build" \

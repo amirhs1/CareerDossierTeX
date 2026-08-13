@@ -765,6 +765,41 @@ fixture list is a hand-written `cases` array rather than a glob: a `cases` entry
 with no fixture, or a fixture no entry names, is caught here rather than at the
 next full run.
 
+The `lint` target runs a third script in the same slot:
+
+```bash
+tests/check-parallel.sh --self-test
+```
+
+`make check-parallel` (`CONTRIBUTING.md` "Local builds") runs `check`'s eleven
+targets concurrently. That is a scheduling change, not a new assertion — every
+verdict is still the owning suite's — but it introduces one failure mode no
+suite can report on itself. A worker that dies before its suite ever ran leaves
+no failure behind, only an absence, and an absence is indistinguishable from a
+clean run unless something is counting. The driver therefore requires every
+dispatched target to leave a result file and fails when the count of results is
+not the count dispatched, naming the targets that produced none.
+
+An assertion of that kind is worth exactly what its negative control is worth,
+and the control has to be committed rather than performed once by hand, so
+`--self-test` drives the dispatcher and the collector over synthetic workers:
+a batch that all succeeds must pass and account for every member; a batch with
+one failing member must fail, name that member, and replay its output; and a
+batch from which one result file is removed — the state a killed worker leaves
+behind — must fail as an accounting failure rather than as two passes and a
+shrug. It also asserts statically that `check`'s prerequisite list is still
+`$(CHECK_TARGETS)` and that every dispatched name is `.PHONY`, because a serial
+and a parallel path dispatching different target sets is a drift no run would
+report, and a dispatched name that is not `.PHONY` would make `make <target>` a
+no-op that exits 0.
+
+It compiles nothing and needs no TeX, which is why it shares the sub-second
+`lint` slot and runs on the TeX-free CI lint runner. The font-cache proof the
+driver performs before fanning out — one small build required to show it
+typeset real glyphs, because an unwritable luaotfload cache leaves every
+document empty and every suite passing — is not exercised here for that reason;
+it is exercised by every real `check-parallel` run.
+
 ### Module regression suite (l3build)
 
 The logic-bearing packages are covered by an `l3build` regression suite. Each

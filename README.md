@@ -444,6 +444,11 @@ suites plus every supported example build — with:
 make check
 ```
 
+`make check-parallel` runs the same targets concurrently when the serial wait is
+the thing in your way; the serial `make check` remains the gate, and
+[`CONTRIBUTING.md`](CONTRIBUTING.md) "The same suite, faster, before a push" says
+why.
+
 `make help` lists every individual target, `make clean` removes the generated
 files afterwards, and the `check` prerequisites in the `Makefile` are the
 authoritative suite list. A local suite and its CI job are equivalent, though a

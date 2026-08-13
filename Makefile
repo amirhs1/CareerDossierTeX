@@ -4,9 +4,10 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash and awk — both of its scripts, since
-# the second one drives the other runners in their compile-nothing `--list`
-# mode; l3build for `regression`;
+# pure text processing and needs only bash, awk, and make — all three of its
+# scripts, since the second one drives the other runners in their
+# compile-nothing `--list` mode and the third exercises check-parallel's
+# accounting controls against synthetic workers; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
 # `links`, and `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing
 # beyond LuaLaTeX for `metadata` and `annotations`, which read the PDF's own
@@ -56,6 +57,25 @@
 # gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
 # sources, so the source tree never picks up untracked build artifacts.
 #
+# Running the full suite faster (issue #378). `check` stays serial: it is the
+# pre-push gate and the CI-aligned entry point, and a gate whose result depends
+# on scheduling is not a gate. `check-parallel` is the opt-in fast path for the
+# one full run before a push:
+#
+#   make check                  serial, deterministic, what CI runs
+#   make check-parallel         the same targets, four at a time
+#   make check-parallel JOBS=8  the same targets, eight at a time
+#
+# Both dispatch $(CHECK_TARGETS) and cannot drift apart, because that variable
+# is the only place the list exists; `check-targets` prints it for the driver,
+# and `make lint` asserts that `check` still expands it. The driver is
+# tests/check-parallel.sh, which explains what it adds beyond running the same
+# eleven targets — an accounting assertion and a font-cache proof, both of which
+# exist because a run that reports green without doing the work is this
+# repository's characteristic failure. It is not `make -j`: GNU make 3.81, which
+# is what macOS ships, has no `--output-sync`, so under `-j` the eleven suites
+# interleave and "which suite failed" stops being answerable.
+#
 # Run `make help` for the target list.
 
 BUILD_DIR        := build
@@ -78,7 +98,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -110,17 +130,35 @@ academic-letter: | $(EXAMPLES_BUILD_DIR) ## Build the academic letter example
 statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 	$(LATEXMK) $(STATEMENTS)
 
+# The suite list, in the order `check` runs it. It lives in one variable
+# because two entry points now dispatch it — `check` serially and
+# `check-parallel` concurrently — and a hand-maintained second copy is how the
+# `annotations` suite once dropped out of a run that was then reported clean.
+#
 # `lint` runs first: it compiles nothing, finishes in well under a second, and
 # what it catches is a source-level omission that every LaTeX-running suite
 # below would report as green.
-check: lint regression extract-test smoke layout bibliography-test links metadata annotations tagging examples ## Run the full supported local suite
+CHECK_TARGETS := lint regression extract-test smoke layout bibliography-test \
+                 links metadata annotations tagging examples
+
+check: $(CHECK_TARGETS) ## Run the full supported local suite
 	@printf '\nAll suites passed.\n'
+
+# Not in `help`: an implementation detail of check-parallel, not a target a
+# contributor invokes. It exists so the driver reads the list make expands
+# rather than a copy of it.
+check-targets:
+	@printf '%s\n' $(CHECK_TARGETS)
+
+check-parallel: ## Opt-in: check's targets concurrently, JOBS=N (the gate is still serial check)
+	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS))
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, and the suite fixture-selection contract
+lint: ## Static lint: option values, the fixture-selection contract, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-fixture-filter.sh
+	tests/check-parallel.sh --self-test
 
 regression: ## Module regression suite (l3build check); TEST=<name> runs one test
 	l3build check $(TEST)
