@@ -148,7 +148,10 @@ A good implementation issue explains:
 4. likely affected files;
 5. observable acceptance criteria;
 6. the test files under `tests/` that will prove those criteria;
-7. the release milestone, which is required, and the parent epic when the issue
+7. where the issue prescribes a *mechanism* rather than an outcome, the smallest
+   command that would show that mechanism does not work, and the result of
+   running it — see "How this could be wrong" in the templates;
+8. the release milestone, which is required, and the parent epic when the issue
    is part of one.
 
 Use focused issues that can be completed on one branch. Split work that becomes too broad.
