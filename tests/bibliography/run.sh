@@ -93,13 +93,23 @@ got="$(pdftotext -enc UTF-8 "$base.pdf" - | sed '/^\f/d' \
                while (last > 0 && line[last] ~ /^[[:space:]]*$/) last--
                for (i = 1; i <= last; i++) print line[i] }')"
 
+# The observed text goes to a scratch file so `diff` reads two ordinary paths.
+# This was `diff -u "$expected" <(printf '%s\n' "$got")` until issue #392, which
+# fails under a restricted sandbox with `diff: /dev/fd/63: Operation not
+# permitted` — a denial on diff's own input, which this runner then reported as
+# BIBLIOGRAPHY EXTRACTION MISMATCH above an empty diff. That reads as a fixture
+# or sorting defect, which is the most expensive way to be told the sandbox
+# denied a pipe. tests/check-parallel.sh avoids process substitution for the
+# same reason and is the in-repo precedent.
+printf '%s\n' "$got" > "$base.got"
+
 if [ "$update" -eq 1 ]; then
   printf '%s\n' "$got" > "$expected"
   echo "  baseline updated: $expected"
 elif [ ! -f "$expected" ]; then
   echo "  MISSING baseline $expected (run with --update to create)"
   exit 1
-elif ! diff -u "$expected" <(printf '%s\n' "$got") > "$base.diff"; then
+elif ! diff -u "$expected" "$base.got" > "$base.diff"; then
   echo "  BIBLIOGRAPHY EXTRACTION MISMATCH:"
   sed 's/^/    /' "$base.diff"
   exit 1

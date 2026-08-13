@@ -90,6 +90,11 @@ tests/*/*.tokens
 # control in a *.guard file so the runner can report it after deciding the
 # verdict. Generated evidence, like the two above.
 tests/*/*.guard
+# The extraction and bibliography runners write the text they extracted to a
+# *.got file and diff that against the committed baseline, rather than diffing
+# against a process substitution the sandbox denies (issue #392). The baseline
+# is source; what a run happened to extract is scratch.
+tests/*/*.got
 
 # veraPDF reports and the toolchain record from tests/tagging/run.sh. These are
 # evidence retained as CI artifacts and reviewed per run, not committed files.

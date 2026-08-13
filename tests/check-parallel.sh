@@ -32,7 +32,7 @@
 # stale artifact reads as evidence, `grep -q` loses a race to SIGPIPE. Running
 # eleven suites concurrently adds a fresh instance of that class — a worker that
 # dies before its suite ever ran leaves no failure behind, only an absence — so
-# two checks here are the substance rather than paperwork:
+# three checks here are the substance rather than paperwork:
 #
 #   - ACCOUNTING. Every dispatched target must leave a result file. The run
 #     fails loudly when the number of results is not the number dispatched, and
@@ -46,11 +46,19 @@
 #     build it at once, which is exactly when it goes wrong. So the cache is
 #     warmed by one small build before any worker starts, and that build is
 #     required to prove it typeset real glyphs.
+#   - BIBER CACHE. The same class of failure in a second tool, with a different
+#     fix. biber re-unpacks its native slice into a per-user cache on *every*
+#     invocation, so two of them sharing that cache truncate each other's
+#     binary and a different pair of the three biber targets fails each run.
+#     Warming it does not help — measured. Each worker gets its own cache
+#     instead, and one probe extraction proves biber can unpack here at all
+#     before anything is dispatched.
 #
-# `--self-test` exercises both the accounting assertion and the failure path
-# against synthetic workers, compiles nothing, and needs no TeX. `make lint`
-# runs it, which is how the negative control stays committed rather than
-# performed once by hand.
+# `--self-test` exercises the accounting assertion, the failure path, the
+# per-worker cache isolation, and the extraction verdict, against synthetic
+# workers and synthetic logs. It compiles nothing and needs neither TeX nor
+# biber. `make lint` runs it, which is how the negative controls stay committed
+# rather than performed once by hand.
 #
 # WHERE IT RUNS
 #
@@ -61,9 +69,11 @@
 # does; see tests/layout/sweep-linebreak-parallel.sh, which is the precedent
 # this file copies.
 #
-# It needs whatever `make check` needs. Run it from an ordinary interactive
-# shell: under a restricted sandbox the font-cache proof below is what fails,
-# and it fails before any suite has had the chance to report a hollow pass.
+# It needs whatever `make check` needs. Under a restricted sandbox that means
+# the font cache has to be reachable — the committed .claude/settings.json
+# grants it for Claude Code, see CLAUDE.md — and where it is not, the font-cache
+# proof below is what fails, before any suite has had the chance to report a
+# hollow pass.
 #
 # USAGE
 #
@@ -71,7 +81,8 @@
 #
 #   --jobs       concurrent targets; default 4. Capped at the number of targets.
 #   --list       print the target list the run would dispatch, and exit.
-#   --self-test  run the accounting and failure-path controls; compile nothing.
+#   --self-test  run the accounting, failure-path, biber-isolation, and
+#                biber-extraction controls; compile nothing.
 #
 # Output lands in build/check-parallel/, which is gitignored and removed by
 # `make clean`. Each target's full stdout and stderr is kept there as
@@ -195,6 +206,10 @@ run_batch() {
     printf '  dispatch [%d/%d] %s\n' "$((i + 1))" "$n" "$name"
     (
       cd "$root" || exit 127
+      # This worker's own biber cache, so no two of them rewrite one unpacked
+      # binary; see "Biber cache isolation" below. Guarded on the directory
+      # because --self-test drives this dispatcher without preparing them.
+      [ -d "$par_root/$slot" ] && export PAR_TMPDIR="$par_root/$slot"
       start="$SECONDS"
       # The nested subshell is load-bearing: a command that calls `exit` would
       # otherwise take the worker with it and skip the result write below,
@@ -207,6 +222,13 @@ run_batch() {
       # Written last and in one line, so a half-written result is not a
       # plausible reading of a missing one.
       printf '%s %s\n' "$code" "$((SECONDS - start))" > "$scratch/$slot.status"
+      # This worker's biber cache is now dead weight — about 200 MB of unpacked
+      # Perl runtime — and the biber targets finish long before the longest
+      # suite does. Freeing it here rather than at the end of the run makes the
+      # peak follow how much actually overlaps instead of the whole run. After
+      # the status write, never before: the accounting evidence outranks the
+      # disk, and a worker that died leaves its cache for the end-of-run sweep.
+      rm -rf "$par_root/$slot"
     ) &
     # Throttle without `wait -n` (bash >= 4.3 only; macOS /bin/bash is 3.2).
     while [ "$(jobs -rp | wc -l | tr -d ' ')" -ge "$jobs" ]; do
@@ -367,6 +389,127 @@ WARMTEX
 }
 
 # --------------------------------------------------------------------------
+# Biber cache isolation.
+#
+# The same class of failure as the font cache above, in a second tool, and it
+# does not have the same fix. biber is a PAR-packed universal binary, and on
+# macOS every invocation re-extracts its native slice with `lipo` into
+# <PAR_TMPDIR>/par-<user>/cache-<hash>/thin/biber. Every invocation, not the
+# first: measured 2026-08-13, that file's inode changes on each run, so this is
+# a rewrite-every-time path and not a populate-once cache. Two biber processes
+# pointed at it therefore truncate each other's binary, and the loser reports
+#
+#   lipo: can't move temporary file: …/thin/biber to …/thin/biber.lipo
+#   biber: extracting arm64 binary with lipo failed (wstatus=256)
+#
+# or, having exec'd a half-written file, `cannot execute thin binary (errno=8)`.
+# Three dispatched targets invoke biber — bibliography-test, links, and examples
+# (through academic-bibliography) — so under fan-out they collide, a different
+# pair of them failing each run, which is what makes it read as a flaky fixture
+# rather than as infrastructure. Serial `make check` never sees it, so the gate
+# was always sound; only this path needed fixing.
+#
+# Warming the cache before dispatch is the obvious fix and is not one: measured,
+# six concurrent invocations against a fully warm shared cache failed exactly as
+# six against a cold one did. What the failure needs is not warmth but that no
+# two invocations share a cache. Each worker therefore gets its own PAR_TMPDIR —
+# six concurrent invocations, isolated, zero failures. The directories are
+# created before dispatch rather than by the workers, so a filesystem that
+# cannot hold them stops the run with one message instead of three targets
+# failing on a lipo error. Issue #392.
+
+par_root="$scratch/par"
+
+# Created up front, one per dispatched target, named for the slot so a stray
+# cache is attributable. Each one a biber target actually uses costs about
+# 200 MB of unpacked Perl runtime while the run is in flight — three or four of
+# them in practice, since only the biber targets unpack anything — and the whole
+# tree is removed when the run ends, as well as by `make clean`.
+prepare_par_caches() {
+  local n i dir
+  n="${#batch_names[@]}"
+  for (( i = 0; i < n; i++ )); do
+    dir="$par_root/$(slot_for "$i" "${batch_names[$i]}")"
+    if ! mkdir -p "$dir"; then
+      printf 'check-parallel: cannot create the per-worker biber cache\n' >&2
+      printf '%s\n' "  $dir" >&2
+      printf 'Without one cache per worker the three biber targets corrupt\n' >&2
+      printf "each other's unpacked binary. Nothing was dispatched.\n" >&2
+      return 1
+    fi
+  done
+  printf '  biber caches isolated (one per worker, under %s)\n' "$par_root"
+  return 0
+}
+
+# The verdict on one extraction, split from the invocation below so --self-test
+# can drive it over synthetic logs on a machine with no biber.
+biber_extract_verdict() { # <exit status> <log file>
+  local status="$1" log="$2"
+  [ -f "$log" ] || return 1
+  # The extraction failure is checked before the exit status, not after it. A
+  # tool that could not do its work can still exit 0 — which is what nullfont
+  # taught the font-cache proof above — and a probe that trusts the status
+  # proves nothing while reporting that it did.
+  grep 'lipo' "$log" > /dev/null 2>&1 && return 1
+  grep 'extracting' "$log" > /dev/null 2>&1 && return 1
+  [ "$status" -eq 0 ] || return 1
+  # And the positive half: the version line only prints once the packed runtime
+  # has been unpacked and run.
+  grep -i 'biber version' "$log" > /dev/null 2>&1 || return 1
+  return 0
+}
+
+# One extraction, in its own cache, before anything is dispatched. Isolation is
+# the fix; this is the pre-flight check that biber can unpack at all here — a
+# full temp filesystem, a denied cache, or a missing lipo otherwise surfaces as
+# three targets failing deep inside latexmk with an error about a thin binary.
+probe_biber_extraction() {
+  local dir="$par_root/probe"
+  local log="$scratch/warm/biber.stdout"
+  local status
+  mkdir -p "$dir" "$scratch/warm" || return 1
+
+  # Absent biber is not this script's failure to report: the three targets that
+  # need it say so themselves, and the other eight need nothing from it.
+  if ! command -v biber > /dev/null 2>&1; then
+    printf '  biber not found; skipping its extraction probe (the targets that\n'
+    printf '  need it report that themselves)\n'
+    return 0
+  fi
+
+  # In its own cache, like the workers, rather than the shared one: what is
+  # being proved is that an unpack into a directory of this kind works here.
+  PAR_TMPDIR="$dir" biber --version > "$log" 2>&1
+  status="$?"
+
+  if ! biber_extract_verdict "$status" "$log"; then
+    # The probe cache is left in place here, unlike on the success path below:
+    # whatever half-unpacked state it holds is the evidence for why this
+    # failed, and the message points at it.
+    printf 'check-parallel: biber could not unpack itself (exit %s).\n' \
+      "$status" >&2
+    printf 'The three targets that need it (bibliography-test, links,\n' >&2
+    printf 'examples) would fail deep inside latexmk instead. Nothing was\n' >&2
+    printf 'dispatched.\n' >&2
+    printf 'Probe cache: %s\n' "$dir/par-*" >&2
+    printf 'Shared cache used by the serial path: %s\n' "${TMPDIR:-/tmp}/par-*" >&2
+    printf 'If the shared one is damaged, drop it and re-extract:\n' >&2
+    printf '  rm -rf "${TMPDIR:-/tmp}"/par-*\n' >&2
+    printf '  biber --version\n' >&2
+    printf 'See %s\n' "$log" >&2
+    tail -10 "$log" 2>/dev/null | sed 's/^/  /' >&2
+    return 1
+  fi
+
+  # An unpacked biber is ~200 MB and this one has served its purpose; the
+  # workers each make their own.
+  rm -rf "$dir"
+  printf '  biber unpacks (one probe extraction, in its own cache)\n'
+  return 0
+}
+
+# --------------------------------------------------------------------------
 # --self-test: the committed negative controls.
 #
 # Three of them, because each covers a way the machinery above could report a
@@ -468,6 +611,67 @@ self_test() {
     fails=$((fails + 1))
   fi
 
+  printf '\n== control 4: every worker must get its own biber cache ==\n'
+  # The fix for the biber race is that no two workers share a PAR cache, and a
+  # fix that quietly stopped being applied would restore a failure that reads
+  # as a flaky fixture. So the workers are asked what they were given. No biber
+  # here: the assertion is about the environment the dispatcher hands out.
+  rm -f "$scratch"/*.status "$scratch"/*.log
+  batch_names=(alpha beta gamma)
+  batch_cmds=('printf "%s\n" "$PAR_TMPDIR"' 'printf "%s\n" "$PAR_TMPDIR"' \
+              'printf "%s\n" "$PAR_TMPDIR"')
+  if prepare_par_caches > "$scratch/c4.prepare" 2>&1; then
+    run_batch > "$scratch/c4.dispatch" 2>&1
+    local reported="$scratch/c4.caches" total distinct
+    cat "$scratch/$(slot_for 0 alpha).log" "$scratch/$(slot_for 1 beta).log" \
+        "$scratch/$(slot_for 2 gamma).log" 2>/dev/null | grep . > "$reported"
+    total="$(grep -c . "$reported")"
+    distinct="$(sort -u "$reported" | grep -c .)"
+    if [ "$total" -eq 3 ] && [ "$distinct" -eq 3 ]; then
+      printf '  ok: three workers, three distinct PAR_TMPDIR values\n'
+    else
+      printf '  FAIL: %s worker(s) reported a cache, %s of them distinct;\n' \
+        "$total" "$distinct"
+      printf '        expected 3 and 3. Sharing one cache is the race itself.\n'
+      fails=$((fails + 1))
+    fi
+  else
+    printf '  FAIL: could not prepare the per-worker caches; see %s\n' \
+      "$scratch/c4.prepare"
+    fails=$((fails + 1))
+  fi
+
+  printf '\n== control 5: a biber extraction that unpacked nothing must refuse ==\n'
+  # Driven over synthetic logs so this stays in the sub-second lint slot and
+  # runs where there is no biber. The second case is the substantive one: the
+  # extraction can fail while the invocation still exits 0, and a probe that
+  # reads only the status would dispatch on a broken toolchain.
+  local cold="$scratch/biber-cold.log" warm="$scratch/biber-warm.log"
+  {
+    printf "lipo: can't move temporary file: "
+    printf '/tmp/par-501/cache-0123456789/thin/biber\n'
+    printf 'biber: extracting arm64 binary with lipo failed (wstatus=256)\n'
+  } > "$cold"
+  printf 'biber version: 2.21\n' > "$warm"
+
+  if biber_extract_verdict 2 "$cold"; then
+    printf '  FAIL: a failed extraction was accepted\n'
+    fails=$((fails + 1))
+  elif biber_extract_verdict 0 "$cold"; then
+    printf '  FAIL: a failed extraction that exited 0 was accepted; the status\n'
+    printf '        is not the proof, the log is.\n'
+    fails=$((fails + 1))
+  elif biber_extract_verdict 0 "$scratch/biber-absent.log"; then
+    printf '  FAIL: a missing log was accepted\n'
+    fails=$((fails + 1))
+  elif ! biber_extract_verdict 0 "$warm"; then
+    printf '  FAIL: a genuine extraction was rejected\n'
+    fails=$((fails + 1))
+  else
+    printf '  ok: refused on failure, on a zero-exit failure, and on no log;\n'
+    printf '      accepted only a proven extraction\n'
+  fi
+
   printf '\n'
   if [ "$fails" -ne 0 ]; then
     printf 'check-parallel --self-test: %d control(s) FAILED.\n' "$fails"
@@ -504,20 +708,27 @@ fi
 printf 'check-parallel: %d targets, %d at a time\n' "${#targets[@]}" "$jobs"
 printf '(the gate is the serial `make check`; this is the fast pre-push run)\n\n'
 
-warm_font_cache || exit 1
-printf '\n'
-
-started="$SECONDS"
-
 batch_names=(${targets[@]+"${targets[@]}"})
 batch_cmds=()
 for target in ${targets[@]+"${targets[@]}"}; do
   batch_cmds+=("make $target")
 done
 
+warm_font_cache || exit 1
+prepare_par_caches || exit 1
+probe_biber_extraction || exit 1
+printf '\n'
+
+started="$SECONDS"
+
 run_batch
 collect_batch
 verdict="$?"
+
+# The per-worker biber caches are ~200 MB each and hold nothing reviewable — an
+# unpacked Perl runtime and a thinned binary. The logs above are the evidence
+# worth keeping, so drop the caches whichever way the run went.
+rm -rf "$par_root"
 
 printf '\n  wall clock: %ss\n' "$((SECONDS - started))"
 

@@ -314,20 +314,18 @@ whose result depends on how work was scheduled is not a gate. Use
 `check-parallel` to find failures quickly, and let the serial run be the thing
 you push behind.
 
-Neither path can run a different set of targets from the other — both expand
-`CHECK_TARGETS`, and `make lint` fails if `check` ever stops doing so. The
-driver is `tests/check-parallel.sh`, whose header explains the two things it
-adds beyond running the same targets: it counts results and fails when a worker
-leaves none, and it warms luaotfload's font cache with one build that has to
-prove it typeset real glyphs before anything fans out. `docs/TESTING.md`
-"Option lint" describes the committed controls behind both. Per-target output is
-captured under `build/check-parallel/` and replayed in the Makefile's order, so
-which suite failed is answerable from the transcript.
+Expect roughly 2.1× — about four minutes on the maintainer's machine — not the
+fourfold a `JOBS=4` might suggest: the wall time is the longest single suite,
+not the sum divided by the workers.
 
-It is deliberately not `make -j check`. macOS ships GNU make 3.81, which has no
-`--output-sync`, so the eleven suites would interleave line by line; and `-j`
-would also fan out inside `examples`, whose six sub-targets share one `latexmk`
-output directory.
+The driver is `tests/check-parallel.sh`. `docs/TESTING.md` "The parallel run" is
+canonical for how it works, what it asserts beyond running the same targets, the
+two tool caches it has to prepare first, its measured speedup and its disk cost,
+and why it is opt-in rather than the gate; none of that is repeated here. Two
+consequences you meet while using it: per-target output is captured under
+`build/check-parallel/` and replayed in the `Makefile`'s order, so which suite
+failed is answerable from the transcript, and a run transiently uses a few
+hundred MB there for biber's sake, freed as it goes.
 
 ### Scoping a suite while you iterate
 

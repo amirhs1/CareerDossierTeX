@@ -215,5 +215,6 @@ clean: ## Remove generated documents, logs, and the l3build sandbox
 	@rm -f tests/*/*.aux tests/*/*.log tests/*/*.out tests/*/*.pdf \
 	       tests/*/*.xdv tests/*/*.fls tests/*/*.fdb_latexmk \
 	       tests/*/*.bbl tests/*/*.bcf tests/*/*.blg tests/*/*.run.xml \
-	       tests/*/*.diff tests/*/*.stdout tests/*/*.tokens tests/*/*.guard
+	       tests/*/*.diff tests/*/*.stdout tests/*/*.tokens tests/*/*.guard \
+	       tests/*/*.got
 	@printf 'Cleaned generated files. Tracked source and .tlg baselines are untouched.\n'

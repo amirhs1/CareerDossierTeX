@@ -33,7 +33,41 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   rendered output changed, and no suite's verdict changed — only how many of
   them run at once and where one of them writes its artifacts.
 
+### Fixed
+
+- The local suites run under a restricted Bash sandbox, and `make
+  check-parallel` no longer fails at random from a cold biber cache. ([#392])
+
+  `extract-test` and `bibliography-test` compared their extracted text against a
+  process substitution, which a sandbox that denies re-opening pipe file
+  descriptors rejects with `diff: /dev/fd/63: Operation not permitted`. The
+  denial lands on `diff`'s own input, so both suites reported an extraction
+  mismatch above an empty diff — infrastructure wearing a fixture defect's
+  clothes. Each now writes what it extracted to a scratch `*.got` file and diffs
+  two ordinary paths.
+
+  `tagging` invokes veraPDF, whose JVM does not read `TMPDIR` but asks Darwin
+  for the per-user temp directory directly. Where that directory is denied,
+  veraPDF dies in its own static initialiser and the runner reported every
+  fixture as failing PDF/UA-2 validation — eleven verdicts from a validator that
+  never started. The suite now points the JVM at the temp directory the rest of
+  it already uses.
+
+  biber re-unpacks its native binary into a per-user cache on *every*
+  invocation, so two invocations sharing that cache truncate each other's
+  binary: the three targets that invoke it (`bibliography-test`, `links`,
+  `examples`) raced under `check-parallel`, and a different pair of them failed
+  each run — a race that reads as a flaky fixture. Warming the cache first does
+  not help, measured; each worker now gets its own, freed as that worker
+  finishes. Serial `make check` was never affected.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed, and no suite's verdict changed — only
+  where three runners write their intermediates, and what the parallel driver
+  prepares and proves before dispatching.
+
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
+[#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
 
 ## [0.8.0] - 2026-08-12
 
