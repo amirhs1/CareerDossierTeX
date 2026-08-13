@@ -82,6 +82,49 @@ batches inside one request rather than around several.
 `.agents/skills/open-draft-pr/reference.md` (appendix) is where that is spent,
 and is canonical for the procedure.
 
+### `make check` cannot run under the Bash sandbox
+
+LuaLaTeX cannot reach luaotfload's font cache under the sandbox. What follows is
+not an error: `fontspec` falls back to `nullfont`, every document typesets
+empty, `latexmk` exits 0 for each build, and only the baseline comparison
+notices. So the run reports the repository's own test suite failing when what
+failed is the harness. Measured on 2026-08-13 on a commit with no `.cls`,
+`.sty`, or `.tex` change, so a real regression is excluded by construction:
+
+| Invocation | Sandbox | Result |
+|---|---|---|
+| `make check` | on | aborts in `regression`; 29 of 48 tests fail; 29 s |
+| `make check` | off | `All suites passed.`, exit 0; 7 min 25 s |
+| `make check-parallel JOBS=8` | on | refuses to dispatch; names the cause; 0.3 s |
+
+Every failing diff carries the same two lines:
+
+```text
+! Font \TU/texgyreheros(0)/m/n/10=…: not loadable: metric data not found or bad.
++ Missing character: There is no - (U+002D) in font nullfont!
+```
+
+Two signatures, and the cheaper one is the second. The obvious one is many
+baselines failing at once on a branch that changed no LaTeX. The other is
+speed: 29 s against the unsandboxed 7 min 25 s, because an empty document
+compiles almost instantly. A suite that normally costs minutes and comes back in
+seconds has not run fast — it has run on nothing. Read either as the sandbox
+before reading it as a regression.
+
+Two things follow. Run `make check` with the sandbox deliberately disabled, as a
+considered choice rather than after a confusing failure — the same exception the
+`gh` section above spends for one call, and the reason `docs/TESTING.md` tells a
+human not to run the sweep scripts under one either. And **never regenerate a
+`.tlg` or extraction baseline from a sandboxed run**: a baseline captured
+against `nullfont` is committed damage that passes locally and fails in CI.
+
+`make check-parallel` is the cheap probe rather than a second gate. Its
+font-cache warm-up build refuses to dispatch anything it cannot prove typeset
+real glyphs, so it names the cause in under a second where `check` spends its
+regression suite to mis-report it; `CONTRIBUTING.md` "The same suite, faster,
+before a push" is canonical for the target itself, and the gate remains the
+serial `make check`.
+
 ## Git attribution
 
 Use Claude Code's current `attribution` configuration, and do not rely on the
