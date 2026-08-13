@@ -33,6 +33,35 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   rendered output changed, and no suite's verdict changed — only how many of
   them run at once and where one of them writes its artifacts.
 
+- `make smoke`, `make layout`, and `make tagging` take `JOBS=N` and run that
+  many of their own fixtures at once. With no `JOBS` each runs exactly what it
+  ran before, in the same order, with byte-identical output, so `make check` and
+  CI are unaffected and the serial run remains the gate. ([#390])
+
+  Measured on the maintainer's machine: `smoke` 108 s to 40 s and `layout` 95 s
+  to 35 s at `JOBS=4`. The target-level driver could not reach this — its floor
+  is the longest single target.
+
+  Each fixture became a function reporting through its return status alone,
+  because a worker is a subshell and the `fail=1` every assertion used to set
+  dies with it; a runner that lost its verdicts would report a clean run of
+  nothing. The dispatcher, throttle, ordered replay, and accounting assertion
+  are now one shared implementation in `tests/lib/fanout.sh`, used by
+  `tests/check-parallel.sh` as well, so its five committed controls exercise the
+  code all four callers run. `make lint` additionally asserts that each runner's
+  serial and parallel paths select the same fixtures and that the `Makefile` can
+  reach the `--jobs` path.
+
+  `make check-parallel` now passes every dispatched target an explicit `JOBS`,
+  defaulting to 1: a command-line `JOBS` lands in `MAKEFLAGS`, so without this
+  `make check-parallel JOBS=4` would have silently fanned out inside each target
+  as well — sixteen concurrent LuaLaTeX processes. Raise it with
+  `INNER_JOBS=N`.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed, and no suite's verdict changed — only
+  how many fixtures each runner compiles at once.
+
 ### Fixed
 
 - The local suites run under a restricted Bash sandbox, and `make
@@ -67,6 +96,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   prepares and proves before dispatching.
 
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
+[#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
 
 ## [0.8.0] - 2026-08-12

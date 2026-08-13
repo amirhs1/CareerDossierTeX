@@ -390,6 +390,36 @@ and "selected, checked nothing" print as the same blank space.
 `tests/lint/run-fixture-filter.sh` holds this contract to account and runs in
 the `lint` slot; see `docs/TESTING.md` "Option lint".
 
+### Running one suite's fixtures concurrently
+
+Scoping helps when you know which fixture you care about. When you need the
+whole of a long suite — before a push, or when the failure could be anywhere —
+`smoke`, `layout`, and `tagging` take `JOBS=N` and run that many of their own
+fixtures at once:
+
+```bash
+make smoke JOBS=4
+make layout JOBS=8 FIXTURE='resume-*'
+```
+
+**With no `JOBS` nothing changes.** Each runs exactly the fixtures it ran
+before, in the same order, with byte-identical output — which is what `make
+check` and CI invoke, and why neither is affected. As with `check-parallel`, the
+serial run remains the gate.
+
+`JOBS` composes with `FIXTURE`, and it composes with `check-parallel` — but the
+two layers multiply, so `check-parallel` pins the inner one to 1 and you raise
+it deliberately:
+
+```bash
+make check-parallel JOBS=4 INNER_JOBS=2
+```
+
+`docs/TESTING.md` "Fanning out inside a suite" is canonical for the measured
+speedups, the shared dispatcher, the accounting assertion that makes a
+concurrent run safe to believe, and the process budget; none of it is repeated
+here.
+
 The underlying invocation, if you prefer to run it directly or need to build a
 single document:
 
