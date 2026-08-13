@@ -380,7 +380,10 @@ In review
 
 Listed in the Project's own option order. Copy the exact string from
 `gh project field-list 2 --owner amirhs1`; option lookup is by name, so a
-mismatched transcription sets nothing and reports no error.
+mismatched transcription resolves to an empty option id. The documented write
+path in `.agents/skills/open-draft-pr/reference.md` rejects that with a
+`VALIDATION` error and a non-zero exit; a hand-run `gh project item-edit`
+accepts it silently.
 
 Meanings:
 
