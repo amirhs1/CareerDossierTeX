@@ -129,6 +129,26 @@ normalize() {
                             for (i = 1; i <= last; i++) print line[i] }'
 }
 
+# Compare captured text against a committed baseline, writing the observed text
+# to <slot>.got and the difference to <slot>.diff. Returns diff's own status.
+#
+# The scratch file is load-bearing rather than tidy. This ran as
+# `diff -u "$exp" <(printf '%s\n' "$got")` until issue #392, which fails under a
+# restricted sandbox with
+#
+#   diff: /dev/fd/63: Operation not permitted
+#
+# because re-opening a pipe file descriptor is denied there. The denial lands on
+# diff's *input*, so diff exits nonzero having compared nothing and the runner
+# reported EXTRACTION MISMATCH above an empty .diff — infrastructure wearing a
+# fixture defect's clothes, on a suite whose fixtures had not changed.
+# tests/check-parallel.sh already avoids process substitution for this reason
+# and is the in-repo precedent.
+compare_to_baseline() { # <baseline> <observed text> <slot>
+  printf '%s\n' "$2" > "$3.got"
+  diff -u "$1" "$3.got" > "$3.diff"
+}
+
 # Log lines that are allowed to appear. Keep this list short and justified.
 #  - clig/hlig "not available": TeX Gyre Heros has no contextual/historic
 #    ligature tables to disable; the common-ligature suppression still applies.
@@ -240,7 +260,7 @@ EOF
     continue
   fi
 
-  if ! diff -u "$exp" <(printf '%s\n' "$got") > "$base.diff"; then
+  if ! compare_to_baseline "$exp" "$got" "$base"; then
     echo "  EXTRACTION MISMATCH:"; sed 's/^/    /' "$base.diff"; fail=1
   else
     echo "  extraction OK (poppler)"
@@ -268,7 +288,7 @@ EOF
     else
       kgot="$(osascript -l JavaScript "$here/pdfkit-extract.js" "$here/$base.pdf" \
               | normalize)"
-      if ! diff -u "$kexp" <(printf '%s\n' "$kgot") > "$base.pdfkit.diff"; then
+      if ! compare_to_baseline "$kexp" "$kgot" "$base.pdfkit"; then
         echo "  PDFKIT EXTRACTION MISMATCH:"; sed 's/^/    /' "$base.pdfkit.diff"
         fail=1
       else

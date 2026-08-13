@@ -187,6 +187,41 @@ else
   skipped+=("veraPDF PDF/UA-2 validation (verapdf not installed)")
 fi
 
+# veraPDF is the one gate here that runs on a JVM, and the JVM does not read
+# $TMPDIR: on Darwin it asks confstr(_CS_DARWIN_USER_TEMP_DIR) for the per-user
+# temp directory directly. Under a restricted sandbox that directory is denied,
+# and veraPDF dies in its own static initialiser before validating anything:
+#
+#   Caused by: java.nio.file.FileSystemException:
+#     /var/folders/…/T/7478532095515290837: Operation not permitted
+#
+# Every `verapdf` call below then fails, and the runner reports each fixture as
+# `failed veraPDF UA-2 validation` — eleven validation verdicts from a validator
+# that never started, which is this repository's characteristic failure wearing
+# its other face: not a hollow pass but a hollow failure. Point the JVM at the
+# temp directory the rest of this suite already uses ($work is under it), so the
+# verdicts come from a validator that ran.
+#
+# Appended rather than assigned, so a caller's own _JAVA_OPTIONS survives; the
+# JVM applies the last occurrence of a repeated -D. It splits the variable on
+# whitespace, so a temp path containing a space would arrive as two unparsable
+# options and reintroduce the failure this prevents — left alone in that case,
+# which is no worse than before and is not silent, since the JVM's startup error
+# still names the directory.
+if [ "$have_verapdf" -eq 1 ]; then
+  jvm_tmpdir="${TMPDIR:-/tmp}"
+  case "$jvm_tmpdir" in
+    *[[:space:]]*)
+      echo "note: TMPDIR contains whitespace; not setting veraPDF's java.io.tmpdir."
+      echo "      Under a restricted sandbox veraPDF may fail to start."
+      echo
+      ;;
+    *)
+      export _JAVA_OPTIONS="${_JAVA_OPTIONS:+$_JAVA_OPTIONS }-Djava.io.tmpdir=$jvm_tmpdir"
+      ;;
+  esac
+fi
+
 have_mutool=0
 if command -v mutool >/dev/null 2>&1; then
   have_mutool=1

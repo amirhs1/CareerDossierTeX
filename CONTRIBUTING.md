@@ -316,13 +316,17 @@ you push behind.
 
 Neither path can run a different set of targets from the other — both expand
 `CHECK_TARGETS`, and `make lint` fails if `check` ever stops doing so. The
-driver is `tests/check-parallel.sh`, whose header explains the two things it
+driver is `tests/check-parallel.sh`, whose header explains the three things it
 adds beyond running the same targets: it counts results and fails when a worker
-leaves none, and it warms luaotfload's font cache with one build that has to
-prove it typeset real glyphs before anything fans out. `docs/TESTING.md`
-"Option lint" describes the committed controls behind both. Per-target output is
-captured under `build/check-parallel/` and replayed in the Makefile's order, so
-which suite failed is answerable from the transcript.
+leaves none; it warms luaotfload's font cache with one build that has to prove
+it typeset real glyphs before anything fans out; and it gives every worker its
+own biber cache, because biber re-unpacks its binary on each invocation and two
+invocations sharing a cache corrupt each other — three of the eleven targets
+need biber, and each such cache costs about 200 MB while the run is in flight,
+removed when it ends. `docs/TESTING.md` "Option lint" describes the committed
+controls behind all three. Per-target output is captured under
+`build/check-parallel/` and replayed in the Makefile's order, so which suite
+failed is answerable from the transcript.
 
 It is deliberately not `make -j check`. macOS ships GNU make 3.81, which has no
 `--output-sync`, so the eleven suites would interleave line by line; and `-j`

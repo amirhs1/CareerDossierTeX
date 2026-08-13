@@ -793,12 +793,29 @@ and a parallel path dispatching different target sets is a drift no run would
 report, and a dispatched name that is not `.PHONY` would make `make <target>` a
 no-op that exits 0.
 
-It compiles nothing and needs no TeX, which is why it shares the sub-second
-`lint` slot and runs on the TeX-free CI lint runner. The font-cache proof the
-driver performs before fanning out — one small build required to show it
-typeset real glyphs, because an unwritable luaotfload cache leaves every
-document empty and every suite passing — is not exercised here for that reason;
-it is exercised by every real `check-parallel` run.
+Two tool caches are prepared before the driver fans out, because a cache that
+several concurrent processes build at once is a cache built wrong — but the two
+need opposite treatment. luaotfload's is warmed: one small LuaLaTeX build,
+required to show it typeset real glyphs, because an unwritable cache leaves
+every document empty and every suite passing. biber's cannot be warmed, and
+issue #392 measured why: biber re-unpacks its native binary into that cache on
+*every* invocation, not the first, so two invocations sharing one cache truncate
+each other's binary — six concurrent invocations failed against a fully warm
+shared cache exactly as they did against a cold one. Each worker is therefore
+given its own biber cache, and six concurrent invocations so isolated failed
+zero times.
+
+The font-cache proof needs TeX, so it is exercised by every real
+`check-parallel` run rather than here. The biber halves need neither TeX nor
+biber and so are committed controls in the `lint` slot. The isolation is
+asserted by asking three synthetic workers what cache they were handed and
+requiring three distinct answers, because a fix that quietly stopped being
+applied would restore a failure that reads as a flaky bibliography fixture. The
+driver's pre-flight extraction probe is asserted over synthetic logs: it must
+refuse a failed extraction, refuse one that failed while still exiting 0 — the
+status is not the proof, the log is, which is the nullfont lesson in a second
+tool — refuse a missing log, and accept only an invocation that printed its
+version.
 
 ### Module regression suite (l3build)
 
