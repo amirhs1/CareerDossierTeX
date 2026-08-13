@@ -51,15 +51,38 @@ fail=0
 # run. Every assertion here is made per fixture, so a run with no fixtures
 # passes all of them, and that is indistinguishable from a suite that checked
 # something.
+#
+# Fixture-level concurrency (issue #390) is opt-in through `--jobs N`, which
+# `make smoke JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
+# runner takes the serial path below and is the suite it has always been: the
+# same fixtures, in the same order, with byte-identical output. That is the
+# invocation CI makes and the one `make check` makes, and a gate whose result
+# depends on scheduling is not a gate.
 fixture_filter=""
 list_only=0
-for arg in "$@"; do
-  case "$arg" in
-    --list) list_only=1 ;;
-    -*)     echo "unknown option: $arg" >&2; exit 2 ;;
-    *)      fixture_filter="$arg" ;;
+list_units_only=0
+jobs=1
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --list)   list_only=1; shift ;;
+    # The units the drivers would dispatch, which is `--list` plus the checks
+    # that are not a fixture compile. tests/lint/run-fixture-filter.sh asserts
+    # the two against each other; see "The unit list" below.
+    --list-units) list_units_only=1; shift ;;
+    --jobs)
+      [ "$#" -ge 2 ] || { echo "--jobs needs a value" >&2; exit 2; }
+      jobs="$2"; shift 2
+      ;;
+    --jobs=*) jobs="${1#--jobs=}"; shift ;;
+    -*)       echo "unknown option: $1" >&2; exit 2 ;;
+    *)        fixture_filter="$1"; shift ;;
   esac
 done
+
+case "$jobs" in
+  ''|*[!0-9]*) echo "--jobs takes a positive integer, got: $jobs" >&2; exit 2 ;;
+esac
+[ "$jobs" -ge 1 ] || { echo "--jobs takes a positive integer" >&2; exit 2; }
 
 fixture_matches() {
   [ -z "$fixture_filter" ] && return 0
@@ -248,15 +271,31 @@ if [ -n "$fixture_filter" ]; then
   echo
 fi
 
+# Every block below is a *unit*: a function that prints everything the serial
+# runner printed for it, including its trailing blank line, and reports its
+# verdict through its return status alone (issue #390).
+#
+# That shape is what makes the two paths one path. The serial driver calls these
+# in order; the parallel driver dispatches them and replays their captured
+# output in the same order. Byte-identical output between the two is therefore
+# structural rather than something a test has to keep checking.
+#
+# The one invasive consequence: a unit may not report by assigning to `fail`,
+# because a worker is a subshell and its assignment dies with it — a suite that
+# compiled 121 fixtures, lost 120 verdicts, and reported a clean run is exactly
+# the failure this repository keeps producing. So every former `fail=1; continue`
+# is now `return 1`, and the drivers below own the accumulation.
+
 # Prove the supported-engine contract independently from class behavior. The
 # same minimal source must build with LuaLaTeX and fail at the package guard
 # (rather than later in fontspec) under both unsupported engines.
-if [ "$engine_selected" -eq 1 ]; then
+smoke_engine_contract() {
+  local unit_fail=0 engine job rc
   echo "== $engine_fixture.tex (engine contract) =="
   if ! lualatex -halt-on-error -interaction=nonstopmode "$engine_fixture.tex" \
       > "$engine_fixture-lualatex.stdout" 2>&1; then
     echo "  LuaLaTeX EXPECTED PASS but compile failed"
-    fail=1
+    unit_fail=1
   else
     echo "  LuaLaTeX build OK"
   fi
@@ -267,16 +306,17 @@ if [ "$engine_selected" -eq 1 ]; then
     rc=$?
     if [ "$rc" -eq 0 ]; then
       echo "  $engine EXPECTED FAILURE but compile succeeded"
-      fail=1
+      unit_fail=1
     elif ! tr '\n' ' ' < "$job.log" | tr -s ' ' | grep -qF "$engine_needle"; then
       echo "  $engine FAILED for the wrong reason: expected '$engine_needle'"
-      fail=1
+      unit_fail=1
     else
       echo "  $engine failed at the LuaLaTeX guard as intended"
     fi
   done
   echo
-fi
+  return "$unit_fail"
+}
 
 # Issue #252: the header-stack fixture below compiles the worked example
 # published in docs/API.md, so it is only worth compiling while the two are the
@@ -291,7 +331,8 @@ fi
 # It is gated on its own fixture being selected (issue #359): the claim it makes
 # is about that fixture, and a run that does not compile it has no business
 # reporting on it.
-if fixture_matches components-header-stack-doc; then
+smoke_doc_drift() {
+  local unit_fail=0 doc_source doc_fixture
   doc_source="$root/docs/API.md"
   doc_fixture="$here/components-header-stack-doc.tex"
   echo "== docs/API.md worked example == components-header-stack-doc.tex =="
@@ -308,7 +349,7 @@ if fixture_matches components-header-stack-doc; then
   ' "$doc_source" > "$here/doc-example.stdout"
   if [ $? -ne 0 ]; then
     echo "  FAILED to locate exactly one worked example in docs/API.md"
-    fail=1
+    unit_fail=1
   else
     awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/doc-fixture.stdout"
     if diff -u "$here/doc-example.stdout" "$here/doc-fixture.stdout" > "$here/doc-example.diff"; then
@@ -316,23 +357,31 @@ if fixture_matches components-header-stack-doc; then
     else
       echo "  DRIFTED — the fixture no longer compiles what docs/API.md publishes:"
       sed 's/^/    /' "$here/doc-example.diff"
-      fail=1
+      unit_fail=1
     fi
   fi
   echo
-fi
+  return "$unit_fail"
+}
 
-# A filter selecting only the engine contract leaves this array empty, and a
-# bare "${selected_cases[@]}" would then be an unbound-variable error under
-# `set -u' in bash 3.2. The ${a[@]+"${a[@]}"} form expands to nothing instead.
-for entry in ${selected_cases[@]+"${selected_cases[@]}"}; do
+# One case, by its index into `selected_cases`.
+#
+# The index rather than the entry text is what a worker is handed, and that is
+# deliberate: several entries carry single quotes (`Unknown 'fontsize' value
+# '9pt'`), so passing the text through the dispatcher's `eval` would need
+# quoting that is easy to get subtly wrong and whose failure mode is a fixture
+# silently checking the wrong needle. A subshell inherits the array, so an index
+# needs no quoting at all.
+smoke_case() {
+  local entry base rest expect needle once tex rc unexpected flat count
+  entry="${selected_cases[$1]}"
   base="${entry%% *}"; rest="${entry#* }"
   expect="${rest%%|*}"; needle=""; once=""
   [ "$rest" != "$expect" ] && needle="${rest#*|}"
   if [ "$expect" = "fail-once" ]; then once="${needle##*|}"; needle="${needle%|*}"; fi
   tex="$base.tex"
   echo "== $tex ($expect) =="
-  if [ ! -f "$tex" ]; then echo "  MISSING fixture $tex"; fail=1; continue; fi
+  if [ ! -f "$tex" ]; then echo "  MISSING fixture $tex"; return 1; fi
 
   # `fail-once' counts reports across the whole preamble, so it must not stop
   # at the first one. Every other expectation keeps -halt-on-error. The flag is
@@ -348,7 +397,7 @@ for entry in ${selected_cases[@]+"${selected_cases[@]}"}; do
   case "$expect" in
     pass)
       if [ "$rc" -ne 0 ]; then
-        echo "  EXPECTED PASS but compile failed (see $base.log)"; fail=1; continue
+        echo "  EXPECTED PASS but compile failed (see $base.log)"; return 1
       fi
       # Academic-letter footers include the total page count, which is resolved
       # by the label written on the first LuaLaTeX pass.
@@ -356,20 +405,20 @@ for entry in ${selected_cases[@]+"${selected_cases[@]}"}; do
         lualatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1
         rc=$?
         if [ "$rc" -ne 0 ]; then
-          echo "  EXPECTED PASS but footer rerun failed (see $base.log)"; fail=1; continue
+          echo "  EXPECTED PASS but footer rerun failed (see $base.log)"; return 1
         fi
       fi
       unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' "$base.log" \
                     | grep -viE "$allow" || true)"
       if [ -n "$unexpected" ]; then
-        echo "  UNEXPECTED LOG LINES:"; printf '%s\n' "$unexpected" | sed 's/^/    /'; fail=1
-      else
-        echo "  build OK, log clean"
+        echo "  UNEXPECTED LOG LINES:"; printf '%s\n' "$unexpected" | sed 's/^/    /'
+        return 1
       fi
+      echo "  build OK, log clean"
       ;;
     fail|fail-once)
       if [ "$rc" -eq 0 ]; then
-        echo "  EXPECTED FAILURE but compile succeeded"; fail=1; continue
+        echo "  EXPECTED FAILURE but compile succeeded"; return 1
       fi
       # A message longer than the terminal width is wrapped, and TeX prefixes
       # every continuation line with the reporting module in parentheses. That
@@ -379,22 +428,91 @@ for entry in ${selected_cases[@]+"${selected_cases[@]}"}; do
       flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ' \
         | sed 's/(careerdossier-[a-z]*)[[:space:]]*/ /g' | tr -s ' ')"
       if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
-        echo "  FAILED for the wrong reason: expected '$needle' in the log"; fail=1
+        echo "  FAILED for the wrong reason: expected '$needle' in the log"; return 1
       elif [ -n "$once" ]; then
         # -o prints one line per match, so this counts occurrences rather than
         # matching lines; the log has already been flattened to a single line.
         count="$(printf '%s' "$flat" | grep -oF "$once" | wc -l | tr -d ' ')"
         if [ "$count" != "1" ]; then
-          echo "  REPORTED $count TIMES, expected exactly 1: '$once'"; fail=1
-        else
-          echo "  failed as intended, reported once ($needle)"
+          echo "  REPORTED $count TIMES, expected exactly 1: '$once'"; return 1
         fi
+        echo "  failed as intended, reported once ($needle)"
       else
         echo "  failed as intended${needle:+ ($needle)}"
       fi
       ;;
   esac
+  return 0
+}
+
+# --------------------------------------------------------------------------
+# The unit list.
+#
+# Built once and used by both drivers, so the serial and parallel paths cannot
+# select different work: there is one list, and `--list-units` prints it for
+# tests/lint/run-fixture-filter.sh to hold to account against `--list`. A
+# runner whose parallel path quietly dispatched a subset would otherwise report
+# a clean run of something other than the suite.
+unit_names=()
+unit_cmds=()
+
+[ "$engine_selected" -eq 1 ] \
+  && { unit_names+=("$engine_fixture"); unit_cmds+=("smoke_engine_contract"); }
+
+# Issue #252's drift check is its own unit rather than part of the fixture's
+# own: it printed before every compile when this ran serially, and keeping that
+# position is what makes the two paths' output identical.
+if fixture_matches components-header-stack-doc; then
+  unit_names+=("components-header-stack-doc-drift")
+  unit_cmds+=("smoke_doc_drift")
+fi
+
+for (( i = 0; i < ${#selected_cases[@]}; i++ )); do
+  unit_names+=("${selected_cases[$i]%% *}")
+  unit_cmds+=("smoke_case $i")
 done
+
+if [ "$list_units_only" -eq 1 ]; then
+  printf '%s\n' ${unit_names[@]+"${unit_names[@]}"}
+  exit 0
+fi
+
+# --------------------------------------------------------------------------
+# The two drivers. Same units, same order; the only difference is how many are
+# in flight, and — for the parallel one — the accounting assertion that a unit
+# which left no verdict is a failure rather than a smaller denominator.
+
+if [ "$jobs" -eq 1 ]; then
+  for (( i = 0; i < ${#unit_names[@]}; i++ )); do
+    eval "${unit_cmds[$i]}" || fail=1
+  done
+else
+  . "$root/tests/lib/fanout.sh"
+  scratch="$root/build/fanout/smoke"
+  rm -rf "$scratch"
+  mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
+
+  fanout_reset
+  for (( i = 0; i < ${#unit_names[@]}; i++ )); do
+    fanout_add "${unit_names[$i]}" "${unit_cmds[$i]}" || exit 2
+  done
+
+  echo "fixture concurrency: $jobs at a time (the gate is the serial run)"
+  # Required before fan-out, not merely nice to have: several LuaLaTeX processes
+  # racing to build a cold luaotfload cache is precisely when it goes wrong, and
+  # a nullfont run compiles every fixture empty and passes every one of them.
+  fanout_warm_fonts "$scratch" || exit 1
+  echo
+  fanout_run "$jobs" "$scratch"
+  fanout_gather "$scratch"
+  fanout_replay "$scratch"
+  fanout_account fixtures || fail=1
+  for (( i = 0; i < ${#unit_names[@]}; i++ )); do
+    case "${fanout_states[$i]}" in
+      FAILED*) fail=1 ;;
+    esac
+  done
+fi
 
 echo
 [ "$fail" -eq 0 ] && echo "ALL SMOKE FIXTURES PASSED$scope_note" \

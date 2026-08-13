@@ -71,15 +71,35 @@ cd "$here"
 # run. Every assertion this suite makes is made per fixture, so a run with no
 # fixtures passes all of them, and "0 fixtures, all passed" is indistinguishable
 # from a suite that actually checked something.
+#
+# Fixture-level concurrency (issue #390) is opt-in through `--jobs N`, which
+# `make layout JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
+# runner takes the serial path below and is the suite it has always been: the
+# same fixtures, in the same order, with byte-identical output.
 fixture_filter=""
 list_only=0
-for arg in "$@"; do
-  case "$arg" in
-    --list) list_only=1 ;;
-    -*)     echo "unknown option: $arg" >&2; exit 2 ;;
-    *)      fixture_filter="$arg" ;;
+list_units_only=0
+jobs=1
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --list)   list_only=1; shift ;;
+    # The units the drivers would dispatch. Here that is exactly `--list`, since
+    # every unit is one fixture; tests/lint/run-fixture-filter.sh asserts it.
+    --list-units) list_units_only=1; shift ;;
+    --jobs)
+      [ "$#" -ge 2 ] || { echo "--jobs needs a value" >&2; exit 2; }
+      jobs="$2"; shift 2
+      ;;
+    --jobs=*) jobs="${1#--jobs=}"; shift ;;
+    -*)       echo "unknown option: $1" >&2; exit 2 ;;
+    *)        fixture_filter="$1"; shift ;;
   esac
 done
+
+case "$jobs" in
+  ''|*[!0-9]*) echo "--jobs takes a positive integer, got: $jobs" >&2; exit 2 ;;
+esac
+[ "$jobs" -ge 1 ] || { echo "--jobs takes a positive integer" >&2; exit 2; }
 
 fixtures=()
 total=0
@@ -100,7 +120,10 @@ if [ "${#fixtures[@]}" -eq 0 ]; then
   exit 1
 fi
 
-if [ "$list_only" -eq 1 ]; then
+if [ "$list_only" -eq 1 ] || [ "$list_units_only" -eq 1 ]; then
+  # Identical lists on purpose: every unit this runner dispatches is one
+  # fixture, so `--list-units` differing from `--list` would itself be the bug
+  # the lint's dispatch check exists to catch.
   for tex in "${fixtures[@]}"; do echo "${tex%.tex}"; done
   exit 0
 fi
@@ -143,8 +166,20 @@ fail=0
 # reports without asserting, which is how a candidate value is explored.
 page_fill_min="${CDOSSIER_PAGE_FILL_MIN-90}"
 
-for tex in "${fixtures[@]}"; do
-  base="${tex%.tex}"
+# One fixture, start to finish (issue #390).
+#
+# `local fail` shadows the global deliberately. Every assertion below already
+# said `fail=1`, and rewriting eighteen of them to accumulate into a new name
+# would be eighteen chances to miss one silently — a missed site reports a clean
+# fixture, which is the failure this repository keeps producing. Shadowing keeps
+# each site as it was and moves the accumulation to the one place that changed:
+# the return below, which is the only channel out of a worker subshell.
+#
+# The two former `continue`s are `return 1`, for the same reason.
+layout_fixture() {
+  local tex="$1"
+  local fail=0
+  local base="${tex%.tex}"
   echo "== $tex =="
 
   # `\tracingpages=1` goes on the command line rather than into a rebuild of
@@ -157,11 +192,11 @@ for tex in "${fixtures[@]}"; do
   # otherwise be expanded while TeX looked for another digit.
   if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
        "\\tracingpages=1 \\input{$tex}" > "$base.stdout" 2>&1; then
-    echo "  COMPILE FAILED (see $base.log)"; fail=1; continue
+    echo "  COMPILE FAILED (see $base.log)"; return 1
   fi
   if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
        "\\tracingpages=1 \\input{$tex}" >> "$base.stdout" 2>&1; then
-    echo "  RERUN FAILED (see $base.log)"; fail=1; continue
+    echo "  RERUN FAILED (see $base.log)"; return 1
   fi
 
   # No overfull boxes.
@@ -675,7 +710,54 @@ EOF
       fi
       ;;
   esac
-done
+  return "$fail"
+}
+
+# --------------------------------------------------------------------------
+# The two drivers. Same fixtures, same order; the only difference is how many
+# are in flight, and — for the parallel one — the accounting assertion that a
+# fixture which left no verdict is a failure rather than a smaller denominator.
+#
+# $control_dir needs no protection from the fan-out. Its cleanup is an EXIT
+# trap, and a trap does not fire in a background subshell: measured on both
+# bash 5.3 and the macOS /bin/bash 3.2 this suite has to run under, it fires
+# once, in the parent, after `wait`. The wrappers written into it are named
+# per fixture already, so no two workers share a path there either.
+
+fail=0
+
+if [ "$jobs" -eq 1 ]; then
+  for tex in "${fixtures[@]}"; do
+    layout_fixture "$tex" || fail=1
+  done
+else
+  . "$root/tests/lib/fanout.sh"
+  scratch="$root/build/fanout/layout"
+  rm -rf "$scratch"
+  mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
+
+  fanout_reset
+  for tex in "${fixtures[@]}"; do
+    fanout_add "${tex%.tex}" "layout_fixture '$tex'" || exit 2
+  done
+
+  echo "fixture concurrency: $jobs at a time (the gate is the serial run)"
+  # Required before fan-out: several LuaLaTeX processes racing to build a cold
+  # luaotfload cache is when it goes wrong, and a nullfont run produces no
+  # overfull box, no stranded heading, and no underfull page — it passes every
+  # assertion above having typeset nothing.
+  fanout_warm_fonts "$scratch" || exit 1
+  echo
+  fanout_run "$jobs" "$scratch"
+  fanout_gather "$scratch"
+  fanout_replay "$scratch"
+  fanout_account fixtures || fail=1
+  for (( i = 0; i < ${#fixtures[@]}; i++ )); do
+    case "${fanout_states[$i]}" in
+      FAILED*) fail=1 ;;
+    esac
+  done
+fi
 
 echo
 [ "$fail" -eq 0 ] && echo "ALL LAYOUT FIXTURES PASSED$scope_note" \
