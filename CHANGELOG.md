@@ -58,8 +58,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   binary: the three targets that invoke it (`bibliography-test`, `links`,
   `examples`) raced under `check-parallel`, and a different pair of them failed
   each run — a race that reads as a flaky fixture. Warming the cache first does
-  not help, measured; each worker now gets its own. Serial `make check` was
-  never affected.
+  not help, measured; each worker now gets its own, freed as that worker
+  finishes. Serial `make check` was never affected.
 
   **Contributor tooling only.** No class, option, key, command, token, fixture,
   baseline, or rendered output changed, and no suite's verdict changed — only

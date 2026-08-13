@@ -222,6 +222,13 @@ run_batch() {
       # Written last and in one line, so a half-written result is not a
       # plausible reading of a missing one.
       printf '%s %s\n' "$code" "$((SECONDS - start))" > "$scratch/$slot.status"
+      # This worker's biber cache is now dead weight — about 200 MB of unpacked
+      # Perl runtime — and the biber targets finish long before the longest
+      # suite does. Freeing it here rather than at the end of the run makes the
+      # peak follow how much actually overlaps instead of the whole run. After
+      # the status write, never before: the accounting evidence outranks the
+      # disk, and a worker that died leaves its cache for the end-of-run sweep.
+      rm -rf "$par_root/$slot"
     ) &
     # Throttle without `wait -n` (bash >= 4.3 only; macOS /bin/bash is 3.2).
     while [ "$(jobs -rp | wc -l | tr -d ' ')" -ge "$jobs" ]; do

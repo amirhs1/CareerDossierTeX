@@ -771,51 +771,153 @@ The `lint` target runs a third script in the same slot:
 tests/check-parallel.sh --self-test
 ```
 
-`make check-parallel` (`CONTRIBUTING.md` "Local builds") runs `check`'s eleven
-targets concurrently. That is a scheduling change, not a new assertion — every
-verdict is still the owning suite's — but it introduces one failure mode no
-suite can report on itself. A worker that dies before its suite ever ran leaves
-no failure behind, only an absence, and an absence is indistinguishable from a
-clean run unless something is counting. The driver therefore requires every
-dispatched target to leave a result file and fails when the count of results is
-not the count dispatched, naming the targets that produced none.
+It is the committed negative control for `make check-parallel`, and it belongs
+in this slot because it compiles nothing and needs neither TeX nor biber. What
+it asserts, and why each assertion exists, is in "The parallel run" below rather
+than here.
 
-An assertion of that kind is worth exactly what its negative control is worth,
-and the control has to be committed rather than performed once by hand, so
-`--self-test` drives the dispatcher and the collector over synthetic workers:
-a batch that all succeeds must pass and account for every member; a batch with
-one failing member must fail, name that member, and replay its output; and a
-batch from which one result file is removed — the state a killed worker leaves
-behind — must fail as an accounting failure rather than as two passes and a
-shrug. It also asserts statically that `check`'s prerequisite list is still
-`$(CHECK_TARGETS)` and that every dispatched name is `.PHONY`, because a serial
-and a parallel path dispatching different target sets is a drift no run would
-report, and a dispatched name that is not `.PHONY` would make `make <target>` a
-no-op that exits 0.
+### The parallel run
 
-Two tool caches are prepared before the driver fans out, because a cache that
-several concurrent processes build at once is a cache built wrong — but the two
-need opposite treatment. luaotfload's is warmed: one small LuaLaTeX build,
-required to show it typeset real glyphs, because an unwritable cache leaves
-every document empty and every suite passing. biber's cannot be warmed, and
-issue #392 measured why: biber re-unpacks its native binary into that cache on
-*every* invocation, not the first, so two invocations sharing one cache truncate
-each other's binary — six concurrent invocations failed against a fully warm
-shared cache exactly as they did against a cold one. Each worker is therefore
-given its own biber cache, and six concurrent invocations so isolated failed
-zero times.
+`make check-parallel` runs `check`'s eleven targets concurrently instead of one
+after another. `CONTRIBUTING.md` "Local builds" is canonical for how to invoke
+it and for the rule that the serial `make check` remains the gate; this section
+is about what the thing actually does, what it costs, and what it is worth.
 
-The font-cache proof needs TeX, so it is exercised by every real
-`check-parallel` run rather than here. The biber halves need neither TeX nor
-biber and so are committed controls in the `lint` slot. The isolation is
-asserted by asking three synthetic workers what cache they were handed and
-requiring three distinct answers, because a fix that quietly stopped being
-applied would restore a failure that reads as a flaky bibliography fixture. The
-driver's pre-flight extraction probe is asserted over synthetic logs: it must
-refuse a failed extraction, refuse one that failed while still exiting 0 — the
-status is not the proof, the log is, which is the nullfont lesson in a second
-tool — refuse a missing log, and accept only an invocation that printed its
-version.
+#### How it works
+
+The unit of parallelism is the **target**, not the fixture and not the compile.
+`tests/check-parallel.sh` asks the `Makefile` which targets `check` runs, then
+dispatches each as its own `make <target>`, four at a time by default:
+
+```text
+make check-targets  ->  lint regression extract-test smoke layout
+                        bibliography-test links metadata annotations
+                        tagging examples
+```
+
+Nothing about how a suite decides anything changes. Every verdict is still made
+by the suite that made it serially; only how many of them are in flight at once
+is different. Three properties make that safe to believe:
+
+- **One target list.** Both paths expand the same `CHECK_TARGETS` variable, and
+  `make lint` fails if `check` ever stops doing so. A hand-maintained second
+  copy is how the `annotations` suite once dropped out of a run that was then
+  reported clean.
+- **Ordered replay.** Each worker's stdout and stderr is captured to
+  `build/check-parallel/NN-<target>.log` and replayed in the `Makefile`'s order
+  after the run, so "which suite failed" is answerable from the transcript. This
+  is one of the two reasons it is not `make -j check`: macOS ships GNU make
+  3.81, which has no `--output-sync`, so eleven suites would interleave line by
+  line. The other is that `-j` would also fan out *inside* `examples`, whose six
+  sub-targets share one `latexmk` output directory — a collision this driver
+  does not have, because it dispatches `examples` whole.
+- **Accounting.** Every dispatched target must leave a result file, and the run
+  fails when the count of results is not the count dispatched, naming the ones
+  that produced none. Concurrency adds a failure no suite can report on itself:
+  a worker that dies before its suite ever ran leaves no failure behind, only an
+  absence, and an absence reads exactly like a clean run unless something is
+  counting.
+
+Two tool caches then have to be prepared before anything fans out, because a
+cache that several processes build at once is a cache built wrong — and the two
+need opposite treatment:
+
+- **luaotfload's font cache is warmed.** One small LuaLaTeX build before
+  dispatch, required to prove it typeset real glyphs. Where the cache is
+  unwritable, `fontspec` falls back to `nullfont`, every document typesets
+  empty, and every suite passes having measured nothing.
+- **biber's cache is isolated, because it cannot be warmed.** Issue #392
+  measured why: biber re-unpacks its native binary into that cache on *every*
+  invocation, not the first — the extracted file's inode changes on each run —
+  so two invocations sharing one cache truncate each other's binary. Six
+  concurrent invocations failed against a fully warm shared cache exactly as
+  against a cold one; six with a private `PAR_TMPDIR` each failed zero times.
+  Each worker therefore gets its own, and one probe extraction before dispatch
+  proves biber can unpack here at all.
+
+`--self-test` is the committed control for all of that, driven over synthetic
+workers and synthetic logs so it needs no TeX and no biber: a clean batch must
+pass and account for every member; a batch with one failing member must fail,
+name it, and replay its output; a batch with one result file removed — the state
+a killed worker leaves — must fail as an accounting failure rather than as two
+passes and a shrug; three workers must report three *distinct* biber caches,
+since an isolation that quietly stopped being applied would restore a failure
+that reads as a flaky bibliography fixture; and the extraction verdict must
+refuse a failure that still exited 0, because the status is not the proof, the
+log is. It also asserts statically that `check`'s prerequisite list is still
+`$(CHECK_TARGETS)` and that every dispatched name is `.PHONY`, since a
+dispatched name that is not `.PHONY` would make `make <target>` a no-op that
+exits 0. The font-cache proof is the one part not exercised here — it needs TeX,
+so every real run exercises it instead.
+
+#### What it is worth, and what it costs
+
+Measured on the maintainer's machine, 2026-08-13, same commit and same session:
+
+| | Wall time |
+|---|---|
+| `make check` (serial) | 431 s |
+| `make check-parallel JOBS=4` | 190–207 s over six runs |
+
+So roughly **2.1×**, saving about four minutes. Four honest bounds on that:
+
+1. **The ceiling is structural, not a matter of more workers.** Parallel wall
+   time is the longest single target plus contention, not the sum divided by
+   `JOBS`. `smoke` (124 s), `tagging` (116 s), and `layout` (114 s) dominate,
+   while `lint` (2 s), `annotations` (5 s), and `metadata` (8 s) are finished
+   before the long ones are a third done. More than about four workers buys
+   almost nothing.
+2. **It is the smallest of the four costs of a change.** Reading the canonical
+   sources, following the procedure, and late rework each cost more than compute
+   does; those are addressed by the reading map, the batched metadata path, and
+   suite scoping respectively. This saves four minutes **once per branch**, not
+   once per edit — the development loop should be using `FIXTURE=`/`TEST=`
+   scoping, which takes the full layout suite from 95.1 s to 1.8 s.
+3. **CI gains nothing from it.** `.github/workflows/build.yml` already runs one
+   suite per job across roughly sixteen jobs. This is a local convenience only.
+4. **It gates nothing.** A gate whose result depends on how work was scheduled
+   is not a gate, so the serial `make check` remains the thing to push behind.
+
+Against that, the costs:
+
+- **Disk.** Each biber-using worker's private cache is about 208 MB of unpacked
+  Perl runtime, and three or four of them are made over a run. Each is freed as
+  its worker finishes rather than at the end, so the peak follows how much
+  actually overlaps rather than the whole run: sampled every five seconds at
+  `JOBS=4`, it reached **416 MB** — two caches at once — against the ~830 MB the
+  same run would hold if they lived to the end. The tree goes entirely when the
+  run ends, and with `make clean`.
+
+  That cost is the price of the only isolation biber allows, and the two cheaper
+  alternatives were measured and rejected under #392: a shared cache made
+  read-only after warming does not work, because biber cannot write it, falls
+  back to the *default* shared cache, and races there; and giving each worker
+  its own `PAR_TMPDIR` while sharing the modules through `PAR_GLOBAL_TMPDIR`
+  does not work either, because the global setting overrides the per-process one
+  and re-shares everything — the per-worker directories stayed empty at 0 B and
+  all four invocations raced.
+
+  Where that 208 MB goes, since the number is surprising: `inc/` (the bundled
+  Perl module tree) is 124 MB, `thin/biber` (the arm64 slice `lipo` extracts
+  from the 79 MB universal binary on every run) is 41 MB, and ICU's Unicode
+  collation data is 31 MB. biber is a PAR-packed self-contained application
+  rather than a script — Perl cannot `require` a module, and the loader cannot
+  `dlopen` a library, from inside a packed archive — so unpacking to a real
+  filesystem path is how it runs at all, not an optimisation.
+- **Machinery.** Two cache workarounds, an accounting assertion, and five
+  committed controls exist so that a scheduling convenience cannot quietly
+  report a clean run. That is the right ratio for this repository, whose
+  characteristic failure is a check that passes without doing the work — but it
+  is machinery, and it is the reason the parallel path is opt-in and the serial
+  one is the gate.
+
+Parallelising *across targets* is ordinary build engineering rather than
+anything LaTeX-specific, and it is worth knowing that the LaTeX toolchain makes
+it harder than most: `l3build` has no parallel mode at all, and the two failures
+above are both global-state hazards — a per-user font cache and a per-user
+unpacking cache — of a kind a single-user, single-run toolchain accumulates
+freely. Parallelism *inside* a suite would be the larger prize and the larger
+risk; it is deliberately not attempted here.
 
 ### Module regression suite (l3build)
 
