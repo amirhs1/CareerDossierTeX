@@ -899,7 +899,8 @@ So roughly **2.1×**, saving about four minutes. Four honest bounds on that:
 
    How much more than four workers buys was measured on 2026-08-13, when #390
    needed to know whether cheaper scheduling would do its job for it: `JOBS=8`
-   ran in **156 s** against `JOBS=4`'s 206 s, a further 24%. The reason is
+   ran in **157 s** against `JOBS=4`'s 206 s, a further 24%, both from a clean
+   tree so that neither run inherited an up-to-date `examples`. The reason is
    dispatch order, not core count — the eleven targets are dispatched in
    `Makefile` order and `tagging`, the third-longest, sits tenth, so at four
    slots it cannot start until t≈85 s and cannot finish before t≈204 s. That
