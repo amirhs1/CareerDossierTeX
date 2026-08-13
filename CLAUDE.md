@@ -82,6 +82,12 @@ batches inside one request rather than around several.
 `.agents/skills/open-draft-pr/reference.md` (appendix) is where that is spent,
 and is canonical for the procedure.
 
+### The sandbox `allowWrite` grant
+
+`allowWrite` covers `~/Library/texlive` because LuaLaTeX's font cache lives
+there. Without it TeX typesets empty `nullfont` documents that pass every build
+and fail every baseline, fast — never regenerate one from such a run. #386, #392.
+
 ## Git attribution
 
 Use Claude Code's current `attribution` configuration, and do not rely on the
