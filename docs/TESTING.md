@@ -786,13 +786,19 @@ ships. LaTeX writes both values into the `.log` without complaint, so a
 distribution whose `careerdossier-resume.cls` says `0.8.0` while its
 `careerdossier-theme.sty` says `0.7.0` contains nothing wrong enough to fail.
 
-Four checks, over `manifest.txt` and the root sources together: every `.sty`
+Five checks, over `manifest.txt` and the root sources together: every `.sty`
 and `.cls` the manifest lists under "The Work" exists and declares itself; every
-declaration parses into a `{date} {version}` pair; all the pairs are identical;
-and the declaring files and the manifest's list are the same set. The last is
-here because it is the same class of drift and costs nothing once both lists are
-open — and `manifest.txt` is what defines the Work for the LPPL, so a source
-missing from it is a licensing defect before it is a packaging one.
+declaration parses into a `{name} {date} {version}` triple; all the
+`{date} {version}` pairs are identical; every declared name equals its own
+file's basename; and the declaring files and the manifest's list are the same
+set. The name check is the same hand-typed-argument drift one field to the
+left — a `careerdossier-them` inside `careerdossier-theme.sty` is silent in
+exactly the way a stale version is, since LaTeX repeats the declared string into
+the `.log` without comparing it to the filename and `l3build` uses it for
+messages only. The last is here because it is the same class of drift and costs
+nothing once both lists are open — and `manifest.txt` is what defines the Work
+for the LPPL, so a source missing from it is a licensing defect before it is a
+packaging one.
 
 The reference pair is the commonest one, not the first: a bump that missed one
 file should name that file, not the nine that are right. A failure prints the
@@ -806,7 +812,7 @@ sequence. Consistency among the ten is the property that holds at every commit,
 so it is the only one asserted.
 
 The fixtures under `tests/lint/fixtures/version/` are this lint's own tests —
-seven miniature Works, one consistent and one per way of being inconsistent —
+eight miniature Works, one consistent and one per way of being inconsistent —
 and the runner checks itself against them every run. Each carries three sources
 with the defect in the third, which is what exercises the frequency rule: with
 two files a mismatch is a tie and either could be reported as the wrong one.

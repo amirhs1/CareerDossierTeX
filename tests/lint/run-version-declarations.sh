@@ -20,17 +20,24 @@
 # says 0.8.0 while its careerdossier-theme.sty says 0.7.0, with nothing anywhere
 # that is wrong enough to fail.
 #
-# So the four checks below, over `manifest.txt' and the root sources together:
+# So the five checks below, over `manifest.txt' and the root sources together:
 #
 #   1. every .sty/.cls the manifest lists under "The Work" exists and carries a
 #      \ProvidesExpl{Package,Class} declaration;
-#   2. every such declaration parses into a {date} {version} pair;
-#   3. all the pairs are identical; and
-#   4. the declaring files and the manifest's Work list are the same set, so a
+#   2. every such declaration parses into a {name} {date} {version} triple;
+#   3. all the {date} {version} pairs are identical;
+#   4. every declared {name} equals its own file's basename without extension;
+#      and
+#   5. the declaring files and the manifest's Work list are the same set, so a
 #      source added to the Work without a manifest entry -- or a manifest entry
 #      with no source -- is caught by the same pass.
 #
-# (4) is here because it is the same class of drift as (3) and costs nothing
+# (4) is the same hand-typed-argument drift as (3), one field to the left: a
+# `careerdossier-them' in careerdossier-theme.sty is silent in exactly the way a
+# stale version is. LaTeX repeats whatever string the declaration carries into
+# the `.log' without comparing it to the filename, and `l3build' uses the
+# declared module name for messages only, so nothing else cross-checks the two.
+# (5) is here because it is the same class of drift as (3) and costs nothing
 # once both lists are being read; `manifest.txt' is what defines the Work for
 # the LPPL, so a file missing from it is a licensing defect as well as a
 # packaging one.
@@ -97,9 +104,9 @@ AWK
 
 # Reads one source file and prints a single tab-separated record:
 #
-#   PARSED       <date> <version>
-#   UNPARSEABLE  -     -            a \ProvidesExpl* line no pair could be read from
-#   NONE         -     -            no \ProvidesExpl* line at all
+#   PARSED       <name> <date> <version>
+#   UNPARSEABLE  -      -      -          a \ProvidesExpl* line nothing could be read from
+#   NONE         -      -      -          no \ProvidesExpl* line at all
 #
 # The two failure states are kept apart because they are different defects with
 # different fixes: a typo'd argument list, versus a file that never declared
@@ -117,15 +124,15 @@ BEGIN { seen = 0; parsed = 0 }
   if (match(line, /\\ProvidesExpl(Package|Class)[ \t]*[{][^{}]*[}][ \t]*[{][^{}]*[}][ \t]*[{][^{}]*[}]/)) {
     seg = substr(line, RSTART, RLENGTH)
     split(seg, parts, /[{}]/)
-    printf "PARSED\t%s\t%s\n", trim(parts[4]), trim(parts[6])
+    printf "PARSED\t%s\t%s\t%s\n", trim(parts[2]), trim(parts[4]), trim(parts[6])
     parsed = 1
     exit
   }
 }
 END {
   if (parsed) exit
-  if (seen) print "UNPARSEABLE\t-\t-"
-  else print "NONE\t-\t-"
+  if (seen) print "UNPARSEABLE\t-\t-\t-"
+  else print "NONE\t-\t-\t-"
 }
 AWK
 
@@ -137,7 +144,7 @@ work_seen=0
 lint_tree() {
   local dir="$1"
   local manifest="$dir/manifest.txt"
-  local work files decl state date version file base
+  local work files decl state name date version file base
   local reference_date="" reference_version="" bad=0
 
   if [ ! -f "$manifest" ]; then
@@ -170,7 +177,7 @@ lint_tree() {
       for (i = 1; i <= n; i++) if (w[i] != "") inwork[w[i]] = 1
     }
     $2 == "PARSED" && ($1 in inwork) {
-      key = $3 "\t" $4
+      key = $4 "\t" $5
       if (!(key in count)) order[++seen] = key
       count[key]++
     }
@@ -197,14 +204,16 @@ lint_tree() {
     detail=""
     version=""
     date=""
+    name=""
     if [ ! -f "$dir/$base" ]; then
       status="MISSING FILE"
       detail="manifest.txt lists $base under \"The Work\", but no such file exists"
     else
       line="$(printf '%s' "$files" | awk -F'\t' -v b="$base" '$1 == b { print; exit }')"
       state="$(printf '%s' "$line" | cut -f2)"
-      date="$(printf '%s' "$line" | cut -f3)"
-      version="$(printf '%s' "$line" | cut -f4)"
+      name="$(printf '%s' "$line" | cut -f3)"
+      date="$(printf '%s' "$line" | cut -f4)"
+      version="$(printf '%s' "$line" | cut -f5)"
       case "$state" in
         NONE)
           status="NO DECLARATION"
@@ -215,7 +224,13 @@ lint_tree() {
           detail="$base declares itself but no { date } { version } pair could be read; the form is \\ProvidesExpl{Package,Class} {name} {date} {version}"
           ;;
         *)
-          if [ "$version" != "$reference_version" ]; then
+          if [ "$name" != "${base%.*}" ]; then
+            # Identity before values: a file that has told LaTeX it is some
+            # other module is the more misleading of the two defects, and a
+            # single declaration can carry both.
+            status="NAME MISMATCH"
+            detail="$base declares itself as { $name }; a Work file's \\ProvidesExpl* name must be its own basename, ${base%.*}"
+          elif [ "$version" != "$reference_version" ]; then
             status="VERSION MISMATCH"
             detail="$base declares { $date } { $version }; the rest of the Work declares $reference"
           elif [ "$date" != "$reference_date" ]; then
@@ -239,7 +254,7 @@ EOF
   # Work or should stop saying so.
   local nl='
 '
-  while IFS="$(printf '\t')" read -r base state _ _; do
+  while IFS="$(printf '\t')" read -r base state _ _ _; do
     [ -n "$base" ] || continue
     [ "$state" = "NONE" ] && continue
     case "$nl$work$nl" in
@@ -312,6 +327,7 @@ self_check version-mismatch    "VERSION MISMATCH"
 self_check date-mismatch       "DATE MISMATCH"
 self_check no-declaration      "NO DECLARATION"
 self_check unparseable         "UNPARSEABLE DECLARATION"
+self_check wrong-name          "NAME MISMATCH"
 self_check missing-file        "MISSING FILE"
 self_check not-in-manifest     "NOT IN MANIFEST"
 
