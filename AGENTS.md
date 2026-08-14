@@ -180,10 +180,10 @@ load-bearing" for regenerating a `.tlg` or extraction reference, and "Log
 inspection" and "Visual verification" for what to read afterwards.
 `CONTRIBUTING.md` keeps the sections about *running* rather than writing a
 suite: "Local builds" for the invocation and for what a target's CI job is
-called, then "The same suite, faster, before a push", "Scoping a suite while you
-iterate", and "Running one suite's fixtures concurrently" for the ways to spend
-less wall clock than the gate does. Three rules govern whatever that reading
-says:
+called, "The gate, and the serial path" for what `make check` runs concurrently
+and how to make a run deterministic, then "Scoping a suite while you iterate"
+and "Running one suite's fixtures concurrently" for spending less wall clock
+still. Three rules govern whatever that reading says:
 
 - Every behavior change adds or updates the smallest test that would fail
   without it, in the same change (rule 6), of the kind that module's concern

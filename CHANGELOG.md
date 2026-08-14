@@ -12,8 +12,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 - `make check-parallel` runs `make check`'s eleven targets concurrently instead
   of one after another, with `JOBS=N` to choose how many are in flight (default
-  four). `make check` is unchanged and remains the pre-push gate and the
-  CI-aligned entry point. ([#378])
+  four). It arrived as an opt-in path alongside a serial `make check`; later in
+  this same release ([#399]) it became what `make check` itself runs. ([#378])
 
   Both entry points expand one `CHECK_TARGETS` variable, so they cannot dispatch
   different suites; `make lint` fails if `check` ever stops doing so. The
@@ -35,8 +35,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 - `make smoke`, `make layout`, and `make tagging` take `JOBS=N` and run that
   many of their own fixtures at once. With no `JOBS` each runs exactly what it
-  ran before, in the same order, with byte-identical output, so `make check` and
-  CI are unaffected and the serial run remains the gate. ([#390])
+  ran before, in the same order, with byte-identical output, so CI is
+  unaffected; the gate pins this inner fan-out to 1 regardless. ([#390])
 
   Measured on the maintainer's machine: `smoke` 108 s to 40 s and `layout` 95 s
   to 35 s at `JOBS=4`. The target-level driver could not reach this — its floor
@@ -79,6 +79,45 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   baseline, or rendered output changed, and no suite's verdict changed — `make
   lint` runs one more script and can fail for one more reason.
 
+### Changed
+
+- `make check` runs its eleven targets four at a time and is still the pre-push
+  gate; `make check-serial` runs the same eleven one after another. `JOBS=N`
+  sets the worker count, and `make check-parallel` survives as an alias of
+  `check`. On the maintainer's machine the gate falls from about seven minutes
+  to about four. ([#399])
+
+  The gate had been serial on the argument that `check` is the CI-aligned entry
+  point. What CI aligns to is the target set and the commands, not the
+  scheduling: `.github/workflows/build.yml` runs sixteen jobs on sixteen runners
+  with no `needs:` between them, so a serial local `check` was the one execution
+  model nothing else in the project used. Both paths still dispatch one
+  `CHECK_TARGETS` variable through the same `make <target>` invocations, and no
+  CI file changed.
+
+  Four workers is the default because it is the fastest value measured green —
+  serial 439 s, `JOBS=2` 285 s, `JOBS=4` 211 s, confirmed at the default by five
+  consecutive clean-tree runs at 211–249 s against `check-serial`'s 431 s.
+  `JOBS=8` is a further 20% and failed four of eight clean-tree runs, every
+  failure a text-extraction assertion against a document that is provably
+  correct ([#398], a guard reporting present text as missing under load, not
+  anything the classes did). The default carries that bound rather than the best
+  time.
+
+  `make lint` gained two controls, because retargeting the old one would have
+  quietly stopped covering the gate: `check` is now a recipe and has no
+  prerequisite list to assert on. It now also checks that `check` dispatches
+  through the driver, and compares what each path would actually dispatch —
+  make's own expanded prerequisite list for `check-serial` against the list the
+  driver is handed. Each control was run against a `Makefile` broken in the way
+  it claims to catch, and only the comparison catches a `check-targets` recipe
+  rewritten to print a hand-written list — the shape that once dropped
+  `annotations` from a run that was then reported clean.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed, and no suite's verdict changed — only
+  how many of them run at once by default.
+
 ### Fixed
 
 - The local suites run under a restricted Bash sandbox, and `make
@@ -115,6 +154,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
+[#398]: https://github.com/amirhs1/CareerDossierTeX/issues/398
+[#399]: https://github.com/amirhs1/CareerDossierTeX/issues/399
 [#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
 
 ## [0.8.0] - 2026-08-12

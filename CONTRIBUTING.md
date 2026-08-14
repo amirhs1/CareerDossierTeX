@@ -280,8 +280,8 @@ make clean
 ```
 
 `make help` is the authoritative target list, and the `Makefile`'s
-`CHECK_TARGETS` variable — which is what the `check` target expands — is the
-authoritative suite list. Prefer both to any prose enumeration, here or
+`CHECK_TARGETS` variable — which both `check` and `check-serial` dispatch — is
+the authoritative suite list. Prefer both to any prose enumeration, here or
 elsewhere. A hand-maintained copy of either will drift, and a drifted copy is
 how the `annotations` suite came to be omitted from a run that was then reported
 clean.
@@ -297,38 +297,48 @@ Target and job names overlap but are not in bijection, so do not derive one from
 the other. The extraction and bibliography *targets* are `extract-test` and
 `bibliography-test`, while the matching *jobs* are `extraction` and
 `bibliography`; job `cv` runs `make academic-cv academic-bibliography` and job
-`statement` runs `make statements`; and `examples`, `check`, `check-parallel`,
-`test`, `clean`, and every `review-*` target have no job at all.
+`statement` runs `make statements`; and `examples`, `check`, `check-serial`,
+`check-parallel`, `test`, `clean`, and every `review-*` target have no job at
+all.
 
-### The same suite, faster, before a push
+### The gate, and the serial path
 
-`make check` runs its eleven targets one after another, which on the
-maintainer's machine is several minutes of dead time paid once per branch. The
-same targets can run concurrently instead:
+`make check` runs its eleven targets four at a time, which on the maintainer's
+machine takes about four minutes rather than seven. It is the pre-push gate. Set
+the worker count with `JOBS`, or take the deterministic path instead:
 
 ```bash
-make check-parallel            # four at a time
-make check-parallel JOBS=8     # eight at a time
+make check                     # the gate: eleven targets, four at a time
+make check JOBS=2              # fewer workers
+make check-serial              # one target after another
 ```
 
-**The gate is still the serial `make check`.** `check-parallel` is a
-convenience, not a substitute: `check` is what CI is aligned to, and a gate
-whose result depends on how work was scheduled is not a gate. Use
-`check-parallel` to find failures quickly, and let the serial run be the thing
-you push behind.
+`check-serial` dispatches exactly the same targets in the same order and is
+worth reaching for when a parallel run reports something surprising: it removes
+scheduling as a variable in one command. `check-parallel` survives as an alias
+of `check`.
 
-Expect roughly 2.1× — about four minutes on the maintainer's machine — not the
-fourfold a `JOBS=4` might suggest: the wall time is the longest single suite,
-not the sum divided by the workers.
+**Four is the default because it is the fastest value measured green** — serial
+439 s, `JOBS=2` 285 s, `JOBS=4` 211 s, against `JOBS=8` at 168–201 s and four
+red runs in eight. Those failures are a guard that reports present text as
+missing under load (#398), not anything the classes did, so `JOBS=8` is
+unusable rather than merely brisk. Do not raise the default while that is open;
+a red `JOBS=4` run for the same reason is a reason to reconsider the parallel
+gate rather than to retry it.
+
+Expect roughly 1.8×–2.0×, not the fourfold `JOBS=4` might suggest: the wall time
+is the longest single suite, not the sum divided by the workers. Five clean-tree
+runs at the default measured 211–249 s against `check-serial`'s 431 s, so treat
+the fast end as the fast end rather than the number to plan around.
 
 The driver is `tests/check-parallel.sh`. `docs/TESTING.md` "The parallel run" is
 canonical for how it works, what it asserts beyond running the same targets, the
 two tool caches it has to prepare first, its measured speedup and its disk cost,
-and why it is opt-in rather than the gate; none of that is repeated here. Two
-consequences you meet while using it: per-target output is captured under
-`build/check-parallel/` and replayed in the `Makefile`'s order, so which suite
-failed is answerable from the transcript, and a run transiently uses a few
-hundred MB there for biber's sake, freed as it goes.
+and what a scheduled run had to prove before it could be the gate; none of that
+is repeated here. Two consequences you meet while using it: per-target output is
+captured under `build/check-parallel/` and replayed in the `Makefile`'s order,
+so which suite failed is answerable from the transcript, and a run transiently
+uses a few hundred MB there for biber's sake, freed as it goes.
 
 ### Scoping a suite while you iterate
 
@@ -403,17 +413,19 @@ make layout JOBS=8 FIXTURE='resume-*'
 ```
 
 **With no `JOBS` nothing changes.** Each runs exactly the fixtures it ran
-before, in the same order, with byte-identical output — which is what `make
-check` and CI invoke, and why neither is affected. As with `check-parallel`, the
-serial run remains the gate.
+before, in the same order, with byte-identical output — which is what CI invokes
+and why it is unaffected.
 
-`JOBS` composes with `FIXTURE`, and it composes with `check-parallel` — but the
-two layers multiply, so `check-parallel` pins the inner one to 1 and you raise
-it deliberately:
+`JOBS` composes with `FIXTURE`, and it composes with the gate — but the two
+layers multiply, so `check` pins the inner one to 1 and you raise it
+deliberately:
 
 ```bash
-make check-parallel JOBS=4 INNER_JOBS=2
+make check JOBS=4 INNER_JOBS=2
 ```
+
+That pinning is why making the gate parallel did not quietly quadruple the
+process budget along with it.
 
 `docs/TESTING.md` "Fanning out inside a suite" is canonical for the measured
 speedups, the shared dispatcher, the accounting assertion that makes a

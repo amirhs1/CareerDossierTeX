@@ -9,9 +9,23 @@
 # suite that already made it serially; nothing here changes how a suite decides,
 # only how many of them are in flight at once.
 #
-# `make check` itself is untouched and stays serial: it is the pre-push gate and
-# the CI-aligned entry point, and a gate whose result depends on scheduling is
-# not a gate. This is the opt-in fast path for the one full run before a push.
+# Since #399 this is what `make check` runs, so it is the pre-push gate rather
+# than an opt-in alternative to it. The serial path is `make check-serial` and
+# dispatches the same eleven targets one at a time. Being the gate is why the
+# proofs below are not optional decoration: they are the reason a scheduled run
+# is allowed to be the thing a push happens behind.
+#
+# WHY FOUR
+#
+# --jobs defaults to 4 because 4 is the fastest value measured green (#399):
+# serial 439 s, JOBS=2 285 s, JOBS=4 211 s, all green; JOBS=8 runs in 168-201 s
+# and failed 4 of 8 clean-tree runs. Every one of those failures was a
+# text-extraction assertion against a document that is provably correct — a
+# guard reporting present text as missing under load, which is #398 and is not
+# about the classes at all. So the ceiling here is a known open defect rather
+# than a property of the machine, and raising the default waits on that issue.
+# A red `JOBS=4` run for that reason is a reason to reconsider this arrangement,
+# not to retry it.
 #
 # WHY NOT `make -j`
 #
@@ -79,7 +93,8 @@
 #
 #   tests/check-parallel.sh [--jobs N] [--inner-jobs N] [--list] [--self-test]
 #
-#   --jobs       concurrent targets; default 4. Capped at the number of targets.
+#   --jobs       concurrent targets; default 4, for the reason under WHY FOUR
+#                above. Capped at the number of targets.
 #   --inner-jobs fixtures in flight inside each target; default 1, meaning each
 #                runner takes its serial path. The two layers multiply, so the
 #                process budget is --jobs x --inner-jobs; see issue #390 and the
@@ -105,13 +120,14 @@ mode=run
 # `jobs', and the default is the whole of the process budget answer.
 #
 # The two layers compose multiplicatively, and left alone they would compose
-# silently: `make check-parallel JOBS=4' puts JOBS=4 in MAKEFLAGS, every
-# dispatched `make smoke' inherits it as a command-line variable, and four
-# targets each fanning out four fixtures is sixteen LuaLaTeX processes on an
-# eight-core machine — asked for by nobody and reported by nothing. So every
-# dispatched target is given an explicit JOBS below, which overrides the
-# inherited one, and the product is bounded at `jobs' until someone raises it on
-# purpose.
+# silently: `make check JOBS=4' puts JOBS=4 in MAKEFLAGS, every dispatched
+# `make smoke' inherits it as a command-line variable, and four targets each
+# fanning out four fixtures is sixteen LuaLaTeX processes on an eight-core
+# machine — asked for by nobody and reported by nothing. So every dispatched
+# target is given an explicit JOBS below, which overrides the inherited one, and
+# the product is bounded at `jobs' until someone raises it on purpose. Since
+# #399 that also means making the gate parallel did not multiply the process
+# budget as a side effect.
 inner_jobs=1
 
 die() {
@@ -178,11 +194,11 @@ esac
 # --------------------------------------------------------------------------
 # The target list.
 #
-# It is read from the Makefile rather than written here. `check` and this
+# It is read from the Makefile rather than written here. `check-serial` and this
 # script therefore cannot dispatch different sets: both expand the one
-# CHECK_TARGETS variable, and `--self-test` asserts that `check`'s prerequisite
-# list is still literally that variable. A hand-maintained second copy is how
-# the annotations suite once dropped out of a run that was then reported clean.
+# CHECK_TARGETS variable, and `--self-test` compares what each of them would
+# actually dispatch. A hand-maintained second copy is how the annotations suite
+# once dropped out of a run that was then reported clean.
 
 scratch="$root/build/check-parallel"
 [ "$mode" = "self-test" ] && scratch="$root/build/check-parallel-selftest"
@@ -453,23 +469,85 @@ probe_biber_extraction() {
 self_test() {
   local fails=0 rc out
 
-  printf '== static contract: check and check-parallel dispatch one target set ==\n'
-  # `check`'s prerequisite list must be the variable, not a copy of it. A copy
-  # is the drift this whole arrangement exists to make impossible.
-  if grep -E '^check:[[:space:]]+\$\(CHECK_TARGETS\)[[:space:]]' \
+  printf '== static contract: the two paths dispatch one target set ==\n'
+  # `check-serial`'s prerequisite list must be the variable, not a copy of it.
+  # A copy is the drift this whole arrangement exists to make impossible.
+  #
+  # This assertion used to be made about `check`. It moved here under #399, when
+  # `check` became a recipe that runs this driver and stopped having a
+  # prerequisite list to assert on — which means the target that moved out from
+  # under it is the gate. That is the hole the dynamic control below exists to
+  # close, and it is why this grep is no longer the load-bearing one.
+  if grep -E '^check-serial:[[:space:]]+\$\(CHECK_TARGETS\)[[:space:]]' \
        "$root/Makefile" > /dev/null 2>&1; then
-    printf '  ok: `check` expands $(CHECK_TARGETS)\n'
+    printf '  ok: `check-serial` expands $(CHECK_TARGETS)\n'
   else
-    printf '  FAIL: Makefile `check:` no longer reads `$(CHECK_TARGETS)`.\n'
+    printf '  FAIL: Makefile `check-serial:` no longer reads `$(CHECK_TARGETS)`.\n'
     printf '        The serial and parallel paths can now dispatch different\n'
     printf '        target sets, which no run would report.\n'
     fails=$((fails + 1))
   fi
 
+  # And the gate must still reach the suites through this driver. Without this,
+  # `check` could be repointed at a subset — or at nothing — while every other
+  # assertion here went on passing about `check-serial`, a target nobody runs.
+  local gate_recipe
+  gate_recipe="$(awk '/^check:/ { found = 1; next }
+                      found && /^\t/ { print; next }
+                      found { exit }' "$root/Makefile")"
+  case "$gate_recipe" in
+    *tests/check-parallel.sh*)
+      printf '  ok: `check` dispatches through this driver\n' ;;
+    *)
+      printf '  FAIL: Makefile `check:` no longer runs tests/check-parallel.sh.\n'
+      printf '        The gate is meant to be the parallel path (#399); nothing\n'
+      printf '        else here would notice it had stopped being one.\n'
+      fails=$((fails + 1))
+      ;;
+  esac
+
   if read_targets; then
     printf '  ok: `make check-targets` named %d targets\n' "${#targets[@]}"
   else
     printf '  FAIL: could not read the target list\n'
+    fails=$((fails + 1))
+  fi
+
+  # The dynamic half, and the one that holds the *gate* to account. Everything
+  # above is about how the two paths are spelled; this compares what each of
+  # them would actually dispatch. `make -p` prints make's own expanded rule
+  # database, so the serial list is read from make rather than from the
+  # Makefile's text, and `make check-targets` is the exact command this driver
+  # runs to build the parallel one.
+  #
+  # It is here because "by construction" was the reasoning that let the
+  # annotations suite drop out of a reported-clean run. A `check-targets` recipe
+  # rewritten to print a hand-written list would satisfy every static assertion
+  # above — the variable is still there, the gate still runs this driver — and
+  # still hand the gate a different suite set than the serial path has. Only a
+  # comparison of outcomes catches that, so this control fails for any way the
+  # two disagree rather than for the two spellings anticipated here.
+  local serial_list="$scratch/serial-prereqs.txt"
+  local driver_list="$scratch/driver-targets.txt"
+  (cd "$root" && make -pn check-serial 2>/dev/null) \
+    | sed -n 's/^check-serial:[[:space:]]*//p' \
+    | head -1 | tr ' ' '\n' | sed '/^$/d' | sort > "$serial_list"
+  printf '%s\n' ${targets[@]+"${targets[@]}"} | sed '/^$/d' | sort > "$driver_list"
+
+  if [ ! -s "$serial_list" ]; then
+    printf '  FAIL: could not read `check-serial` prerequisites from make.\n'
+    printf '        `make -pn check-serial` printed no `check-serial:` rule, so\n'
+    printf '        the two dispatch paths were never compared. If make prints\n'
+    printf '        its database differently here, repair this control rather\n'
+    printf '        than dropping it: it is the only one that covers the gate.\n'
+    fails=$((fails + 1))
+  elif cmp -s "$serial_list" "$driver_list"; then
+    printf '  ok: both paths would dispatch the same %d targets\n' \
+      "${#targets[@]}"
+  else
+    printf '  FAIL: the serial and parallel paths would dispatch different sets.\n'
+    printf '        `make check-serial` against what this driver was handed:\n'
+    diff "$serial_list" "$driver_list" 2>/dev/null | sed 's/^/          /'
     fails=$((fails + 1))
   fi
 
@@ -644,7 +722,7 @@ if [ "$inner_jobs" -gt 1 ]; then
   printf 'fixture fan-out inside each target: %d (process budget: %d x %d = %d)\n' \
     "$inner_jobs" "$jobs" "$inner_jobs" "$((jobs * inner_jobs))"
 fi
-printf '(the gate is the serial `make check`; this is the fast pre-push run)\n\n'
+printf '(this is the gate; `make check-serial` runs the same targets one at a time)\n\n'
 
 batch_names=(${targets[@]+"${targets[@]}"})
 batch_cmds=()

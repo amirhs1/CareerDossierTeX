@@ -833,17 +833,33 @@ The `lint` target runs a fourth script in the same slot:
 tests/check-parallel.sh --self-test
 ```
 
-It is the committed negative control for `make check-parallel`, and it belongs
-in this slot because it compiles nothing and needs neither TeX nor biber. What
-it asserts, and why each assertion exists, is in "The parallel run" below rather
-than here.
+It is the committed negative control for the driver `make check` runs, and it
+belongs in this slot because it compiles nothing and needs neither TeX nor
+biber. What it asserts, and why each assertion exists, is in "The parallel run"
+below rather than here.
 
 ### The parallel run
 
-`make check-parallel` runs `check`'s eleven targets concurrently instead of one
-after another. `CONTRIBUTING.md` "Local builds" is canonical for how to invoke
-it and for the rule that the serial `make check` remains the gate; this section
-is about what the thing actually does, what it costs, and what it is worth.
+`make check` runs its eleven targets four at a time rather than one after
+another, and `make check-serial` is the same eleven singly. `CONTRIBUTING.md`
+"The gate, and the serial path" is canonical for how to invoke either; this
+section is about what the thing actually does, what it costs, and what it is
+worth.
+
+The parallel path was opt-in when it arrived in #378 and became the gate in
+#399. The argument for keeping the gate serial had been that `check` is the
+CI-aligned entry point — but `.github/workflows/build.yml` runs sixteen jobs on
+sixteen runners with no `needs:` anywhere, so CI's execution model is fully
+concurrent and fully isolated, and local serial `check` was the one execution
+model nothing else in the project used. What "CI-aligned" buys is the same
+target set and the same commands, and both paths still dispatch
+`$(CHECK_TARGETS)` through the same `make <target>` invocations. Neither
+property depends on scheduling.
+
+That is the argument for allowing it. What makes it *safe* are the properties
+and proofs below, and they are the reason a scheduled run is permitted to be the
+thing a push happens behind — a gate that reports green without having done the
+work would be worse than a slow one.
 
 #### How it works
 
@@ -862,9 +878,9 @@ by the suite that made it serially; only how many of them are in flight at once
 is different. Three properties make that safe to believe:
 
 - **One target list.** Both paths expand the same `CHECK_TARGETS` variable, and
-  `make lint` fails if `check` ever stops doing so. A hand-maintained second
-  copy is how the `annotations` suite once dropped out of a run that was then
-  reported clean.
+  `make lint` compares what each of them would dispatch. A hand-maintained
+  second copy is how the `annotations` suite once dropped out of a run that was
+  then reported clean.
 - **Ordered replay.** Each worker's stdout and stderr is captured to
   `build/check-parallel/NN-<target>.log` and replayed in the `Makefile`'s order
   after the run, so "which suite failed" is answerable from the transcript. This
@@ -906,22 +922,65 @@ passes and a shrug; three workers must report three *distinct* biber caches,
 since an isolation that quietly stopped being applied would restore a failure
 that reads as a flaky bibliography fixture; and the extraction verdict must
 refuse a failure that still exited 0, because the status is not the proof, the
-log is. It also asserts statically that `check`'s prerequisite list is still
-`$(CHECK_TARGETS)` and that every dispatched name is `.PHONY`, since a
+log is. It also asserts that every dispatched name is `.PHONY`, since a
 dispatched name that is not `.PHONY` would make `make <target>` a no-op that
 exits 0. The font-cache proof is the one part not exercised here — it needs TeX,
 so every real run exercises it instead.
 
+Three further controls guard the target list itself, and #399 is why there are
+three rather than one. Until then a single grep asserted that `check`'s
+prerequisite list was literally `$(CHECK_TARGETS)`. Making `check` a recipe left
+that grep with nothing to say about the gate — it could only be pointed at
+`check-serial` — so the obvious move, retargeting it, would have quietly stopped
+covering the target that matters. Each control was therefore run against a
+Makefile broken in the way it claims to catch:
+
+| Divergence introduced | `check-serial` grep | gate grep | list comparison |
+|---|---|---|---|
+| `check-targets` prints a hand-written list, dropping `annotations` | ok | ok | **FAIL** |
+| `check` stops dispatching through the driver | ok | **FAIL** | ok |
+| `check-serial`'s prerequisites become a copy that still matches | **FAIL** | ok | ok |
+
+The diagonal is the point: no control is redundant. The first row is the
+historical failure this whole arrangement exists to prevent — a suite silently
+absent from a run that is then reported clean — and only the list comparison
+catches it, because it is the only one comparing *what each path would dispatch*
+rather than how either is spelled. It reads the serial list out of `make -p`'s
+expanded rule database and the parallel one from `make check-targets`, the exact
+command the driver runs, so it fails for any way the two disagree rather than
+for the spellings someone anticipated. The two greps each catch a row it cannot
+see in turn, which is why the one #399 expected to become vestigial was kept.
+
 #### What it is worth, and what it costs
 
-Measured on the maintainer's machine, 2026-08-13, same commit and same session:
+The calibration sweep, measured on the maintainer's machine 2026-08-13 with
+`make clean` before every run so none inherited an up-to-date `examples`:
 
-| | Wall time |
-|---|---|
-| `make check` (serial) | 431 s |
-| `make check-parallel JOBS=4` | 190–207 s over six runs |
+| | Wall time | Result |
+|---|---|---|
+| `make check-serial` | 439 s | green |
+| `make check JOBS=2` | 285 s | green |
+| **`make check JOBS=4`** (the default) | **211 s** | **green** |
+| `make check JOBS=8` | 168–201 s | **4 red in 8 runs** |
 
-So roughly **2.1×**, saving about four minutes. Four honest bounds on that:
+That sweep is what settled the default at 4. It was confirmed at the default
+when #399 landed, by five consecutive clean-tree runs on the branch: **211, 225,
+247, 248, and 249 s, all green**, against `make check-serial` at **431 s** in
+the same session. So the speedup is **roughly 1.8×–2.0×**, saving about three
+minutes — and note the spread, which is the honest reading: a single 211 s run
+is the fast end of a range, not the figure to quote. Wall time here moves with
+whatever else the machine is doing.
+
+`JOBS=8` is a further 20% and is not the default, because it fails about half
+the time: every one of those failures is a text-extraction assertion against a
+document that is provably correct — a guard that reports present text as missing
+under load (#398) — so the ceiling is an open defect elsewhere rather than a
+property of the machine. The default carries that bound, and the honest form of
+the claim is not "a parallel gate is trustworthy" but **"a parallel gate is
+trustworthy at 4 and is not at 8"**. If a `JOBS=4` run is ever red for the #398
+reason, this arrangement should be reconsidered rather than retried.
+
+Four honest bounds on the speedup itself:
 
 1. **The ceiling is structural, not a matter of more workers.** Parallel wall
    time is the longest single target plus contention, not the sum divided by
@@ -948,9 +1007,23 @@ So roughly **2.1×**, saving about four minutes. Four honest bounds on that:
    once per edit — the development loop should be using `FIXTURE=`/`TEST=`
    scoping, which takes the full layout suite from 95.1 s to 1.8 s.
 3. **CI gains nothing from it.** `.github/workflows/build.yml` already runs one
-   suite per job across roughly sixteen jobs. This is a local convenience only.
-4. **It gates nothing.** A gate whose result depends on how work was scheduled
-   is not a gate, so the serial `make check` remains the thing to push behind.
+   suite per job across roughly sixteen jobs. This is a local convenience only,
+   and #399 changed no CI file.
+4. **The saving only counts because it lands on the gate.** #378 and #390 were
+   both justified by making a change cheaper to verify, and both left the gate
+   serial — so the saving landed on a run made *in addition to* the one pushed
+   behind, which is no saving for anyone who has to run the gate anyway. Moving
+   it onto `check` is what collects the debt those two issues ran up, and is
+   why the dispatch order below still matters.
+
+Dispatch order was the other candidate for that 50 s and was rejected under
+#399. Sorting longest-first models ~158 s at `JOBS=4`, but the replay follows
+dispatch order, so sorting for speed also sorts the transcript — and "which
+suite failed is answerable in `Makefile` order" is one of the two reasons this
+is not `make -j`. It would also push `lint` from first to eleventh, and pair
+`bibliography-test` with `examples`, two biber targets that never currently
+overlap. The queue only exists because there are fewer slots than targets;
+removing it means `JOBS≥11`, which #398 blocks.
 
 Against that, the costs:
 
@@ -978,12 +1051,13 @@ Against that, the costs:
   rather than a script — Perl cannot `require` a module, and the loader cannot
   `dlopen` a library, from inside a packed archive — so unpacking to a real
   filesystem path is how it runs at all, not an optimisation.
-- **Machinery.** Two cache workarounds, an accounting assertion, and five
-  committed controls exist so that a scheduling convenience cannot quietly
-  report a clean run. That is the right ratio for this repository, whose
-  characteristic failure is a check that passes without doing the work — but it
-  is machinery, and it is the reason the parallel path is opt-in and the serial
-  one is the gate.
+- **Machinery.** Two cache workarounds, an accounting assertion, and eight
+  committed controls exist so that a scheduled run cannot quietly report a clean
+  one. That is the right ratio for this repository, whose characteristic failure
+  is a check that passes without doing the work — and it is the whole of what
+  earns this path the gate. `make check-serial` is the standing answer to a
+  parallel result that looks wrong, since it removes scheduling as a variable
+  without removing any assertion.
 
 Parallelising *across targets* is ordinary build engineering rather than
 anything LaTeX-specific, and it is worth knowing that the LaTeX toolchain makes
@@ -1052,10 +1126,10 @@ The dispatcher, the throttle, the ordered replay, and the accounting assertion
 are one implementation, `tests/lib/fanout.sh`, shared with
 `tests/check-parallel.sh` rather than copied into each runner — a second copy of
 a check against a silent failure is how one of them stops being made. Its
-committed negative controls are `check-parallel`'s existing five, which now
-drive the shared code: a clean batch accounts for every member; one failing
-member fails by name with its output replayed; and **a removed result file is an
-accounting failure rather than a pass.**
+committed negative controls are the driver's existing five, which now drive the
+shared code: a clean batch accounts for every member; one failing member fails
+by name with its output replayed; and **a removed result file is an accounting
+failure rather than a pass.**
 
 #### What it is worth, and what it costs
 
@@ -1079,15 +1153,17 @@ invokes biber, so no two of its own workers can race there.
 
 Three bounds, in the spirit of the ones above:
 
-1. **It does not make the gate faster.** `make check` has no `JOBS` and stays
-   serial, deliberately. The saving lands on `check-parallel` and on a scoped
-   development loop — a run you make *in addition to* the gate you push behind.
-2. **The two layers multiply.** `check-parallel JOBS=4` with each target fanning
-   out 4 is sixteen LuaLaTeX processes. Left alone that would happen silently: a
+1. **It still does not make the gate faster.** The gate fans out across
+   *targets*, and pins the fixture fan-out inside each one to 1. So this saving
+   lands on a scoped development loop and on running a long suite by itself —
+   not on `make check`, which #399 sped up the other way.
+2. **The two layers multiply.** `make check JOBS=4` with each target fanning out
+   4 is sixteen LuaLaTeX processes. Left alone that would happen silently: a
    command-line `JOBS` lands in `MAKEFLAGS` and every dispatched sub-make would
-   inherit it. So `check-parallel` passes every target an explicit `JOBS`,
-   defaulting to 1, and the product is raised only by `INNER_JOBS=N`, which
-   prints the budget it is about to use.
+   inherit it. So the driver passes every target an explicit `JOBS`, defaulting
+   to 1, and the product is raised only by `INNER_JOBS=N`, which prints the
+   budget it is about to use. That pinning is also why making the gate parallel
+   did not multiply the process budget as a side effect.
 3. **Contention is real above four.** The `JOBS=8` columns cost roughly a third
    more CPU-seconds than the `JOBS=4` ones for their extra wall-clock saving,
    because the fixtures start competing for the same cores.
