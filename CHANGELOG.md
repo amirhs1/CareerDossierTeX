@@ -62,6 +62,31 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   baseline, or rendered output changed, and no suite's verdict changed — only
   how many fixtures each runner compiles at once.
 
+- `make lint` asserts that every Markdown anchor link resolves. Each
+  `](TARGET.md#anchor)` and same-file `](#anchor)` in a tracked Markdown file,
+  outside fenced code, must name a heading that exists in the target. ([#407])
+
+  The documentation set navigates by these links, and [#259] made that
+  load-bearing: `docs/API.md` and `docs/MIGRATION.md` now point at
+  `docs/ARCHITECTURE.md` for mechanisms they used to restate, so a pointer that
+  resolves to nothing is worse than the duplication it replaced. Three such
+  links were already in the tree — this file linked to
+  `docs/MIGRATION.md#080---unreleased` after the `v0.8.0` release renamed that
+  heading — and are repaired here.
+
+  The lint reproduces GitHub's anchor derivation, which is the part that can be
+  wrong in the direction that matters: a bad derivation reports working links as
+  broken ([#398]'s failure mode). It strips punctuation by blacklist rather than
+  keeping a whitelist, so `## Résumé class` stays `#résumé-class`, and it emits
+  one hyphen per space rather than per run of spaces, because removing an em
+  dash or arrow leaves the spaces that flanked it. Running it against the tree
+  before trusting it caught the second of those; six fixtures pin each failure
+  mode, including both.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed — `make lint` runs one more script and
+  can fail for one more reason.
+
 - `make lint` asserts that `AGENTS.md` names every section it points to. Every
   section name it quotes must exist as a heading in `CONTRIBUTING.md` or
   `docs/TESTING.md`, and every subsection of `CONTRIBUTING.md`'s "Local builds"
@@ -234,12 +259,14 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   prepares and proves before dispatching.
 
 [#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
+[#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
 [#398]: https://github.com/amirhs1/CareerDossierTeX/issues/398
 [#399]: https://github.com/amirhs1/CareerDossierTeX/issues/399
 [#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
+[#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
 
 ## [0.8.0] - 2026-08-12
 
@@ -402,7 +429,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   upright black body text. Nothing is renamed and no source edit is required;
   a document that wants the previous appearance adds `muted=italic` to its
   `\documentclass` options. See
-  [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
+  [`docs/MIGRATION.md`](docs/MIGRATION.md#080---2026-08-12).
 
   Which styling to want is a real trade-off, which is why it is a choice. Italic
   at small sizes is harder to read for low-vision and dyslexic readers than a
@@ -430,7 +457,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   no color. Every document class loads components, so no document built on a
   CareerDossierTeX class needs an edit; a document that loads
   `careerdossier-typography` on its own should load `careerdossier-components`
-  instead. See [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
+  instead. See [`docs/MIGRATION.md`](docs/MIGRATION.md#080---2026-08-12).
 
 - A new `make links` suite asserts that no URL or e-mail address a document
   renders picks up extraction whitespace within a visual line — and that one
@@ -669,7 +696,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
   A document that calls `\CDossierSizeTitle` now gets an
   undefined-control-sequence error. See
-  [`docs/MIGRATION.md`](docs/MIGRATION.md#080---unreleased).
+  [`docs/MIGRATION.md`](docs/MIGRATION.md#080---2026-08-12).
 
 - `\CDossierEmergencyStretch` keeps its `2.00 ×` body-size derivation, now
   chosen by measurement rather than inherited for continuity. **No document

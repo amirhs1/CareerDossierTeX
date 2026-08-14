@@ -433,23 +433,27 @@ statement heading would quietly become run-in.
 
 #### Boundary ownership
 
-This section is the one place in `docs/` that derives the composition rules
-below and the per-family header below-gap that follows from them. `docs/API.md`
-states what each rule costs an author overriding a token, and
-`docs/MIGRATION.md` states what a particular release requires of a document;
-both link here rather than repeat the reasoning. That matters because the
-reasoning quotes calibrated ratios and the ratios move: #206 retuned them,
-PR #254 updated the ratio table above, and the prose copies that existed
-elsewhere at the time went stale with no test and no reviewer catching it (#185,
-#259). Keeping the derivation adjacent to the table it quotes is what makes a
-retune a single reviewable diff.
+This chapter is the one place in `docs/` that derives the composition rules
+below, the per-family header below-gap that follows from them, and the `\@xsect`
+run-in floor under the statement's heading scale. `docs/API.md` states what each
+rule costs an author overriding a token, and `docs/MIGRATION.md` states what a
+particular release requires of a document; both link here rather than repeat the
+reasoning. That matters because the reasoning quotes calibrated ratios and the
+ratios move: #206 retuned them, PR #254 updated the ratio table above, and the
+prose copies that existed elsewhere at the time went stale with no test and no
+reviewer catching it (#185, #259). Keeping the derivation adjacent to the table
+it quotes is what makes a retune a single reviewable diff.
 
-Two other statements of these rules are deliberate and stay. `CHANGELOG.md` is a
+Two other kinds of statement are deliberate and stay. `CHANGELOG.md` is a
 point-in-time record whose entries are correct as of their own release, so
 rewriting one to reference this moving section would make it less accurate. And
 `careerdossier-tokens.sty`, `careerdossier-components.sty`, and the classes
-state the rule in comments at the point of implementation, where a reader of the
-code needs it; correcting those comments is tracked separately under #275.
+state each rule in a comment at the point of implementation, where someone
+editing that code needs it without the documentation open. What those comments
+must not carry is a *calibrated ratio belonging to another token* — nothing
+updates such a literal when the other token moves, which is the same defect in a
+`.sty` file that #185 repaired in prose. They name the token and defer the value
+to the table above.
 
 Two composition rules decide which token a reader actually sees at a boundary,
 and both are consequences of how the gap is contributed rather than of any

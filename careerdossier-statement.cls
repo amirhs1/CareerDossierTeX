@@ -247,9 +247,10 @@
 %% Both skips are stated as the *complete* gap a reader sees, which costs an
 %% explicit subtraction. A heading is a paragraph, and so is the text under it,
 %% so TeX contributes `\parskip' on each side beyond whatever the skip asks
-%% for -- and in this class `\parskip' is a visible 0.50 line. Passing the raw
-%% token would render every gap half a line wider than the token says, which is
-%% precisely the failure #168 removed from the section rule. Subtracting
+%% for -- and in this class `\parskip' is \CDossierProseParSkip, a visible gap.
+%% Passing the raw token would render every gap that much wider than the token
+%% says, which is precisely the failure #168 removed from the section rule.
+%% Subtracting
 %% `\parskip' here keeps the token's stated value and the rendered gap the same
 %% number, and the smoke fixture asserts that.
 %%

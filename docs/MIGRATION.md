@@ -792,13 +792,15 @@ After:
 
 Reason: both classes set `\parindent = 0pt`, so this token was the only thing
 separating one paragraph from the next in either class, but the two classes
-pull it in opposite directions. The statement's heading below-tokens must stay
-strictly greater than it — `\@xsect` reads a non-positive after-skip as a
-request for a run-in heading — so the token is a floor under the statement's
-entire heading scale. The letter has no heading scale to bound it and would
-prefer a more generous paragraph gap for its unindented block paragraphs. A
-single shared token meant retuning either class's paragraph gap was decided for
-the other as a side effect. `\CDossierLetterParSkip` ships at the same ratio as
+pull it in opposite directions. The statement's heading below-tokens are floored
+by it and the letter's are not, so a single shared token meant retuning either
+class's paragraph gap was decided for the other as a side effect. What imposes
+that floor is derived under
+[“Vertical rhythm” in `ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm).
+
+**If you override `\CDossierProseParSkip`,** keep every statement heading
+below-token strictly greater than the value you set. A statement heading whose
+after-skip reaches zero silently becomes a run-in heading rather than erroring. `\CDossierLetterParSkip` ships at the same ratio as
 `\CDossierProseParSkip`, so the split renders no document differently;
 only source that reads or sets the letter's paragraph gap by name needs the
 edit.
