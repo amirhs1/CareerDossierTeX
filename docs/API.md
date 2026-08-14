@@ -1188,7 +1188,9 @@ The gap between the rule and the section's first content is the larger of
 `\CDossierRecordSectionBelowSkip` and whatever leading space the following
 block contributes — never their sum. A section that opens with an entry, a
 bullet list, or an ordinary paragraph therefore yields one predictable gap
-rather than three different ones.
+rather than three different ones. This is the general boundary rule applied to
+one token; see
+[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
 
 The argument is user-visible text. The command does not automatically translate arbitrary section titles.
 
@@ -2378,28 +2380,31 @@ resolved values at each `fontsize` are tabulated in
 | Prose (statement) | `\CDossierProseHeaderBelowSkip`, `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`, `\CDossierProseSubsectionAboveSkip`, `\CDossierProseSubsectionBelowSkip`, `\CDossierProseParSkip` |
 | Letter | `\CDossierLetterHeaderBelowSkip`, `\CDossierLetterParSkip`, `\CDossierLetterRecipientLineGapSkip`, `\CDossierLetterBlockSkip`, `\CDossierLetterBodyAboveSkip`, `\CDossierLetterBodyBelowSkip`, `\CDossierLetterSignatureGapSkip` |
 
-Only the two gaps *inside* the header block are shared. The gap *below* it is a
-boundary against whatever the class puts next — a ruled section in the record
-classes, a prose section in the statement, the date line in the letter — so each
-family owns that one, and all three ship at the same `0.9375` ratio.
+Only the two gaps *inside* the header block are shared; the gap *below* it is
+owned by one token per family. All three ship at the same ratio, so setting all
+three reproduces the single shared token the families were split out of, and
+setting one moves only that family.
 
 Two rules govern how a token reaches the page, and overriding a token without
-them in mind is the usual reason an override appears to do nothing:
+them in mind is the usual reason an override appears to do nothing. Both are
+derived, together with the per-family split above, under
+[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership);
+what an author needs from them is:
 
 - **Boundaries compose with `\addvspace`, which takes the maximum of the
   adjacent claims and never their sum.** Raising a token past its neighbour is
-  what makes it visible; lowering it below its neighbour makes it inert.
-  `\CDossierRecordEntryGapSkip` in particular is a *floor* for the entry
-  heading → body boundary, which a bullet list overrides with
-  `\CDossierRecordListEdgeAboveSkip`.
+  what makes it visible; lowering it below its neighbour makes it inert, and
+  neither the output nor the log will say so. `\CDossierRecordEntryGapSkip` in
+  particular is a *floor* for the entry heading → body boundary, which a bullet
+  list overrides with `\CDossierRecordListEdgeAboveSkip`.
 - **One token also carries a constraint from outside the type scale.**
   `\CDossierRecordListEdgeAboveSkip` may not go below `0.25` without breaking
   the extraction order of the entry heading's dates column, as described under
   [`CDossierItemize`](#cdossieritemize).
-- **A paragraph boundary also contributes `\parskip`.** In the statement class
-  that is `\CDossierProseParSkip`, and in the letter class it is
-  `\CDossierLetterParSkip`; a token at such a boundary is emitted as
-  `token − \parskip` so the token still names the rendered gap. The header block
+- **A paragraph boundary also contributes `\parskip`, and the class has already
+  accounted for it.** Where a token sits at such a boundary the class emits it
+  as `token − \parskip`, so the value you set is still the gap a reader
+  measures — do not subtract the paragraph gap yourself. The header block
   zeroes `\parskip` for its own scope, which is why the two shared header gap
   tokens behave identically in all four classes.
 

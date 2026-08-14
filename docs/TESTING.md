@@ -873,6 +873,36 @@ prevent. One constraint it does impose, on one short section: every quoted
 string in "Build and test" is treated as a section name, so a phrase quoted
 there that is not a heading fails the lint by name and should be rephrased.
 
+A fifth script in the same slot checks the other kind of cross-reference — the
+Markdown link rather than the quoted section name:
+
+```bash
+tests/lint/run-markdown-anchors.sh
+```
+
+Every `](TARGET.md#anchor)` and every same-file `](#anchor)` in a tracked
+Markdown file, outside fenced code, must resolve to a heading in the target.
+This exists because #259 made those links load-bearing: `docs/API.md` and
+`docs/MIGRATION.md` now point at `docs/ARCHITECTURE.md` for mechanisms they used
+to restate, and a pointer that resolves to nothing is worse than the duplication
+it replaced. The failure was already in the tree — `CHANGELOG.md` linked three
+times to `docs/MIGRATION.md#080---unreleased` after the release renamed that
+heading to `## [0.8.0] - 2026-08-12` (#407).
+
+The lint derives GitHub's anchor from the heading text, and that derivation is
+the part that can be wrong: get it wrong and it reports a working link as broken,
+which is #398's failure mode. Two consequences worth knowing before editing it.
+It strips punctuation by **blacklist**, naming the ASCII marks plus the em dash
+and rightwards arrow that headings here actually contain, because a whitelist of
+`[a-z0-9 _-]` turns `## Résumé class` into `#rsum-class`. And it emits one hyphen
+per **space**, not per run of spaces: removing a `—` or `→` leaves the space that
+flanked it on each side, so `## Upgrading to v0.4.0: XeLaTeX → LuaLaTeX` is
+`#upgrading-to-v040-xelatex--lualatex` with two hyphens. Collapsing runs reported
+two working `docs/MIGRATION.md` links as broken, and the tree caught it before
+the lint was trusted. It is not a general GitHub-compatible implementation and
+should not claim to be; when a heading uses punctuation it does not know, teach
+the derivation rather than delete the check.
+
 The `lint` target runs two more scripts in the same slot:
 
 ```bash

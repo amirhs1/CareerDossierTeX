@@ -383,8 +383,10 @@
 %% below-token, which \MakeCDossierHeader has already contributed -- for this
 %% class \CDossierLetterHeaderBelowSkip (issue #223). The retired
 %% \CDossierLetterheadBelowSkip claimed the same boundary immediately
-%% afterwards with a smaller value (0.75 against 0.8125), and `\addvspace'
-%% takes the maximum, so it never reached the page.
+%% afterwards with a smaller value, and `\addvspace' takes the maximum, so it
+%% never reached the page. The two ratios it lost by are in docs/MIGRATION.md
+%% ("Three vertical-spacing tokens retired, two added"), where the release that
+%% retired it records them.
 %%
 %% Issue #299: the subject line uses \CDossierSubjectStyle, the role that
 %% describes it. It previously borrowed \CDossierEntryTitleStyle, which names a

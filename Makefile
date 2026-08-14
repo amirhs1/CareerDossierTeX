@@ -203,11 +203,12 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, text guards, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, text guards, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
 	tests/lint/run-agents-references.sh
+	tests/lint/run-markdown-anchors.sh
 	tests/lint/run-text-guards.sh
 	tests/check-parallel.sh --self-test
 

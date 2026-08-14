@@ -984,8 +984,8 @@
 %% below it turns out to be.
 %%
 %% Each line is its own paragraph, so `\parskip' lands in every boundary. In the
-%% prose classes that is a visible 0.50 line the header tokens cannot express a
-%% gap below, and `\addvspace' cannot absorb it: `\parskip' is inserted at the
+%% prose classes that is a visible gap the header tokens could not express a
+%% value below, and `\addvspace' cannot absorb it: `\parskip' is inserted at the
 %% next paragraph's start, after `\addvspace' has already read `\lastskip', so
 %% the two always add. The stack therefore zeroes `\parskip' for its own group
 %% and subtracts it from every gap it emits, so each token names the rendered

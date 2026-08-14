@@ -488,13 +488,15 @@
     %% The below-ratio is pinned from both sides. Record boundaries compose with
     %% `\addvspace', which takes the maximum, so a below-token that only ties the
     %% opening claim of what follows never reaches the page: it would be the dead
-    %% token issue #204 retired \CDossierRecordEntryBelowSkip for. The two blocks
-    %% a record subsection introduces open at 0.3125
-    %% (\CDossierRecordEntryAboveSkip, an entry run) and 0.25
-    %% (\CDossierRecordListEdgeAboveSkip, the CV's CDossierPublications list), so
-    %% the value must exceed 0.3125 to be reachable at all, and must stay under
-    %% \CDossierRecordSectionBelowSkip (0.4375) to read as tighter than the
-    %% section it sits inside. On the sixteenth grid that leaves exactly 0.375.
+    %% token issue #204 retired \CDossierRecordEntryBelowSkip for. It must
+    %% therefore exceed both claims a record subsection can meet below it --
+    %% \CDossierRecordEntryAboveSkip (an entry run) and
+    %% \CDossierRecordListEdgeAboveSkip (the CV's CDossierPublications list) --
+    %% and must stay under \CDossierRecordSectionBelowSkip to read as tighter
+    %% than the section it sits inside. On the sixteenth grid that leaves
+    %% exactly the 0.375 set below. Those three neighbours' ratios are
+    %% tabulated in docs/ARCHITECTURE.md ("Vertical rhythm"); they are not
+    %% repeated here, because nothing updates a copy of them when they move.
     %%
     %% One pair therefore serves both cases, which is the product question #337
     %% asked. 0.375 wins the maximum against an entry run and against the
@@ -609,10 +611,12 @@
     %% strictly greater than it (see the comment above), while the letter has
     %% no heading scale to bound it and would prefer a more generous gap
     %% between its unindented block paragraphs. Splitting the token per family
-    %% lets either retune independently; both shipped at the same 0.50 value,
-    %% so the split itself was mechanism-only. Issue #206 then tightened both
-    %% to 0.25 -- still equal, but now by measurement rather than by the split's
-    %% starting condition, and either may move alone from here.
+    %% lets either retune independently; both shipped at the same value, so the
+    %% split itself was mechanism-only. Issue #206 then tightened both together
+    %% -- still equal, but now by measurement rather than by the split's
+    %% starting condition, and either may move alone from here. The set line
+    %% above is the value; docs/ARCHITECTURE.md ("Vertical rhythm") tabulates
+    %% the pair.
     \__cdossier_tokens_set_skip:Nn \CDossierLetterParSkip { 0.25 }
     %% Issue #204: the recipient block prints one field per line and separated
     %% them with a bare `\\', so the only vertical distance in the letter that no

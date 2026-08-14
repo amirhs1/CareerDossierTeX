@@ -578,7 +578,7 @@ removing them changes no output:
 
 | Removed | Use instead | Why it never rendered |
 |---|---|---|
-| `\CDossierRecordEntryBelowSkip` | `\CDossierRecordEntryAboveSkip` | Block boundaries compose with `\addvspace`, which takes the maximum of the adjacent claims, never their sum. At 0.125 this token lost to `\CDossierRecordEntryAboveSkip` (0.25) between two entries and to `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every boundary it appeared at. |
+| `\CDossierRecordEntryBelowSkip` | `\CDossierRecordEntryAboveSkip` | At 0.125 it lost the maximum to `\CDossierRecordEntryAboveSkip` (0.25) between two entries and to `\CDossierRecordSectionAboveSkip` (0.6875) at the end of a section — every boundary it appeared at. |
 | `\CDossierLetterheadBelowSkip` | `\CDossierLetterHeaderBelowSkip` | It claimed the header → date boundary immediately after `\MakeCDossierHeader` had already claimed it, at a smaller value (0.75 against 0.8125), so the maximum discarded it. |
 | `\CDossierHeaderAboveSkip`, renamed `\CDossierSharedHeaderAboveSkip` earlier in this release | nothing — the boundary does not exist | It claimed the boundary *above* the first header line. Every class renders its header as the first material in the document, and TeX discards glue at the top of a page, so the token rendered nothing at `0.00` or at any other value. |
 
@@ -606,27 +606,28 @@ boundaries *between letterhead blocks*; a document that set
 lines, which was plain `\baselineskip` — the one vertical distance in the letter
 no token expressed. At `0.00` it reproduces that spacing exactly.
 
-Reason: `\addvspace` takes the maximum of the claims at a boundary, so where two
-tokens met, the smaller was unreachable — a maintainer who lowered it saw no
-change and no diagnostic. Giving each boundary exactly one token is a
-prerequisite for retuning the ratios ([#206](https://github.com/amirhs1/CareerDossierTeX/issues/206)).
+Reason: where two tokens met at one boundary the smaller was unreachable, so
+lowering it changed nothing and reported nothing. Giving each boundary exactly
+one token is a prerequisite for retuning the ratios
+([#206](https://github.com/amirhs1/CareerDossierTeX/issues/206)). The
+composition rule behind this is derived under
+[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
 
 ### Header spacing no longer floored by `\parskip`
 
-`careerdossier-letter` and `careerdossier-statement` set `\parskip` to
-`\CDossierProseParSkip` document-wide. Every header line is its own paragraph,
-so that paragraph gap landed in every header boundary on top of the header
-token, and `\addvspace` could not absorb it: `\parskip` is inserted at the next
-paragraph's start, after `\addvspace` has already read `\lastskip`, so the two
-always add.
+`careerdossier-letter` and `careerdossier-statement` set `\parskip`
+document-wide, and every header line is its own paragraph, so that paragraph gap
+landed in every header boundary *on top of* the header token — a paragraph
+boundary's `\parskip` always adds, and no header token could express a gap below
+that floor.
 
 The header block now zeroes `\parskip` for its own scope, so the header gap
 tokens name the rendered gap in all four classes. That zero is fixed, not a
 token: an intermediate revision of this release exposed it as
-`\CDossierSharedHeaderParSkip`, but the value cancelled itself — the stack
-emits every gap as `token − \parskip` and the following header line then
-contributes `\parskip` again — so no value of it changed anything. It is not
-part of the released API.
+`\CDossierSharedHeaderParSkip`, but no value of it changed anything, and it is
+not part of the released API. Both facts follow from the composition rules
+derived under
+[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
 
 **Letters and statements reflow.** Each header boundary tightens by the prose
 paragraph gap as it stood before the retune above — 0.50 of a line, 7.25 pt at
@@ -657,10 +658,11 @@ floor.
 ### `\CDossierRecordEntryGapSkip` became a floor rather than added space
 
 The entry heading → body gap is now contributed with `\addvspace` instead of
-`\vspace`. A `\vspace` appends a zero glue after its own skip, so the following
-block's `\addvspace` saw `\lastskip = 0` and the two *added*; the gap above a
+`\vspace`, which changes what a document gets at that boundary: the gap above a
 bullet list was `\CDossierRecordEntryGapSkip` **plus**
-`\CDossierRecordListEdgeAboveSkip`. It is now the larger of the two.
+`\CDossierRecordListEdgeAboveSkip`, and is now the larger of the two. Why a
+`\vspace` made the two add is derived under
+[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
 
 **Résumés and CVs reflow slightly.** The gap above every bullet list inside an
 entry tightens by `\CDossierRecordEntryGapSkip` — 0.85 pt at `fontsize=11pt`,
@@ -790,14 +792,16 @@ After:
 
 Reason: both classes set `\parindent = 0pt`, so this token was the only thing
 separating one paragraph from the next in either class, but the two classes
-pull it in opposite directions. The statement's heading below-tokens must stay
-strictly greater than it — `\@xsect` reads a non-positive after-skip as a
-request for a run-in heading — so the token is a floor under the statement's
-entire heading scale. The letter has no heading scale to bound it and would
-prefer a more generous paragraph gap for its unindented block paragraphs. A
-single shared token meant retuning either class's paragraph gap was decided for
-the other as a side effect. `\CDossierLetterParSkip` ships at the same `0.50`
-ratio as `\CDossierProseParSkip`, so the split renders no document differently;
+pull it in opposite directions. The statement's heading below-tokens are floored
+by it and the letter's are not, so a single shared token meant retuning either
+class's paragraph gap was decided for the other as a side effect. What imposes
+that floor is derived under
+[“Vertical rhythm” in `ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm).
+
+**If you override `\CDossierProseParSkip`,** keep every statement heading
+below-token strictly greater than the value you set. A statement heading whose
+after-skip reaches zero silently becomes a run-in heading rather than erroring. `\CDossierLetterParSkip` ships at the same ratio as
+`\CDossierProseParSkip`, so the split renders no document differently;
 only source that reads or sets the letter's paragraph gap by name needs the
 edit.
 
@@ -814,23 +818,18 @@ After:
 \CDossierProseHeaderBelowSkip    % careerdossier-statement
 \CDossierLetterHeaderBelowSkip   % careerdossier-letter
 
-Reason: the two gaps *inside* the header block are genuinely shared — every
-class stacks the same lines in the same order, and the block zeroes `\parskip`
-for its own scope, so one ratio renders one gap everywhere. The gap *below* the
-block is not shared in that sense: it is a boundary against whatever the class
-puts next, and that neighbour differs per family — a ruled `\CDossierSection`
-in the record classes, a prose section heading in the statement, and the date
-line (`\CDossierLetterBlockSkip`, `0.50`) in the letter. One token therefore had
-to clear whichever of those was largest in *any* class, so raising the
-statement's section gap spent vertical space in the résumé and the CV, and the
-letter carried a floor set by a section boundary it does not have.
+Reason: the two gaps *inside* the header block are genuinely shared, but the gap
+*below* it is a boundary against whatever the class puts next, and that
+neighbour differs per family, so one token had to clear whichever neighbour was
+largest in *any* class. The derivation, and what that cost each class, is under
+[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
 
-All three ship at the `0.8125` ratio the single token carried, so the split
-renders no document differently; only source that reads or sets the gap below a
-header by name needs the edit. Replace `\CDossierHeaderBelowSkip` with the
-token for the class being styled, and set all three when styling every class
-from one shared preamble. Retuning any of them is tracked separately under
-issue #206.
+All three ship at the ratio the single token carried, so the split renders no
+document differently; only source that reads or sets the gap below a header by
+name needs the edit. Replace `\CDossierHeaderBelowSkip` with the token for the
+class being styled, and set all three when styling every class from one shared
+preamble. Retuning any of them is tracked separately under issue #206 — the
+`v0.6.0` → `v0.7.0` ratios for all three are in the retune table above.
 
 Note the intermediate name. Earlier in this same release the token was renamed
 `\CDossierSharedHeaderBelowSkip`; that name is superseded here and was never
