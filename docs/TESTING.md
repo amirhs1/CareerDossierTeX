@@ -827,16 +827,124 @@ prevent. One constraint it does impose, on one short section: every quoted
 string in "Build and test" is treated as a section name, so a phrase quoted
 there that is not a heading fails the lint by name and should be rephrased.
 
-The `lint` target runs a fourth script in the same slot:
+The `lint` target runs two more scripts in the same slot:
 
 ```bash
+tests/lint/run-text-guards.sh
 tests/check-parallel.sh --self-test
 ```
 
-It is the committed negative control for the driver `make check` runs, and it
-belongs in this slot because it compiles nothing and needs neither TeX nor
-biber. What it asserts, and why each assertion exists, is in "The parallel run"
-below rather than here.
+Both are committed negative controls, and both belong in this slot because they
+compile nothing and need neither TeX nor biber. What the second asserts is in
+"The parallel run" below; the first is the section immediately following.
+
+### A guard answers three states, not two
+
+Every assertion about a PDF's extracted text — a running header, a folio, a
+contact item, a tagged label — asks two things in sequence: capture the text,
+then ask whether a string is in it. Both can fail, and the failure that matters
+is the one where the *question could not be asked at all*.
+
+The old spelling had no room for it:
+
+```sh
+elif ! printf '%s\n' "$page_text" | grep -Fq "$furniture_label"; then
+  echo "  MISSING RUNNING HEADER on page $n: $furniture_label"
+```
+
+Under `make check JOBS=8` this reported a label MISSING that sat on line 1 of a
+page `pdftotext` had extracted correctly and exited 0 on, and that the runner's
+own re-extraction found (issue #398). A pipeline that returns non-zero for any
+reason other than "no match" is indistinguishable from absent text.
+
+**The half that matters is the inverted one.** Each `medium=screen` branch asks
+the same question the other way round — the header must *not* be there — and
+whatever makes the pipeline spuriously non-zero makes that branch spuriously
+false. The violation is not reported and the fixture passes. A hollow failure is
+loud and wastes an afternoon; a hollow pass is this repository's characteristic
+defect, and a two-state guard is one more way to manufacture one.
+
+So the contract, in `tests/lib/text.sh`, is three-valued:
+
+| Status | Meaning |
+|---|---|
+| `0` | present — the needle occurs in the text |
+| `1` | absent — it does not |
+| `2` | **unknown** — the question could not be answered |
+
+`text_contains`, `text_contains_line`, and `text_matches` answer it; `text_page`
+and `text_extract` capture text, or yield `CDTEXT_UNAVAILABLE` when the
+extraction could not be performed.
+
+**A count owes the same three states, and needs them more.** `text_count_lines`
+and `text_count_matches` print a count and return `0`, or print nothing and
+return `2`. The reason is arithmetic rather than logic: `grep -Fc … || true`
+over text that was never extracted answers `0`, and `0` is the *passing* value
+for every count guard here — the page-one label count tests `-ne 0`, the
+orphaned-bullet check tests `-eq 1`. So the unperformable answer was
+numerically identical to a clean page, and `|| true` is what made it silent, by
+turning any pipeline failure into an empty string that `[ "" -ne 0 ]` reports as
+false. Two guards shipped that way.
+
+The counterexample is `tests/layout/run.sh`'s page-fill parse, which is safe
+without any of this: it compares its record count against the page count derived
+independently from the log, so "found nothing" cannot read as "nothing to find".
+Where an independent expected value exists, comparing against it is the stronger
+construction. A caller must treat `2` as a failure of its
+own, naming that the check could not run — never as either verdict. Each runner
+spells that in its own idiom, because what it does with a failure differs
+(`tests/tagging/run.sh` has `require_text`/`forbid_text` around
+`record_failure`; `tests/layout/run.sh` branches inline), and only the predicate
+is shared.
+
+Two design points are worth keeping, because both were load-bearing:
+
+- **The fixed-string match runs in the shell.** `case` with a quoted expansion
+  matches literally — the same semantics as `grep -F` — and forks nothing, opens
+  no pipe, and runs no external program, so there is no channel by which a match
+  can be reported as a miss whatever the load. `text_matches` still needs `grep`
+  for the two genuine regular expressions, and uses a here-string rather than a
+  pipe, reading grep's status three ways: `0` found, `1` absent, `2` or more
+  could not be checked.
+- **The mechanism was never diagnosed, and the fix does not depend on one.**
+  #398 tested a `grep -q` SIGPIPE race under `pipefail`, `pdftotext` failing
+  under concurrency, and the pipeline failing under fork pressure — 2000, 640,
+  and 7200 trials — and *none* reproduced. The fix removes the class rather than
+  repairing a cause, which is what makes it verifiable against what was actually
+  established.
+
+`tests/lint/run-text-guards.sh` is the committed control. Its first assertion is
+the one to preserve: it runs both spellings over the same present text with
+`PATH` emptied, which puts a guard into the unperformable state deterministically
+and with no load at all. The old form reports the text MISSING; `text_contains`
+does not. The rest cover the three states across all three predicates, both
+polarities failing on an unperformable check *and saying so*, literal matching of
+needles containing glob metacharacters, an empty needle refusing to pass, and a
+failed extraction marking itself unavailable rather than reading as an empty
+page.
+
+Its last two controls are a ratchet: no `... | grep -q` **or** `... | grep -c`
+guard may reappear in a runner or a shared library. It is scoped to the shape
+rather than to a list of known sites, so a *new* runner with the old spelling is
+caught too. The one blanket exemption is the control script itself, which must
+hold the old spelling in order to demonstrate that it fails.
+
+A count that is genuinely safe — one that is only printed, or one compared
+against an independently derived expected value — is exempted at the site:
+
+```sh
+# guard-ok: compared against $pages, derived independently from the log, so a
+# parse that finds nothing reports 0 against a non-zero page count and fails.
+fill_pages="$(printf '%s\n' "$fill_records" | grep -c '.' || true)"
+```
+
+The marker lives next to the code rather than in a list, which would rot apart
+from what it describes, and two properties make it worth trusting: it must carry
+a reason, so an exemption costs an argument rather than a keyword; and it shields
+only the contiguous run of code lines beneath it, ending at the first blank line,
+so it cannot spread down a file. The last control asserts both by re-running the
+scanner over a synthetic file containing a bare marker, a reasoned one, and an
+offence past a blank line.
 
 ### The parallel run
 

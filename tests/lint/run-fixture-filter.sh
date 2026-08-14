@@ -61,6 +61,11 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+
+# Membership and output guards that answer "could not check" apart from
+# "absent" (issue #398).
+. "$root/tests/lib/text.sh"
+
 fail=0
 
 # Membership without a pipe. `printf ... | grep -q' would exit at the first
@@ -190,9 +195,14 @@ EOF
     ondisk_sorted="$(printf '%s\n' "$ondisk" | sort)"
     if [ "$listed_sorted" != "$ondisk_sorted" ]; then
       echo "  UNIVERSE MISMATCH: --list and tests/$suite/*.tex disagree."
+      # The two loops below only elaborate a mismatch already reported and
+      # already fatal, so they read text_contains_line as a boolean. That is
+      # safe here and nowhere else in this file: `$name` is guarded non-empty
+      # on the line above each call and neither list can be the unavailable
+      # sentinel, so the third state is unreachable rather than merged away.
       while IFS= read -r name; do
         [ -n "$name" ] || continue
-        if ! printf '%s\n' "$ondisk_sorted" | grep -qxF "$name"; then
+        if ! text_contains_line "$ondisk_sorted" "$name"; then
           echo "      selected but no such fixture file: $name"
         fi
       done <<EOF
@@ -200,7 +210,7 @@ $listed_sorted
 EOF
       while IFS= read -r name; do
         [ -n "$name" ] || continue
-        if ! printf '%s\n' "$listed_sorted" | grep -qxF "$name"; then
+        if ! text_contains_line "$listed_sorted" "$name"; then
           echo "      fixture file never selected: $name"
         fi
       done <<EOF
@@ -208,6 +218,8 @@ $ondisk_sorted
 EOF
       fail=1
     else
+      # guard-ok: display only. This count is printed, never compared, and the
+      # assertion it accompanies was already made by the string equality above.
       n_all="$(printf '%s\n' "$listed" | grep -c . || true)"
       echo "  --list names all $n_all fixtures and no others"
     fi
@@ -218,6 +230,9 @@ EOF
   #    would still "work" for a developer and would still cost the full suite.
   subset="$("$runner" --list "$pattern")"
   rc=$?
+  # guard-ok: a zero is the explicit failure branch below, not the passing one —
+  # `n_subset -eq 0` is reported as SELECTED NOTHING, and a zero `n_all` makes
+  # the `-ge` comparison true and is reported as SELECTED ALL. Both fail loudly.
   n_subset="$(printf '%s\n' "$subset" | grep -c . || true)"
   n_all="$(printf '%s\n' "$listed" | grep -c . || true)"
   if [ "$rc" -ne 0 ]; then
@@ -253,12 +268,23 @@ EOF
     echo "  NON-MATCHING PATTERN EXITED 0. A run that selected no fixture"
     echo "    passes every assertion this suite makes, and reports so."
     fail=1
-  elif ! printf '%s\n' "$nomatch_out" | grep -q 'NO FIXTURE MATCHES'; then
-    echo "  NON-MATCHING PATTERN failed without saying why:"
-    printf '%s\n' "$nomatch_out" | sed 's/^/    /' | head -5
-    fail=1
   else
-    echo "  a pattern matching nothing exits $rc and says so"
+    # Three states, not two (issue #398): a non-zero exit whose reason could
+    # not be read has not been shown to be the documented one.
+    text_contains "$nomatch_out" 'NO FIXTURE MATCHES'
+    case "$?" in
+      0) echo "  a pattern matching nothing exits $rc and says so" ;;
+      1)
+        echo "  NON-MATCHING PATTERN failed without saying why:"
+        printf '%s\n' "$nomatch_out" | sed 's/^/    /' | head -5
+        fail=1
+        ;;
+      *)
+        echo "  NON-MATCHING PATTERN produced no checkable output, so it has"
+        echo "    not been shown to fail for the documented reason."
+        fail=1
+        ;;
+    esac
   fi
 
   # 4. The empty pattern is the full suite. `make smoke` with FIXTURE unset

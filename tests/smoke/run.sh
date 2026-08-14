@@ -34,6 +34,10 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 cd "$here"
 export TEXINPUTS="$root:${TEXINPUTS:-}"
+
+# Log guards that answer "could not check" apart from "absent" (issue #398).
+. "$root/tests/lib/text.sh"
+
 fail=0
 
 # Fixture selection (issue #359).
@@ -290,7 +294,7 @@ fi
 # same minimal source must build with LuaLaTeX and fail at the package guard
 # (rather than later in fontspec) under both unsupported engines.
 smoke_engine_contract() {
-  local unit_fail=0 engine job rc
+  local unit_fail=0 engine job rc engine_log
   echo "== $engine_fixture.tex (engine contract) =="
   if ! lualatex -halt-on-error -interaction=nonstopmode "$engine_fixture.tex" \
       > "$engine_fixture-lualatex.stdout" 2>&1; then
@@ -307,11 +311,30 @@ smoke_engine_contract() {
     if [ "$rc" -eq 0 ]; then
       echo "  $engine EXPECTED FAILURE but compile succeeded"
       unit_fail=1
-    elif ! tr '\n' ' ' < "$job.log" | tr -s ' ' | grep -qF "$engine_needle"; then
-      echo "  $engine FAILED for the wrong reason: expected '$engine_needle'"
-      unit_fail=1
     else
-      echo "  $engine failed at the LuaLaTeX guard as intended"
+      # Flattened into a variable before it is matched (issue #398): with the
+      # match as the last stage of the pipeline, its early exit under `-q`
+      # signals `tr`, and `pipefail` reports "needle absent" for a log that
+      # contains it — here, "failed for the wrong reason" about a correct
+      # failure.
+      if [ -f "$job.log" ]; then
+        engine_log="$(tr '\n' ' ' < "$job.log" | tr -s ' ')"
+      else
+        engine_log="$CDTEXT_UNAVAILABLE"
+      fi
+      text_contains "$engine_log" "$engine_needle"
+      case "$?" in
+        0) echo "  $engine failed at the LuaLaTeX guard as intended" ;;
+        1)
+          echo "  $engine FAILED for the wrong reason: expected '$engine_needle'"
+          unit_fail=1
+          ;;
+        *)
+          echo "  $engine LEFT NO READABLE LOG: the reason for its failure was"
+          echo "    never checked, so this is not evidence about the guard."
+          unit_fail=1
+          ;;
+      esac
     fi
   done
   echo
@@ -373,7 +396,7 @@ smoke_doc_drift() {
 # silently checking the wrong needle. A subshell inherits the array, so an index
 # needs no quoting at all.
 smoke_case() {
-  local entry base rest expect needle once tex rc unexpected flat count
+  local entry base rest expect needle once tex rc unexpected flat count needle_state
   entry="${selected_cases[$1]}"
   base="${entry%% *}"; rest="${entry#* }"
   expect="${rest%%|*}"; needle=""; once=""
@@ -427,8 +450,16 @@ smoke_case() {
       # is still named in the "! Package <module> Error:" opening.
       flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ' \
         | sed 's/(careerdossier-[a-z]*)[[:space:]]*/ /g' | tr -s ' ')"
-      if [ -n "$needle" ] && ! printf '%s' "$flat" | grep -qF "$needle"; then
+      needle_state=0
+      if [ -n "$needle" ]; then
+        text_contains "$flat" "$needle"; needle_state=$?
+      fi
+      if [ "$needle_state" -eq 1 ]; then
         echo "  FAILED for the wrong reason: expected '$needle' in the log"; return 1
+      elif [ "$needle_state" -ne 0 ]; then
+        echo "  LOG NOT READABLE: '$needle' was never looked for, so this"
+        echo "    failure has not been shown to be the expected one."
+        return 1
       elif [ -n "$once" ]; then
         # -o prints one line per match, so this counts occurrences rather than
         # matching lines; the log has already been flattened to a single line.

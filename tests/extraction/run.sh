@@ -44,6 +44,10 @@ cd "$here"
 root="$(cd "$here/../.." && pwd)"
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
+# Extracted-text guards that answer "could not check" apart from "absent"
+# (issue #398).
+. "$root/tests/lib/text.sh"
+
 # Fixture selection (issue #359). The pattern is a shell glob matched anywhere
 # in the basename, so `resume` behaves as a substring search and `statement-*`
 # anchors at the start; it is left unquoted in the `case` below for that reason.
@@ -173,17 +177,22 @@ for tex in "${fixtures[@]}"; do
   got="$(pdftotext -enc UTF-8 "$base.pdf" - | normalize)"
 
   if [ "$base" = "resume-contact-wrap" ]; then
-    contact_text="$(pdftotext -layout -enc UTF-8 "$base.pdf" - | normalize)"
-    if printf '%s\n' "$contact_text" \
-        | grep -Eq '^[[:space:]]*\||\|[[:space:]]*$'; then
+    contact_text="$(text_extract "$base.pdf" -layout | normalize)"
+    text_matches "$contact_text" '^[[:space:]]*\||\|[[:space:]]*$'; state=$?
+    if [ "$state" -eq 0 ]; then
       echo "  ORPHAN CONTACT SEPARATOR in extracted visual line"; fail=1
+    elif [ "$state" -ne 1 ]; then
+      echo "  UNCHECKABLE CONTACT SEPARATORS: no -layout text for $base"; fail=1
     else
       echo "  wrapped contact lines have no orphan separators"
     fi
     contact_item_fail=0
     while IFS= read -r item; do
-      if ! printf '%s\n' "$contact_text" | grep -Fq "$item"; then
+      text_contains "$contact_text" "$item"; state=$?
+      if [ "$state" -eq 1 ]; then
         echo "  SPLIT CONTACT ITEM: $item"; fail=1; contact_item_fail=1
+      elif [ "$state" -ne 0 ]; then
+        echo "  UNCHECKABLE CONTACT ITEM: $item"; fail=1; contact_item_fail=1
       fi
     done <<'EOF'
 alexandria.montgomery.fitzgerald@a-very-long-department.example.org
