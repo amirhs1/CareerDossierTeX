@@ -76,6 +76,15 @@ group_is_listed() {
   return 1
 }
 
+listed_units=()
+unit_is_listed() {
+  local candidate
+  for candidate in ${listed_units[@]+"${listed_units[@]}"}; do
+    [ "$candidate" = "$1" ] && return 0
+  done
+  return 1
+}
+
 # The `group' universe check: the tagging runner's selectable groups against the
 # .tex files backing them, asserted in both directions. See the header for why
 # equality with the directory listing cannot be the assertion here.
@@ -272,6 +281,54 @@ EOF
   else
     echo "  an unknown option is rejected (exit $rc)"
   fi
+
+  # 6. Fan-out (issue #390): where a runner has a `--jobs' path, the units it
+  #    would dispatch must cover the serial universe exactly.
+  #
+  #    This is the one assertion the checks above cannot make. They establish
+  #    that `--list' agrees with the fixture files on disk; none of them looks
+  #    at what the *parallel* driver would actually run. A runner whose fan-out
+  #    silently dispatched a subset would pass every check above and then report
+  #    a clean run of something other than the suite — the same shape of failure
+  #    as a pattern that selects nothing, one layer further in. Compiles
+  #    nothing, like everything else here.
+  if grep -qE -- '--list-units\)[[:space:]]*list_units_only=1' "$runner"; then
+    listed_units=()
+    while IFS= read -r name; do
+      [ -n "$name" ] && listed_units+=("$name")
+    done <<EOF
+$("$runner" --list-units)
+EOF
+    unit_bad=0
+    for name in ${listed_groups[@]+"${listed_groups[@]}"}; do
+      if ! unit_is_listed "$name"; then
+        echo "      fixture never dispatched under --jobs: $name"
+        unit_bad=1
+      fi
+    done
+    # An extra unit is allowed only when it is named for a listed fixture — an
+    # auxiliary check like smoke's docs/API.md drift comparison, which is not a
+    # fixture compile but belongs to one. A unit named for nothing is a unit no
+    # reader of `--list' knows runs.
+    for name in ${listed_units[@]+"${listed_units[@]}"}; do
+      group_is_listed "$name" && continue
+      owned=0
+      for base in ${listed_groups[@]+"${listed_groups[@]}"}; do
+        case "$name" in "$base"-*) owned=1; break ;; esac
+      done
+      if [ "$owned" -eq 0 ]; then
+        echo "      dispatched unit belongs to no listed fixture: $name"
+        unit_bad=1
+      fi
+    done
+    if [ "$unit_bad" -eq 0 ]; then
+      echo "  --jobs dispatches all ${#listed_groups[@]} fixtures as ${#listed_units[@]} units"
+    else
+      echo "  DISPATCH MISMATCH: the serial and parallel paths select"
+      echo "    different fixtures."
+      fail=1
+    fi
+  fi
 done
 
 # The Makefile is the interface the contract above is reached through, so the
@@ -286,11 +343,40 @@ makefile="$root/Makefile"
 tab="$(printf '\t')"
 for suite in smoke layout extraction tagging; do
   # tests/extraction/run.sh is reached through the `extract-test' target.
-  if ! grep -qF "${tab}tests/$suite/run.sh \"\$(FIXTURE)\"" "$makefile"; then
-    echo "  tests/$suite/run.sh is not invoked with \"\$(FIXTURE)\" in the Makefile"
+  #
+  # The recipe line is extracted first and then examined with `case', rather
+  # than matched whole with one `grep -F'. A whole-line match was what this did
+  # until the JOBS pass-through joined the recipe (issue #390), and it broke on
+  # a change that was correct — a literal match asserts the argument list's
+  # exact text, which is more than the contract needs and less than it means.
+  # `case' also avoids the `printf | grep -q' form, whose SIGPIPE race under
+  # `pipefail' reports "not found" for something that is there.
+  recipe="$(grep -F "${tab}tests/$suite/run.sh" "$makefile" | head -1)"
+  if [ -z "$recipe" ]; then
+    echo "  tests/$suite/run.sh is not invoked from the Makefile at all"
     fail=1
-  else
-    echo "  tests/$suite/run.sh receives \"\$(FIXTURE)\""
+    continue
+  fi
+  case "$recipe" in
+    *'"$(FIXTURE)"'*)
+      echo "  tests/$suite/run.sh receives \"\$(FIXTURE)\"" ;;
+    *)
+      echo "  tests/$suite/run.sh is not invoked with \"\$(FIXTURE)\" in the Makefile"
+      fail=1 ;;
+  esac
+  # Where the runner has a fan-out path, the Makefile must be able to reach it,
+  # for the same reason FIXTURE is asserted here: a recipe that dropped its
+  # variable leaves every other check passing while `make smoke JOBS=4' quietly
+  # runs serially — slow, not wrong, and therefore easy to never notice.
+  if grep -qE -- '--list-units\)[[:space:]]*list_units_only=1' \
+       "$root/tests/$suite/run.sh"; then
+    case "$recipe" in
+      *'$(if $(JOBS),--jobs $(JOBS))'*)
+        echo "  tests/$suite/run.sh receives \$(JOBS)" ;;
+      *)
+        echo "  tests/$suite/run.sh has a --jobs path the Makefile cannot reach"
+        fail=1 ;;
+    esac
   fi
 done
 if ! grep -qF "${tab}l3build check \$(TEST)" "$makefile"; then

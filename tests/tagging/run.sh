@@ -95,17 +95,35 @@ export BIBINPUTS="$root/tests/bibliography:${BIBINPUTS:-}"
 # `--update' composes with a pattern, as the extraction runner's does: a
 # baseline regeneration should rewrite only the baselines the change was meant
 # to move.
+#
+# Fixture-group concurrency (issue #390) is opt-in through `--jobs N`, which
+# `make tagging JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
+# runner takes the serial path below and is the suite it has always been.
 fixture_filter=""
 list_only=0
+list_units_only=0
 update=0
-for arg in "$@"; do
-  case "$arg" in
-    --update) update=1 ;;
-    --list)   list_only=1 ;;
-    -*)       echo "unknown option: $arg" >&2; exit 2 ;;
-    *)        fixture_filter="$arg" ;;
+jobs=1
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --update) update=1; shift ;;
+    --list)   list_only=1; shift ;;
+    # The units the drivers would dispatch: exactly the selectable groups.
+    --list-units) list_units_only=1; shift ;;
+    --jobs)
+      [ "$#" -ge 2 ] || { echo "--jobs needs a value" >&2; exit 2; }
+      jobs="$2"; shift 2
+      ;;
+    --jobs=*) jobs="${1#--jobs=}"; shift ;;
+    -*)       echo "unknown option: $1" >&2; exit 2 ;;
+    *)        fixture_filter="$1"; shift ;;
   esac
 done
+
+case "$jobs" in
+  ''|*[!0-9]*) echo "--jobs takes a positive integer, got: $jobs" >&2; exit 2 ;;
+esac
+[ "$jobs" -ge 1 ] || { echo "--jobs takes a positive integer" >&2; exit 2; }
 
 # The five profiles driven by the shared loop, then the standalone groups in the
 # order they run. This array is the suite's fixture universe: `--list' prints it,
@@ -140,7 +158,10 @@ if [ "${#selected[@]}" -eq 0 ]; then
   exit 1
 fi
 
-if [ "$list_only" -eq 1 ]; then
+if [ "$list_only" -eq 1 ] || [ "$list_units_only" -eq 1 ]; then
+  # Identical lists on purpose: every unit this runner dispatches is one
+  # selectable group, so `--list-units` differing from `--list` would itself be
+  # the bug the lint's dispatch check exists to catch.
   printf '%s\n' "${selected[@]}"
   exit 0
 fi
@@ -1082,13 +1103,27 @@ check_biblatex_feasibility() {
   echo "  RECORDED: structure roles (report: $job-structure.txt)"
 }
 
-record_toolchain
+# --------------------------------------------------------------------------
+# The twelve units (issue #390).
+#
+# Each is a function that prints everything the serial runner printed for its
+# group and reports its verdict through its return status alone, because a
+# worker is a subshell and an assignment inside one dies with it.
+#
+# `local fail` shadows the global in every one of them, and that is what makes
+# this tractable rather than a rewrite: `record_failure` is called from 40 sites
+# across sixteen check_* helpers, and bash's dynamic scoping means its `fail=1`
+# lands on the nearest `fail` up the call stack — the unit's local. Measured on
+# bash 5.3 and on the macOS /bin/bash 3.2 this suite must run under. Not one of
+# those 40 sites changes, so not one of them can be missed; a missed site would
+# report a clean group, which is the failure this whole arrangement is against.
 
-for base in "${profiles[@]}"; do
-  group_selected "$base" || continue
+tagging_profile() {
+  local base="$1"
+  local fail=0
   echo "== $base =="
-  compile_fixture "$base.tex" "$base" || continue
-  compile_fixture "$base-untagged.tex" "$base-untagged" || continue
+  compile_fixture "$base.tex" "$base" || return 1
+  compile_fixture "$base-untagged.tex" "$base-untagged" || return 1
   check_structure "$base"
   check_two_page_furniture "$base"
   check_page_two_artifact_stream "$base"
@@ -1126,13 +1161,15 @@ for base in "${profiles[@]}"; do
   if [ "$have_verapdf" -eq 1 ]; then
     compile_fixture "$base-ua2.tex" "$base-ua2" && validate_ua2 "$base"
   fi
-done
+  return "$fail"
+}
 
 # The labelled contact line is a one-page header fixture, so it deliberately
 # sits outside the five-document loop above: that loop asserts two-page
 # continuation furniture, which this fixture must not have. It still runs as
 # part of the ordinary suite rather than as a separate manual step.
-if group_selected resume-contact-labels; then
+tagging_resume_contact_labels() {
+local fail=0
 echo "== resume-contact-labels =="
 if compile_fixture resume-contact-labels.tex resume-contact-labels; then
   check_contact_label_tagging resume-contact-labels
@@ -1143,7 +1180,8 @@ if compile_fixture resume-contact-labels.tex resume-contact-labels; then
       && validate_ua2 resume-contact-labels
   fi
 fi
-fi
+return "$fail"
+}
 
 # Entry metadata set inline (issue #230). Outside the five-document loop for the
 # same reason as the fixture above: it is a one-page document with no
@@ -1151,7 +1189,8 @@ fi
 # by tests/extraction; what only this suite can see is what `inline' does to the
 # tagged path, which is supposed to be nothing a consumer can tell apart from
 # `column' — one artifact per join, and the same logical text either way.
-if group_selected resume-entrymeta-inline; then
+tagging_resume_entrymeta_inline() {
+local fail=0
 echo "== resume-entrymeta-inline =="
 if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
   check_structure_text resume-entrymeta-inline
@@ -1166,13 +1205,15 @@ if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
       && validate_ua2 resume-entrymeta-inline
   fi
 fi
-fi
+return "$fail"
+}
 
 # Link decoration under `medium=screen' (issue #278). Outside the five-document
 # loop for the same reason as the two fixtures above: one page, no continuation
 # furniture. What only this suite can see is whether ulem's rebox pushed the
 # underlined anchor text out of the structure tree.
-if group_selected resume-linkdecoration; then
+tagging_resume_linkdecoration() {
+local fail=0
 echo "== resume-linkdecoration =="
 if compile_fixture resume-linkdecoration.tex resume-linkdecoration; then
   check_structure_text resume-linkdecoration
@@ -1184,13 +1225,15 @@ if compile_fixture resume-linkdecoration.tex resume-linkdecoration; then
       && validate_ua2 resume-linkdecoration
   fi
 fi
-fi
+return "$fail"
+}
 
 # The full recipient block (issue #302). Outside the loop because it is a
 # one-page fixture with no continuation furniture, and because the only thing it
 # is here to pin is the recipient block -- including the `\\' the user writes
 # inside recipient-address, which no other fixture sets.
-if group_selected letter-recipient-address; then
+tagging_letter_recipient_address() {
+local fail=0
 echo "== letter-recipient-address =="
 if compile_fixture letter-recipient-address.tex letter-recipient-address; then
   check_structure_text letter-recipient-address
@@ -1205,7 +1248,8 @@ if compile_fixture letter-recipient-address.tex letter-recipient-address; then
       && validate_ua2 letter-recipient-address
   fi
 fi
-fi
+return "$fail"
+}
 
 # The second heading level (issue #337). Outside the five-document loop for the
 # same reason as the fixtures above: one page, no continuation furniture.
@@ -1214,7 +1258,8 @@ fi
 # heading has no rule and no size of its own, so a subsection that emitted a
 # second /H2 -- or no heading element at all -- would look exactly right and
 # would still flatten the hierarchy for anything reading the structure tree.
-if group_selected cv-subsection; then
+tagging_cv_subsection() {
+local fail=0
 echo "== cv-subsection =="
 if compile_fixture cv-subsection.tex cv-subsection; then
   check_subsection_hierarchy cv-subsection
@@ -1225,29 +1270,116 @@ if compile_fixture cv-subsection.tex cv-subsection; then
       && validate_ua2 cv-subsection
   fi
 fi
-fi
+return "$fail"
+}
 
 # The DisplayDocTitle override sits outside the five-document loop for the same
 # reason: it is a one-page fixture with no continuation furniture, and it is the
 # only fixture whose preamble contradicts the package on purpose.
-if group_selected resume-displaydoctitle-off; then
+tagging_resume_displaydoctitle_off() {
+local fail=0
 echo "== resume-displaydoctitle-off =="
 if compile_fixture resume-displaydoctitle-off.tex resume-displaydoctitle-off; then
   check_display_doc_title_override resume-displaydoctitle-off
 fi
-fi
+return "$fail"
+}
 
 # The feasibility fixture is a selectable group like any other (issue #367). It
 # is the one group whose *only* path is behind a gate, so selecting it on a
 # machine without Biber runs nothing at all -- recorded below rather than left
 # to print as a pass.
-if group_selected biblatex-ua2; then
-  if [ "$have_biber" -eq 1 ]; then
-    echo
-    check_biblatex_feasibility
-  elif [ -n "$fixture_filter" ]; then
-    gated_out+=("biblatex-ua2 (biber or latexmk missing)")
+tagging_biblatex_ua2() {
+  local fail=0
+  echo
+  check_biblatex_feasibility
+  return "$fail"
+}
+
+# --------------------------------------------------------------------------
+# The unit list, and the two drivers.
+#
+# `gated_out` is decided here rather than inside the unit, and that matters: it
+# is a *global* the closing report reads, and a worker's assignment to it would
+# die with the subshell. The one group it can describe is the one whose only
+# path is behind a gate, and when that gate is shut there is no work to dispatch
+# anyway — so the fact is recorded in the parent and the unit simply is not
+# added. Every other global the report reads (`skipped`, and the tool probes
+# behind it) is settled before any unit runs.
+unit_names=()
+unit_cmds=()
+
+# The group-to-unit map, driven from `selected` rather than written out as a
+# second list of groups. That direction is the point: a name added to `groups`
+# without a unit here fails the run below instead of being listed by `--list`,
+# counted in the scope note, and quietly never executed — which is the same
+# class of bug as a filter that selects nothing, and just as silent.
+unit_for_group() {
+  case "$1" in
+    resume|cv|letter|academic-letter|statement)
+                                printf 'tagging_profile %s' "$1" ;;
+    resume-contact-labels)      printf 'tagging_resume_contact_labels' ;;
+    resume-entrymeta-inline)    printf 'tagging_resume_entrymeta_inline' ;;
+    resume-linkdecoration)      printf 'tagging_resume_linkdecoration' ;;
+    letter-recipient-address)   printf 'tagging_letter_recipient_address' ;;
+    cv-subsection)              printf 'tagging_cv_subsection' ;;
+    resume-displaydoctitle-off) printf 'tagging_resume_displaydoctitle_off' ;;
+    biblatex-ua2)               printf 'tagging_biblatex_ua2' ;;
+  esac
+}
+
+for group in ${selected[@]+"${selected[@]}"}; do
+  # The one group whose only path is behind a gate. Recorded here rather than
+  # inside the unit because `gated_out` is a global the closing report reads,
+  # and a worker's assignment to it would die with the subshell.
+  if [ "$group" = biblatex-ua2 ] && [ "$have_biber" -ne 1 ]; then
+    [ -n "$fixture_filter" ] \
+      && gated_out+=("biblatex-ua2 (biber or latexmk missing)")
+    continue
   fi
+  unit_cmd="$(unit_for_group "$group")"
+  if [ -z "$unit_cmd" ]; then
+    echo "INTERNAL: selectable group '$group' has no unit function." >&2
+    echo "  --list names it and no driver would run it, so the closing" >&2
+    echo "  line would report a clean suite having skipped it entirely." >&2
+    exit 2
+  fi
+  unit_names+=("$group")
+  unit_cmds+=("$unit_cmd")
+done
+
+record_toolchain
+
+if [ "$jobs" -eq 1 ]; then
+  for (( i = 0; i < ${#unit_names[@]}; i++ )); do
+    eval "${unit_cmds[$i]}" || fail=1
+  done
+else
+  . "$root/tests/lib/fanout.sh"
+  scratch="$root/build/fanout/tagging"
+  rm -rf "$scratch"
+  mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
+
+  fanout_reset
+  for (( i = 0; i < ${#unit_names[@]}; i++ )); do
+    fanout_add "${unit_names[$i]}" "${unit_cmds[$i]}" || exit 2
+  done
+
+  echo "fixture-group concurrency: $jobs at a time (the gate is the serial run)"
+  # Required before fan-out, and this suite is where it bites hardest: a
+  # nullfont run still produces a structure tree, still extracts, and still
+  # validates — it would pass every gate below having typeset nothing.
+  fanout_warm_fonts "$scratch" || exit 1
+  echo
+  fanout_run "$jobs" "$scratch"
+  fanout_gather "$scratch"
+  fanout_replay "$scratch"
+  fanout_account "fixture groups" || fail=1
+  for (( i = 0; i < ${#unit_names[@]}; i++ )); do
+    case "${fanout_states[$i]}" in
+      FAILED*) fail=1 ;;
+    esac
+  done
 fi
 
 echo

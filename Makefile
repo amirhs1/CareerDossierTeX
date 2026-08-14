@@ -41,6 +41,9 @@
 #   make extract-test FIXTURE=statement
 #   make tagging    FIXTURE=cv-subsection     one tagged-PDF fixture group
 #
+# `smoke`, `layout`, and `tagging` also take JOBS=N, which composes with
+# FIXTURE; see "Fanning out inside a suite" below.
+#
 # The two spellings are not interchangeable, which is why they are not one name.
 # `TEST` is passed through to `l3build check <name>`, which takes an exact test
 # name. `FIXTURE` is a shell glob matched anywhere in a fixture's basename, so a
@@ -75,6 +78,25 @@
 # repository's characteristic failure. It is not `make -j`: GNU make 3.81, which
 # is what macOS ships, has no `--output-sync`, so under `-j` the eleven suites
 # interleave and "which suite failed" stops being answerable.
+#
+# Fanning out inside a suite (issue #390). `smoke`, `layout`, and `tagging`
+# additionally take JOBS=N, which runs that many of their own fixtures at once:
+#
+#   make smoke JOBS=4           four fixtures in flight
+#   make layout JOBS=8 FIXTURE='resume-*'
+#
+# With no JOBS each runs exactly what it ran before, in the same order, with
+# byte-identical output — so `check` and CI are untouched. The shared dispatcher
+# is tests/lib/fanout.sh; the assertion that earns it is that a fixture leaving
+# no verdict fails the run by name rather than shrinking the denominator.
+#
+# The two layers multiply, so `check-parallel` pins the inner one. Every target
+# it dispatches is given an explicit JOBS, defaulting to 1, because a
+# command-line JOBS lands in MAKEFLAGS and every sub-make would otherwise
+# inherit it — four targets each fanning out four fixtures being sixteen
+# LuaLaTeX processes nobody asked for. Raise it deliberately:
+#
+#   make check-parallel JOBS=4 INNER_JOBS=2    process budget 4 x 2 = 8
 #
 # Run `make help` for the target list.
 
@@ -151,7 +173,8 @@ check-targets:
 	@printf '%s\n' $(CHECK_TARGETS)
 
 check-parallel: ## Opt-in: check's targets concurrently, JOBS=N (the gate is still serial check)
-	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS))
+	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS)) \
+	  $(if $(INNER_JOBS),--inner-jobs $(INNER_JOBS))
 
 test: check ## Alias for check
 
@@ -163,11 +186,11 @@ lint: ## Static lint: option values, the fixture-selection contract, and the che
 regression: ## Module regression suite (l3build check); TEST=<name> runs one test
 	l3build check $(TEST)
 
-smoke: ## Supported builds and required failures; FIXTURE=<pattern> scopes it
-	tests/smoke/run.sh "$(FIXTURE)"
+smoke: ## Supported builds and required failures; FIXTURE=<pattern> scopes it, JOBS=N fans out
+	tests/smoke/run.sh $(if $(JOBS),--jobs $(JOBS)) "$(FIXTURE)"
 
-layout: ## Layout-stress fixtures; FIXTURE=<pattern> scopes it
-	tests/layout/run.sh "$(FIXTURE)"
+layout: ## Layout-stress fixtures; FIXTURE=<pattern> scopes it, JOBS=N fans out
+	tests/layout/run.sh $(if $(JOBS),--jobs $(JOBS)) "$(FIXTURE)"
 
 review-page-two: ## Render five-family and all statement page-two reviews
 	tests/layout/render-page-two.sh
@@ -205,8 +228,8 @@ metadata: ## Default-path PDF metadata (/Lang) fixtures
 annotations: ## Link-annotation action types (/S/URI, never /S/GoToR)
 	tests/annotations/run.sh
 
-tagging: ## Opt-in tagged-PDF structure fixtures; FIXTURE=<pattern> scopes it
-	tests/tagging/run.sh "$(FIXTURE)"
+tagging: ## Opt-in tagged-PDF structure fixtures; FIXTURE=<pattern> scopes it, JOBS=N fans out
+	tests/tagging/run.sh $(if $(JOBS),--jobs $(JOBS)) "$(FIXTURE)"
 
 clean: ## Remove generated documents, logs, and the l3build sandbox
 	-@l3build clean >/dev/null 2>&1

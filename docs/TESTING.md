@@ -895,8 +895,20 @@ So roughly **2.1×**, saving about four minutes. Four honest bounds on that:
    time is the longest single target plus contention, not the sum divided by
    `JOBS`. `smoke` (124 s), `tagging` (116 s), and `layout` (114 s) dominate,
    while `lint` (2 s), `annotations` (5 s), and `metadata` (8 s) are finished
-   before the long ones are a third done. More than about four workers buys
-   almost nothing.
+   before the long ones are a third done.
+
+   How much more than four workers buys was measured on 2026-08-13, when #390
+   needed to know whether cheaper scheduling would do its job for it: `JOBS=8`
+   ran in **157 s** against `JOBS=4`'s 206 s, a further 24%, both from a clean
+   tree so that neither run inherited an up-to-date `examples`. The reason is
+   dispatch order, not core count — the eleven targets are dispatched in
+   `Makefile` order and `tagging`, the third-longest, sits tenth, so at four
+   slots it cannot start until t≈85 s and cannot finish before t≈204 s. That
+   models the measured 206 s almost exactly. At eight slots every target starts
+   at once and the makespan collapses to the longest one.
+
+   So the target-level floor is the longest single target, and only fanning out
+   *inside* it goes lower. That is what the next section does.
 2. **It is the smallest of the four costs of a change.** Reading the canonical
    sources, following the procedure, and late rework each cost more than compute
    does; those are addressed by the reading map, the batched metadata path, and
@@ -946,8 +958,107 @@ anything LaTeX-specific, and it is worth knowing that the LaTeX toolchain makes
 it harder than most: `l3build` has no parallel mode at all, and the two failures
 above are both global-state hazards — a per-user font cache and a per-user
 unpacking cache — of a kind a single-user, single-run toolchain accumulates
-freely. Parallelism *inside* a suite would be the larger prize and the larger
-risk; it is deliberately not attempted here.
+freely.
+
+### Fanning out inside a suite
+
+`make smoke JOBS=N`, `make layout JOBS=N`, and `make tagging JOBS=N` run that
+many of the suite's own fixtures at once (issue #390). `CONTRIBUTING.md`
+"Running one suite's fixtures concurrently" is canonical for how to invoke it;
+this section is what it does and why it is safe to believe.
+
+#### What is different from the target level
+
+The section above parallelised *processes that already reported their own
+verdicts*: a dispatched `make layout` either exits 0 or does not, and the driver
+only had to count. Inside a runner there is no such boundary. Every assertion
+wrote into shell state the loop accumulated — `fail=1`, counters, `failed`
+arrays — and **shell state does not survive a subshell.** Getting that wrong
+does not produce a crash. It produces a suite that compiles 54 fixtures, loses
+53 verdicts, and reports a clean run: this repository's characteristic failure,
+one layer further in.
+
+So the unit is a *function* that prints what the serial runner printed and
+reports through its **return status alone**. The serial driver calls those
+functions in order; the parallel driver dispatches them and replays their
+captured output in the same order. Identical output between the two paths is
+therefore structural rather than something a test has to keep re-checking — and
+it is checked anyway, by diffing a full run against the previous commit.
+
+Two things made this a smaller change than it looks:
+
+- **`local fail` shadows the global.** `layout` has eighteen `fail=1` sites and
+  `tagging` has forty, reached through sixteen `check_*` helpers. Bash scopes
+  dynamically, so a helper's `fail=1` lands on the nearest `fail` up the call
+  stack — the unit's local. Measured on bash 5.3 and on the macOS `/bin/bash`
+  3.2 these suites must run under. Not one of those sites changed, so not one of
+  them could be missed, and a missed site reports a clean fixture.
+- **An `EXIT` trap does not fire in a background subshell.** `layout`'s
+  `control_dir` and `tagging`'s `work` are removed by traps, and a trap firing
+  per worker would delete them mid-run. Measured on both bash versions: it fires
+  once, in the parent, after `wait`.
+
+#### What it asserts beyond the fixtures
+
+- **Accounting.** Every dispatched fixture must leave a result file, and the run
+  fails when the count of results is not the count dispatched, naming the ones
+  that produced none. A fixture whose worker died leaves no failure behind, only
+  an absence, and an absence reads exactly like a clean run unless something is
+  counting.
+- **One fixture universe.** `tests/lint/run-fixture-filter.sh` asserts that each
+  runner's `--list-units` — the units its parallel driver would dispatch —
+  covers its `--list` exactly, and that the `Makefile` can actually reach the
+  `--jobs` path. A runner whose fan-out silently dispatched a subset would pass
+  every other check and then report a clean run of something other than the
+  suite. This compiles nothing and runs in the `lint` slot.
+- **The font cache is warmed** before any fixture is dispatched, and the warm-up
+  build must prove it typeset real glyphs. This bites hardest in `tagging`: a
+  `nullfont` run still produces a structure tree, still extracts, and still
+  validates — it would pass every gate having typeset nothing.
+
+The dispatcher, the throttle, the ordered replay, and the accounting assertion
+are one implementation, `tests/lib/fanout.sh`, shared with
+`tests/check-parallel.sh` rather than copied into each runner — a second copy of
+a check against a silent failure is how one of them stops being made. Its
+committed negative controls are `check-parallel`'s existing five, which now
+drive the shared code: a clean batch accounts for every member; one failing
+member fails by name with its output replayed; and **a removed result file is an
+accounting failure rather than a pass.**
+
+#### What it is worth, and what it costs
+
+Measured on the maintainer's machine, 2026-08-13, each suite against the same
+commit and its immediate parent:
+
+| Suite | serial | `JOBS=4` | `JOBS=8` |
+|---|---|---|---|
+| `smoke` | 108 s | 40 s (2.7×) | 31 s (3.4×) |
+| `layout` | 95 s | 35 s (2.7×) | 26 s (3.6×) |
+| `tagging` | 100 s | 36 s (2.8×) | 31 s (3.2×) |
+
+Each was also run against the immediately preceding commit and its serial output
+diffed: identical in all three, apart from the `time` line, and — for `tagging` —
+the timestamp and repository path its own toolchain record carries.
+
+`tagging` scales despite being the suite with the most non-LaTeX work, and its
+serial baseline already ran at 118% CPU because veraPDF's JVM is itself
+threaded. It needed no biber-cache isolation: only one of its twelve groups
+invokes biber, so no two of its own workers can race there.
+
+Three bounds, in the spirit of the ones above:
+
+1. **It does not make the gate faster.** `make check` has no `JOBS` and stays
+   serial, deliberately. The saving lands on `check-parallel` and on a scoped
+   development loop — a run you make *in addition to* the gate you push behind.
+2. **The two layers multiply.** `check-parallel JOBS=4` with each target fanning
+   out 4 is sixteen LuaLaTeX processes. Left alone that would happen silently: a
+   command-line `JOBS` lands in `MAKEFLAGS` and every dispatched sub-make would
+   inherit it. So `check-parallel` passes every target an explicit `JOBS`,
+   defaulting to 1, and the product is raised only by `INNER_JOBS=N`, which
+   prints the budget it is about to use.
+3. **Contention is real above four.** The `JOBS=8` columns cost roughly a third
+   more CPU-seconds than the `JOBS=4` ones for their extra wall-clock saving,
+   because the fixtures start competing for the same cores.
 
 ### Module regression suite (l3build)
 
