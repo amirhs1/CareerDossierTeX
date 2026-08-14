@@ -452,7 +452,7 @@ different acts: an annotation placed outside the entries — a note under the
 version heading naming them — leaves every entry's own text, category, order,
 and citations intact, so it records how a later rule relates to a shipped
 section without making the section less accurate. `[0.7.0]` carries one such
-note, marking the four entries a later `CHANGELOG.md` scope boundary would not
+note, marking the five entries a later `CHANGELOG.md` scope boundary would not
 have produced (#260, #410); `CONTRIBUTING.md` states that boundary. And
 `careerdossier-tokens.sty`, `careerdossier-components.sty`, and the classes
 state each rule in a comment at the point of implementation, where someone
