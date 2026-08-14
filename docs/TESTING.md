@@ -798,6 +798,38 @@ next full run.
 The `lint` target runs a third script in the same slot:
 
 ```bash
+tests/lint/run-agents-references.sh
+```
+
+`AGENTS.md` "Build and test" reproduces none of this file. It points here
+instead, naming sections of `CONTRIBUTING.md` and `docs/TESTING.md` in
+quotation marks — the right shape, and a hand-maintained index of another
+file's headings. This script is what keeps the two in step, asserting in both
+directions: every section name `AGENTS.md` quotes exists as a heading in one of
+those two files, and every `###` section of `CONTRIBUTING.md`'s "Local builds"
+chapter is named in `AGENTS.md`. The first catches a rename on the far side;
+the second catches an addition, which is the one that has actually happened.
+
+It was written because that index drifted twice in two days and neither review
+caught it (#400). `check-parallel` arrived in PR #389 and per-suite `JOBS=` in
+PR #397, each adding a section to the running chapter; `AGENTS.md` went on
+naming two of what were by then four, so the always-loaded core pointed away
+from the entry points that week of work had just built. Writing the lint found
+a third defect nobody had reported: `AGENTS.md` cited "Test-driven where
+practical", a truncated form of this file's actual heading, which resolves for
+a human reader and not for anything mechanical.
+
+The reverse direction is deliberately **not** asserted for `docs/TESTING.md`.
+`AGENTS.md` names six of its sections and ignores the rest on purpose, because
+the reading map exists to make reading selective; requiring every heading here
+to be named would force that index to grow into the copy the lint exists to
+prevent. One constraint it does impose, on one short section: every quoted
+string in "Build and test" is treated as a section name, so a phrase quoted
+there that is not a heading fails the lint by name and should be rephrased.
+
+The `lint` target runs a fourth script in the same slot:
+
+```bash
 tests/check-parallel.sh --self-test
 ```
 
