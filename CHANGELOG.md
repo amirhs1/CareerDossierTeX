@@ -141,11 +141,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   forks nothing and opens no pipe; the two genuine regular expressions use a
   here-string and read `grep`'s status three ways. Captures yield an explicit
   unavailable value rather than an empty string, so a failed extraction can no
-  longer read as an empty page. Forty-one guard sites across `layout` (12),
+  longer read as an empty page. Forty-three guard sites across `layout` (14),
   `tagging` (21), `smoke` (2), `extraction` (2), and the two lint runners (4)
   were converted. [#398] counted 32 in the four suites it named; the shape also
-  covered two `pdfinfo` media-box checks, a club/widow negative control, and the
-  lint runners, and all of them are the same defect.
+  covered two `pdfinfo` media-box checks, a club/widow negative control, two
+  count guards, and the lint runners, and all of them are the same defect.
+
+  Two of those were the same defect arriving as **arithmetic**, and were silent
+  passes rather than noisy failures: the page-one running-label count and the
+  orphaned-bullet count read `grep -Fc … || true`, which answers `0` for text
+  that was never extracted — and `0` is the passing value for both, one testing
+  `-ne 0` and the other `-eq 1`. So a page the runner could not read reported a
+  clean result. `text_count_lines` and `text_count_matches` return a count or an
+  explicit unknown, and the ratchet now covers `| grep -c` as well as
+  `| grep -q`. A count that is genuinely safe is exempted at the site with a
+  `# guard-ok: <reason>` marker that must carry a reason and shields only the
+  block beneath it.
 
   No mechanism is claimed. Three candidates — a `grep -q` SIGPIPE race under
   `pipefail`, `pdftotext` failing under concurrency, and the pipeline failing

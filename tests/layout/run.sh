@@ -394,8 +394,17 @@ layout_fixture() {
         fi
       fi
       if [ "$pages" -gt 1 ] && [ "$n" -eq 1 ]; then
-        label_count="$(printf '%s\n' "$page_text" | grep -Fc "$furniture_label" || true)"
-        if [ "$label_count" -ne "$page_one_label_count" ]; then
+        # Counted with the third state, because 0 is this check's *passing*
+        # value: `grep -Fc` over text that was never extracted also answers 0,
+        # so the old spelling reported a clean page one for a page it had not
+        # read (issue #398).
+        label_count="$(text_count_lines "$page_text" "$furniture_label")"
+        state=$?
+        if [ "$state" -ne 0 ]; then
+          echo "  UNCHECKABLE PAGE-ONE RUNNING LABEL count: no page text, or no"
+          echo "    furniture label for $base; nothing was asserted."
+          furniture_fail=1
+        elif [ "$label_count" -ne "$page_one_label_count" ]; then
           echo "  UNEXPECTED PAGE-ONE RUNNING LABEL count: $label_count"
           furniture_fail=1
         fi
@@ -466,9 +475,17 @@ EOF
           *)         item_pattern='^•' ;;
         esac
         for (( n = 1; n <= pages; n++ )); do
-          items="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
-                   | sed '/^\f/d' | grep -c "$item_pattern" || true)"
-          if [ "$items" -eq 1 ]; then
+          # `-eq 1` is the failing case, so every other count passes — including
+          # the 0 that an unextracted page produces. Counted with the third
+          # state so "no page text" cannot report "no orphaned bullet" (#398).
+          page_text="$(text_page "$base.pdf" "$n")"
+          items="$(text_count_matches "$page_text" "$item_pattern")"
+          state=$?
+          if [ "$state" -ne 0 ]; then
+            echo "  UNCHECKABLE ORPHANED BULLET: page $n of $base yielded no"
+            echo "    text, so its item count was never taken."
+            keep_fail=1
+          elif [ "$items" -eq 1 ]; then
             echo "  ORPHANED BULLET: page $n carries exactly one item of the split list"
             keep_fail=1
           fi
@@ -583,6 +600,8 @@ EOF
   #     to 54% purely because their source says so. A threshold that counted
   #     them would fail five fixtures for behaving exactly as written.
   fill_records="$(awk -f "$here/page-fill.awk" "$base.log")"
+  # guard-ok: compared against $pages, derived independently from the log, so a
+  # parse that finds nothing reports 0 against a non-zero page count and fails.
   fill_pages="$(printf '%s\n' "$fill_records" | grep -c '.' || true)"
   if [ "$fill_pages" -ne "$pages" ]; then
     echo "  PAGE-FILL PARSE MISMATCH: $fill_pages record(s) for $pages page(s)."

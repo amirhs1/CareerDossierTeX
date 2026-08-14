@@ -218,6 +218,8 @@ $ondisk_sorted
 EOF
       fail=1
     else
+      # guard-ok: display only. This count is printed, never compared, and the
+      # assertion it accompanies was already made by the string equality above.
       n_all="$(printf '%s\n' "$listed" | grep -c . || true)"
       echo "  --list names all $n_all fixtures and no others"
     fi
@@ -228,6 +230,9 @@ EOF
   #    would still "work" for a developer and would still cost the full suite.
   subset="$("$runner" --list "$pattern")"
   rc=$?
+  # guard-ok: a zero is the explicit failure branch below, not the passing one —
+  # `n_subset -eq 0` is reported as SELECTED NOTHING, and a zero `n_all` makes
+  # the `-ge` comparison true and is reported as SELECTED ALL. Both fail loudly.
   n_subset="$(printf '%s\n' "$subset" | grep -c . || true)"
   n_all="$(printf '%s\n' "$listed" | grep -c . || true)"
   if [ "$rc" -ne 0 ]; then

@@ -153,6 +153,62 @@ text_matches() {
   return 2
 }
 
+# text_count_lines <text> <needle>
+#
+# Prints the number of lines containing <needle>, `grep -Fc` semantics, and
+# returns 0. Prints nothing and returns 2 when the count cannot be taken.
+#
+# A count needs the third state more than a predicate does, not less, because
+# its unperformable answer is numerically indistinguishable from its commonest
+# *passing* answer. `printf … | grep -Fc "$needle" || true` over text that was
+# never extracted yields `0`, and every caller here compares against `0` or
+# tests `-eq 1`; so a check that could not run reported a clean page. That is
+# the hollow pass of #398 arriving as arithmetic instead of as a boolean, and
+# `|| true` is what makes it silent — it turns any pipeline failure into an
+# empty string, and `[ "" -ne 0 ]` errors to stderr and is read as false.
+#
+# The counterexample worth copying is tests/layout/run.sh's page-fill parse,
+# which is safe without this: it compares the record count against the page
+# count derived independently from the log, so "found nothing" cannot read as
+# "nothing to find". Where an independent expected value exists, use it.
+text_count_lines() {
+  [ "$#" -eq 2 ] || return 2
+  [ -n "$2" ] || return 2
+  text_is_unavailable "$1" && return 2
+  local count=0 line
+  while IFS= read -r line; do
+    case "$line" in
+      *"$2"*) count=$((count + 1)) ;;
+    esac
+  done <<< "$1"
+  printf '%s\n' "$count"
+  return 0
+}
+
+# text_count_matches <text> <ere>
+#
+# text_count_lines for the counts whose subject is a regular expression rather
+# than a string. Same contract: prints the count and returns 0, or prints
+# nothing and returns 2.
+#
+# `grep -c` answers 1 when the count is 0, which is a verdict about the text and
+# not an error, so only 2 and above mean the count could not be taken. That is
+# precisely the distinction `|| true` erased.
+text_count_matches() {
+  [ "$#" -eq 2 ] || return 2
+  [ -n "$2" ] || return 2
+  text_is_unavailable "$1" && return 2
+  local out rc
+  out="$(grep -Ec -- "$2" <<< "$1")"
+  rc="$?"
+  [ "$rc" -le 1 ] || return 2
+  case "$out" in
+    ''|*[!0-9]*) return 2 ;;
+  esac
+  printf '%s\n' "$out"
+  return 0
+}
+
 # text_extract <pdf> [pdftotext option...]
 #
 # The capture half. Prints the PDF's extracted text with form feeds removed, or

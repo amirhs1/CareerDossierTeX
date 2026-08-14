@@ -638,6 +638,8 @@ self_test() {
     cat "$scratch/$(slot_for 0 alpha).log" "$scratch/$(slot_for 1 beta).log" \
         "$scratch/$(slot_for 2 gamma).log" 2>/dev/null | grep . > "$reported"
     total="$(grep -c . "$reported")"
+    # guard-ok: asserted `-eq 3` below against a fixed expected value, so any
+    # miscount — including a zero from a pipeline that failed — fails control 4.
     distinct="$(sort -u "$reported" | grep -c .)"
     if [ "$total" -eq 3 ] && [ "$distinct" -eq 3 ]; then
       printf '  ok: three workers, three distinct PAR_TMPDIR values\n'

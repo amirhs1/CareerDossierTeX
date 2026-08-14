@@ -27,6 +27,8 @@ set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 fails=0
+scratch_dir="$root/build/text-guards-selftest"
+rm -rf "$scratch_dir"
 
 . "$root/tests/lib/text.sh"
 
@@ -230,7 +232,39 @@ else
   fails=$((fails + 1))
 fi
 
-printf '\n== control 6: no runner still asks the two-state question ==\n'
+printf '\n== control 6: a count answers three states too ==\n'
+# The hollow pass arriving as arithmetic. `grep -Fc` over text that was never
+# extracted answers 0, and 0 is the *passing* value for every count comparison
+# in this harness — `-ne 0` for the page-one label count, `-eq 1` for the
+# orphaned bullet. So a count owes the same third state a predicate does, and
+# the unavailable case is the one that used to read as a clean page.
+c6_fail=0
+counted="$(text_count_lines "$present_text" "Cover Letter")"
+[ "$?" -eq 0 ] && [ "$counted" = "1" ] || c6_fail=1
+counted="$(text_count_lines "$present_text" "Résumé")"
+[ "$?" -eq 0 ] && [ "$counted" = "0" ] || c6_fail=1
+text_count_lines "$unavailable" "Cover Letter" > /dev/null
+[ "$?" -eq 2 ] || c6_fail=1
+text_count_lines "$present_text" '' > /dev/null
+[ "$?" -eq 2 ] || c6_fail=1
+
+counted="$(text_count_matches "$present_text" '^Page [0-9]+ of [0-9]+$')"
+[ "$?" -eq 0 ] && [ "$counted" = "1" ] || c6_fail=1
+counted="$(text_count_matches "$present_text" '^nothing$')"
+[ "$?" -eq 0 ] && [ "$counted" = "0" ] || c6_fail=1
+text_count_matches "$unavailable" '^Page' > /dev/null
+[ "$?" -eq 2 ] || c6_fail=1
+
+if [ "$c6_fail" -eq 0 ]; then
+  printf '  ok: both counters return a count, a zero, and an unknown apart\n'
+else
+  printf '  FAIL: a counter conflated "could not count" with a count of zero.\n'
+  printf '        Zero is the passing value for every count guard here, so that\n'
+  printf '        conflation is a silent pass, not a noisy failure.\n'
+  fails=$((fails + 1))
+fi
+
+printf '\n== control 7: no runner still asks the two-state question ==\n'
 # The ratchet. Everything above is about the predicate being right; this is about
 # it being the one the runners use. A single reintroduced `... | grep -q` is one
 # more guard that cannot tell a failed check from a verdict, and no run would
@@ -240,25 +274,98 @@ printf '\n== control 6: no runner still asks the two-state question ==\n'
 # Scoped to the runners and the shared libraries, which is every script that
 # asserts on captured text. It is deliberately not scoped to a list of known
 # sites: a new runner with the old shape is exactly what this must catch.
+#
+# `-q` and `-c` both, because a count needs this more than a boolean does. A
+# guard reading `grep -Fc … || true` over text it never extracted gets 0, and 0
+# is the passing value for every such comparison here — the same hollow pass,
+# arriving as arithmetic. Two sites shipped that way and are fixed alongside
+# this widening.
+#
+# Some counts are legitimately safe — a count that is only printed, or one
+# compared against an independently derived expected value, cannot turn "could
+# not check" into a pass. Those say so at the site with a
+#
+#   # guard-ok: <reason>
+#
+# marker, rather than in an exemption list here, which would rot apart from the
+# code it describes. Two properties make the marker worth trusting: it must
+# carry a reason, so exempting a line costs an argument rather than a keyword;
+# and it shields only the contiguous run of code lines that follows it, ending
+# at the first blank line, so it cannot silently spread down a file.
+#
+# The scan is awk rather than grep because that "comment block immediately
+# above" relationship is not something a line-at-a-time filter can see.
 offenders="$(
-  cd "$root" \
-    && grep -nE '\|[[:space:]]*grep[[:space:]]+-[A-Za-z]*q' \
-         tests/*/run.sh tests/*/run-*.sh tests/lib/*.sh tests/check-parallel.sh \
-         2>/dev/null \
-    | grep -v '^[^:]*:[0-9]*:[[:space:]]*#' \
+  cd "$root" && awk '
+    FNR == 1 { shield = 0 }
+    /^[[:space:]]*#/ {
+      if ($0 ~ /guard-ok:[[:space:]]*[A-Za-z]/) shield = 1
+      next
+    }
+    /^[[:space:]]*$/ { shield = 0; next }
+    {
+      if ($0 ~ /\|[[:space:]]*grep[[:space:]]+-[A-Za-z]*[qc]/ \
+          && shield == 0 \
+          && $0 !~ /guard-ok:[[:space:]]*[A-Za-z]/)
+        printf "%s:%d:%s\n", FILENAME, FNR, $0
+    }
+  ' tests/*/run.sh tests/*/run-*.sh tests/lib/*.sh tests/check-parallel.sh \
+      2>/dev/null \
     | grep -v '^tests/lint/run-text-guards\.sh:'
 )"
-# This script is the one exemption, and it is not a carve-out for convenience:
-# control 1 above must hold the old spelling in order to demonstrate that it
-# fails. Nothing else here may.
+# This script is the one blanket exemption, and it is not a carve-out for
+# convenience: control 1 above must hold the old spelling in order to
+# demonstrate that it fails. Nothing else here may.
 if [ -z "$offenders" ]; then
-  printf '  ok: no `... | grep -q` guard remains in the runners or libraries\n'
+  printf '  ok: no unmarked `| grep -q` or `| grep -c` guard remains\n'
 else
   printf '  FAIL: the two-state pipeline guard is back:\n'
   printf '%s\n' "$offenders" | sed 's/^/    /'
-  printf '        Use text_contains / text_contains_line / text_matches from\n'
-  printf '        tests/lib/text.sh, which answer "could not check" apart from\n'
-  printf '        "absent". See issue #398.\n'
+  printf '        Use text_contains / text_contains_line / text_matches, or\n'
+  printf '        text_count_lines / text_count_matches, from tests/lib/text.sh:\n'
+  printf '        they answer "could not check" apart from "absent" and apart\n'
+  printf '        from a count of zero. If the site is genuinely safe, say why\n'
+  printf '        in a `# guard-ok: <reason>` comment above it. See issue #398.\n'
+  fails=$((fails + 1))
+fi
+
+printf '\n== control 8: the guard-ok marker must cost an argument ==\n'
+# An exemption keyword with no reason is how a ratchet becomes a formality. The
+# scanner is re-run over a synthetic file carrying three shapes: a bare marker,
+# a marker with a reason, and an offence two blank-separated lines below a
+# marker. Only the middle one may be shielded.
+marker_probe="$scratch_dir/guard-ok-probe.sh"
+mkdir -p "$scratch_dir"
+cat > "$marker_probe" <<'PROBE'
+# guard-ok:
+bare="$(printf '%s\n' "$x" | grep -c .)"
+# guard-ok: a stated reason
+reasoned="$(printf '%s\n' "$x" | grep -c .)"
+# guard-ok: a stated reason
+
+far="$(printf '%s\n' "$x" | grep -c .)"
+PROBE
+probe_out="$(awk '
+  FNR == 1 { shield = 0 }
+  /^[[:space:]]*#/ {
+    if ($0 ~ /guard-ok:[[:space:]]*[A-Za-z]/) shield = 1
+    next
+  }
+  /^[[:space:]]*$/ { shield = 0; next }
+  {
+    if ($0 ~ /\|[[:space:]]*grep[[:space:]]+-[A-Za-z]*[qc]/ \
+        && shield == 0 \
+        && $0 !~ /guard-ok:[[:space:]]*[A-Za-z]/)
+      printf "%d\n", FNR
+  }
+' "$marker_probe" | tr '\n' ' ')"
+if [ "$probe_out" = "2 7 " ]; then
+  printf '  ok: a bare marker shields nothing, and a reason shields one block\n'
+else
+  printf '  FAIL: the marker rule flagged lines [%s], expected [2 7 ].\n' "$probe_out"
+  printf '        Line 2 is a marker with no reason and line 7 is past a blank\n'
+  printf '        line; both must still be caught, or `# guard-ok:` becomes a\n'
+  printf '        keyword that silences the ratchet for free.\n'
   fails=$((fails + 1))
 fi
 

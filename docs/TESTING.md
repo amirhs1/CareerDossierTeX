@@ -874,7 +874,23 @@ So the contract, in `tests/lib/text.sh`, is three-valued:
 
 `text_contains`, `text_contains_line`, and `text_matches` answer it; `text_page`
 and `text_extract` capture text, or yield `CDTEXT_UNAVAILABLE` when the
-extraction could not be performed. A caller must treat `2` as a failure of its
+extraction could not be performed.
+
+**A count owes the same three states, and needs them more.** `text_count_lines`
+and `text_count_matches` print a count and return `0`, or print nothing and
+return `2`. The reason is arithmetic rather than logic: `grep -Fc … || true`
+over text that was never extracted answers `0`, and `0` is the *passing* value
+for every count guard here — the page-one label count tests `-ne 0`, the
+orphaned-bullet check tests `-eq 1`. So the unperformable answer was
+numerically identical to a clean page, and `|| true` is what made it silent, by
+turning any pipeline failure into an empty string that `[ "" -ne 0 ]` reports as
+false. Two guards shipped that way.
+
+The counterexample is `tests/layout/run.sh`'s page-fill parse, which is safe
+without any of this: it compares its record count against the page count derived
+independently from the log, so "found nothing" cannot read as "nothing to find".
+Where an independent expected value exists, comparing against it is the stronger
+construction. A caller must treat `2` as a failure of its
 own, naming that the check could not run — never as either verdict. Each runner
 spells that in its own idiom, because what it does with a failure differs
 (`tests/tagging/run.sh` has `require_text`/`forbid_text` around
@@ -907,11 +923,28 @@ needles containing glob metacharacters, an empty needle refusing to pass, and a
 failed extraction marking itself unavailable rather than reading as an empty
 page.
 
-Its last control is a ratchet: no `... | grep -q` guard may reappear in a runner
-or a shared library. It is scoped to the shape rather than to a list of known
-sites, so a *new* runner with the old spelling is caught too. The one exemption
-is the control script itself, which must hold the old spelling in order to
-demonstrate that it fails.
+Its last two controls are a ratchet: no `... | grep -q` **or** `... | grep -c`
+guard may reappear in a runner or a shared library. It is scoped to the shape
+rather than to a list of known sites, so a *new* runner with the old spelling is
+caught too. The one blanket exemption is the control script itself, which must
+hold the old spelling in order to demonstrate that it fails.
+
+A count that is genuinely safe — one that is only printed, or one compared
+against an independently derived expected value — is exempted at the site:
+
+```sh
+# guard-ok: compared against $pages, derived independently from the log, so a
+# parse that finds nothing reports 0 against a non-zero page count and fails.
+fill_pages="$(printf '%s\n' "$fill_records" | grep -c '.' || true)"
+```
+
+The marker lives next to the code rather than in a list, which would rot apart
+from what it describes, and two properties make it worth trusting: it must carry
+a reason, so an exemption costs an argument rather than a keyword; and it shields
+only the contiguous run of code lines beneath it, ending at the first blank line,
+so it cannot spread down a file. The last control asserts both by re-running the
+scanner over a synthetic file containing a bare marker, a reasoned one, and an
+offence past a blank line.
 
 ### The parallel run
 
