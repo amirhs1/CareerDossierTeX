@@ -18,3 +18,8 @@ Work, and are named `lintfixture-*` rather than `careerdossier-*` so that
 
 Each fixture keeps a second, complete option alongside the defective one, so the
 lint has to single out the right key rather than condemn the whole file.
+
+The `version/` subdirectory holds a separate set, for
+`tests/lint/run-version-declarations.sh` (issue #258); see its own `README.md`.
+Those are whole trees rather than single files, because that lint's subject is a
+manifest and the sources it lists taken together.

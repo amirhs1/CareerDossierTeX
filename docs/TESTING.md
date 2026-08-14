@@ -768,6 +768,52 @@ not part of the Work.
 The `lint` target runs a second script in the same slot:
 
 ```bash
+tests/lint/run-version-declarations.sh
+```
+
+It asserts that the Work speaks with one voice about its own version. Every
+file of the Work identifies itself once —
+
+```latex
+\ProvidesExplPackage {careerdossier-base} {2026-08-12} {0.8.0}
+```
+
+— ten times, bumped by hand, and until this script nothing compared the ten.
+That is not an oversight of the baselines: no committed `.tlg` records a version
+or a date, deliberately, because a baseline that pinned one would churn on every
+release. The consequence is that a bump missing one file passes every suite and
+ships. LaTeX writes both values into the `.log` without complaint, so a
+distribution whose `careerdossier-resume.cls` says `0.8.0` while its
+`careerdossier-theme.sty` says `0.7.0` contains nothing wrong enough to fail.
+
+Four checks, over `manifest.txt` and the root sources together: every `.sty`
+and `.cls` the manifest lists under "The Work" exists and declares itself; every
+declaration parses into a `{date} {version}` pair; all the pairs are identical;
+and the declaring files and the manifest's list are the same set. The last is
+here because it is the same class of drift and costs nothing once both lists are
+open — and `manifest.txt` is what defines the Work for the LPPL, so a source
+missing from it is a licensing defect before it is a packaging one.
+
+The reference pair is the commonest one, not the first: a bump that missed one
+file should name that file, not the nine that are right. A failure prints the
+offending file and both pairs.
+
+Three things it deliberately does not check: the version against the latest git
+tag, and the declarations against `CHANGELOG.md` and against `docs/MIGRATION.md`.
+Each legitimately disagrees on `main` between releases, since the declarations
+lead or trail the tag and the headings move at a different moment in the release
+sequence. Consistency among the ten is the property that holds at every commit,
+so it is the only one asserted.
+
+The fixtures under `tests/lint/fixtures/version/` are this lint's own tests —
+seven miniature Works, one consistent and one per way of being inconsistent —
+and the runner checks itself against them every run. Each carries three sources
+with the defect in the third, which is what exercises the frequency rule: with
+two files a mismatch is a tie and either could be reported as the wrong one.
+
+The `lint` target runs a third script in the same slot:
+
+```bash
 tests/lint/run-fixture-filter.sh
 ```
 
@@ -795,7 +841,7 @@ fixture list is a hand-written `cases` array rather than a glob: a `cases` entry
 with no fixture, or a fixture no entry names, is caught here rather than at the
 next full run.
 
-The `lint` target runs a third script in the same slot:
+The `lint` target runs a fourth script in the same slot:
 
 ```bash
 tests/lint/run-agents-references.sh
