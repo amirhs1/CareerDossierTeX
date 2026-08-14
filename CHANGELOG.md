@@ -120,6 +120,52 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A test guard that cannot perform its check now fails saying so, instead of
+  reporting a verdict about a document it never read. ([#398])
+
+  Under `make check JOBS=8` the runners reported a running header MISSING from a
+  page that carried it on line 1, that `pdftotext` had extracted correctly and
+  exited 0 on, and that the runner's own re-extraction found. Every such guard
+  was spelled `printf '%s\n' "$text" | grep -Fq "$needle"`, and a pipeline that
+  returns non-zero for any reason other than "no match" is indistinguishable
+  from absent text.
+
+  The half that mattered had not been observed. Each `medium=screen` branch
+  inverts the same test — the furniture must *not* be there — so whatever made
+  the pipeline spuriously non-zero made that branch spuriously false, and a real
+  violation would pass in silence.
+
+  `tests/lib/text.sh` replaces the two-state question with a three-state one:
+  present, absent, and **could not be checked**, the last of which every caller
+  must fail on by name. Fixed-string matching now runs in the shell, where it
+  forks nothing and opens no pipe; the two genuine regular expressions use a
+  here-string and read `grep`'s status three ways. Captures yield an explicit
+  unavailable value rather than an empty string, so a failed extraction can no
+  longer read as an empty page. Forty-one guard sites across `layout` (12),
+  `tagging` (21), `smoke` (2), `extraction` (2), and the two lint runners (4)
+  were converted. [#398] counted 32 in the four suites it named; the shape also
+  covered two `pdfinfo` media-box checks, a club/widow negative control, and the
+  lint runners, and all of them are the same defect.
+
+  No mechanism is claimed. Three candidates — a `grep -q` SIGPIPE race under
+  `pipefail`, `pdftotext` failing under concurrency, and the pipeline failing
+  under fork pressure — were tested over 2000, 640, and 7200 trials in [#398]
+  and none reproduced, so the fix removes the class rather than repairing a
+  cause. `tests/lint/run-text-guards.sh` is the committed control: it drives
+  both spellings over the same present text with `PATH` emptied, which is the
+  unperformable state with no load at all, and the old form reports MISSING
+  where the new one does not. Its last control is a ratchet that fails if the
+  `... | grep -q` shape reappears in any runner or shared library.
+
+  `JOBS=8` is left non-default. It was 20% faster and failed four of eight runs
+  on this defect; the default carries its own measurement campaign, not this
+  one's.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed. Guard *outcomes* are unchanged for every
+  document that extracts — what changed is what happens when extraction or
+  matching cannot be performed, which used to be a verdict and is now a failure.
+
 - The local suites run under a restricted Bash sandbox, and `make
   check-parallel` no longer fails at random from a cold biber cache. ([#392])
 

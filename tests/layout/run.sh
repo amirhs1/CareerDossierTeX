@@ -56,6 +56,11 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 cd "$here"
 
+# Extracted-text guards that answer "could not check" apart from "absent"
+# (issue #398). Sourced unconditionally: every furniture, contact, and
+# keep-together assertion below goes through it, fanned out or not.
+. "$root/tests/lib/text.sh"
+
 # Fixture selection (issue #359).
 #
 # With no pattern every fixture runs and nothing about this suite has changed;
@@ -180,6 +185,10 @@ layout_fixture() {
   local tex="$1"
   local fail=0
   local base="${tex%.tex}"
+  # Guard state, kept local for the same reason `fail` is: a fan-out worker is
+  # a subshell, but the serial path runs every fixture in one shell and a stale
+  # value carried between them would be read as a verdict.
+  local state=0 paper_re paper_label paper_wrong paper_info keep_unchecked=0
   echo "== $tex =="
 
   # `\tracingpages=1` goes on the command line rather than into a rebuild of
@@ -260,30 +269,42 @@ layout_fixture() {
 
   # Every *-a4-* wrapper must produce an actual ISO A4 media box. This catches
   # a class accepting the public option but silently retaining Letter paper.
+  #
+  # pdfinfo's output is captured before it is matched (issue #398). Piped
+  # straight into `grep -Eq`, grep's early exit hands pdfinfo a SIGPIPE and
+  # `pipefail` turns a match into a non-zero pipeline — reported here as the
+  # wrong paper size, about a document with the right one.
   case "$base" in
     *-a4-*)
-      if ! command -v pdfinfo >/dev/null 2>&1; then
-        echo "  pdfinfo absent: cannot verify A4 media box"; fail=1
-      elif ! pdfinfo -f 1 -l 1 "$base.pdf" | grep -Eq '^Page( +[0-9]+)? size:.*\(A4\)$'; then
-        echo "  WRONG PAPER SIZE: expected A4"
-        pdfinfo -f 1 -l 1 "$base.pdf" | grep -E '^Page( +[0-9]+)? size:' | sed 's/^/    /'
-        fail=1
-      else
-        echo "  A4 media box confirmed"
-      fi
+      paper_re='^Page( +[0-9]+)? size:.*\(A4\)$'
+      paper_label='A4'; paper_wrong='WRONG PAPER SIZE: expected A4'
       ;;
     *)
-      if ! command -v pdfinfo >/dev/null 2>&1; then
-        echo "  pdfinfo absent: cannot verify default Letter media box"; fail=1
-      elif ! pdfinfo -f 1 -l 1 "$base.pdf" | grep -Eq '^Page( +[0-9]+)? size:.*\(letter\)$'; then
-        echo "  WRONG DEFAULT PAPER SIZE: expected Letter"
-        pdfinfo -f 1 -l 1 "$base.pdf" | grep -E '^Page( +[0-9]+)? size:' | sed 's/^/    /'
-        fail=1
-      else
-        echo "  default Letter media box confirmed"
-      fi
+      paper_re='^Page( +[0-9]+)? size:.*\(letter\)$'
+      paper_label='default Letter'
+      paper_wrong='WRONG DEFAULT PAPER SIZE: expected Letter'
       ;;
   esac
+  if ! command -v pdfinfo >/dev/null 2>&1; then
+    echo "  pdfinfo absent: cannot verify $paper_label media box"; fail=1
+  else
+    paper_info="$(pdfinfo -f 1 -l 1 "$base.pdf" 2>/dev/null)" \
+      || paper_info="$CDTEXT_UNAVAILABLE"
+    text_matches "$paper_info" "$paper_re"
+    case "$?" in
+      0) echo "  $paper_label media box confirmed" ;;
+      1)
+        echo "  $paper_wrong"
+        printf '%s\n' "$paper_info" | grep -E '^Page( +[0-9]+)? size:' | sed 's/^/    /'
+        fail=1
+        ;;
+      *)
+        echo "  UNCHECKABLE MEDIA BOX: pdfinfo produced nothing readable for"
+        echo "    $base.pdf, so the $paper_label assertion was never made."
+        fail=1
+        ;;
+    esac
+  fi
 
   # Under the default `medium=print`, shared page furniture is suppressed
   # entirely for a one-page document, and a multi-page document carries
@@ -316,33 +337,59 @@ layout_fixture() {
       page_one_label_count=1
     fi
     for (( n = 1; n <= pages; n++ )); do
-      page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - | sed '/^\f/d')"
+      page_text="$(text_page "$base.pdf" "$n")"
 
       # Folio. Absent on every page under `screen`; under `print` absent from a
       # one-page document and present on every page otherwise. The `screen`
       # assertion is not vacuous: the same fixture under `print` would emit
       # `Page N of M` on each of its pages.
+      #
+      # Each of the three branches below reads the predicate's status three
+      # ways (issue #398). The `screen` branches are why: there a check that
+      # could not run used to be indistinguishable from a clean page, so the
+      # fixture passed having asserted nothing. `state 0/1` is the verdict;
+      # anything else is the absence of one, and fails on its own terms.
       if [ "$medium_screen" -eq 1 ]; then
-        if printf '%s\n' "$page_text" | grep -Eq 'Page [0-9]+ of [0-9]+'; then
+        text_matches "$page_text" 'Page [0-9]+ of [0-9]+'; state=$?
+        if [ "$state" -eq 0 ]; then
           echo "  UNEXPECTED SCREEN FOLIO on page $n"; furniture_fail=1
+        elif [ "$state" -ne 1 ]; then
+          echo "  UNCHECKABLE SCREEN FOLIO on page $n: no page text"; furniture_fail=1
         fi
       elif [ "$pages" -eq 1 ]; then
-        if printf '%s\n' "$page_text" | grep -Fq "Page 1 of 1"; then
+        text_contains "$page_text" "Page 1 of 1"; state=$?
+        if [ "$state" -eq 0 ]; then
           echo "  UNEXPECTED SINGLE-PAGE FOLIO"; furniture_fail=1
+        elif [ "$state" -ne 1 ]; then
+          echo "  UNCHECKABLE SINGLE-PAGE FOLIO: no page text"; furniture_fail=1
         fi
-      elif ! printf '%s\n' "$page_text" | grep -Fq "Page $n of $pages"; then
-        echo "  MISSING FOLIO: Page $n of $pages"; furniture_fail=1
+      else
+        text_contains "$page_text" "Page $n of $pages"; state=$?
+        if [ "$state" -eq 1 ]; then
+          echo "  MISSING FOLIO: Page $n of $pages"; furniture_fail=1
+        elif [ "$state" -ne 0 ]; then
+          echo "  UNCHECKABLE FOLIO on page $n: no page text"; furniture_fail=1
+        fi
       fi
 
       # Running header, from page two onwards.
       if [ "$pages" -gt 1 ] && [ "$n" -gt 1 ]; then
+        text_contains "$page_text" "$furniture_label"; state=$?
         if [ "$medium_screen" -eq 1 ]; then
-          if printf '%s\n' "$page_text" | grep -Fq "$furniture_label"; then
+          if [ "$state" -eq 0 ]; then
             echo "  UNEXPECTED SCREEN RUNNING HEADER on page $n: $furniture_label"
             furniture_fail=1
+          elif [ "$state" -ne 1 ]; then
+            echo "  UNCHECKABLE SCREEN RUNNING HEADER on page $n: no page text"
+            echo "    or no label for $base; nothing was asserted."
+            furniture_fail=1
           fi
-        elif ! printf '%s\n' "$page_text" | grep -Fq "$furniture_label"; then
+        elif [ "$state" -eq 1 ]; then
           echo "  MISSING RUNNING HEADER on page $n: $furniture_label"
+          furniture_fail=1
+        elif [ "$state" -ne 0 ]; then
+          echo "  UNCHECKABLE RUNNING HEADER on page $n: no page text or no"
+          echo "    label for $base; nothing was asserted."
           furniture_fail=1
         fi
       fi
@@ -366,17 +413,22 @@ layout_fixture() {
 
     case "$base" in
       resume-contact-wrap-*)
-        contact_text="$(pdftotext -layout -enc UTF-8 "$base.pdf" - | tr -d '\f')"
-        if printf '%s\n' "$contact_text" \
-            | grep -Eq '^[[:space:]]*\||\|[[:space:]]*$'; then
+        contact_text="$(text_extract "$base.pdf" -layout)"
+        text_matches "$contact_text" '^[[:space:]]*\||\|[[:space:]]*$'; state=$?
+        if [ "$state" -eq 0 ]; then
           echo "  ORPHAN CONTACT SEPARATOR"; fail=1
+        elif [ "$state" -ne 1 ]; then
+          echo "  UNCHECKABLE CONTACT SEPARATORS: no -layout text for $base"; fail=1
         else
           echo "  wrapped contact lines have no orphan separators"
         fi
         contact_item_fail=0
         while IFS= read -r item; do
-          if ! printf '%s\n' "$contact_text" | grep -Fq "$item"; then
+          text_contains "$contact_text" "$item"; state=$?
+          if [ "$state" -eq 1 ]; then
             echo "  SPLIT CONTACT ITEM: $item"; fail=1; contact_item_fail=1
+          elif [ "$state" -ne 0 ]; then
+            echo "  UNCHECKABLE CONTACT ITEM: $item"; fail=1; contact_item_fail=1
           fi
         done <<'EOF'
 alexandria.montgomery.fitzgerald@a-very-long-department.example.org
@@ -434,14 +486,25 @@ EOF
           a="${directive%%|||*}"; b="${directive#*|||}"
           a="$(printf '%s' "$a" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
           b="$(printf '%s' "$b" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
-          page_a=0; page_b=0
+          page_a=0; page_b=0; keep_unchecked=0
           for (( n = 1; n <= pages; n++ )); do
-            page_text="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
-                         | sed '/^\f/d')"
-            printf '%s\n' "$page_text" | grep -Fq "$a" && page_a="$n"
-            printf '%s\n' "$page_text" | grep -Fq "$b" && page_b="$n"
+            page_text="$(text_page "$base.pdf" "$n")"
+            text_contains "$page_text" "$a"; state=$?
+            [ "$state" -eq 0 ] && page_a="$n"
+            [ "$state" -gt 1 ] && keep_unchecked=1
+            text_contains "$page_text" "$b"; state=$?
+            [ "$state" -eq 0 ] && page_b="$n"
+            [ "$state" -gt 1 ] && keep_unchecked=1
           done
-          if [ "$page_a" -eq 0 ] || [ "$page_b" -eq 0 ]; then
+          if [ "$keep_unchecked" -ne 0 ]; then
+            # Distinguished from NOT FOUND deliberately: a page whose text
+            # could not be extracted cannot support either verdict, and
+            # reporting it as "not found" is a claim about a document that was
+            # never read (issue #398).
+            echo "  UNCHECKABLE KEEPTOGETHER: a page of $base yielded no text,"
+            echo "    so '$a' / '$b' were never located."
+            keep_fail=1
+          elif [ "$page_a" -eq 0 ] || [ "$page_b" -eq 0 ]; then
             echo "  KEEPTOGETHER TEXT NOT FOUND: '$a' / '$b'"; keep_fail=1
           elif [ "$page_a" -ne "$page_b" ]; then
             echo "  SPLIT ACROSS PAGES ($page_a vs $page_b): '$a' / '$b'"
@@ -691,8 +754,13 @@ EOF
             cw_seen="$(pdftotext -bbox "$cwc.pdf" - \
               | awk -v furniture="$furniture_label" -v prose=1 \
                     -f "$here/page-break-check.awk" | cut -f1 | sort -u)"
-            if printf '%s\n' "$cw_seen" | grep -qx "$cw_declared"; then
+            text_contains_line "$cw_seen" "$cw_declared"; state=$?
+            if [ "$state" -eq 0 ]; then
               echo "  negative control fired: $cw_declared with the penalties permitted"
+            elif [ "$state" -gt 1 ]; then
+              echo "  UNCHECKABLE CLUB/WIDOW CONTROL: the control build produced"
+              echo "    no comparable result, so its firing was never established."
+              fail=1
             else
               echo "  CLUB/WIDOW NEGATIVE CONTROL DID NOT FIRE: this fixture"
               echo "    declares $cw_declared with \\clubpenalty and \\widowpenalty"

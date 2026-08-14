@@ -51,6 +51,10 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+
+# Output guards that answer "could not check" apart from "absent" (issue #398).
+. "$root/tests/lib/text.sh"
+
 fixtures="$here/fixtures"
 
 # Emits one tab-separated record per relevant line:
@@ -197,12 +201,24 @@ self_check() {
   if [ "$rc" -eq 0 ]; then
     echo "  $fixture EXPECTED FAILURE but the lint passed it"
     fail=1
-  elif ! printf '%s' "$out" | grep -qF "$expected"; then
-    echo "  $fixture FAILED for the wrong reason: expected '$expected', got:"
-    printf '%s\n' "$out" | sed 's/^/    /'
-    fail=1
   else
-    echo "  $fixture rejected as intended ($expected)"
+    # Issue #398: read three states, not two. A check that could not run is not
+    # a report about the lint's message.
+    text_contains "$out" "$expected"
+    case "$?" in
+      0) echo "  $fixture rejected as intended ($expected)" ;;
+      1)
+        echo "  $fixture FAILED for the wrong reason: expected '$expected', got:"
+        printf '%s\n' "$out" | sed 's/^/    /'
+        fail=1
+        ;;
+      *)
+        echo "  $fixture PRODUCED NO CHECKABLE OUTPUT: '$expected' was never"
+        echo "    looked for, so the rejection has not been shown to be the"
+        echo "    intended one."
+        fail=1
+        ;;
+    esac
   fi
 }
 

@@ -64,6 +64,11 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+
+# Extracted-text guards that answer "could not check" apart from "absent"
+# (issue #398).
+. "$root/tests/lib/text.sh"
+
 work="${TMPDIR:-/tmp}/careerdossier-tagging-$$"
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work"
@@ -293,6 +298,54 @@ normalize_mupdf() {
 record_failure() {
   echo "  FAIL: $1"
   fail=1
+}
+
+# The two polarities of an extracted-text assertion, in this runner's idiom
+# (issue #398). Both treat "the check could not be performed" as a failure of
+# their own rather than folding it into a verdict, and say which it was.
+#
+# require_text is the branch whose old spelling produced the hollow *failure*
+# #398 reported. forbid_text is the branch that produced the hollow *pass*: a
+# check that could not run reported no violation, and the fixture went green
+# having asserted nothing about the page.
+require_text() { # <text> <needle> <what is missing when it is absent>
+  text_contains "$1" "$2"
+  case "$?" in
+    0) return 0 ;;
+    1) record_failure "$3" ;;
+    *) record_failure "UNCHECKABLE — $3 — the text was never extracted" ;;
+  esac
+  return 1
+}
+
+require_text_line() { # <text> <whole line> <what is missing when it is absent>
+  text_contains_line "$1" "$2"
+  case "$?" in
+    0) return 0 ;;
+    1) record_failure "$3" ;;
+    *) record_failure "UNCHECKABLE — $3 — the text was never extracted" ;;
+  esac
+  return 1
+}
+
+forbid_text() { # <text> <needle> <what is wrong when it is present>
+  text_contains "$1" "$2"
+  case "$?" in
+    1) return 0 ;;
+    0) record_failure "$3" ;;
+    *) record_failure "UNCHECKABLE — $3 — the text was never extracted" ;;
+  esac
+  return 1
+}
+
+forbid_match() { # <text> <ere> <what is wrong when it matches>
+  text_matches "$1" "$2"
+  case "$?" in
+    1) return 0 ;;
+    0) record_failure "$3" ;;
+    *) record_failure "UNCHECKABLE — $3 — the text was never extracted" ;;
+  esac
+  return 1
 }
 
 # A validation result without the toolchain that produced it is not reviewable
@@ -554,62 +607,60 @@ check_two_page_furniture() {
     return
   fi
 
-  page_one="$(pdftotext -enc UTF-8 -f 1 -l 1 "$pdf" - | tr -d '\f')"
-  page_two="$(pdftotext -enc UTF-8 -f 2 -l 2 "$pdf" - | tr -d '\f')"
-  printf '%s\n' "$page_one" | grep -Fqx "Page 1 of 2" \
-    || record_failure "$base page one has no folio"
+  page_one="$(text_page "$pdf" 1)"
+  page_two="$(text_page "$pdf" 2)"
+  require_text_line "$page_one" "Page 1 of 2" "$base page one has no folio"
 
   case "$base" in
     cv)
       running_label="Curriculum Vitae"
-      printf '%s\n' "$page_two" | grep -Fq "Tagged Academic CV" \
-        || record_failure "cv page two has no running header"
-      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
-        || record_failure "cv page two has no running label"
-      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
-        || record_failure "cv page two has no folio"
+      require_text "$page_two" "Tagged Academic CV" \
+        "cv page two has no running header"
+      require_text "$page_two" "$running_label" \
+        "cv page two has no running label"
+      require_text_line "$page_two" "Page 2 of 2" \
+        "cv page two has no folio"
       ;;
     academic-letter)
       running_label="Cover Letter"
-      printf '%s\n' "$page_two" | grep -Fq "Tagged Academic Letter" \
-        || record_failure "academic-letter page two has no running header"
-      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
-        || record_failure "academic-letter page two has no running label"
-      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
-        || record_failure "academic-letter page two has no folio"
+      require_text "$page_two" "Tagged Academic Letter" \
+        "academic-letter page two has no running header"
+      require_text "$page_two" "$running_label" \
+        "academic-letter page two has no running label"
+      require_text_line "$page_two" "Page 2 of 2" \
+        "academic-letter page two has no folio"
       ;;
     statement)
       running_label="Research Programme"
-      printf '%s\n' "$page_two" | grep -Fq "Tagged Research Statement" \
-        || record_failure "statement page two has no running header"
-      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
-        || record_failure "statement page two has no running label"
-      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
-        || record_failure "statement page two has no folio"
+      require_text "$page_two" "Tagged Research Statement" \
+        "statement page two has no running header"
+      require_text "$page_two" "$running_label" \
+        "statement page two has no running label"
+      require_text_line "$page_two" "Page 2 of 2" \
+        "statement page two has no folio"
       ;;
     resume)
       running_label="Résumé"
-      printf '%s\n' "$page_two" | grep -Fq "Tagged Industry Resume" \
-        || record_failure "resume page two has no running header"
-      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
-        || record_failure "resume page two has no running label"
-      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
-        || record_failure "resume page two has no folio"
+      require_text "$page_two" "Tagged Industry Resume" \
+        "resume page two has no running header"
+      require_text "$page_two" "$running_label" \
+        "resume page two has no running label"
+      require_text_line "$page_two" "Page 2 of 2" \
+        "resume page two has no folio"
       ;;
     letter)
       running_label="Cover Letter"
-      printf '%s\n' "$page_two" | grep -Fq "Tagged Industry Letter" \
-        || record_failure "letter page two has no running header"
-      printf '%s\n' "$page_two" | grep -Fq "$running_label" \
-        || record_failure "letter page two has no running label"
-      printf '%s\n' "$page_two" | grep -Fqx "Page 2 of 2" \
-        || record_failure "letter page two has no folio"
+      require_text "$page_two" "Tagged Industry Letter" \
+        "letter page two has no running header"
+      require_text "$page_two" "$running_label" \
+        "letter page two has no running label"
+      require_text_line "$page_two" "Page 2 of 2" \
+        "letter page two has no folio"
       ;;
   esac
 
-  if printf '%s\n' "$page_one" | grep -Fq "$running_label"; then
-    record_failure "$base page one unexpectedly contains its running label"
-  fi
+  forbid_text "$page_one" "$running_label" \
+    "$base page one unexpectedly contains its running label"
 }
 
 check_page_two_artifact_stream() {
@@ -669,18 +720,16 @@ check_contact_label_tagging() {
 
   grep -qa 'StructTreeRoot' "$pdf" || record_failure "$base has no structure tree"
 
-  extracted="$(pdftotext -enc UTF-8 "$pdf" -)"
-  printf '%s\n' "$extracted" | grep -Fq 'Email: ' \
-    || record_failure "$base lost its Email label in extraction"
-  printf '%s\n' "$extracted" | grep -Fq 'Phone: ' \
-    || record_failure "$base lost its Phone label in extraction"
+  extracted="$(text_extract "$pdf")"
+  require_text "$extracted" 'Email: ' \
+    "$base lost its Email label in extraction"
+  require_text "$extracted" 'Phone: ' \
+    "$base lost its Phone label in extraction"
   # website is absent from the fixture: no orphan label, no stray separator.
-  if printf '%s\n' "$extracted" | grep -Fq 'Website:'; then
-    record_failure "$base emitted an orphan Website label for an absent field"
-  fi
-  if printf '%s\n' "$extracted" | grep -Eq '\|[[:space:]]*$|^[[:space:]]*\|'; then
-    record_failure "$base has a stray separator at a contact-line edge"
-  fi
+  forbid_text "$extracted" 'Website:' \
+    "$base emitted an orphan Website label for an absent field"
+  forbid_match "$extracted" '\|[[:space:]]*$|^[[:space:]]*\|' \
+    "$base has a stray separator at a contact-line edge"
 
   if [ "$have_mutool" -eq 1 ]; then
     text_artifacts="$(
