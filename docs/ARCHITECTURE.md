@@ -446,7 +446,14 @@ it quotes is what makes a retune a single reviewable diff.
 
 Two other kinds of statement are deliberate and stay. `CHANGELOG.md` is a
 point-in-time record whose entries are correct as of their own release, so
-rewriting one to reference this moving section would make it less accurate. And
+rewriting one to reference this moving section would make it less accurate. That
+governs *rewriting* an entry, not adding context around one, and the two are
+different acts: an annotation placed outside the entries — a note under the
+version heading naming them — leaves every entry's own text, category, order,
+and citations intact, so it records how a later rule relates to a shipped
+section without making the section less accurate. `[0.7.0]` carries one such
+note, marking the four entries a later `CHANGELOG.md` scope boundary would not
+have produced (#260, #410); `CONTRIBUTING.md` states that boundary. And
 `careerdossier-tokens.sty`, `careerdossier-components.sty`, and the classes
 state each rule in a comment at the point of implementation, where someone
 editing that code needs it without the documentation open. What those comments
