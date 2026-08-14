@@ -61,24 +61,37 @@
 # gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
 # sources, so the source tree never picks up untracked build artifacts.
 #
-# Running the full suite faster (issue #378). `check` stays serial: it is the
-# pre-push gate and the CI-aligned entry point, and a gate whose result depends
-# on scheduling is not a gate. `check-parallel` is the opt-in fast path for the
-# one full run before a push:
+# Running the full suite (issues #378, #390, #399). `check` is the pre-push gate
+# and runs its eleven targets four at a time. The serial path survives under its
+# own name:
 #
-#   make check                  serial, deterministic, what CI runs
-#   make check-parallel         the same targets, four at a time
-#   make check-parallel JOBS=8  the same targets, eight at a time
+#   make check                  the gate: eleven targets, four at a time
+#   make check JOBS=2           the same targets, two at a time
+#   make check-serial           one target after another, deterministic
 #
-# Both dispatch $(CHECK_TARGETS) and cannot drift apart, because that variable
-# is the only place the list exists; `check-targets` prints it for the driver,
-# and `make lint` asserts that `check` still expands it. The driver is
-# tests/check-parallel.sh, which explains what it adds beyond running the same
-# eleven targets — an accounting assertion and a font-cache proof, both of which
-# exist because a run that reports green without doing the work is this
-# repository's characteristic failure. It is not `make -j`: GNU make 3.81, which
-# is what macOS ships, has no `--output-sync`, so under `-j` the eleven suites
-# interleave and "which suite failed" stops being answerable.
+# The gate was serial until #399 on the argument that it is the CI-aligned entry
+# point. What CI is aligned to is the target set and the commands, not the
+# scheduling: .github/workflows/build.yml runs sixteen jobs on sixteen runners
+# with no `needs:` anywhere, so local serial `check` was the one execution model
+# nothing else here used. Both paths dispatch $(CHECK_TARGETS) through the same
+# `make <target>` invocations, so that alignment is unchanged.
+#
+# JOBS defaults to 4 because 4 is the fastest value measured green: serial 439 s,
+# JOBS=2 285 s, JOBS=4 211 s, all green, against JOBS=8 at 168-201 s and 4 red in
+# 8 clean-tree runs. Every one of those failures is a text-extraction assertion
+# against a document that is provably correct — a guard that reports present text
+# as missing under load (#398) — so it is not the classes, and 8 is unusable
+# until that is fixed rather than merely slower to trust.
+#
+# Both entry points dispatch $(CHECK_TARGETS) and cannot drift apart, because
+# that variable is the only place the list exists; `check-targets` prints it for
+# the driver, and `make lint` asserts that the two would dispatch the same set.
+# The driver is tests/check-parallel.sh, which explains what it adds beyond
+# running the same eleven targets — an accounting assertion and a font-cache
+# proof, both of which exist because a run that reports green without doing the
+# work is this repository's characteristic failure. It is not `make -j`: GNU make
+# 3.81, which is what macOS ships, has no `--output-sync`, so under `-j` the
+# eleven suites interleave and "which suite failed" stops being answerable.
 #
 # Fanning out inside a suite (issue #390). `smoke`, `layout`, and `tagging`
 # additionally take JOBS=N, which runs that many of their own fixtures at once:
@@ -91,13 +104,14 @@
 # is tests/lib/fanout.sh; the assertion that earns it is that a fixture leaving
 # no verdict fails the run by name rather than shrinking the denominator.
 #
-# The two layers multiply, so `check-parallel` pins the inner one. Every target
-# it dispatches is given an explicit JOBS, defaulting to 1, because a
-# command-line JOBS lands in MAKEFLAGS and every sub-make would otherwise
-# inherit it — four targets each fanning out four fixtures being sixteen
-# LuaLaTeX processes nobody asked for. Raise it deliberately:
+# The two layers multiply, so `check` pins the inner one. Every target it
+# dispatches is given an explicit JOBS, defaulting to 1, because a command-line
+# JOBS lands in MAKEFLAGS and every sub-make would otherwise inherit it — four
+# targets each fanning out four fixtures being sixteen LuaLaTeX processes nobody
+# asked for. That pinning is why making the gate parallel did not multiply the
+# process budget as a side effect. Raise it deliberately:
 #
-#   make check-parallel JOBS=4 INNER_JOBS=2    process budget 4 x 2 = 8
+#   make check JOBS=4 INNER_JOBS=2             process budget 4 x 2 = 8
 #
 # Run `make help` for the target list.
 
@@ -121,7 +135,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check check-serial check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -153,29 +167,38 @@ academic-letter: | $(EXAMPLES_BUILD_DIR) ## Build the academic letter example
 statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 	$(LATEXMK) $(STATEMENTS)
 
-# The suite list, in the order `check` runs it. It lives in one variable
-# because two entry points now dispatch it — `check` serially and
-# `check-parallel` concurrently — and a hand-maintained second copy is how the
+# The suite list, in the order both entry points run it. It lives in one
+# variable because two of them dispatch it — `check` concurrently and
+# `check-serial` one at a time — and a hand-maintained second copy is how the
 # `annotations` suite once dropped out of a run that was then reported clean.
 #
-# `lint` runs first: it compiles nothing, finishes in well under a second, and
-# what it catches is a source-level omission that every LaTeX-running suite
-# below would report as green.
+# `lint` runs first, and dispatch order still matters now that the gate is
+# parallel: it compiles nothing, finishes in well under a second, and what it
+# catches is a source-level omission that every LaTeX-running suite below would
+# report as green. Sorting this list longest-first models a further ~50 s at
+# JOBS=4 and was rejected under #399 — it would sort the transcript too, since
+# the replay follows dispatch order, and push `lint` from first to eleventh.
 CHECK_TARGETS := lint regression extract-test smoke layout bibliography-test \
                  links metadata annotations tagging examples
 
-check: $(CHECK_TARGETS) ## Run the full supported local suite
+check: ## Run the full supported local suite — the gate; JOBS=N sets the workers
+	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS)) \
+	  $(if $(INNER_JOBS),--inner-jobs $(INNER_JOBS))
+
+# The serial path, kept because a deterministic run is worth having when a
+# parallel one reports something surprising: it removes scheduling as a variable
+# in one command. It is also the prerequisite list `make lint` reads the target
+# set from, so it is load-bearing beyond being an alternative.
+check-serial: $(CHECK_TARGETS) ## check's targets one after another, deterministic
 	@printf '\nAll suites passed.\n'
 
-# Not in `help`: an implementation detail of check-parallel, not a target a
+# Not in `help`: an implementation detail of the driver, not a target a
 # contributor invokes. It exists so the driver reads the list make expands
 # rather than a copy of it.
 check-targets:
 	@printf '%s\n' $(CHECK_TARGETS)
 
-check-parallel: ## Opt-in: check's targets concurrently, JOBS=N (the gate is still serial check)
-	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS)) \
-	  $(if $(INNER_JOBS),--inner-jobs $(INNER_JOBS))
+check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
