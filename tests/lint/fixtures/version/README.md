@@ -15,10 +15,16 @@ remains the one that defines the Work.
 | `consistent/` | `OK` |
 | `version-mismatch/` | `VERSION MISMATCH` |
 | `date-mismatch/` | `DATE MISMATCH` |
+| `wrong-name/` | `NAME MISMATCH` |
 | `no-declaration/` | `NO DECLARATION` |
 | `unparseable/` | `UNPARSEABLE DECLARATION` |
 | `missing-file/` | `MISSING FILE` |
 | `not-in-manifest/` | `NOT IN MANIFEST` |
+
+`wrong-name/` is the one tree whose defect is not a version or a date: its third
+source declares a name its filename does not carry, while both other arguments
+agree with the other two sources. Keeping the version and date correct there is
+what isolates that verdict from the two above it (issue #405).
 
 Every tree carries three sources rather than two, and the defective one is
 always the third. Two agreeing files and one outlier is what makes the lint
