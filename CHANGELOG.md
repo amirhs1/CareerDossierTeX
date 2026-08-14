@@ -108,8 +108,10 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   date. It reads `manifest.txt` and the root sources together: each `.sty`/`.cls`
   listed under "The Work" must exist and declare itself with
   `\ProvidesExplPackage` or `\ProvidesExplClass`, each declaration must parse
-  into a `{date} {version}` pair, all the pairs must be identical, and the
-  declaring files and the manifest's list must be the same set. ([#258])
+  into a `{name} {date} {version}` triple, all the `{date} {version}` pairs must
+  be identical, every declared name must equal its own file's basename, and the
+  declaring files and the manifest's list must be the same set.
+  ([#258], [#405])
 
   The ten declarations are bumped by hand and nothing compared them. No
   committed baseline records a version or a date — deliberately, since one that
@@ -117,8 +119,12 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   suite. LaTeX writes both values into the `.log` without complaint, and a
   distribution whose `careerdossier-resume.cls` says `0.8.0` while its
   `careerdossier-theme.sty` says `0.7.0` contains nothing wrong enough to fail.
-  The set comparison rides along because it is the same class of drift, and
-  `manifest.txt` is what defines the Work for the LPPL.
+  The name check is that same hand-typed-argument drift one field to the left:
+  a `careerdossier-them` inside `careerdossier-theme.sty` is silent in exactly
+  the way a stale version is, because LaTeX repeats the declared string into the
+  `.log` without comparing it to the filename and `l3build` uses it for messages
+  only. The set comparison rides along because it is the same class of drift,
+  and `manifest.txt` is what defines the Work for the LPPL.
 
   It does not check the declarations against the git tag, `CHANGELOG.md`, or
   `docs/MIGRATION.md`: each legitimately disagrees on `main` between releases.
@@ -266,6 +272,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#398]: https://github.com/amirhs1/CareerDossierTeX/issues/398
 [#399]: https://github.com/amirhs1/CareerDossierTeX/issues/399
 [#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
+[#405]: https://github.com/amirhs1/CareerDossierTeX/issues/405
 [#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
 
 ## [0.8.0] - 2026-08-12
