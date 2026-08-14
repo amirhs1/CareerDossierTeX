@@ -574,10 +574,20 @@ Update documentation in the same pull request as the related behavior.
 
 ### Update `CHANGELOG.md` when:
 
-- a user-visible feature is added;
+- a feature is added;
 - behavior changes;
 - a bug is fixed;
 - a breaking change is introduced.
+
+Each of those four is qualified by *user-visible*: `manifest.txt` calls
+`CHANGELOG.md` "user-visible changes per release", and that is the whole test —
+what changed, not who ran it. A change that alters rendered output, a public
+name, or a documented behavior earns an entry however internal its cause looks.
+Maintainer tooling and agent instructions do not: `.agents/`, `.claude/`, a CI
+workflow, a maintainer-only script. Neither does a `Makefile` target a
+contributor is told to run, which is documented here instead. The boundary is
+not applied backwards — entries already shipped stay as written, including four
+in `[0.7.0]` (#188, #195, #233, #236) that it would not have produced (#260).
 
 For entry format, house style, and how `CHANGELOG.md` relates to GitHub
 Release notes, see `.agents/skills/release-notes/reference.md`.
