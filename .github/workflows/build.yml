@@ -97,7 +97,7 @@ jobs:
           bash --version | head -1
           grep --version | head -1
           awk --version 2>&1 | head -1 || awk -W version 2>&1 | head -1
-      - name: Option lint (choice-valued options name their accepted values)
+      - name: Static lint (source-level invariants no compiled fixture asserts)
         run: make lint
 
   regression:

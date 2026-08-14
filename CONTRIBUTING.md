@@ -264,7 +264,7 @@ Build every supported example:
 make
 ```
 
-Run every suite CI runs — the option lint, the module regression suite,
+Run every suite CI runs — the static lint, the module regression suite,
 extraction, smoke, layout, the focused BibLaTeX/Biber fixture, the link
 copy-paste, default-path metadata, and link-annotation suites, and the
 tagged-structure fixtures — plus all supported example builds:
@@ -782,7 +782,9 @@ Release preparation should verify:
 - supported examples compile locally;
 - the accumulated test suite passes without adding milestone-end coverage;
 - CI passes on `main`;
-- version strings are updated;
+- version strings are updated — `make lint` asserts that the ten Work files
+  declare the same version and date as each other, so a bump that missed one is
+  caught, but nothing checks the pair against the tag you are about to cut;
 - `README.md` reflects current support;
 - `API.md` matches implementation;
 - `CHANGELOG.md` is updated;

@@ -1,0 +1,19 @@
+Fixture manifest — a source the manifest does not list
+========================================================
+
+Lint input for tests/lint/run-version-declarations.sh. This tree is never
+compiled and is not part of the Work; it pins one verdict of that lint.
+
+
+The Work
+--------
+
+manifest.txt                  this file; defines the Work
+lintfixture-alpha.sty         a fixture source
+lintfixture-beta.sty          a fixture source
+
+
+Distributed with the Work
+-------------------------
+
+README.md                     what this tree pins

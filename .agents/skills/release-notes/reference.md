@@ -111,6 +111,13 @@ considered ready for the maintainer, and again before any tag is authorized:
 - [ ] `\ProvidesExplPackage`/`\ProvidesExplClass` date and version match the
       release date and tag in every `.sty`/`.cls` file:
       `grep -n "ProvidesExpl" *.sty *.cls`
+
+      `make lint` already asserts that the ten agree *with each other* and that
+      the declaring files are exactly `manifest.txt`'s Work list (#258), so a
+      bump that missed one file no longer reaches here. What it deliberately
+      does not check — because both are false on `main` between releases — is
+      that the agreed pair is the release date and the tag about to be cut.
+      That half is this checklist item, and it is the only half left.
 - [ ] The supported engine statement is current (today: LuaLaTeX only;
       XeLaTeX and pdfLaTeX are unsupported and produce a fatal error — see
       `careerdossier-typography.sty`).

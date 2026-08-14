@@ -79,6 +79,31 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   baseline, or rendered output changed, and no suite's verdict changed — `make
   lint` runs one more script and can fail for one more reason.
 
+- `make lint` asserts that every file of the Work declares the same version and
+  date. It reads `manifest.txt` and the root sources together: each `.sty`/`.cls`
+  listed under "The Work" must exist and declare itself with
+  `\ProvidesExplPackage` or `\ProvidesExplClass`, each declaration must parse
+  into a `{date} {version}` pair, all the pairs must be identical, and the
+  declaring files and the manifest's list must be the same set. ([#258])
+
+  The ten declarations are bumped by hand and nothing compared them. No
+  committed baseline records a version or a date — deliberately, since one that
+  did would churn on every release — so a bump that missed a file passed every
+  suite. LaTeX writes both values into the `.log` without complaint, and a
+  distribution whose `careerdossier-resume.cls` says `0.8.0` while its
+  `careerdossier-theme.sty` says `0.7.0` contains nothing wrong enough to fail.
+  The set comparison rides along because it is the same class of drift, and
+  `manifest.txt` is what defines the Work for the LPPL.
+
+  It does not check the declarations against the git tag, `CHANGELOG.md`, or
+  `docs/MIGRATION.md`: each legitimately disagrees on `main` between releases.
+  Confirming that the agreed pair is the *right* pair stays a release-time step,
+  in `.agents/skills/release-notes/reference.md`.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed, and no suite's verdict changed — `make
+  lint` runs one more script and can fail for one more reason.
+
 ### Changed
 
 - `make check` runs its eleven targets four at a time and is still the pre-push
@@ -208,6 +233,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   where three runners write their intermediates, and what the parallel driver
   prepares and proves before dispatching.
 
+[#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
