@@ -4,10 +4,11 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash, awk, and make — all three of its
+# pure text processing and needs only bash, awk, and make — all four of its
 # scripts, since the second one drives the other runners in their
-# compile-nothing `--list` mode and the third exercises check-parallel's
-# accounting controls against synthetic workers; l3build for `regression`;
+# compile-nothing `--list` mode, the third reads three Markdown files, and the
+# fourth exercises check-parallel's accounting controls against synthetic
+# workers; l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
 # `links`, and `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing
 # beyond LuaLaTeX for `metadata` and `annotations`, which read the PDF's own
@@ -178,9 +179,10 @@ check-parallel: ## Opt-in: check's targets concurrently, JOBS=N (the gate is sti
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, the fixture-selection contract, and the check-parallel controls
+lint: ## Static lint: option values, fixture selection, AGENTS.md pointers, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-fixture-filter.sh
+	tests/lint/run-agents-references.sh
 	tests/check-parallel.sh --self-test
 
 regression: ## Module regression suite (l3build check); TEST=<name> runs one test

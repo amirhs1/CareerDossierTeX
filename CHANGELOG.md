@@ -62,6 +62,23 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   baseline, or rendered output changed, and no suite's verdict changed — only
   how many fixtures each runner compiles at once.
 
+- `make lint` asserts that `AGENTS.md` names every section it points to. Every
+  section name it quotes must exist as a heading in `CONTRIBUTING.md` or
+  `docs/TESTING.md`, and every subsection of `CONTRIBUTING.md`'s "Local builds"
+  chapter must be named in `AGENTS.md`. ([#400])
+
+  `AGENTS.md` reproduces no test documentation; it points at it by naming
+  sections, which is a hand-maintained index of another file's headings. That
+  index drifted twice in two days: the two entry points added above ([#378],
+  [#390]) each added a section to that chapter, and `AGENTS.md` went on naming
+  two of what were by then four. The new lint also found a third defect nobody
+  had reported — a truncated section citation that resolves for a human reader
+  and not for anything mechanical.
+
+  **Contributor tooling only.** No class, option, key, command, token, fixture,
+  baseline, or rendered output changed, and no suite's verdict changed — `make
+  lint` runs one more script and can fail for one more reason.
+
 ### Fixed
 
 - The local suites run under a restricted Bash sandbox, and `make
@@ -98,6 +115,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
+[#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
 
 ## [0.8.0] - 2026-08-12
 

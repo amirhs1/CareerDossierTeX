@@ -173,14 +173,17 @@ destructive-action, or metadata decision that cannot be resolved from the repo.
 ## Build and test
 
 `docs/TESTING.md` is the test documentation, and none of it is reproduced here:
-"Test-driven where practical" for where test material lives, "Match the test to
-the module" for which kind of test a concern takes, "Coverage expectations" for
-the matrix a change has to cover, "Baselines are load-bearing" for regenerating
-a `.tlg` or extraction reference, and "Log inspection" and "Visual verification"
-for what to read afterwards. `CONTRIBUTING.md` keeps the two sections about
-*running* rather than writing a suite — "Local builds" and "Scoping a suite
-while you iterate", for the invocation and for what a target's CI job is called.
-Three rules govern whatever that reading says:
+"Test-driven where practical; test-as-you-go always" for where test material
+lives, "Match the test to the module" for which kind of test a concern takes,
+"Coverage expectations" for the matrix a change has to cover, "Baselines are
+load-bearing" for regenerating a `.tlg` or extraction reference, and "Log
+inspection" and "Visual verification" for what to read afterwards.
+`CONTRIBUTING.md` keeps the sections about *running* rather than writing a
+suite: "Local builds" for the invocation and for what a target's CI job is
+called, then "The same suite, faster, before a push", "Scoping a suite while you
+iterate", and "Running one suite's fixtures concurrently" for the ways to spend
+less wall clock than the gate does. Three rules govern whatever that reading
+says:
 
 - Every behavior change adds or updates the smallest test that would fail
   without it, in the same change (rule 6), of the kind that module's concern
