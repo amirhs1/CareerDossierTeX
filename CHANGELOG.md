@@ -1153,10 +1153,9 @@ changes only; a change to contributor tooling is documented in
 `CONTRIBUTING.md` instead. That boundary was settled after this release shipped
 (#260) and is not applied backwards, so five entries below that it would not
 have produced stay as written: #188 and #195 under `### Changed`, then the
-three under `### Fixed` — #211, #233, and #236. `CONTRIBUTING.md` names four of
-the five (#188, #195, #233, #236); #211 was identified alongside them while
-this note was written (#410). Each was accurate when written and is unchanged
-here, and none is precedent for adding a similar entry today. See
+three under `### Fixed` — #211, #233, and #236. `CONTRIBUTING.md` lists the
+same five. Each was accurate when written and is unchanged here, and none is
+precedent for adding a similar entry today. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md#update-changelogmd-when).
 
 ### Added
