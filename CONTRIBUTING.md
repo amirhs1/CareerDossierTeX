@@ -586,8 +586,11 @@ name, or a documented behavior earns an entry however internal its cause looks.
 Maintainer tooling and agent instructions do not: `.agents/`, `.claude/`, a CI
 workflow, a maintainer-only script. Neither does a `Makefile` target a
 contributor is told to run, which is documented here instead. The boundary is
-not applied backwards — entries already shipped stay as written, including four
-in `[0.7.0]` (#188, #195, #233, #236) that it would not have produced (#260).
+not applied backwards — entries already shipped stay as written, including five
+in `[0.7.0]` (#188, #195, #211, #233, #236) that it would not have produced
+(#260). `CHANGELOG.md` carries a note under that release's own heading saying
+so, listing the same five, so a reader who opens the register first is not left
+reading them as precedent (#410).
 
 For entry format, house style, and how `CHANGELOG.md` relates to GitHub
 Release notes, see `.agents/skills/release-notes/reference.md`.
