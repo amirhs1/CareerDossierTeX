@@ -15,9 +15,9 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-resume owns résumé-specific page behaviour for the v0.1.0
-%% English industry dossier: Letter/A4 geometry, class options, and the
-%% section, entry, and list structures.
+%% careerdossier-resume owns résumé-specific page behaviour for the English
+%% industry dossier: Letter/A4 geometry, class options, and the section,
+%% entry, and list structures.
 %% Reusable identity and contact logic lives in careerdossier-components; this
 %% class only arranges it on the page.
 

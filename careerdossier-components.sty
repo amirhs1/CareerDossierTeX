@@ -1945,9 +1945,11 @@
           { \hypersetup { pdfauthor = { \CDossierFieldValue { name } } } }
       }
       { }
-    %% v0.1.0 is English-only (see docs/ARCHITECTURE.md); there is no language
-    %% key to route this through yet. Either way of declaring one wins over the
-    %% derived value: the document's own \hypersetup, and \DocumentMetadata.
+    %% CareerDossierTeX is English-only by settled decision (see
+    %% docs/ARCHITECTURE.md, "English strings and the absence of a language
+    %% module"); there is no language key to route this through. Either way of
+    %% declaring one wins over the derived value: the document's own
+    %% \hypersetup, and \DocumentMetadata.
     \__cdossier_components_kernel_lang_if_set:F
       {
         \__cdossier_components_hyp_if_unset:nT { @pdflang }
