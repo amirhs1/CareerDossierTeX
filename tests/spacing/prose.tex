@@ -1,0 +1,73 @@
+% prose.tex — every vertical boundary the statement (prose) class owns.
+%
+% The \documentclass line is rewritten by report.sh for each font size. See
+% record.tex for why each boundary is measured in its own \vbox rather than by
+% marking up a running document.
+\documentclass[type=research, fontsize=11pt]{careerdossier-statement}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada.lovelace@example.com},
+}
+
+\newbox\ProbeSectionBox
+\newbox\ProbeStarBox
+\newbox\ProbeSubsectionBox
+\newbox\ProbeParaBox
+
+\begin{document}
+
+% -- section heading between two paragraphs --------------------------------
+\setbox\ProbeSectionBox=\vbox{%
+  \noindent Preceding prose line.\par
+  \CDossierSection{Research Vision}
+  \noindent Following prose line.\par
+}
+
+% -- the same through the kernel spelling, which must measure identically ---
+\setbox\ProbeStarBox=\vbox{%
+  \noindent Preceding prose line.\par
+  \section*{Research Vision}
+  \noindent Following prose line.\par
+}
+
+% -- subsection heading between two paragraphs -----------------------------
+\setbox\ProbeSubsectionBox=\vbox{%
+  \noindent Preceding prose line.\par
+  \CDossierSubsection{A Narrower Theme}
+  \noindent Following prose line.\par
+}
+
+% -- two ordinary paragraphs (ProseParSkip) --------------------------------
+\setbox\ProbeParaBox=\vbox{%
+  \noindent First paragraph line.\par
+  \noindent Second paragraph line.\par
+}
+
+\directlua{
+  dofile("tests/spacing/probe.lua")
+  local baseline = \number\dimexpr\baselineskip\relax\space
+
+  cdossier_probe.token("baselineskip", baseline, baseline)
+  local function tok(name, sp) cdossier_probe.token(name, sp, baseline) end
+  tok("ProseSectionAboveSkip",    \number\dimexpr\CDossierProseSectionAboveSkip\relax)
+  tok("ProseSectionBelowSkip",    \number\dimexpr\CDossierProseSectionBelowSkip\relax)
+  tok("ProseSubsectionAboveSkip", \number\dimexpr\CDossierProseSubsectionAboveSkip\relax)
+  tok("ProseSubsectionBelowSkip", \number\dimexpr\CDossierProseSubsectionBelowSkip\relax)
+  tok("ProseParSkip",             \number\dimexpr\CDossierProseParSkip\relax)
+  tok("parskip",                  \number\dimexpr\parskip\relax)
+
+  cdossier_probe.report(\number\ProbeSectionBox, "section", {
+    "prose -> section heading", "section heading -> prose"})
+  cdossier_probe.report(\number\ProbeStarBox, "section-star", {
+    "prose -> section* heading", "section* heading -> prose"})
+  cdossier_probe.report(\number\ProbeSubsectionBox, "subsection", {
+    "prose -> subsection heading", "subsection heading -> prose"})
+  cdossier_probe.report(\number\ProbeParaBox, "para", {"paragraph -> paragraph"})
+}
+
+\box\ProbeSectionBox
+\box\ProbeStarBox
+\box\ProbeSubsectionBox
+\box\ProbeParaBox
+
+\end{document}

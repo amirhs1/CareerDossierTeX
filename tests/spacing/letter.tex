@@ -1,0 +1,61 @@
+% letter.tex — the vertical boundaries the letter class owns.
+%
+% The letterhead, recipient block, and closing are page-level compositions
+% rather than free-standing blocks, so what a \vbox can hold is the body
+% paragraph rhythm and the closing stack. The letterhead's own boundaries are
+% reported from the real document instead; see report.sh.
+%
+% See record.tex for why each boundary is measured in its own \vbox.
+\documentclass[fontsize=11pt]{careerdossier-letter}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada.lovelace@example.com},
+}
+\CDossierLetterSetup{
+  date           = {14 July 2026},
+  recipient-name = {Hiring Committee},
+  salutation     = {Dear Members of the Hiring Committee,},
+  closing        = {Sincerely,},
+}
+
+\newbox\ProbeParaBox
+\newbox\ProbeClosingBox
+
+\begin{document}
+
+% -- two ordinary body paragraphs (LetterParSkip) --------------------------
+\setbox\ProbeParaBox=\vbox{%
+  \noindent First body paragraph line.\par
+  \noindent Second body paragraph line.\par
+}
+
+% -- body copy into the closing stack --------------------------------------
+\setbox\ProbeClosingBox=\vbox{%
+  \noindent Final body paragraph line.\par
+  \MakeCDossierClosing
+}
+
+\directlua{
+  dofile("tests/spacing/probe.lua")
+  local baseline = \number\dimexpr\baselineskip\relax\space
+
+  cdossier_probe.token("baselineskip", baseline, baseline)
+  local function tok(name, sp) cdossier_probe.token(name, sp, baseline) end
+  tok("LetterParSkip",            \number\dimexpr\CDossierLetterParSkip\relax)
+  tok("LetterBlockSkip",          \number\dimexpr\CDossierLetterBlockSkip\relax)
+  tok("LetterBodyAboveSkip",      \number\dimexpr\CDossierLetterBodyAboveSkip\relax)
+  tok("LetterBodyBelowSkip",      \number\dimexpr\CDossierLetterBodyBelowSkip\relax)
+  tok("LetterRecipientLineGapSkip", \number\dimexpr\CDossierLetterRecipientLineGapSkip\relax)
+  tok("LetterSignatureGapSkip",   \number\dimexpr\CDossierLetterSignatureGapSkip\relax)
+  tok("LetterHeaderBelowSkip",    \number\dimexpr\CDossierLetterHeaderBelowSkip\relax)
+  tok("parskip",                  \number\dimexpr\parskip\relax)
+
+  cdossier_probe.report(\number\ProbeParaBox, "para", {"paragraph -> paragraph"})
+  cdossier_probe.report(\number\ProbeClosingBox, "closing", {
+    "body -> closing", "closing -> signature name"})
+}
+
+\box\ProbeParaBox
+\box\ProbeClosingBox
+
+\end{document}
