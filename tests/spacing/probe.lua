@@ -126,6 +126,152 @@ function cdossier_probe.report(boxnumber, context, labels)
   end
 end
 
+-- First glyphs of a box, so a page-level row can be identified by what it says.
+-- Page compositions nest boxes several levels deep and carry no labels of their
+-- own, so without this the header stack's boundaries are unattributable.
+local function text_of(n, budget)
+  if node.type(n.id) == "rule" then return "<rule>" end
+  local out = {}
+  local function walk(head)
+    for m in node.traverse(head) do
+      if #out >= budget then return end
+      local kind = node.type(m.id)
+      if kind == "glyph" then
+        out[#out + 1] = (m.char < 128) and string.char(m.char) or "?"
+      elseif kind == "glue" and #out > 0 then
+        out[#out + 1] = " "
+      elseif is_box(kind) then
+        walk(m.list)
+      end
+    end
+  end
+  walk(n.list)
+  return (table.concat(out):gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+-- Walk a shipped page and report every boundary at every nesting level. The
+-- header stack, letterhead, and recipient block are page compositions rather
+-- than free-standing blocks, so they are unreachable from a \vbox fixture and
+-- only this path measures them.
+function cdossier_probe.report_page(boxnumber, context)
+  local function walk(list, path)
+    local prev, structural, interline, index = nil, 0, 0, 0
+    for n in node.traverse(list) do
+      local kind = node.type(n.id)
+      if is_box(kind) or kind == "rule" then
+        if prev then
+          index = index + 1
+          local _, prev_ink_lo = node_ink(prev)
+          local next_ink_hi = node_ink(n)
+          local prev_depth, next_height = node_depth(prev), node_height(n)
+          local optical
+          if prev_ink_lo and next_ink_hi then
+            optical = structural + interline
+                      + (prev_depth - prev_ink_lo) + (next_height - next_ink_hi)
+          end
+          -- Only boundaries between two boxes that actually carry ink are
+          -- reported; the page is full of structural scaffolding whose gaps
+          -- name nothing a reader sees.
+          if optical and text_of(prev, 24) ~= "" and text_of(n, 24) ~= "" then
+            texio.write_nl(string.format(
+              "CDPAGE\t%s\t%s\t%d\t%.3f\t%.3f\t%.3f\t%s\t=>\t%s",
+              context, path, index,
+              pt(structural), pt(interline), pt(prev_depth + structural + interline + next_height),
+              string.format("%.3f", pt(optical)),
+              text_of(prev, 24) .. " || " .. text_of(n, 24)))
+          end
+        end
+        prev, structural, interline = n, 0, 0
+      elseif kind == "glue" then
+        local sub = glue_subtypes[n.subtype]
+        if sub == "baselineskip" or sub == "lineskip" then
+          interline = interline + n.width
+        else
+          structural = structural + n.width
+        end
+      elseif kind == "kern" then
+        structural = structural + n.kern
+      end
+    end
+    local child = 0
+    for n in node.traverse(list) do
+      if is_box(node.type(n.id)) and n.list then
+        child = child + 1
+        walk(n.list, path .. "/" .. child)
+      end
+    end
+  end
+  walk(tex.box[boxnumber].list, "")
+end
+
+-- The first few characters set in a box, used to name a boundary that no
+-- fixture labelled. Page-level compositions -- the identity stack, the
+-- letterhead, the recipient block -- are assembled by \MakeCDossierHeader and
+-- \MakeCDossierLetterhead rather than written by the document, so a \vbox
+-- fixture cannot reach them and there is nothing to label them with in
+-- advance. The text they set is the only stable handle they have.
+local function text_of(head, budget)
+  local out = {}
+  for n in node.traverse(head) do
+    local kind = node.type(n.id)
+    if kind == "glyph" then
+      out[#out + 1] = unicode.utf8.char(n.char)
+    elseif kind == "glue" and #out > 0 then
+      out[#out + 1] = " "
+    elseif is_box(kind) then
+      out[#out + 1] = text_of(n.list, budget)
+    end
+    if #table.concat(out) >= budget then break end
+  end
+  return (table.concat(out):gsub("%s+", " "))
+end
+
+-- Walk a shipped page and report every boundary in every vertical list it
+-- contains, naming each by the text on either side. `report' cannot be used
+-- here: it takes one vlist, and a page is a tree of them.
+function cdossier_probe.report_page(boxnumber, context)
+  local function descend(head, path)
+    local prev, structural, interline, index = nil, 0, 0, 0
+    for n in node.traverse(head) do
+      local kind = node.type(n.id)
+      if is_box(kind) or kind == "rule" then
+        if prev then
+          index = index + 1
+          local _, prev_ink_lo = node_ink(prev)
+          local next_ink_hi = node_ink(n)
+          local prev_depth, next_height = node_depth(prev), node_height(n)
+          if prev_ink_lo and next_ink_hi then
+            local optical = structural + interline
+                            + (prev_depth - prev_ink_lo) + (next_height - next_ink_hi)
+            local a = is_box(node.type(prev.id)) and text_of(prev.list, 24) or "[rule]"
+            local b = is_box(kind) and text_of(n.list, 24) or "[rule]"
+            -- Boundaries between two pieces of real text are the only ones a
+            -- reader can see as a gap; empty struts and spacing boxes are not.
+            if a ~= "" and b ~= "" then
+              texio.write_nl(string.format(
+                "CDPAGE\t%s\t%s\t%d\t%s\t%s\t%.3f\t%.3f\t%.3f",
+                context, path, index, a, b,
+                pt(structural), pt(interline), pt(optical)))
+            end
+          end
+        end
+        prev, structural, interline = n, 0, 0
+        if is_box(kind) then descend(n.list, path .. "." .. index) end
+      elseif kind == "glue" then
+        local sub = glue_subtypes[n.subtype]
+        if sub == "baselineskip" or sub == "lineskip" then
+          interline = interline + n.width
+        else
+          structural = structural + n.width
+        end
+      elseif kind == "kern" then
+        structural = structural + n.kern
+      end
+    end
+  end
+  descend(tex.box[boxnumber].list, "p")
+end
+
 -- Report a token's value and its ratio against the body baseline, so the
 -- structural column can be checked against the design without a second lookup.
 function cdossier_probe.token(name, sp, baseline)
