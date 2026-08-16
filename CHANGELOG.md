@@ -217,6 +217,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A raw `#` in a profile value or a `\CDossierLink` argument now builds, and the
+  address reaches the link target intact. It used to stop the build with
+  `! Illegal parameter number in definition of \Hy@tempa.` — hyperref's own
+  diagnostic, naming neither the field, nor the value, nor the fix. `\#` keeps
+  working and produces the same annotation, so no existing document changes, and
+  `docs/API.md` no longer asks for the escape. ([#353])
+
+  Every link the toolkit emits is covered: the contact line's `website` and web
+  profiles, `\CDossierLink` in body text, the ORCID resolver, and the academic
+  CV's manual publication list. Both arguments of a link needed the repair, not
+  just the target — `\nolinkurl` is built on the same hyperref internal as
+  `\href`, so the displayed address failed for the same reason.
+
+  The tempting repair is worse than the bug and is worth naming so it is not
+  attempted again: handing hyperref a catcode-12 string compiles with zero
+  errors and silently drops everything from the `#` onwards, because an
+  unescaped `#` is hyperref's fragment delimiter. `example.com/a#b` emitted
+  `/URI(https://example.com/a)` — a loud build failure traded for a link that
+  looks right on the page and points somewhere else, the same class of defect as
+  [#328]. No text-layer suite can see it, so two `tests/annotations/` fixtures
+  pin the emitted action for both spellings side by side.
+
+  `%` is unchanged and still must be written `\%`. TeX's lexer discards it while
+  `\CDossierSetup` is still reading its argument, so no package code can recover
+  it; `docs/API.md` continues to say so.
+
 - A cover letter no longer breaks a page between the closing and the signature
   name. `\MakeCDossierClosing` keeps the two on the same page, whichever page
   that turns out to be: when they do not both fit under the body, the break now
@@ -341,6 +367,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
+[#353]: https://github.com/amirhs1/CareerDossierTeX/issues/353
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392

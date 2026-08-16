@@ -750,29 +750,38 @@ address.
 #### Characters that stop the build
 
 A field value is read as ordinary text, not as `\url`'s verbatim argument, so
-two characters are consumed by TeX before the link machinery ever sees them and
-must be escaped. This applies to every profile field, not only these three.
+one character is consumed by TeX before the link machinery ever sees it and must
+be escaped. This applies to every profile field, not only these three.
 
 | Written | Result | Write instead |
 |---|---|---|
-| `github.com/ada#about` | build fails | `github.com/ada\#about` |
 | `example.com/a%b` | build fails | `example.com/a\%b` |
 | `example.com/a%25b` | build fails | `example.com/a\%25b` — percent-encoding does not help, the `%` is still a comment character |
 
-Nothing else needs escaping. `&`, `_`, `~`, `$`, and `^` all build and render
-correctly, so a pasted Google Scholar address carrying `&hl=en` is fine in every
-class.
+`%` cannot be fixed at the package level, and the reason is worth stating once:
+TeX's lexer discards it and the rest of the line while `\CDossierSetup` is still
+reading its argument, so the tokens never reach any code this package could
+write. `\%` is the only possible answer.
+
+Nothing else needs escaping. `#`, `&`, `_`, `~`, `$`, and `^` all build and
+render correctly, so a pasted Google Scholar address carrying `&hl=en` is fine
+in every class, and so is a documentation link carrying `#installation`.
 
 **Escaping them anyway is harmless**, which makes the rule safe to apply
 defensively: `example.com/a&b` and `example.com/a\&b` produce a byte-identical
 `/URI(https://example.com/a&b)` action in the PDF, and likewise for the others.
-So the whole rule an author needs is *escape `#` and `%`; escaping anything else
-changes nothing.* Over-escaping cannot silently break a link.
+So the whole rule an author needs is *escape `%`; escaping anything else changes
+nothing.* Over-escaping cannot silently break a link.
 
 In practice this affects `website` and [`\CDossierLink`](#cdossierlink) far more
 than the three keys above: a LinkedIn or GitHub handle and a Google Scholar
-identifier are restricted to letters, digits, hyphens, and underscores, so
-neither character occurs in one.
+identifier are restricted to letters, digits, hyphens, and underscores, so `%`
+does not occur in one.
+
+`#` used to belong in the table above, failing with a hyperref-internal error
+that named neither the field nor the fix. Since `v0.9.0` a raw `#` is accepted
+and reaches the link target intact, and `\#` keeps working unchanged — the two
+spellings produce the same annotation, so no existing document needs editing.
 
 ### Contact-field labels (`contact-labels`)
 
