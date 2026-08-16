@@ -189,6 +189,32 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
   **Example content only.** No class, option, key, command, or token changed.
 
+- Two shipped examples now demonstrate the package's two accessibility opt-ins,
+  which no example used before. `examples/industry/resume-english.tex` sets
+  `contact-labels = true`, so its contact line reads `Email: …`, `Phone: …`,
+  `Website: …`; `examples/industry/letter-industry.tex` carries
+  `\DocumentMetadata{lang=en, tagging=on}` and ships tagged. Each explains in
+  its own source comment what the feature does and why a reader might want it.
+  ([#273])
+
+  Both features were implemented, documented, and fixture-covered, but invisible
+  where users actually start. `contact-labels` is the one that matters most: it
+  is the only mechanism that identifies a phone number as a phone number in
+  *untagged* output — the default path, and the one plain extraction and ATS
+  parsers see. It is demonstrated on the résumé, which stays untagged for that
+  reason, while the letter demonstrates the tagged path.
+
+  The tagged letter's source comment repeats the same scope caveat `README.md`
+  uses: the tagged path is a tested preview covering five fixture profiles, and
+  neither that example nor a document derived from it carries a PDF/UA, WCAG,
+  ATS, or general accessibility conformance claim.
+
+  **Example content only.** No class, option, key, command, token, or default
+  changed; both features remain opt-in and off by default, and the other nine
+  examples are untouched. Neither example repaginates: every word of both keeps
+  the vertical position it had, the résumé's labels change only how its contact
+  line packs into its two existing rows, and both still build to one page.
+
 ### Fixed
 
 - A cover letter no longer breaks a page between the closing and the signature
@@ -314,6 +340,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#197]: https://github.com/amirhs1/CareerDossierTeX/issues/197
 [#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
+[#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392

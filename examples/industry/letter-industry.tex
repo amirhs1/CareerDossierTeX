@@ -6,6 +6,10 @@
 % \CDossierLetterSetup, \MakeCDossierLetterhead, \MakeCDossierClosing). It shares
 % the same profile data as the résumé example.
 %
+% It is also the example that demonstrates the opt-in tagged-PDF path (see the
+% \DocumentMetadata line below). The résumé example demonstrates the other
+% accessibility feature, `contact-labels', on the default untagged path.
+%
 % Compile with LuaLaTeX:
 %   latexmk -lualatex -interaction=nonstopmode -halt-on-error \
 %     examples/industry/letter-industry.tex
@@ -14,6 +18,30 @@
 %
 % Run from the repository root so the class and shared packages resolve, or add
 % the repository root to TEXINPUTS.
+
+% Tagged PDF is off by default and is requested here, before \documentclass,
+% because \DocumentMetadata has to come first. With it on, headings,
+% paragraphs, lists, and links are written into the PDF's structure tree as
+% semantic content, while the decorative rule, the contact separators, and the
+% running page furniture are marked as layout artifacts -- so a screen reader
+% announces the letter's structure and stays silent about its decoration. No
+% public command or class option changes, and turning it on does not
+% repaginate the document.
+%
+% What this is and is not: a tested preview, not a conformance claim. The
+% industry letter is one of five profiles covered by fixtures under
+% tests/tagging/, and passing them is not a PDF/UA, WCAG, ATS, or general
+% accessibility conformance claim -- neither for this example nor for a
+% document derived from it. See
+% README.md, "Tagged PDF (opt-in preview)", for the scope of what was verified.
+%
+% Every tagged build in this project logs one harmless tagpdf warning, that
+% neither unicode-math nor lua-unicode-math is loaded and so luamml writes no
+% MathML. Nothing here contains math; the warning is expected on the tagged
+% path and the test suites treat it as such.
+%
+% Deleting this line returns the example to the default untagged path.
+\DocumentMetadata{lang=en, tagging=on}
 
 \documentclass{careerdossier-letter}
 

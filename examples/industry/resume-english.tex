@@ -5,6 +5,11 @@
 % résumé built entirely from the public API (\CDossierSetup, \MakeCDossierHeader,
 % \CDossierSection, \CDossierSubsection, CDossierEntry, CDossierItemize).
 %
+% It is also the example that demonstrates `contact-labels' (see below). It is
+% deliberately left on the default *untagged* path, because that is the output
+% the label is there to fix; the tagged path is demonstrated instead by
+% examples/industry/letter-industry.tex, which shares this profile.
+%
 % Compile with LuaLaTeX:
 %   latexmk -lualatex -interaction=nonstopmode -halt-on-error \
 %     examples/industry/resume-english.tex
@@ -17,6 +22,21 @@
 \documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
 
 \input{examples/profiles/profile-english.tex}
+
+% `contact-labels' prefixes a short identifying label -- Email, Phone,
+% Website -- to the three contact fields whose value does not say what it is.
+% It is an option key rather than profile data, so it belongs here in the
+% document and not in the shared profile file.
+%
+% Why a résumé would want it: an e-mail address and a website are announced as
+% links by a screen reader, but a phone number is announced as bare digits with
+% nothing conveying what it is, and plain-text extraction and ATS parsers see
+% no link annotations at all. A visible label is the one mechanism that reaches
+% every consumer, including the untagged output this example produces.
+%
+% It is opt-in and off by default; deleting this line restores the unlabelled
+% contact line. See docs/API.md, "Contact-field labels (contact-labels)".
+\CDossierSetup{ contact-labels = true }
 
 \begin{document}
 
