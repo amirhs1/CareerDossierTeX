@@ -66,7 +66,9 @@ CareerDossierTeX is English-only.
 
 - LuaLaTeX (LuaHBTeX)
 - `latexmk`
-- A reasonably complete TeX Live or MiKTeX installation
+- A TeX Live or MiKTeX installation carrying `fontspec`, `geometry`,
+  `hyperref`, `enumitem`, `xcolor`, `l3keys2e`, `lua-ul`, and the TeX Gyre
+  fonts — all present in a full install of either distribution
 
 Fonts are resolved by file name through `luaotfload`, so the build does not
 depend on OS-installed fonts.
@@ -78,6 +80,107 @@ bibliography do not require them.
 CareerDossierTeX does not support XeLaTeX or pdfLaTeX. Compiling with either
 stops with an actionable error naming LuaLaTeX. Users upgrading from `v0.2.x`
 should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
+
+### Supported releases
+
+| Component | Minimum | Verified against |
+|---|---|---|
+| LaTeX kernel | `2022-06-01` | `2026-06-01` |
+| TeX Live | 2022 — the release carrying that kernel | 2026 |
+| Engine | LuaHBTeX (any release providing the above) | LuaHBTeX 1.24.0 |
+
+The two columns answer different questions, and the difference is deliberate.
+
+**Minimum** is what the code declares. Every file of the Work carries
+`\NeedsTeXFormat{LaTeX2e}[2022-06-01]`, so an older kernel names itself in a
+LaTeX warning at the top of the log — the kernel treats this as a warning, not
+an error, so the build continues and may then fail obscurely; the warning is
+the thing to read first. MiKTeX is supported on the same terms — any release
+shipping that kernel or newer.
+
+**Verified against** is what this release was actually built and tested on:
+locally under TeX Live 2026 on macOS, and in GitHub Actions against a pinned
+`texlive/texlive` image digest. Releases between the declared minimum and the
+verified toolchain are expected to work and are **not** tested; a report from
+one is welcome. The tagged-PDF preview additionally depends on
+`pdfmanagement-testphase` and `tagpdf`, whose exact verified versions are
+recorded in [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) §7.1.
+
+## Installation
+
+CareerDossierTeX is not on CTAN yet, so there is no `tlmgr install` route.
+Installing means putting the class and package files somewhere LaTeX searches,
+after which `\documentclass{careerdossier-resume}` resolves.
+
+**What to install** is the set of files listed under "The Work" in
+[`manifest.txt`](manifest.txt): six `careerdossier-*.sty` packages and four
+`careerdossier-*.cls` classes, all at the top level of the repository.
+`manifest.txt` is the single definition of that set — copy what it lists rather
+than any list repeated elsewhere, so that adding or removing a module cannot
+leave these instructions stale. Nothing else in the repository is needed to
+compile your own document; `docs/`, `examples/`, `tests/`, and the `Makefile`
+are for reading the reference material and for developing the toolkit.
+
+The three routes below install the same files and differ only in where they put
+them. All of them still require LuaLaTeX — see "Requirements" above.
+
+### Route 1 — beside the document
+
+The simplest route, and the one that needs no configuration on any installation.
+Copy the files into the same directory as your `.tex` file:
+
+```bash
+cp /path/to/CareerDossierTeX/careerdossier-*.sty \
+   /path/to/CareerDossierTeX/careerdossier-*.cls .
+```
+
+LaTeX searches the document's own directory first, so the classes resolve with
+no further step. This is per-document: each new document needs its own copy, and
+updating means recopying into each.
+
+### Route 2 — a local `texmf` tree
+
+Install once for every document on the machine. Ask your installation where its
+personal tree lives rather than guessing — the path differs by platform
+(`~/Library/texmf` on macOS, `~/texmf` on Linux):
+
+```bash
+kpsewhich -var-value=TEXMFHOME
+```
+
+Then copy the files into `tex/latex/careerdossier/` beneath it:
+
+```bash
+mkdir -p "$(kpsewhich -var-value=TEXMFHOME)/tex/latex/careerdossier"
+cp /path/to/CareerDossierTeX/careerdossier-*.sty \
+   /path/to/CareerDossierTeX/careerdossier-*.cls \
+   "$(kpsewhich -var-value=TEXMFHOME)/tex/latex/careerdossier/"
+```
+
+On TeX Live that is the whole step. `TEXMFHOME` is searched by directory scan
+rather than through an `ls-R` index, so no `mktexlsr` or `texhash` run is
+needed; running one is harmless but changes nothing. On MiKTeX, register the
+directory as a user root and refresh the file name database through MiKTeX
+Console — MiKTeX's own documentation is authoritative for that step, which was
+not exercised here.
+
+Update by replacing the files; uninstall by deleting the `careerdossier`
+directory.
+
+### Route 3 — Overleaf
+
+Overleaf projects have no personal `texmf` tree, so route 1 is the one that
+applies:
+
+1. Upload the files into the project alongside your `.tex` file. Overleaf's
+   *Upload* accepts a multiple selection, so they all go in one action.
+2. Set the compiler to **LuaLaTeX** under *Menu → Compiler*. This is required
+   rather than a preference: under pdfLaTeX or XeLaTeX the classes stop with an
+   error naming LuaLaTeX.
+
+Overleaf compiles through `latexmk`, which already reruns as often as the
+auxiliary files require, so the two-pass note under "Quick start" is handled for
+you there.
 
 ## Quick start
 

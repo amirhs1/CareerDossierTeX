@@ -10,6 +10,24 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- `README.md` gains an `## Installation` section covering the three routes onto
+  a path where `\documentclass{careerdossier-resume}` resolves: beside the
+  document, a local `texmf` tree, and Overleaf. Nothing in the repository had
+  said how, so a user who was not cloning it to develop the toolkit was blocked
+  before the first build. ([#261])
+
+  `## Requirements` now states a supported floor rather than "a reasonably
+  complete TeX Live or MiKTeX installation": LaTeX kernel `2022-06-01`, the
+  version every file of the Work already declares through `\NeedsTeXFormat`,
+  and TeX Live 2022 as the release carrying it — held apart from the toolchain
+  the release was verified against, which is TeX Live 2026 and LuaHBTeX 1.24.0.
+  The required packages are named too.
+
+  The file list points at `manifest.txt` instead of restating the ten
+  filenames, so adding or removing a module cannot leave the instructions
+  stale. **Documentation only** — no class, option, key, command, token, or
+  rendered output changed.
+
 - `make check-parallel` runs `make check`'s eleven targets concurrently instead
   of one after another, with `JOBS=N` to choose how many are in flight (default
   four). It arrived as an opt-in path alongside a serial `make check`; later in
@@ -389,6 +407,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#197]: https://github.com/amirhs1/CareerDossierTeX/issues/197
 [#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
+[#261]: https://github.com/amirhs1/CareerDossierTeX/issues/261
 [#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
 [#353]: https://github.com/amirhs1/CareerDossierTeX/issues/353
 [#355]: https://github.com/amirhs1/CareerDossierTeX/issues/355
