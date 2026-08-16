@@ -1,0 +1,41 @@
+% resume-fragment-actions.tex — a `#' in a link keeps its fragment (issue #353).
+%
+% A raw `#' in a profile value used to stop the build from inside hyperref
+% ("Illegal parameter number in definition of \Hy@tempa"), naming neither the
+% field nor the fix. The package now rewrites it to \#, the one spelling
+% hyperref carries into the annotation intact.
+%
+% THIS SUITE IS THE ONLY ONE THAT CAN SEE THE FIX, and that is the whole reason
+% the fixture is here rather than under `links' or `extraction'. The tempting
+% repair — hand hyperref a catcode-12 string — compiles with zero errors and
+% emits /URI(https://example.org/ada), silently dropping everything from the
+% `#' onwards, because an unescaped `#' is hyperref's fragment delimiter. The
+% page is right, the extracted text is right, and the link points at the wrong
+% address. Only the emitted action distinguishes the fix from that defect.
+%
+% BOTH SPELLINGS ARE PINNED, side by side. `website' is written with a raw `#'
+% and `github' with the documented \# escape; the two must reach the PDF as the
+% same kind of annotation with the same address, so a future change that fixes
+% one by breaking the other cannot pass. The escape is what documents already
+% in the wild use, and it has to keep working unchanged.
+%
+% Addresses are kept short so no link wraps; see the note in
+% resume-contact-actions.tex on why a wrap would confuse the comparison.
+%
+% URIEXPECT: mailto:ada@example.test
+% URIEXPECT: https://example.org/ada#install
+% URIEXPECT: https://example.invalid/esc#escaped
+% URIEXPECT: https://example.invalid/body#frag
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name    = {Ada Lovelace},
+  email   = {ada@example.test},
+  website = {example.org/ada#install},
+  github  = {https://example.invalid/esc\#escaped},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Notes}
+A body link carrying a fragment: \CDossierLink{example.invalid/body#frag}.
+\end{document}

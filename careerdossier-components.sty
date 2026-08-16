@@ -304,6 +304,8 @@
 
 \tl_new:N   \l__cdossier_components_disp_tl
 \tl_new:N   \l__cdossier_components_url_tl
+\tl_new:N   \l__cdossier_components_target_tl
+\tl_new:N   \l__cdossier_components_shown_tl
 \str_new:N  \l__cdossier_components_scheme_str
 \bool_new:N \l__cdossier_components_printed_bool
 \tl_new:N   \l__cdossier_components_label_tl
@@ -565,6 +567,48 @@
       }
   }
 
+%% Rewrite every raw `#' in a link target to \# in place (issue #353).
+%%
+%% A `#' in a profile value survives tokenization -- unlike `%', which the lexer
+%% destroys before any package code can see it -- so it reaches here intact, at
+%% catcode 6, and the displayed address already renders correctly. Only the
+%% \href target fails, and it fails from inside hyperref: \Hy@tempa is built
+%% with \edef, where a lone parameter character is "Illegal parameter number in
+%% definition of \Hy@tempa" -- a diagnostic naming neither the field, nor the
+%% value, nor the fix.
+%%
+%% THE OBVIOUS REPAIR IS THE WRONG ONE, AND FAILS SILENTLY. Handing hyperref a
+%% catcode-12 string instead (\str_set:Nn) compiles with zero errors, which is
+%% exactly why it is dangerous: hyperref reads an unescaped `#' as the fragment
+%% delimiter and drops everything after it, so `example.com/a#b' emits
+%%
+%%     /URI(https://example.com/a)
+%%
+%% -- a loud build failure traded for a link that looks right on the page and
+%% points at the wrong address, the same class of defect as issue #328. No
+%% text-layer test can catch it, because the displayed address is correct either
+%% way. Measured, not inferred: the two spellings were compared in an
+%% uncompressed build, and only \# reaches the annotation intact.
+%%
+%% So the target has to carry \#, the one spelling hyperref preserves, and the
+%% rewrite is a token substitution rather than a catcode change. l3regex is the
+%% idiom that can express it: \cP matches the parameter catcode class, which an
+%% \tl_replace_all:Nnn search argument cannot hold -- a lone parameter token
+%% breaks expl3's own argument scanning before the replacement is ever reached.
+%%
+%% A value that already writes \# is a control sequence, not a parameter
+%% character, so \cP\# does not match it and documents using the documented
+%% escape are untouched.
+%%
+%% BOTH ARGUMENTS OF A LINK NEED THIS, not just the target. \nolinkurl is also
+%% built on \hyper@normalise, and so also \edef's \Hy@tempa: measured on the
+%% reproducer, rewriting only the target took the failure from five errors to
+%% two, and the two that remained were the displayed address. The unlinked
+%% branch below needs no rewrite -- nothing there reaches hyperref, and the
+%% parameter character typesets as `#' on its own.
+\cs_new_protected:Npn \__cdossier_components_hashescape:N #1
+  { \regex_replace_all:nnN { \cP\# } { \c{\#} } #1 }
+
 %% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
 %% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
 %% \urlstyle{same} so the text stays in the body font rather than switching to
@@ -579,7 +623,12 @@
       {
         \group_begin:
           \CDossierPlainLinks
-          \href {#1} { \nolinkurl {#2} }
+          \tl_set:Nn \l__cdossier_components_target_tl {#1}
+          \tl_set:Nn \l__cdossier_components_shown_tl  {#2}
+          \__cdossier_components_hashescape:N \l__cdossier_components_target_tl
+          \__cdossier_components_hashescape:N \l__cdossier_components_shown_tl
+          \href { \l__cdossier_components_target_tl }
+            { \nolinkurl { \l__cdossier_components_shown_tl } }
         \group_end:
       }
       { \__cdossier_components_links_inert: #2 }
@@ -795,6 +844,14 @@
           { \tl_put_left:Ne \l__cdossier_components_url_tl
               { \tl_to_str:n { https://orcid.org/ } } }
       }
+    %% This branch builds its own \href rather than going through
+    %% \__cdossier_components_link:nn, so it needs the raw-`#' rewrite the
+    %% chokepoint applies (issue #353). An ORCID identifier holds no `#', but
+    %% the value is author-supplied and a mistyped one would otherwise fail
+    %% with hyperref's internal diagnostic while every other field no longer
+    %% does.
+    \__cdossier_components_hashescape:N \l__cdossier_components_url_tl
+    \__cdossier_components_hashescape:N \l__cdossier_components_disp_tl
     \cs_if_exist:NTF \href
       {
         \group_begin:

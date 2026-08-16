@@ -1,0 +1,43 @@
+% resume-fragment-links.tex — copy-paste integrity of an address carrying a
+% fragment (issue #353).
+%
+% A raw `#' in a link is now rewritten to \# before it reaches hyperref, and
+% that rewrite lands on the *displayed* address as well as on the target:
+% \nolinkurl is built on the same hyperref internal as \href and failed for the
+% same reason. So the visible token stream of every link the toolkit emits
+% changed shape, and this suite is what judges whether the address still
+% survives a wrap intact.
+%
+% tests/annotations/resume-fragment-actions.tex pins the other half — that the
+% emitted /URI keeps the fragment rather than truncating at it. Neither suite
+% can see the other's defect: a truncated target renders and pastes perfectly,
+% and a split display extracts wrongly while the annotation stays correct.
+%
+% Both spellings appear. The raw and escaped forms must paste back identically,
+% since the whole point of the change is that an author need not know which one
+% they wrote.
+%
+% The body links are long enough to wrap at `fontsize=12pt, margin=normal', so
+% the fragment sits mid-address rather than conveniently at a line end.
+%
+% LINKTOKEN: example.org/ada#install
+% LINKTOKEN: https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html#appendix-g
+% LINKTOKEN: https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html#results
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-resume}
+\CDossierSetup{
+  name    = {Ada Lovelace},
+  email   = {ada@example.org},
+  website = {example.org/ada#install},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+
+The programme report, written with a raw fragment, is at
+\CDossierLink{https://example.org/programs/analytics-modernization/2024/final-report/8f3a9c1b7e2d4f6a8c0e2b4d6f8a1c3e5b7d9f1a3c5e7b9d/notes.html#appendix-g}
+for downstream consumers.
+
+The deposited appendix, written with the escaped spelling, is at
+\CDossierLink{https://records.example.invalid/collections/analytical-engine/1843/4d7e0b2a6c9f1e3b5d8a0c2e4f6b8d1a3c5e7f9b/appendix-g.html\#results}
+and remains publicly available for review.
+\end{document}

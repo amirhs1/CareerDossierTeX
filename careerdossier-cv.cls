@@ -425,6 +425,7 @@
 \tl_new:N   \l__cdossier_cv_publication_url_tl
 \tl_new:N   \l__cdossier_cv_publication_note_tl
 \tl_new:N   \l__cdossier_cv_publication_target_tl
+\tl_new:N   \l__cdossier_cv_publication_shown_tl
 \str_new:N  \l__cdossier_cv_publication_target_str
 \seq_new:N  \l__cdossier_cv_publication_details_seq
 
@@ -494,6 +495,7 @@
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
     \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
+    \tl_set:Nn \l__cdossier_cv_publication_shown_tl  {#2}
     \str_set:NV \l__cdossier_cv_publication_target_str
       \l__cdossier_cv_publication_target_tl
     \str_if_in:NnF \l__cdossier_cv_publication_target_str { :// }
@@ -509,6 +511,15 @@
           { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
               { \tl_to_str:n { https:// } } }
       }
+    %% A raw `#' in the target is rewritten to \# by the package that owns
+    %% links, for the reason given at \__cdossier_components_hashescape:N in
+    %% careerdossier-components: hyperref's own \edef fails on a parameter
+    %% character, and the catcode-12 repair truncates the address silently
+    %% (issue #353). This link builds its own \href rather than going through
+    %% \__cdossier_components_link:nn, so it applies the rewrite itself. A URL
+    %% carrying a fragment is ordinary in a publication list.
+    \__cdossier_components_hashescape:N \l__cdossier_cv_publication_target_tl
+    \__cdossier_components_hashescape:N \l__cdossier_cv_publication_shown_tl
     %% The visible text is the identifier itself, so this link needs no
     %% decoration under `medium=screen' -- and must not get one: ulem would
     %% rebox the \nolinkurl into a single unbreakable token. See
@@ -518,7 +529,8 @@
         \group_begin:
           \CDossierPlainLinks
           \href { \l__cdossier_cv_publication_target_tl }
-            { #1:\nobreakspace \nolinkurl {#2} }
+            { #1:\nobreakspace
+              \nolinkurl { \l__cdossier_cv_publication_shown_tl } }
         \group_end:
       }
       {
