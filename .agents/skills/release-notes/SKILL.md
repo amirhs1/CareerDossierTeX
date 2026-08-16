@@ -17,7 +17,7 @@ Read and follow, in order:
 
 ## Procedure
 
-### Every behavior-changing PR
+### Every PR with a user-visible change
 
 1. Confirm the change is user-visible: a feature, a behavior change, a fix,
    or a breaking change.
