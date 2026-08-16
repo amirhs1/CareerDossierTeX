@@ -1961,14 +1961,32 @@
       { \prg_return_true: }
   }
 
-%% Build "Doctype -- Name", or just "Name" when the class declared no doctype.
+%% Build "Doctype - Name" with an en dash, or just "Name" when the class
+%% declared no doctype.
+%%
+%% The separator is written as the character it is, not as `--' (issue #428).
+%% Spelling it `--' produced two different titles from one source, because the
+%% two build paths hand the string to different writers. On the default path
+%% hyperref's \pdfstringdef performs the usual TeX ligature substitution on its
+%% way to the PDF string, so `--' arrives as U+2013; under \DocumentMetadata the
+%% kernel's PDF management writes the Info dictionary itself, \pdfstringdef is
+%% never involved, and the two hyphens reach the file literally. Neither path
+%% logs anything, and the difference is only in the catalog, which is why it
+%% survived every suite -- see tests/metadata/run.sh, which now pins the two
+%% against each other.
+%%
+%% U+2013 is the spelling docs/API.md has always documented, and the one the
+%% default path has always shipped, so the tagged path was the side that was
+%% wrong. Naming it by code point keeps this file ASCII, which matters for a
+%% package that ships to CTAN; ^^^^ notation is the kernel's own way to do that
+%% and needs no package.
 \cs_new_protected:Npn \__cdossier_components_pdftitle:
   {
     \tl_set:Nx \l__cdossier_components_pdfname_tl { \CDossierFieldValue { name } }
     \tl_if_blank:VF \l__cdossier_components_doctype_tl
       {
         \tl_put_left:Nx \l__cdossier_components_pdfname_tl
-          { \l__cdossier_components_doctype_tl \c_space_tl -- \c_space_tl }
+          { \l__cdossier_components_doctype_tl \c_space_tl ^^^^2013 \c_space_tl }
       }
   }
 

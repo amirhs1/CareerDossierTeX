@@ -1,0 +1,23 @@
+% The derived /Title on the tagged build path -- issue #428.
+%
+% letter-title-default.tex with one line added. Keep the two bodies identical:
+% the assertion is that the same source yields the same /Title whichever path
+% builds it, and a difference anywhere else would weaken that to a coincidence.
+%
+% This is the only fixture in this suite that passes \DocumentMetadata. The
+% suite is otherwise about the default path precisely because \DocumentMetadata
+% supplies catalog entries itself; here that is the point, since the two writers
+% are what disagreed. Under \DocumentMetadata the kernel's PDF management writes
+% the Info dictionary and hyperref's \pdfstringdef never sees the string, so a
+% literal `--' in the builder reached the file as two hyphens while the default
+% path -- where \pdfstringdef converts it -- shipped an en dash.
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Metadata Fixture}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

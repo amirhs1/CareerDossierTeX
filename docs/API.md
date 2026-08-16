@@ -940,6 +940,12 @@ The document type is part of the title so that a résumé and a cover letter bui
 from one profile are distinguishable in a viewer's tab bar, in document
 properties, and in a file manager.
 
+The separator is an en dash, and the derived values are the same whether or not
+the document opts into tagging with `\DocumentMetadata`. Before `v0.9.0` the
+tagged path wrote two hyphens there instead; nothing else about the derived
+metadata differed between the paths, and nothing a document sets itself is
+affected.
+
 When `name` is absent, `/Title` and `/Author` are left unset.
 `\MakeCDossierHeader` and `\MakeCDossierLetterhead` already error on a missing
 `name`; metadata does not add a second diagnostic.
