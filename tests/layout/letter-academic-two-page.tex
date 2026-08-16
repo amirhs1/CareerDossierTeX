@@ -10,6 +10,15 @@
 % Verifies that the page break falls inside the body, that page two carries the
 % `<name> -- Cover Letter` running header, and that every page carries a
 % centered `Page N of M` folio matching careerdossier-cv.
+%
+% Issue #419 freed 3.625pt at the header-to-body boundary, which was just
+% enough to pull the closing line onto page one and strand the signature name
+% alone on page two -- a club/widow pair the fixture's own detector caught.
+% The "Beyond research and teaching" paragraph carries one added sentence so
+% the break again falls inside the body, with the same margin from the edge
+% the fixture had before. \MakeCDossierClosing has no keep-together protection
+% of its own between the closing text and the signature name; #421 tracks that
+% gap separately.
 \documentclass[family=academic]{careerdossier-letter}
 \providecommand\CDossierAFourContinuationStress{}
 \CDossierSetup{
@@ -61,7 +70,11 @@ Beyond research and teaching, I have contributed to the maintenance of open
 research software used across several institutions, served on programme
 committees for conferences concerned with reproducible computational science, and
 organized workshops introducing early-career researchers to version control,
-automated testing, and durable documentation practices.
+automated testing, and durable documentation practices. I have also mentored
+early-career researchers preparing their own grant applications and manuscripts,
+reviewed submissions for two international workshops in my field, and
+contributed documentation improvements to several widely used open-source
+scientific computing packages.
 
 I would welcome the opportunity to contribute to your department's research,
 teaching, and student mentorship. I am especially interested in building courses

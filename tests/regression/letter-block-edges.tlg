@@ -3,22 +3,22 @@ Don't change this file in any respect.
 ============================================================
 TEST 1: letterhead-minimal
 ============================================================
-letterhead-minimal height = 102.16425pt
+letterhead-minimal height = 98.53925pt
 ============================================================
 ============================================================
 TEST 2: letterhead-one-recipient-line
 ============================================================
-letterhead-one-recipient-line height = 127.53925pt
+letterhead-one-recipient-line height = 123.91425pt
 ============================================================
 ============================================================
 TEST 3: letterhead-four-recipient-lines
 ============================================================
-letterhead-four-recipient-lines height = 171.03925pt
+letterhead-four-recipient-lines height = 167.41425pt
 ============================================================
 ============================================================
 TEST 4: letterhead-with-subject
 ============================================================
-letterhead-with-subject height = 152.91425pt
+letterhead-with-subject height = 149.28925pt
 ============================================================
 ============================================================
 TEST 5: body-and-closing-boundaries

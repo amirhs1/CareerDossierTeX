@@ -16,6 +16,7 @@
   email    = {ada.lovelace@example.com},
 }
 
+\newbox\ProbeHeaderBox
 \newbox\ProbeSectionBox
 \newbox\ProbeEntryRunBox
 \newbox\ProbeEntryListBox
@@ -23,6 +24,20 @@
 \newbox\ProbeParaBox
 
 \begin{document}
+
+% -- header stack into the body copy that follows it -----------------------
+% Issue #419: the boundary below the stack is emitted outside the group that
+% zeroes `\parskip' for the lines above it, so it is the one header boundary
+% whose rendered gap can differ from its token. The record classes read the
+% same measurement as the prose ones only because `RecordParSkip' is zero,
+% which is exactly why all three fixtures measure it rather than one.
+\setbox\ProbeHeaderBox=\vbox{%
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{Ada Lovelace}
+  \CDossierHeaderLine{ada.lovelace@example.com}
+  \CDossierHeaderEnd
+  \noindent Following body copy line.\par
+}
 
 % -- section heading between two blocks of body copy -----------------------
 \setbox\ProbeSectionBox=\vbox{%
@@ -96,7 +111,12 @@
   tok("RecordListEdgeBelowSkip",   \number\dimexpr\CDossierRecordListEdgeBelowSkip\relax)
   tok("RecordItemSepSkip",         \number\dimexpr\CDossierRecordItemSepSkip\relax)
   tok("RecordParSkip",             \number\dimexpr\CDossierRecordParSkip\relax)
+  tok("SharedHeaderNameGapSkip",   \number\dimexpr\CDossierSharedHeaderNameGapSkip\relax)
+  tok("RecordHeaderBelowSkip",     \number\dimexpr\CDossierRecordHeaderBelowSkip\relax)
+  tok("parskip",                   \number\dimexpr\parskip\relax)
 
+  cdossier_probe.report(\number\ProbeHeaderBox, "header", {
+    "header name -> header meta", "header stack -> body"})
   cdossier_probe.report(\number\ProbeSectionBox, "section", {
     "body -> section heading", "section heading -> rule", "rule -> body"})
   % An entry head sets two line boxes -- the title/dates row and the
@@ -122,6 +142,7 @@
   cdossier_probe.report(\number\ProbeParaBox, "para", {"paragraph -> paragraph"})
 }
 
+\box\ProbeHeaderBox
 \box\ProbeSectionBox
 \box\ProbeEntryRunBox
 \box\ProbeEntryListBox

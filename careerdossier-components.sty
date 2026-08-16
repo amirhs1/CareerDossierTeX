@@ -988,8 +988,8 @@
 %% value below, and `\addvspace' cannot absorb it: `\parskip' is inserted at the
 %% next paragraph's start, after `\addvspace' has already read `\lastskip', so
 %% the two always add. The stack therefore zeroes `\parskip' for its own group
-%% and subtracts it from every gap it emits, so each token names the rendered
-%% gap in every class.
+%% and subtracts it from every gap it emits inside that group, so each
+%% between-line token names the rendered gap in every class.
 %%
 %% Issue #220: that isolation is load-bearing and must stay, but the zero is not
 %% a tunable. It used to come from a public \CDossierSharedHeaderParSkip, which
@@ -999,6 +999,14 @@
 %% a literal zero; the subtraction below is kept because it is the project-wide
 %% emission contract for a paragraph boundary, not because `\parskip' can be
 %% non-zero here.
+%%
+%% Issue #419: the boundary below the stack is not inside that group -- it is
+%% emitted after `\group_end:' has restored the class's real `\parskip', which
+%% is non-zero in the two prose classes. There the same subtraction is
+%% load-bearing rather than a no-op, so \CDossierHeaderEnd routes that boundary
+%% through the same \__cdossier_components_headerstack_gap:N helper the
+%% between-line boundaries use: one emission contract, applied wherever a
+%% paragraph follows, whether `\parskip' happens to be zero or not.
 %%
 %% Issue #223: the gaps *between* two header lines are genuinely shared -- every
 %% class stacks the same shape and the group-local zero above makes the same
@@ -1029,8 +1037,11 @@
 \NewDocumentCommand \CDossierHeaderLine { m }
   { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
 
-%% A header gap has to be reduced by the paragraph gap the following line
-%% contributes on its own; see the block comment above.
+%% A gap that precedes a paragraph has to be reduced by the `\parskip' that
+%% paragraph contributes on its own; see the block comment above. Every
+%% boundary the stack emits routes through this one helper, including the
+%% boundary below the stack (issue #419), so `\parskip' is read wherever it is
+%% not already zeroed for the group.
 \cs_new_protected:Npn \__cdossier_components_headerstack_gap:N #1
   { \addvspace { \dim_eval:n { #1 - \parskip } } }
 
@@ -1071,7 +1082,8 @@
               \group_end:
             }
         \group_end:
-        \addvspace { \tl_use:N \l__cdossier_components_headerbelow_tl }
+        \exp_args:No \__cdossier_components_headerstack_gap:N
+          \l__cdossier_components_headerbelow_tl
       }
   }
 

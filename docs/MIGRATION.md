@@ -357,6 +357,48 @@ is documented in
 [Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
 in this format.
 
+## [Unreleased]
+
+### The gap below the header stack no longer adds `\parskip`
+
+`v0.7.0` zeroed `\parskip` for the header block's own scope, so the gaps
+*between* header lines render their token in all four classes — see
+[Header spacing no longer floored by `\parskip`](#header-spacing-no-longer-floored-by-parskip)
+below. The boundary *below* the stack was left out of that fix: it is emitted
+after the block's scope ends, where `careerdossier-letter` and
+`careerdossier-statement` have restored their document-wide `\parskip`, and the
+first body paragraph then contributed that `\parskip` on top of the token.
+`\CDossierProseHeaderBelowSkip` and `\CDossierLetterHeaderBelowSkip` therefore
+named a gap narrower than the one a reader measured — by 3.00 pt at `10pt`,
+3.40 pt at `11pt`, and 3.625 pt at `12pt`, or 27% of the token's value.
+
+That boundary now routes through the same `token − \parskip` emission the
+between-line boundaries already used, so all three header tokens name the
+rendered gap in all four classes. No public command, class option, key, or token
+value changes.
+
+**Letters and statements reflow.** The header-to-body gap tightens by exactly
+one `\parskip` — 3.625 pt at `fontsize=12pt` — once per document. Measured on
+the shipped examples and on the size/margin matrix, no example and no
+class × margin × size combination changes its page count, but a letter or
+statement fits marginally more body text on page one. Résumé and CV are
+unaffected, because `\CDossierRecordParSkip` is `0.00` and the subtraction was
+already a no-op there.
+
+To keep the previous letter or statement header-to-body gap, add the paragraph
+gap back after `\documentclass`:
+
+```latex
+\makeatletter\ExplSyntaxOn
+\skip_add:Nn \CDossierLetterHeaderBelowSkip { \CDossierLetterParSkip }
+\ExplSyntaxOff\makeatother
+```
+
+Use `\CDossierProseHeaderBelowSkip` with `\CDossierProseParSkip` in
+`careerdossier-statement`. Unlike the `v0.7.0` note above, the token may be read
+here rather than written out, because no retune accompanies this change. Do not
+apply it in the résumé or CV, whose gap never moved.
+
 ## [0.8.0] - 2026-08-12
 
 ### `CDossierEntry` reads its body as an argument

@@ -9,12 +9,24 @@
   email = {ada.lovelace@example.com},
 }
 
+\newbox\ProbeHeaderBox
 \newbox\ProbeSectionBox
 \newbox\ProbeStarBox
 \newbox\ProbeSubsectionBox
 \newbox\ProbeParaBox
 
 \begin{document}
+
+% -- header stack into the prose that follows it ---------------------------
+% Issue #419: this class's `\parskip' is non-zero, so the boundary below the
+% stack is where the token and the rendered gap came apart. See record.tex.
+\setbox\ProbeHeaderBox=\vbox{%
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{Ada Lovelace}
+  \CDossierHeaderLine{ada.lovelace@example.com}
+  \CDossierHeaderEnd
+  \noindent Following prose line.\par
+}
 
 % -- section heading between two paragraphs --------------------------------
 \setbox\ProbeSectionBox=\vbox{%
@@ -55,7 +67,11 @@
   tok("ProseSubsectionBelowSkip", \number\dimexpr\CDossierProseSubsectionBelowSkip\relax)
   tok("ProseParSkip",             \number\dimexpr\CDossierProseParSkip\relax)
   tok("parskip",                  \number\dimexpr\parskip\relax)
+  tok("SharedHeaderNameGapSkip",  \number\dimexpr\CDossierSharedHeaderNameGapSkip\relax)
+  tok("ProseHeaderBelowSkip",     \number\dimexpr\CDossierProseHeaderBelowSkip\relax)
 
+  cdossier_probe.report(\number\ProbeHeaderBox, "header", {
+    "header name -> header meta", "header stack -> prose"})
   cdossier_probe.report(\number\ProbeSectionBox, "section", {
     "prose -> section heading", "section heading -> prose"})
   cdossier_probe.report(\number\ProbeStarBox, "section-star", {
@@ -65,6 +81,7 @@
   cdossier_probe.report(\number\ProbeParaBox, "para", {"paragraph -> paragraph"})
 }
 
+\box\ProbeHeaderBox
 \box\ProbeSectionBox
 \box\ProbeStarBox
 \box\ProbeSubsectionBox
