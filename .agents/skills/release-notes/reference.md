@@ -40,7 +40,7 @@ shipped at 350. Treat significantly more than that as a signal to cut, not a
 target — when the release notes start reproducing the CHANGELOG, the "see the
 CHANGELOG" link has gone decorative.
 
-## CHANGELOG.md entries (every behavior-changing PR)
+## CHANGELOG.md entries (every user-visible PR)
 
 1. Add or update the entry in the same PR as the user-visible change (see
    `CONTRIBUTING.md`, "Update `CHANGELOG.md` when").
