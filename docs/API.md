@@ -823,6 +823,14 @@ baseline (`tests/extraction/resume-contact-labels.tex` and
 `tests/extraction/resume-contact-optional.tex`). The labels survive Poppler
 and PDFKit plain-text extraction with clean separators.
 
+One shipped example turns the key on:
+[`examples/industry/resume-english.tex`](../examples/industry/resume-english.tex)
+sets it after loading the shared profile — the key is an option, not profile
+data, so it belongs in the document rather than in
+`examples/profiles/profile-english.tex`. That example stays on the default
+untagged path deliberately, since untagged output is what the label exists to
+fix. The remaining ten examples leave the key at its `false` default.
+
 ### Contact-line wrapping
 
 Contact fields form a centered block whose rows are packed greedily in the

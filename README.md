@@ -358,6 +358,13 @@ by default**. Opt in with `\DocumentMetadata` before `\documentclass`:
 \documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
 ```
 
+One shipped example is built this way so the opt-in is visible where users
+start:
+[`examples/industry/letter-industry.tex`](examples/industry/letter-industry.tex)
+carries the `\DocumentMetadata` line above, and its source comment explains what
+tagging does and what is not being claimed. The other ten examples stay on the
+default untagged path.
+
 When tagging is on, section headings, lists, paragraphs, and links are exposed
 as structure, while decorative rules, contact separators, and running page
 furniture are marked as layout artifacts. No public command or class option
