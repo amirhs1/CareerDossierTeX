@@ -10,7 +10,7 @@ LaTeX-package details a generic template would miss.
 ## Authority boundary
 
 Adding or updating a `CHANGELOG.md` entry is routine work: do it in the same
-PR as the behavior change, like any other required doc update.
+PR as the user-visible change, like any other required doc update.
 
 Drafting GitHub Release note text is also routine work once
 `CONTRIBUTING.md`'s "Release contributions" checklist is otherwise satisfied —
@@ -42,7 +42,7 @@ CHANGELOG" link has gone decorative.
 
 ## CHANGELOG.md entries (every behavior-changing PR)
 
-1. Add or update the entry in the same PR as the behavior change (see
+1. Add or update the entry in the same PR as the user-visible change (see
    `CONTRIBUTING.md`, "Update `CHANGELOG.md` when").
 2. Place new entries under `## [Unreleased]`. Release preparation retitles
    that section to `## [X.Y.Z] - YYYY-MM-DD` and opens a fresh empty
