@@ -176,6 +176,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A cover letter no longer breaks a page between the closing and the signature
+  name. `\MakeCDossierClosing` keeps the two on the same page, whichever page
+  that turns out to be: when they do not both fit under the body, the break now
+  falls above the closing and the whole block opens the next page. ([#421])
+
+  The two are separate one-line paragraphs, so `\clubpenalty` and
+  `\widowpenalty` — which govern the first and last line of *one* paragraph —
+  never saw the boundary, and the signature gap between them was an ordinary
+  legal breakpoint. The gap was latent in every release since the command was
+  introduced; [#419]'s tightened header boundary is what first moved a committed
+  fixture across the edge that exposes it.
+
+  No public command, class option, key, or token value changes, and no gap
+  moves. Only a letter whose closing did not fit repaginates, and it gains a
+  page rather than losing one.
+
 - The gap below the header stack in a statement or letter now equals the token
   that names it, at every body size. `\CDossierProseHeaderBelowSkip` and
   `\CDossierLetterHeaderBelowSkip` measured the boundary between the header
@@ -291,6 +307,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#405]: https://github.com/amirhs1/CareerDossierTeX/issues/405
 [#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
 [#419]: https://github.com/amirhs1/CareerDossierTeX/issues/419
+[#421]: https://github.com/amirhs1/CareerDossierTeX/issues/421
 
 ## [0.8.0] - 2026-08-12
 

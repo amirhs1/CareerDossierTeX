@@ -1167,6 +1167,24 @@ Renders:
 
 This command validates that `name` exists.
 
+The three are a single unit for pagination: the closing text and the signature
+name always land on the same page, whichever page that turns out to be. When
+they do not both fit under the body, the page breaks *above* the closing and
+the whole block opens the next page. This is a contract of the command, not a
+token: the boundary between the two is forbidden outright, because under
+`\raggedbottom` a page-break penalty here is a boolean rather than a dial (see
+"Typographic page-break penalties" below), and a keep-together that is not
+infinite is not a keep.
+
+It is a separate guarantee from `\clubpenalty` and `\widowpenalty`, which
+cannot express it. Those govern the first and last line *of one paragraph*, and
+the closing and the name are two separate one-line paragraphs — so before
+`v0.9.0` a sufficiently-tuned letter could strand "Sincerely," at the foot of
+one page and the signature name alone at the head of the next
+([#421](https://github.com/amirhs1/CareerDossierTeX/issues/421)). Nothing else
+about the block changed; a letter whose closing already fit paginates exactly as
+before.
+
 ### `\CDossierSection`
 
 ```latex
