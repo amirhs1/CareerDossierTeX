@@ -353,6 +353,78 @@ for job in letter-override-default letter-override-tagged; do
 done
 echo
 
+echo "== a document's own '--' is upstream's to spell, and the paths differ =="
+# Issue #442, and the only check in this suite that asserts the two paths
+# DISAGREE. Read the reason before changing it.
+#
+# The three sections above converge the paths because the string is the
+# package's to compose. This one does not, because the string is not: since
+# #440 a value the document sets is passed through untouched, and the two
+# writers spell it differently. hyperref's \pdfstringdef applies TeX's input
+# ligatures on the default path; under \DocumentMetadata the kernel's PDF
+# management writes the Info dictionary and \pdfstringdef never runs.
+#
+# #442 weighed accepting this, reporting it upstream, and working around it
+# here, and settled on accept-and-document. Working around it would mean
+# rewriting values the package deliberately does not touch, and would still
+# reach only the two fields it knows about. So the behaviour is documented in
+# docs/API.md ("Overriding the derived metadata") and pinned here, which is
+# what stops "accepted" from decaying into "unnoticed".
+#
+# pdfsubject is the load-bearing field, not a third example. Nothing in
+# careerdossier-components reads or writes it, so it cannot be diverging
+# because of anything this package did -- and it diverges identically to the
+# two fields the package does handle. That is the evidence for docs/API.md's
+# claim that the cause is upstream, and the reason the workaround was declined.
+# Measured the same way outside this repository: `article' + `hyperref' with no
+# CareerDossierTeX file loaded at all diverges identically (2026-08-16,
+# LuaHBTeX 1.24.0 / TeX Live 2026).
+#
+# THIS CHECK IS SELF-RETIRING. It fails if hyperref or the LaTeX kernel ever
+# makes the two paths agree, and that failure is the notification, not a
+# regression: docs/API.md then documents behaviour that no longer happens. The
+# repair in that case is to delete this section and its two fixtures and
+# correct docs/API.md -- never to make the package converge the values itself,
+# which is the option #442 declined.
+#
+# Expected values are built here from their parts rather than copied out of a
+# build, so neither path can pass by agreeing with whatever it currently emits.
+# en_dash_hex is the constant the #439 block above defines; ascii_utf16be_hex
+# is ASCII-only, hence the splice on the default side.
+for job in letter-passthrough-default letter-passthrough-tagged; do
+  if compile_fixture "$job.tex" "$job"; then
+    for field in Title Author Subject; do
+      case "$job" in
+        *-default)
+          expected="$(ascii_utf16be_hex 'Passthrough ')$en_dash_hex$(ascii_utf16be_hex " $field")"
+          ;;
+        *-tagged)
+          expected="$(ascii_utf16be_hex "Passthrough -- $field")"
+          ;;
+      esac
+      read_info "$job" "$field" "$expected"
+    done
+  fi
+done
+# Stated in its own right, as the two sections above do. "Both paths converted"
+# and "both paths passed through" are failures this suite should be able to
+# tell apart from "the two disagree", and only the last one is what ships.
+for field in Title Author Subject; do
+  pt_default="$work/letter-passthrough-default.$field"
+  pt_tagged="$work/letter-passthrough-tagged.$field"
+  if [ -s "$pt_default" ] && [ -s "$pt_tagged" ]; then
+    if [ "$(cat "$pt_default")" != "$(cat "$pt_tagged")" ]; then
+      echo "  the two paths spell /$field differently, as docs/API.md documents"
+    else
+      record_failure \
+        "the two build paths now agree on a document's own /$field -- read the note above this check before treating that as a regression"
+    fi
+  else
+    record_failure "one of the two paths produced no /$field to compare"
+  fi
+done
+echo
+
 if [ "$fail" -eq 0 ]; then
   echo "ALL METADATA FIXTURES PASSED"
 else

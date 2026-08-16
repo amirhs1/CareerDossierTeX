@@ -1058,11 +1058,16 @@ kernel instead and arrives as typed. So
 ```
 
 gives an en dash without `\DocumentMetadata` and two hyphens with it. The same
-applies to `pdfsubject` and `pdfkeywords`, which this package never sees at all.
-This is upstream behaviour rather than something the classes choose, and the
-package does not work around it: doing so would mean rewriting values it
-deliberately passes through untouched. Type the character you want — `–` — and
-both paths agree.
+applies to `pdfsubject` and `pdfkeywords`, which this package never sees at all
+— and to a plain `article` with `hyperref` and no CareerDossierTeX file loaded,
+which is what places the cause upstream rather than in these classes.
+
+The classes leave it alone by decision rather than by omission. Working around
+it would mean rewriting values they deliberately pass through, and would still
+reach only `pdftitle` and `pdfauthor`, leaving `pdfsubject` and `pdfkeywords`
+diverging exactly as before — trading one surprise for a narrower and less
+predictable one. Type the character you want — `–` — and both paths agree on
+every field at once.
 
 ## Public commands
 

@@ -280,9 +280,13 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   Values you set yourself are unchanged and still follow `hyperref`'s own
   behaviour, which does differ between the paths; `docs/API.md` records that
   under "Overriding the derived metadata". Rewriting them would mean overriding
-  the pass-through [#440] just established, so the package leaves them alone;
-  that residue is tracked as [#442]. `pdfsubject`, which this package never
-  reads or writes, diverges the same way, which is what places it upstream.
+  the pass-through [#440] just established, so the package leaves them alone.
+  [#442] settled that as a decision rather than an open residue, and `make
+  metadata` now pins it with the one check in the tree that requires two build
+  paths to *disagree*: the day upstream converges them is the day the suite
+  says `docs/API.md` needs correcting. `pdfsubject`, which this package never
+  reads or writes, diverges the same way, and so does a plain `article` with
+  `hyperref` and none of these classes loaded; that is what places it upstream.
 
   `make metadata` gains a fixture pair carrying a double-barrelled name and
   requiring the two paths to agree on `/Title` *and* `/Author`, which are
