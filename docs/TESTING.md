@@ -757,6 +757,22 @@ path for the other. Their strings are plain ASCII on purpose, so that the
 separate question of how a `--` is spelled on each path (issue #439) cannot
 change what they measure.
 
+A third pair asks that separate question: whether a `--` the *user* typed, in a
+value the package composes into the derived string, is spelled the same on both
+paths (issue #439). It is not a variant of the #428 pair. That one uses a plain
+name, so it is silent about anything a user typed, and its fix — naming the
+separator by code point instead of writing `--` — does nothing for a `--`
+arriving from the profile. Keep this pair's name double-barrelled, or it
+collapses into a second copy of #428's and stops covering anything. It checks
+`/Title` and `/Author` separately, because they are different routes out of
+`name` and only one of them goes through the title builder.
+
+The four-sequence conversion table behind it (`--`, `---`, `` !` ``, `` ?` ``,
+and the ` `` `/`''` that are deliberately *not* on it) is pinned in
+`tests/regression/components-pdfmeta.lvt` rather than here: a case costs a line
+there and a built PDF pair here, and the property this suite exists to assert is
+that the two paths agree, not what the table contains.
+
 Two things about it are deliberate and worth keeping. Its fixtures build
 uncompressed, because on the default path the catalog otherwise sits inside a
 compressed object stream, where a text search of the file finds nothing whether

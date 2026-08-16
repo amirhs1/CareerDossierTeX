@@ -130,6 +130,18 @@
           { \tl_set:Nn ##3 { \q_no_value } }
       }
   }
+% Reset the profile name without the `overwriting with the new value' warning
+% (issue #439). The ligature tests below walk one name through eight spellings,
+% and the warning is correct every time -- eight copies of it in the baseline
+% would bury the four strings the test exists to pin. It is redirected rather
+% than silenced globally so it still fires for every other test in this file.
+\cs_new_protected:Npn \cdossiertestSetName #1
+  {
+    \group_begin:
+      \msg_redirect_name:nnn { careerdossier-base } { overwrite } { none }
+      \CDossierSetup { name = {#1} }
+    \group_end:
+  }
 \cs_new_protected:Npn \cdossiertestSetKernelInfoEmptyStore
   {
     \cs_set_protected:Npn \pdfmanagement_get:nnN ##1##2##3
@@ -192,6 +204,55 @@
 % With no doctype, the title is the bare name and carries no stray separator.
 \TEST{title-without-doctype-is-bare-name}{
   \cdossiertestClearDoctype
+  \cdossiertestTitle
+}
+
+% The input-ligature table, sequence by sequence (issue #439).
+%
+% tests/metadata/run.sh asserts the property that matters -- the two build paths
+% spell a user's `--' the same way -- but it can only afford one built pair, so
+% it covers `--' and is silent about the other three. This is where the table
+% itself is pinned, because here a case costs a line.
+%
+% The negative controls are the point of the test, not padding. `` and '' look
+% like they belong on the list and do not: \pdfstringdef leaves them as the two
+% ASCII characters typed, measured under LuaHBTeX 1.24.0. Converting them here
+% would make the tagged path disagree with the default one in the opposite
+% direction -- a fix that introduces the bug it is fixing, and one no built
+% fixture in this repo would catch, since none carries a quote in a name.
+%
+% Two hyphens is not a subset of three: the baseline holds an en dash for one
+% and an em dash for the other, so an implementation that tried `--' first would
+% turn --- into an en dash and a stray hyphen, and fail here rather than in a
+% user's PDF.
+\TEST{title-converts-tex-input-ligatures}{
+  \cdossiertestClearDoctype
+  \cdossiertestSetName{a--b}        \cdossiertestTitle
+  \cdossiertestSetName{a---b}       \cdossiertestTitle
+  \cdossiertestSetName{a----b}      \cdossiertestTitle
+  \cdossiertestSetName{!`a?`b}      \cdossiertestTitle
+}
+
+\TEST{title-leaves-quotes-and-guillemets-alone}{
+  \cdossiertestClearDoctype
+  \cdossiertestSetName{``a''}       \cdossiertestTitle
+  \cdossiertestSetName{<<a>> ,,b}   \cdossiertestTitle
+  \cdossiertestSetName{a-b}         \cdossiertestTitle
+}
+
+% The doctype is user text on one class -- careerdossier-statement derives it
+% from \CDossierStatementSetup{title=...} -- so the pass has to see the composed
+% string, not just the name. Converting the name alone passes every other case
+% in this file.
+%
+% \CDossierSetup is global here -- the profile outlives the \TEST that set it,
+% which is what lets title-without-doctype-is-bare-name above read the name set
+% two tests earlier. So this block restores the name it found on the way out:
+% the tests below derive metadata from whatever is current, and would otherwise
+% report `a-b'.
+\TEST{title-converts-ligatures-in-the-doctype-too}{
+  \cdossiertestSetName{Ada Lovelace}
+  \cdossiertestSetDoctype{Testdoc -- Draft}
   \cdossiertestTitle
 }
 

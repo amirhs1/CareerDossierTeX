@@ -1931,6 +1931,7 @@
 %% ---------------------------------------------------------------------------
 \tl_new:N \l__cdossier_components_doctype_tl
 \tl_new:N \l__cdossier_components_pdfname_tl
+\tl_new:N \l__cdossier_components_pdfauthor_tl
 
 %% Declare the kind of document being produced. The owning class calls this, so
 %% a resume and a letter built from one profile do not receive identical PDF
@@ -1997,6 +1998,58 @@
         \tl_put_left:Nx \l__cdossier_components_pdfname_tl
           { \l__cdossier_components_doctype_tl \c_space_tl ^^^^2013 \c_space_tl }
       }
+    \__cdossier_components_pdfligatures:N \l__cdossier_components_pdfname_tl
+  }
+
+%% Spell TeX's input ligatures the same way on both build paths (issue #439).
+%%
+%% The comment above fixed the separator this package writes, and could, by
+%% naming the character instead of spelling it `--'. That does not reach a `--'
+%% the package did not write: `name = {Ada Lovelace--Byron}' still arrived as an
+%% en dash on the default path and as two hyphens under \DocumentMetadata, and
+%% the package does not get to choose how a user spells their own name. The
+%% doctype is user text too on one class -- careerdossier-statement derives it
+%% from \CDossierStatementSetup{title=...} -- so this is applied to the composed
+%% string rather than to the name alone.
+%%
+%% Converting unconditionally is deliberate, and is why there is no test for
+%% which path is running. Every sequence below maps to a character that
+%% \pdfstringdef then leaves alone, so pre-converting is idempotent: the default
+%% path reaches the same string it always did, and the tagged path -- where
+%% \pdfstringdef never runs -- reaches it too. A path test here would be a
+%% second thing to keep correct for no difference in output.
+%%
+%% The table is measured, not assumed, against \pdfstringdef under LuaHBTeX
+%% 1.24.0 / TeX Live 2026, and it is shorter than issue #439 supposed:
+%%
+%%   --  -> U+2013     ---  -> U+2014     !`  -> U+00A1     ?`  -> U+00BF
+%%
+%% and, notably, `` and '' are NOT converted -- they reach the PDF as the two
+%% ASCII characters typed, on both paths, and so must not be listed here. So are
+%% <<, >> and ,,. The order matters: --- is tried before --, or three hyphens
+%% would become an en dash followed by a stray hyphen. Longer runs then agree
+%% with \pdfstringdef by falling out of the same greedy left-to-right pass
+%% (---- gives U+2014 then a hyphen, both ways round).
+%%
+%% Naming the outputs by code point keeps this file ASCII, which matters for a
+%% package that ships to CTAN; ^^^^ notation is the kernel's own way to do that
+%% and needs no package.
+%%
+%% Reach. This covers the strings this package composes -- /Title and /Author,
+%% both from `name'. It cannot cover a value the document sets itself, which
+%% since #440 this package deliberately passes through untouched, nor
+%% pdfsubject or pdfkeywords, which it never sees. Those follow hyperref's and
+%% the kernel's own behaviour and still differ between the paths; that is
+%% recorded in docs/API.md and tracked as issue #442 rather than worked around
+%% here. pdfsubject is the evidence it is not this package's to fix: nothing
+%% here reads or writes it, and it diverges exactly like the two fields that
+%% are.
+\cs_new_protected:Npn \__cdossier_components_pdfligatures:N #1
+  {
+    \regex_replace_all:nnN { --- } { ^^^^2014 } #1
+    \regex_replace_all:nnN { -- }  { ^^^^2013 } #1
+    \regex_replace_all:nnN { !` }  { ^^^^00a1 } #1
+    \regex_replace_all:nnN { \?` } { ^^^^00bf } #1
   }
 
 %% Has \DocumentMetadata already declared the document's language?
@@ -2084,8 +2137,19 @@
           }
         \__cdossier_components_kernel_info_if_set:nF { Author }
           {
+            %% /Author is the second route out of `name' and does not go
+            %% through the title builder, so it needs the ligature pass in its
+            %% own right (issue #439). Handing \hypersetup the raw field here
+            %% passes the /Title check and fails the /Author one.
             \__cdossier_components_hyp_if_unset:nT { @pdfauthor }
-              { \hypersetup { pdfauthor = { \CDossierFieldValue { name } } } }
+              {
+                \tl_set:Nx \l__cdossier_components_pdfauthor_tl
+                  { \CDossierFieldValue { name } }
+                \__cdossier_components_pdfligatures:N
+                  \l__cdossier_components_pdfauthor_tl
+                \hypersetup
+                  { pdfauthor = { \l__cdossier_components_pdfauthor_tl } }
+              }
           }
       }
       { }

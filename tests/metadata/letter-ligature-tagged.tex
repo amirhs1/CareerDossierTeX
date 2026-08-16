@@ -1,0 +1,23 @@
+% A user-supplied `--' in the derived /Title and /Author, tagged path -- #439.
+%
+% letter-ligature-default.tex with one line added. Keep the two bodies
+% identical: the assertion is that the same profile yields the same strings
+% whichever path builds it, and a difference anywhere else would weaken that to
+% a coincidence.
+%
+% This is the path that was wrong. Under \DocumentMetadata the kernel's PDF
+% management writes the Info dictionary and hyperref's \pdfstringdef never sees
+% the string, so the two hyphens reached the file literally while the default
+% path shipped an en dash. #428 fixed that for the separator by not spelling it
+% `--'; text arriving from the profile cannot be fixed that way, because the
+% package does not choose how a user spells their own name.
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Metadata Fixture--Twin}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

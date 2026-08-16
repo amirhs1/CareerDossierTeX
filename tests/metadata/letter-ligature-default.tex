@@ -1,0 +1,26 @@
+% A user-supplied `--' in the derived /Title and /Author, default path -- #439.
+%
+% Half of a pair, and the second such pair in this suite. letter-title-*.tex
+% asks whether the *separator* the package writes is spelled the same on both
+% paths (#428); this one asks the same question of text the package did not
+% write and only composes into the string.
+%
+% The two are not redundant. #428's pair uses a plain name, so it is silent
+% about anything the user typed, and the fix for it -- naming the separator by
+% code point -- does nothing for a `--' arriving from the profile. Keep this
+% fixture's name double-barrelled: with a plain name it degenerates into a
+% second copy of the #428 pair and stops covering anything.
+%
+% `Metadata Fixture--Twin' is the realistic case the issue was filed against, a
+% double-barrelled surname typed the TeX way. The name reaches /Title (behind
+% the doctype) and /Author (alone), so one fixture covers both routes; the
+% builder is shared by every class, so the letter is enough.
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Metadata Fixture--Twin}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}
