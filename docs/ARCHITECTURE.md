@@ -1549,7 +1549,10 @@ Responsibilities:
   `\CDossierSubsection` (#337), which is what lets `Publications` carry journal,
   conference, and preprint groups without promoting each to a ruled section;
 - own the manual-publication list and its source-order numbering while using
-  shared list metrics;
+  shared list metrics, including whether a grouped list restarts its numbering
+  or carries on from the one before it (#355) — a property of the list, not of
+  the heading above it, which is why the key sits on `CDossierPublications` and
+  not on `\CDossierSubsection`;
 - keep entries together across page breaks where practical without boxing an
   entire long entry; and
 - preserve logical source and extraction order.
@@ -1715,6 +1718,7 @@ cdossier/resume
 cdossier/cv
 cdossier/entry
 cdossier/publication
+cdossier/publications
 cdossier/biblatex
 ```
 

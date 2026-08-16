@@ -1,0 +1,10 @@
+Ada Lovelace
+Selected Publications
+Journal Articles
+1) Ada Lovelace. First Journal Article.
+2) Ada Lovelace. Second Journal Article.
+Conference Papers
+3) Ada Lovelace. Third, Across a Subsection.
+
+Preprints
+4) Ada Lovelace. Fourth, Across a Section.

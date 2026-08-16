@@ -1,0 +1,138 @@
+% cv-publication-numbering.lvt — issue #355 grouped publication-list numbering.
+%
+% Each CDossierPublications opens its own enumerate, so two lists in one section
+% both label their first item `1)'. That was invisible while a second list meant
+% a second ruled section; \CDossierSubsection (#337) made one section carrying
+% several groups the natural markup, and made it visible.
+%
+% The decision recorded here is that restarting stays the default — a group is a
+% self-contained list — and that continuing across groups is opt-in through
+% `numbering=continue'. So the first thing this fixture pins is the *default*,
+% which no other test asserted: cv-subsection-edges.lvt uses one list and the
+% tagged cv-subsection baseline uses two but had no way to say which behaviour
+% it was recording.
+%
+% What is typed is \value{enumi} immediately after each \CDossierPublication,
+% which is the number the `\arabic*' label of that item prints. The label itself
+% is asserted where it is actually rendered: tests/extraction for the untagged
+% page and tests/tagging/cv-publication-numbering.structure.txt for the tagged
+% structure tree. This layer covers the counter mechanics and the option, and
+% deliberately does not restate those.
+%
+% The counter is carried in a global int and seeded onto `enumi' after
+% \begin{enumerate} rather than through enumitem's `start'/`resume' keys,
+% because the tagged branch runs LaTeX Lab's key emulation rather than enumitem
+% and cannot be assumed to implement either (issues #218 and #193). Seeding the
+% LaTeX counter works the same on both branches, and test 4 is what holds that
+% claim to account on the untagged one.
+\input{regression-test}
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\makeatletter
+\newcommand\cdossiertestNumber[1]{\TYPE{#1 number = \arabic{enumi}}}
+\makeatother
+
+\begin{document}
+\START
+
+% 1. The default. Two lists in one section both restart, which is the shipped
+% behaviour and the one a document that says nothing must keep.
+\TEST{default-restarts-per-list}{
+  \CDossierSection{Selected Publications}
+  \CDossierSubsection{Journal Articles}
+  \begin{CDossierPublications}
+    \CDossierPublication{authors = {A. Lovelace}, title = {First}}
+    \cdossiertestNumber{list-1-item-1}
+    \CDossierPublication{authors = {A. Lovelace}, title = {Second}}
+    \cdossiertestNumber{list-1-item-2}
+  \end{CDossierPublications}
+  \CDossierSubsection{Conference Papers}
+  \begin{CDossierPublications}
+    \CDossierPublication{authors = {A. Lovelace}, title = {Third}}
+    \cdossiertestNumber{list-2-item-1}
+  \end{CDossierPublications}
+}
+
+% 2. The opt-in. The second list continues from where the first stopped, so a
+% number identifies a publication within the document rather than within its
+% group.
+\TEST{continue-across-lists-in-one-section}{
+  \CDossierSection{Selected Publications}
+  \CDossierSubsection{Journal Articles}
+  \begin{CDossierPublications}
+    \CDossierPublication{authors = {A. Lovelace}, title = {First}}
+    \cdossiertestNumber{list-1-item-1}
+    \CDossierPublication{authors = {A. Lovelace}, title = {Second}}
+    \cdossiertestNumber{list-1-item-2}
+  \end{CDossierPublications}
+  \CDossierSubsection{Conference Papers}
+  \begin{CDossierPublications}[numbering = continue]
+    \CDossierPublication{authors = {A. Lovelace}, title = {Third}}
+    \cdossiertestNumber{list-2-item-1}
+    \CDossierPublication{authors = {A. Lovelace}, title = {Fourth}}
+    \cdossiertestNumber{list-2-item-2}
+  \end{CDossierPublications}
+}
+
+% 3. The same across a section boundary. A section rule is a stronger break than
+% a subsection heading, and nothing in the carry knows about either — which is
+% the point: the sequence is a property of the document, not of the enclosing
+% heading, so the two cases must agree.
+\TEST{continue-across-sections}{
+  \CDossierSection{Journal Articles}
+  \begin{CDossierPublications}
+    \CDossierPublication{authors = {A. Lovelace}, title = {First}}
+    \cdossiertestNumber{section-1-item-1}
+  \end{CDossierPublications}
+  \CDossierSection{Conference Papers}
+  \begin{CDossierPublications}[numbering = continue]
+    \CDossierPublication{authors = {A. Lovelace}, title = {Second}}
+    \cdossiertestNumber{section-2-item-1}
+  \end{CDossierPublications}
+}
+
+% 4. `restart' is the default spelled out, and it restarts even when it follows a
+% list that continued. Without this the default and the explicit value could
+% diverge and only the default would be covered.
+\TEST{explicit-restart-after-continue}{
+  \CDossierSection{Selected Publications}
+  \begin{CDossierPublications}
+    \CDossierPublication{authors = {A. Lovelace}, title = {First}}
+    \cdossiertestNumber{list-1-item-1}
+  \end{CDossierPublications}
+  \begin{CDossierPublications}[numbering = continue]
+    \CDossierPublication{authors = {A. Lovelace}, title = {Second}}
+    \cdossiertestNumber{list-2-item-1}
+  \end{CDossierPublications}
+  \begin{CDossierPublications}[numbering = restart]
+    \CDossierPublication{authors = {A. Lovelace}, title = {Third}}
+    \cdossiertestNumber{list-3-item-1}
+  \end{CDossierPublications}
+}
+
+% 5. The rejected value names the accepted set, exactly once. l3keys' own choice
+% error says only that the value is not one of a fixed set; tests/lint/run.sh
+% requires the `numbering / unknown' sub-key that replaces it, and this is the
+% assertion that the replacement actually reaches the user.
+\TEST{unknown-numbering-value}{
+  \CDossierSection{Selected Publications}
+  \begin{CDossierPublications}[numbering = sequential]
+    \CDossierPublication{authors = {A. Lovelace}, title = {First}}
+  \end{CDossierPublications}
+}
+
+% 6. An unknown key on the environment is rejected on its own terms rather than
+% being read as a numbering value.
+\TEST{unknown-publications-key}{
+  \CDossierSection{Selected Publications}
+  \begin{CDossierPublications}[ordering = source]
+    \CDossierPublication{authors = {A. Lovelace}, title = {First}}
+  \end{CDossierPublications}
+}
+
+\END
+\end{document}

@@ -1,0 +1,48 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: default-restarts-per-list
+============================================================
+list-1-item-1 number = 1
+list-1-item-2 number = 2
+list-2-item-1 number = 1
+============================================================
+============================================================
+TEST 2: continue-across-lists-in-one-section
+============================================================
+list-1-item-1 number = 1
+list-1-item-2 number = 2
+list-2-item-1 number = 3
+list-2-item-2 number = 4
+============================================================
+============================================================
+TEST 3: continue-across-sections
+============================================================
+section-1-item-1 number = 1
+section-2-item-1 number = 2
+============================================================
+============================================================
+TEST 4: explicit-restart-after-continue
+============================================================
+list-1-item-1 number = 1
+list-2-item-1 number = 2
+list-3-item-1 number = 1
+============================================================
+============================================================
+TEST 5: unknown-numbering-value
+============================================================
+! Package careerdossier-cv Error: Unknown 'numbering' value 'sequential' for CDossierPublications.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'restart' (each list numbers from 1) and 'continue' (this list carries on from the last one).
+============================================================
+============================================================
+TEST 6: unknown-publications-key
+============================================================
+! Package careerdossier-cv Error: Unknown CDossierPublications key 'ordering'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The only supported key is 'numbering'.
+============================================================

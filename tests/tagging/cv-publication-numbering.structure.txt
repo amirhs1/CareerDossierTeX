@@ -1,0 +1,23 @@
+1	0	section	Tagged Numbering CV
+1	1	text	Research Engineer
+1	2	Link	numbering@example.test
+1	3	subsection	Selected Publications
+1	4	text	
+1	5	text	
+1	6	subsubsection	Journal Articles
+1	7	itemlabel	1)
+1	8	text	A. Lovelace. 
+1	9	Em	Notes on the Analytical Engine
+1	10	text	. Scientific Memoirs, 1843.
+1	11	subsubsection	Conference Papers
+1	12	itemlabel	2)
+1	13	text	A. Lovelace. 
+1	14	Em	On Programmable Looms
+1	15	text	. Example Symposium, 1842.
+1	16	subsection	Preprints
+1	17	text	
+1	18	text	
+1	19	itemlabel	3)
+1	20	text	A. Lovelace. 
+1	21	Em	On Carrying a Number Across a Rule
+1	22	text	. Example Preprint Server, 1841.
