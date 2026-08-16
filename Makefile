@@ -136,7 +136,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check check-serial check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check check-serial check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -241,6 +241,15 @@ review-linebreak-parallel: ## review-linebreak with one sweep per value in paral
 
 review-pagefill: ## Report page fill and the atom forcing each break (#334)
 	tests/layout/report-pagefill.sh
+
+# Two runners, deliberately. report.sh measures \vbox fixtures and so names
+# every boundary by construction; report-pages.sh walks a real shipped page and
+# so reaches the identity stack and the letterhead, which no \vbox can hold, but
+# can only name a boundary by the text on either side. Where both reach the same
+# gap they must agree, which is the cross-check between them.
+review-spacing: ## Report the structural and visible gap at every boundary (#417)
+	tests/spacing/report.sh
+	tests/spacing/report-pages.sh
 
 extract-test: ## Extraction round-trip vs baselines; FIXTURE=<pattern> scopes it
 	tests/extraction/run.sh "$(FIXTURE)"

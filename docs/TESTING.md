@@ -1461,6 +1461,43 @@ the committed values do not have. For a token whose default is `0.00` only the
 upward direction exists, and the reading is then "any non-zero value renders",
 not "this gap is on the page today".
 
+### Structural gap and visible gap are different numbers
+
+The matrix above proves each token *renders*. It does not say how much white a
+reader sees, and those are different quantities:
+
+```text
+visible white = structural gap + interline glue
+interline glue = baselineskip - depth(previous box) - height(next box)
+```
+
+The tokens own the structural gap exactly — that is what
+`statement-section-gap` asserts. **No token can reach the interline term**, and
+it is not symmetric around a heading: a heading box is tall and shallow, so it
+starves the gap above itself and hands it back below. Measured on the statement
+class at 12 pt, the section pair is 2.33:1 in tokens and 1.32:1 in visible
+white. A conclusion about hierarchy drawn from the token ratio alone will be
+wrong by roughly that much.
+
+```bash
+make review-spacing        # or: tests/spacing/report.sh; tests/spacing/report-pages.sh
+```
+
+Both gaps, every boundary, four classes, 10/11/12 pt. It is a report, not a
+gate: no assertion, no baseline, and it is not part of `make check`.
+
+**Two measures of "white" exist, and they disagree on ratios.** `pdftotext
+-bbox` reports each word as the font's full **em-box**, not glyph ink — at 12 pt
+body that box is 15.97 pt tall against 14.5 pt of leading, so consecutive lines
+in one paragraph overlap and the tool reports **−1.53 pt**. A negative gap is
+the tell that a figure came from it. The node-level measure this harness uses
+takes TeX's line boxes, which bound the glyphs actually present. Both are
+legitimate — use `pdftotext -bbox` for extraction and reading-order work,
+because it is the extractor's own view, and the node measure for typographic
+judgements. **Whichever you use, record which one produced the number.** #206's
+figures were labelled "ink to ink" and were not, and the mislabelling survived
+two releases because no measurement script was committed to check them against.
+
 ### BibLaTeX/Biber fixture
 
 The optional integration has a focused multi-pass fixture that runs Biber,

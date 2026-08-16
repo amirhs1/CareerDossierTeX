@@ -1,0 +1,10 @@
+% shipout-hook.tex — measure a real page instead of a \vbox fixture.
+%
+% The identity stack and the letterhead are assembled by \MakeCDossierHeader
+% and \MakeCDossierLetterhead into the page, not into a block a fixture can
+% \setbox. Hooking `shipout/before' is the only place their boundaries exist as
+% nodes. \ShipoutBox is LaTeX's own name for the box being shipped.
+\directlua{dofile("tests/spacing/probe.lua")}
+\AddToHook{shipout/before}{%
+  \directlua{cdossier_probe.report_page(\number\ShipoutBox, "page\the\value{page}")}%
+}

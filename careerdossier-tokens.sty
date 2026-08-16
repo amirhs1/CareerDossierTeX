@@ -539,13 +539,30 @@
     %%
     %% Issue #206 retuned all four. The pair relation is a floor -- above is at
     %% least twice below -- rather than an equality, because the ratio of the
-    %% tokens is not the ratio a reader perceives: both gaps are padded by the
-    %% same line-box white and a heading spends part of its own below-gap on
-    %% its deeper font box, so a pair at 2:1 in tokens renders wider than 2:1
-    %% in white. Measured on the built statement at 12 pt, this pair renders
-    %% 9.65 pt above against 3.27 pt below -- 2.95:1. The subsection pair
-    %% renders 7.03 / 2.68, or 2.62:1. `tests/regression/tokens-invariants.lvt'
-    %% asserts the floor at 10/11/12 pt.
+    %% tokens is not the ratio a reader perceives: the token owns only the
+    %% explicit glue, and TeX adds interline glue on top that no token can
+    %% reach. A heading box is tall and shallow, so it starves the interline
+    %% glue above itself and hands it back below, and the two gaps therefore
+    %% diverge asymmetrically.
+    %%
+    %% Two measures of that white exist and they do not agree on the ratio, so
+    %% a figure is meaningless unless it names one. Measured on the built
+    %% statement at 12 pt (issue #417):
+    %%
+    %%                          pdftotext -bbox     ink to ink
+    %%   above a section              9.65 pt         15.39 pt
+    %%   below a section              3.27 pt         11.62 pt
+    %%   above : below                2.95 : 1         1.32 : 1
+    %%
+    %% `pdftotext -bbox' reports a word's full font em-box rather than its ink
+    %% -- 15.97 pt against 14.5 pt of leading at 12 pt -- so consecutive lines
+    %% overlap and it reports -1.53 pt between two lines of one paragraph. Use
+    %% it for extraction work, where it is the extractor's own view, and the
+    %% node measure for typography. `make review-spacing' reports both.
+    %%
+    %% So the floor buys less separation than "2:1" suggests: in ink this pair
+    %% renders 1.31-1.37:1 across 10/11/12 pt and the subsection pair 1.14:1.
+    %% `tests/regression/tokens-invariants.lvt' asserts the floor at all three.
     %%
     %% One consequence is easy to mis-state: a section that opens directly with
     %% a subsection does *not* take the subsection's above-gap. `\@startsection'

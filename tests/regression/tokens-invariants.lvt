@@ -26,13 +26,25 @@
 % choose; it is not a target to be repaired later.
 %
 % The three heading pairs are recorded as `above >= 2 x below', not as an
-% equality. Measured on rendered output during #206, the ratio of the *tokens*
-% is not the ratio a reader perceives: both gaps are padded by the same
-% line-box white, and a section heading set in a larger size spends part of its
-% own below-gap on its deeper font box, so a pair at exactly 2:1 reads flatter
-% than 2:1. A trial retune at 2.67:1 measured about 3.5:1 of visible white in
-% the statement class. The relation therefore names the floor the hierarchy
-% depends on and leaves the surplus to the calibration.
+% equality, because the ratio of the *tokens* is not the ratio a reader
+% perceives. A token owns only the explicit glue; TeX adds interline glue that
+% no token can reach, and a heading box -- tall and shallow -- starves it above
+% the heading and returns it below.
+%
+% Which way that skews the ratio depends on how the white is measured, and the
+% two measures disagree. Re-measured at 12 pt in the statement class (#417):
+% under `pdftotext -bbox' this pair renders 2.95:1, wider than its 2.33:1 in
+% tokens; measured ink to ink it renders 1.32:1, flatter. An earlier note here
+% said "reads flatter than 2:1" and then cited a trial at 2.67:1 measuring
+% 3.5:1 -- which is wider. Both numbers were right and the two measures were
+% never named apart, so the sentence contradicted itself.
+%
+% What the floor therefore buys is less than "2:1" suggests: in ink the prose
+% section pair renders 1.31-1.37:1 across 10/11/12 pt, the prose subsection
+% pair 1.14:1, and the record subsection pair 1.20-1.21:1. The relation names
+% the floor the hierarchy depends on and leaves the surplus to the calibration;
+% it is not a promise of two-to-one separation on the page. `make review-spacing'
+% reports both measures at every boundary.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-tokens}

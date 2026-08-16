@@ -26,15 +26,13 @@ if ! command -v lualatex >/dev/null 2>&1; then
 fi
 
 tsv="$out/pages.tsv"
-printf 'class\tsize\tpath\tindex\tabove\tbelow\tstructural\tinterline\twhite\n' >"$tsv"
+printf 'class\tsize\tpage\tpath\tindex\tabove\tbelow\tstructural\tinterline\twhite\n' >"$tsv"
 
 # The hook is injected immediately after \documentclass so it is in force for
-# every shipout, including the first page.
-#
-# `shipout/before' with `\ShipoutBox' is the current kernel interface.
-# \AtBeginShipout is atbegshi's, which the classes do not load, so it is
-# undefined at this point in the preamble.
-hook='\directlua{dofile("tests/spacing/probe.lua")}\AddToHook{shipout/before}{\directlua{cdossier_probe.report_page(\number\ShipoutBox, "page")}}'
+# every shipout, including the first page. It lives in its own .tex file rather
+# than in this variable: TeX held in a shell string cannot be read, linted, or
+# commented like TeX, and this one has to explain \ShipoutBox.
+hook='\input{tests/spacing/shipout-hook.tex}'
 
 run_one() {
   local class="$1" fixture="$2" extra="$3" size="$4"
@@ -60,7 +58,7 @@ run_one() {
   fi
 
   awk -F'\t' -v c="$class" -v s="$size" '
-    /^CDPAGE/ { print c "\t" s "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 }
+    /^CDPAGE/ { print c "\t" s "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 }
   ' "$out/$job.stdout" >>"$tsv"
 
   echo "  measured: $job"
