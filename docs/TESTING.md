@@ -505,7 +505,10 @@ elsewhere, because a summary is what drifts. Cover the relevant parts:
 - derived PDF document metadata after any change to it, on **both** build paths
   (`make metadata`): the two paths hand the string to different writers, so a
   value that is right on the default path can be wrong under
-  `\DocumentMetadata` while nothing is logged and every other suite passes;
+  `\DocumentMetadata` while nothing is logged and every other suite passes.
+  This covers the precedence rule as well as the derived value — a document's
+  own `\hypersetup` reaches the two paths by different routes, so "the user's
+  field is never overwritten" is a claim that has to be made on each of them;
 - unsupported-engine error;
 - every option's accepted and rejected values, including the error naming the
   accepted values, and rejection reported exactly once;
@@ -742,6 +745,17 @@ before comparing; comparing the bytes would report every such pair as different.
 The expected value is constructed in the runner rather than copied out of a
 build, so a fixture cannot pass by agreeing with whatever the package currently
 emits.
+
+The pair beside it asks the prior question: whether a document's *own*
+`pdftitle` and `pdfauthor` reach the PDF at all. They did not, under
+`\DocumentMetadata` — issue #440, where `hyperref`'s driver records the value in
+the kernel's PDF management and leaves the `\@pdftitle` the package reads
+defined and empty, so a user's title looked like an absent one and the derived
+value overwrote it. Both halves of that pair are load-bearing: the tagged one is
+the defect, and the default one is the evidence that fixing it did not trade one
+path for the other. Their strings are plain ASCII on purpose, so that the
+separate question of how a `--` is spelled on each path (issue #439) cannot
+change what they measure.
 
 Two things about it are deliberate and worth keeping. Its fixtures build
 uncompressed, because on the default path the catalog otherwise sits inside a

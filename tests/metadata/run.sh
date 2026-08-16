@@ -160,26 +160,27 @@ expected_title_hex="\
 0020004D00650074006100640061007400610020004600690078007400750072\
 0065"
 
-# Read the derived /Title as uppercase UTF-16BE hex, BOM removed.
+# Read an Info dictionary string -- /Title or /Author -- as uppercase UTF-16BE
+# hex, BOM removed.
 #
-# The pattern deliberately requires a string-valued /Title -- `(' or `<'. A
-# tagged file also carries /Title keys whose values are a name (in the role map)
-# and an indirect reference (in the structure tree), and matching those would
-# compare the wrong thing while looking like it worked. Exactly one string-valued
-# /Title is expected, and title_hex fails rather than guessing if that is not
-# what it finds.
-title_hex() {
-  local pdf="$1" raw count
-  count="$(grep -ac '/Title *[(<][^)>]*[)>]' "$pdf")"
+# The pattern deliberately requires a string value -- `(' or `<'. A tagged file
+# also carries /Title keys whose values are a name (in the role map) and an
+# indirect reference (in the structure tree), and matching those would compare
+# the wrong thing while looking like it worked. Exactly one string-valued
+# instance of the key is expected, and info_hex fails rather than guessing if
+# that is not what it finds.
+info_hex() {
+  local pdf="$1" key="$2" raw count
+  count="$(grep -ac "/$key *[(<][^)>]*[)>]" "$pdf")"
   if [ "$count" != "1" ]; then
     return 1
   fi
-  raw="$(grep -ao '/Title *[(<][^)>]*[)>]' "$pdf")"
-  printf '%s\n' "$raw" | awk '
+  raw="$(grep -ao "/$key *[(<][^)>]*[)>]" "$pdf")"
+  printf '%s\n' "$raw" | awk -v key="$key" '
     BEGIN { for (n = 32; n < 127; n++) ord[sprintf("%c", n)] = n }
     {
       s = $0
-      sub(/^\/Title[ ]*/, "", s)
+      sub("^/" key "[ ]*", "", s)
       delim = substr(s, 1, 1)
       s = substr(s, 2, length(s) - 2)
       if (delim == "<") {
@@ -211,36 +212,52 @@ title_hex() {
     }'
 }
 
-# Read one fixture's title and check it against the expected value. The reading
-# and the checking are separate from the two-path comparison below, and the
-# value is kept whether or not it matched: a run where both paths are wrong in
-# the same way and a run where they disagree are different defects, and this
+# Read one fixture's Info string and check it against the expected value. The
+# reading and the checking are separate from the two-path comparison below, and
+# the value is kept whether or not it matched: a run where both paths are wrong
+# in the same way and a run where they disagree are different defects, and this
 # suite should be able to say which one it is looking at.
-read_title() {
-  local job="$1" expected="$2" found
+read_info() {
+  local job="$1" key="$2" expected="$3" found
 
-  found="$(title_hex "$work/$job.pdf")"
+  found="$(info_hex "$work/$job.pdf" "$key")"
   if [ -z "$found" ]; then
-    record_failure "$job: no single string-valued /Title, so its check proves nothing"
+    record_failure "$job: no single string-valued /$key, so its check proves nothing"
     return 1
   fi
   if [ "$found" != "$expected" ]; then
-    record_failure "$job has /Title $found, expected $expected"
+    record_failure "$job has /$key $found, expected $expected"
   else
-    echo "  $job: /Title $found"
+    echo "  $job: /$key $found"
   fi
-  printf '%s\n' "$found" >"$work/$job.title"
+  printf '%s\n' "$found" >"$work/$job.$key"
+}
+
+# The UTF-16BE code units an ASCII string encodes, as uppercase hex.
+#
+# Expected values are built from the string here rather than copied out of a
+# build, so a fixture cannot pass by agreeing with whatever the package
+# currently emits. Only awk is used: iconv and xxd are not guaranteed on the
+# CI image, and every string this is applied to is ASCII by fixture design.
+ascii_utf16be_hex() {
+  printf '%s' "$1" | awk '
+    BEGIN { for (n = 32; n < 127; n++) ord[sprintf("%c", n)] = n }
+    {
+      out = ""
+      for (i = 1; i <= length($0); i++) { out = out sprintf("00%02X", ord[substr($0, i, 1)]) }
+      print out
+    }'
 }
 
 title_default=""
 title_tagged=""
 if compile_fixture letter-title-default.tex letter-title-default; then
-  read_title letter-title-default "$expected_title_hex" &&
-    title_default="$(cat "$work/letter-title-default.title")"
+  read_info letter-title-default Title "$expected_title_hex" &&
+    title_default="$(cat "$work/letter-title-default.Title")"
 fi
 if compile_fixture letter-title-tagged.tex letter-title-tagged; then
-  read_title letter-title-tagged "$expected_title_hex" &&
-    title_tagged="$(cat "$work/letter-title-tagged.title")"
+  read_info letter-title-tagged Title "$expected_title_hex" &&
+    title_tagged="$(cat "$work/letter-title-tagged.Title")"
 fi
 # The issue's own assertion, stated in its own right rather than inferred from
 # the two above. Both halves must have been read for the paths to be said to
@@ -254,6 +271,32 @@ if [ -n "$title_default" ] && [ -n "$title_tagged" ]; then
 else
   record_failure "one of the two paths produced no /Title to compare"
 fi
+echo
+
+echo "== a document's own /Title and /Author survive on both paths =="
+# Issue #440, and the counterpart to the section above: that one is about the
+# value this package derives, this one about the value it must not derive.
+#
+# The tagged half is the fixture the bug was reported against. hyperref's
+# \DocumentMetadata driver writes pdftitle and pdfauthor into the kernel's PDF
+# management and leaves \@pdftitle and \@pdfauthor defined and empty, which is
+# exactly what an unset field looks like, so the detector read "the document
+# supplied nothing" and the derived values overwrote the user's. Nothing was
+# logged and the document compiled cleanly.
+#
+# The default half is not ceremony either. docs/API.md promises this behaviour
+# without qualifying the path, and the fix adds a second reading to a detector
+# the default path also runs through; a regression that traded one path for the
+# other would otherwise pass. It is the "unchanged, shown rather than asserted"
+# half of the issue's acceptance criteria.
+expected_override_title_hex="$(ascii_utf16be_hex 'Override Fixture Title')"
+expected_override_author_hex="$(ascii_utf16be_hex 'Override Fixture Author')"
+for job in letter-override-default letter-override-tagged; do
+  if compile_fixture "$job.tex" "$job"; then
+    read_info "$job" Title "$expected_override_title_hex"
+    read_info "$job" Author "$expected_override_author_hex"
+  fi
+done
 echo
 
 if [ "$fail" -eq 0 ]; then

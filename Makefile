@@ -260,7 +260,7 @@ bibliography-test: ## Biber sorting and identifier-precedence fixture
 links: ## Copy-paste integrity of URLs and e-mail addresses
 	tests/links/run.sh
 
-metadata: ## Default-path PDF metadata (/Lang), and /Title across both paths
+metadata: ## Default-path PDF metadata (/Lang), and /Title and /Author across both paths
 	tests/metadata/run.sh
 
 annotations: ## Link-annotation action types (/S/URI, never /S/GoToR)

@@ -258,6 +258,37 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A document's own `\hypersetup{pdftitle=…, pdfauthor=…}` now survives on the
+  tagged build path. Under `\DocumentMetadata` both fields were discarded and
+  replaced by the values derived from the profile, so a document asking for
+  `Draft – Title` by `Someone Else` shipped `Cover Letter – Ada Lovelace` by
+  `Ada Lovelace` instead — silently, with nothing in the log and a clean
+  compile. `docs/API.md`'s "a field you set is never overwritten" is now true on
+  both paths, as it always claimed to be. ([#440])
+
+  Only the tagged path was affected, and it was so from the start rather than by
+  regression. `hyperref`'s `\DocumentMetadata` driver writes the value straight
+  into the LaTeX kernel's PDF management and leaves the `\@pdftitle` and
+  `\@pdfauthor` macros the package reads defined and empty — which is exactly
+  what an unset field looks like, so the package concluded the document had
+  supplied nothing. The fix asks the kernel as well, through
+  `\pdfmanagement_get:nnN`, and treats a field as the document's own when either
+  route carries it. This is the same trap `/Lang` hit in [#276] and the same
+  shape of fix; `/Title` and `/Author` had never been given the equivalent.
+
+  `make metadata` gains a fixture pair that sets both fields and requires both
+  to reach the PDF, tagged and untagged. The default half is not redundant: it
+  is what would catch a repair that traded one path for the other.
+
+  A separate difference remains and is tracked in [#439] — a `--` you type
+  yourself still reaches `/Title` as an en dash on the default path and as two
+  hyphens on the tagged one. That is about how your text is spelled, not about
+  whether it arrives, and the fixtures here use plain ASCII so the two questions
+  stay apart.
+
+  **Metadata only.** No class, option, key, command, token, or default changed,
+  and nothing rendered on the page moves.
+
 - A document built with `\DocumentMetadata{tagging=on}` now carries the same PDF
   `/Title` as the same document built without it. Tagged output showed
   `Cover Letter -- Ada Lovelace` where the default path showed
@@ -445,6 +476,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#419]: https://github.com/amirhs1/CareerDossierTeX/issues/419
 [#421]: https://github.com/amirhs1/CareerDossierTeX/issues/421
 [#428]: https://github.com/amirhs1/CareerDossierTeX/issues/428
+[#439]: https://github.com/amirhs1/CareerDossierTeX/issues/439
+[#440]: https://github.com/amirhs1/CareerDossierTeX/issues/440
 
 ## [0.8.0] - 2026-08-12
 

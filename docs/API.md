@@ -982,7 +982,9 @@ Set any field yourself with `\hypersetup` and it is used unchanged:
 A field you set is never overwritten, and the order does not matter — the
 `\hypersetup` may appear before or after `\CDossierSetup`. Fields you do not set
 are still derived, so overriding `pdftitle` alone leaves `/Author` and `/Lang`
-in place.
+in place. This holds whether or not you opt into tagging — `\DocumentMetadata`
+routes your `pdftitle` and `pdfauthor` to the LaTeX kernel rather than to
+`hyperref`'s own record, and both routes count as "you set it".
 
 The language has a second route, and it wins too:
 
