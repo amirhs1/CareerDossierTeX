@@ -1891,6 +1891,8 @@ Manual publications require no bibliography package or Biber run:
 counter on entry, and uses the shared list spacing and label separation.
 `\CDossierPublication` is valid only inside that environment.
 
+`\CDossierPublication` takes these keys:
+
 | Key | Required | Purpose |
 |---|---:|---|
 | `authors` | Yes | Display-order author list |
@@ -1907,6 +1909,46 @@ offer a style option for changing that precedence. Each entry renders in this
 order: authors, italic title, the comma-joined present `venue`/`date` values,
 `note`, and the preferred visible identifier. Sentence punctuation is emitted
 only around present groups, so absent optional fields leave no stray separators.
+
+#### Numbering across grouped lists
+
+The environment itself takes one optional key:
+
+| Key | Values | Default | Purpose |
+|---|---|---|---|
+| `numbering` | `restart`, `continue` | `restart` | Whether this list numbers from 1 or carries on from the previous list |
+
+Each list is self-contained by default, so a section that carries several groups
+numbers each group from `1)`:
+
+```latex
+\CDossierSection{Selected Publications}
+\CDossierSubsection{Journal Articles}
+\begin{CDossierPublications} ... \end{CDossierPublications}   % 1) 2) 3)
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications} ... \end{CDossierPublications}   % 1) 2)
+```
+
+That reads correctly when a number is cited together with its group — "journal
+article 1". A document whose numbers are cited on their own, from a cover letter
+or a grant form, wants one sequence across the whole document instead, and asks
+for it per list:
+
+```latex
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications}[numbering = continue] ... \end{CDossierPublications}   % 4) 5)
+```
+
+`continue` resumes from the final number of the **preceding** list, wherever
+that list was: a subsection heading and a section rule are equally invisible to
+it, since the sequence belongs to the document rather than to the heading above
+it. A `restart` list in between therefore resets what a later `continue` picks
+up. Setting `numbering` on the first list of a document has no effect under
+either value, and a document with a single publication list renders identically
+whether it sets the key or not.
+
+Both values behave the same under `\DocumentMetadata{tagging=on}`: the number a
+consumer reads from the structure tree is the number on the page.
 
 ### Optional BibLaTeX and Biber integration
 
@@ -2524,7 +2566,8 @@ The implementation should stop compilation for:
 - an unknown public field or label name;
 - a manual publication used outside `CDossierPublications`;
 - a manual publication missing `authors` or `title`;
-- an unknown manual-publication or preferred-author key;
+- an unknown manual-publication, publication-list, or preferred-author key;
+- an unsupported `numbering` value on `CDossierPublications`;
 - a preferred-author declaration missing `family` or `given`;
 - loading `careerdossier-biblatex` when the optional BibLaTeX dependency is
   unavailable; and

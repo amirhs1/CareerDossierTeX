@@ -135,6 +135,29 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   baseline, or rendered output changed, and no suite's verdict changed — `make
   lint` runs one more script and can fail for one more reason.
 
+- `CDossierPublications` takes a `numbering` key. `restart` is the default and
+  is what the class has always done — each list numbers from `1)`. `numbering =
+  continue` carries on from the previous list instead, so a document whose
+  publication numbers are cited from a cover letter or a grant form can have one
+  sequence across every group. ([#355])
+
+  `\CDossierSubsection` ([#337]) is what made the question visible: before it, a
+  second publication list meant a second ruled section, and restarting read as
+  correct. With grouping, the natural markup is one `Selected Publications`
+  section carrying `Journal Articles` and `Conference Papers`, and both groups
+  opened at `1)` with no way to say which publication `1` meant. Restarting
+  stays the default because a group is a self-contained list and "journal
+  article 1" is unambiguous given the group; continuing is the document's
+  choice, made per list.
+
+  `continue` resumes from the final number of the preceding list wherever it
+  was — a subsection heading and a section rule are equally invisible to it —
+  and behaves identically on the tagged and untagged paths.
+
+  **No existing output moves.** A document that does not set the key renders as
+  before, including every shipped example; the key is additive and its default
+  is the shipped behaviour.
+
 ### Changed
 
 - `make check` runs its eleven targets four at a time and is still the pre-push
@@ -368,6 +391,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
 [#353]: https://github.com/amirhs1/CareerDossierTeX/issues/353
+[#355]: https://github.com/amirhs1/CareerDossierTeX/issues/355
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
 [#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392

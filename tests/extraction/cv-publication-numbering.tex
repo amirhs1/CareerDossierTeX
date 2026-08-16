@@ -1,0 +1,42 @@
+% cv-publication-numbering.tex — numbering carried across grouped lists (#355).
+%
+% cv-publications-manual.tex already renders the default: two lists in two
+% sections, both starting at `1)'. This is the opt-in half, and it is here rather
+% than only in tests/regression because the counter is one thing and the label a
+% reader sees is another. What the page carries is the `1)' ... `4)' run, and an
+% extractor is what reports it.
+%
+% Two boundaries, because a grouped list and a new section are different breaks
+% and the sequence must ignore both: `continue' across a subsection inside one
+% section, then `continue' across a section rule.
+\documentclass{careerdossier-cv}
+\CDossierSetup{name={Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Selected Publications}
+\CDossierSubsection{Journal Articles}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {First Journal Article}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {Second Journal Article}
+  }
+\end{CDossierPublications}
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications}[numbering = continue]
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {Third, Across a Subsection}
+  }
+\end{CDossierPublications}
+\CDossierSection{Preprints}
+\begin{CDossierPublications}[numbering = continue]
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {Fourth, Across a Section}
+  }
+\end{CDossierPublications}
+\end{document}

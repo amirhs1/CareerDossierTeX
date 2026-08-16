@@ -1,0 +1,11 @@
+% cv-publication-numbering-ua2.tex -- PDF/UA-2 validation variant of
+% cv-publication-numbering.tex.
+%
+% Same body as the tagged fixture; only the declared standard differs. Seeding
+% the list counter is the one thing this fixture does that an ordinary list does
+% not, and a validator is what says the resulting list is still a well-formed L
+% structure rather than merely one that prints the numbers we wanted. Declaring
+% pdfstandard=ua-2 evaluates this named artifact only and is not a conformance
+% claim for arbitrary user documents (see issue #77).
+\DocumentMetadata{lang=en,tagging=on,pdfstandard=ua-2}
+\input{cv-publication-numbering-body.inc.tex}
