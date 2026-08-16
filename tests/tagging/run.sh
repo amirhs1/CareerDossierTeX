@@ -142,6 +142,7 @@ groups=(
   resume-linkdecoration
   letter-recipient-address
   cv-subsection
+  cv-publication-numbering
   resume-displaydoctitle-off
   biblatex-ua2
 )
@@ -1322,6 +1323,29 @@ fi
 return "$fail"
 }
 
+# Grouped publication-list numbering (issue #355). Outside the five-document
+# loop for the same reason as the fixtures above: one page, no continuation
+# furniture.
+#
+# The property is invisible to every geometric check in this suite. A tagged
+# branch that ignored the seeded counter would print `1)' three times, which is
+# a perfectly well-formed page with perfectly well-formed word geometry and the
+# shipped default's own rendering; only the structure text says which numbers
+# the list actually carries.
+tagging_cv_publication_numbering() {
+local fail=0
+echo "== cv-publication-numbering =="
+if compile_fixture cv-publication-numbering.tex cv-publication-numbering; then
+  check_structure_text cv-publication-numbering
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture cv-publication-numbering-ua2.tex cv-publication-numbering-ua2 \
+      && validate_ua2 cv-publication-numbering
+  fi
+fi
+return "$fail"
+}
+
 # The DisplayDocTitle override sits outside the five-document loop for the same
 # reason: it is a one-page fixture with no continuation furniture, and it is the
 # only fixture whose preamble contradicts the package on purpose.
@@ -1372,6 +1396,7 @@ unit_for_group() {
     resume-linkdecoration)      printf 'tagging_resume_linkdecoration' ;;
     letter-recipient-address)   printf 'tagging_letter_recipient_address' ;;
     cv-subsection)              printf 'tagging_cv_subsection' ;;
+    cv-publication-numbering)   printf 'tagging_cv_publication_numbering' ;;
     resume-displaydoctitle-off) printf 'tagging_resume_displaydoctitle_off' ;;
     biblatex-ua2)               printf 'tagging_biblatex_ua2' ;;
   esac

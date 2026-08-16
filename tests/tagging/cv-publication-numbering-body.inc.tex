@@ -1,0 +1,59 @@
+% cv-publication-numbering-body.inc.tex -- shared body for the tagged
+% publication-numbering fixtures (issue #355).
+%
+% cv-subsection-body.inc.tex is the tagged record of the *default*: two grouped
+% lists whose baselines both read `itemlabel 1)'. This is the opt-in half.
+%
+% It is a tagging fixture rather than only an extraction one because the two
+% branches of CDossierPublications are different code. The untagged branch is
+% enumitem; the tagged branch is LaTeX Lab's key emulation, which is why
+% `leftmargin' has to be a dimension there (issues #218 and #193). The carry is
+% seeded onto the `enumi' counter precisely so that it does not depend on which
+% branch is running -- and this fixture is the only thing that would notice if
+% that stopped being true on the tagged one, since `1)' repeated is a plausible
+% enough page to pass every geometric check.
+%
+% Structure text, not extraction, is what reports it: the label is a marked-up
+% element of the list item, so tests/tagging/structure-text.pl reads the number
+% a consumer walking the structure tree receives.
+%
+% Two boundaries, matching the extraction fixture: a subsection inside one
+% section, then a section rule. Deliberately one page with no continuation
+% furniture, so it stays outside the five-document loop in run.sh.
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name={Tagged Numbering CV},
+  headline={Research Engineer},
+  email={numbering@example.test}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Selected Publications}
+\CDossierSubsection{Journal Articles}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors={A. Lovelace},
+    title={Notes on the Analytical Engine},
+    venue={Scientific Memoirs},
+    date={1843}
+  }
+\end{CDossierPublications}
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications}[numbering = continue]
+  \CDossierPublication{
+    authors={A. Lovelace},
+    title={On Programmable Looms},
+    venue={Example Symposium},
+    date={1842}
+  }
+\end{CDossierPublications}
+\CDossierSection{Preprints}
+\begin{CDossierPublications}[numbering = continue]
+  \CDossierPublication{
+    authors={A. Lovelace},
+    title={On Carrying a Number Across a Rule},
+    venue={Example Preprint Server},
+    date={1841}
+  }
+\end{CDossierPublications}
+\end{document}

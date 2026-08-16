@@ -446,6 +446,47 @@
 \msg_new:nnnn { careerdossier-cv } { unknown-publication-key }
   { Unknown~\c_backslash_str CDossierPublication~key~'#1'. }
   { The~supported~keys~are:~authors,~title,~venue,~date,~doi,~url,~note. }
+\msg_new:nnnn { careerdossier-cv } { unknown-publications-key }
+  { Unknown~CDossierPublications~key~'#1'. }
+  { The~only~supported~key~is~'numbering'. }
+\msg_new:nnnn { careerdossier-cv } { unknown-numbering }
+  { Unknown~'numbering'~value~'#1'~for~CDossierPublications. }
+  {
+    The~accepted~values~are~'restart'~(each~list~numbers~from~1)~and~
+    'continue'~(this~list~carries~on~from~the~last~one).
+  }
+
+%% Numbering across grouped lists (issue #355).
+%%
+%% `restart' is the default and is the behaviour the class shipped with: each
+%% CDossierPublications is a self-contained list and its first item is `1)'.
+%% Under \CDossierSubsection one section commonly carries several groups, and a
+%% document whose numbers are cited from a cover letter or a grant form needs a
+%% number to identify a publication outright rather than within its group; that
+%% document asks for `continue'.
+%%
+%% `continue' resumes from the final number of the *preceding* list, not from a
+%% running total the class maintains behind the user's back, so a `restart' list
+%% in between resets what a later `continue' picks up. Mixing the two in one
+%% document is degenerate by construction and this is the reading that keeps the
+%% key local to the list it appears on.
+\tl_new:N \l__cdossier_cv_publications_numbering_tl
+\int_new:N \g__cdossier_cv_publications_carry_int
+
+\keys_define:nn { cdossier / publications }
+  {
+    numbering .choices:nn =
+      { restart , continue }
+      { \tl_set_eq:NN \l__cdossier_cv_publications_numbering_tl \l_keys_choice_tl } ,
+    numbering / unknown .code:n =
+      { \msg_error:nnn { careerdossier-cv } { unknown-numbering } {#1} } ,
+    numbering .value_required:n = true ,
+    unknown .code:n =
+      {
+        \msg_error:nnx { careerdossier-cv } { unknown-publications-key }
+          { \l_keys_key_str }
+      } ,
+  }
 
 \keys_define:nn { cdossier / publication }
   {
@@ -594,9 +635,28 @@
 %% CDossierItemize states its own `\textbullet' twice for the same reason.
 \dim_new:N \l__cdossier_cv_publication_label_width_dim
 
-\NewDocumentEnvironment { CDossierPublications } { }
+%% The carry is seeded onto `enumi' after \begin{enumerate} rather than through
+%% enumitem's `start' or `resume' key, and that is deliberate. The tagged branch
+%% below is not enumitem at all -- it is LaTeX Lab's key emulation, which is why
+%% `leftmargin' has to be a dimension there -- so a key either of them might not
+%% implement is exactly what this must not depend on. The list counter is a
+%% LaTeX counter on both branches, and \begin{enumerate} has already zeroed it
+%% through \usecounter by the time the seed lands, so the first \item steps from
+%% the seeded value. `enumi' is named outright because this list is a top-level
+%% CV construct: it holds \CDossierPublication and nothing else, and every
+%% documented use puts it directly under a section or a subsection. A list
+%% nested inside another LaTeX list would take `enumii' and `continue' would
+%% seed the wrong counter -- an undocumented shape, and the cost of noticing it
+%% is a number that starts in the wrong place, not a broken document.
+%%
+%% tests/regression/cv-publication-numbering.lvt covers the untagged branch and
+%% tests/tagging/cv-publication-numbering.structure.txt the tagged one, which is
+%% where a branch that ignored the seed would show up.
+\NewDocumentEnvironment { CDossierPublications } { O{} }
   {
     \bool_set_true:N \l__cdossier_cv_publications_active_bool
+    \tl_set:Nn \l__cdossier_cv_publications_numbering_tl { restart }
+    \keys_set:nn { cdossier / publications } {#1}
     \tag_if_active:TF
       {
         \hbox_set:Nn \l_tmpa_box { \textbf { 1) } }
@@ -632,8 +692,13 @@
             partopsep  = 0pt ,
           ]
       }
+    \tl_if_eq:NnT \l__cdossier_cv_publications_numbering_tl { continue }
+      { \int_gset_eq:NN \c@enumi \g__cdossier_cv_publications_carry_int }
   }
   {
+    %% Read before \end{enumerate}: the counter is stepped inside the list's
+    %% group, and this is the last number the list actually labelled.
+    \int_gset_eq:NN \g__cdossier_cv_publications_carry_int \c@enumi
     \__cdossier_components_listedge_after:
     \end { enumerate }
     \bool_set_false:N \l__cdossier_cv_publications_active_bool
