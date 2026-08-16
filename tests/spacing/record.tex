@@ -1,0 +1,131 @@
+% record.tex — every vertical boundary the record classes (résumé, CV) own.
+%
+% The \documentclass line is rewritten by report.sh for each class and font
+% size, exactly as tests/layout/render-size-margin-matrix.sh does, so this one
+% fixture covers both record classes at all three sizes.
+%
+% Each boundary is measured inside its own \vbox with a known sequence of line
+% boxes, rather than by marking up a running document. A marker node between
+% two blocks would break `\addvspace': it reads `\lastskip' to collapse against
+% the preceding glue, and an intervening whatsit makes `\lastskip' zero, so the
+% marker would silently change the very gap it was inserted to name.
+\documentclass[fontsize=11pt]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada.lovelace@example.com},
+}
+
+\newbox\ProbeSectionBox
+\newbox\ProbeEntryRunBox
+\newbox\ProbeEntryListBox
+\newbox\ProbeSubsectionBox
+\newbox\ProbeParaBox
+
+\begin{document}
+
+% -- section heading between two blocks of body copy -----------------------
+\setbox\ProbeSectionBox=\vbox{%
+  \noindent Preceding body copy line.\par
+  \CDossierSection{Experience}
+  \noindent Following body copy line.\par
+}
+
+% -- two entries in a row, neither carrying a list -------------------------
+\setbox\ProbeEntryRunBox=\vbox{%
+  \noindent Preceding body copy line.\par
+  \begin{CDossierEntry}[title = {Principal Data Scientist},
+                        organization = {Digital Services Laboratory},
+                        dates = {2024--Present}]
+    Body copy under the first entry.
+  \end{CDossierEntry}
+  \begin{CDossierEntry}[title = {Senior Data Scientist},
+                        organization = {Civic Technology Research Group},
+                        dates = {2021--2024}]
+    Body copy under the second entry.
+  \end{CDossierEntry}
+}
+
+% -- an entry whose body is a bullet list, followed by another entry -------
+\setbox\ProbeEntryListBox=\vbox{%
+  \begin{CDossierEntry}[title = {Principal Data Scientist},
+                        organization = {Digital Services Laboratory},
+                        dates = {2024--Present}]
+    \begin{CDossierItemize}
+      \item First bullet item.
+      \item Second bullet item.
+    \end{CDossierItemize}
+  \end{CDossierEntry}
+  \begin{CDossierEntry}[title = {Senior Data Scientist},
+                        organization = {Civic Technology Research Group},
+                        dates = {2021--2024}]
+    Body copy under the following entry.
+  \end{CDossierEntry}
+}
+
+% -- section, subsection, entry -------------------------------------------
+\setbox\ProbeSubsectionBox=\vbox{%
+  \noindent Preceding body copy line.\par
+  \CDossierSubsection{A Narrower Theme}
+  \noindent Following body copy line.\par
+}
+
+% -- two ordinary paragraphs (RecordParSkip) -------------------------------
+\setbox\ProbeParaBox=\vbox{%
+  \noindent First paragraph line.\par
+  \noindent Second paragraph line.\par
+}
+
+\directlua{
+  dofile("tests/spacing/probe.lua")
+  % \number consumes the end-of-line space after \relax, so without \space the
+  % digits run straight into the next Lua token and Lua reports a malformed
+  % number. Every other \number here is followed by `)' or `,' and is safe.
+  local baseline = \number\dimexpr\baselineskip\relax\space
+
+  cdossier_probe.token("baselineskip", baseline, baseline)
+  local function tok(name, sp) cdossier_probe.token(name, sp, baseline) end
+  tok("RecordSectionAboveSkip",    \number\dimexpr\CDossierRecordSectionAboveSkip\relax)
+  tok("RecordSectionRuleGapSkip",  \number\dimexpr\CDossierRecordSectionRuleGapSkip\relax)
+  tok("RecordSectionBelowSkip",    \number\dimexpr\CDossierRecordSectionBelowSkip\relax)
+  tok("RecordSubsectionAboveSkip", \number\dimexpr\CDossierRecordSubsectionAboveSkip\relax)
+  tok("RecordSubsectionBelowSkip", \number\dimexpr\CDossierRecordSubsectionBelowSkip\relax)
+  tok("RecordEntryAboveSkip",      \number\dimexpr\CDossierRecordEntryAboveSkip\relax)
+  tok("RecordEntryGapSkip",        \number\dimexpr\CDossierRecordEntryGapSkip\relax)
+  tok("RecordListEdgeAboveSkip",   \number\dimexpr\CDossierRecordListEdgeAboveSkip\relax)
+  tok("RecordListEdgeBelowSkip",   \number\dimexpr\CDossierRecordListEdgeBelowSkip\relax)
+  tok("RecordItemSepSkip",         \number\dimexpr\CDossierRecordItemSepSkip\relax)
+  tok("RecordParSkip",             \number\dimexpr\CDossierRecordParSkip\relax)
+
+  cdossier_probe.report(\number\ProbeSectionBox, "section", {
+    "body -> section heading", "section heading -> rule", "rule -> body"})
+  % An entry head sets two line boxes -- the title/dates row and the
+  % organization/location row -- so each entry contributes an interior boundary
+  % that no token owns. Measured, not assumed: it is why these label lists are
+  % longer than the number of tokens involved.
+  cdossier_probe.report(\number\ProbeEntryRunBox, "entry-run", {
+    "body -> entry head",
+    "entry title row -> entry meta row",
+    "entry head -> entry body",
+    "entry body -> next entry head",
+    "entry title row -> entry meta row",
+    "entry head -> entry body"})
+  cdossier_probe.report(\number\ProbeEntryListBox, "entry-list", {
+    "entry title row -> entry meta row",
+    "entry head -> list first item",
+    "item -> item",
+    "list last item -> next entry head",
+    "entry title row -> entry meta row",
+    "entry head -> entry body"})
+  cdossier_probe.report(\number\ProbeSubsectionBox, "subsection", {
+    "body -> subsection heading", "subsection heading -> body"})
+  cdossier_probe.report(\number\ProbeParaBox, "para", {"paragraph -> paragraph"})
+}
+
+\box\ProbeSectionBox
+\box\ProbeEntryRunBox
+\box\ProbeEntryListBox
+\box\ProbeSubsectionBox
+\box\ProbeParaBox
+
+\end{document}

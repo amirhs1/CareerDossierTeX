@@ -1250,8 +1250,9 @@ precedent for adding a similar entry today. See
   sits closer to the entry that owns it than to the next one, and the letter's
   body is framed by a gap visibly wider than an ordinary paragraph break.
 
-  Measured on the built documents: the statement's section pair renders 9.65 pt
-  above against 3.27 pt below at 12 pt, and its subsections 7.03 / 2.68. The
+  Measured on the built documents with `pdftotext -bbox`: the statement's
+  section pair renders 9.65 pt above against 3.27 pt below at 12 pt, and its
+  subsections 6.67 / 2.68. The
   résumé's bullet lists sit 2.30 pt below their entry heading and 4.99 pt above
   the next entry, reversing an inversion in which a list sat *further* from the
   entry that owned it. **No supported combination changes its page count** —
