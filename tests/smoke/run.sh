@@ -342,26 +342,33 @@ smoke_engine_contract() {
 }
 
 # Issue #252: the header-stack fixture below compiles the worked example
-# published in docs/API.md, so it is only worth compiling while the two are the
+# published in the manual, so it is only worth compiling while the two are the
 # same text. Nothing else notices when a documented example is edited and its
 # fixture is not -- the fixture keeps building, and the promise it was added to
 # keep quietly stops being kept. Compare them before compiling anything.
 #
-# The documented block is found by its content (the fenced `latex' block that
-# declares a document *and* opens a header stack), not by the prose around it,
-# so rewording the paragraph above the example does not break this.
+# The documented block is found by its content (the block that declares a
+# document *and* opens a header stack), not by the prose around it, so rewording
+# the paragraph above the example does not break this.
+#
+# The source moved from docs/API.md to doc/careerdossier.tex when the manual
+# became the interface reference (#263), which changed the block delimiters from
+# a Markdown fence to the manual's `latexcode' environment and nothing else.
+# Retargeting a control is how one silently stops covering (#399), so the
+# no-block case below is a failure rather than a skip: a manual this cannot find
+# an example in is indistinguishable from a manual that no longer publishes one.
 #
 # It is gated on its own fixture being selected (issue #359): the claim it makes
 # is about that fixture, and a run that does not compile it has no business
 # reporting on it.
 smoke_doc_drift() {
   local unit_fail=0 doc_source doc_fixture
-  doc_source="$root/docs/API.md"
+  doc_source="$root/doc/careerdossier.tex"
   doc_fixture="$here/components-header-stack-doc.tex"
-  echo "== docs/API.md worked example == components-header-stack-doc.tex =="
+  echo "== manual worked example == components-header-stack-doc.tex =="
   awk '
-    /^```latex$/          { inblock = 1; buf = ""; next }
-    inblock && /^```$/    {
+    /^\\begin[{]latexcode[}]$/ { inblock = 1; buf = ""; next }
+    inblock && /^\\end[{]latexcode[}]$/ {
                             inblock = 0
                             if (buf ~ /CDossierHeaderBegin/ && buf ~ /documentclass/)
                               { found++; out = buf }
@@ -371,14 +378,14 @@ smoke_doc_drift() {
     END                   { if (found != 1) exit 1; printf "%s", out }
   ' "$doc_source" > "$here/doc-example.stdout"
   if [ $? -ne 0 ]; then
-    echo "  FAILED to locate exactly one worked example in docs/API.md"
+    echo "  FAILED to locate exactly one worked example in doc/careerdossier.tex"
     unit_fail=1
   else
     awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/doc-fixture.stdout"
     if diff -u "$here/doc-example.stdout" "$here/doc-fixture.stdout" > "$here/doc-example.diff"; then
       echo "  documented example and fixture are identical"
     else
-      echo "  DRIFTED — the fixture no longer compiles what docs/API.md publishes:"
+      echo "  DRIFTED — the fixture no longer compiles what the manual publishes:"
       sed 's/^/    /' "$here/doc-example.diff"
       unit_fail=1
     fi
