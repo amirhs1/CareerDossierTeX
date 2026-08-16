@@ -78,7 +78,8 @@ and [MIT's ATS guide](https://capd.mit.edu/resources/make-your-resume-ats-friend
 
 > **Verify at release.** Vendor guidance and limits change. Re-check these three
 > pages, and any figure attributed to a vendor (for example the Greenhouse parser
-> size limit in §11.9), each release cycle.
+> size limit in [`TESTING.md`](TESTING.md#real-portal-acceptance) "Real portal
+> acceptance"), each release cycle.
 
 ## 1. What "ATS-friendly" should mean in this package
 
@@ -254,7 +255,8 @@ it. Close the following bullet list up against the heading and Poppler groups th
 two bands, then sorts the column as trailing material — after the bullets, or,
 on a page carrying furniture, after the `Page N of M` folio. The reordering is a
 property of the component's geometry, not of tagging, and Apple PDFKit does not
-show it. `tests/extraction/` pins the order for both classes; see section 11.6.
+show it. `tests/extraction/` pins the order for both classes; see
+[`TESTING.md`](TESTING.md#reading-order-assertions) "Reading-order assertions".
 
 #### Why the component cannot fix this itself
 
@@ -571,7 +573,7 @@ consumer-specific, so test more than one consumer.** The fixture runner gates on
 Poppler, on the absence of `/ActualText`, and — on macOS — on PDFKit itself.
 
 None of this is a tagging, PDF/UA, WCAG, or ATS-conformance claim. It concerns
-the text layer only; see sections 7 and 8.
+the text layer only; see section 7.
 
 Never search a decompressed PDF for the word `ToUnicode` and call the document
 validated. Use `pdffonts` for a quick inventory, inspect suspicious mappings when
@@ -843,7 +845,9 @@ reboxing underline it would also have been a correctness one.
 Second, plain extracted text cannot check this: a legitimate line wrap and a
 split token both read as whitespace. The decision needs word bounding boxes —
 pieces on different visual lines are a wrap, pieces sharing one line are the
-defect. `make links` (§11) is the assertion, and it carries a negative control
+defect. `make links` is the assertion
+([`TESTING.md`](TESTING.md#link-copy-paste-integrity-suite)), and it carries a
+negative control
 — a fixture that widens the bibliography's URL glue past the threshold on
 purpose and must be reported as split — so the checker is re-proved against a
 genuinely broken PDF on every run. The control sets that gap directly rather
@@ -1609,109 +1613,7 @@ their artifact-only separator invisible to the consumer, are any more legible
 than one glued run is exactly the kind of question 7.2's manual screen-reader
 pass, not a structural count, can actually answer.
 
-## 8. Class and package architecture
-
-### 8.1 Module layout (matches the repository)
-
-CareerDossierTeX is modular: keep classes thin and put reusable behaviour in the
-shared packages. `docs/ARCHITECTURE.md` is the authoritative module map and
-dependency direction; the ATS-relevant rules are that margins never live in
-`careerdossier-base` and contact-line logic is never duplicated across classes.
-
-Multilingual and RTL support is **dropped** (see `docs/ROADMAP.md`); should it
-ever return, it would extend the existing typography and component modules —
-and introduce a label abstraction — rather than add language-specific classes.
-
-### 8.2 Build on a stable base class
-
-Use `\LoadClass` rather than reimplementing LaTeX's entire page, list, footnote,
-and section machinery. `article` is a suitable base for the résumé; the letter
-class may build on `article` or `letter` if its output order is tested. Override
-only what the document type requires.
-
-### 8.3 File identification and engine requirement
-
-Every file should identify itself and its minimum kernel date:
-
-```tex
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesClass{careerdossier-resume}
-  [2026-07-30 v0.6.0 ATS-conscious résumé class]
-```
-
-Choose the actual date based on the newest kernel interface used. The current LaTeX
-class/package author guide notes that kernel key-value options
-(`\DeclareKeys`/`\ProcessKeyOptions`) require at least the 2022-06-01 release.
-
-Fail early and clearly under the wrong engine (the canonical check lives in
-`careerdossier-typography.sty`). Do not allow pdfLaTeX or XeLaTeX to proceed until
-a late, confusing font error appears. LuaLaTeX is the supported engine.
-
-### 8.4 Public API: semantic, small, and stable
-
-Public commands and environments use the `CDossier` prefix; `docs/API.md` is the
-authoritative list with signatures, keys, and defaults. Two properties matter
-for extraction: the implementation emits stored keys in one documented canonical
-order regardless of input order, and it omits absent optional keys without
-leaving separators or spacing artifacts.
-
-Use `\NewDocumentCommand` and `\NewDocumentEnvironment` for public document
-interfaces. Use `expl3` for internal data structures and logic. Internal names use
-the private form `\__cdossier_<module>_<action>:<signature>`; never borrow another
-package's internals and never expose private commands in examples or docs.
-
-### 8.5 Options
-
-Use the kernel's current key-value option system (l3keys-based) for new code;
-`docs/API.md` lists each class's accepted option values and defaults. The design
-rules matter more than the syntax:
-
-- documented defaults are predictable;
-- unknown options produce an actionable error or are deliberately passed to the
-  base class;
-- options do not silently change the text layer;
-- every option combination shown in documentation has a regression test; and
-- it is better to omit an unsupported option than to accept and ignore it.
-
-### 8.6 Dependencies
-
-- Load packages with `\RequirePackage`, not primitive `\input`.
-- Specify a minimum version date when relying on a recent feature.
-- Keep the dependency set small.
-- Consult current package manuals and the tagging-status table before adding a
-  dependency.
-- Prefer kernel hooks through `\AddToHook` over legacy `every...` packages or
-  direct patching.
-- Avoid redefining unsupported LaTeX internals. Commands containing `@` are
-  generally internal and may change.
-- Use LaTeX box commands rather than TeX primitives where practical.
-
-### 8.7 Diagnostics
-
-Use `\ClassError`, `\ClassWarning`, `\ClassInfo`, or their package equivalents.
-Every error should state (1) what failed, (2) why it matters, (3) what the user
-should change, and (4) where the relevant documentation is.
-
-Conditions worth diagnosing include: compilation under the wrong engine; an
-unavailable selected font; an unsupported option value; a missing applicant name;
-and duplicate critical metadata. Do not silently fall back from an unavailable
-requested font to an arbitrary system font.
-
-## 9. Repository and source organization
-
-The repository uses a flat, handwritten `.sty`/`.cls` layout — which is fully
-acceptable for CTAN — with source at the top level and examples, docs, and CI in
-their own directories. This is the project's chosen path; a `.dtx`/`docstrip`
-workflow is an optional future consideration, not a requirement (see §14). See
-`docs/ARCHITECTURE.md` for the current repository layout and module set, and
-`build.lua` for the `l3build` regression configuration under `tests/regression/`.
-
-Separate: public commands from internal implementation; content semantics from
-visual details; user documentation from programmer documentation as the package
-grows; examples from regression fixtures; and generated artifacts from tracked
-source.
-
-## 10. Compilation policy
+## 8. Compilation policy
 
 ### Supported command
 
@@ -1739,193 +1641,7 @@ missing characters; option clashes; and deprecated interfaces. Do not make every
 harmless TeX warning fatal, but maintain an explicit allowlist; a new warning
 should fail CI until reviewed.
 
-## 11. Testing strategy
-
-### 11.1 Test layers
-
-1. **Class/package regression tests** — API behaviour, options, errors, grouping,
-   and load order **(l3build; Phase 1 onward)**.
-2. **PDF extraction tests** — characters, spaces, reading order, and semantic
-   adjacency **(Phase 1)**.
-3. **PDF structural tests** — syntax, embedded fonts, metadata, tags, and
-   accessibility claims.
-4. **Rendered-page tests** — overlap, clipping, density, page breaks, contrast.
-5. **Real-portal tests** — parsed preview or autofill where possible.
-
-Add each layer's focused fixture with the implementation it validates. When
-practical, run the new fixture before implementation and confirm that it fails
-for the intended reason. All automated sources, expected outputs, runners, and
-baselines belong under `tests/`; milestone release work reruns them but does not
-defer their creation.
-
-### 11.2 `l3build` for package tests **(Phase 1 onward)**
-
-The regression harness is configured in `build.lua` (`tests/regression/`,
-LuaTeX, LaTeX format); `docs/TESTING.md` documents how to run and save its
-checks. Two disciplines are load-bearing for a text-layer-sensitive package:
-add a regression test for every fixed bug, and inspect every newly saved
-`.tlg` — `l3build` detects change but cannot decide whether the new output is
-correct. Maintain negative tests proving unsupported engines fail with the
-intended message.
-
-### 11.3 Ground-truth extraction fixture **(Phase 1)**
-
-Include a document containing text like:
-
-```text
-Zoë Dvořák Łukasz İpek José
-office efficient affine waffle difficult
-(C++) (c++) C# F# R&D 100% AT&T
-email@example.org +1 416 555 0199
-https://example.org/a_b?q=one&lang=en
-Senior Research & Development Engineer
-January 2023 - Present
-```
-
-Add representative bullets, headings, links, page breaks, bold, and italic. The
-expected file should contain the intended plain text in the intended order.
-
-### 11.4 Command-line extraction
-
-```sh
-pdftotext -enc UTF-8 document.pdf document.txt
-pdftotext -layout -enc UTF-8 document.pdf document-layout.txt
-pdffonts document.pdf
-qpdf --check document.pdf
-```
-
-Interpretation: default `pdftotext` is the more important reading-order signal;
-`-layout` is a useful second view, not the canonical expected output; `pdffonts`
-can reveal missing embedding but cannot prove correct mapping; `qpdf --check` tests
-PDF syntax, not ATS semantics. Normalize line endings and Unicode deliberately
-before diffing, but be cautious about normalizing all whitespace — removing too
-much can hide missing word separators.
-
-### 11.5 Multiple-consumer test
-
-Copy and paste the same high-risk text in at least: Poppler (`pdftotext`); a
-PDFium-based viewer such as Chrome; PDF.js in Firefox; and one additional common
-target such as Adobe Acrobat Reader or macOS Preview. The Inter example shows why
-one extractor is not enough. If consumers disagree, record the discrepancy and
-choose the more conservative font or feature setup.
-
-### 11.6 Reading-order assertions
-
-Assert order and adjacency, not just a bag of words: applicant name precedes
-contact information; the `Experience` heading precedes the first job; each title
-remains near its organization and date; bullets remain under their entry;
-`Education` does not interleave with `Skills`; and page furniture does not
-interrupt sentences.
-
-**Entry-head column order is covered** (issue #221). Three fixtures in
-`tests/extraction/` assert that an entry heading's right-hand dates/location
-column extracts between its heading and its bullets, on the untagged path this
-suite builds:
-
-| Fixture | Class | Pages | What it adds |
-|---|---|---|---|
-| `resume-entry-dates-order` | résumé | 1 | the cheapest form of the assertion |
-| `cv-entry-dates-order` | CV | 1 | the same component under CV geometry |
-| `resume-entry-dates-page-furniture` | résumé | 2 | running header and folio present |
-
-Two findings from building them are worth keeping, because they decide what a
-fixture of this kind has to look like:
-
-- **Two entries, not one.** The last entry sorted on a page always trails its
-  own column, at every list-edge value. A one-entry fixture therefore cannot see
-  the fault appear or disappear — which is why the three pre-existing fixtures
-  with dates (`resume-contact-optional`, `resume-contact-wrap`,
-  `cv-contact-optional`) stayed green throughout the #219 regression. The
-  assertion lives on an entry that is followed by more material.
-- **Page furniture is sufficient, not necessary.** A single page with two
-  entries reproduces the reordering exactly as the two-page form does; the folio
-  only makes it more conspicuous by putting the dates below the page furniture.
-
-Poppler is the discriminating consumer here. The committed `*.pdfkit.txt`
-baselines keep each heading row on one line at every value tested, so they
-record the layout but do not detect the fault.
-
-**Link copy-paste integrity is covered** (issue #294). `tests/links/`
-(`make links`) asserts that no URL or e-mail address is emitted as two or more
-words sharing a visual line, and that a wrapped one reassembles exactly — see
-§6, "Copy-paste integrity", for the mechanism. One fixture per link site: the
-résumé contact line, the CV contact line and its manual publication list, both
-letter families, and the BibLaTeX bibliography.
-
-Three properties of the suite are the point of it:
-
-- **It reads coordinates, not text.** `pdftotext -bbox` is what distinguishes a
-  wrap from a split; the plain text of the two is identical. Line identity is
-  inferred from `yMin` — the top of the word box, a line-position proxy rather
-  than the typographic baseline, hence a small tolerance.
-- **It declares its expectations in the fixture.** A `% LINKTOKEN:` line names
-  each token that must stay atomic, and a token that is absent from the PDF
-  fails the run — a fixture that stops rendering its link cannot pass quietly.
-- **It carries a negative control.** `cv-bibliography-urlmuskip-raised.tex`
-  restores BibLaTeX's `0mu plus 3mu` and must be reported as split. It shares
-  its `.bib` with the passing bibliography fixture, so the muskip is the only
-  difference between an intact URL and a spread one.
-
-### 11.7 Visual regression
-
-Render each example to PNG and inspect it after meaningful changes. Include narrow
-and long values, multiple pages, long organization names, long URLs, and accents.
-Check clipping and overlap; broken bold/italic; orphan headings; awkward page
-splits; rules extending into text; contrast; and 200-400% zoom. Full automated
-visual regression is a later-phase goal.
-
-### 11.8 Tagged-PDF checks
-
-When tagging is enabled, inspect the structure tree; check language metadata;
-verify headings and lists; confirm decorative rules and page furniture are
-artifacts; run the appropriate veraPDF profile if claiming a standard; and perform
-at least one screen-reader reading-order check. Do not let accessibility tests
-replace text-extraction tests.
-
-`tests/tagging/run.sh` (`make tagging`) automates every part of that except the
-screen-reader pass, which stays manual by nature. Recorded results and the
-outstanding VoiceOver/NVDA checklists are in sections 7.1 and 7.2.
-
-One check there is not an extraction check and should not be read as one.
-`tests/tagging/structure-text.pl` decodes each marked-content run from the
-content stream and consults no glyph coordinate at all, so what it prints is
-the *logical* text of a structure element rather than an extractor's
-reconstruction of the page. That distinction is the whole reason it exists:
-Poppler, MuPDF, and PDFKit all rebuild words from geometry, so all three were
-blind to two cells joined by nothing but positioning glue (7.6). A defect of
-that shape is invisible to every other check in this document. Its per-fixture
-`*.structure.txt` baselines are assertions, not records — regenerate one only
-for an intended change to the tagged text, and read the diff.
-
-### 11.9 Real portal acceptance
-
-When a portal previews parsed fields, inspect and correct name, email, phone, job
-titles, employers, date ranges, education, current location, and links. Follow the
-portal's requested format. Greenhouse documentation has stated a parser input size
-limit in one recruiting workflow, so keep PDFs compact and image-light; do not
-treat that vendor-specific limit as universal, and re-check the current figure.
-
-## 12. CI and release gates
-
-Phase 1 CI runs every applicable committed suite under `tests/`, compiles both
-supported examples on pushes and pull requests, installs a LuaLaTeX-capable TeX
-environment, uploads PDFs and logs as artifacts, and fails when tests or
-compilation fail. Do not require a new status check in branch protection until
-it has passed at least once.
-
-Broader gates are later-phase targets: a CI matrix (current TeX Live, optionally
-the oldest supported release, a scheduled pre-release job); mandatory failure on
-new unexpected warnings, missing/substituted font faces, semantic extraction
-differences, ordered-block failures, unembedded meaningful fonts, `qpdf --check`
-errors, or visual clipping.
-
-Run the full suite, not only unit tests, after changes to: fonts or font versions;
-`fontspec` options; section or entry formatting; box, list, header, footer, or
-page-break code; hyperlink or icon packages; tagged-PDF settings; bibliography
-styles **(planned)**; minimum LaTeX version; the TeX Live image; or any dependency
-that affects output.
-
-## 13. Documentation requirements
+## 9. Documentation requirements
 
 Keep documentation in sync with behaviour, in the same change; `CONTRIBUTING.md`
 ("Documentation requirements") maps each kind of change to the doc it belongs
@@ -1936,50 +1652,7 @@ Keep examples fictional and realistic. Obvious placeholders such as `First Last`
 `Company 1` can themselves be skipped by parsers, as Greenhouse's documentation
 notes. Use clearly fictional but plausible names and organizations.
 
-## 14. CTAN readiness **(planned — v1.0.0)**
-
-CTAN's requirements govern the uploaded archive, not the development repository. As
-of July 2026 the core expectations, verified against
-[CTAN's upload guidance](https://ctan.org/help/upload-pkg?lang=en), include:
-
-- one `.zip`, `.tar.gz`, or `.tgz` archive;
-- a top-level directory named for the package;
-- a top-level `README`/`README.txt`/`README.md`, ASCII or UTF-8 (no BOM), in
-  English, containing a licence statement and a version identifier;
-- PDF documentation together with its source;
-- no files that can be generated from other files, except the PDF documentation
-  and derived fonts.
-
-Handwritten `.sty`/`.cls` files are source and are included as-is; a `.dtx`/`.ins`
-workflow is optional. CTAN in fact discourages *generated* `README` and `.ins`
-files because they tend to go stale against their source. TDS packaging
-(`.tds.zip`) is optional and, for a package without an elaborate install, generally
-unnecessary.
-
-When the project reaches this milestone, `l3build ctan` can generate and inspect
-the release archive from the handwritten source; there is no need to migrate to
-`.dtx`. Verify the archive manually before upload.
-
-### Licence and fonts
-
-- LPPL 1.3c or later is conventional for LaTeX code; the project uses LPPL 1.3c,
-  maintenance status `maintained`, maintainer Amir Sadeghi.
-- Give documentation and examples explicit licence terms.
-- Do not assume a font licence permits bundling merely because the font is free to
-  use in documents. List every bundled asset and its licence, and keep third-party
-  notices and source links.
-
-### Versioning and maintenance
-
-- Keep release date and version synchronized across source, documentation, README,
-  and CTAN metadata.
-- Maintain a changelog that calls out extraction or rendering changes.
-- State the minimum LaTeX release and TeX Live versions.
-- Provide a public bug tracker and repository.
-- Document deprecations before removing public interfaces, and add a regression
-  test for each fixed parsing bug.
-
-## 15. What to do and what not to do while writing the package
+## 10. What to do and what not to do while writing the package
 
 ### Do
 
@@ -2017,7 +1690,7 @@ the release archive from the handwritten source; there is no need to migrate to
 - present future features (named font combinations, CTAN packaging, or a
   consolidated profile interface) as if they were current.
 
-## 16. Minimal reference template and class skeleton
+## 11. Minimal reference template and class skeleton
 
 ### User template **(Phase 1)**
 
@@ -2097,82 +1770,10 @@ The exact load order for `fontspec`, `hyperref`, language support, and any
 tagging-related packages must be verified against current manuals and the test
 suite. Do not freeze this illustrative order as policy without integration tests.
 
-## 17. Release checklist
-
-> This is the full CTAN-quality release checklist, targeted at `v1.0.0`. For Phase
-> 1, the applicable subset is the **Document output** and **Extraction** groups
-> plus basic build CI; the CTAN group is out of Phase 1 scope.
-
-### Document output
-
-- [ ] Single-column output is the default.
-- [ ] Essential content appears in the document body.
-- [ ] Headings are conventional and extract correctly.
-- [ ] Dates remain associated with the correct entry.
-- [ ] Links retain useful visible text.
-- [ ] Bullets are standard list constructs.
-- [ ] No icon, table, graphic, or colour carries unique meaning.
-- [ ] No hidden or mismatched text exists.
-
-### LuaLaTeX and fonts
-
-- [ ] Wrong engines fail early with a useful message.
-- [ ] Default fonts are reproducible and legally distributable.
-- [ ] Upright, bold, italic, and bold italic are explicit.
-- [ ] No per-word `/ActualText` spans are present (section 4.5).
-- [ ] Ligature and alternate-feature policy is documented.
-- [ ] Font versions are recorded and all meaningful fonts are embedded.
-
-### Extraction
-
-- [ ] Ground-truth text round-trips through Poppler.
-- [ ] Ground-truth text round-trips through a second, non-Poppler consumer
-      (PDFKit on macOS), because Poppler recovers spacing that others do not.
-- [ ] The output contains no `/ActualText` spans (section 4.5).
-- [ ] Default and `-layout` extraction have been inspected.
-- [ ] Punctuation, accents, symbols, URLs, and ligature sequences pass.
-- [ ] Ordered-block assertions pass.
-- [ ] Copy/paste passes in at least two independent PDF engines.
-- [ ] A real portal preview has been checked when feasible.
-
-### Accessibility and rendering
-
-- [ ] The default `hyperref` metadata route and the separate opt-in
-      `\DocumentMetadata` tagging route are documented.
-- [ ] Tagged fixtures pass structure, artifact, and extraction checks, and the
-      untagged path is unchanged.
-- [ ] The five UA-2 fixture variants pass veraPDF, and the reports and toolchain
-      record from that run were reviewed (section 7.1).
-- [ ] At least one macOS and one Windows screen-reader reading-order check is
-      recorded, or the release explicitly states which one is outstanding
-      (section 7.2).
-- [ ] No PDF/UA or WCAG claim is made beyond what a validator run and manual
-      inspection actually covered, and the fixtures that were validated are named.
-- [ ] Rendered pages have no clipping, overlap, missing glyphs, or bad page breaks,
-      and output is legible in grayscale and at high zoom.
-
-### Package quality
-
-- [ ] Public API is semantic and documented; internal names are namespaced.
-- [ ] Current l3keys options and kernel hooks are used where appropriate.
-- [ ] Errors and warnings are actionable.
-- [ ] Every fixed bug has a regression test.
-- [ ] User and programmer documentation build cleanly; changelog and version
-      metadata agree.
-
-### CTAN **(v1.0.0)**
-
-- [ ] README, licence, PDF manual, and documentation source are present.
-- [ ] Archive has one correctly named top-level directory.
-- [ ] No temporary or prohibited generated files are included.
-- [ ] Font and asset licences have been audited.
-- [ ] `l3build check`, extraction tests, documentation build, and `l3build ctan`
-      pass, and the final archive has been opened and inspected manually.
-
-## 18. Ongoing maintenance rule
+## 12. Ongoing maintenance rule
 
 ATS parsing, PDF consumers, LaTeX's tagged-PDF implementation, `fontspec`,
-LuaHBTeX, fonts, and CTAN rules all change. Treat this guide as a maintained compatibility
+LuaHBTeX, and fonts all change. Treat this guide as a maintained compatibility
 document. At least once per release cycle:
 
 1. read the latest LaTeX News;
@@ -2181,8 +1782,11 @@ document. At least once per release cycle:
 4. review the tagging-status table for every dependency;
 5. rerun the extraction matrix on current TeX Live;
 6. test any changed font files;
-7. inspect current CTAN upload guidance; and
-8. update the compatibility statement with tested versions and known failures.
+7. update the compatibility statement with tested versions and known failures.
+
+CTAN's own rules change on the same cadence;
+[`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md) owns that review and the release
+gates that depend on it.
 
 Optimize for evidence, not folklore: simple structure, explicit semantics,
 reproducible fonts, defensive PDF text generation, and repeatable tests.

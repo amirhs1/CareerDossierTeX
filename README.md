@@ -476,6 +476,7 @@ gate, not the stage where feature tests are first created. See
 - [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
 - [`AGENTS.md`](AGENTS.md): the operating contract for coding agents
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
+- [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md): the per-release gate and the CTAN packaging requirements
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
 
 Only behavior documented in `docs/API.md` and covered by the relevant tests and

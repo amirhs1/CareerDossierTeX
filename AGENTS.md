@@ -64,7 +64,8 @@ rows that apply.
 | Documentation only                 | the document itself; `README.md` when user-facing status changes; `CHANGELOG.md` only when the change is user-visible                                                                                                                           |
 | Agent tooling, skills, or sandbox  | `AI-POLICY.md`, `CLAUDE.md`, `.agents/skills/`, `CONTRIBUTING.md` § "AI-assisted contributions"                                                                                                                                                 |
 | Build, test harness, or CI         | `Makefile`, `CONTRIBUTING.md` § "Local builds", `docs/TESTING.md` (the suite the harness runs), `.github/workflows/build.yml`                                                                                                                   |
-| CHANGELOG or release preparation   | `.agents/skills/release-notes/reference.md`, `CHANGELOG.md`, `docs/ROADMAP.md`                                                                                                                                                                  |
+| CHANGELOG or release preparation   | `.agents/skills/release-notes/reference.md`, `CHANGELOG.md`, `docs/ROADMAP.md`, `docs/RELEASE-CHECKLIST.md`                                                                                                                                                                  |
+| Release gate or CTAN packaging     | `docs/RELEASE-CHECKLIST.md`, `docs/ROADMAP.md`, `CONTRIBUTING.md` § "CI expectations"                                                                                                                                                           |
 
 Three facts no row carries: `gh label list --limit 100` is the _definition_ of
 the allowed labels, and no file in the tree defines them; a new issue is filed
@@ -293,7 +294,9 @@ instruction files alone are not a security boundary. See `AI-POLICY.md`.
 Rule 7 requires the affected documentation in the same change.
 `CONTRIBUTING.md` "Documentation requirements" states which document each kind
 of change lands in, and "Licensing contributions" the obligations that attach
-to adding or changing a licensed source file. The `release-notes` skill and its
+to adding or changing a licensed source file. `docs/ATS-EXTRACTION.md` is
+scoped to extraction, tagging, and reproducibility; the release gates and the
+CTAN packaging requirements live in `docs/RELEASE-CHECKLIST.md`. The `release-notes` skill and its
 `reference.md` state `CHANGELOG.md` house style and how GitHub Release notes
 are drafted; rule 11 bounds what may then be done with them. None of the three
 is repeated here.
