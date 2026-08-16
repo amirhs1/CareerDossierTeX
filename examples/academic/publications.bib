@@ -1,5 +1,11 @@
 % Fictional entries for the supported BibLaTeX/Biber example.
 % Names, titles, venues, identifiers, and URLs are invented test data.
+%
+% Twenty entries across four types (article, inproceedings, unpublished
+% preprint, book) and six years, so the rendered bibliography spans multiple
+% pages at the default fontsize=12pt and exercises the ydnt sort order and
+% DOI -> e-print -> URL identifier precedence across a realistic spread
+% rather than the three-entry fixture this replaced (#197).
 
 @article{lovelace2026reliable,
   author       = {Lovelace, Ada and Hopper, Grace},
@@ -13,15 +19,105 @@
   url          = {https://example.invalid/articles/reliable-engines}
 }
 
+@article{hopper2026compilers,
+  author       = {Hopper, Grace and Lovelace, Ada},
+  title        = {Compiling Symbolic Instructions for Portable Analytical
+                   Machines},
+  journaltitle = {Journal of Example Computing},
+  date         = {2026-02},
+  volume       = {13},
+  number       = {1},
+  pages        = {1--22},
+  doi          = {10.9999/jec.2026.002}
+}
+
+@inproceedings{church2026lambda,
+  author    = {Church, Alonzo and Turing, Alan},
+  title     = {A Lambda-Calculus Foundation for Fictional Type Systems},
+  booktitle = {Proceedings of the Symposium on Imaginary Algorithms},
+  date      = {2026-06},
+  pages     = {12--29},
+  doi       = {10.9999/sia.2026.012}
+}
+
+@unpublished{shannon2026entropy,
+  author     = {Shannon, Claude},
+  title      = {Entropy Bounds for Speculative Communication Channels},
+  date       = {2026-01},
+  eprint     = {2601.05555},
+  eprinttype = {arxiv},
+  note       = {Preprint}
+}
+
 @inproceedings{turing2025verification,
-  author    = {Turing, Alan and Lovelace, Ada},
-  title     = {Verification Methods for Symbolic Workflows},
+  author     = {Turing, Alan and Lovelace, Ada},
+  title      = {Verification Methods for Symbolic Workflows},
+  booktitle  = {Proceedings of the Fictional Systems Conference},
+  date       = {2025-09},
+  pages      = {44--53},
+  eprint     = {2509.01234},
+  eprinttype = {arxiv},
+  url        = {https://example.invalid/preprints/verification-methods}
+}
+
+@book{vonneumann2025architectures,
+  author    = {von Neumann, John},
+  title     = {Architectures for Imaginary Stored-Program Computers},
+  publisher = {Example Academic Press},
+  location  = {Toronto},
+  date      = {2025},
+  url       = {https://example.invalid/books/stored-program-architectures}
+}
+
+@article{dijkstra2025structured,
+  author       = {Dijkstra, Edsger and Hoare, Tony},
+  title        = {Structured Reasoning About Fictional Concurrent Systems},
+  journaltitle = {Transactions on Speculative Systems},
+  date         = {2025-11},
+  volume       = {8},
+  number       = {4},
+  pages        = {301--330},
+  doi          = {10.9999/tss.2025.301}
+}
+
+@inproceedings{hamming2025errorcorrecting,
+  author     = {Hamming, Richard},
+  title      = {Error-Correcting Codes for Fictional Noisy Archives},
+  booktitle  = {International Conference on Theoretical Fabrications},
+  date       = {2025-08},
+  pages      = {88--101},
+  eprint     = {2508.09876},
+  eprinttype = {arxiv}
+}
+
+@article{knuth2025literate,
+  author       = {Knuth, Donald},
+  title        = {Literate Programming for Reproducible Fictional Research},
+  journaltitle = {Journal of Example Computing},
+  date         = {2025-05},
+  volume       = {11},
+  number       = {3},
+  pages        = {210--245},
+  doi          = {10.9999/jec.2025.210}
+}
+
+@unpublished{ritchie2025portable,
+  author     = {Ritchie, Dennis and Thompson, Ken},
+  title      = {Portable Systems Programming for Imaginary Kernels},
+  date       = {2025-03},
+  eprint     = {2503.02468},
+  eprinttype = {arxiv},
+  note       = {Preprint}
+}
+
+@inproceedings{wing2025verification,
+  author    = {Wing, Jeannette and Lovelace, Ada},
+  title     = {Formal Verification Practices for Fictional Safety-Critical
+                Systems},
   booktitle = {Proceedings of the Fictional Systems Conference},
   date      = {2025-09},
-  pages     = {44--53},
-  eprint    = {2509.01234},
-  eprinttype = {arxiv},
-  url       = {https://example.invalid/preprints/verification-methods}
+  pages     = {210--223},
+  doi       = {10.9999/fsc.2025.210}
 }
 
 @book{lovelace2024methods,
@@ -31,4 +127,83 @@
   location  = {Toronto},
   date      = {2024},
   url       = {https://example.invalid/books/computational-scholarship}
+}
+
+@book{liskov2024substitution,
+  author    = {Liskov, Barbara},
+  title     = {Substitution Principles for Imaginary Object Systems},
+  publisher = {Example Academic Press},
+  location  = {Cambridge},
+  date      = {2024},
+  url       = {https://example.invalid/books/substitution-principles}
+}
+
+@article{hopcroft2024automata,
+  author       = {Hopcroft, John and Ullman, Jeffrey},
+  title        = {Automata-Theoretic Bounds on Fictional Parsing Problems},
+  journaltitle = {Archive of Example Theory},
+  date         = {2024-10},
+  volume       = {6},
+  number       = {2},
+  pages        = {55--80},
+  doi          = {10.9999/aet.2024.055}
+}
+
+@inproceedings{naur2024report,
+  author    = {Naur, Peter and Backus, John},
+  title     = {A Revised Report on a Fictional Algorithmic Language},
+  booktitle = {Symposium on Imaginary Algorithms},
+  date      = {2024-06},
+  pages     = {140--159},
+  url       = {https://example.invalid/proceedings/revised-report}
+}
+
+@unpublished{perlis2024epigrams,
+  author     = {Perlis, Alan},
+  title      = {Epigrams on Fictional Programming Practice},
+  date       = {2024-01},
+  eprint     = {2401.01111},
+  eprinttype = {arxiv},
+  note       = {Preprint}
+}
+
+@article{lovelace2023notes,
+  author       = {Lovelace, Ada},
+  title        = {Extended Notes on the Fictional Analytical Engine},
+  journaltitle = {Journal of Example Computing},
+  date         = {2023-07},
+  volume       = {9},
+  number       = {3},
+  pages        = {301--340},
+  doi          = {10.9999/jec.2023.301}
+}
+
+@book{turing2023imitation,
+  author    = {Turing, Alan},
+  title     = {On Imitation and Fictional Machine Intelligence},
+  publisher = {Example Academic Press},
+  location  = {Toronto},
+  date      = {2023},
+  url       = {https://example.invalid/books/imitation-and-intelligence}
+}
+
+@inproceedings{hopper2022compilerdesign,
+  author    = {Hopper, Grace},
+  title     = {Compiler Design for Fictional Business Data Systems},
+  booktitle = {International Conference on Theoretical Fabrications},
+  date      = {2022-08},
+  pages     = {5--18},
+  doi       = {10.9999/ictf.2022.005}
+}
+
+@article{babbage2021engines,
+  author       = {Babbage, Charles and Lovelace, Ada},
+  title        = {Difference and Analytical Engines: A Fictional
+                   Retrospective},
+  journaltitle = {Transactions on Speculative Systems},
+  date         = {2021-03},
+  volume       = {4},
+  number       = {1},
+  pages        = {1--30},
+  doi          = {10.9999/tss.2021.001}
 }

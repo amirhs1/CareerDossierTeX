@@ -174,6 +174,21 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   baseline, or rendered output changed, and no suite's verdict changed — only
   how many of them run at once by default.
 
+- `examples/academic/publications.bib` now declares twenty fictional entries
+  across four types (`article`, `inproceedings`, `unpublished` preprints, and
+  `book`) instead of three, so `examples/academic/cv-bibliography.tex` renders
+  two pages under its default `fontsize=12pt` rather than one. ([#197])
+
+  The previous three-entry database was too thin to show the multi-page
+  pagination, varied entry lengths, and list-edge behavior across a page break
+  that [#196]'s calibrated item spacing actually has to handle. The expanded
+  database still builds cleanly — Biber reports no warnings, LuaLaTeX reports
+  no overfull boxes or undefined references — and `tests/bibliography/run.sh`,
+  which derives its shipped-example assertion from the database's own entry
+  count rather than pinning content, passes unchanged.
+
+  **Example content only.** No class, option, key, command, or token changed.
+
 ### Fixed
 
 - A cover letter no longer breaks a page between the closing and the signature
@@ -296,6 +311,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   where three runners write their intermediates, and what the parallel driver
   prepares and proves before dispatching.
 
+[#197]: https://github.com/amirhs1/CareerDossierTeX/issues/197
 [#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
