@@ -61,6 +61,7 @@
 # --- Secrets, local preferences, and private personal data ---
 CLAUDE.local.md
 .claude/settings.local.json
+.claude/worktrees/
 .env
 *.local
 secrets/
