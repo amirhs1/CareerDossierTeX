@@ -1597,11 +1597,59 @@ Standard BibLaTeX commands continue to own resource selection, `\nocite`, and
 bibliography printing. CareerDossierTeX owns only the dossier-specific profile
 and author-emphasis extension.
 
+## Class and package construction
+
+### Build on a stable base class
+
+Use `\LoadClass` rather than reimplementing LaTeX's entire page, list, footnote,
+and section machinery. `article` is a suitable base for the résumé; the letter
+class may build on `article` or `letter` if its output order is tested. Override
+only what the document type requires.
+
+### File identification and engine requirement
+
+Every file should identify itself and its minimum kernel date:
+
+```tex
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\ProvidesClass{careerdossier-resume}
+  [2026-07-30 v0.6.0 ATS-conscious résumé class]
+```
+
+Choose the actual date based on the newest kernel interface used. The current LaTeX
+class/package author guide notes that kernel key-value options
+(`\DeclareKeys`/`\ProcessKeyOptions`) require at least the 2022-06-01 release.
+
+Fail early and clearly under the wrong engine (the canonical check lives in
+`careerdossier-typography.sty`). Do not allow pdfLaTeX or XeLaTeX to proceed until
+a late, confusing font error appears. LuaLaTeX is the supported engine.
+
+### Dependencies
+
+- Load packages with `\RequirePackage`, not primitive `\input`.
+- Specify a minimum version date when relying on a recent feature.
+- Keep the dependency set small.
+- Consult current package manuals and the tagging-status table before adding a
+  dependency.
+- Prefer kernel hooks through `\AddToHook` over legacy `every...` packages or
+  direct patching.
+- Avoid redefining unsupported LaTeX internals. Commands containing `@` are
+  generally internal and may change.
+- Use LaTeX box commands rather than TeX primitives where practical.
+
 ## Public versus internal API
 
 ### Public API
 
 Public commands, options, keys, and environments are documented in `docs/API.md`.
+
+Two properties matter for extraction: the implementation emits stored keys in
+one documented canonical order regardless of input order, and it omits absent
+optional keys without leaving separators or spacing artifacts.
+
+Use `\NewDocumentCommand` and `\NewDocumentEnvironment` for public document
+interfaces. Use `expl3` for internal data structures and logic; never borrow
+another package's internals.
 
 Examples include:
 
@@ -1671,6 +1719,16 @@ cdossier/biblatex
 ```
 
 Avoid one global key family that mixes profile fields, typography, page geometry, and future language settings.
+
+`docs/API.md` lists each class's accepted option values and defaults. The design
+rules matter more than the syntax:
+
+- documented defaults are predictable;
+- unknown options produce an actionable error or are deliberately passed to the
+  base class;
+- options do not silently change the text layer;
+- every option combination shown in documentation has a regression test; and
+- it is better to omit an unsupported option than to accept and ignore it.
 
 ## State and grouping
 
@@ -1790,6 +1848,15 @@ Warnings should identify:
 
 Do not expose raw low-level TeX errors when the package can detect the problem first.
 
+Use `\ClassError`, `\ClassWarning`, `\ClassInfo`, or their package equivalents.
+Every error should state (1) what failed, (2) why it matters, (3) what the user
+should change, and (4) where the relevant documentation is.
+
+Conditions worth diagnosing include: compilation under the wrong engine; an
+unavailable selected font; an unsupported option value; a missing applicant name;
+and duplicate critical metadata. Do not silently fall back from an unavailable
+requested font to an arbitrary system font.
+
 ## Text extraction and accessibility
 
 The source order should follow reading order.
@@ -1903,6 +1970,7 @@ CareerDossierTeX/
 │   ├── ATS-EXTRACTION.md
 │   ├── MIGRATION.md
 │   ├── NAMING-CONVENTION.md
+│   ├── RELEASE-CHECKLIST.md
 │   ├── ROADMAP.md
 │   └── TESTING.md
 ├── tests/
@@ -1955,6 +2023,18 @@ content has one home under `.agents/`, and the per-tool directories hold only
 that tool's own settings.
 
 Do not create empty placeholder classes for future releases.
+
+The flat, handwritten `.sty`/`.cls` layout — source at the top level, examples,
+docs, and CI in their own directories — is fully acceptable for CTAN. This is
+the project's chosen path; a `.dtx`/`docstrip` workflow is an optional future
+consideration, not a requirement (see
+[`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md) "CTAN readiness"). `build.lua`
+holds the `l3build` regression configuration under `tests/regression/`.
+
+Separate: public commands from internal implementation; content semantics from
+visual details; user documentation from programmer documentation as the package
+grows; examples from regression fixtures; and generated artifacts from tracked
+source.
 
 ## Example and profile separation
 

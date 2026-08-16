@@ -457,6 +457,26 @@ or in the same change as — the first module whose coverage depends on it, rath
 than accumulating `.lvt` sources that no runner can execute. Until the harness
 lands, record the specific regression tests owed as explicit, tracked debt.
 
+### The five test layers
+
+Every automated check here belongs to one of five layers, and the layer decides
+what a failure means:
+
+1. **Class/package regression tests** — API behaviour, options, errors, grouping,
+   and load order **(l3build; Phase 1 onward)**.
+2. **PDF extraction tests** — characters, spaces, reading order, and semantic
+   adjacency **(Phase 1)**.
+3. **PDF structural tests** — syntax, embedded fonts, metadata, tags, and
+   accessibility claims.
+4. **Rendered-page tests** — overlap, clipping, density, page breaks, contrast.
+5. **Real-portal tests** — parsed preview or autofill where possible.
+
+Add each layer's focused fixture with the implementation it validates. When
+practical, run the new fixture before implementation and confirm that it fails
+for the intended reason. All automated sources, expected outputs, runners, and
+baselines belong under `tests/`; milestone release work reruns them but does not
+defer their creation.
+
 ### Coverage expectations
 
 Changes affecting a shared package should test every affected class. There are
@@ -541,6 +561,95 @@ regeneration cannot quietly absorb a second, unrelated output change:
 Run it after any change to fonts, `fontspec` options, or the TeX distribution.
 Rationale and the full method are in
 [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md).
+
+### Ground-truth extraction fixture **(Phase 1)**
+
+Include a document containing text like:
+
+```text
+Zoë Dvořák Łukasz İpek José
+office efficient affine waffle difficult
+(C++) (c++) C# F# R&D 100% AT&T
+email@example.org +1 416 555 0199
+https://example.org/a_b?q=one&lang=en
+Senior Research & Development Engineer
+January 2023 - Present
+```
+
+Add representative bullets, headings, links, page breaks, bold, and italic. The
+expected file should contain the intended plain text in the intended order.
+
+### Command-line extraction
+
+```sh
+pdftotext -enc UTF-8 document.pdf document.txt
+pdftotext -layout -enc UTF-8 document.pdf document-layout.txt
+pdffonts document.pdf
+qpdf --check document.pdf
+```
+
+Interpretation: default `pdftotext` is the more important reading-order signal;
+`-layout` is a useful second view, not the canonical expected output; `pdffonts`
+can reveal missing embedding but cannot prove correct mapping; `qpdf --check` tests
+PDF syntax, not ATS semantics. Normalize line endings and Unicode deliberately
+before diffing, but be cautious about normalizing all whitespace — removing too
+much can hide missing word separators.
+
+### Multiple-consumer test
+
+Copy and paste the same high-risk text in at least: Poppler (`pdftotext`); a
+PDFium-based viewer such as Chrome; PDF.js in Firefox; and one additional common
+target such as Adobe Acrobat Reader or macOS Preview. The Inter example shows why
+one extractor is not enough. If consumers disagree, record the discrepancy and
+choose the more conservative font or feature setup.
+
+### Reading-order assertions
+
+Assert order and adjacency, not just a bag of words: applicant name precedes
+contact information; the `Experience` heading precedes the first job; each title
+remains near its organization and date; bullets remain under their entry;
+`Education` does not interleave with `Skills`; and page furniture does not
+interrupt sentences.
+
+**Entry-head column order is covered** (issue #221). Three fixtures in
+`tests/extraction/` assert that an entry heading's right-hand dates/location
+column extracts between its heading and its bullets, on the untagged path this
+suite builds:
+
+| Fixture | Class | Pages | What it adds |
+|---|---|---|---|
+| `resume-entry-dates-order` | résumé | 1 | the cheapest form of the assertion |
+| `cv-entry-dates-order` | CV | 1 | the same component under CV geometry |
+| `resume-entry-dates-page-furniture` | résumé | 2 | running header and folio present |
+
+Two findings from building them are worth keeping, because they decide what a
+fixture of this kind has to look like:
+
+- **Two entries, not one.** The last entry sorted on a page always trails its
+  own column, at every list-edge value. A one-entry fixture therefore cannot see
+  the fault appear or disappear — which is why the three pre-existing fixtures
+  with dates (`resume-contact-optional`, `resume-contact-wrap`,
+  `cv-contact-optional`) stayed green throughout the #219 regression. The
+  assertion lives on an entry that is followed by more material.
+- **Page furniture is sufficient, not necessary.** A single page with two
+  entries reproduces the reordering exactly as the two-page form does; the folio
+  only makes it more conspicuous by putting the dates below the page furniture.
+
+Poppler is the discriminating consumer here. The committed `*.pdfkit.txt`
+baselines keep each heading row on one line at every value tested, so they
+record the layout but do not detect the fault.
+
+Copy-paste integrity of a link is the same kind of assertion made on
+coordinates rather than text; "Link copy-paste integrity suite" below is the
+statement of it, and issue #294 the coverage.
+
+### Real portal acceptance
+
+When a portal previews parsed fields, inspect and correct name, email, phone, job
+titles, employers, date ranges, education, current location, and links. Follow the
+portal's requested format. Greenhouse documentation has stated a parser input size
+limit in one recruiting workflow, so keep PDFs compact and image-light; do not
+treat that vendor-specific limit as universal, and re-check the current figure.
 
 ### Link copy-paste integrity suite
 
@@ -1369,6 +1478,12 @@ repository root:
 make regression            # or: l3build check
 ```
 
+Two disciplines are load-bearing for a text-layer-sensitive package: add a
+regression test for every fixed bug, and inspect every newly saved `.tlg` —
+`l3build` detects change but cannot decide whether the new output is correct.
+Maintain negative tests proving unsupported engines fail with the intended
+message.
+
 Run a single test by name (without the `.lvt` extension):
 
 ```bash
@@ -1607,3 +1722,9 @@ When layout changes:
 - check long links and contact lines;
 - check print and grayscale behavior;
 - attach or link a preview in the pull request.
+
+Render each example to PNG and inspect it after meaningful changes. Include narrow
+and long values, multiple pages, long organization names, long URLs, and accents.
+Check clipping and overlap; broken bold/italic; orphan headings; awkward page
+splits; rules extending into text; contrast; and 200–400% zoom. Full automated
+visual regression is a later-phase goal.

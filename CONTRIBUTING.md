@@ -560,6 +560,12 @@ Update documentation in the same pull request as the related behavior.
 - the coverage a kind of change owes changes;
 - a baseline regeneration procedure changes.
 
+### Update `RELEASE-CHECKLIST.md` when:
+
+- a per-release gate is added, removed, or reworded;
+- the CTAN packaging or licence-audit requirements change;
+- a check's supporting evidence moves to a different suite or document.
+
 ### Update `ROADMAP.md` when:
 
 - release boundaries change;
@@ -732,6 +738,18 @@ The build workflow should:
 - upload PDFs and logs as artifacts;
 - keep its commands locally reproducible where practical;
 - pin every container and third-party action to an immutable reference.
+
+Broader gates are later-phase targets: a CI matrix (current TeX Live, optionally
+the oldest supported release, a scheduled pre-release job); mandatory failure on
+new unexpected warnings, missing/substituted font faces, semantic extraction
+differences, ordered-block failures, unembedded meaningful fonts, `qpdf --check`
+errors, or visual clipping.
+
+Run the full suite, not only unit tests, after changes to: fonts or font versions;
+`fontspec` options; section or entry formatting; box, list, header, footer, or
+page-break code; hyperlink or icon packages; tagged-PDF settings; bibliography
+styles **(planned)**; minimum LaTeX version; the TeX Live image; or any dependency
+that affects output.
 
 ### What actually gates a merge
 
