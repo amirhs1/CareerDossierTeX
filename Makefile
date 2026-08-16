@@ -4,10 +4,11 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash, awk, and make — all five of its
+# pure text processing and needs only bash, awk, and make — all seven of its
 # scripts, since the second one drives the other runners in their
 # compile-nothing `--list` mode, the third reads three Markdown files, the
-# fourth drives tests/lib/text.sh over synthetic text, and the fifth exercises
+# fourth reads doc/careerdossier.tex and README.md, the fifth drives
+# tests/lib/text.sh over synthetic text, and the sixth exercises
 # check-parallel's accounting controls against synthetic workers;
 # l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
@@ -72,7 +73,7 @@
 #
 # The gate was serial until #399 on the argument that it is the CI-aligned entry
 # point. What CI is aligned to is the target set and the commands, not the
-# scheduling: .github/workflows/build.yml runs sixteen jobs on sixteen runners
+# scheduling: .github/workflows/build.yml runs seventeen jobs on seventeen runners
 # with no `needs:` anywhere, so local serial `check` was the one execution model
 # nothing else here used. Both paths dispatch $(CHECK_TARGETS) through the same
 # `make <target>` invocations, so that alignment is unchanged.
@@ -118,8 +119,12 @@
 
 BUILD_DIR        := build
 EXAMPLES_BUILD_DIR := $(BUILD_DIR)/examples
+MANUAL_BUILD_DIR := $(BUILD_DIR)/manual
 LATEXMK       := latexmk -lualatex -interaction=nonstopmode -halt-on-error \
                  -output-directory=$(EXAMPLES_BUILD_DIR)
+MANUAL_LATEXMK := latexmk -lualatex -interaction=nonstopmode -halt-on-error \
+                 -output-directory=$(MANUAL_BUILD_DIR)
+MANUAL        := doc/careerdossier.tex
 RESUME        := examples/industry/resume-english.tex
 LETTER        := examples/industry/letter-industry.tex
 ACADEMIC_CV   := examples/academic/cv-academic.tex
@@ -136,7 +141,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements check check-serial check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements manual check check-serial check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -167,6 +172,15 @@ academic-letter: | $(EXAMPLES_BUILD_DIR) ## Build the academic letter example
 
 statements: | $(EXAMPLES_BUILD_DIR) ## Build all six statement examples
 	$(LATEXMK) $(STATEMENTS)
+
+$(MANUAL_BUILD_DIR):
+	@mkdir -p $(MANUAL_BUILD_DIR)
+
+# The PDF manual CTAN requires, built from its own committed source. The PDF is
+# a build artifact like every other one here and is not tracked; `l3build ctan'
+# is what puts it in the release archive (#264).
+manual: | $(MANUAL_BUILD_DIR) ## Build the PDF manual into $(MANUAL_BUILD_DIR)/
+	$(MANUAL_LATEXMK) $(MANUAL)
 
 # The suite list, in the order both entry points run it. It lives in one
 # variable because two of them dispatch it — `check` concurrently and
@@ -203,12 +217,13 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, text guards, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, manual names, text guards, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
 	tests/lint/run-agents-references.sh
 	tests/lint/run-markdown-anchors.sh
+	tests/lint/run-manual-names.sh
 	tests/lint/run-text-guards.sh
 	tests/check-parallel.sh --self-test
 

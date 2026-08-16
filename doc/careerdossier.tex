@@ -1,0 +1,2300 @@
+% careerdossier.tex — the CareerDossierTeX user manual.
+%
+% Copyright (C) 2026 Amir Sadeghi.
+%
+% This file is distributed with the Work under the LaTeX Project Public
+% License, version 1.3c or, at your option, any later version. The Work is
+% defined in manifest.txt, which also records this file under "Distributed
+% with the Work".
+%
+% LPPL maintenance status: `maintained'.
+% Current Maintainer: Amir Sadeghi.
+%
+% Build it with the repository target, which keeps every artifact out of the
+% source tree:
+%
+%     make manual          -> build/manual/careerdossier.pdf
+%
+% The manual documents the released public interface only. Private LaTeX3
+% names are deliberately absent: tests/lint/run-manual-names.sh fails the
+% build if one appears here, and fails it again if a public name documented
+% here is not declared by a file in the Work.
+%
+% The version and date below are the release this manual documents, and
+% tests/lint/run-version-declarations.sh checks them against manifest.txt's
+% Work files.
+
+\documentclass[11pt]{article}
+
+\newcommand{\CDossierManualVersion}{0.8.0}
+\newcommand{\CDossierManualDate}{2026-08-12}
+
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{fontspec}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+% Table cells hold long names; justifying them produces underfull lines that
+% carry no information. L is p, set ragged right.
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{fancyvrb}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}[Scale=MatchLowercase]
+\setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]
+
+\hypersetup{
+  pdftitle          = {CareerDossierTeX: a LuaLaTeX toolkit for career documents},
+  pdfauthor         = {Amir Sadeghi},
+  pdfsubject        = {User manual for the CareerDossierTeX document classes},
+  pdflang           = {en},
+  pdfdisplaydoctitle = true,
+  bookmarksnumbered = true
+}
+
+\DefineVerbatimEnvironment{latexcode}{Verbatim}
+  {fontsize=\small, frame=leftline, framesep=8pt, xleftmargin=10pt}
+
+\DefineVerbatimEnvironment{plaincode}{Verbatim}
+  {fontsize=\small, xleftmargin=10pt}
+
+% Public names are long, and to TeX each is one unbreakable token: a paragraph
+% or a table cell holding \CDossierRecordListEdgeAboveSkip overruns the measure
+% rather than wrapping. Break them where a reader already reads a boundary ---
+% before an interior capital, and after `-', `/', or `.' --- and insert no
+% hyphen, because a broken name must still read as the name it is. This is the
+% same rule the toolkit applies to an address in \CDossierLink.
+\makeatletter
+\newif\ifcd@firstchar
+\newcommand{\cd@breaklong}[1]{%
+  \cd@firstchartrue
+  \@tfor\cd@char:=#1\do{\expandafter\cd@testchar\cd@char}}
+\newcommand{\cd@testchar}[1]{%
+  \ifcd@firstchar
+    \cd@firstcharfalse
+  \else
+    \ifnum\uccode`#1=`#1 \allowbreak\fi
+  \fi
+  #1%
+  \ifnum0\if#1-1\fi\if#1/1\fi\if#1.1\fi>0 \allowbreak\fi}
+
+% Robust, because these appear in section titles: the scanner above is built
+% from \if tests, and an unprotected one expanded while writing the table of
+% contents or a PDF bookmark ends the run with `Incomplete \iffalse'.
+\DeclareRobustCommand{\opt}[1]{\texttt{\cd@breaklong{#1}}}
+\DeclareRobustCommand{\key}[1]{\texttt{\cd@breaklong{#1}}}
+\DeclareRobustCommand{\cmd}[1]{\texttt{\textbackslash\cd@breaklong{#1}}}
+\DeclareRobustCommand{\env}[1]{\texttt{\cd@breaklong{#1}}}
+\DeclareRobustCommand{\file}[1]{\texttt{\cd@breaklong{#1}}}
+\makeatother
+
+% A PDF bookmark is a string, not typeset material, so give hyperref a plain
+% spelling of each rather than leaving it to warn about a command it cannot
+% render.
+\pdfstringdefDisableCommands{%
+  \def\opt#1{#1}%
+  \def\key#1{#1}%
+  \def\cmd#1{\textbackslash #1}%
+  \def\env#1{#1}%
+  \def\file#1{#1}%
+}
+
+% An address in running text or a table cell gets the same treatment, through
+% url.sty's own breakpoint list rather than the scanner above, since an address
+% carries characters the scanner would have to be told about one at a time.
+\makeatletter
+\g@addto@macro\UrlBreaks{%
+  \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m%
+  \do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z%
+  \do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M%
+  \do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z%
+  \do\0\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9%
+  \do\=\do\?\do\&\do\-\do\_}
+\makeatother
+\DeclareUrlCommand{\addr}{\urlstyle{tt}}
+
+\setlist{noitemsep, topsep=4pt}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+
+% A paragraph naming three public commands has few break points and would
+% otherwise set overfull rather than merely loose.
+\tolerance=800
+\emergencystretch=1em
+
+\title{\sffamily\bfseries CareerDossierTeX}
+\author{Amir Sadeghi}
+\date{Version \CDossierManualVersion\ (\CDossierManualDate)}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\small
+A reusable LuaLaTeX toolkit for producing a consistent set of career documents
+--- résumé, cover letter, academic CV, and seven kinds of statement --- from one
+shared profile.
+
+Distributed under the \LaTeX{} Project Public License, version 1.3c or, at your
+option, any later version. LPPL maintenance status \texttt{maintained}; current
+maintainer Amir Sadeghi. The Work is defined in \file{manifest.txt}.
+
+Repository and issue tracker:
+\url{https://github.com/amirhs1/CareerDossierTeX}
+\end{minipage}
+\end{center}
+
+\vspace{1.5\baselineskip}
+
+\tableofcontents
+
+\clearpage
+
+\section{About this manual}
+
+This manual documents the released public interface of CareerDossierTeX: every
+class, option, key, command, environment, and design token an author writes,
+with its accepted values and its default. It is the reference for people writing
+documents with the toolkit.
+
+It does not document the internals. Which module owns which concern, and why, is
+recorded in \file{docs/ARCHITECTURE.md} in the repository. Private \LaTeX3 names
+--- those spelled with a leading double underscore --- are not public and do not
+appear here; they may be renamed or removed in any release.
+
+\subsection{Interface stability}
+
+Before \texttt{v1.0.0} the public interface may still change between minor
+versions. Every such change is recorded in \file{CHANGELOG.md}, and a change
+that needs an edit to your source is additionally recorded, with a before-and-after
+example, in \file{docs/MIGRATION.md}. Read the latter before upgrading.
+
+Calibrated token \emph{values} are not stable before \texttt{v1.0.0}; the token
+names and the boundaries they own are.
+
+\subsection{What is supported}
+
+Only behaviour documented in this manual, and covered by the repository's tests
+and shipped examples, should be treated as supported. Internal helper commands
+are not public merely because they are technically reachable.
+
+Text extraction is a tested baseline, not an accessibility guarantee. This
+toolkit makes no PDF/UA, WCAG, or ATS conformance claim; \S\ref{sec:tagging}
+states the scope of what has actually been verified.
+
+\section{Requirements and installation}
+\label{sec:install}
+
+\subsection{Requirements}
+
+\begin{itemize}
+  \item \textbf{LuaLaTeX}, which is the sole supported engine. XeLaTeX and
+        pdf\LaTeX{} stop with a fatal error naming LuaLaTeX; there is no
+        compatibility mode and no way to bypass the guard.
+  \item A current \TeX{} Live or MiK\TeX{} distribution providing the
+        \textsf{TeX Gyre} fonts (Termes and Heros), \textsf{fontspec},
+        \textsf{geometry}, \textsf{hyperref}, \textsf{enumitem}, and
+        \textsf{xcolor}. Nothing is bundled with this toolkit.
+  \item \textbf{latexmk}, recommended: a résumé or CV needs two passes, and
+        latexmk performs them.
+  \item \textbf{Biber and BibLaTeX}, only if you opt into the bibliography
+        integration of \S\ref{sec:biblatex}.
+\end{itemize}
+
+\subsection{Three ways to install}
+
+\subsubsection*{Route 1 --- beside the document}
+
+Copy the \file{.sty} and \file{.cls} files into the same directory as your
+document. \LaTeX{} finds files in the current directory first, so nothing else
+is needed. This is the right route for a single application, for a directory you
+will send to someone else, and for trying the toolkit out.
+
+\subsubsection*{Route 2 --- a local \texttt{texmf} tree}
+
+Install once and use the classes from any directory:
+
+\begin{plaincode}
+mkdir -p ~/texmf/tex/latex/careerdossier
+cp careerdossier-*.sty careerdossier-*.cls ~/texmf/tex/latex/careerdossier/
+\end{plaincode}
+
+On \TeX{} Live the tree is found without a further step; \texttt{mktexlsr} is
+needed only for a system-wide tree. The MiK\TeX{} equivalent is a user root
+registered with \texttt{initexmf}.
+
+\subsubsection*{Route 3 --- Overleaf}
+
+Upload the \file{.sty} and \file{.cls} files into the project alongside the
+document, and set the project's compiler to LuaLaTeX in
+\textsf{Menu $\rightarrow$ Compiler}. Overleaf resolves files from the project
+root, so this is Route 1 with an upload.
+
+\section{A first document}
+\label{sec:first}
+
+A complete résumé, in the shape every document in the toolkit follows: load a
+class, set the profile once, render the header, then write content.
+
+\begin{latexcode}
+\documentclass{careerdossier-resume}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  phone    = {+1 555 555 5555},
+  location = {London, UK},
+  website  = {example.com},
+  linkedin = {ada-lovelace},
+  github   = {ada-lovelace}
+}
+
+\begin{document}
+
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+
+\begin{CDossierEntry}[
+  title        = {Senior Data Scientist},
+  organization = {Example Organization},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Developed a reproducible analytical workflow.
+    \item Led the migration of the reporting pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}
+\end{latexcode}
+
+Build it with:
+
+\begin{plaincode}
+latexmk -lualatex resume.tex
+\end{plaincode}
+
+Two passes are required, and latexmk performs them. A résumé and a CV record
+each list's length in the auxiliary file so the page-break policy of
+\S\ref{sec:pagination} can be applied, and the \texttt{Page N of M} folio needs
+the final page count. On a first build from a clean tree the page breaks and the
+folio are therefore provisional; the second pass settles both.
+
+The other document types follow the same shape and are shown complete in
+\S\ref{sec:examples}.
+
+\section{The document classes}
+\label{sec:classes}
+
+\subsection{Loading a class}
+
+The four classes are loaded by name. They live at the top level of the
+distribution, so do not write a path:
+
+\begin{latexcode}
+\documentclass{careerdossier-resume}
+\documentclass{careerdossier-letter}
+\documentclass{careerdossier-cv}
+\documentclass[type=research]{careerdossier-statement}
+\end{latexcode}
+
+\subsection{Supported configuration}
+
+\begin{longtable}{@{}L{0.36\textwidth}L{0.58\textwidth}@{}}
+\toprule
+\textbf{Setting} & \textbf{Support} \\
+\midrule
+\endhead
+Engine & LuaLaTeX only \\
+Language & English \\
+Paper & US Letter (default) and opt-in A4 \\
+Body size & \opt{fontsize=10pt|11pt|12pt}, per-class default \\
+Margins & \opt{margin=normal} (1\,in) or \opt{margin=narrow} (0.5\,in) \\
+Body font & Serif (default) and opt-in sans \\
+Output medium & \opt{medium=print} (default) or \opt{medium=screen} \\
+Entry-metadata de-emphasis & \opt{muted=plain} (default), \opt{italic}, \opt{gray}, \opt{both} \\
+Entry-metadata placement & \opt{entrymeta=column} (default) or \opt{inline}; résumé and CV \\
+Theme & Monochrome \\
+Tagged structure & Opt-in, off by default \\
+Résumé class & \file{careerdossier-resume} \\
+CV class & \file{careerdossier-cv} \\
+Letter class & \file{careerdossier-letter}, industry and academic families \\
+Statement class & \file{careerdossier-statement}, default interest type plus six others \\
+Bibliography & Optional \file{careerdossier-biblatex} \\
+Manual publications & \env{CDossierPublications}, in the CV \\
+RTL or bilingual layout & Not supported \\
+\bottomrule
+\end{longtable}
+
+\subsection{Options and their defaults}
+
+Every option takes a fixed set of values. An unsupported value stops the build
+with a class error naming the option, the value supplied, the owning class, and
+the accepted values --- so you never have to look the accepted set up here in
+order to act on the error. An option is rejected rather than silently ignored.
+
+\begin{longtable}{@{}L{0.16\textwidth}L{0.30\textwidth}L{0.16\textwidth}L{0.30\textwidth}@{}}
+\toprule
+\textbf{Option} & \textbf{Accepted values} & \textbf{Classes} & \textbf{Default} \\
+\midrule
+\endhead
+\opt{fontsize} & \opt{10pt}, \opt{11pt}, \opt{12pt} & all four & \opt{11pt} résumé; \opt{12pt} others \\
+\opt{margin} & \opt{normal}, \opt{narrow} & all four & \opt{narrow} résumé; \opt{normal} others \\
+\opt{paper} & \opt{letter}, \opt{a4} & all four & \opt{letter} \\
+\opt{bodyfont} & \opt{serif}, \opt{sans} & all four & \opt{serif} \\
+\opt{medium} & \opt{print}, \opt{screen} & all four & \opt{print} \\
+\opt{muted} & \opt{plain}, \opt{italic}, \opt{gray}, \opt{both} & all four & \opt{plain} \\
+\opt{entrymeta} & \opt{column}, \opt{inline} & résumé, CV & \opt{column} \\
+\opt{family} & \opt{industry}, \opt{academic} & letter & \opt{industry} \\
+\opt{type} & seven values, \S\ref{sec:statement} & statement & \opt{interest} \\
+\bottomrule
+\end{longtable}
+
+Two settings are fixed and are not options: the language is English and the
+theme is monochrome.
+
+\subsubsection{\texttt{fontsize}}
+
+\opt{fontsize} selects one whole-point type scale for the whole document. It is
+the only input to type size; there is no per-element size option. The sizes it
+resolves to, in points:
+
+\begin{longtable}{@{}lrrr@{}}
+\toprule
+\textbf{Element} & \opt{10pt} & \opt{11pt} & \opt{12pt} \\
+\midrule
+\endhead
+Name & 19 & 21 & 23 \\
+Statement title & 15 & 16 & 18 \\
+Headline, subtitle & 12 & 13 & 14 \\
+Section heading & 11 & 12 & 13 \\
+Entry title, body text, bullets, dates & 10 & 11 & 12 \\
+Contact line & 9 & 10 & 11 \\
+Running header, folio & 8 & 9 & 10 \\
+\bottomrule
+\end{longtable}
+
+Structural vertical spacing scales with the same option, as a fixed fraction of
+the body baseline. \S\ref{sec:tokens} lists the tokens that name each gap.
+
+\opt{density=compact|standard} was removed in \texttt{v0.6.0} and has no
+replacement.
+
+\subsubsection{\texttt{margin}}
+
+\opt{normal} means one-inch margins and \opt{narrow} half-inch margins.
+\opt{margin} and \opt{fontsize} together decide line length. Measured in TeX
+Gyre Termes on US Letter, full lines of running prose hold roughly:
+
+\begin{longtable}{@{}lll@{}}
+\toprule
+\opt{fontsize} & \opt{margin} & \textbf{Characters per line} \\
+\midrule
+\endhead
+\opt{10pt} & \opt{normal} & 110--120 \\
+\opt{10pt} & \opt{narrow} & 130--140 \\
+\opt{11pt} & \opt{normal} & 102--113 \\
+\opt{11pt} & \opt{narrow} & 118--127 \\
+\opt{12pt} & \opt{normal} & 93--101 \\
+\opt{12pt} & \opt{narrow} & 108--117 \\
+\bottomrule
+\end{longtable}
+
+The prose classes default to \opt{12pt} at \opt{margin=normal} because that is
+the only combination whose measure lands near the conventional 45--90 character
+guidance at a one-inch margin.
+
+\paragraph{Known limitation.} The résumé's default \opt{11pt} with
+\opt{margin=narrow} produces the longest measure in the project, roughly
+118--127 characters per line. It is chosen for one-page capacity and is fine for
+entry lines and short bullets, which are split across the measure and never
+reach its full width. It is visibly long in a full-width summary paragraph. If a
+résumé opens with a dense prose summary, prefer \opt{margin=normal},
+\opt{fontsize=12pt}, or a shorter summary.
+
+The classes load \textsf{geometry}. An advanced user may call \cmd{geometry}
+after \cmd{documentclass} to replace the preset. Do not load \textsf{geometry}
+again with package options: that can produce an option clash. A raw override
+bypasses the two tested presets, so its pagination and visual result are the
+author's responsibility.
+
+\subsubsection{\texttt{paper}}
+
+\opt{a4} selects an ISO A4 media box while retaining the selected margin preset,
+font size, spacing, and page-furniture design. Because A4 is slightly narrower
+and taller than US Letter, line and page breaks may change.
+
+\subsubsection{\texttt{bodyfont}}
+
+\opt{serif}, the default, preserves the TeX Gyre Termes body with TeX Gyre Heros
+headings. \opt{sans} selects TeX Gyre Heros for the document body; headings
+remain TeX Gyre Heros. The option changes no size, semantic role, spacing,
+geometry, or page furniture. Arbitrary font names and per-role font selection
+are not supported.
+
+\subsubsection{\texttt{medium}}
+
+The same dossier is read in two contexts with different needs. On screen the PDF
+viewer already shows page position, so a folio is redundant chrome; on paper a
+loose page has no such affordance, and the folio is what keeps a multi-page
+dossier in order after it is put down.
+
+\opt{print}, the default, emits the page furniture described in
+\S\ref{sec:furniture}. \opt{screen} emits no running header and no folio on any
+page.
+
+\opt{medium} also decides whether a link carries a visible decoration:
+
+\begin{longtable}{@{}L{0.20\textwidth}L{0.70\textwidth}@{}}
+\toprule
+\textbf{Value} & \textbf{Author-written \cmd{href} anchor text} \\
+\midrule
+\endhead
+\opt{print} & undecorated --- reads as ordinary body text \\
+\opt{screen} & underlined \\
+\bottomrule
+\end{longtable}
+
+Links are drawn in body black with no border under both values, which is the
+print-safe treatment. Where a link's visible text is the address --- the contact
+line, \cmd{CDossierLink}, an ORCID iD, a bibliography DOI --- the absence of a
+rule costs a reader nothing, because the text announces itself. Where you supply
+your own anchor text there is otherwise no cue of any kind:
+
+\begin{latexcode}
+Shipped the analytical engine, documented in a
+\href{https://example.org/work}{public write-up}.
+\end{latexcode}
+
+Under \opt{medium=screen} \emph{public write-up} is underlined; under
+\opt{medium=print} it is not. A rule under a contact line's e-mail and website
+but not under its phone or location would read as emphasis rather than as
+linking, which is why address-as-text links are never decorated.
+\cmd{CDossierPlainLinks} suppresses the decoration for a region.
+
+The link \emph{annotation} is emitted under both media. It is invisible on paper
+and costs nothing there, and stripping it would hand dead links to anyone who
+opens a \opt{medium=print} file on screen.
+
+The option changes only whether furniture and decoration are emitted. Page
+geometry is unchanged, so switching \opt{medium} cannot reflow a document, and
+extracted text is identical under both values.
+
+\subsubsection{\texttt{muted}}
+
+\opt{muted} decides how de-emphasised runs are rendered: an entry's dates and
+location in the résumé and CV, and the statement's application-context line.
+Note the spelling \opt{gray}, not \emph{grey}.
+
+\begin{longtable}{@{}L{0.28\textwidth}L{0.24\textwidth}L{0.40\textwidth}@{}}
+\toprule
+\textbf{Value} & \textbf{Shape} & \textbf{Colour} \\
+\midrule
+\endhead
+\opt{plain} (default) & upright & text token (black) \\
+\opt{italic} & italic & text token (black) \\
+\opt{gray} & upright & muted token (gray 0.30) \\
+\opt{both} & italic & muted token (gray 0.30) \\
+\bottomrule
+\end{longtable}
+
+The muted token measures 8.52:1 against white under the WCAG 2.1
+relative-luminance formula, well above the 4.5:1 normal-text floor.
+
+Which styling to want is a genuine trade-off, which is why it is an option.
+Italic at small sizes is harder to read for low-vision and dyslexic readers than
+a high-contrast gray, and this metadata is scanned rather than read; but shape,
+unlike a gray level, survives a fax, a photocopy, and a 1-bit print.
+\opt{plain} is the default because both halves are real, and a reader affected
+by both would otherwise have nothing to select. Under \opt{plain} the dates and
+location are distinguished by position and content alone, which is the design's
+standing claim under every value.
+
+All four values are visual only: no extractor sees a difference, and the reading
+order is identical under each. Colour is never the only carrier of meaning.
+
+\subsubsection{\texttt{entrymeta}}
+
+Accepted by the résumé and CV; the letter and statement classes do not accept it
+because neither has entry headings.
+
+\opt{entrymeta} decides where an entry's dates and location sit. Under the
+default \opt{column} they are set flush right, opposite the title and
+organization:
+
+\begin{plaincode}
+Senior Engineer                                          2024-Present
+Example Labs                                              Toronto, ON
+  * First achievement in source order.
+\end{plaincode}
+
+Under \opt{inline} they follow the title and organization on the same line,
+joined by \cmd{CDossierEntryMetaSeparator}:
+
+\begin{plaincode}
+Senior Engineer | 2024-Present
+Example Labs | Toronto, ON
+  * First achievement in source order.
+\end{plaincode}
+
+Nothing else changes under either value: the cells keep their order, their
+semantic roles, and the page-break penalty that holds the two heading lines
+together, and a missing \key{organization}, \key{location}, or \key{dates}
+leaves no stray separator under \opt{inline} just as it leaves no empty column
+under \opt{column}.
+
+\paragraph{What the option is for.} \cmd{CDossierRecordListEdgeAboveSkip}
+carries a lower bound of \texttt{0.25} that is an extraction constraint rather
+than a design preference (\S\ref{sec:itemize}). The bound exists because the
+flush-right column makes each heading row a two-column region for a geometric
+extractor, and only enough vertical separation below the heading keeps the dates
+from being read after the bullets. \opt{inline} has no column, so no such region
+arises and the bound does not apply to a document that selects it. This is the
+only supported way to set a list edge below \texttt{0.25} without breaking
+reading order:
+
+\begin{latexcode}
+\documentclass[entrymeta=inline]{careerdossier-resume}
+\ExplSyntaxOn
+\skip_set:Nn \CDossierRecordListEdgeAboveSkip
+  { \fp_to_dim:n { 0.125 * \dim_to_fp:n { \CDossierBodyLeading } } }
+\ExplSyntaxOff
+\end{latexcode}
+
+Under \opt{column} that override still breaks reading order, and nothing detects
+it for you.
+
+\opt{inline} is not the default because it is a visible design change --- it
+discards the column the résumé's layout is built around --- and because making it
+the default would reflow every existing document to buy a constraint only some
+documents care about. Design, a clean text layer, and a sub-\texttt{0.25} list
+edge are mutually exclusive; any two are available.
+
+Both values are equivalent on the tagged path: the separator is emitted as a
+layout artifact, exactly as the contact line's \texttt{|} is, so a consumer
+reading the structure tree receives the same logical text under either value and
+assistive technology is not made to announce a vertical bar.
+
+\paragraph{\cmd{CDossierEntryMetaSeparator}} is the mark \opt{entrymeta=inline}
+places between two cells, with its surrounding space. The default is
+\verb|~|\verb+|+\verb|~|, the same mark the contact line uses, so a document has
+one field separator rather than two. It is emitted only between two cells that
+are both present, so redefining it cannot introduce a stray separator. Two
+properties of the default are worth preserving in a replacement:
+
+\begin{itemize}
+  \item The mark is wrapped as a \textbf{layout artifact}, which is what keeps
+        it out of the structure tree on the tagged path. A replacement set as
+        ordinary text renders identically and will also be announced by a screen
+        reader.
+  \item The \textbf{leading} space is ordinary content glue and the
+        \textbf{trailing} one sits inside the artifact. An artifact interrupts
+        the enclosing run, so only the leading space survives as the word
+        boundary between the two cells; a second content space would show up as
+        a doubled gap in the extracted text.
+\end{itemize}
+
+Keep the mark out of the muted role as well: the cell following it is set in
+\cmd{CDossierMutedStyle}, and an italic separator reads as a glyph belonging to
+the metadata rather than as a boundary between fields. The default wraps the
+mark in \cmd{CDossierBodyStyle}, which resets shape as well as family.
+
+\subsubsection{\texttt{family} (letter)}
+
+\opt{family} accepts \opt{industry} and \opt{academic}, defaulting to
+\opt{industry}. It is label- and metadata-only: it selects the PDF document type
+while both values use the same geometry, calibrated type scale, prose rhythm,
+letterhead structure, and shared \texttt{Cover Letter} continuation label.
+Switching between the two does not select a denser or roomier layout, and does
+not introduce new recipient keys.
+
+\subsection{Loading a package directly}
+
+Three of the packages also accept options when loaded with \cmd{usepackage}, and
+report an unsupported value the same way a class does:
+
+\begin{longtable}{@{}L{0.30\textwidth}L{0.30\textwidth}L{0.32\textwidth}@{}}
+\toprule
+\textbf{Package} & \textbf{Options} & \textbf{Package default} \\
+\midrule
+\endhead
+\file{careerdossier-tokens} & \opt{fontsize}, \opt{margin} & \opt{12pt}, \opt{normal} \\
+\file{careerdossier-typography} & \opt{bodyfont} & \opt{serif} \\
+\file{careerdossier-components} & \opt{medium}, \opt{muted}, \opt{entrymeta} & \opt{print}, \opt{plain}, \opt{column} \\
+\bottomrule
+\end{longtable}
+
+\textbf{A package default is not a class default.} Loading
+\file{careerdossier-tokens} directly gives \opt{12pt} and \opt{normal}, where
+the résumé class resolves to \opt{11pt} and \opt{narrow} --- because the class
+passes its own values down before it loads the package. Set the option
+explicitly when loading a package directly; do not assume it inherits a class's
+choice.
+
+\section{Profile metadata}
+\label{sec:profile}
+
+\subsection{\cmd{CDossierSetup}}
+
+One profile serves every document. Set it once, in the preamble:
+
+\begin{latexcode}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  phone    = {+1 555 555 5555},
+  location = {London, UK},
+  website  = {example.com},
+  linkedin = {ada-lovelace},
+  github   = {ada-lovelace},
+  scholar  = {kukA0LcAAAAJ},
+  orcid    = {0000-0002-1825-0097}
+}
+\end{latexcode}
+
+In practice the profile lives in its own file, included by every document built
+from it, so that an address is corrected in one place.
+
+\subsection{Profile keys}
+
+\begin{longtable}{@{}llL{0.52\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Required} & \textbf{Purpose} \\
+\midrule
+\endhead
+\key{name} & Yes & Person's display name \\
+\key{headline} & No & Professional title or short descriptor \\
+\key{email} & No & E-mail address \\
+\key{phone} & No & Telephone number \\
+\key{location} & No & City, region, or country \\
+\key{website} & No & Personal or professional website \\
+\key{linkedin} & No & LinkedIn handle, profile path, or URL \\
+\key{github} & No & GitHub handle, profile path, or URL \\
+\key{scholar} & No & Google Scholar identifier, profile path, or URL \\
+\key{orcid} & No & ORCID identifier or profile URL \\
+\key{affiliation} & Conditional & Current institution, organization, studio, or independent-practice description \\
+\bottomrule
+\end{longtable}
+
+Whitespace-only values count as missing.
+
+\key{name} is the only key every class requires. A class may require a further
+key for a particular document, and the statement class does: \key{email} for
+every statement, \key{affiliation} for \opt{type=research}, and \key{website}
+for \opt{type=artist}. \emph{Conditional} above means exactly that --- the key is
+optional to the profile and required by some documents that use it.
+
+A shared profile is expected to carry fields for several document types, so a
+class that does not display a field does not warn about it.
+
+\subsection{Accepted forms for the web-profile keys}
+\label{sec:webkeys}
+
+\key{linkedin}, \key{github}, and \key{scholar} each name a service with a
+documented canonical address, so each accepts a bare identifier as well as an
+address. A bare identifier is expanded to the canonical address --- for the
+displayed text and the link target alike, so the address on the page is the
+address the link goes to:
+
+\begin{longtable}{@{}L{0.14\textwidth}L{0.24\textwidth}L{0.54\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Written} & \textbf{Displayed} \\
+\midrule
+\endhead
+\key{linkedin} & \texttt{ada-lovelace} & \addr{linkedin.com/in/ada-lovelace} \\
+\key{github} & \texttt{ada-lovelace} & \texttt{github.com/ada-lovelace} \\
+\key{scholar} & \texttt{kukA0LcAAAAJ} & \addr{scholar.google.com/citations?user=kukA0LcAAAAJ} \\
+\bottomrule
+\end{longtable}
+
+A value is read as a bare identifier when it contains neither \texttt{/} nor
+\texttt{.}\ --- the two characters every address form carries, and that none of
+these three services permits in an identifier.
+
+Any other value is used exactly as written, with only the \texttt{https://}
+scheme supplied when it carries none. A \texttt{www.}\ host, a trailing slash,
+and query parameters are all preserved.
+
+\key{website} has no canonical host by definition and is never expanded: a value
+with no \texttt{/} or \texttt{.}\ is displayed and linked exactly as written.
+\key{orcid} keeps its own normalization and its \texttt{ORCID:} label
+(\S\ref{sec:orcid}).
+
+\subsubsection{Forms that work}
+
+Give either the identifier alone or a complete address. The forms in between are
+what go wrong.
+
+\begin{longtable}{@{}L{0.13\textwidth}L{0.40\textwidth}L{0.39\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Write} & \textbf{Displayed and linked as} \\
+\midrule
+\endhead
+\key{linkedin} & \texttt{ada-lovelace} & \addr{linkedin.com/in/ada-lovelace} \\
+\key{linkedin} & \addr{linkedin.com/in/ada-lovelace} & unchanged \\
+\key{linkedin} & \addr{www.linkedin.com/in/ada-lovelace} & unchanged, \texttt{www.}\ kept \\
+\key{linkedin} & \addr{https://www.linkedin.com/in/ada-lovelace/} & unchanged, scheme and trailing slash kept \\
+\key{github} & \texttt{ada-lovelace} & \texttt{github.com/ada-lovelace} \\
+\key{github} & \texttt{github.com/ada-lovelace} & unchanged \\
+\key{scholar} & \texttt{kukA0LcAAAAJ} & \addr{scholar.google.com/citations?user=kukA0LcAAAAJ} \\
+\key{scholar} & \addr{scholar.google.com/citations?user=kukA0LcAAAAJ} & unchanged \\
+\bottomrule
+\end{longtable}
+
+A Google Scholar identifier containing \texttt{\_} needs no escape.
+
+\subsubsection{Forms to avoid}
+
+These build successfully and produce a broken link, which is the case worth
+knowing about: the page looks correct and nothing in the log says otherwise.
+Bare identifiers are not validated, because nothing in \LaTeX{} can dereference
+an address.
+
+\begin{longtable}{@{}L{0.30\textwidth}L{0.26\textwidth}L{0.36\textwidth}@{}}
+\toprule
+\textbf{Written} & \textbf{You get} & \textbf{Why} \\
+\midrule
+\endhead
+\texttt{linkedin = \{in/ada-lovelace\}} & \addr{https://in/ada-lovelace} & half a path: the \texttt{/} makes it read as an address, so it is left alone \\
+\texttt{linkedin = \{ada.lovelace\}} & \addr{https://ada.lovelace} & the \texttt{.}\ makes it read as a host, and no LinkedIn slug contains one \\
+\texttt{linkedin = \{Ada Lovelace\}} & \addr{linkedin.com/in/Ada Lovelace} & a display name, not a handle; note the space inside the address \\
+\texttt{github = \{@ada-lovelace\}} & \addr{github.com/@ada-lovelace} & \texttt{@} is a social-media convention, not part of a GitHub address \\
+\texttt{github = \{ada-lovelace/some-repo\}} & \addr{https://ada-lovelace/some-repo} & a repository, not a profile --- put repository links in body text with \cmd{CDossierLink} \\
+\texttt{scholar = \{user=kukA0LcAAAAJ\}} & the prefix added on top of it & the query rather than the identifier \\
+\bottomrule
+\end{longtable}
+
+\subsubsection{Characters that stop the build}
+\label{sec:escaping}
+
+A field value is read as ordinary text, not as a verbatim argument, so one
+character is consumed by \TeX{} before the link machinery ever sees it and must
+be escaped. This applies to every profile field, not only the three above.
+
+\begin{longtable}{@{}L{0.26\textwidth}L{0.16\textwidth}L{0.50\textwidth}@{}}
+\toprule
+\textbf{Written} & \textbf{Result} & \textbf{Write instead} \\
+\midrule
+\endhead
+\texttt{example.com/a\%b} & build fails & \texttt{example.com/a\textbackslash\%b} \\
+\texttt{example.com/a\%25b} & build fails & \texttt{example.com/a\textbackslash\%25b} \\
+\bottomrule
+\end{longtable}
+
+Percent-encoding does not help; the \texttt{\%} is still a comment character.
+This cannot be fixed at the package level, and the reason is worth stating once:
+\TeX's lexer discards \texttt{\%} and the rest of the line while
+\cmd{CDossierSetup} is still reading its argument, so the tokens never reach any
+code this package could write. \verb|\%| is the only possible answer.
+
+Nothing else needs escaping. \texttt{\#}, \texttt{\&}, \texttt{\_},
+\texttt{\textasciitilde}, \texttt{\$}, and \texttt{\textasciicircum} all build
+and render correctly, so a pasted Google Scholar address carrying
+\texttt{\&hl=en} is fine, and so is a link carrying \texttt{\#installation}.
+
+\textbf{Escaping them anyway is harmless}, which makes the rule safe to apply
+defensively. Written either way, \texttt{a\&b} and \texttt{a\textbackslash\&b}
+produce a byte-identical link action in the PDF. So the whole rule is
+\emph{escape} \texttt{\%}; \emph{escaping anything else changes nothing}.
+Over-escaping cannot silently break a link.
+
+In practice this affects \key{website} and \cmd{CDossierLink} far more than the
+three keys above, since a LinkedIn or GitHub handle and a Scholar identifier are
+restricted to letters, digits, hyphens, and underscores.
+
+\subsection{ORCID}
+\label{sec:orcid}
+
+An ORCID iD is displayed as ordinary text with a descriptive \texttt{ORCID:}
+label and a web link. A bare identifier is normalized to an
+\texttt{https://orcid.org/} target; a complete URL is used as supplied. ORCID is
+the one web-profile key whose displayed text stays the bare identifier: its
+label supplies the meaning the other three take from their domain.
+
+The value is checked against the shape of an ORCID iD --- sixteen digits in four
+hyphen-separated groups whose final character is a digit or \texttt{X} --- and a
+value matching neither that shape nor an ORCID address raises a warning naming
+the value and the expected form:
+
+\begin{longtable}{@{}L{0.46\textwidth}L{0.46\textwidth}@{}}
+\toprule
+\textbf{Written} & \textbf{Result} \\
+\midrule
+\endhead
+\texttt{0000-0002-1825-0097} & accepted \\
+\texttt{0000-0002-1825-009X} & accepted --- \texttt{X} is the documented checksum character \\
+\texttt{orcid.org/0000-0002-1825-0097} & accepted \\
+\addr{https://orcid.org/0000-0002-1825-0097} & accepted \\
+\texttt{0000-0002-1825-009} & warns --- too short \\
+\texttt{0000-0002-1825-009X7} & warns --- too long \\
+\addr{https://example.org/ada-lovelace} & warns --- not an ORCID address \\
+\addr{scholar.google.com/citations?user=example} & warns --- a value in the wrong key \\
+\bottomrule
+\end{longtable}
+
+An optional \texttt{www.}, a lowercase \texttt{x} checksum character, and one
+trailing slash are accepted without a warning: they resolve, and warning about a
+working value would only teach authors to ignore the warning that matters.
+
+The check never stops the build, and nothing about the stored value, the link
+target, or the label depends on its outcome --- an author holding an identifier
+this check does not anticipate still gets exactly the document they wrote. It is
+a shape check only: it does not verify the ISO 7064 checksum, and it cannot tell
+whether an iD is registered, since \LaTeX{} has no network access.
+
+\subsection{Contact-field labels}
+\label{sec:contactlabels}
+
+\begin{latexcode}
+\CDossierSetup{ contact-labels = true }   % default: false
+\end{latexcode}
+
+\key{contact-labels} is an option key, not a profile field: it holds no value to
+print and cannot be read back with \cmd{CDossierPrintField}. When enabled, the
+contact line prefixes a short identifying label to the fields whose nature the
+value itself does not convey:
+
+\begin{longtable}{@{}L{0.22\textwidth}L{0.70\textwidth}@{}}
+\toprule
+\textbf{Field} & \textbf{Rendered as} \\
+\midrule
+\endhead
+\key{email} & \texttt{Email: ada@example.com} \\
+\key{phone} & \texttt{Phone: +1 555 0100} \\
+\key{website} & \texttt{Website: example.test/resume} \\
+\bottomrule
+\end{longtable}
+
+The remaining fields stay unlabelled by design: \key{linkedin}, \key{github},
+and \key{scholar} display beginning with their service's domain --- including
+when you supplied a bare identifier, since that is expanded --- \key{orcid}
+always carries its own label, and a \key{location} value is a place name. Labels
+are fixed English strings; the project is English-only.
+
+\paragraph{Why it exists.} In the default rendering a screen reader announces
+the e-mail and the website as links, so their nature is conveyed --- but the
+phone number is announced as bare digits with nothing indicating what it is.
+Sighted readers infer all three from format and position; that inference is
+exactly what a screen-reader user does not get. A visible text label is the one
+mechanism that works in every consumer --- screen readers, plain text
+extraction, and ATS parsers --- including the default untagged output, which is
+why it is the primary fix rather than a tag-level attribute.
+
+Behavioural guarantees:
+
+\begin{itemize}
+  \item the default rendering is unchanged, and the feature is strictly opt-in;
+  \item the key applies to every class's contact line, including
+        document-specific subsets such as the statement classes';
+  \item an absent field leaves no orphan label and no stray separator;
+  \item labels are content, not layout artifacts, so they reach the structure
+        tree and the extracted text; separators remain artifacts;
+  \item \key{contact-labels} alone means \texttt{true}, and the value must be a
+        boolean.
+\end{itemize}
+
+\subsection{Contact-line wrapping}
+
+Contact fields form a centred block whose rows are packed greedily in the fixed
+field order. Complete fields are the only permitted units: e-mail addresses,
+phone numbers, locations, websites, LinkedIn, GitHub, Scholar, and ORCID items
+remain intact on one visual line. A separator is inserted only after two
+adjacent items are known to fit on the same row, so no visual line begins or
+ends with one.
+
+The component does not truncate values or reduce the selected font size. Each
+complete item is measured against the available width, and an item that cannot
+fit on an otherwise empty line raises an error naming the field. Shorten its
+displayed value, select \opt{margin=narrow}, or choose a smaller supported
+\opt{fontsize}.
+
+\subsection{Required-field validation}
+
+\key{name} is required before rendering a dossier header or letterhead. A
+missing name produces an error that names the missing key, identifies the
+command that required it, and shows a minimal correction. Optional fields never
+produce empty separators or blank lines.
+
+\section{Letter metadata}
+\label{sec:letter}
+
+\begin{latexcode}
+\CDossierLetterSetup{
+  date                   = {\today},
+  recipient-name         = {Hiring Manager},
+  recipient-title        = {Director of Analytics},
+  recipient-organization = {Example Organization},
+  recipient-address      = {123 Example Street\\Toronto, Ontario},
+  subject                = {Application for the Data Scientist Position},
+  salutation             = {Dear Hiring Manager,},
+  closing                = {Sincerely,}
+}
+\end{latexcode}
+
+\begin{longtable}{@{}llL{0.46\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Required} & \textbf{Default or behaviour} \\
+\midrule
+\endhead
+\key{date} & No & \cmd{today} \\
+\key{recipient-name} & No & Omitted when empty \\
+\key{recipient-title} & No & Omitted when empty \\
+\key{recipient-organization} & No & Omitted when empty \\
+\key{recipient-address} & No & Omitted when empty; may contain \texttt{\textbackslash\textbackslash} \\
+\key{subject} & No & Entire subject line omitted when empty \\
+\key{salutation} & No & \texttt{Dear Hiring Manager,} \\
+\key{closing} & No & \texttt{Sincerely,} \\
+\bottomrule
+\end{longtable}
+
+The recipient block collapses cleanly when one or more optional fields are
+absent: an absent block or subject omits both the content and its following
+block skip.
+
+\section{Statements}
+\label{sec:statement}
+
+All statement documents use one class with an optional \opt{type} option and the
+shared settings. When \opt{type} is omitted the class selects \opt{interest},
+which requires no profile fields beyond \key{name} and \key{email}. Supplying
+\opt{type} without a value, or with an unsupported value, produces an actionable
+class error.
+
+\begin{longtable}{@{}lL{0.42\textwidth}l@{}}
+\toprule
+\opt{type} & \textbf{Default title} & \textbf{Default running title} \\
+\midrule
+\endhead
+\opt{interest} (default) & Statement of Interest & Statement of Interest \\
+\opt{research} & Research Statement & Research Statement \\
+\opt{teaching} & Teaching Statement & Teaching Statement \\
+\opt{teaching-philosophy} & Statement of Teaching Philosophy & Teaching Philosophy \\
+\opt{diversity} & Statement of Contributions to Equity, Diversity, Inclusion, and Accessibility & EDIA Statement \\
+\opt{artist} & Artist Statement & Artist Statement \\
+\opt{purpose} & Statement of Purpose & Statement of Purpose \\
+\bottomrule
+\end{longtable}
+
+The type selects a title, continuation-page identification, and required-field
+contract. It does not generate or enforce content sections.
+
+\subsection{Statement metadata}
+
+Document-specific values use a separate setup command, because they describe one
+statement rather than a reusable profile:
+
+\begin{latexcode}
+\CDossierStatementSetup{
+  title               = {Research Statement},
+  running-title       = {Research Statement},
+  subtitle            = {Reliable scientific computing},
+  application-context = {Application for Assistant Professor of Computational Science},
+  application-id      = {APP-2026-0042}
+}
+\end{latexcode}
+
+\begin{longtable}{@{}llL{0.50\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Required} & \textbf{Default or behaviour} \\
+\midrule
+\endhead
+\key{title} & No & Default selected by the active \opt{type}; a nonblank value overrides it \\
+\key{running-title} & No & Short default selected by the active \opt{type}; overrides independently of \key{title} \\
+\key{subtitle} & No & One short line beneath the title; omitted when blank \\
+\key{application-context} & No & Separate contextual line; omitted when blank \\
+\key{application-id} & No & Rendered as labelled text with the application context; omitted when blank \\
+\bottomrule
+\end{longtable}
+
+Whitespace-only values count as absent. Later setup calls overwrite earlier
+values.
+
+Current affiliation is reusable identity data rather than application-specific
+state, so it is a shared profile key (\key{affiliation}) rather than a statement
+key.
+
+\subsection{Required fields and displayed contacts}
+
+Every statement requires \key{name} and \key{email}. The header validates the
+following additional type-specific requirements and renders only the listed
+optional contacts:
+
+\begin{longtable}{@{}L{0.26\textwidth}L{0.24\textwidth}L{0.42\textwidth}@{}}
+\toprule
+\textbf{Type} & \textbf{Additional required field} & \textbf{Optional displayed fields} \\
+\midrule
+\endhead
+\opt{interest} & None & \key{phone}, \key{website}, \key{affiliation} \\
+\opt{research} & \key{affiliation} & \key{phone}, \key{website}, \key{scholar}, \key{orcid} \\
+\opt{teaching} & None & \key{phone}, \key{website}, \key{affiliation} \\
+\opt{teaching-philosophy} & None & \key{phone}, \key{website}, \key{affiliation} \\
+\opt{diversity} & None & \key{phone}, \key{website}, \key{affiliation} \\
+\opt{artist} & \key{website} & \key{phone}, \key{affiliation} \\
+\opt{purpose} & None & \key{phone}, \key{website}, \key{affiliation} \\
+\bottomrule
+\end{longtable}
+
+For \opt{artist}, \key{website} may identify a personal site, portfolio, or
+comparable public presence. Shared \key{headline}, \key{location},
+\key{linkedin}, and \key{github} values remain available to other documents but
+are not displayed by the statement header, and their presence does not warn.
+
+\subsection{First-page identity order}
+
+\cmd{MakeCDossierStatementHeader} validates the active type and emits the
+present items in this fixed logical order:
+
+\begin{enumerate}
+  \item profile \key{name};
+  \item the selected statement title;
+  \item optional one-line \key{subtitle};
+  \item optional or required profile \key{affiliation};
+  \item optional \key{application-context}, followed by a labelled
+        \key{application-id} when both are present;
+  \item required \key{email}, followed by the active type's present optional
+        contacts.
+\end{enumerate}
+
+Application context is not a second subtitle and is not mixed into the contact
+list. An absent value leaves neither a blank line nor a gap. The page-one title
+drives the PDF document metadata; the running title exists only for page
+furniture.
+
+\subsection{Author content and headings}
+
+The class introduces no command for research aims, teaching themes, EDI
+commitments, artistic methods, or statement-of-purpose paragraphs. Authors write
+ordinary prose and may add headings where the content benefits. Two unnumbered
+heading levels are available, spelled exactly as in the résumé and CV:
+
+\begin{latexcode}
+\CDossierSection{Research Vision and Significance}
+\CDossierSubsection{A Narrower Theme}
+\end{latexcode}
+
+The rhythm is this class's own. A statement separates its paragraphs by a
+visible \cmd{CDossierProseParSkip}, so its heading gaps are calibrated against
+that and use the prose tokens rather than the record classes':
+
+\begin{longtable}{@{}L{0.24\textwidth}L{0.68\textwidth}@{}}
+\toprule
+\textbf{Property} & \textbf{Statement heading} \\
+\midrule
+\endhead
+Section size & \cmd{CDossierSizeSection} --- 11 / 12 / 13\,pt \\
+Subsection size & \cmd{CDossierSizeBody} --- 10 / 11 / 12\,pt \\
+Typeface & \cmd{CDossierSectionStyle}, in both \opt{bodyfont} modes \\
+Space above & \cmd{CDossierProseSectionAboveSkip} / \cmd{CDossierProseSubsectionAboveSkip} \\
+Space below & \cmd{CDossierProseSectionBelowSkip} / \cmd{CDossierProseSubsectionBelowSkip} \\
+Decorative rule & None \\
+\bottomrule
+\end{longtable}
+
+A statement heading carries no rule: the full-width rule under
+\cmd{CDossierSection} in the résumé and CV is entry-structured section
+furniture, and a prose document reads better without it.
+
+Numbered sectioning and levels below \cmd{subsection} are inherited from
+\textsf{article} unchanged and are outside the calibrated design.
+
+\section{Content commands and environments}
+\label{sec:content}
+
+\subsection{\cmd{MakeCDossierHeader}}
+
+Renders the résumé or CV identity block from the shared profile. It validates
+\key{name}; sets the name, optional headline, and contact line on the calibrated
+type scale; renders \key{headline} only when present and leaves no gap behind
+when it is absent; renders the available contact fields, inserting separators
+only between rendered fields that remain on the same visual line; creates links
+for the supported contact fields; prefixes the text labels of
+\S\ref{sec:contactlabels} when enabled; and adds no page numbers.
+
+\subsection{\cmd{MakeCDossierLetterhead} and \cmd{MakeCDossierClosing}}
+
+\cmd{MakeCDossierLetterhead} renders the cover-letter opening material in order:
+the shared sender identity, the date, the recipient block, the optional subject,
+and the salutation. An absent recipient block or subject omits both the content
+and its following block skip.
+
+\cmd{MakeCDossierClosing} renders the configured closing, suitable signature
+space, and the profile \key{name}, and validates that \key{name} exists.
+
+The three are a single unit for pagination: the closing text and the signature
+name always land on the same page, whichever page that turns out to be. When
+they do not both fit under the body, the page breaks \emph{above} the closing and
+the whole block opens the next page. This is a contract of the command rather
+than a token --- the boundary between the two is forbidden outright, because
+under \cmd{raggedbottom} a page-break penalty here is a boolean rather than a
+dial (\S\ref{sec:penalties}), and a keep-together that is not infinite is not a
+keep. It is a separate guarantee from \cmd{clubpenalty} and \cmd{widowpenalty},
+which govern the first and last line \emph{of one paragraph} and cannot express
+it.
+
+\subsection{The header stack}
+
+\begin{latexcode}
+\CDossierHeaderBegin
+\CDossierHeaderLine{<content>}
+\CDossierHeaderLine{<content>}
+\CDossierHeaderEnd
+\end{latexcode}
+
+Composes a centred header stack line by line. \cmd{MakeCDossierHeader} and
+\cmd{MakeCDossierStatementHeader} render fixed line lists and are what a
+document normally uses; this triple is the interface beneath them, for a header
+whose lines a document has to choose itself.
+
+A caller states only which lines are present, in reading order. Every gap is
+owned by the components package, and the triple adds no spacing option: no gap
+above the first line, \cmd{CDossierSharedHeaderNameGapSkip} below the first,
+\cmd{CDossierSharedHeaderMetaGapSkip} below every later one, and the rendering
+class's own header-below token as the boundary under the stack. Position decides
+which token guards a boundary, never presence, so an omitted line leaves neither
+a blank line nor a gap behind. Emit a line conditionally by calling
+\cmd{CDossierHeaderLine} only when you have content for it.
+
+\begin{itemize}
+  \item \cmd{CDossierHeaderBegin} starts a stack and discards any lines left
+        over from an abandoned one.
+  \item \cmd{CDossierHeaderLine} stores its argument unexpanded and typesets
+        nothing yet, so a line may carry structure --- a heading, a link, a
+        tagged element --- and keeps it.
+  \item \cmd{CDossierHeaderEnd} renders the collected lines, each as its own
+        centred paragraph, and emits the boundary below the stack.
+  \item A stack with no lines renders nothing, including no boundary below it.
+  \item No validation is performed: the wrapper commands keep their own.
+\end{itemize}
+
+A worked example --- a résumé wanting \key{location} on a line of its own
+\emph{between} the headline and the contact line, which is a position no
+append-only hook can reach. It is a complete document, and
+\file{tests/smoke/components-header-stack-doc.tex} compiles this exact text on
+every run, so the example on this page is one the toolkit is known to accept:
+
+\begin{latexcode}
+\documentclass{careerdossier-resume}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  location = {London, UK},
+  email    = {ada@example.com},
+}
+
+\begin{document}
+
+\CDossierHeaderBegin
+\CDossierHeaderLine{
+  \CDossierNameStyle \CDossierSizeName
+  \CDossierPrintField{name}
+}
+\CDossierHeaderLine{
+  \CDossierHeadlineStyle \CDossierSizeHeadline
+  \CDossierPrintField{headline}
+}
+\CDossierIfFieldTF{location}
+  {
+    \CDossierHeaderLine{
+      \CDossierMutedStyle \CDossierSizeSmall
+      \CDossierPrintField{location}
+    }
+  }
+  { }
+\CDossierHeaderLine{
+  \CDossierBodyStyle \CDossierSizeSmall
+  \CDossierPrintField{email}
+}
+\CDossierHeaderEnd
+
+\CDossierSection{Experience}
+
+\end{document}
+\end{latexcode}
+
+The guard wraps the \cmd{CDossierHeaderLine} call rather than appearing inside
+it: that is the whole of ``conditional''. Drop the \key{location} key and the
+header renders three lines with no gap left behind.
+
+\subsection{\cmd{CDossierSection}}
+
+\begin{latexcode}
+\CDossierSection{Experience}
+\end{latexcode}
+
+Creates a résumé or CV section heading followed by a full-width decorative rule.
+Class-controlled spacing places the rule closer to its heading than to the
+content below.
+
+The rule sits \cmd{CDossierRecordSectionRuleGapSkip} below the heading's
+\emph{baseline}, not below the bottom of its line box, so its height does not
+change when the heading happens to contain a descender. The token consequently
+has a lower bound: it must exceed the heading's depth, or the rule would cross
+descender ink.
+
+The gap between the rule and the section's first content is the larger of
+\cmd{CDossierRecordSectionBelowSkip} and whatever leading space the following
+block contributes --- never their sum. A section that opens with an entry, a
+bullet list, or an ordinary paragraph therefore yields one predictable gap
+rather than three different ones.
+
+The argument is user-visible text; the command does not translate it. The
+statement class defines \cmd{CDossierSection} too, without a rule and on the
+prose heading rhythm.
+
+\subsection{\cmd{CDossierSubsection}}
+
+\begin{latexcode}
+\CDossierSection{Experience}
+\CDossierSubsection{Industry}
+\end{latexcode}
+
+A second-level heading inside a résumé or CV section, for natural groupings that
+are not themselves sections --- \emph{Experience} split into industry and
+academic, \emph{Publications} split into journal, conference, and preprint.
+Without it such a group has to be promoted to a full ruled section, which
+flattens the hierarchy it was meant to show.
+
+The heading carries no rule and no size of its own: it is
+\cmd{CDossierSectionStyle} at \cmd{CDossierSizeBody}, so the level is marked by
+weight, face, and spacing. The rule belongs to the section.
+
+The gap below is \cmd{CDossierRecordSubsectionBelowSkip}, and it is the same gap
+whether the next block is a run of entries or a publication list. The gap above
+is \cmd{CDossierRecordSubsectionAboveSkip}, with one deliberate exception: a
+section that opens \emph{directly} with a subsection does not take that gap, and
+the boundary is \cmd{CDossierRecordSectionBelowSkip} alone. Anything typeset in
+between ends the exception.
+
+\subsection{\env{CDossierEntry}}
+
+\begin{latexcode}
+\begin{CDossierEntry}[
+  title        = {Data Scientist},
+  organization = {Example Organization},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  Entry content.
+\end{CDossierEntry}
+\end{latexcode}
+
+\begin{longtable}{@{}llL{0.50\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Required} & \textbf{Purpose} \\
+\midrule
+\endhead
+\key{title} & Yes & Position, degree, award, or entry title \\
+\key{organization} & No & Employer, institution, or organization \\
+\key{location} & No & City, region, country, or remote status \\
+\key{dates} & No & Date or date range \\
+\bottomrule
+\end{longtable}
+
+Named keys are preferred over positional arguments because they are
+self-documenting and can be extended without changing the meaning of existing
+arguments. Missing optional keys are omitted without leaving visible punctuation
+or spacing artifacts. The environment controls the entry heading and local
+spacing but does not force bullet content.
+
+An entry body may be empty. A body-less entry --- the normal shape for an
+\emph{Education} or \emph{Certificates} section, where the heading carries the
+degree, institution, and dates --- renders its heading and contributes nothing
+further, and the boundary after it stays a legal page break.
+
+The body is read as an argument, so catcode-sensitive content cannot appear
+directly inside an entry. \cmd{verb}, \textsf{listings} environments, and
+anything else that depends on rescanning characters must be wrapped in a macro
+defined outside the entry, or placed outside it.
+
+\subsection{\env{CDossierItemize}}
+\label{sec:itemize}
+
+\begin{latexcode}
+\begin{CDossierItemize}
+  \item First accomplishment.
+  \item Second accomplishment.
+\end{CDossierItemize}
+\end{latexcode}
+
+A résumé-appropriate itemized list with controlled indentation and spacing.
+Prefer it over globally redefining \env{itemize}.
+
+The space above the list is \cmd{CDossierRecordListEdgeAboveSkip} and the space
+below is \cmd{CDossierRecordListEdgeBelowSkip}. Each token is the complete gap
+at its end of the list, and both collapse with the adjacent block's own spacing
+rather than adding to it. The CV's publication list uses the same pair.
+
+\cmd{CDossierRecordListEdgeAboveSkip} additionally carries a \textbf{lower bound
+of \texttt{0.25}}, which is an extraction constraint rather than a design
+preference. The entry heading sets its dates and location in a right-hand
+column, and a geometric extractor keeps that column with its entry only while
+the entry's vertical band stays distinct from the list beneath it. Below
+\texttt{0.25} the two merge and the dates extract after the bullets --- on the
+résumé and the CV alike, at every supported body size, and on tagged and
+untagged output equally. Overriding this token below \texttt{0.25} therefore
+breaks reading order; \opt{entrymeta=inline} is the supported way to go lower.
+
+When the list crosses a page boundary it is never split so that a single item
+stands alone on either side; a list longer than a page still breaks normally.
+
+\subsection{Manual publications}
+\label{sec:publications}
+
+Manual publications require no bibliography package and no Biber run:
+
+\begin{latexcode}
+\CDossierSection{Publications}
+
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace and Jane Example},
+    title   = {A Demonstration Article},
+    venue   = {Journal of Examples},
+    date    = {2026},
+    doi     = {10.9999/example.2026.1}
+  }
+\end{CDossierPublications}
+\end{latexcode}
+
+\env{CDossierPublications} creates a numbered list in source order and uses the
+shared list spacing and label separation. \cmd{CDossierPublication} is valid
+only inside that environment, and takes these keys:
+
+\begin{longtable}{@{}llL{0.50\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Required} & \textbf{Purpose} \\
+\midrule
+\endhead
+\key{authors} & Yes & Display-order author list \\
+\key{title} & Yes & Publication title \\
+\key{venue} & No & Journal, book, conference, or publisher \\
+\key{date} & No & Year or display date \\
+\key{doi} & No & DOI value or complete DOI URL \\
+\key{url} & No & Fallback public URL \\
+\key{note} & No & Short status or contribution note \\
+\bottomrule
+\end{longtable}
+
+Missing optional values collapse cleanly. When both \key{doi} and \key{url} are
+present, the DOI is the displayed link and the URL is the fallback. Each entry
+renders in this order: authors, italic title, the comma-joined present
+\key{venue} and \key{date} values, \key{note}, and the preferred visible
+identifier. Sentence punctuation is emitted only around present groups, so
+absent optional fields leave no stray separators.
+
+\subsubsection{Numbering across grouped lists}
+
+The environment takes one optional key:
+
+\begin{longtable}{@{}lllL{0.40\textwidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Values} & \textbf{Default} & \textbf{Purpose} \\
+\midrule
+\endhead
+\key{numbering} & \opt{restart}, \opt{continue} & \opt{restart} & Whether this list numbers from 1 or carries on from the previous list \\
+\bottomrule
+\end{longtable}
+
+Each list is self-contained by default, so a section carrying several groups
+numbers each from 1. That reads correctly when a number is cited together with
+its group --- ``journal article 1''. A document whose numbers are cited on their
+own, from a cover letter or a grant form, wants one sequence across the whole
+document instead, and asks for it per list:
+
+\begin{latexcode}
+\CDossierSubsection{Conference Papers}
+\begin{CDossierPublications}[numbering = continue]
+  ...
+\end{CDossierPublications}
+\end{latexcode}
+
+\opt{continue} resumes from the final number of the \emph{preceding} list,
+wherever that list was: a subsection heading and a section rule are equally
+invisible to it, since the sequence belongs to the document rather than to the
+heading above it. A \opt{restart} list in between therefore resets what a later
+\opt{continue} picks up. Setting \key{numbering} on the first list of a document
+has no effect under either value.
+
+\subsection{\cmd{CDossierLink}}
+\label{sec:link}
+
+\begin{latexcode}
+\CDossierLink{example.org/ada/portfolio}
+\CDossierLink{https://example.org/programs/2024/final-report/notes.html}
+\end{latexcode}
+
+The supported way to put a link in body text --- a bullet, an entry, a letter
+paragraph, a statement paragraph. The argument is both the text that appears on
+the page and, once normalized, the link target: a value carrying no scheme gains
+\texttt{https://}, exactly as \key{website} does, and a value that has one keeps
+it. The displayed text is the argument as written, never the normalized target.
+
+\cmd{CDossierLink} takes no bare identifier: body text has no service to expand
+one against (\S\ref{sec:webkeys}).
+
+Use it for every address in running text. Typing the URL as plain text does not
+work, and neither does \cmd{url}:
+
+\begin{longtable}{@{}lL{0.66\textwidth}@{}}
+\toprule
+\textbf{Form} & \textbf{What a long address does} \\
+\midrule
+\endhead
+plain text & no URL break points, so \TeX{} either overruns the margin or hyphenates the address --- and the inserted hyphen travels into the pasted URL \\
+\cmd{url} & breaks after punctuation only, so a long segment carrying none stays one unbreakable token \\
+\cmd{CDossierLink} & may break after any character, with no inserted hyphen \\
+\bottomrule
+\end{longtable}
+
+\cmd{CDossierEmergencyStretch} cannot rescue either of the first two: it
+redistributes a line's interword glue, and a line holding one over-wide token
+has none to redistribute.
+
+\cmd{CDossierLink} extends the URL break set with the ASCII letters and digits
+for the duration of one link, so the address may break anywhere rather than only
+after punctuation, and a break point inserts a penalty and no discretionary
+hyphen --- so a wrapped address still copies and pastes back character for
+character. The extension is local: the contact line and the bibliography keep
+the punctuation-only breaks they were calibrated with.
+
+The argument is read as ordinary text (\S\ref{sec:escaping}). A query string is
+the common case:
+
+\begin{latexcode}
+\CDossierLink{https://example.org/search?q=studies\&profile=advanced}
+\end{latexcode}
+
+Keep the address on one source line. A URL cannot contain a literal space, so a
+space in the argument --- in practice always a line break inside it --- is
+removed from the link target, with a warning naming the repaired target. Without
+that repair the page would look correct while the link went somewhere else.
+Write \texttt{\%20} if the space is genuinely part of the address.
+
+A \cmd{CDossierLink} is never underlined under either \opt{medium}: its visible
+text is the address, so it already announces itself.
+
+\subsection{\cmd{CDossierPlainLinks}}
+
+\begin{latexcode}
+{\CDossierPlainLinks
+ Read the \href{https://example.org/report}{annual report}.}
+\end{latexcode}
+
+A declaration that turns off link decoration for the rest of the enclosing
+group. Under \opt{medium=print} it changes nothing, because nothing is decorated
+there; under \opt{medium=screen} an \cmd{href} inside its scope is set without
+the underline while still emitting its link annotation.
+
+Use it where a link's visible text is already the address, or where a passage
+carries so many links that ruling each one would be noise. The toolkit applies
+it to its own address-as-text links --- the contact line, \cmd{CDossierLink},
+the ORCID iD, the manual publication identifiers, and the whole bibliography ---
+so those need nothing from a document.
+
+There is no matching command to turn decoration back on. Scope it with a group,
+as above, or with the environment it belongs to.
+
+\subsection{Field accessors}
+
+These are intended mainly for advanced users and shared components.
+
+\cmd{CDossierPrintField}\texttt{\{name\}} prints the stored value of a profile
+field. For an absent optional field it prints nothing; for an unknown field name
+it produces an actionable error.
+
+\cmd{CDossierIfFieldTF}\texttt{\{phone\}\{present\}\{absent\}} executes the
+first branch when the field exists and is nonblank, and the second otherwise.
+Both branches are long, so they may contain full paragraphs.
+
+\cmd{CDossierFieldValue}\texttt{\{email\}} expands to the stored value, or to
+nothing when the field is absent. It does not typeset and does not validate the
+field name.
+
+Expandability is what makes the last of these the correct choice anywhere the
+value is written into the PDF rather than onto the page --- a heading's recorded
+title, or any other PDF string. Such values are purified first, and purification
+expands what it can and discards what it cannot: \cmd{CDossierPrintField} is
+protected, so it does not survive as a value but its argument text does, which
+records a plausible wrong string rather than failing. Nothing on the rendered
+page reveals that.
+
+\subsection{Hyperlink behaviour}
+
+When present, \key{email} uses a \texttt{mailto:} link, and \key{website},
+\key{linkedin}, \key{github}, and \key{scholar} use web links. Printed text
+stays readable in monochrome, and URLs are breakable rather than extending
+beyond the margin. A displayed URL is not assumed to include a protocol.
+
+\paragraph{Without \textsf{hyperref}.} Every link the toolkit emits is emitted
+only when \textsf{hyperref} has supplied \cmd{href}. Without it each one
+degrades to its visible address as plain text, so the identifier stays readable,
+selectable, and extractable; nothing in the PDF is clickable.
+
+All four classes load \textsf{hyperref}, so a document built on one of them is
+never in this state. It is reachable by loading
+\file{careerdossier-components} into another class, and there the degradation
+is otherwise invisible --- the page looks finished. The package therefore warns
+once per document, at the first link that degrades, naming the cause and the
+effect. Once, not once per field: a contact line with five linked fields has a
+single cause.
+
+\section{Optional BibLaTeX and Biber}
+\label{sec:biblatex}
+
+The CV class does not load \textsf{biblatex}. Opt in explicitly:
+
+\begin{latexcode}
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+
+\addbibresource{publications.bib}
+\CDossierHighlightAuthor{
+  family = {Lovelace},
+  given  = {Ada}
+}
+
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}
+\end{latexcode}
+
+The integration package loads and configures \textsf{biblatex}; standard
+BibLaTeX commands remain the public resource-selection and printing interface.
+Its one supported profile is fixed:
+
+\begin{plaincode}
+backend=biber
+style=numeric
+sorting=ydnt
+\end{plaincode}
+
+Entries are numbered, sorted year-descending / name / title, and show at most
+one preferred public identifier, in the order DOI, e-print, URL. The package
+uses monochrome link styling and does not redefine unrelated document lists or
+headings globally.
+
+The gap between bibliography entries follows the same calibrated list token as
+every other list in the CV, so a \textsf{biblatex} list and a manual publication
+list share one rhythm at every \opt{fontsize}. The horizontal gap between an
+entry number and its entry follows the shared list label token for the same
+reason. BibLaTeX's own default places that gap at roughly one em, which is the
+width at which a plain-text extractor stops treating the numbers as labels and
+starts treating them as a separate left-hand column, emitting them as a block
+ahead of the entry text; the shared token is half the body size and clears that
+threshold at every supported \opt{fontsize}.
+
+URLs printed in a bibliography carry no stretch at their break points, so a
+justified line ending in a URL spreads its word spaces rather than the URL
+itself --- a stretched URL extracts as separate tokens and is then neither
+searchable nor copyable. Rigid glue rules that out at any measure or URL length,
+and the profile therefore also enables BibLaTeX's three URL break penalties,
+which are disabled by default: without them a long URL would overrun the margin
+instead. Two visible results follow, both intended. A URL breaks where the line
+ends rather than at the nearest earlier punctuation, so an address may wrap in
+the middle of a run of letters or digits; and a line holding nothing but URL is
+set ragged-right and reported underfull, since it has no glue to justify with. A
+wrapped address still concatenates back exactly.
+
+\cmd{CDossierHighlightAuthor} may be repeated for spelling or initial variants.
+It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and
+does not alter citations. Both keys are required; an incomplete declaration
+produces an actionable package error.
+
+Loading \file{careerdossier-biblatex} when \textsf{biblatex} is unavailable
+reports the missing optional dependency and explains that you may either install
+BibLaTeX and Biber or use \env{CDossierPublications}. A CV that does not load
+the integration package builds without either.
+
+\section{PDF document metadata}
+\label{sec:metadata}
+
+Each class derives the PDF's document metadata from the shared profile. Nothing
+needs to be called; the derived values are applied automatically at
+\cmd{begin}\texttt{\{document\}}.
+
+\begin{longtable}{@{}L{0.16\textwidth}L{0.18\textwidth}L{0.58\textwidth}@{}}
+\toprule
+\textbf{PDF field} & \textbf{Derived from} & \textbf{Value} \\
+\midrule
+\endhead
+\texttt{/Title} & \key{name} & \texttt{Résumé – <name>}, \texttt{Cover Letter – <name>}, \texttt{Curriculum Vitae – <name>}, \texttt{Academic Cover Letter – <name>}, or the statement's title \\
+\texttt{/Author} & \key{name} & \texttt{<name>} \\
+\texttt{/Lang} & fixed & \texttt{en} \\
+\bottomrule
+\end{longtable}
+
+The document type is part of the title so that a résumé and a cover letter built
+from one profile are distinguishable in a viewer's tab bar, in document
+properties, and in a file manager. The separator is an en dash, and the derived
+values are the same whether or not the document opts into tagging.
+
+When \key{name} is absent, \texttt{/Title} and \texttt{/Author} are left unset;
+the header commands already error on a missing \key{name}, and metadata does not
+add a second diagnostic.
+
+\subsection{\TeX{} input ligatures in a derived value}
+
+Text you supply is \TeX{} input, so the usual input ligatures apply to it on the
+way into the PDF. A \key{name} of \texttt{\{Ada Lovelace-{}-Byron\}} reaches
+\texttt{/Title} and \texttt{/Author} with an en dash, and the same holds for a
+statement's \key{title}:
+
+\begin{longtable}{@{}L{0.30\textwidth}L{0.60\textwidth}@{}}
+\toprule
+\textbf{You type} & \textbf{The PDF carries} \\
+\midrule
+\endhead
+\texttt{-{}-} & – (en dash, U+2013) \\
+\texttt{-{}-{}-} & — (em dash, U+2014) \\
+\texttt{!`} & ¡ \\
+\texttt{?`} & ¿ \\
+\bottomrule
+\end{longtable}
+
+Nothing else is converted. In particular the two ASCII quote sequences are
+\textbf{not} turned into curly quotes in a metadata string --- they arrive as
+the characters you typed. Type the character itself if you want one:
+\texttt{\{Ada Lovelace–Byron\}} in a UTF-8 source works and is unambiguous.
+
+This holds on both build paths. Only values this package derives are covered;
+see below for a value you set yourself.
+
+\subsection{\texttt{/DisplayDocTitle}}
+
+A \texttt{/Title} in the file is not what a viewer puts in its window title, tab
+bar, or recent-documents list. A viewer uses the filename unless the PDF's
+viewer preferences ask otherwise, so the classes also request
+\texttt{/DisplayDocTitle true}. Without it the derived title is present and
+unused --- the case PDF/UA-2 clause 8.11.2 and WCAG 2.1 AA 2.4.2 (Page Titled)
+are about. It is requested on both build paths and changes nothing about
+rendering, extracted text, or the structure tree.
+
+\subsection{Overriding the derived metadata}
+
+Set any field yourself with \cmd{hypersetup} and it is used unchanged:
+
+\begin{latexcode}
+\documentclass{careerdossier-resume}
+
+\hypersetup{
+  pdftitle  = {Ada Lovelace — Data Scientist, Analytical Engine Division},
+  pdfauthor = {A. Lovelace},
+  pdflang   = {en-GB}
+}
+
+\CDossierSetup{ name = {Ada Lovelace} }
+\end{latexcode}
+
+A field you set is never overwritten, and the order does not matter --- the
+\cmd{hypersetup} may appear before or after \cmd{CDossierSetup}. Fields you do
+not set are still derived, so overriding \texttt{pdftitle} alone leaves
+\texttt{/Author} and \texttt{/Lang} in place. This holds whether or not you opt
+into tagging.
+
+The language has a second route, and it wins too:
+
+\begin{latexcode}
+\DocumentMetadata{ lang = de, tagging = on }
+\documentclass{careerdossier-resume}
+\end{latexcode}
+
+\cmd{DocumentMetadata} records the language for the \LaTeX{} kernel, which
+writes \texttt{/Lang} itself, and the derived \texttt{en} stands aside. It always
+settles on a language --- it defaults to \texttt{en} when you give no
+\key{lang} key --- so on that path the kernel owns \texttt{/Lang} outright.
+
+Declaring a language does not make the document that language.
+CareerDossierTeX is English-only; \key{lang} sets the declaration a screen
+reader reads, not hyphenation, fonts, or any fixed string.
+
+\texttt{pdfdisplaydoctitle} is the one setting that works by ordering rather
+than by detection, because \textsf{hyperref} gives a boolean no state that
+distinguishes ``not set'' from ``set to false''. The classes request it while
+\textsf{hyperref} is still loading, so any value in your preamble is later and
+wins:
+
+\begin{latexcode}
+\hypersetup{ pdfdisplaydoctitle = false }   % show the filename instead
+\end{latexcode}
+
+The one place that does not reach is a value passed as a package option, which
+\textsf{hyperref} processes before the classes can be asked anything. Set it
+with \cmd{hypersetup} in the preamble instead.
+
+Other \textsf{hyperref} metadata (\texttt{pdfsubject}, \texttt{pdfkeywords},
+\dots) is untouched.
+
+\paragraph{One divergence to know about.} A value you set yourself does not get
+the input-ligature handling described above, because this package never rewrites
+it. It follows \textsf{hyperref}'s own behaviour, and that behaviour differs
+between the two build paths: \textsf{hyperref} converts on the default path,
+while under \cmd{DocumentMetadata} your value goes to the \LaTeX{} kernel
+instead and arrives as typed. So
+
+\begin{latexcode}
+\hypersetup{ pdftitle = {Résumé -- Ada Lovelace} }
+\end{latexcode}
+
+gives an en dash without \cmd{DocumentMetadata} and two hyphens with it. The
+same applies to \texttt{pdfsubject} and \texttt{pdfkeywords}, and to a plain
+\textsf{article} with \textsf{hyperref} and no CareerDossierTeX file loaded ---
+which is what places the cause upstream rather than in these classes. Type the
+character you want, and both paths agree on every field at once.
+
+\section{Page furniture}
+\label{sec:furniture}
+
+All four classes use the same page-furniture policy. Under the default
+\opt{medium=print}:
+
+\begin{itemize}
+  \item a one-page document has no running header and no folio;
+  \item page one of a multi-page document has only a centred
+        \texttt{Page N of M} folio;
+  \item pages two and later add a centred \texttt{<name> -- <document label>}
+        running header above the body and retain the folio;
+  \item the résumé label is \texttt{Résumé}, the CV label is
+        \texttt{Curriculum Vitae}, both letter families use
+        \texttt{Cover Letter}, and a statement uses its independently
+        configurable short running title.
+\end{itemize}
+
+Under \opt{medium=screen} neither is emitted, on any page and at any page count.
+
+Furniture uses the sans-serif furniture step of the calibrated type scale and
+the monochrome text token. It stays print-safe and is marked as a layout
+artifact when tagged output is active. Which furniture is emitted is the only
+user-configurable part of the policy; its typography, wording, and placement are
+not.
+
+The header and the folio sit in the vertical centre of the top and bottom
+margins respectively, at every \opt{fontsize} $\times$ \opt{margin} combination
+and on both paper sizes. Their distance from the paper edge therefore follows
+the selected margin preset. This affects only where the furniture sits inside
+the margin; the text block is unchanged.
+
+Single-page suppression and the \texttt{of M} total use the last absolute page
+recorded in the auxiliary file, which is why a first build from a clean tree
+shows a provisional folio.
+
+\section{Pagination}
+\label{sec:pagination}
+
+The résumé and CV classes state where a page may break rather than leaving every
+break to \LaTeX's defaults:
+
+\begin{itemize}
+  \item a section heading is placed only when it has room to introduce
+        something;
+  \item an entry heading stays with its own second line and with the first line
+        of its body;
+  \item a bullet list is never split leaving one item alone on either side.
+\end{itemize}
+
+The policy uses page-break penalties, not boxing, so material that genuinely
+does not fit still breaks: an entry or bullet list longer than a page paginates
+normally rather than overflowing.
+
+\subsection{\cmd{CDossierSectionNeedLines}}
+
+The section heading's keep, expressed as a bound. A section heading is placed
+only when at least this many lines of body leading remain on the page;
+otherwise the page breaks before the heading and the heading opens the next one.
+It defaults to \texttt{4}, which is what the heading needs to introduce
+anything: the heading and its rule, the two lines of the first entry heading,
+and that entry's first line of body.
+
+It is a count of lines rather than a dimension, because it is a statement about
+content --- the same four lines at every \opt{fontsize}.
+
+\begin{latexcode}
+\int_set:Nn \CDossierSectionNeedLines { 6 }
+\end{latexcode}
+
+\subsection{\cmd{CDossierSubsectionNeedLines}}
+
+The same bound for \cmd{CDossierSubsection}, defaulting to \texttt{3}. It is
+smaller because a subsection commits less to the page: its own heading line and
+the two lines of the first entry heading, with no rule between them. It does not
+additionally require that entry's first line of body, because the entry heading
+already carries its own keep down to it.
+
+A subsection that opens its section directly is exempt from this bound: the
+section's own requirement already placed that material, and testing it a second
+time could only break the page between a section heading and the subsection
+immediately under it --- the stranded heading the bound exists to prevent.
+
+\subsection{Typographic page-break penalties}
+\label{sec:penalties}
+
+All four classes set \cmd{brokenpenalty}, \cmd{clubpenalty}, and
+\cmd{widowpenalty} from three named tokens ---
+\cmd{CDossierBrokenPenalty}, \cmd{CDossierClubPenalty}, and
+\cmd{CDossierWidowPenalty} --- through one command,
+\cmd{CDossierApplyPageBreakPenalties}. A hyphenated word is therefore never
+split across a page break, and no single line of a paragraph is stranded alone
+at the foot of one page or the head of the next.
+
+All three default to \texttt{10000} --- forbidding the break --- across every
+family. This is safe because all four classes are \cmd{raggedbottom}:
+forbidding a club or widow break only closes off the first and last line of a
+paragraph as a break point, and every interior line break remains available, so
+a page can still break inside an over-long paragraph rather than overflow.
+
+These tokens are \textbf{booleans, not dials}. Under \cmd{raggedbottom} a page
+being built carries no stretch, so every break candidate short of the goal
+scores the worst possible badness; all candidates tie, the page builder keeps the
+last one that fits, and the penalty's magnitude never enters the comparison.
+Only a value of \texttt{10000} or more changes anything, by removing the
+breakpoint from consideration altogether. Measured across every letter and
+statement fixture at \texttt{10000, 4000, 1000, 300, 150, 50, 0}, the results
+form a step function with a single step: \texttt{9999} paginates identically to
+\texttt{0}. Setting either token to a ``discounted'' value does not soften the
+rule, it switches it off.
+
+The cost of that rule was measured and accepted: each fixture that gains page
+fill by permitting these breaks gains a club or widow line with it, one for one.
+There is no value, and no per-family split, that buys the space without the
+defect, so the toolkit keeps the space.
+
+The letter and statement classes otherwise remain continuous prose with no
+further structural page-break policy.
+
+\subsection{Hyphenation}
+
+\cmd{hyphenpenalty} and \cmd{exhyphenpenalty} keep \TeX's defaults of
+\texttt{50} in all four families. No token sets them, and that is a decision
+rather than an omission: raising the penalty was measured and rejected. Across
+the shipped examples, \texttt{500} removes 18 hyphens and creates 10 lines
+looser than badness 99 --- roughly a one-for-one trade, paid to fix a problem
+the record classes do not have. Forbidding hyphenation entirely produces
+overfull boxes.
+
+A document that wants different behaviour can set either parameter in its
+preamble; both are ordinary \TeX{} parameters and nothing in the toolkit
+overrides them.
+
+\section{Design tokens}
+\label{sec:tokens}
+
+\subsection{Vertical spacing}
+
+Every vertical boundary in the four classes is owned by exactly one token, and
+each token is the complete gap a reader measures. The names follow
+\cmd{CDossier<Family><Scope><Position>Skip}.
+
+\begin{longtable}{@{}lL{0.70\textwidth}@{}}
+\toprule
+\textbf{Family} & \textbf{Tokens} \\
+\midrule
+\endhead
+Shared (all four) & \cmd{CDossierSharedHeaderNameGapSkip},
+  \cmd{CDossierSharedHeaderMetaGapSkip} \\
+Record (résumé, CV) & \cmd{CDossierRecordHeaderBelowSkip},
+  \cmd{CDossierRecordSectionAboveSkip},
+  \cmd{CDossierRecordSectionRuleGapSkip},
+  \cmd{CDossierRecordSectionBelowSkip},
+  \cmd{CDossierRecordSubsectionAboveSkip},
+  \cmd{CDossierRecordSubsectionBelowSkip},
+  \cmd{CDossierRecordEntryAboveSkip},
+  \cmd{CDossierRecordEntryGapSkip},
+  \cmd{CDossierRecordListEdgeAboveSkip},
+  \cmd{CDossierRecordListEdgeBelowSkip},
+  \cmd{CDossierRecordItemSepSkip},
+  \cmd{CDossierRecordParSkip} \\
+Prose (statement) & \cmd{CDossierProseHeaderBelowSkip},
+  \cmd{CDossierProseSectionAboveSkip},
+  \cmd{CDossierProseSectionBelowSkip},
+  \cmd{CDossierProseSubsectionAboveSkip},
+  \cmd{CDossierProseSubsectionBelowSkip},
+  \cmd{CDossierProseParSkip} \\
+Letter & \cmd{CDossierLetterHeaderBelowSkip},
+  \cmd{CDossierLetterParSkip},
+  \cmd{CDossierLetterRecipientLineGapSkip},
+  \cmd{CDossierLetterBlockSkip},
+  \cmd{CDossierLetterBodyAboveSkip},
+  \cmd{CDossierLetterBodyBelowSkip},
+  \cmd{CDossierLetterSignatureGapSkip} \\
+\bottomrule
+\end{longtable}
+
+Only the two gaps \emph{inside} the header block are shared; the gap
+\emph{below} it is owned by one token per family. All three ship at the same
+ratio, so setting all three reproduces a single shared token, and setting one
+moves only that family.
+
+Three rules govern how a token reaches the page, and overriding a token without
+them in mind is the usual reason an override appears to do nothing.
+
+\begin{itemize}
+  \item \textbf{Boundaries take the maximum of the adjacent claims, never their
+        sum.} Raising a token past its neighbour is what makes it visible;
+        lowering it below its neighbour makes it inert, and neither the output
+        nor the log will say so. \cmd{CDossierRecordEntryGapSkip} in particular
+        is a \emph{floor} for the entry-heading-to-body boundary, which a bullet
+        list overrides with \cmd{CDossierRecordListEdgeAboveSkip}.
+  \item \textbf{One token carries a constraint from outside the type scale.}
+        \cmd{CDossierRecordListEdgeAboveSkip} may not go below \texttt{0.25}
+        without breaking the extraction order of the entry heading's dates
+        column (\S\ref{sec:itemize}).
+  \item \textbf{A paragraph boundary also contributes \cmd{parskip}, and the
+        class has already accounted for it.} Where a token sits at such a
+        boundary the class emits it minus \cmd{parskip}, so the value you set is
+        still the gap a reader measures --- do not subtract the paragraph gap
+        yourself.
+\end{itemize}
+
+The calibrated \emph{values} are not stable API before \texttt{v1.0.0}; the
+token names and the boundaries they own are.
+
+\subsection{Line breaking}
+
+\cmd{CDossierEmergencyStretch} is the extra flexibility \TeX{} may distribute
+among a paragraph's interword glue when it can find no set of breakpoints within
+\cmd{tolerance}. It is 2.00 times the body size --- 20\,pt, 22\,pt, and 24\,pt at
+\opt{fontsize=10pt}, \opt{11pt}, and \opt{12pt} --- and it derives from the body
+size rather than the body leading because the quantity is horizontal. It does
+not scale with the measure, and deliberately so: deriving it from the line width
+instead was measured and rejected, because the pool a paragraph needs tracks
+neither quantity.
+
+All four classes set \cmd{emergencystretch} from it, unconditionally and
+identically. Raising it lets a paragraph with few break points set looser
+instead of overfull; lowering it to \texttt{0pt} restores \TeX's default
+behaviour, which is to allow the overfull box. Neither direction affects a
+paragraph that already sets within \cmd{tolerance}, because
+\cmd{emergencystretch} is consulted only in a third line-breaking pass that such
+a paragraph never reaches.
+
+\subsection{Typography roles}
+
+Each role names one place in a document, and describes meaning rather than a
+particular font family, weight, or size:
+
+\begin{longtable}{@{}lL{0.60\textwidth}@{}}
+\toprule
+\textbf{Role} & \textbf{Where it applies} \\
+\midrule
+\endhead
+\cmd{CDossierNameStyle} & the profile name at the head of every document \\
+\cmd{CDossierHeadlineStyle} & the optional headline below the name \\
+\cmd{CDossierSectionStyle} & every section heading, in every class; also, at a
+  smaller step of the size scale, the statement's subsection headings, and at a
+  larger one its document title \\
+\cmd{CDossierEntryTitleStyle} & the title line a \env{CDossierEntry} renders, in
+  the résumé and the CV \\
+\cmd{CDossierSubjectStyle} & a cover letter's subject line \\
+\cmd{CDossierBodyStyle} & running prose, and every line set as prose: the
+  contact line, an entry's organization, and the letter's date, recipient block,
+  salutation, closing, and signature name \\
+\cmd{CDossierMutedStyle} & the de-emphasised runs \opt{muted} governs \\
+\cmd{CDossierLinkStyle} & author-written anchor text under \opt{medium=screen};
+  the identity under \opt{medium=print} and inside \cmd{CDossierPlainLinks} \\
+\bottomrule
+\end{longtable}
+
+\cmd{CDossierEntryTitleStyle} and \cmd{CDossierSubjectStyle} resolve to the same
+shape today. That is two independent decisions agreeing, not one role with two
+names: redefining either leaves the other alone. Do not define one in terms of
+the other.
+
+\cmd{CDossierMutedStyle} and \cmd{CDossierLinkStyle} are published by the
+components package rather than the typography package, because each resolves to
+something the typography package does not own --- a colour and a rule
+respectively. Both are available in every document class. A document that wants
+a different link affordance redefines \cmd{CDossierLinkStyle}.
+
+Their visual definitions may evolve before \texttt{v1.0.0}.
+
+\subsection{Colour}
+
+The monochrome theme exposes four semantic tokens:
+
+\begin{latexcode}
+\CDossierTextColor
+\CDossierMutedColor
+\CDossierRuleColor
+\CDossierLinkColor
+\end{latexcode}
+
+\cmd{CDossierMutedColor} is gray 0.30, measured at 8.52:1 against white under
+the WCAG 2.1 relative-luminance formula. It is what \opt{muted=gray} and
+\opt{muted=both} render de-emphasised runs in; under \opt{muted=plain} or
+\opt{muted=italic} nothing uses it.
+
+Do not rely on the underlying colour names or values as stable API before
+\texttt{v1.0.0}.
+
+\section{Tagged structure}
+\label{sec:tagging}
+
+Tagged output is opt-in and off by default. It is enabled with the \LaTeX{}
+kernel's \cmd{DocumentMetadata}, which must appear \textbf{before}
+\cmd{documentclass}:
+
+\begin{latexcode}
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-resume}
+\end{latexcode}
+
+This introduces no CareerDossierTeX class option and no public command. The
+tagging interface is the kernel's, not this package's.
+
+When tagging is active the classes expose section headings, lists, paragraphs,
+and links as structure, and mark decorative rules, contact separators, and
+running page furniture as layout artifacts. When it is not active, output is
+unchanged from the untagged path. Under tagging, \cmd{CDossierSubsection} is a
+depth-3 heading role-mapped to \texttt{/H3}, opening a depth-3 division nested
+inside its section's.
+
+\paragraph{Scope of the claim.} Tagged output is a tested preview for five
+fixture profiles --- industry résumé, industry letter, academic CV, academic
+letter, and statement. It is \textbf{not} a PDF/UA, WCAG, ATS, or general
+accessibility conformance claim. The macOS VoiceOver reading-order pass covers
+four of the five; the statement fixture and Windows/NVDA remain
+screen-reader-unverified.
+
+\section{Errors and warnings}
+
+\subsection{Errors}
+
+Compilation stops for:
+
+\begin{itemize}
+  \item use under an unsupported engine;
+  \item an unsupported class-option value;
+  \item a missing required \key{name} when rendering identity content;
+  \item an unknown public field or label name;
+  \item a manual publication used outside \env{CDossierPublications};
+  \item a manual publication missing \key{authors} or \key{title};
+  \item an unknown manual-publication, publication-list, or preferred-author
+        key;
+  \item an unsupported \key{numbering} value;
+  \item a preferred-author declaration missing \key{family} or \key{given};
+  \item loading \file{careerdossier-biblatex} when BibLaTeX is unavailable;
+  \item malformed key-value input that cannot be interpreted safely.
+\end{itemize}
+
+A missing-BibLaTeX diagnostic names BibLaTeX and Biber, recommends building with
+latexmk after installation, and points to \env{CDossierPublications} as the
+dependency-free alternative. A missing Biber executable is reported by the
+standard toolchain rather than by a separate preflight.
+
+\subsection{Warnings}
+
+Warnings are raised for an unusually long contact field, a URL that cannot be
+normalized, an \key{orcid} value that does not have the shape of an ORCID iD,
+metadata overwritten by a later setup call, fields accepted but not displayed by
+the active class, and links degraded to plain text because \textsf{hyperref} is
+absent. Each explains the likely effect and the corrective action.
+
+\section{Complete examples}
+\label{sec:examples}
+
+\subsection{Résumé}
+
+\begin{latexcode}
+\documentclass{careerdossier-resume}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  location = {London, UK}
+}
+
+\begin{document}
+
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+
+\begin{CDossierEntry}[
+  title        = {Data Scientist},
+  organization = {Example Organization},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Developed a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}
+\end{latexcode}
+
+\subsection{Cover letter}
+
+\begin{latexcode}
+\documentclass{careerdossier-letter}
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+  location = {London, UK}
+}
+
+\CDossierLetterSetup{
+  recipient-name         = {Hiring Manager},
+  recipient-organization = {Example Organization},
+  subject                = {Application for the Data Scientist Position}
+}
+
+\begin{document}
+
+\MakeCDossierLetterhead
+
+I am writing to apply for the Data Scientist position.
+
+\MakeCDossierClosing
+
+\end{document}
+\end{latexcode}
+
+An academic cover letter is the same document with
+\cmd{documentclass}\texttt{[family=academic]}.
+
+\subsection{Academic CV}
+
+\begin{latexcode}
+\documentclass{careerdossier-cv}
+
+\CDossierSetup{
+  name    = {Ada Lovelace},
+  email   = {ada@example.com},
+  scholar = {kukA0LcAAAAJ},
+  orcid   = {0000-0002-1825-0097}
+}
+
+\begin{document}
+
+\MakeCDossierHeader
+
+\CDossierSection{Academic Appointments}
+
+\begin{CDossierEntry}[
+  title        = {Assistant Professor},
+  organization = {Example University},
+  location     = {Toronto, Ontario},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Research and teaching summary.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Publications}
+
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace and Jane Example},
+    title   = {A Demonstration Article},
+    venue   = {Journal of Examples},
+    date    = {2026},
+    doi     = {10.9999/example.2026.1}
+  }
+\end{CDossierPublications}
+
+\end{document}
+\end{latexcode}
+
+Education, appointments, research, teaching, grants, awards, presentations, and
+service all use \env{CDossierEntry}; there is no separate command per section
+type.
+
+\subsection{Statements}
+
+The default interest type needs only \key{name} and \key{email}:
+
+\begin{latexcode}
+\documentclass{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}}
+\begin{document}
+\MakeCDossierStatementHeader
+This statement introduces work and interests without a type-specific contract.
+\end{document}
+\end{latexcode}
+
+Research requires \key{affiliation}:
+
+\begin{latexcode}
+\documentclass[type=research]{careerdossier-statement}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.com},
+  affiliation={Example University}, orcid={0000-0002-1825-0097}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+My research develops reliable methods for computational inquiry.
+\end{document}
+\end{latexcode}
+
+Artist requires \key{website}:
+
+\begin{latexcode}
+\documentclass[type=artist]{careerdossier-statement}
+\CDossierSetup{
+  name={Ada Lovelace}, email={ada@example.com},
+  website={portfolio.example.com}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+My practice examines the relationship between material and computation.
+\end{document}
+\end{latexcode}
+
+Purpose may carry both an application context and an identifier:
+
+\begin{latexcode}
+\documentclass[type=purpose]{careerdossier-statement}
+\CDossierSetup{name={Ada Lovelace}, email={ada@example.com}}
+\CDossierStatementSetup{
+  application-context = {Application to the MSc in Computational Science},
+  application-id      = {12345678}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+I seek advanced study in reliable scientific computing.
+\end{document}
+\end{latexcode}
+
+The remaining types --- \opt{teaching}, \opt{teaching-philosophy}, and
+\opt{diversity} --- follow the interest example, differing only in the title
+their type selects.
+
+\section{Further reading}
+
+These live in the repository rather than in this manual, because each is about
+the project rather than about writing a document with it.
+
+\begin{longtable}{@{}lL{0.60\textwidth}@{}}
+\toprule
+\textbf{Document} & \textbf{Subject} \\
+\midrule
+\endhead
+\file{README.md} & overview, installation, and a short quick start \\
+\file{CHANGELOG.md} & release history and user-visible changes \\
+\file{docs/MIGRATION.md} & what changed between releases, and what needs a source edit \\
+\file{docs/ARCHITECTURE.md} & module boundaries, internal design, and the calibrated ratios behind the tokens \\
+\file{docs/ATS-EXTRACTION.md} & design guidance for ATS-safe output and text extraction \\
+\file{docs/ROADMAP.md} & release phases, non-goals, and what is deferred \\
+\file{docs/TESTING.md} & the test suites and coverage expectations \\
+\file{CONTRIBUTING.md} & issue, branch, commit, and pull-request workflow \\
+\bottomrule
+\end{longtable}
+
+Report a defect or propose a feature at
+\url{https://github.com/amirhs1/CareerDossierTeX/issues}.
+
+\end{document}
