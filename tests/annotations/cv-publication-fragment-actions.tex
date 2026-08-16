@@ -1,0 +1,41 @@
+% cv-publication-fragment-actions.tex — a `#' in a publication identifier
+% (issue #353).
+%
+% careerdossier-cv builds the publication list's \href itself rather than going
+% through the components chokepoint, so it applies the raw-`#' rewrite itself
+% and needs its own fixture: a change to the shared helper that missed this
+% call site would leave every contact-line link fixed and this one still
+% failing from inside hyperref.
+%
+% A URL with a fragment is ordinary in a publication list — a section anchor in
+% an online report, or a named view of a dataset — so both spellings appear
+% below, raw and escaped, and must produce the same address.
+%
+% See resume-fragment-actions.tex for why the *annotation* is the only place
+% the defect and the fix are distinguishable.
+%
+% URIEXPECT: mailto:ada@example.test
+% URIEXPECT: https://example.invalid/report#results
+% URIEXPECT: https://example.invalid/data#view
+\documentclass{careerdossier-cv}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name  = {Ada Lovelace},
+  email = {ada@example.test},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {A URL With a Raw Fragment},
+    url     = {example.invalid/report#results}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {A URL With an Escaped Fragment},
+    url     = {example.invalid/data\#view}
+  }
+\end{CDossierPublications}
+\end{document}
