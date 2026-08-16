@@ -765,9 +765,10 @@
   }
 
 %% Apply the typographic page-break penalties. Each class calls this after
-%% setting up the document and optionally adjusting the penalty tokens for
-%% the document family (e.g., CDossierClubPenalty and CDossierWidowPenalty
-%% to 4000 for continuous-prose documents).
+%% setting up the document. All four document families share the same
+%% forbidding club and widow values; the block comment on those tokens above
+%% records the measurement that rejected a discounted value for the
+%% continuous-prose classes.
 \NewDocumentCommand \CDossierApplyPageBreakPenalties { }
   {
     \brokenpenalty = \CDossierBrokenPenalty
