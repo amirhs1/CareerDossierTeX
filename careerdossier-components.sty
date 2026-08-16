@@ -1985,7 +1985,7 @@
 %% survived every suite -- see tests/metadata/run.sh, which now pins the two
 %% against each other.
 %%
-%% U+2013 is the spelling docs/API.md has always documented, and the one the
+%% U+2013 is the spelling the manual has always documented, and the one the
 %% default path has always shipped, so the tagged path was the side that was
 %% wrong. Naming it by code point keeps this file ASCII, which matters for a
 %% package that ships to CTAN; ^^^^ notation is the kernel's own way to do that
@@ -2045,7 +2045,7 @@
 %% only the two fields above. pdfsubject is the evidence it is not this
 %% package's to fix -- nothing here reads or writes it, and it diverges exactly
 %% like the two fields that are -- and `article' with `hyperref' and none of
-%% these classes loaded diverges identically too. docs/API.md documents the
+%% these classes loaded diverges identically too. The manual documents the
 %% behaviour and tests/metadata pins it, deliberately asserting that the two
 %% paths DISAGREE; if that pair ever fails, read its note before changing
 %% anything here.
@@ -2202,7 +2202,7 @@
 %% = false } and wins. The one case ordering cannot cover is the value arriving
 %% as a package option, via \PassOptionsToPackage before \documentclass: those
 %% are processed while hyperref loads, so this hook still runs last. See
-%% docs/API.md.
+%% doc/careerdossier.tex.
 %%
 %% Unlike the derived fields this is not gated on `name'. It carries no value of
 %% its own, and with no /Title in the file a viewer falls back to the filename

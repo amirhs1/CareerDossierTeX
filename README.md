@@ -3,9 +3,10 @@
 A reusable LuaLaTeX toolkit for producing consistent career documents from shared profile data.
 
 For people using the toolkit: what it supports today, how to install and build,
-and the options at a glance. [`docs/API.md`](docs/API.md) is the complete
-interface reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing
-the code.
+and the options at a glance. The PDF manual — `make manual`, or the
+`careerdossier.pdf` attached to a release — is the complete interface
+reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing the
+code.
 
 > **Status:** `v0.8.0 — Semantic Structure and Tagged Output` is the current
 > published release. A document's structure was visible on the page but largely
@@ -203,7 +204,7 @@ Save personal metadata in `examples/profiles/profile-english.tex`:
 
 Optional fields may be omitted. Contact separators should adjust automatically when a field is missing.
 
-`linkedin`, `github`, and `scholar` also accept a bare handle — `linkedin = {example}` displays and links `linkedin.com/in/example`. See [`docs/API.md`](docs/API.md) for the accepted forms per key.
+`linkedin`, `github`, and `scholar` also accept a bare handle — `linkedin = {example}` displays and links `linkedin.com/in/example`. See the manual for the accepted forms per key.
 
 ### 2. Create a résumé
 
@@ -252,8 +253,8 @@ sizes are one design at three scales rather than three separate designs.
 The prose classes default to `12pt` deliberately: at a one-inch margin that is
 the only body size whose full-measure line lands near the conventional 45–90
 character range. The résumé instead keeps `11pt,narrow` for one-page capacity,
-which runs long in full-width prose — see [`docs/API.md`](docs/API.md) for the
-measured figures and when to override it.
+which runs long in full-width prose — see the manual for the measured figures
+and when to override it.
 
 `medium` names the output context and decides whether page furniture is
 emitted. `print` is the default and keeps the running header and `Page N of M`
@@ -285,171 +286,36 @@ See the complete example in:
 examples/industry/resume-english.tex
 ```
 
-### 3. Create a cover letter
+### 3. The other document types
 
-```latex
-\documentclass{careerdossier-letter}
+The remaining classes follow the same shape — load a class, set the profile,
+render the header, write content. The manual walks each one through in full
+under "Complete examples"; the shipped examples are complete working documents:
 
-\input{examples/profiles/profile-english.tex}
+| Document | Class | Complete example |
+|---|---|---|
+| Cover letter | `careerdossier-letter` | [`examples/industry/letter-industry.tex`](examples/industry/letter-industry.tex) |
+| Academic cover letter | `careerdossier-letter`, `family=academic` | [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.tex) |
+| Academic CV | `careerdossier-cv` | [`examples/academic/cv-academic.tex`](examples/academic/cv-academic.tex) |
+| Academic CV with BibLaTeX | `careerdossier-cv` plus `careerdossier-biblatex` | [`examples/academic/cv-bibliography.tex`](examples/academic/cv-bibliography.tex) |
+| Statements, seven types | `careerdossier-statement` | [`examples/statements/`](examples/statements/) |
 
-\CDossierLetterSetup{
-  date                   = {\today},
-  recipient-name         = {Hiring Manager},
-  recipient-organization = {Example Organization},
-  recipient-address      = {Toronto, Ontario},
-  subject                = {Application for the Data Scientist Position},
-  salutation             = {Dear Hiring Manager,},
-  closing                = {Sincerely,}
-}
+Three things worth knowing before you open one:
 
-\begin{document}
+- `family=academic` changes a letter's document-type metadata, not its layout.
+  Both letter families use the same size, margin, prose rhythm, and continuation
+  furniture.
+- The CV adds a dependency-free publication list, `CDossierPublications`, and an
+  optional BibLaTeX and Biber profile in `careerdossier-biblatex`. A CV that does
+  not load that package builds without either tool.
+- A statement selects one of seven types with `type=`. Omit it for a statement of
+  interest, which requires only `name` and `email`; `type=research` also requires
+  profile `affiliation`, and `type=artist` profile `website`.
 
-\MakeCDossierLetterhead
-
-I am writing to apply for the Data Scientist position.
-
-% Continue the letter body here.
-
-\MakeCDossierClosing
-
-\end{document}
-```
-
-See the complete example in:
-
-```text
-examples/industry/letter-industry.tex
-```
-
-`family=academic` changes the letter's document-type metadata, not its layout.
-Both letter families use the same selected size, margin, prose rhythm, and
-shared continuation furniture.
-
-### 4. Create an academic CV
-
-The academic CV reuses the shared profile, section, entry, and list interfaces.
-It also provides a dependency-free manual publication list:
-
-```latex
-\documentclass[fontsize=12pt, margin=normal]{careerdossier-cv}
-
-\CDossierSetup{
-  name     = {Ada Lovelace},
-  headline = {Researcher in Analytical Computing},
-  scholar  = {scholar.google.com/citations?user=ada-example},
-  orcid    = {0000-0002-1825-0097}
-}
-
-\begin{document}
-\MakeCDossierHeader
-
-\CDossierSection{Academic Appointments}
-\begin{CDossierEntry}[
-  title        = {Research Fellow},
-  organization = {Example Institute},
-  dates        = {2024--Present}
-]
-  Research and teaching summary.
-\end{CDossierEntry}
-
-\CDossierSection{Selected Publications}
-\CDossierSubsection{Journal Articles}
-\begin{CDossierPublications}
-  \CDossierPublication{
-    authors = {Ada Lovelace and Grace Hopper},
-    title   = {Reliable Analytical Engines},
-    venue   = {Journal of Example Computing},
-    date    = {2026},
-    doi     = {10.9999/example.2026.1}
-  }
-\end{CDossierPublications}
-\end{document}
-```
-
-`\CDossierSubsection` is optional. It is the level between a section and an
-entry, for groups that are not themselves sections — `Publications` split into
-journal, conference, and preprint, or `Experience` into industry and academic —
-so a group need not be promoted to a ruled section of its own. It works the same
-way in the résumé class.
-
-The complete no-BibLaTeX example is
-[`examples/academic/cv-academic.tex`](examples/academic/cv-academic.tex).
-
-### 5. Opt in to BibLaTeX and Biber
-
-```latex
-\documentclass{careerdossier-cv}
-\usepackage{careerdossier-biblatex}
-
-\input{examples/profiles/profile-academic.tex}
-\addbibresource{publications.bib}
-\CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
-
-\begin{document}
-\MakeCDossierHeader
-\nocite{*}
-\printbibliography[title={Selected Publications}]
-\end{document}
-```
-
-This optional package uses the fixed `backend=biber`, `style=numeric`, and
-`sorting=ydnt` profile. See
-[`examples/academic/cv-bibliography.tex`](examples/academic/cv-bibliography.tex)
-and its fictional
-[`publications.bib`](examples/academic/publications.bib).
-
-### 6. Create an academic cover letter
-
-```latex
-\documentclass[family=academic]{careerdossier-letter}
-\input{examples/profiles/profile-academic.tex}
-
-\CDossierLetterSetup{
-  recipient-name         = {Professor Grace Hopper},
-  recipient-organization = {Example University},
-  subject                = {Application for Assistant Professor},
-  salutation             = {Dear Professor Hopper,}
-}
-
-\begin{document}
-\MakeCDossierLetterhead
-I am writing to apply for the Assistant Professor position.
-\MakeCDossierClosing
-\end{document}
-```
-
-See [`examples/academic/letter-academic.tex`](examples/academic/letter-academic.tex).
-
-### 7. Create a statement
-
-Use one class. Omit `type` for a statement of interest, or select an
-explicit type when its title and validation contract fit the document:
-
-```latex
-\documentclass[
-  type=research,
-  fontsize=12pt,
-  margin=normal
-]{careerdossier-statement}
-\input{examples/profiles/profile-academic.tex}
-
-\CDossierStatementSetup{
-  subtitle            = {Reliable scientific computing},
-  application-context = {Application for Assistant Professor},
-  application-id      = {APP-2026-0042}
-}
-
-\begin{document}
-\MakeCDossierStatementHeader
-\CDossierSection{Research Vision}
-My research develops reliable methods for computational inquiry.
-\end{document}
-```
-
-Statements of interest require only `name` and `email`. Research statements
-also require profile `affiliation`; artist statements also require profile
-`website`. Complete two-page examples for all six specialized types live in
-[`examples/statements/`](examples/statements/).
+`\CDossierSubsection` is available in the résumé and the CV as the level between
+a section and an entry — `Publications` split into journal, conference, and
+preprint, or `Experience` into industry and academic — so a group need not be
+promoted to a ruled section of its own.
 
 ## Tagged PDF (opt-in preview)
 
@@ -529,6 +395,12 @@ All eleven examples may also be built with the repository `Makefile`:
 make
 ```
 
+The manual is built the same way, and lands in `build/manual/`:
+
+```bash
+make manual
+```
+
 Run `make help` for the full target list.
 
 A configuration is supported only after its examples compile locally and in GitHub Actions.
@@ -576,7 +448,8 @@ gate, not the stage where feature tests are first created. See
 
 ## Documentation
 
-- [`docs/API.md`](docs/API.md): public commands, keys, environments, defaults, and errors
+- [`doc/careerdossier.tex`](doc/careerdossier.tex): the PDF manual — public classes, options, keys, commands, environments, tokens, and errors. Build it with `make manual`, or take `careerdossier.pdf` from a release
+- [`docs/API.md`](docs/API.md): where that manual is, and the interface stability policy
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): module boundaries and internal design
 - [`docs/ROADMAP.md`](docs/ROADMAP.md): release phases and planned features
 - [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
@@ -589,7 +462,7 @@ gate, not the stage where feature tests are first created. See
 - [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md): the per-release gate and the CTAN packaging requirements
 - [`CHANGELOG.md`](CHANGELOG.md): release history and user-visible changes
 
-Only behavior documented in `docs/API.md` and covered by the relevant tests and
+Only behavior documented in the manual and covered by the relevant tests and
 supported examples should be treated as supported.
 
 ## Releases

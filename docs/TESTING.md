@@ -785,14 +785,14 @@ It checks three fields, one of each kind that exists. `pdftitle` and
 `pdfauthor` are the two the package would have to rewrite for a workaround to
 reach them. `pdfsubject` is the third and the load-bearing one: nothing in
 `careerdossier-components` reads or writes it, yet it diverges identically, so
-it is the measurement behind `docs/API.md`'s claim that the cause is upstream
+it is the measurement behind the manual's claim that the cause is upstream
 rather than anything the classes do. (`pdfkeywords` behaves as `pdfsubject`
 does and is left out — a fourth field would cost the same build and prove the
 same point.)
 
 It is written to retire itself. If `hyperref` or the kernel ever converges the
 two paths, this pair fails, and that failure is a notification rather than a
-regression: `docs/API.md` would then be documenting behaviour that no longer
+regression: the manual would then be documenting behaviour that no longer
 happens. The repair at that point is to delete the pair and correct the
 document — never to make the package converge the values itself, which is the
 option #442 declined.
@@ -1093,6 +1093,48 @@ the lint was trusted. It is not a general GitHub-compatible implementation and
 should not claim to be; when a heading uses punctuation it does not know, teach
 the derivation rather than delete the check.
 
+### Manual-name lint
+
+The PDF manual became the authored interface reference in `v0.9.0` (#263), and
+two of that issue's acceptance criteria are assertions rather than prose: every
+public name it documents exists in the source, and no private name appears.
+Neither is checkable by compiling it. A manual documenting
+`\CDossierSubsectoin`, or still documenting a command deleted two releases ago,
+typesets perfectly and reads as authoritative — LaTeX never sees those names as
+names, only as words in a document.
+
+```bash
+tests/lint/run-manual-names.sh
+```
+
+It reads `doc/careerdossier.tex` as text and asserts three things: that no
+`\__cdossier_` name appears; that every `\CDossier…`, `\MakeCDossier…`, and
+`CDossier…` environment it mentions occurs in a file `manifest.txt` lists
+under "The Work"; and that the release the manual declares, and the one
+`README.md`'s "current release" block declares, both match the Work's
+`\ProvidesExpl*` declarations.
+
+The name check is deliberately weak: it asks whether a name occurs in the Work
+at all, not whether it occurs in a *definition*. A stricter form would have to
+know every way expl3, xparse, and the kernel can bind a name and would fail on
+the ones it did not know — reporting its own gaps as the manual's, which is
+#398's failure mode. The weak form still catches both failures that happen: a
+name misspelled in the manual, and a name removed from the source while the
+manual keeps it.
+
+The release check is the second half of a separate finding.
+`run-version-declarations.sh` checks the `.sty`/`.cls` declarations against
+`manifest.txt`, and nothing checked
+the documentation, which named the release in two further places; the manual
+would have made a third. Only declarations are checked, and deliberately:
+`docs/MIGRATION.md` mentions many versions in prose, so a grep there would match
+history and fail on nothing useful.
+
+Five fixtures, `tests/lint/fixtures/manualfixture-*.tex`, hold one manual per
+verdict — correct, private name, unknown name, wrong version, and a file the
+extraction finds nothing in — so a lint that had stopped detecting anything
+fails there rather than passing everything.
+
 The `lint` target runs two more scripts in the same slot:
 
 ```bash
@@ -1222,8 +1264,8 @@ worth.
 
 The parallel path was opt-in when it arrived in #378 and became the gate in
 #399. The argument for keeping the gate serial had been that `check` is the
-CI-aligned entry point — but `.github/workflows/build.yml` runs sixteen jobs on
-sixteen runners with no `needs:` anywhere, so CI's execution model is fully
+CI-aligned entry point — but `.github/workflows/build.yml` runs seventeen jobs
+on seventeen runners with no `needs:` anywhere, so CI's execution model is fully
 concurrent and fully isolated, and local serial `check` was the one execution
 model nothing else in the project used. What "CI-aligned" buys is the same
 target set and the same commands, and both paths still dispatch
@@ -1381,7 +1423,8 @@ Four honest bounds on the speedup itself:
    once per edit — the development loop should be using `FIXTURE=`/`TEST=`
    scoping, which takes the full layout suite from 95.1 s to 1.8 s.
 3. **CI gains nothing from it.** `.github/workflows/build.yml` already runs one
-   suite per job across roughly sixteen jobs. This is a local convenience only,
+   suite per job across roughly seventeen jobs. This is a local convenience
+   only,
    and #399 changed no CI file.
 4. **The saving only counts because it lands on the gate.** #378 and #390 were
    both justified by making a change cheaper to verify, and both left the gate

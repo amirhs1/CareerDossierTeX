@@ -10,6 +10,21 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Added
 
+- A PDF manual, `doc/careerdossier.tex`, is the toolkit's interface reference,
+  and `make manual` builds it into `build/manual/`. It documents every public
+  class, option, key, command, environment, and design token, with its accepted
+  values and default, in one 39-page document. CTAN requires PDF documentation
+  together with its source, and this is the last of its requirements this
+  project did not meet. ([#263])
+
+  The PDF is a build artifact and is not tracked, like every other one here; the
+  release archive ships it beside its source, and `manifest.txt` lists that
+  source under "Distributed with the Work". A CI job builds the manual on every
+  pull request, so one that stops compiling fails a check rather than a release.
+
+  **Documentation only** — no class, option, key, command, token, or rendered
+  output changed.
+
 - `README.md` gains an `## Installation` section covering the three routes onto
   a path where `\documentclass{careerdossier-resume}` resolves: beside the
   document, a local `texmf` tree, and Overleaf. Nothing in the repository had
@@ -177,6 +192,44 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   is the shipped behaviour.
 
 ### Changed
+
+- **`docs/API.md` is now a pointer rather than the interface reference.** The
+  manual above supersedes it: what is left is where to find the manual, how to
+  build it, and the interface stability policy, which binds a contributor
+  changing the interface rather than an author using it. Every other section
+  moved into the manual. ([#263])
+
+  Two documents describing one interface is the duplication [#259] exists to
+  stop, and it had already cost this project once — [#185] found ten sentences
+  left stale across three documents after the `v0.7.0` retune, one of them
+  documenting a recipe that restored half the spacing it claimed to remove. A
+  PDF manual as the reference is also the ordinary shape for a LaTeX package.
+  What it costs a reader of this repository on the web is the inline, browsable
+  reference; `README.md` links the built PDF and `docs/API.md` says how to get
+  one.
+
+  Fifty-three references across nine files were retargeted. `CHANGELOG.md`'s own
+  references are historical and stay as they are, except that two of them
+  carried a section anchor into a file that no longer has that section — those
+  two now link to the file without the anchor, so `make lint` still resolves
+  every Markdown anchor in the tree.
+
+- `README.md`'s quick start covers the shared profile and the résumé, then
+  names the other five document types with their shipped examples in a table.
+  It used to walk through all seven, which the manual now does in full.
+  ([#263])
+
+- `make lint` gains a seventh script, `tests/lint/run-manual-names.sh`. It fails
+  the build when the manual documents a private LaTeX3 name, when it documents a
+  public name that appears in no file of the Work, or when the release the
+  manual and `README.md` declare disagrees with the one the Work declares.
+  ([#263])
+
+  Neither of the first two is checkable by compiling the manual: a manual
+  documenting `\CDossierSubsectoin`, or a command deleted two releases ago,
+  typesets perfectly and reads as authoritative. The third extends #258's
+  version lint, which checked the `.sty`/`.cls` declarations and nothing in the
+  documentation, to the two places the documentation declares a release.
 
 - `make check` runs its eleven targets four at a time and is still the pre-push
   gate; `make check-serial` runs the same eleven one after another. `JOBS=N`
@@ -508,6 +561,9 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
 [#398]: https://github.com/amirhs1/CareerDossierTeX/issues/398
 [#399]: https://github.com/amirhs1/CareerDossierTeX/issues/399
+[#185]: https://github.com/amirhs1/CareerDossierTeX/issues/185
+[#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
+[#263]: https://github.com/amirhs1/CareerDossierTeX/issues/263
 [#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
 [#405]: https://github.com/amirhs1/CareerDossierTeX/issues/405
 [#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
@@ -757,7 +813,7 @@ similar entry today. See
 
   `\CDossierEntryTitleStyle` keeps its name, its definition, and its use in
   entry headings. The published role list in
-  [`docs/API.md`](docs/API.md#typography-roles) now says where each role
+  [`docs/API.md`](docs/API.md) now says where each role
   applies.
 
 - Under `medium=screen`, a link an author writes with their own anchor text is
@@ -789,7 +845,7 @@ similar entry today. See
   rebuild words from glyph geometry, and PDF/UA-2 validation still passes — but
   the tagged structure tree loses the space, so a screen reader announces
   `publicwrite-up`. `lua-ul` is LuaLaTeX-only, which costs nothing here, and
-  LPPL 1.3c. See [`docs/API.md`](docs/API.md#medium) for the option and
+  LPPL 1.3c. See [`docs/API.md`](docs/API.md) for the option and
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) for the measurements.
 
 - The `linkedin`, `github`, and `scholar` profile keys accept a bare handle or

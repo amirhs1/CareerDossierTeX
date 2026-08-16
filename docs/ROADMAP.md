@@ -3,7 +3,7 @@
 Release scope, phase boundaries, and explicit non-goals — what each release is
 for, and what it deliberately excludes. **Nothing here is a support statement.**
 A feature described in a planned phase does not exist yet; `README.md` and
-[`API.md`](API.md) describe what is actually released.
+the PDF manual describe what is actually released.
 
 ## Product direction
 
@@ -110,7 +110,8 @@ Understand and preserve the strongest existing résumé and cover-letter impleme
 - record dependencies and public commands;
 - identify duplicated code;
 - begin `docs/MIGRATION.md`;
-- define the initial public interface in `docs/API.md`.
+- define the initial public interface (in `docs/API.md`, which `v0.9.0` replaced
+  with the PDF manual).
 
 ### Completion condition
 
@@ -364,7 +365,7 @@ needs side margins near 1.68 in, which no career-services guidance endorses.
 
 **Known accepted limitation:** the résumé default is the longest measure in the
 project, accepted for one-page capacity rather than overlooked. It is stated
-for authors in `docs/API.md`, with the rationale in `docs/ARCHITECTURE.md`.
+for authors in the manual, with the rationale in `docs/ARCHITECTURE.md`.
 
 ### Explicit non-goals
 
