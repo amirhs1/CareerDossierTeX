@@ -258,6 +258,41 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A `--` you type yourself now reaches the PDF `/Title` and `/Author` spelled the
+  same way on both build paths. A `name` of `Ada Lovelace--Byron` shipped
+  `Ada Lovelace–Byron` without `\DocumentMetadata` and `Ada Lovelace--Byron`
+  with it, so turning tagging on changed the name a viewer displays and a screen
+  reader announces. The en dash — what the default path has always produced — is
+  now what both produce. ([#439])
+
+  This is the half [#428] left out of scope. That entry removed the package's own
+  `--` from the derived string by naming the separator as the character it is;
+  that cannot reach a `--` arriving from your profile, because the package does
+  not choose how you spell your own name. Every class is affected, and a
+  statement's `title` is covered too, since it becomes the document type in front
+  of the name.
+
+  Four TeX input ligatures are converted, and `docs/API.md` now lists them:
+  `--`, `---`, `` !` ``, and `` ?` ``. ` `` ` and `''` are **not** among them —
+  measured, not assumed — and reach the PDF as the ASCII characters you typed on
+  both paths, as they always did.
+
+  Values you set yourself are unchanged and still follow `hyperref`'s own
+  behaviour, which does differ between the paths; `docs/API.md` records that
+  under "Overriding the derived metadata". Rewriting them would mean overriding
+  the pass-through [#440] just established, so the package leaves them alone;
+  that residue is tracked as [#442]. `pdfsubject`, which this package never
+  reads or writes, diverges the same way, which is what places it upstream.
+
+  `make metadata` gains a fixture pair carrying a double-barrelled name and
+  requiring the two paths to agree on `/Title` *and* `/Author`, which are
+  different routes out of `name`. The conversion table itself, including the two
+  sequences that must stay unconverted, is pinned in
+  `tests/regression/components-pdfmeta.lvt`.
+
+  **Metadata only.** No class, option, key, command, token, or default changed,
+  and nothing rendered on the page moves.
+
 - A document's own `\hypersetup{pdftitle=…, pdfauthor=…}` now survives on the
   tagged build path. Under `\DocumentMetadata` both fields were discarded and
   replaced by the values derived from the profile, so a document asking for
@@ -280,11 +315,10 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   to reach the PDF, tagged and untagged. The default half is not redundant: it
   is what would catch a repair that traded one path for the other.
 
-  A separate difference remains and is tracked in [#439] — a `--` you type
-  yourself still reaches `/Title` as an en dash on the default path and as two
-  hyphens on the tagged one. That is about how your text is spelled, not about
-  whether it arrives, and the fixtures here use plain ASCII so the two questions
-  stay apart.
+  A separate difference — how a `--` you type yourself is spelled on each path —
+  was tracked in [#439] and is fixed in this same release; see its entry above.
+  That is about how your text is spelled, not about whether it arrives, and the
+  fixtures here keep to plain ASCII so the two questions stay apart.
 
   **Metadata only.** No class, option, key, command, token, or default changed,
   and nothing rendered on the page moves.
@@ -478,6 +512,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#428]: https://github.com/amirhs1/CareerDossierTeX/issues/428
 [#439]: https://github.com/amirhs1/CareerDossierTeX/issues/439
 [#440]: https://github.com/amirhs1/CareerDossierTeX/issues/440
+[#442]: https://github.com/amirhs1/CareerDossierTeX/issues/442
 
 ## [0.8.0] - 2026-08-12
 

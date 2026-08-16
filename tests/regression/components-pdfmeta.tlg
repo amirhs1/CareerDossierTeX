@@ -36,62 +36,82 @@ TEST 7: title-without-doctype-is-bare-name
 [Ada Lovelace]
 ============================================================
 ============================================================
-TEST 8: displaydoctitle-asks-hyperref-for-true
+TEST 8: title-converts-tex-input-ligatures
+============================================================
+[a–b]
+[a—b]
+[a—-b]
+[^^a1a^^bfb]
+============================================================
+============================================================
+TEST 9: title-leaves-quotes-and-guillemets-alone
+============================================================
+[``a'']
+[<<a>> ,,b]
+[a-b]
+============================================================
+============================================================
+TEST 10: title-converts-ligatures-in-the-doctype-too
+============================================================
+[Testdoc – Draft – Ada Lovelace]
+============================================================
+============================================================
+TEST 11: displaydoctitle-asks-hyperref-for-true
 ============================================================
 hypersetup: pdfdisplaydoctitle=true
 ============================================================
 ============================================================
-TEST 9: pdfmeta-writes-title-author-and-lang
+TEST 12: pdfmeta-writes-title-author-and-lang
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
-hypersetup: pdfauthor={\CDossierFieldValue {name}}
+hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
 hypersetup: pdflang=en
 ============================================================
 ============================================================
-TEST 10: pdfmeta-keeps-user-pdflang
+TEST 13: pdfmeta-keeps-user-pdflang
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
-hypersetup: pdfauthor={\CDossierFieldValue {name}}
+hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
 ============================================================
 ============================================================
-TEST 11: pdfmeta-keeps-documentmetadata-lang
+TEST 14: pdfmeta-keeps-documentmetadata-lang
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
-hypersetup: pdfauthor={\CDossierFieldValue {name}}
+hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
 ============================================================
 ============================================================
-TEST 12: kernel-info-without-accessor-reads-as-unset
-============================================================
-Info/Title -> unset
-============================================================
-============================================================
-TEST 13: kernel-info-no-value-reads-as-unset
+TEST 15: kernel-info-without-accessor-reads-as-unset
 ============================================================
 Info/Title -> unset
 ============================================================
 ============================================================
-TEST 14: kernel-info-empty-value-reads-as-unset
+TEST 16: kernel-info-no-value-reads-as-unset
 ============================================================
 Info/Title -> unset
 ============================================================
 ============================================================
-TEST 15: kernel-info-value-reads-as-user-supplied
+TEST 17: kernel-info-empty-value-reads-as-unset
+============================================================
+Info/Title -> unset
+============================================================
+============================================================
+TEST 18: kernel-info-value-reads-as-user-supplied
 ============================================================
 Info/Title -> user-supplied
 ============================================================
 ============================================================
-TEST 16: kernel-info-is-read-per-key
+TEST 19: kernel-info-is-read-per-key
 ============================================================
 Info/Author -> unset
 ============================================================
 ============================================================
-TEST 17: pdfmeta-keeps-kernel-info-title
+TEST 20: pdfmeta-keeps-kernel-info-title
 ============================================================
-hypersetup: pdfauthor={\CDossierFieldValue {name}}
+hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
 hypersetup: pdflang=en
 ============================================================
 ============================================================
-TEST 18: pdfmeta-keeps-kernel-info-author
+TEST 21: pdfmeta-keeps-kernel-info-author
 ============================================================
 hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
 hypersetup: pdflang=en

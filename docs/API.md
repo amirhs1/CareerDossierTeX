@@ -946,6 +946,31 @@ tagged path wrote two hyphens there instead; nothing else about the derived
 metadata differed between the paths, and nothing a document sets itself is
 affected.
 
+### TeX input ligatures in a derived value
+
+Text you supply is TeX input, so the usual input ligatures apply to it on the
+way into the PDF. A `name` of `{Ada Lovelace--Byron}` reaches `/Title` and
+`/Author` as `Ada Lovelace–Byron`, with an en dash, and the same holds for a
+statement's `title`, which becomes the document type:
+
+| You type | The PDF carries |
+|---|---|
+| `--` | – (en dash, U+2013) |
+| `---` | — (em dash, U+2014) |
+| ``!` `` | ¡ |
+| ``?` `` | ¿ |
+
+Nothing else is converted. In particular ` `` ` and `''` are **not** turned into
+curly quotes in a metadata string — they arrive as the two ASCII characters you
+typed. Type the character itself if you want one: `{Ada Lovelace–Byron}` in a
+UTF-8 source works and is unambiguous.
+
+This holds on both build paths, which it did not before `v0.9.0`: the tagged
+path left a `--` in your own text as two hyphens while the default path
+converted it. Only values this package derives are covered — see
+[Overriding the derived metadata](#overriding-the-derived-metadata) for what
+happens to a value you set yourself.
+
 When `name` is absent, `/Title` and `/Author` are left unset.
 `\MakeCDossierHeader` and `\MakeCDossierLetterhead` already error on a missing
 `name`; metadata does not add a second diagnostic.
@@ -1020,6 +1045,24 @@ The one place that does not reach is a value passed as a package option — with
 
 Other `hyperref` metadata (`pdfsubject`, `pdfkeywords`, …) is untouched; set it
 with `\hypersetup` as usual.
+
+A value you set yourself does not get the input-ligature handling described
+under [TeX input ligatures in a derived value](#tex-input-ligatures-in-a-derived-value),
+because this package never rewrites it. It follows `hyperref`'s own behaviour,
+and that behaviour differs between the two build paths: `hyperref` converts on
+the default path, and under `\DocumentMetadata` your value goes to the LaTeX
+kernel instead and arrives as typed. So
+
+```latex
+\hypersetup{ pdftitle = {Résumé -- Ada Lovelace} }
+```
+
+gives an en dash without `\DocumentMetadata` and two hyphens with it. The same
+applies to `pdfsubject` and `pdfkeywords`, which this package never sees at all.
+This is upstream behaviour rather than something the classes choose, and the
+package does not work around it: doing so would mean rewriting values it
+deliberately passes through untouched. Type the character you want — `–` — and
+both paths agree.
 
 ## Public commands
 

@@ -273,6 +273,60 @@ else
 fi
 echo
 
+echo "== a user's own '--' is spelled the same on both paths =="
+# Issue #439, and the half #428 left out of scope. That one removed the
+# package's own `--' from the derived string; this one is about a `--' the
+# package did not write and only composes in, which no change to the builder's
+# own spelling can reach.
+#
+# Both routes out of `name' are checked, because they are different code paths
+# into the Info dictionary and only one of them goes through the title builder:
+# /Title carries the name behind a doctype, /Author carries it alone. A fix
+# applied to the builder alone would pass the first and fail the second.
+#
+# The expected strings are built here from their parts rather than copied out of
+# a build, so neither can pass by agreeing with whatever the package currently
+# emits. `2013' is EN DASH, the spelling docs/API.md documents and the one the
+# default path has always shipped; ascii_utf16be_hex is ASCII-only, hence the
+# splice.
+en_dash_hex=2013
+expected_ligature_title_hex="\
+$(ascii_utf16be_hex 'Cover Letter ')$en_dash_hex\
+$(ascii_utf16be_hex ' Metadata Fixture')$en_dash_hex\
+$(ascii_utf16be_hex 'Twin')"
+expected_ligature_author_hex="\
+$(ascii_utf16be_hex 'Metadata Fixture')$en_dash_hex$(ascii_utf16be_hex 'Twin')"
+
+ligature_default_title=""
+ligature_tagged_title=""
+ligature_default_author=""
+ligature_tagged_author=""
+for job in letter-ligature-default letter-ligature-tagged; do
+  if compile_fixture "$job.tex" "$job"; then
+    read_info "$job" Title "$expected_ligature_title_hex" &&
+      eval "ligature_${job#letter-ligature-}_title=\"\$(cat '$work/$job.Title')\""
+    read_info "$job" Author "$expected_ligature_author_hex" &&
+      eval "ligature_${job#letter-ligature-}_author=\"\$(cat '$work/$job.Author')\""
+  fi
+done
+# Stated in its own right, as for #428 above: "both wrong in the same way" and
+# "the two disagree" are different defects, and this suite should say which one
+# it is looking at rather than leave it to be inferred from the two checks
+# above.
+for key in title author; do
+  eval "d=\$ligature_default_$key; t=\$ligature_tagged_$key"
+  if [ -n "$d" ] && [ -n "$t" ]; then
+    if [ "$d" = "$t" ]; then
+      echo "  both paths agree on /$key"
+    else
+      record_failure "the two build paths spell a user's '--' differently in /$key"
+    fi
+  else
+    record_failure "one of the two paths produced no /$key to compare"
+  fi
+done
+echo
+
 echo "== a document's own /Title and /Author survive on both paths =="
 # Issue #440, and the counterpart to the section above: that one is about the
 # value this package derives, this one about the value it must not derive.
