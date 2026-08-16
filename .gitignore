@@ -61,6 +61,14 @@
 # --- Secrets, local preferences, and private personal data ---
 CLAUDE.local.md
 .claude/settings.local.json
+# Agent worktrees. Claude Code's own worktree isolation checks a branch out
+# under .claude/worktrees/<name>/, which git reports as an untracked directory
+# in the parent checkout. The tooling writes the same pattern into
+# .git/info/exclude, but that file is per-clone and is never committed, so
+# without this line a fresh clone or a second machine surfaces the directory
+# again. The contents are a checkout, not source: the branch is the artifact
+# worth keeping, and the worktree is removed when the session ends.
+.claude/worktrees/
 .env
 *.local
 secrets/
