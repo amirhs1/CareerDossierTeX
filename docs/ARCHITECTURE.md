@@ -3,7 +3,8 @@
 For people changing the code: which module owns which concern, why the
 boundaries fall where they do, and how the pieces load. It is the reference for
 deciding *where* a change belongs. What each public name does belongs in
-[`API.md`](API.md); this file does not restate it.
+the PDF manual, [`../doc/careerdossier.tex`](../doc/careerdossier.tex); this
+file does not restate it.
 
 ## Purpose
 
@@ -435,7 +436,7 @@ statement heading would quietly become run-in.
 
 This chapter is the one place in `docs/` that derives the composition rules
 below, the per-family header below-gap that follows from them, and the `\@xsect`
-run-in floor under the statement's heading scale. `docs/API.md` states what each
+run-in floor under the statement's heading scale. The manual states what each
 rule costs an author overriding a token, and `docs/MIGRATION.md` states what a
 particular release requires of a document; both link here rather than repeat the
 reasoning. That matters because the reasoning quotes calibrated ratios and the
@@ -783,7 +784,7 @@ approach the full measure — but it is real in a full-width Summary paragraph,
 and it was accepted knowing that. Do not narrow the résumé's default measure
 without revisiting the capacity argument; it is an accepted limitation, not an
 oversight to correct. The measured figures, and the advice on when an author
-should override it, are in `docs/API.md`.
+should override it, are in the manual.
 
 #### Page-break penalties
 
@@ -919,7 +920,7 @@ the paragraphs above establish for the parameters it sits beside: the penalty
 here is binary, so there is no value to choose and a named integer would
 advertise a dial the page builder never consults. It is not shared either,
 because the boundary is not shared: no other class emits two one-line paragraphs
-that have to paginate as one. `docs/API.md` states it as a contract of
+that have to paginate as one. The manual states it as a contract of
 `\MakeCDossierClosing`.
 
 #### Hyphenation
@@ -1274,10 +1275,10 @@ wrappers interleave conditionals between lines, so the begin/end pair is no
 harder to misuse and the triple translates the existing primitives verbatim.
 
 How the triple meets the four public-API conditions above (#252): it is named
-and documented in `docs/API.md`, covered by `components-headerstack.lvt`, and
+and documented in the manual, covered by `components-headerstack.lvt`, and
 introduced in the changelog. The "used by a supported example" condition is met
 by the two wrappers, which exercise it on every build of every class, plus a
-worked example in `docs/API.md` compiled as
+worked example in the manual compiled as
 `tests/smoke/components-header-stack-doc.tex`. Deliberately **no** new document
 under `examples/`: that directory is user documentation for people writing
 dossiers, and this is a composition interface for whoever writes the class. A
@@ -1385,7 +1386,7 @@ have to wait. It is therefore requested from the `package/hyperref/after` hook,
 where it precedes every preamble line the document writes, and both drivers
 honour the last write — which reverses the precedence mechanism, from detection
 to ordering, while keeping the same outcome. The limits of that are recorded in
-[`API.md`](API.md).
+the PDF manual.
 
 This module does not load `hyperref` (the classes own it), so the entry points
 are guarded and the package still loads without it, matching how the link
@@ -1570,7 +1571,7 @@ Responsibilities:
 
 - load `biblatex` only when the user opts into this package;
 - configure the fixed numeric, Biber-backed, year-descending profile documented
-  in `docs/API.md`;
+  in the manual;
 - expose repeatable author-highlighting declarations;
 - implement DOI, then e-print, then URL display precedence;
 - reuse semantic monochrome typography and link tokens;
@@ -1644,7 +1645,8 @@ a late, confusing font error appears. LuaLaTeX is the supported engine.
 
 ### Public API
 
-Public commands, options, keys, and environments are documented in `docs/API.md`.
+Public commands, options, keys, and environments are documented in the PDF
+manual, `doc/careerdossier.tex`.
 
 Two properties matter for extraction: the implementation emits stored keys in
 one documented canonical order regardless of input order, and it omits absent
@@ -1724,7 +1726,7 @@ cdossier/biblatex
 
 Avoid one global key family that mixes profile fields, typography, page geometry, and future language settings.
 
-`docs/API.md` lists each class's accepted option values and defaults. The design
+The manual lists each class's accepted option values and defaults. The design
 rules matter more than the syntax:
 
 - documented defaults are predictable;
@@ -1968,8 +1970,10 @@ CareerDossierTeX/
 │   │   ├── letter-academic.tex
 │   │   └── publications.bib
 │   └── statements/           (one example per statement type)
+├── doc/
+│   └── careerdossier.tex     (the user manual; `make manual' builds it)
 ├── docs/
-│   ├── API.md
+│   ├── API.md                (where the manual is, and the stability policy)
 │   ├── ARCHITECTURE.md
 │   ├── ATS-EXTRACTION.md
 │   ├── MIGRATION.md
@@ -2246,7 +2250,7 @@ Before tagging a release:
 
 - affected examples compile locally;
 - CI passes on `main`;
-- `docs/API.md` matches implementation;
+- the manual matches implementation;
 - `CHANGELOG.md` is updated;
 - version strings are correct;
 - the working tree is clean.

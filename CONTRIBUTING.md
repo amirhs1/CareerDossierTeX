@@ -14,7 +14,8 @@ This project uses focused issues, short-lived branches, pull requests, repeatabl
 Read:
 
 - [`README.md`](README.md) for current support;
-- [`docs/API.md`](docs/API.md) for the public interface;
+- the PDF manual, [`doc/careerdossier.tex`](doc/careerdossier.tex), for the
+  public interface — build it with `make manual`;
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for module boundaries;
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) for release scope;
 - [`docs/MIGRATION.md`](docs/MIGRATION.md) before renaming public features;
@@ -531,13 +532,20 @@ documenting, and testing it.
 
 Update documentation in the same pull request as the related behavior.
 
-### Update `API.md` when:
+### Update the manual (`doc/careerdossier.tex`) when:
 
 - a public command is added, changed, or removed;
 - a class option or setup key changes;
 - a default changes;
 - validation behavior changes;
 - a public warning or error changes meaningfully.
+
+The manual is the interface reference; `docs/API.md` is a pointer to it plus the
+stability policy (#263). Build it with `make manual`, and read the built PDF
+rather than the source before deciding the wording reads correctly.
+`make lint` fails if the manual documents a private LaTeX3 name, documents a
+public name that appears in no file of the Work, or declares a release the Work
+does not.
 
 ### Update `ARCHITECTURE.md` when:
 
@@ -758,9 +766,14 @@ branch protection, so read it with `gh api repos/<owner>/<repo>/rulesets` rather
 than from the older branch-protection endpoint or from this paragraph. As last
 derived, it requires a pull request, allows all three merge methods, requires
 **zero** approving reviews, forbids deletion and non-fast-forward pushes, and
-requires every one of the workflow's sixteen job contexts to pass against an
-up-to-date branch. Green CI is therefore the merge gate; a branch that is not
-close-out complete when it goes green is one that can be merged incomplete.
+requires sixteen named job contexts to pass against an up-to-date branch. Green
+CI is therefore the merge gate; a branch that is not close-out complete when it
+goes green is one that can be merged incomplete.
+
+Sixteen is the ruleset's list, not the workflow's job count: `manual` was added
+to `.github/workflows/build.yml` by #263 and is deliberately not required yet,
+per the rule below. Read the ruleset for the current list rather than counting
+jobs.
 
 Do not require a status check in the ruleset until that check has completed
 successfully at least once. Once it has, delete the "this is a new check"
@@ -817,7 +830,7 @@ Release preparation should verify:
   declare the same version and date as each other, so a bump that missed one is
   caught, but nothing checks the pair against the tag you are about to cut;
 - `README.md` reflects current support;
-- `API.md` matches implementation;
+- the manual matches implementation;
 - `CHANGELOG.md` is updated;
 - GitHub Release notes are drafted;
 - `LICENSE` and `manifest.txt` remain accurate;

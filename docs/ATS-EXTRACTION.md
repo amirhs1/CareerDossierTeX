@@ -4,7 +4,7 @@
 
 **Status:** Design and reference material — describes the engineering contract the
 package is built toward. It is **not** documentation of shipped behavior; only
-`docs/API.md` and the compiled examples describe what is currently supported.
+The PDF manual and the compiled examples describe what is currently supported.
 **Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
 sections that discuss XeTeX behavior are retained as rationale and history, and
 are marked as such.
@@ -12,7 +12,7 @@ are marked as such.
 cover-letter families, academic CV, statement documents, and optional publication
 support; US Letter (default) and opt-in A4, monochrome, LuaLaTeX, and opt-in
 tagged structure. The statement class supports a default statement of interest
-plus six other statement types — see `docs/API.md` and `docs/ROADMAP.md`. Every
+plus six other statement types — see the manual and `docs/ROADMAP.md`. Every
 class accepts the calibrated `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`
 options plus `medium=print|screen`, which decides whether page furniture is
 emitted at all, and `muted=plain|italic|gray|both`, which decides how an entry's
@@ -354,7 +354,7 @@ This does not change the calibration. `column` is the default, the committed
 `0.25` is unchanged, and `tokens-invariants` still guards it; a document buys
 the lower edge by selecting `inline` and setting the token itself, and gets no
 warning if it sets the token without the option. See
-[`API.md`](API.md) for the option and the separator token.
+the manual for the option and the separator token.
 
 On the tagged path the two values are equivalent. The separator is emitted as a
 layout artifact, as the contact line's `|` is, so the structure element text
@@ -812,7 +812,7 @@ in a justified paragraph with nothing measuring it, so a long address written as
 plain text is *hyphenated*: the pasted URL then carries an inserted hyphen that
 was never part of it, and no word-boundary check sees anything wrong, because
 the hyphen is a legitimate character in a legitimate word.
-[`\CDossierLink`](API.md#cdossierlink) is the supported form (issue #308). It
+`\CDossierLink` (see the manual) is the supported form (issue #308). It
 extends url.sty's `\UrlBreaks` with the letters and digits for one link, and
 url.sty's break points carry a penalty and no discretionary hyphen, so a wrapped
 address concatenates back exactly. `tests/links/resume-body-link.tex` pins that
@@ -839,7 +839,7 @@ why it exists.
 
 The address-as-text links this toolkit renders — the contact line,
 `\CDossierLink`, an ORCID iD, a bibliography DOI — are never decorated, under
-either medium. That is a legibility decision (see `docs/API.md`), and under a
+either medium. That is a legibility decision (see the manual), and under a
 reboxing underline it would also have been a correctness one.
 
 Second, plain extracted text cannot check this: a legitimate line wrap and a
@@ -911,7 +911,7 @@ and does not need a language-abstraction layer.
 
 The title itself needs nothing set here: the classes derive `/Title` from the
 profile and ask the viewer to display it (`/DisplayDocTitle`), on this path as
-well as the tagged one. See [`API.md`](API.md) for the derived fields and how to
+well as the tagged one. See the manual for the derived fields and how to
 override them.
 
 Opt in to tagged structure with `\DocumentMetadata` before `\documentclass`:
@@ -1808,5 +1808,5 @@ reproducible fonts, defensive PDF text generation, and repeatable tests.
 ---
 
 *Part of CareerDossierTeX. Licensed under LPPL 1.3c. Maintainer: Amir Sadeghi.
-This document is design and reference material; `docs/API.md` and the compiled
+This document is design and reference material; the PDF manual and the compiled
 examples remain the authority on shipped behavior.*

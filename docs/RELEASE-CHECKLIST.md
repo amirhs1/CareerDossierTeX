@@ -24,6 +24,11 @@ of July 2026 the core expectations, verified against
 - no files that can be generated from other files, except the PDF documentation
   and derived fonts.
 
+The PDF documentation is `careerdossier.pdf`, built by `make manual` from the
+committed `doc/careerdossier.tex` (#263). The source is tracked and the PDF is
+not, so the archive is what carries both; wiring that into `l3build ctan` is
+#264.
+
 Handwritten `.sty`/`.cls` files are source and are included as-is; a `.dtx`/`.ins`
 workflow is optional. CTAN in fact discourages *generated* `README` and `.ins`
 files because they tend to go stale against their source. TDS packaging
@@ -117,11 +122,14 @@ the release archive from the handwritten source; there is no need to migrate to
 - [ ] Errors and warnings are actionable.
 - [ ] Every fixed bug has a regression test.
 - [ ] User and programmer documentation build cleanly; changelog and version
-      metadata agree.
+      metadata agree. `make manual` builds the user manual, and `make lint`
+      asserts that the release it declares matches the Work's.
 
 ### CTAN **(v1.0.0)**
 
-- [ ] README, licence, PDF manual, and documentation source are present.
+- [ ] README, licence, PDF manual, and documentation source are present —
+      `careerdossier.pdf` and `doc/careerdossier.tex`, the PDF built from that
+      source rather than from anything else.
 - [ ] Archive has one correctly named top-level directory.
 - [ ] No temporary or prohibited generated files are included.
 - [ ] Font and asset licences have been audited.

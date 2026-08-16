@@ -3,7 +3,8 @@
 For people with documents built on an earlier release: what changed between
 versions, which changes need a source edit, and which only change how a document
 renders. Read it before upgrading. It records the *differences* — the current
-interface itself is in [`API.md`](API.md).
+interface itself is in the PDF manual,
+[`../doc/careerdossier.tex`](../doc/careerdossier.tex).
 
 ## Status
 
@@ -67,7 +68,7 @@ characters per line for every combination are tabulated in
 [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
 
 The résumé's default is the longest measure in the project, kept deliberately
-for one-page capacity; see [`API.md`](API.md) for when to override it.
+for one-page capacity; see the manual for when to override it.
 
 On US Letter paper, `margin=narrow` increases the physical text block from the
 v0.5.0 résumé's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
@@ -320,12 +321,12 @@ requires no migration. To try it, add `\DocumentMetadata` before
 ```
 
 Tagged output is a tested preview for the five fixture profiles only and carries
-no PDF/UA, WCAG, or ATS conformance claim. See [`API.md`](API.md) for scope.
+no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
 ## Purpose
 
 This file records migration paths for incompatible public changes once
-implementation begins, per the stability policy in [`docs/API.md`](API.md).
+implementation begins, per the stability policy in [`API.md`](API.md).
 
 Before `v1.0.0`, breaking changes are allowed but must be documented here and in
 [`CHANGELOG.md`](../CHANGELOG.md) in the same pull request that introduces the
@@ -520,7 +521,7 @@ Being body text in the ordinary text token, `plain` is also the one value that
 cannot fail a contrast floor. What it drops is a redundant signal rather than
 the only one: the dates are still identified by their position and by their
 content, and under `entrymeta=inline` by the separator as well. See
-[`API.md`](API.md#muted).
+the manual's `muted` section.
 
 ### `\CDossierMutedStyle` is published by `careerdossier-components`
 
@@ -789,8 +790,9 @@ ways. Ten tokens used `Above`/`Below` before `Skip`, the list-edge pair used
 `Before`/`After` after `Skip`, two more used `After` with no matching
 `Before`, and five carried no positional word at all. An unprefixed name also
 meant either "shared by every class" or "résumé and CV only", with nothing in
-the name to distinguish them. A reader of [`API.md`](API.md) could not predict
-a token's name from its role, which is the point of a semantic token system.
+the name to distinguish them. A reader of the interface reference could not
+predict a token's name from its role, which is the point of a semantic token
+system.
 
 This particular change is a rename only. Every token keeps its calibrated
 ratio, all eleven supported examples render with identical word coordinates
@@ -923,9 +925,9 @@ They now carry the private form `AGENTS.md` reserves for internal names:
 | `\MakeCDossierPageFurniture` | `\__cdossier_components_apply_page_furniture:` |
 
 **No document reflows and no supported document needs an edit.** None of the
-three was ever documented in [`API.md`](API.md), and no example, fixture, or
-class option calls them by the old name; the three renames are internal to the
-package-to-class boundary. Source that called one of the old names now gets an
+three was ever documented in the interface reference, and no example, fixture,
+or class option calls them by the old name; the three renames are internal to
+the package-to-class boundary. Source that called one of the old names now gets an
 undefined-control-sequence error.
 
 Calling the new names is possible but unsupported, and the spelling is stricter:
