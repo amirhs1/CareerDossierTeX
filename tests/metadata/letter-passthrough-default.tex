@@ -1,0 +1,44 @@
+% A `--' in a document's OWN metadata, default (untagged) path -- issue #442.
+%
+% Half of a pair, and the fixture for the one position #442 settled on: the
+% divergence is accepted and passed through, so it is pinned rather than fixed.
+% This pair is therefore the only one in the suite that asserts the two paths
+% DISAGREE. Read run.sh's `a document's own -- is upstream's to spell' section
+% for why, and for the condition under which this fixture retires itself.
+%
+% Not a duplicate of either neighbouring pair, and the three are easy to
+% conflate:
+%
+%   letter-override-*    does a document's own value reach the PDF at all?
+%                        (#440) Plain ASCII on purpose, so a separator either
+%                        path might rewrite cannot muddy the answer.
+%   letter-ligature-*    is a `--' the package COMPOSED spelled the same way on
+%                        both paths? (#439) Yes -- the package converts it.
+%   this pair            is a `--' the package was HANDED spelled the same way?
+%                        (#442) No, and deliberately not.
+%
+% pdfsubject is set alongside pdftitle and pdfauthor, and is the load-bearing
+% field rather than a fourth example. CareerDossierTeX never reads or writes it
+% -- no hook, no detector, nothing in careerdossier-components touches it -- so
+% it cannot be diverging because of anything the package did. It diverges
+% exactly like the two fields the package does handle, which is what makes
+% `this is hyperref's and the kernel's, not ours' a measurement here instead of
+% an assertion in a comment. Removing it would leave the reasoning in
+% docs/API.md unchecked.
+%
+% Every string carries `--' and nothing else the two writers treat differently,
+% so a failure names the ligature and not some second difference.
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\hypersetup{
+  pdftitle   = {Passthrough -- Title},
+  pdfauthor  = {Passthrough -- Author},
+  pdfsubject = {Passthrough -- Subject}
+}
+\CDossierSetup{ name={Passthrough Fixture}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

@@ -1,0 +1,34 @@
+% A `--' in a document's OWN metadata, tagged build path -- issue #442.
+%
+% letter-passthrough-default.tex with one line added. Keep the two bodies
+% identical: the assertion is about what the build path does to the same
+% \hypersetup, and a difference anywhere else would weaken that to a
+% coincidence.
+%
+% This is the path that keeps the two hyphens, and -- unlike #428 and #439 --
+% it is not the path that is wrong. Under \DocumentMetadata the value goes to
+% the LaTeX kernel's PDF management, which writes the Info dictionary itself
+% and never hands the string to hyperref's \pdfstringdef; on the default path
+% \pdfstringdef runs and applies TeX's input-ligature substitution. Neither
+% writer is doing anything this package asked for, and neither logs anything.
+%
+% #439 fixed the values the package composes by converting them before handing
+% them over. That fix stops at the values it composes, on purpose: rewriting a
+% value the document set would walk back the pass-through #440 established, and
+% it could not reach pdfsubject or pdfkeywords in any case. #442 recorded the
+% choice; this pair is what keeps it honest.
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\hypersetup{
+  pdftitle   = {Passthrough -- Title},
+  pdfauthor  = {Passthrough -- Author},
+  pdfsubject = {Passthrough -- Subject}
+}
+\CDossierSetup{ name={Passthrough Fixture}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

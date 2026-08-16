@@ -2039,11 +2039,16 @@
 %% both from `name'. It cannot cover a value the document sets itself, which
 %% since #440 this package deliberately passes through untouched, nor
 %% pdfsubject or pdfkeywords, which it never sees. Those follow hyperref's and
-%% the kernel's own behaviour and still differ between the paths; that is
-%% recorded in docs/API.md and tracked as issue #442 rather than worked around
-%% here. pdfsubject is the evidence it is not this package's to fix: nothing
-%% here reads or writes it, and it diverges exactly like the two fields that
-%% are.
+%% the kernel's own behaviour and still differ between the paths. Issue #442
+%% settled that as accepted rather than worked around: a workaround would
+%% rewrite values this package passes through on purpose, and would still reach
+%% only the two fields above. pdfsubject is the evidence it is not this
+%% package's to fix -- nothing here reads or writes it, and it diverges exactly
+%% like the two fields that are -- and `article' with `hyperref' and none of
+%% these classes loaded diverges identically too. docs/API.md documents the
+%% behaviour and tests/metadata pins it, deliberately asserting that the two
+%% paths DISAGREE; if that pair ever fails, read its note before changing
+%% anything here.
 \cs_new_protected:Npn \__cdossier_components_pdfligatures:N #1
   {
     \regex_replace_all:nnN { --- } { ^^^^2014 } #1

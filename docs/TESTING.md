@@ -773,6 +773,30 @@ and the ` `` `/`''` that are deliberately *not* on it) is pinned in
 there and a built PDF pair here, and the property this suite exists to assert is
 that the two paths agree, not what the table contains.
 
+A fourth pair is the exception to every sentence above: it requires the two
+paths to *disagree*. A `--` in a value the document sets itself is not the
+package's to spell, and since #440 it is passed through untouched, so it
+reaches an en dash on the default path and two hyphens under
+`\DocumentMetadata`. Issue #442 weighed accepting that, reporting it upstream,
+and working around it here, and settled on accepting it; this pair is what
+stops "accepted" from decaying into "unnoticed".
+
+It checks three fields, one of each kind that exists. `pdftitle` and
+`pdfauthor` are the two the package would have to rewrite for a workaround to
+reach them. `pdfsubject` is the third and the load-bearing one: nothing in
+`careerdossier-components` reads or writes it, yet it diverges identically, so
+it is the measurement behind `docs/API.md`'s claim that the cause is upstream
+rather than anything the classes do. (`pdfkeywords` behaves as `pdfsubject`
+does and is left out — a fourth field would cost the same build and prove the
+same point.)
+
+It is written to retire itself. If `hyperref` or the kernel ever converges the
+two paths, this pair fails, and that failure is a notification rather than a
+regression: `docs/API.md` would then be documenting behaviour that no longer
+happens. The repair at that point is to delete the pair and correct the
+document — never to make the package converge the values itself, which is the
+option #442 declined.
+
 Two things about it are deliberate and worth keeping. Its fixtures build
 uncompressed, because on the default path the catalog otherwise sits inside a
 compressed object stream, where a text search of the file finds nothing whether
