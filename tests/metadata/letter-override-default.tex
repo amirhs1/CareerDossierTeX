@@ -1,0 +1,30 @@
+% A document's own /Title and /Author on the default (untagged) path -- #440.
+%
+% Half of a pair. Its twin, letter-override-tagged.tex, is this file with a
+% \DocumentMetadata line added and nothing else changed, so a field that
+% survives here and not there is a field the build path discarded.
+%
+% Both strings are plain ASCII words, deliberately. `--' in a user's own title
+% is converted to an en dash by hyperref's \pdfstringdef on this path and
+% reaches the file literally on the tagged one, which is a separate defect
+% (#439) about how the user's text is spelled. This pair asks the prior
+% question -- whether the user's text reaches the PDF at all -- and a separator
+% either path might rewrite would confuse the two.
+%
+% Neither string can be produced by deriving: the derived title for this
+% profile is `Cover Letter <en dash> Override Fixture' and the derived author
+% is `Override Fixture', so a pass here cannot come from the module overwriting
+% with a value that happens to match.
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\hypersetup{
+  pdftitle  = {Override Fixture Title},
+  pdfauthor = {Override Fixture Author}
+}
+\CDossierSetup{ name={Override Fixture}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

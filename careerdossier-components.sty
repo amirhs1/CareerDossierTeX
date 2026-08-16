@@ -1917,6 +1917,15 @@
 %% places \hypersetup *before* \CDossierSetup; a blind write here would silently
 %% discard it.
 %%
+%% Detecting "already set" takes two readers, not one, and every field here
+%% needs both. hyperref's own \@pdf... macros are the record on the default
+%% path; under \DocumentMetadata the value goes to the kernel instead, and the
+%% \@pdf... macro the module would otherwise trust is left empty. Reading one
+%% route only is the failure mode this block has had twice -- #276 for /Lang,
+%% #440 for /Title and /Author -- and it is silent both times, because the two
+%% mechanisms are writing the same PDF entry by different means. The two
+%% conditionals below are those readers.
+%%
 %% hyperref is not loaded by this module (the classes own it), so every entry
 %% point is guarded and the package still loads without it.
 %% ---------------------------------------------------------------------------
@@ -2018,18 +2027,66 @@
       { \prg_return_false: }
   }
 
+%% Has the document already supplied this Info dictionary entry through the
+%% kernel's PDF management? (issue #440)
+%%
+%% The /Lang trap above, again, for /Title and /Author. There are two ways into
+%% each of those too, and \__cdossier_components_hyp_if_unset:n sees only one.
+%% Under \DocumentMetadata, hyperref's driver writes pdftitle and pdfauthor
+%% straight into the kernel's PDF management and never populates \@pdftitle or
+%% \@pdfauthor, which stay defined and empty -- indistinguishable, to the reader
+%% above, from a document that supplied nothing. So a document's own
+%% \hypersetup{pdftitle=...} was detected as absent and overwritten by the
+%% derived title, silently, with nothing in the log.
+%%
+%% /Lang is asked through \GetDocumentProperties, and that is not the accessor
+%% here: measured on 2026-08-16, \GetDocumentProperties{document/title} is blank
+%% on the tagged path even when the document set pdftitle, because the kernel's
+%% document properties do not record it. \pdfmanagement_get:nnN is the public
+%% l3pdfmanagement reader for the dictionary the value does land in; pdflscape
+%% uses it with this same \quark_if_no_value: idiom.
+%%
+%% Like \GetDocumentProperties it is undefined when \DocumentMetadata was never
+%% used -- which is the default path, where hyperref owns the Info dictionary,
+%% \@pdftitle is populated, and the reader above is sufficient on its own. So
+%% the guard is not a fallback: on each path exactly one of the two readers can
+%% see anything, and a field counts as user-supplied when either says so.
+\tl_new:N \l__cdossier_components_info_tl
+\prg_new_protected_conditional:Npnn \__cdossier_components_kernel_info_if_set:n #1
+  { T , F , TF }
+  {
+    \cs_if_exist:NTF \pdfmanagement_get:nnN
+      {
+        \pdfmanagement_get:nnN { Info } {#1} \l__cdossier_components_info_tl
+        \quark_if_no_value:NTF \l__cdossier_components_info_tl
+          { \prg_return_false: }
+          {
+            \tl_if_empty:NTF \l__cdossier_components_info_tl
+              { \prg_return_false: }
+              { \prg_return_true: }
+          }
+      }
+      { \prg_return_false: }
+  }
+
 %% Apply the derived metadata. Only ever called when hyperref is present.
 \cs_new_protected:Npn \__cdossier_components_pdfmeta:
   {
     \CDossierIfFieldTF { name }
       {
-        \__cdossier_components_hyp_if_unset:nT { @pdftitle }
+        \__cdossier_components_kernel_info_if_set:nF { Title }
           {
-            \__cdossier_components_pdftitle:
-            \hypersetup { pdftitle = { \l__cdossier_components_pdfname_tl } }
+            \__cdossier_components_hyp_if_unset:nT { @pdftitle }
+              {
+                \__cdossier_components_pdftitle:
+                \hypersetup { pdftitle = { \l__cdossier_components_pdfname_tl } }
+              }
           }
-        \__cdossier_components_hyp_if_unset:nT { @pdfauthor }
-          { \hypersetup { pdfauthor = { \CDossierFieldValue { name } } } }
+        \__cdossier_components_kernel_info_if_set:nF { Author }
+          {
+            \__cdossier_components_hyp_if_unset:nT { @pdfauthor }
+              { \hypersetup { pdfauthor = { \CDossierFieldValue { name } } } }
+          }
       }
       { }
     %% CareerDossierTeX is English-only by settled decision (see

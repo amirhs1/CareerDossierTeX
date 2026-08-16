@@ -1,0 +1,27 @@
+% A document's own /Title and /Author on the tagged build path -- issue #440.
+%
+% letter-override-default.tex with one line added. Keep the two bodies
+% identical: the assertion is that the same \hypersetup reaches the PDF
+% whichever path builds it, and a difference anywhere else would weaken that to
+% a coincidence.
+%
+% This is the fixture the bug was reported against. Under \DocumentMetadata
+% hyperref's driver writes pdftitle/pdfauthor straight into the kernel's PDF
+% management and never populates \@pdftitle/\@pdfauthor, so a detector reading
+% only those two saw `defined and empty' -- the same reading as a document that
+% supplied nothing -- and the derived title and name overwrote the user's,
+% silently and with nothing in the log.
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\hypersetup{
+  pdftitle  = {Override Fixture Title},
+  pdfauthor = {Override Fixture Author}
+}
+\CDossierSetup{ name={Override Fixture}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

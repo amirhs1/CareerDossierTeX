@@ -1,6 +1,6 @@
 % components-pdfmeta.lvt — careerdossier-components PDF metadata construction.
 %
-% Four things are checked here, none of which any other suite can see.
+% Five things are checked here, none of which any other suite can see.
 %
 % 1. The "has the document already set this?" test. The module derives
 %    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
@@ -14,6 +14,15 @@
 %    non-existent branch as "already set" makes the field vanish from the PDF
 %    with nothing in the log. The control sequences below stand in for
 %    hyperref's, so the conditional is exercised without loading hyperref.
+%
+% 5. The same question asked of the kernel's PDF management, which is where the
+%    document's own pdftitle and pdfauthor land under \DocumentMetadata and
+%    where hyperref's \@pdftitle and \@pdfauthor stay empty (issue #440).
+%    Reading only case 1 therefore reported "the document supplied nothing" for
+%    a document that supplied both, and the derived values overwrote them --
+%    silently, since the two mechanisms write the same Info entries. Four states
+%    of that second reader are pinned: no accessor (the default path), the key
+%    absent, the key present and empty, and the key carrying a value.
 %
 % 2. The title join. The owning class declares a document type so a résumé and a
 %    cover letter built from one profile do not receive identical titles; with no
@@ -101,6 +110,37 @@
 % \DocumentMetadata.
 \cs_new_protected:Npn \cdossiertestSetKernelLang #1
   { \cs_set:cpn { GetDocumentProperties } ##1 {#1} }
+
+% The same shape for /Title and /Author (issue #440). Under \DocumentMetadata
+% hyperref writes those into the kernel's PDF management and leaves \@pdftitle
+% and \@pdfauthor defined-but-empty, so the stand-ins above report "unset" for a
+% document that did in fact supply a value. \pdfmanagement_get:nnN is the reader
+% that can see it; like \GetDocumentProperties it does not exist at all on the
+% default path, which is why it is undefined here until a test installs it.
+%
+% The real one yields \q_no_value for a key the dictionary does not carry, so
+% the stand-in does too: that quark and an empty value are different states of
+% the store and both have to read as "the document supplied nothing".
+\cs_new_protected:Npn \cdossiertestSetKernelInfo #1#2
+  {
+    \cs_set_protected:Npn \pdfmanagement_get:nnN ##1##2##3
+      {
+        \str_if_eq:nnTF {##2} {#1}
+          { \tl_set:Nn ##3 {#2} }
+          { \tl_set:Nn ##3 { \q_no_value } }
+      }
+  }
+\cs_new_protected:Npn \cdossiertestSetKernelInfoEmptyStore
+  {
+    \cs_set_protected:Npn \pdfmanagement_get:nnN ##1##2##3
+      { \tl_set:Nn ##3 { \q_no_value } }
+  }
+\cs_new_protected:Npn \cdossiertestKernelInfoVerdict #1
+  {
+    \__cdossier_components_kernel_info_if_set:nTF {#1}
+      { \TYPE{ Info/#1 ~ -> ~ user-supplied } }
+      { \TYPE{ Info/#1 ~ -> ~ unset } }
+  }
 \ExplSyntaxOff
 
 \begin{document}
@@ -194,6 +234,68 @@
 \TEST{pdfmeta-keeps-documentmetadata-lang}{
   \cdossiertestRecordHypersetup
   \cdossiertestSetKernelLang{de}
+  \cdossiertestPdfmeta
+}
+
+% ---------------------------------------------------------------------------
+% The kernel's Info dictionary as a second route into /Title and /Author, and
+% the four states its reader has to tell apart (issue #440).
+% ---------------------------------------------------------------------------
+
+% No accessor at all: the default path, where hyperref owns the Info dictionary
+% and \@pdftitle is the record. Nothing to preserve here, so "unset" -- and this
+% is the state every other test in this file is in, which is what keeps the new
+% reader from changing the default path's answers above.
+\TEST{kernel-info-without-accessor-reads-as-unset}{
+  \cdossiertestKernelInfoVerdict{Title}
+}
+
+% The accessor exists but the dictionary has no such key. \q_no_value is not a
+% value the document supplied, and reading it as one would suppress the derived
+% title on every tagged build.
+\TEST{kernel-info-no-value-reads-as-unset}{
+  \cdossiertestSetKernelInfoEmptyStore
+  \cdossiertestKernelInfoVerdict{Title}
+}
+
+% Present but empty. A distinct state from \q_no_value, and the same verdict:
+% an empty title is not a title, and treating it as one leaves the PDF with the
+% filename in the viewer's tab bar.
+\TEST{kernel-info-empty-value-reads-as-unset}{
+  \cdossiertestSetKernelInfo{Title}{}
+  \cdossiertestKernelInfoVerdict{Title}
+}
+
+% The state the bug turned on: the document's own value, in the one place the
+% tagged path puts it.
+\TEST{kernel-info-value-reads-as-user-supplied}{
+  \cdossiertestSetKernelInfo{Title}{Already~Set~By~User}
+  \cdossiertestKernelInfoVerdict{Title}
+}
+
+% The reader is asked per key, not once for the pair. A document that set only
+% pdftitle must still receive a derived author.
+\TEST{kernel-info-is-read-per-key}{
+  \cdossiertestSetKernelInfo{Title}{Already~Set~By~User}
+  \cdossiertestKernelInfoVerdict{Author}
+}
+
+% And the behaviour those verdicts buy, recorded the way the pdflang precedence
+% tests above are: a title the document set through \DocumentMetadata's route
+% produces no pdftitle line below, while pdfauthor and pdflang are still
+% derived. Before #440 all three lines appeared and the user's title was gone.
+\TEST{pdfmeta-keeps-kernel-info-title}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetDoctype{Testdoc}
+  \cdossiertestSetKernelInfo{Title}{Already~Set~By~User}
+  \cdossiertestPdfmeta
+}
+
+% The mirror image: no pdfauthor line, and the title still derived.
+\TEST{pdfmeta-keeps-kernel-info-author}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetDoctype{Testdoc}
+  \cdossiertestSetKernelInfo{Author}{Already~Set~By~User}
   \cdossiertestPdfmeta
 }
 
