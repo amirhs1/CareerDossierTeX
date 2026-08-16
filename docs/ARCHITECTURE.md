@@ -909,6 +909,19 @@ being one. The `tokens-*-defaults` baselines now record `\topskip` and
 `\@secpenalty` beside the bottom-fill state, so a package that supplies either
 fails a baseline rather than switching this calibration on in silence.
 
+**One structural keep lives outside this module**, in `careerdossier-letter.cls`
+rather than here: the `\nobreak` that `\MakeCDossierClosing` emits between the
+closing text and the signature name (#421). The club and widow parameters cannot
+reach that boundary — the two are separate one-line paragraphs, not the first
+and last line of one — and the `\vspace` between them contributes glue after a
+box, which is an ordinary legal breakpoint. It is not a token, for the reason
+the paragraphs above establish for the parameters it sits beside: the penalty
+here is binary, so there is no value to choose and a named integer would
+advertise a dial the page builder never consults. It is not shared either,
+because the boundary is not shared: no other class emits two one-line paragraphs
+that have to paginate as one. `docs/API.md` states it as a contract of
+`\MakeCDossierClosing`.
+
 #### Hyphenation
 
 `\hyphenpenalty` and `\exhyphenpenalty` are **deliberately left at TeX's

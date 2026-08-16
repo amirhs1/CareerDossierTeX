@@ -425,6 +425,24 @@
 %% of \CDossierLetterBodyAboveSkip that opens it. It previously borrowed
 %% \CDossierLetterBlockSkip, which names the boundary *between letterhead
 %% blocks*; the two are separate boundaries and the default value is unchanged.
+%%
+%% Issue #421: the \nobreak before the signature gap. The closing text and the
+%% name are two separate one-line paragraphs, so \clubpenalty and \widowpenalty
+%% never see the boundary between them -- those parameters govern the first and
+%% last line *of one paragraph*, and here each paragraph is a single line that
+%% is both. The only material between the two is \vspace's glue, and a modern
+%% \@vspace in vertical mode contributes \vskip alone (the \hrule\nobreak pair
+%% belongs to \vspace*), so that glue follows a box and is a legal breakpoint:
+%% "Sincerely," could be left at the foot of one page with the signature name
+%% alone at the head of the next.
+%%
+%% This is not a token. Every vertical token here is rigid and the class is
+%% \raggedbottom, so page badness is constant and only p >= 10000 changes which
+%% candidate the page builder keeps (#342) -- a keep-together that is not
+%% infinite is not a keep, and a named integer would advertise a dial the page
+%% builder cannot read. The closing block is two lines: forbidding this one
+%% boundary cannot overflow a page, it moves the whole block to the next one,
+%% breaking instead at the \addvspace above -- which stays legal.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierClosing { }
   {
@@ -433,6 +451,7 @@
     \addvspace { \CDossierLetterBodyBelowSkip }
     \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
     \par
+    \nobreak
     \vspace { \CDossierLetterSignatureGapSkip }
     \noindent { \CDossierBodyStyle \CDossierPrintField { name } }
     \par

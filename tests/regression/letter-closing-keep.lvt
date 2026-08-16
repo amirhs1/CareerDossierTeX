@@ -1,0 +1,71 @@
+% letter-closing-keep.lvt — issue #421, the closing block's keep-together.
+%
+% \MakeCDossierClosing emits the closing text and the signature name as two
+% separate one-line paragraphs with \vspace{\CDossierLetterSignatureGapSkip}
+% between them. A modern \@vspace in vertical mode contributes \vskip alone —
+% the \hrule\nobreak pair belongs to \vspace* — so that glue follows a box and
+% is a legal page break, and the two lines can land on different pages.
+% \clubpenalty and \widowpenalty cannot reach it: they govern the first and last
+% line *of one paragraph*, and here each paragraph is a single line.
+%
+% letter-block-edges.lvt already measures this block, but it measures the
+% composed height of a \vbox, and a penalty contributes 0pt. Its numbers are
+% unchanged by whether the boundary is breakable, which is exactly the property
+% under test here — so the assertion has to read the node list, the way
+% cv-entry-keep-penalty.lvt reads the entry's keep.
+%
+% The tokeniser below is that file's, deliberately: the same spelling of "what
+% is in this vertical list" keeps the two readable against each other.
+% Consecutive glue collapses to a single `g', because the assertion is where the
+% penalty sits relative to the two line boxes, not how much space surrounds it.
+%
+% What the expected sequence says, reading the closing block from its top: `g'
+% for the body's closing edge, `H' for the closing line, `P10000' — the keep —
+% then `g' for the signature gap and `H' for the name. The keep must sit between
+% the closing box and the gap glue and not after it: a penalty *after* the glue
+% leaves the glue itself a legal breakpoint and forbids nothing.
+\input{regression-test}
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+\CDossierLetterSetup{closing = {Sincerely,}}
+
+\makeatletter
+\newcommand\cdossiertestNodes[1]{%
+  \TYPE{#1 nodes = \directlua{
+    local t = {}
+    local lastglue = false
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("penalty") then
+        table.insert(t, "P" .. n.penalty) lastglue = false
+      elseif n.id == node.id("glue") then
+        if not lastglue then table.insert(t, "g") end
+        lastglue = true
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "H") lastglue = false
+      else
+        table.insert(t, node.type(n.id)) lastglue = false
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+\makeatother
+
+\begin{document}
+\START
+
+% One body paragraph and the closing. The body's own line is the first `H'; the
+% closing's two lines are the last two, with the keep between them.
+\TEST{letter-closing-keep}{
+  \setbox9=\vbox{
+    Body paragraph one.
+    \par
+    \MakeCDossierClosing
+  }
+  \cdossiertestNodes{body-and-closing}
+}
+
+\END

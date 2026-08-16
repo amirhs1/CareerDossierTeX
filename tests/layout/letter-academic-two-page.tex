@@ -16,9 +16,11 @@
 % alone on page two -- a club/widow pair the fixture's own detector caught.
 % The "Beyond research and teaching" paragraph carries one added sentence so
 % the break again falls inside the body, with the same margin from the edge
-% the fixture had before. \MakeCDossierClosing has no keep-together protection
-% of its own between the closing text and the signature name; #421 tracks that
-% gap separately.
+% the fixture had before. That kept this fixture's break inside the body but
+% left the boundary itself unprotected; #421 closed the gap by adding a
+% \nobreak inside \MakeCDossierClosing, and
+% letter-keeptogether-closing-two-page.tex is the fixture that forces the
+% closing across the page edge on purpose to hold it.
 \documentclass[family=academic]{careerdossier-letter}
 \providecommand\CDossierAFourContinuationStress{}
 \CDossierSetup{
