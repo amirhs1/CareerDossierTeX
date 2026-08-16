@@ -3,12 +3,12 @@ Don't change this file in any respect.
 ============================================================
 TEST 1: prose-heading-and-paragraph-boundaries
 ============================================================
-after-header page-total = 72.09149pt
-after-section-heading page-total = 90.259pt
-after-first-paragraph page-total = 108.267pt
-after-second-paragraph page-total = 126.392pt
-after-subsection-heading page-total = 150.96875pt
-after-third-paragraph page-total = 168.98575pt
-after-second-section-heading page-total = 201.31975pt
-after-fourth-paragraph page-total = 216.61075pt
+after-header page-total = 68.46649pt
+after-section-heading page-total = 86.634pt
+after-first-paragraph page-total = 104.642pt
+after-second-paragraph page-total = 122.767pt
+after-subsection-heading page-total = 147.34375pt
+after-third-paragraph page-total = 165.36075pt
+after-second-section-heading page-total = 197.69475pt
+after-fourth-paragraph page-total = 212.98575pt
 ============================================================

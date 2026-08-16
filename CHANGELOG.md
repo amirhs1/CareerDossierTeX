@@ -176,6 +176,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- The gap below the header stack in a statement or letter now equals the token
+  that names it, at every body size. `\CDossierProseHeaderBelowSkip` and
+  `\CDossierLetterHeaderBelowSkip` measured the boundary between the header
+  stack and the paragraph after it, and a paragraph boundary contributes
+  `\parskip` on top of whatever token guards it — 3.00 pt to 3.625 pt across
+  the three body sizes — so the rendered gap was one `\parskip` wider than
+  either token claimed, under-stating it by up to 27% at 12 pt. The header
+  stack already zeroed and subtracted `\parskip` for the gaps between its own
+  lines; the boundary below the stack now routes through the same emission
+  contract, the way the section rule and the prose headings already do
+  ([#168], [#177]). The résumé and CV's `\CDossierRecordHeaderBelowSkip` was
+  already correct, because those classes' `\parskip` is `0`. No public
+  command, class option, key, or token value changes; the tightened gap moves
+  every statement and letter document and their pagination should be
+  reviewed. ([#419])
+
 - A test guard that cannot perform its check now fails saying so, instead of
   reporting a verdict about a document it never read. ([#398])
 
@@ -274,6 +290,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
 [#405]: https://github.com/amirhs1/CareerDossierTeX/issues/405
 [#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
+[#419]: https://github.com/amirhs1/CareerDossierTeX/issues/419
 
 ## [0.8.0] - 2026-08-12
 

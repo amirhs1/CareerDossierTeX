@@ -1026,8 +1026,8 @@ option:
 - the rendering class's own header-below token as the boundary under the stack
   (`\CDossierRecordHeaderBelowSkip`, `\CDossierLetterHeaderBelowSkip`, or
   `\CDossierProseHeaderBelowSkip`);
-- `\parskip` zeroed for the header group, so each token names the rendered gap
-  in every class.
+- `\parskip` zeroed for the header group and subtracted from the boundary below
+  the stack (since #419), so each token names the rendered gap in every class.
 
 Position decides which token guards a boundary, never presence, so an omitted
 line leaves neither a blank line nor a gap behind. Emit a line conditionally by
@@ -2406,7 +2406,10 @@ what an author needs from them is:
   as `token − \parskip`, so the value you set is still the gap a reader
   measures — do not subtract the paragraph gap yourself. The header block
   zeroes `\parskip` for its own scope, which is why the two shared header gap
-  tokens behave identically in all four classes.
+  tokens behave identically in all four classes. The boundary below the header
+  block is outside that scope and reads the class's real `\parskip` instead
+  (non-zero in the two prose classes), so it is subtracted explicitly there
+  (#419) rather than by the zeroing.
 
 Since `v0.7.0`, `\CDossierRecordHeaderBelowSkip`,
 `\CDossierProseHeaderBelowSkip`, `\CDossierLetterHeaderBelowSkip`,

@@ -18,10 +18,23 @@
   closing        = {Sincerely,},
 }
 
+\newbox\ProbeHeaderBox
 \newbox\ProbeParaBox
 \newbox\ProbeClosingBox
 
 \begin{document}
+
+% -- header stack into the body copy that follows it -----------------------
+% Issue #419: the letterhead as a whole is a page-level composition, but the
+% shared header stack inside it is not, and its below-stack boundary is the one
+% this class's non-zero `\parskip' widened past its token. See record.tex.
+\setbox\ProbeHeaderBox=\vbox{%
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{Ada Lovelace}
+  \CDossierHeaderLine{ada.lovelace@example.com}
+  \CDossierHeaderEnd
+  \noindent Following body paragraph line.\par
+}
 
 % -- two ordinary body paragraphs (LetterParSkip) --------------------------
 \setbox\ProbeParaBox=\vbox{%
@@ -49,12 +62,16 @@
   tok("LetterSignatureGapSkip",   \number\dimexpr\CDossierLetterSignatureGapSkip\relax)
   tok("LetterHeaderBelowSkip",    \number\dimexpr\CDossierLetterHeaderBelowSkip\relax)
   tok("parskip",                  \number\dimexpr\parskip\relax)
+  tok("SharedHeaderNameGapSkip",  \number\dimexpr\CDossierSharedHeaderNameGapSkip\relax)
 
+  cdossier_probe.report(\number\ProbeHeaderBox, "header", {
+    "header name -> header meta", "header stack -> body"})
   cdossier_probe.report(\number\ProbeParaBox, "para", {"paragraph -> paragraph"})
   cdossier_probe.report(\number\ProbeClosingBox, "closing", {
     "body -> closing", "closing -> signature name"})
 }
 
+\box\ProbeHeaderBox
 \box\ProbeParaBox
 \box\ProbeClosingBox
 

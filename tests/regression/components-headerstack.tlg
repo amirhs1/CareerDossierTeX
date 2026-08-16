@@ -13,26 +13,26 @@ TEST 2: gaps-with-headline
 ============================================================
 addvspace = 3.625pt
 addvspace = 2.71875pt
-addvspace = 13.59375pt
+addvspace = 9.96875pt
 ============================================================
 ============================================================
 TEST 3: gaps-without-headline
 ============================================================
 addvspace = 3.625pt
-addvspace = 13.59375pt
+addvspace = 9.96875pt
 ============================================================
 ============================================================
 TEST 4: below-token-is-the-letter-family-token
 ============================================================
 addvspace = 3.625pt
-addvspace = 33.0pt
+addvspace = 29.375pt
 ============================================================
 ============================================================
 TEST 5: public-triple-emits-the-positional-gaps
 ============================================================
 addvspace = 3.625pt
 addvspace = 2.71875pt
-addvspace = 33.0pt
+addvspace = 29.375pt
 ============================================================
 ============================================================
 TEST 6: public-line-body-is-deferred-and-used-once
@@ -40,7 +40,7 @@ TEST 6: public-line-body-is-deferred-and-used-once
 line-body Alpha
 addvspace = 3.625pt
 line-body Beta
-addvspace = 13.59375pt
+addvspace = 9.96875pt
 ============================================================
 ============================================================
 TEST 7: public-empty-stack-emits-nothing
@@ -50,7 +50,7 @@ empty-stack-done
 ============================================================
 TEST 8: stack-heights-are-the-rendered-gaps
 ============================================================
-stack-one-line height = 24.39375pt
-header-two-lines height = 49.37274pt
-header-three-lines height = 68.09149pt
+stack-one-line height = 20.76875pt
+header-two-lines height = 45.74774pt
+header-three-lines height = 64.46649pt
 ============================================================

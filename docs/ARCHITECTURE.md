@@ -492,7 +492,11 @@ token's value.
    such a boundary is therefore emitted as `\addvspace{token − \parskip}`, which
    is why the table's numbers are gaps a reader measures. `careerdossier-
    statement.cls` does this for its headings; the shared header stack does it for
-   every header line.
+   every header line, and — since #419 — for the boundary below the stack too.
+   That boundary sits outside the group that zeroes `\parskip` for the lines
+   above it, so in the two prose classes it previously rendered one `\parskip`
+   wider than its token; the fix routes it through the same
+   `token − \parskip` emission the between-line boundaries already used.
 
    Every header line is its own paragraph, so before #204 the prose classes'
    document-wide `\parskip` — 0.50 at the time — landed in every header
