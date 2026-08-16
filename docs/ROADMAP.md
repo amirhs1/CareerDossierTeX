@@ -343,22 +343,10 @@ one shared, proportional design system, driven by two public inputs —
 
 ### Included
 
-- `careerdossier-tokens.sty`: the single source of truth for the type scale,
-  vertical rhythm, rule weight, list metrics, and page geometry;
-- `fontsize` (`10pt`, `11pt`, `12pt`) and `margin` (`normal`, `narrow`) on all
-  four classes; `fontsize` is new on the letter and statement classes, `12pt`
-  is new everywhere;
-- per-class defaults rather than one uniform default: the résumé stays compact
-  (`11pt`, `narrow`), while the CV, letter, and statement default to `12pt` at
-  the shared `normal` margin to
-  keep prose line length within a readable range at a conventional margin;
-- one shared page-furniture design (running header from page two, `Page N of
-  M` folio) across all four classes, with the folio suppressed on single-page
-  documents;
-- a keep-together page-break policy for section headings, entry headings, and
-  bullet groups;
-- reference PDFs for every `fontsize` × `margin` combination, across all four
-  document types.
+Delivered scope and this release's criteria are recorded in the closed
+[`v0.6.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/9),
+[epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137), and its
+[`CHANGELOG.md` entry](../CHANGELOG.md#060---2026-07-30).
 
 ### Agreed defaults and their measured cost
 
@@ -392,37 +380,6 @@ for authors in `docs/API.md`, with the rationale in `docs/ARCHITECTURE.md`.
 - the `density` (`compact`/`standard`) class option, replaced by the
   calibrated, proportional rhythm derived from `fontsize`.
 
-### Release criteria
-
-- no `.sty` or `.cls` file mentions `density`, and no file under `examples/`
-  passes it as an option — `grep -rnE 'density[[:space:]]*=' *.sty *.cls
-  examples/` returns nothing. Match on `density=`, not the bare word:
-  `examples/statements/artist-statement.tex` uses "density" as ordinary
-  English prose;
-- the résumé and CV classes reject `density=` with their actionable
-  unknown-option message, pinned by `tests/smoke/resume-density-option.tex`
-  and `tests/smoke/cv-density-option.tex` at the class layer and
-  `tests/regression/tokens-errors.lvt` at the package layer. These fixtures
-  are the enforcement of the removal and are expected to name the option;
-  mentions in `CHANGELOG.md`, `docs/MIGRATION.md`, and `docs/API.md` are
-  required by the breaking-change documentation rule. Neither is an exception
-  to be eliminated;
-- no literal type size or structural vertical space outside
-  `careerdossier-tokens.sty`;
-- no `\geometry` call outside the shared geometry primitive;
-- all four classes accept `fontsize` and `margin` and reject unsupported
-  values with an actionable message;
-- every type size in the output is a whole number of points;
-- bullets align with section headings, section rules, and entry titles;
-- a one-page document carries no folio; a multi-page document carries a folio
-  throughout and a running header from page two;
-- tagged builds still mark furniture and the section rule as artifacts;
-- CI builds every example at all three `fontsize` values.
-
-Tracked under
-[milestone `v0.6.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/9)
-and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
-
 ## Phase 6: `v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership`
 
 ### Goal
@@ -430,163 +387,27 @@ and [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137).
 Reclaim ownership of vertical placement and spacing for the calibrated design
 system released in `v0.6.0`, make page furniture selectable by output context,
 and retune the vertical-rhythm ratios once every gap is owned by a token.
-
-The unifying concern is not page furniture as such. In several places a
-vertical dimension is decided by a third-party default or a hard-coded constant
-rather than by the design system that is supposed to own it: `geometry`'s
-defaults place the running header and folio (#183); LaTeX's single `topsep`
-cannot express a different space above and below a list (#191);
-`careerdossier-biblatex` hard-codes the bibliography's inter-entry gap at `6pt`
-(#196); LaTeX Lab's block default decides the space below a list on the tagged
-path (#193); and the prose `\parskip` floors every header gap, leaving the
-header tokens unable to express the spacing they name (#204). Each item hands
-one such decision back to the token that should own it. #203 then makes the
-token names consistent, and #206 sets the values.
-
-Two items do not share that concern; both arrived from implementing #184 in
-PR #210. #212 widens the named-values class error from `medium` to every
-choice-valued option — the inconsistency that PR knowingly left behind as out of
-scope. #211 investigates a Biber date-parsing failure that the same work
-uncovered but did not cause.
-
-**Scope expanded on 2026-08-03.** A trial retune under #206 established that
-four of the values it had to set were pinned by defects rather than chosen by
-design: the list-edge opening token by an extraction-order fault (#219), the
-shared header gap by a cross-family coupling (#223), the prose paragraph gap by
-one token serving both the letter and the statement (#222), and two header
-tokens that could not affect output at any value (#220). Tuning against those
-would have reflowed every document twice in consecutive releases, so #219–#225
-were added ahead of #206. As shipped, all six are output-neutral or corrective —
-the milestone description's "five of the six" predates #219 resolving as
-documentation and tests only — and #206 remains the release's one deliberate
-reflow. #220, #222, and #223 change the public token list and #224 adds three
-public commands, so the breaking surface and `MIGRATION.md` grew accordingly.
-
-A further group landed as the work proceeded: #218 (the CV's manual publication
-list did not build under tagging), #232 and #233 and #236 (option-error
-reporting and the lint that keeps it from regressing), #242 (three
-public-prefixed internal primitives made private), and the documentation and
-process issues #205, #208, #213, #239, #241, #246, #252, and the fixture audit
-#255.
-
-**No type-scale step or margin preset changes value.** The vertical-rhythm
-ratios do, under #206 and against its stated design rules.
-
-Rendered output therefore moves in two ways: it is *corrected* where a spacing
-decision was never the design system's to begin with, and it *reflows by
-design* where the ratios are retuned.
-
-| Item | Rendered effect |
-|---|---|
-| #183 | furniture moves within the existing margins; `\textheight` and `\textwidth` are unchanged |
-| #184 | defaults to `print`, reproducing current output exactly |
-| #191 | none — both tokens keep the single token's value |
-| #195 | none — generated review filenames only |
-| #196 | bibliography entries move up as the hard-coded `6pt` gap closes |
-| #193 | the tagged path's space below a list changes to match the untagged path |
-| #211 | none — the reported failure did not reproduce; see below |
-| #212 | none — error text only; no document that compiles today is affected |
-| #204, #220, #222, #223, #224 | header and list boundaries move where a token could not previously express its gap; the token splits themselves are output-neutral |
-| #206 | every document reflows by design; no combination changes page count |
-| #218, #219, #232, #233, #236, #242 | none for a document that builds today; #218 makes a tagged CV build at all |
-
-The new public surface is one additive class option whose default reproduces
-current output exactly (#184), three additive header-composition commands
-(#224), and a reworked vertical-spacing token vocabulary: renamed onto one
-convention (#191, #203), split per family where one token served two (#222,
-#223), extended where a boundary had no token (#204), and reduced where a token
-could not reach the page (#204, #220). Every rename and retirement is
-source-compatible for a document that does not read the token by name.
+Several vertical dimensions had been decided by a third-party default or a
+hard-coded constant rather than by the design system meant to own them —
+`geometry`'s header and folio placement, LaTeX's single `topsep`, a
+hard-coded bibliography inter-entry gap, LaTeX Lab's tagged-path list default,
+and headers unable to escape the prose `\parskip` among them — and each is
+handed back to its owning token, with the vertical-rhythm ratios retuned once
+every gap can express itself. Rendered output therefore moves in two ways: it
+is *corrected* where a spacing decision was never the design system's to begin
+with, and it *reflows by design* where the ratios are retuned; no type-scale
+step or margin preset changes value. The release also adds a `medium`
+(`screen`/`print`) class option, three header-composition commands, and a
+renamed and split vertical-spacing token vocabulary, every rename and
+retirement source-compatible for a document that does not read a token by
+name.
 
 ### Included
 
-- furniture placement derived from the resolved margin rather than from
-  `geometry` package defaults: `headheight`, `headsep`, and `footskip` are
-  computed so that the running header is vertically centred in the top margin
-  and the `Page N of M` folio is vertically centred in the bottom margin, at
-  every `fontsize` × `margin` combination and on both `letter` and `a4`;
-- a `headheight` large enough for the furniture step of the type scale at every
-  `fontsize`, replacing the inherited fixed `12pt`;
-- a public `medium` option (`screen`, `print`) on all four document classes,
-  defaulting to `print`: `print` keeps today's behaviour (running header from
-  page two, folio throughout, both suppressed on a single-page document) and
-  `screen` emits no running header and no folio on any page. Both open
-  questions on the proposal are settled: the option is named `medium`, and
-  `screen` suppresses the running header as well as the folio;
-- an actionable class error for an unsupported `medium` value, naming the
-  accepted values instead of falling back to `l3keys`' generic choice error
-  (#184). As shipped in PR #210 this left `medium` the only option that explains
-  itself, which #212 below corrects;
-- every other choice-valued public option naming its accepted values and its
-  owning module when it rejects one (#212): `fontsize`, `margin`, `paper`, and
-  `bodyfont` on all four classes, the letter's `family`, and the same options on
-  `careerdossier-typography` and `careerdossier-tokens` for direct package users.
-  No option name, accepted value, or default changes — only the text of an error
-  that already stops the build — so `docs/MIGRATION.md` needs no entry. The
-  smoke suite's `*-bad-<option>` expectations match on the generic wording and
-  are updated with it;
-- splitting the single list-edge token into `\CDossierRecordListEdgeAboveSkip`
-  and `\CDossierRecordListEdgeBelowSkip`, so the space above a list and the
-  space below it can be tuned independently (#191). Both keep the value the
-  single token had, so no list moves;
-- the bibliography's inter-entry gap reading `\CDossierRecordItemSepSkip`
-  instead of a hard-coded `6pt`, so a `biblatex` publication list and a
-  `CDossierPublications` list share one rhythm at every `fontsize` (#196);
-- a diagnosis and named CI coverage for the Biber date-parsing failure reported
-  in #211, which **did not reproduce**. It was reported as Biber 2.21 rejecting
-  every `date` value while accepting the legacy `year` field — dropping every
-  year from the rendered bibliography and misordering the entries — but
-  `make bibliography-test` passes on a clean tree with the same binary, and CI
-  had been running that suite since #69, buried inside the job named `cv`. The
-  likely mechanism is an incomplete `PAR::Packer` cache under `TMPDIR`, which
-  only the `date` path depends on; it is documented as plausible, not proven.
-  The work therefore keeps the `date` field and the biber-warning gate exactly
-  as they were — both proposed escapes remain explicit non-fixes — and instead
-  splits the suite into a visible `bibliography` CI job and teaches
-  `tests/bibliography/run.sh` to recognise the signature and name the remedy;
-- the tagged path's closing list edge owned by
-  `\CDossierRecordListEdgeBelowSkip` rather than LaTeX Lab's block default, so
-  a tagged and an untagged build of one source stop paginating toward
-  different outcomes (#193). The candidate fix depends on `latex-lab`
-  testphase package internals rather than a stable interface, so it targets a
-  guarded fix that degrades cleanly if that interface changes;
-- regression, smoke, and layout coverage for the resolved furniture metrics,
-  both `medium` values, the unknown-value error on every choice-valued option,
-  and both list edges on both the untagged and tagged paths;
-- this roadmap renumbering and the phase-numbering convention that prevents it
-  from drifting again;
-- one naming convention across the vertical-spacing tokens (#203), and header
-  and letter-block tokens that own the gaps they name rather than inheriting
-  the prose `\parskip` (#204). #204 retires the two tokens that never won an
-  `\addvspace` maximum and adds three for boundaries no token described. Unlike
-  #191 and #203 it is *not* output-neutral: letter and statement headers
-  tighten by the prose paragraph gap at each header boundary, the gap above a
-  bullet list inside an entry tightens by `\CDossierRecordEntryGapSkip`, and a
-  document with no `headline` gains that same amount below the name;
-- the four defects that pinned values #206 had to set: the entry-head date
-  column extracting out of order below a list-edge floor of `0.25` (#219, with
-  #221 covering it in the extraction suite), the two header tokens that could
-  not affect output at any value (#220), and the two tokens that each served two
-  families and so coupled their retunes (#222, #223). #224 makes the shared
-  header stack a public composition triple so the statement class can interleave
-  its own lines without reaching into another module's private commands, and
-  #225 asserts the heading-pair and run-in floors before the retune moves them;
-- a retune of the vertical-rhythm ratios (#206), once #203 and #204 leave every
-  gap owned by a token that can express it. Documents reflow;
-- option-error consistency and the gate that holds it: one report per rejected
-  class option instead of two (#232), a TeX-free `make lint` that fails when a
-  choice-valued option does not name its accepted values (#233), and the
-  statement class's `type` declared as an ordinary choice list so the lint can
-  see it (#236);
-- the CV's `CDossierPublications` list building under
-  `\DocumentMetadata{tagging=on}`, where it stopped with `Missing number,
-  treated as zero` and produced no PDF at all (#218);
-- three class-to-package primitives that carried a public prefix without being
-  part of the author-facing interface made private, ahead of `v1.0.0` freezing
-  whatever still carries that prefix (#242);
-- a fixture audit establishing that a spacing token's value being *reported* by
-  a regression fixture is not the same as its gap being *rendered* by one, and
-  a committed fixture that renders every token (#255).
+Delivered scope and this release's criteria are recorded in the closed
+[`v0.7.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/10),
+[epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182), and its
+[`CHANGELOG.md` entry](../CHANGELOG.md#070---2026-08-04).
 
 ### Explicit non-goals
 
@@ -608,156 +429,28 @@ source-compatible for a document that does not read the token by name.
   `pdftotext -layout` reads in source order — and fixing it means changing
   `biblatex` label geometry, which #196 lists as a non-goal.
 
-### Release criteria
-
-- header and folio are vertically centred in their margins at all six
-  `fontsize` × `margin` combinations, on Letter and A4;
-- `\textheight` and `\textwidth` are unchanged from `v0.6.0` at every
-  combination;
-- `medium=screen` suppresses furniture and `medium=print` retains current
-  behaviour, on all four document classes;
-- an unsupported value for any choice-valued public option — `medium` (#184) and
-  every other option (#212) — produces an actionable class error naming the
-  accepted values and the owning module, with the smoke suite asserting the new
-  text for every `*-bad-*` fixture and a regression pinning one message per
-  module;
-- `make review-matrix` output is reviewed for both media, with PDFs named
-  `type-margin-fontsize` (#195);
-- the extraction, tagging, layout, and regression suites pass;
-- both list edges are owned by their tokens on the untagged path, with the
-  rendered gap unchanged from `v0.6.0` by the split itself (#191) — the later
-  retune (#206) moves it deliberately;
-- the tagged path's closing list edge equals
-  `\CDossierRecordListEdgeBelowSkip`, and `pdftotext -bbox` output agrees
-  between tagged and untagged builds of every supported example, or every
-  remaining difference is explained (#193);
-- `cv-bibliography`'s inter-entry gap equals `\CDossierRecordItemSepSkip`
-  (#196);
-- `make bibliography-test` passes on a clean tree with the `date` field and the
-  biber-warning gate both intact, the rendered bibliography shows every year in
-  `ydnt` order, and that suite is visible as its own CI job rather than nested
-  in another (#211);
-- `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/MIGRATION.md`, and
-  `CHANGELOG.md` are updated;
-- the vertical-spacing tokens follow one naming convention (#203), headers and
-  letter blocks own their own gaps (#204), and the retuned ratios are reviewed
-  against rendered output at both margins and all three body sizes (#206);
-- every ordering relation in `tests/regression/tokens-invariants` holds at all
-  three body sizes, and every spacing token is rendered — not merely reported —
-  by a committed fixture (#225, #255);
-- `make lint` passes, and every choice-valued option in the classes and shared
-  packages names its accepted values and its owning module (#233, #236);
-- tag and GitHub Release `v0.7.0` are published.
-
-Tracked under
-[milestone `v0.7.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/10)
-and [epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182).
-
 ## Phase 7: `v0.8.0 — Semantic Structure and Tagged Output`
 
 ### Goal
 
 Complete the semantic structure and the tagged-output metadata, and settle the
-public typography and colour roles, before the `v1.0.0` API freeze.
-
-The unifying concern is that the released output carries less structure than it
-appears to. At `v0.7.0` no document from any of the four classes contains an
-`/H1`, and the résumé and CV contain no `Sect` division at all where the
-statement nests two (#267, #268); the derived `/Title` never reaches a viewer's
-window because `DisplayDocTitle` is unset (#277); and `/Lang` is absent from the
-default build path (#276). Alongside that, three public roles are still
-unsettled: `Title` names two different things in the type scale and the entry
-primitives (#269), entry metadata has no decided de-emphasis role (#271), and
-several semantic colour tokens are declared but never consumed (#270).
-
-Two items change rendered output where the current behaviour is a defect rather
-than a choice: links have no visible affordance under `medium=screen` (#278),
-and `emergencystretch` is set in more than one place with no named token (#272).
+public typography and colour roles, before the `v1.0.0` API freeze. The
+released output had carried less structure than it appeared to — no document
+from any of the four classes contained an `/H1`, `/Lang` was absent from the
+default build path, and the derived `/Title` never reached a viewer's window —
+and three public roles were still unsettled: the `Title` collision between the
+type scale and the entry primitives, entry metadata's de-emphasis role, and
+several semantic colour tokens declared but never consumed. Two further
+defects were corrected rather than chosen: links had no visible affordance
+under `medium=screen`, and `emergencystretch` was set in more than one place
+with no named token.
 
 ### Included
 
-- a top-level heading role for the document identity, so tagged output has an
-  `/H1` (#267);
-- `Sect` divisions around résumé and CV section headings, matching the statement
-  class (#268);
-- `/Lang` emitted on the default build path (#276);
-- `DisplayDocTitle` set so the derived `/Title` reaches the viewer (#277);
-- the `Title` collision between the type scale and the entry role resolved
-  (#269);
-- a decided rendered de-emphasis role for entry metadata (#271);
-- the unused semantic colour tokens either consumed or retired (#270);
-- a visible link affordance under `medium=screen`, keeping `medium=print`
-  unchanged (#278);
-- one `emergencystretch` policy behind one named token (#272);
-- an inline entry-metadata option, which also frees the list-edge floor (#230);
-- the extracted reading order of bibliography entry numbers corrected (#199), a
-  follow-up from #196 that `v0.7.0` lists as a non-goal because fixing it means
-  changing `biblatex` label geometry.
-
-The eleven items above are the scope this phase was planned with on 2026-08-05.
-The milestone grew to 97 issues, and the additional work falls into five groups
-rather than one expansion:
-
-- **the heading structure completed beyond the `/H1`.** The document identity
-  and the statement title are recorded as heading *titles*, not only as roles
-  (#305), and `\CDossierSubsection` adds the second heading level the record
-  classes lacked, role-mapped to `/H3` (#337). The letter's subject line gets
-  its own semantic role (#299), and `\hfill`-positioned entry and recipient text
-  no longer concatenates in extraction (#302).
-- **the de-emphasis decision grew a fourth value.** #271 settled the role;
-  #324 then added `muted=plain` and made it the default, so entry metadata is no
-  longer italic in any class — the release's one unconditional rendered break.
-- **link correctness, once #278 made links visible.** A scheme-less profile
-  value emitted a remote-PDF action rather than a URI one (#328); the `linkedin`,
-  `github`, and `scholar` keys now accept a bare handle (#330); an `orcid` value
-  that is not ORCID-shaped warns (#331); and a build without `hyperref`, in which
-  every link degrades to plain text, warns once instead of silently (#329).
-- **the page-break policy, which the `emergencystretch` work opened.** A
-  body-less entry (#332) and an empty section (#340) each leaked a keep penalty;
-  the section keep became a bound with a page-fill policy behind it (#333); the
-  club and widow penalties were bounded for the prose families (#342); the
-  hyphenation policy (#309) and the emergency-stretch derivation (#310) were
-  decided by measurement; and #351 declined the page-builder tolerance that
-  would have lifted the one remaining outlier.
-- **the instruments that hold all of it to account.** `make links` guards
-  copy-paste integrity of every URL and e-mail address (#294, #312); `make
-  review-linebreak` (#316, #320) and `make review-pagefill` (#334) report what
-  the layout suite now asserts on; the fixture-selector work scoped five suites
-  (#359, #367); and #348 fixed a club/widow detector that could not see
-  paragraph boundaries in the prose families.
-
-The remainder is documentation and agent-instruction work (#279, #292, #345,
-#347, #357, #358, #360, #364) and test coverage (#319, #335, #336) that changes
-no public behaviour.
-
-### Release criteria
-
-- tagged output from every supported example contains an `/H1` for the document
-  identity (#267, #305), and the résumé and CV open a `Sect` division at each
-  section heading (#268), with `\CDossierSubsection` nesting a depth-3 heading
-  inside it (#337);
-- `/Lang` is present on the default build path (#276) and `DisplayDocTitle` is
-  set so the derived `/Title` reaches the viewer (#277);
-- `muted=plain|italic|gray|both` and `entrymeta=column|inline` are accepted and
-  rejected as documented on every class that takes them, with `muted=plain` the
-  default and `muted=italic` restoring the previous appearance (#271, #324,
-  #230);
-- the `Title` collision is resolved (#269) and no declared semantic colour token
-  is left unconsumed (#270), with a use assertion at each survivor's consumer;
-- every link the toolkit emits carries a `/S/URI` action and never a `/S/GoToR`
-  one (#328), a bare handle and a full URL both resolve (#330), and `make
-  annotations` holds that to account;
-- no URL or e-mail address in any supported example splits so that it fails to
-  reassemble by copy-paste, on every toolchain the suite runs (#294, #312);
-- bibliography entry numbers extract on their entry's line (#199);
-- no page a keep policy governs falls below 90% of its page goal (#333, #334),
-  and no committed fixture strands a club or widow line above the ratchet #348
-  set;
-- `make check` is green — lint, regression, extraction, smoke, layout,
-  bibliography, links, metadata, annotations, tagging, and all eleven examples;
-- `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/ATS-EXTRACTION.md`,
-  `docs/MIGRATION.md`, and `CHANGELOG.md` are updated;
-- tag and GitHub Release `v0.8.0` are published.
+Delivered scope and this release's criteria are recorded in the closed
+[`v0.8.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/11),
+[epic #281](https://github.com/amirhs1/CareerDossierTeX/issues/281), and its
+[`CHANGELOG.md` entry](../CHANGELOG.md#080---2026-08-12).
 
 ### Explicit non-goals
 
@@ -770,10 +463,6 @@ no public behaviour.
 - a `templates/` folder. Proposed in
   [issue #280](https://github.com/amirhs1/CareerDossierTeX/issues/280) and
   deliberately unmilestoned; the release that carries it is undecided.
-
-Tracked under
-[milestone `v0.8.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/11)
-and [epic #281](https://github.com/amirhs1/CareerDossierTeX/issues/281).
 
 ## Phase 8: `v0.9.0 — Documentation, Examples, and Release Readiness`
 
@@ -808,8 +497,7 @@ Release readiness:
 - build a PDF manual and ship it with its source (#263) — the one hard blocker
   on a CTAN submission;
 - configure `l3build ctan` and inspect the resulting archive (#264);
-- lint that every Work file declares the same version and date (#258);
-- record a VoiceOver reading-order check for the statement fixture (#274).
+- lint that every Work file declares the same version and date (#258).
 
 Tracked under
 [milestone `v0.9.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/12)
@@ -829,7 +517,10 @@ Declare a stable and fully documented interface.
 - deprecation policy is documented;
 - release ZIP works on Overleaf;
 - examples and manual are complete;
-- CI verifies all supported configurations.
+- CI verifies all supported configurations;
+- manual screen-reader passes are recorded for VoiceOver on the statement
+  fixture (#274) and NVDA on Windows (#96), so both sit together as one
+  release criterion.
 
 Tracked under
 [milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
