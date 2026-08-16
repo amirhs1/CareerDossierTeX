@@ -28,7 +28,7 @@ cdossiertestneverdefined -> unset
 ============================================================
 TEST 6: title-joins-doctype-and-name
 ============================================================
-[Testdoc -- Ada Lovelace]
+[Testdoc – Ada Lovelace]
 ============================================================
 ============================================================
 TEST 7: title-without-doctype-is-bare-name

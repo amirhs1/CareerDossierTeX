@@ -1,0 +1,19 @@
+% The derived /Title on the default (untagged) build path -- issue #428.
+%
+% Half of a pair. Its twin, letter-title-tagged.tex, is this file with a
+% \DocumentMetadata line added and nothing else changed, so any difference
+% between the two /Title strings is a difference the build path made.
+%
+% The letter is the class the divergence was reported against, and one class is
+% enough: every class derives its title through the same builder,
+% \__cdossier_components_pdftitle: in careerdossier-components.sty. Only the
+% doctype word in front of the name differs between them.
+\documentclass{careerdossier-letter}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Metadata Fixture}, email={metadata@example.test} }
+\CDossierLetterSetup{ recipient-name={Hiring Committee} }
+\begin{document}
+\MakeCDossierLetterhead
+A paragraph, so the letter has a body.
+\MakeCDossierClosing
+\end{document}

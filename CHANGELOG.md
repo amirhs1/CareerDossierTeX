@@ -258,6 +258,29 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ### Fixed
 
+- A document built with `\DocumentMetadata{tagging=on}` now carries the same PDF
+  `/Title` as the same document built without it. Tagged output showed
+  `Cover Letter -- Ada Lovelace` where the default path showed
+  `Cover Letter – Ada Lovelace`, so turning tagging on changed the title a
+  viewer puts in its window and a screen reader announces. The en dash — the
+  form `docs/API.md` has always documented and the default path has always
+  shipped — is now what both paths produce. ([#428])
+
+  Every class is affected, since all four derive their title through one
+  builder; the cover letter is simply where it was noticed. It is not a
+  regression: the builder joined the document type to the name with a literal
+  `--` from the start, and only the default path converted it, because hyperref's
+  `\pdfstringdef` applies the usual ligature substitution on the way to the PDF
+  string. Under `\DocumentMetadata` the kernel's PDF management writes the Info
+  dictionary itself and no such conversion happens.
+
+  `make metadata` now asserts the two paths agree, which is the half of this
+  that closes the gap rather than the instance: nothing logged the difference,
+  and no suite read the title, so both paths passed everything while disagreeing.
+
+  **Metadata only.** No class, option, key, command, token, or default changed,
+  and nothing rendered on the page moves.
+
 - A raw `#` in a profile value or a `\CDossierLink` argument now builds, and the
   address reaches the link target intact. It used to stop the build with
   `! Illegal parameter number in definition of \Hy@tempa.` — hyperref's own
@@ -421,6 +444,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
 [#419]: https://github.com/amirhs1/CareerDossierTeX/issues/419
 [#421]: https://github.com/amirhs1/CareerDossierTeX/issues/421
+[#428]: https://github.com/amirhs1/CareerDossierTeX/issues/428
 
 ## [0.8.0] - 2026-08-12
 

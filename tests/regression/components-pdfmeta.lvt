@@ -136,6 +136,13 @@
 
 % With a doctype declared, the title distinguishes the document from a sibling
 % built off the same profile.
+%
+% The baseline holds the separator as the en dash it is. It used to hold `--',
+% which looked equivalent and was not: only one of the two build paths converted
+% it, so the string this test reports was not the string half of the users got
+% (issue #428). What this test can see is the builder's output, so it is the
+% place the spelling is pinned; that the two paths then agree about it is
+% tests/metadata/run.sh's assertion, since it needs two real PDFs.
 \TEST{title-joins-doctype-and-name}{
   \CDossierSetup{ name = {Ada Lovelace} }
   \cdossiertestSetDoctype{Testdoc}

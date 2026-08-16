@@ -502,6 +502,10 @@ elsewhere, because a summary is what drifts. Cover the relevant parts:
   annotation carries a `/S/URI` action and never a `/S/GoToR` remote-PDF one
   (`make annotations`). The page, the extracted text, and the `links` invariant
   all stay correct when this one is wrong, so no other suite covers it;
+- derived PDF document metadata after any change to it, on **both** build paths
+  (`make metadata`): the two paths hand the string to different writers, so a
+  value that is right on the default path can be wrong under
+  `\DocumentMetadata` while nothing is logged and every other suite passes;
 - unsupported-engine error;
 - every option's accepted and rejected values, including the error naming the
   accepted values, and rejection reported exactly once;
@@ -725,6 +729,20 @@ It builds each class on the default path and checks the catalog's `/Lang`, plus
 a document that sets `pdflang` itself and one that loads
 `careerdossier-components` after `hyperref`. It needs only LuaLaTeX.
 
+It also holds the one assertion in the tree that spans both build paths: that
+the derived `/Title` is the same string whether or not the document opts into
+tagging. That comparison is here because `/Title` is Info-dictionary metadata,
+which is this suite's subject, and because it cannot be made from one path
+alone — issue #428, where the tagged path shipped `Cover Letter -- <name>`
+against the default path's `Cover Letter – <name>` from identical source, for
+as long as both paths had existed. The two writers serialise the same string
+differently, hyperref's `\pdfstringdef` as an escaped literal and the kernel's
+PDF management as hex, so the runner normalises both to UTF-16BE code units
+before comparing; comparing the bytes would report every such pair as different.
+The expected value is constructed in the runner rather than copied out of a
+build, so a fixture cannot pass by agreeing with whatever the package currently
+emits.
+
 Two things about it are deliberate and worth keeping. Its fixtures build
 uncompressed, because on the default path the catalog otherwise sits inside a
 compressed object stream, where a text search of the file finds nothing whether
@@ -737,7 +755,10 @@ silence.
 It is separate from the tagged-PDF suite below by build path rather than by
 subject: every tagging fixture passes `\DocumentMetadata`, which supplies
 catalog entries itself and therefore cannot show what the package contributes on
-its own.
+its own. The `/Title` pair above is the deliberate exception and stays one — a
+fixture belongs here because the default path is the only place its subject is
+visible, and `letter-title-tagged.tex` earns its `\DocumentMetadata` only by
+being the other half of a comparison.
 
 ### Link-annotation suite
 
