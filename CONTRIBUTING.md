@@ -301,17 +301,24 @@ the other. The extraction and bibliography *targets* are `extract-test` and
 `bibliography-test`, while the matching *jobs* are `extraction` and
 `bibliography`; job `cv` runs `make academic-cv academic-bibliography` and job
 `statement` runs `make statements`; and `examples`, `check`, `check-serial`,
-`check-parallel`, `test`, `clean`, and every `review-*` target have no job at
-all.
+`check-parallel`, `test`, `clean`, `ctan`, and every `review-*` target have no
+job at all. Two of those need a word. `ctan-lint` is dispatched by `make check`
+like any other suite, but its CI cover is a *step* of the `regression` job
+rather than a job of its own: it loads `build.lua` under `texlua`, so it cannot
+run in the TeX-free `lint` job, and the `regression` job already loads that file.
+And `ctan` builds the release archive — a release-time action rather than a
+per-pull-request one, which is why `ctan-lint` checks the configuration on every
+run while the target itself is called for by
+[`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md#building-the-archive).
 
 ### The gate, and the serial path
 
-`make check` runs its eleven targets four at a time, which on the maintainer's
+`make check` runs its twelve targets four at a time, which on the maintainer's
 machine takes about four minutes rather than seven. It is the pre-push gate. Set
 the worker count with `JOBS`, or take the deterministic path instead:
 
 ```bash
-make check                     # the gate: eleven targets, four at a time
+make check                     # the gate: twelve targets, four at a time
 make check JOBS=2              # fewer workers
 make check-serial              # one target after another
 ```

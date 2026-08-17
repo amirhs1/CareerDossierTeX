@@ -517,6 +517,11 @@ elsewhere, because a summary is what drifts. Cover the relevant parts:
   is a fixture compiling that exact text. A template added to the manual's
   "Complete examples" chapter needs a `manual-example-*.tex` fixture in the same
   change, or `make smoke` fails (see "Documented templates are compiled" below);
+- the release archive after any change to the Work's file set or to `build.lua`'s
+  packaging configuration (`make ctan-lint`). A file
+  added to the Work that no `sourcefiles` glob matches, or a file list naming
+  something that no longer exists, costs the archive a file and costs
+  `l3build ctan` no error — see "CTAN packaging lint" below;
 - all affected classes after changes to a shared package;
 - tagged and untagged output after changes to tagging or shared packages; and
 - bibliography sorting and field precedence after `careerdossier-biblatex.sty`
@@ -1218,6 +1223,59 @@ fails there rather than passing everything.
 about the same file: not whether the names it documents exist, but whether the
 complete documents it publishes compile. "Documented templates are compiled"
 above is the one statement of that check and is not repeated here.
+
+### CTAN packaging lint
+
+```bash
+make ctan-lint                         # tests/lint/run-ctan-config.sh, the driver
+                                       # tests/lint/ctan-config.lua, the assertions
+```
+
+It is a `CHECK_TARGETS` member of its own rather than a script in the `lint`
+slot, and the reason is the interpreter. Every other lint here reads text and
+needs no TeX, which is why the CI `lint` job runs on a bare runner instead of
+pulling the TeX Live container; this one loads `build.lua` under `texlua`. Its
+CI cover is therefore a step of the `regression` job, which already loads that
+same file.
+
+`build.lua` gained a packaging configuration in `v0.9.0` (#264), and
+`l3build ctan` cannot check it. Its file lists are globs, and **a glob that
+matches nothing is not an error** — it contributes no files and the run exits 0.
+Drop `README.md` from `textfiles`, or misspell `careerdossier.tex` in
+`typesetfiles`, and l3build builds an archive with no README or no manual and
+reports success. Those are the two CTAN requirements a submission is rejected
+for: a top-level README carrying a licence and a version, and PDF documentation
+together with its source.
+
+Building the archive would not catch it either. What `l3build ctan` produces is
+an archive; nothing compares that archive against what it was supposed to
+contain. This lint does, from the two files that already know — `manifest.txt`,
+which defines the Work, and a Work file's own `\ProvidesExpl*` declaration. Six
+checks: the package name, the published version, that every literal filename in
+a file list exists, that the README, licence, manifest, and manual source are
+each carried by some list, that `packtdszip` was decided rather than defaulted,
+and that every Work file is matched by a `sourcefiles` glob.
+
+It is the one lint here that **loads** its subject instead of reading it, and
+the reason is the version. `build.lua` derives that from
+`careerdossier-base.sty` rather than restating it, so that no eleventh copy
+exists to go stale beside the ten the version lint above already holds equal —
+`manifest.txt` defines the Work and `build.lua` is not part of it, so a literal
+there would sit outside the set that lint reads. A grep can see the derivation
+but not its result; loading is what makes the value `l3build` would publish
+available to compare, against a *different* Work file than the one it was
+derived from. Two consequences. The l3build variable defaults are deliberately
+not loaded first, which is what lets `packtdszip` distinguish "set to false"
+from "never set" — unset is `nil`, and `nil` is the failure. And the driver
+fails rather than skips when `texlua` is absent, per "A guard answers three
+states, not two" below.
+
+Its negative controls are not fixture directories but mutations: the audit takes
+the configuration as an argument, so the self-check re-runs it over a broken
+copy, one per check, each expecting its own failure back. A checker that stopped
+detecting a stale version, a missing file, a defaulted `packtdszip`, a renamed
+package, or a Work file left out of the archive fails there rather than
+reporting a clean tree.
 
 The `lint` target runs two more scripts in the same slot:
 

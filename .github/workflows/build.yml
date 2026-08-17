@@ -108,6 +108,12 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Module regression suite (l3build check on LuaTeX)
         run: l3build check
+      # The CTAN packaging configuration, which lives in the same build.lua this
+      # job already loads. It is not in the `lint` job because it loads that file
+      # under `texlua` rather than reading it, and that job runs on a bare runner
+      # with no TeX. Locally it is `make ctan-lint`, dispatched by `make check`.
+      - name: CTAN packaging configuration (build.lua)
+        run: tests/lint/run-ctan-config.sh
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload regression logs
         if: always()
