@@ -191,6 +191,23 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   before, including every shipped example; the key is additive and its default
   is the shipped behaviour.
 
+- `make smoke` compiles the user template published in `docs/ATS-EXTRACTION.md`
+  §11 and fails if the guide's text and the fixture disagree. It is the second
+  documented template to get this treatment, after the manual's header-stack
+  example ([#252]); `tests/smoke/ats-user-template-doc.tex` holds the published
+  text verbatim, and the drift unit diffs the two before compiling either.
+  ([#450])
+
+  The template compiled at the time this was added — verified by extracting and
+  building it — so this guards the next rename rather than repairing a present
+  break. The failure it exists for is [#185]'s: an uncompiled example in a
+  document nobody re-reads goes stale in silence, and a reader cannot tell which
+  of several published templates is current.
+
+  **Contributor tooling only.** No class, option, key, command, token, or
+  rendered output changed — `make smoke` compiles one more fixture and can fail
+  for one more reason.
+
 ### Changed
 
 - **`docs/API.md` is now a pointer rather than the interface reference.** The
@@ -608,6 +625,8 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#442]: https://github.com/amirhs1/CareerDossierTeX/issues/442
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
+[#252]: https://github.com/amirhs1/CareerDossierTeX/issues/252
+[#450]: https://github.com/amirhs1/CareerDossierTeX/issues/450
 
 ## [0.8.0] - 2026-08-12
 
