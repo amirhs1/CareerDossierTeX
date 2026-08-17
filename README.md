@@ -477,26 +477,16 @@ Source archives and selected example PDFs are available through GitHub Releases.
 
 ## Roadmap
 
-| Version | Goal |
-|---|---|
-| `v0.1.0` | English industry résumé and cover letter |
-| `v0.1.1` | Metadata and build corrections |
-| `v0.2.0` | Academic CV, academic letter, and optional bibliography support |
-| `v0.2.1` | Extraction correction |
-| `v0.4.0` | LuaLaTeX transition and tagged-PDF preview |
-| `v0.5.0` | Statement classes and broader customization |
-| `v0.6.0` | Calibrated type scale and vertical rhythm |
-| `v0.7.0` | Page furniture placement, the `medium` option, and spacing ownership |
-| `v0.8.0` | Semantic structure, tagged-output metadata, and public typography and colour roles |
-| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive |
-| `v1.0.0` | Stable and documented public API |
+Everything in the support matrix above is in the current release, named under
+[Releases](#releases). Two releases remain planned: `v0.9.0` consolidates the
+documentation set, revises the examples, and prepares the CTAN archive, and
+`v1.0.0` declares the public interface stable and fully documented. Nothing is
+scheduled after that.
 
-Farsi, bilingual, and right-to-left support (`v0.3.0`) is dropped.
-CareerDossierTeX is English-only. Colour themes and named font families
-(`v1.1.0`) are deferred with no scheduled release; that milestone was closed
-empty on 2026-08-05.
-
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for release boundaries and non-goals.
+[`docs/ROADMAP.md`](docs/ROADMAP.md#release-overview) owns the release table —
+every version, its goal, and its status, including the two milestones closed
+without shipping — together with the boundary between releases and each one's
+non-goals.
 
 ## Contributing
 

@@ -325,6 +325,23 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **Documentation only** — no class, option, key, command, token, or rendered
   output changed, and no versioned entry was touched.
 
+- `README.md`'s "Roadmap" is two paragraphs instead of a twelve-row table of
+  every release and its goal. `docs/ROADMAP.md` "Release overview" carries the
+  same information with a `Status` column the README's copy did not have, and
+  owns it; nothing kept the two in step, and the list changes at every release
+  boundary. What a reader landing on the README wants is what release this is
+  and where the project is going, which is what is left, with the table one
+  link away. ([#449])
+
+  The dropped and deferred milestones are not lost with the table: the support
+  matrix above already states that the toolkit is English-only, that Farsi,
+  bilingual, and right-to-left support is dropped, and that themes, named font
+  families, and icons remain later work.
+
+  **Documentation only** — no class, option, key, command, token, or rendered
+  output changed, and the "current release" block `make lint` reads is
+  untouched.
+
 ### Fixed
 
 - A `--` you type yourself now reaches the PDF `/Title` and `/Author` spelled the
@@ -590,6 +607,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#440]: https://github.com/amirhs1/CareerDossierTeX/issues/440
 [#442]: https://github.com/amirhs1/CareerDossierTeX/issues/442
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
+[#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
 
 ## [0.8.0] - 2026-08-12
 
