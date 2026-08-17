@@ -1338,6 +1338,34 @@ so it cannot spread down a file. The last control asserts both by re-running the
 scanner over a synthetic file containing a bare marker, a reasoned one, and an
 offence past a blank line.
 
+### Running under a restricted sandbox
+
+Two runners used to fail under a Bash sandbox that denies re-opening a pipe file
+descriptor or reaching the per-user temp directory, and both failed in this
+file's characteristic way — a verdict about work that never happened (#392).
+
+`tests/extraction/run.sh` and `tests/bibliography/run.sh` compared their
+extracted text against a process substitution. The denial lands on `diff`'s own
+*input*, so `diff` exited non-zero having compared nothing and the runner
+reported an extraction mismatch above an empty diff. Each now writes what it
+extracted to a scratch `*.got` file and diffs two ordinary paths; the scratch
+file is load-bearing rather than tidy, and `tests/check-parallel.sh` avoids
+process substitution for the same reason.
+
+`tests/tagging/run.sh` invokes veraPDF, whose JVM does not read `TMPDIR` but
+asks Darwin for the per-user temp directory directly. Where that directory is
+denied, veraPDF dies in its own static initialiser and every fixture was
+reported as failing PDF/UA-2 validation — eleven verdicts from a validator that
+never started, the hollow *failure* to the hollow pass above. The runner points
+the JVM at the temp directory the rest of the suite already uses, appending to
+`_JAVA_OPTIONS` so a caller's own value survives, and declines to set it when
+the path contains whitespace rather than passing an unparsable option.
+
+The third half of #392 — biber's cache, which cannot be shared between
+concurrent invocations — is under "The parallel run" below, since it is a
+concurrency defect rather than a sandbox one. Both source files carry the full
+diagnosis in comments at the repair site.
+
 ### The parallel run
 
 `make check` runs its eleven targets four at a time rather than one after

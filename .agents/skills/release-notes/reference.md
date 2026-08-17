@@ -70,6 +70,46 @@ CHANGELOG" link has gone decorative.
 8. At release-preparation time, add the version's own compare-link
    definition at the very bottom of the file (`[X.Y.Z]: .../compare/vPREV...vX.Y.Z`)
    and repoint `[Unreleased]` at `.../compare/vX.Y.Z...HEAD`.
+9. At release-preparation time, and **before** the retitle in step 2, sweep
+   `[Unreleased]` for contributor-tooling entries and remove them. See
+   "The tooling sweep" below.
+
+## The tooling sweep (release-preparation time only)
+
+`CONTRIBUTING.md` "Update `CHANGELOG.md` when" is the boundary: an entry earns
+its place by being *user-visible*, and a `Makefile` target a contributor is told
+to run, a test-harness guard, or a lint script does not. That boundary is not
+applied backwards, so a shipped section is annotated rather than rewritten
+(#410, #413). `[Unreleased]` is the opposite case — it sits inside the
+boundary's own era and is still editable — and the sweep is what keeps a
+release from shipping entries the rule says it should not have produced. #414
+ran it for `v0.9.0` and removed eleven; without a standing step the next
+release accumulates the same backlog.
+
+Run it in this order:
+
+```bash
+grep -n 'Contributor tooling only' CHANGELOG.md   # the marker, but not the test
+```
+
+1. **Do not trust the marker.** It finds entries that declared themselves; it
+   misses one that is tooling-only without carrying it, and #414 found exactly
+   one such entry. Read every lead bullet in `[Unreleased]` and apply the
+   `CONTRIBUTING.md` test to each: *what* changed, not who ran it.
+2. **Confirm the content has a home before deleting it.** A contributor-facing
+   target belongs in `CONTRIBUTING.md`, a suite or guard in `docs/TESTING.md`.
+   Usually it is already there and nothing is needed; where it is not, write it
+   there in the same change. Deleting an entry must not delete the only record
+   of the behavior.
+3. **Delete the entry's reference-link definitions with it, and only then.**
+   Removing an entry can strand a `[#NNN]` definition, and it can equally strand
+   a *citation* in a surviving entry whose definition went with the entry
+   removed. Nothing in `make lint` covers either; audit the section directly and
+   re-check that every `[#NNN]` cited anywhere in the file still resolves.
+4. **Leave a citation that survives.** A user-visible entry may legitimately
+   cite a tooling issue as part of its reasoning; that is a link to an issue,
+   not an entry for it, and it stays.
+5. Then `make lint`, which covers the Markdown anchors but not step 3.
 
 ## GitHub Release notes (release-preparation time only)
 
