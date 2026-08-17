@@ -525,12 +525,14 @@ Declare a stable and fully documented interface.
 - supported engines and languages are tested;
 - migration paths exist for renamed features;
 - deprecation policy is documented;
-- release ZIP works on Overleaf;
-- examples and manual are complete;
+- examples are complete;
 - CI verifies all supported configurations;
 - manual screen-reader passes are recorded for VoiceOver on the statement
   fixture (#274) and NVDA on Windows (#96), so both sit together as one
-  release criterion.
+  release criterion;
+- the uploaded archive satisfies the CTAN packaging requirements, which
+  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
+  states in full and this file does not restate (#448).
 
 Tracked under
 [milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
@@ -567,7 +569,9 @@ The live issue and Project metadata now follow the continuous-testing policy:
 
 - CTAN packaging via `l3build ctan`, and the PDF manual a submission requires —
   `v0.9.0`, under #264 and #263. Whether the manual is handwritten or generated
-  from a `.dtx` is decided there; `.dtx` is not a CTAN requirement.
+  from a `.dtx` is decided there, against what
+  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
+  states CTAN requires.
 - Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
   LuaLaTeX transition supersedes that precondition, and opt-in tagged structure
   is now in-scope for `v0.4.0` via
