@@ -230,8 +230,9 @@ bounds this workflow and is not restated here.
   issue from a template rather than a blank body; `CONTRIBUTING.md` "Issue
   workflow" states the templates and the structure they encode.
 - Every issue carries a milestone, except work whose release is genuinely
-  undecided — see the exception in `docs/NAMING-CONVENTION.md` §7. An epic
-  parent only when the work genuinely decomposes into several issues.
+  undecided — see the exception in `docs/NAMING-CONVENTION.md` "Milestone
+  naming convention". An epic parent only when the work genuinely decomposes
+  into several issues.
 - Every PR links an issue with `Closes #...`, except a revert, a release chore,
   or a CI/tooling repair — which state the problem, proposal, and acceptance
   criteria in the PR body instead. Every PR comes from a focused branch merged
@@ -312,8 +313,8 @@ is ever dropped, so a missing one is always a defect and never an omission. Each
 section is a few lines: the report is a summary, and reasoning a reviewer needs
 in order to judge the change belongs in the PR body, not here. The title line is
 the branch's own commit and PR title, in the form `docs/NAMING-CONVENTION.md`
-section 4 defines, with a `closes #<issue>` suffix; that convention is not
-restated here.
+"Commit message convention" defines, with a `closes #<issue>` suffix; that
+convention is not restated here.
 
 ```text
 ## <type>(<scope>): <summary> — closes #<issue>

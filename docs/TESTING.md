@@ -540,7 +540,7 @@ compiled by a smoke fixture holding that text verbatim:
 | Published in | Fixture | Drift unit |
 |---|---|---|
 | `doc/careerdossier.tex`, "The header stack" | `tests/smoke/components-header-stack-doc.tex` | `components-header-stack-doc-drift` (#252) |
-| `docs/ATS-EXTRACTION.md` §11, "User template" | `tests/smoke/ats-user-template-doc.tex` | `ats-user-template-doc-drift` (#450) |
+| `docs/ATS-EXTRACTION.md`, "User template" | `tests/smoke/ats-user-template-doc.tex` | `ats-user-template-doc-drift` (#450) |
 
 Compiling the fixture is only half of it. A fixture that keeps building while
 its published twin is edited proves nothing about the twin, so each drift unit
@@ -945,7 +945,8 @@ minutes that a per-push job should not pay. A separate weekly
 `verapdf-scheduled` workflow builds veraPDF from a pinned commit and runs the
 same gate. Do not describe a pull request as PDF/UA-validated on the strength of
 the PR checks alone; see `CONTRIBUTING.md` "Pinned dependencies" and
-[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) section 7.1.
+[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
+"Recorded validation results".
 
 ### Option lint
 

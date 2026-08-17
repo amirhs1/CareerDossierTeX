@@ -7,7 +7,7 @@ assignees: ""
 ---
 
 <!--
-Title form: `docs/NAMING-CONVENTION.md` section 2, "Epic issue titles".
+Title form: `docs/NAMING-CONVENTION.md`, "Epic issue titles".
 Open an epic only for work that genuinely decomposes into several issues —
 a release epic, or a cross-cutting effort spanning more than one class or
 package. `CONTRIBUTING.md` "Work item structure" is canonical for when an epic
