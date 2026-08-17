@@ -633,6 +633,13 @@ would not have produced (#260). `CHANGELOG.md` carries a note under each
 release's own heading saying so, listing the same entries, so a reader who
 opens the register first is not left reading them as precedent (#410, #413).
 
+`[Unreleased]` is the one section this is *not* true of. It sits inside the
+boundary's own era and is still editable, so an entry there that the boundary
+would not have produced is removed at release preparation rather than annotated
+— a note saying it predates the rule would be false. `v0.9.0` was the first
+release to sweep it, and eleven entries came out (#414); the sweep is a standing
+step in `.agents/skills/release-notes/reference.md`, "The tooling sweep".
+
 For entry format, house style, and how `CHANGELOG.md` relates to GitHub
 Release notes, see `.agents/skills/release-notes/reference.md`.
 

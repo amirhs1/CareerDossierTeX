@@ -43,131 +43,6 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   stale. **Documentation only** — no class, option, key, command, token, or
   rendered output changed.
 
-- `make check-parallel` runs `make check`'s eleven targets concurrently instead
-  of one after another, with `JOBS=N` to choose how many are in flight (default
-  four). It arrived as an opt-in path alongside a serial `make check`; later in
-  this same release ([#399]) it became what `make check` itself runs. ([#378])
-
-  Both entry points expand one `CHECK_TARGETS` variable, so they cannot dispatch
-  different suites; `make lint` fails if `check` ever stops doing so. The
-  parallel driver counts results and fails when a dispatched target leaves none,
-  because a worker that dies before its suite ran leaves an absence rather than
-  a failure, and it warms luaotfload's font cache with one build required to
-  prove it typeset real glyphs before fanning out. Per-target output is captured
-  and replayed in the Makefile's order.
-
-  The shipped-example bibliography guard in `tests/bibliography/run.sh` now
-  compiles into `build/bibliography-example/` rather than the
-  `academic-bibliography` target's `build/examples/`. Both are reached by `make
-  check`, and concurrently they raced on the same `.aux`, `.bcf`, `.bbl`, and
-  `.pdf`.
-
-  **Contributor tooling only.** No class, option, key, command, token, or
-  rendered output changed, and no suite's verdict changed — only how many of
-  them run at once and where one of them writes its artifacts.
-
-- `make smoke`, `make layout`, and `make tagging` take `JOBS=N` and run that
-  many of their own fixtures at once. With no `JOBS` each runs exactly what it
-  ran before, in the same order, with byte-identical output, so CI is
-  unaffected; the gate pins this inner fan-out to 1 regardless. ([#390])
-
-  Measured on the maintainer's machine: `smoke` 108 s to 40 s and `layout` 95 s
-  to 35 s at `JOBS=4`. The target-level driver could not reach this — its floor
-  is the longest single target.
-
-  Each fixture became a function reporting through its return status alone,
-  because a worker is a subshell and the `fail=1` every assertion used to set
-  dies with it; a runner that lost its verdicts would report a clean run of
-  nothing. The dispatcher, throttle, ordered replay, and accounting assertion
-  are now one shared implementation in `tests/lib/fanout.sh`, used by
-  `tests/check-parallel.sh` as well, so its five committed controls exercise the
-  code all four callers run. `make lint` additionally asserts that each runner's
-  serial and parallel paths select the same fixtures and that the `Makefile` can
-  reach the `--jobs` path.
-
-  `make check-parallel` now passes every dispatched target an explicit `JOBS`,
-  defaulting to 1: a command-line `JOBS` lands in `MAKEFLAGS`, so without this
-  `make check-parallel JOBS=4` would have silently fanned out inside each target
-  as well — sixteen concurrent LuaLaTeX processes. Raise it with
-  `INNER_JOBS=N`.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed, and no suite's verdict changed — only
-  how many fixtures each runner compiles at once.
-
-- `make lint` asserts that every Markdown anchor link resolves. Each
-  `](TARGET.md#anchor)` and same-file `](#anchor)` in a tracked Markdown file,
-  outside fenced code, must name a heading that exists in the target. ([#407])
-
-  The documentation set navigates by these links, and [#259] made that
-  load-bearing: `docs/API.md` and `docs/MIGRATION.md` now point at
-  `docs/ARCHITECTURE.md` for mechanisms they used to restate, so a pointer that
-  resolves to nothing is worse than the duplication it replaced. Three such
-  links were already in the tree — this file linked to
-  `docs/MIGRATION.md#080---unreleased` after the `v0.8.0` release renamed that
-  heading — and are repaired here.
-
-  The lint reproduces GitHub's anchor derivation, which is the part that can be
-  wrong in the direction that matters: a bad derivation reports working links as
-  broken ([#398]'s failure mode). It strips punctuation by blacklist rather than
-  keeping a whitelist, so `## Résumé class` stays `#résumé-class`, and it emits
-  one hyphen per space rather than per run of spaces, because removing an em
-  dash or arrow leaves the spaces that flanked it. Running it against the tree
-  before trusting it caught the second of those; six fixtures pin each failure
-  mode, including both.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed — `make lint` runs one more script and
-  can fail for one more reason.
-
-- `make lint` asserts that `AGENTS.md` names every section it points to. Every
-  section name it quotes must exist as a heading in `CONTRIBUTING.md` or
-  `docs/TESTING.md`, and every subsection of `CONTRIBUTING.md`'s "Local builds"
-  chapter must be named in `AGENTS.md`. ([#400])
-
-  `AGENTS.md` reproduces no test documentation; it points at it by naming
-  sections, which is a hand-maintained index of another file's headings. That
-  index drifted twice in two days: the two entry points added above ([#378],
-  [#390]) each added a section to that chapter, and `AGENTS.md` went on naming
-  two of what were by then four. The new lint also found a third defect nobody
-  had reported — a truncated section citation that resolves for a human reader
-  and not for anything mechanical.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed, and no suite's verdict changed — `make
-  lint` runs one more script and can fail for one more reason.
-
-- `make lint` asserts that every file of the Work declares the same version and
-  date. It reads `manifest.txt` and the root sources together: each `.sty`/`.cls`
-  listed under "The Work" must exist and declare itself with
-  `\ProvidesExplPackage` or `\ProvidesExplClass`, each declaration must parse
-  into a `{name} {date} {version}` triple, all the `{date} {version}` pairs must
-  be identical, every declared name must equal its own file's basename, and the
-  declaring files and the manifest's list must be the same set.
-  ([#258], [#405])
-
-  The ten declarations are bumped by hand and nothing compared them. No
-  committed baseline records a version or a date — deliberately, since one that
-  did would churn on every release — so a bump that missed a file passed every
-  suite. LaTeX writes both values into the `.log` without complaint, and a
-  distribution whose `careerdossier-resume.cls` says `0.8.0` while its
-  `careerdossier-theme.sty` says `0.7.0` contains nothing wrong enough to fail.
-  The name check is that same hand-typed-argument drift one field to the left:
-  a `careerdossier-them` inside `careerdossier-theme.sty` is silent in exactly
-  the way a stale version is, because LaTeX repeats the declared string into the
-  `.log` without comparing it to the filename and `l3build` uses it for messages
-  only. The set comparison rides along because it is the same class of drift,
-  and `manifest.txt` is what defines the Work for the LPPL.
-
-  It does not check the declarations against the git tag, `CHANGELOG.md`, or
-  `docs/MIGRATION.md`: each legitimately disagrees on `main` between releases.
-  Confirming that the agreed pair is the *right* pair stays a release-time step,
-  in `.agents/skills/release-notes/reference.md`.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed, and no suite's verdict changed — `make
-  lint` runs one more script and can fail for one more reason.
-
 - `CDossierPublications` takes a `numbering` key. `restart` is the default and
   is what the class has always done — each list numbers from `1)`. `numbering =
   continue` carries on from the previous list instead, so a document whose
@@ -190,58 +65,6 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   **No existing output moves.** A document that does not set the key renders as
   before, including every shipped example; the key is additive and its default
   is the shipped behaviour.
-
-- `make smoke` compiles the user template published in `docs/ATS-EXTRACTION.md`
-  "Minimal reference template and class skeleton" and fails if the guide's text
-  and the fixture disagree. It is the second documented template to get this
-  treatment, after the manual's header-stack example ([#252]);
-  `tests/smoke/ats-user-template-doc.tex` holds the published text verbatim, and
-  the drift unit diffs the two before compiling either.
-  ([#450])
-
-  The template compiled at the time this was added — verified by extracting and
-  building it — so this guards the next rename rather than repairing a present
-  break. The failure it exists for is [#185]'s: an uncompiled example in a
-  document nobody re-reads goes stale in silence, and a reader cannot tell which
-  of several published templates is current.
-
-  **Contributor tooling only.** No class, option, key, command, token, or
-  rendered output changed — `make smoke` compiles one more fixture and can fail
-  for one more reason.
-
-- Every complete document the manual publishes is now compiled. `make smoke`
-  builds all seven templates from `doc/careerdossier.tex` "Complete examples" —
-  résumé, cover letter, academic CV, and four statement types — from
-  `tests/smoke/manual-example-*.tex` fixtures holding their published text
-  verbatim, and `make lint` gains an eighth script,
-  `tests/lint/run-manual-examples.sh`, asserting that the chapter's examples and
-  those fixtures are in **bijection**. ([#458])
-
-  This closes the gap [#450] left. That issue's premise was that the manual's
-  templates were already covered by [#252]'s control; measured, they were not —
-  that control selects the one block containing `\CDossierHeaderBegin`, so the
-  seven documents in this chapter were matched by nothing, in the file [#263]
-  made the interface reference. A reader copying a template out of the interface
-  reference has the strongest claim that it works.
-
-  The check is a set assertion rather than seven more per-example selectors,
-  because selectors are what let the gap open: an example no selector names
-  reads exactly like an example that does not exist. Adding an eighth example
-  without a fixture now fails. It lives in `lint` rather than in the smoke
-  runner because it is a claim about text that needs no TeX, and because it is
-  owned by no single fixture — `run-fixture-filter.sh` requires a dispatched
-  smoke unit to be named for a listed fixture, and this one would be named for
-  seven.
-
-  All seven compiled unchanged when the fixtures were written, so this guards
-  the next rename rather than repairing a break. Four of them are statements
-  whose types already had `statement-*-valid` fixtures, so their compiles are
-  close to redundant and their value is the drift half.
-
-  **Contributor tooling only.** No class, option, key, command, token, or
-  rendered output changed, and the manual's text is untouched — `make smoke`
-  compiles seven more fixtures, about 8 s at `JOBS=4`, and `make lint` runs one
-  more script.
 
 ### Changed
 
@@ -270,55 +93,6 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   names the other five document types with their shipped examples in a table.
   It used to walk through all seven, which the manual now does in full.
   ([#263])
-
-- `make lint` gains a seventh script, `tests/lint/run-manual-names.sh`. It fails
-  the build when the manual documents a private LaTeX3 name, when it documents a
-  public name that appears in no file of the Work, or when the release the
-  manual and `README.md` declare disagrees with the one the Work declares.
-  ([#263])
-
-  Neither of the first two is checkable by compiling the manual: a manual
-  documenting `\CDossierSubsectoin`, or a command deleted two releases ago,
-  typesets perfectly and reads as authoritative. The third extends #258's
-  version lint, which checked the `.sty`/`.cls` declarations and nothing in the
-  documentation, to the two places the documentation declares a release.
-
-- `make check` runs its eleven targets four at a time and is still the pre-push
-  gate; `make check-serial` runs the same eleven one after another. `JOBS=N`
-  sets the worker count, and `make check-parallel` survives as an alias of
-  `check`. On the maintainer's machine the gate falls from about seven minutes
-  to about four. ([#399])
-
-  The gate had been serial on the argument that `check` is the CI-aligned entry
-  point. What CI aligns to is the target set and the commands, not the
-  scheduling: `.github/workflows/build.yml` runs sixteen jobs on sixteen runners
-  with no `needs:` between them, so a serial local `check` was the one execution
-  model nothing else in the project used. Both paths still dispatch one
-  `CHECK_TARGETS` variable through the same `make <target>` invocations, and no
-  CI file changed.
-
-  Four workers is the default because it is the fastest value measured green —
-  serial 439 s, `JOBS=2` 285 s, `JOBS=4` 211 s, confirmed at the default by five
-  consecutive clean-tree runs at 211–249 s against `check-serial`'s 431 s.
-  `JOBS=8` is a further 20% and failed four of eight clean-tree runs, every
-  failure a text-extraction assertion against a document that is provably
-  correct ([#398], a guard reporting present text as missing under load, not
-  anything the classes did). The default carries that bound rather than the best
-  time.
-
-  `make lint` gained two controls, because retargeting the old one would have
-  quietly stopped covering the gate: `check` is now a recipe and has no
-  prerequisite list to assert on. It now also checks that `check` dispatches
-  through the driver, and compares what each path would actually dispatch —
-  make's own expanded prerequisite list for `check-serial` against the list the
-  driver is handed. Each control was run against a `Makefile` broken in the way
-  it claims to catch, and only the comparison catches a `check-targets` recipe
-  rewritten to print a hand-written list — the shape that once dropped
-  `annotations` from a run that was then reported clean.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed, and no suite's verdict changed — only
-  how many of them run at once by default.
 
 - `examples/academic/publications.bib` now declares twenty fictional entries
   across four types (`article`, `inproceedings`, `unpublished` preprints, and
@@ -569,111 +343,15 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   every statement and letter document and their pagination should be
   reviewed. ([#419])
 
-- A test guard that cannot perform its check now fails saying so, instead of
-  reporting a verdict about a document it never read. ([#398])
-
-  Under `make check JOBS=8` the runners reported a running header MISSING from a
-  page that carried it on line 1, that `pdftotext` had extracted correctly and
-  exited 0 on, and that the runner's own re-extraction found. Every such guard
-  was spelled `printf '%s\n' "$text" | grep -Fq "$needle"`, and a pipeline that
-  returns non-zero for any reason other than "no match" is indistinguishable
-  from absent text.
-
-  The half that mattered had not been observed. Each `medium=screen` branch
-  inverts the same test — the furniture must *not* be there — so whatever made
-  the pipeline spuriously non-zero made that branch spuriously false, and a real
-  violation would pass in silence.
-
-  `tests/lib/text.sh` replaces the two-state question with a three-state one:
-  present, absent, and **could not be checked**, the last of which every caller
-  must fail on by name. Fixed-string matching now runs in the shell, where it
-  forks nothing and opens no pipe; the two genuine regular expressions use a
-  here-string and read `grep`'s status three ways. Captures yield an explicit
-  unavailable value rather than an empty string, so a failed extraction can no
-  longer read as an empty page. Forty-three guard sites across `layout` (14),
-  `tagging` (21), `smoke` (2), `extraction` (2), and the two lint runners (4)
-  were converted. [#398] counted 32 in the four suites it named; the shape also
-  covered two `pdfinfo` media-box checks, a club/widow negative control, two
-  count guards, and the lint runners, and all of them are the same defect.
-
-  Two of those were the same defect arriving as **arithmetic**, and were silent
-  passes rather than noisy failures: the page-one running-label count and the
-  orphaned-bullet count read `grep -Fc … || true`, which answers `0` for text
-  that was never extracted — and `0` is the passing value for both, one testing
-  `-ne 0` and the other `-eq 1`. So a page the runner could not read reported a
-  clean result. `text_count_lines` and `text_count_matches` return a count or an
-  explicit unknown, and the ratchet now covers `| grep -c` as well as
-  `| grep -q`. A count that is genuinely safe is exempted at the site with a
-  `# guard-ok: <reason>` marker that must carry a reason and shields only the
-  block beneath it.
-
-  No mechanism is claimed. Three candidates — a `grep -q` SIGPIPE race under
-  `pipefail`, `pdftotext` failing under concurrency, and the pipeline failing
-  under fork pressure — were tested over 2000, 640, and 7200 trials in [#398]
-  and none reproduced, so the fix removes the class rather than repairing a
-  cause. `tests/lint/run-text-guards.sh` is the committed control: it drives
-  both spellings over the same present text with `PATH` emptied, which is the
-  unperformable state with no load at all, and the old form reports MISSING
-  where the new one does not. Its last control is a ratchet that fails if the
-  `... | grep -q` shape reappears in any runner or shared library.
-
-  `JOBS=8` is left non-default. It was 20% faster and failed four of eight runs
-  on this defect; the default carries its own measurement campaign, not this
-  one's.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed. Guard *outcomes* are unchanged for every
-  document that extracts — what changed is what happens when extraction or
-  matching cannot be performed, which used to be a verdict and is now a failure.
-
-- The local suites run under a restricted Bash sandbox, and `make
-  check-parallel` no longer fails at random from a cold biber cache. ([#392])
-
-  `extract-test` and `bibliography-test` compared their extracted text against a
-  process substitution, which a sandbox that denies re-opening pipe file
-  descriptors rejects with `diff: /dev/fd/63: Operation not permitted`. The
-  denial lands on `diff`'s own input, so both suites reported an extraction
-  mismatch above an empty diff — infrastructure wearing a fixture defect's
-  clothes. Each now writes what it extracted to a scratch `*.got` file and diffs
-  two ordinary paths.
-
-  `tagging` invokes veraPDF, whose JVM does not read `TMPDIR` but asks Darwin
-  for the per-user temp directory directly. Where that directory is denied,
-  veraPDF dies in its own static initialiser and the runner reported every
-  fixture as failing PDF/UA-2 validation — eleven verdicts from a validator that
-  never started. The suite now points the JVM at the temp directory the rest of
-  it already uses.
-
-  biber re-unpacks its native binary into a per-user cache on *every*
-  invocation, so two invocations sharing that cache truncate each other's
-  binary: the three targets that invoke it (`bibliography-test`, `links`,
-  `examples`) raced under `check-parallel`, and a different pair of them failed
-  each run — a race that reads as a flaky fixture. Warming the cache first does
-  not help, measured; each worker now gets its own, freed as that worker
-  finishes. Serial `make check` was never affected.
-
-  **Contributor tooling only.** No class, option, key, command, token, fixture,
-  baseline, or rendered output changed, and no suite's verdict changed — only
-  where three runners write their intermediates, and what the parallel driver
-  prepares and proves before dispatching.
-
 [#197]: https://github.com/amirhs1/CareerDossierTeX/issues/197
-[#258]: https://github.com/amirhs1/CareerDossierTeX/issues/258
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#261]: https://github.com/amirhs1/CareerDossierTeX/issues/261
 [#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
 [#353]: https://github.com/amirhs1/CareerDossierTeX/issues/353
 [#355]: https://github.com/amirhs1/CareerDossierTeX/issues/355
-[#378]: https://github.com/amirhs1/CareerDossierTeX/issues/378
-[#390]: https://github.com/amirhs1/CareerDossierTeX/issues/390
-[#392]: https://github.com/amirhs1/CareerDossierTeX/issues/392
-[#398]: https://github.com/amirhs1/CareerDossierTeX/issues/398
-[#399]: https://github.com/amirhs1/CareerDossierTeX/issues/399
 [#185]: https://github.com/amirhs1/CareerDossierTeX/issues/185
 [#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#263]: https://github.com/amirhs1/CareerDossierTeX/issues/263
-[#400]: https://github.com/amirhs1/CareerDossierTeX/issues/400
-[#405]: https://github.com/amirhs1/CareerDossierTeX/issues/405
 [#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
 [#419]: https://github.com/amirhs1/CareerDossierTeX/issues/419
 [#421]: https://github.com/amirhs1/CareerDossierTeX/issues/421
@@ -684,9 +362,6 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
 [#447]: https://github.com/amirhs1/CareerDossierTeX/issues/447
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
-[#252]: https://github.com/amirhs1/CareerDossierTeX/issues/252
-[#450]: https://github.com/amirhs1/CareerDossierTeX/issues/450
-[#458]: https://github.com/amirhs1/CareerDossierTeX/issues/458
 
 ## [0.8.0] - 2026-08-12
 
