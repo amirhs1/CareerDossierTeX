@@ -512,6 +512,10 @@ elsewhere, because a summary is what drifts. Cover the relevant parts:
 - unsupported-engine error;
 - every option's accepted and rejected values, including the error naming the
   accepted values, and rejection reported exactly once;
+- any user-facing template a change publishes or edits: a documented template is
+  a promise that the code in it runs, and the only thing that keeps the promise
+  is a fixture compiling that exact text (see "Documented templates are
+  compiled" below);
 - all affected classes after changes to a shared package;
 - tagged and untagged output after changes to tagging or shared packages; and
 - bibliography sorting and field precedence after `careerdossier-biblatex.sty`
@@ -527,6 +531,38 @@ pdftotext build/examples/resume-english.pdf \
 ```
 
 Inspect the output for logical reading order.
+
+### Documented templates are compiled
+
+Two documents publish a template a reader is expected to copy, and each is
+compiled by a smoke fixture holding that text verbatim:
+
+| Published in | Fixture | Drift unit |
+|---|---|---|
+| `doc/careerdossier.tex`, "The header stack" | `tests/smoke/components-header-stack-doc.tex` | `components-header-stack-doc-drift` (#252) |
+| `docs/ATS-EXTRACTION.md`, "User template" | `tests/smoke/ats-user-template-doc.tex` | `ats-user-template-doc-drift` (#450) |
+
+Compiling the fixture is only half of it. A fixture that keeps building while
+its published twin is edited proves nothing about the twin, so each drift unit
+extracts the published block and diffs it against the fixture **before** either
+is compiled, and reports `DRIFTED` with the diff when they disagree. Each block
+is located by its content — the one that declares a document and opens a header
+stack, the one that declares a document and calls `\MakeCDossierHeader` — so the
+prose around an example may be reworded freely; failing to find exactly one such
+block is a failure and not a skip, because a document this cannot find an
+example in is indistinguishable from one that no longer publishes an example.
+
+Each unit is gated on its own fixture being selected (#359), so `FIXTURE=`
+scoping cannot leave a claim being made about something the run did not compile.
+
+The failure this guards is #185's: an uncompiled template in a document nobody
+re-reads goes stale silently, and a reader cannot tell which of several
+published templates is current. Neither template was broken when its guard was
+added; what a guard buys here is the next rename.
+
+Not every published `latexcode` or fenced block is covered — the manual's
+"Complete examples" chapter is not, and `examples/` carries the compiled
+long-form equivalents instead.
 
 ### Extraction round-trip test
 
@@ -909,7 +945,8 @@ minutes that a per-push job should not pay. A separate weekly
 `verapdf-scheduled` workflow builds veraPDF from a pinned commit and runs the
 same gate. Do not describe a pull request as PDF/UA-validated on the strength of
 the PR checks alone; see `CONTRIBUTING.md` "Pinned dependencies" and
-[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) section 7.1.
+[`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
+"Recorded validation results".
 
 ### Option lint
 

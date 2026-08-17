@@ -81,7 +81,8 @@ the release archive from the handwritten source; there is no need to migrate to
 - [ ] Default fonts are reproducible and legally distributable.
 - [ ] Upright, bold, italic, and bold italic are explicit.
 - [ ] No per-word `/ActualText` spans are present
-      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#45-actualtext-tounicode-and-their-limits) §4.5).
+      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#actualtext-tounicode-and-their-limits),
+      "`/ActualText`, `ToUnicode`, and their limits").
 - [ ] Ligature and alternate-feature policy is documented.
 - [ ] Font versions are recorded and all meaningful fonts are embedded.
 
@@ -91,7 +92,8 @@ the release archive from the handwritten source; there is no need to migrate to
 - [ ] Ground-truth text round-trips through a second, non-Poppler consumer
       (PDFKit on macOS), because Poppler recovers spacing that others do not.
 - [ ] The output contains no `/ActualText` spans
-      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#45-actualtext-tounicode-and-their-limits) §4.5).
+      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#actualtext-tounicode-and-their-limits),
+      "`/ActualText`, `ToUnicode`, and their limits").
 - [ ] Default and `-layout` extraction have been inspected.
 - [ ] Punctuation, accents, symbols, URLs, and ligature sequences pass.
 - [ ] Ordered-block assertions pass.
@@ -106,10 +108,12 @@ the release archive from the handwritten source; there is no need to migrate to
       untagged path is unchanged.
 - [ ] The five UA-2 fixture variants pass veraPDF, and the reports and toolchain
       record from that run were reviewed
-      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#71-recorded-validation-results-v040-plus-the-v050-statement-fixture) §7.1).
+      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
+      "Recorded validation results").
 - [ ] At least one macOS and one Windows screen-reader reading-order check is
       recorded, or the release explicitly states which one is outstanding
-      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#72-screen-reader-reading-order-checks) §7.2).
+      ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#screen-reader-reading-order-checks),
+      "Screen-reader reading-order checks").
 - [ ] No PDF/UA or WCAG claim is made beyond what a validator run and manual
       inspection actually covered, and the fixtures that were validated are named.
 - [ ] Rendered pages have no clipping, overlap, missing glyphs, or bad page breaks,

@@ -4,7 +4,7 @@ This file defines the naming rules for issues, labels, branches, commits, pull r
 
 The goal is to make the GitHub Project easy to scan and to keep the history consistent.
 
-## 1. Core rule
+## Core rule
 
 Use different naming styles for different GitHub objects:
 
@@ -23,7 +23,7 @@ Do not force one convention onto every object. Issues, branches, commits, PRs, a
 
 ---
 
-## 2. Issue title convention
+## Issue title convention
 
 Use:
 
@@ -70,7 +70,7 @@ those rules.
 
 ---
 
-## 3. Branch naming convention
+## Branch naming convention
 
 Use:
 
@@ -115,7 +115,7 @@ Rules:
 
 ---
 
-## 4. Commit message convention
+## Commit message convention
 
 Use a lightweight Conventional Commits style:
 
@@ -188,7 +188,7 @@ Rules:
 
 ---
 
-## 5. Pull request title convention
+## Pull request title convention
 
 Use the same style as commit messages:
 
@@ -222,7 +222,7 @@ Rules:
 
 ---
 
-## 6. Label naming convention
+## Label naming convention
 
 Use labels as metadata, not as titles.
 
@@ -295,7 +295,7 @@ Rules:
 
 ---
 
-## 7. Milestone naming convention
+## Milestone naming convention
 
 Use:
 
@@ -336,7 +336,7 @@ Rules:
 
 ---
 
-## 8. Tag and release naming convention
+## Tag and release naming convention
 
 Use semantic version tags:
 
@@ -366,7 +366,7 @@ CareerDossierTeX v0.1.0 — English Industry Dossier
 
 ---
 
-## 9. Project Status convention
+## Project Status convention
 
 Use the Project `Status` field for workflow state:
 
@@ -409,7 +409,7 @@ Rules:
 
 ---
 
-## 10. Phase numbering convention
+## Phase numbering convention
 
 Phases group releases into stages of the product plan. They are numbered in
 exactly one place:
@@ -465,7 +465,7 @@ Rules:
 
 ---
 
-## 11. Quick decision guide
+## Quick decision guide
 
 When creating a new item, ask:
 
@@ -499,7 +499,68 @@ When creating a new item, ask:
 
 ---
 
-## 12. Golden rule
+## Documentation heading convention
+
+**Number a heading only where a tool generates the number.** In practice that
+splits the documentation in two, and the split is not a compromise between two
+tastes — it follows from who maintains the number.
+
+**The PDF manual is numbered**, and stays that way. `doc/careerdossier.tex` is
+an `article`, so LaTeX numbers its sections automatically, and a
+cross-reference goes through `\label`/`\ref`. Inserting a section renumbers the
+heading and every citation of it in the same build, so the number costs nothing
+to maintain. This is also the near-universal convention for LaTeX package
+manuals — `hyperref`, `biblatex`, `fontspec`, PGF/TikZ, and LaTeX3's own
+`interface3.pdf` are all numbered, and an unnumbered one is the exception on
+CTAN.
+
+**Markdown headings carry no section number**, and a cross-reference names the
+heading rather than numbering it.
+
+```text
+Correct:   `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
+Incorrect: `docs/ATS-EXTRACTION.md` §3.4
+```
+
+Markdown has neither automatic numbering nor `\ref`. A number there is typed by
+hand in the heading *and* again in every citation of it — two hand-maintained
+copies of one fact — and GitHub bakes it into the anchor,
+`#34-dates-and-right-alignment`, so inserting one subsection silently breaks
+every link below the insertion point. That is the failure
+`tests/lint/run-markdown-anchors.sh` exists to catch, and de-numbering the two
+files that were numbered until #447 broke exactly eight anchors, all repaired
+there. Six of the eight files never were numbered; this makes it eight.
+
+This is also the ordinary convention for Markdown documentation generally —
+repository prose is unnumbered essentially everywhere, while numbered documents
+are normative specifications whose numbers a generator emits (RFCs, W3C specs,
+the C++ standard).
+
+**What would reopen the question:** a generator. Sphinx, mdBook, and Bikeshed
+can number a Markdown tree automatically, which restores the property the
+manual already has. If `docs/` is ever built by one of those rather than read on
+GitHub, numbering becomes defensible again — because the generator, not a
+contributor, would own the number. Until then the rule above holds.
+
+Three further things are deliberately outside the Markdown rule:
+
+- `CHANGELOG.md`, whose headings are versions, and whose shipped entries are
+  history rather than a register to bring up to date. An entry that cites a
+  section number stays as written; only its *links* are repointed when a
+  heading moves, per #259 and #263.
+- Phase numbers, which are a Project field rather than a heading — see "Phase
+  numbering convention" above.
+- A heading's release stamp, which is content and belongs in the body under the
+  heading, not in the heading a reader navigates by.
+
+The two lints that hold this to account are `run-markdown-anchors.sh`, which
+fails when a `](TARGET.md#anchor)` names a heading that no longer exists, and
+`run-agents-references.sh`, which fails when `AGENTS.md` quotes a section name
+that no longer exists.
+
+---
+
+## Golden rule
 
 Keep names boring, predictable, and searchable.
 

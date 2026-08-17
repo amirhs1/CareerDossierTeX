@@ -93,9 +93,9 @@ work with no scheduled release, or a proposal whose home has not been chosen.
 Such an issue stays unmilestoned rather than take a milestone that would
 misstate the plan, and it stays invisible to release planning on purpose until
 that decision is made. Do not invent a placeholder milestone for it, and do not
-park it in the furthest-out open milestone. `docs/NAMING-CONVENTION.md` §7 names
-the issues that currently qualify; anything unmilestoned beyond those is an
-oversight.
+park it in the furthest-out open milestone. `docs/NAMING-CONVENTION.md`
+"Milestone naming convention" names the issues that currently qualify; anything
+unmilestoned beyond those is an oversight.
 
 An **epic parent** is for work that genuinely decomposes into several issues — a
 release epic, or a cross-cutting effort spanning more than one class or package.
@@ -200,7 +200,8 @@ Use:
 type/short-description
 ```
 
-`docs/NAMING-CONVENTION.md` section 3 is the canonical list of allowed prefixes
+`docs/NAMING-CONVENTION.md` "Branch naming convention" is the canonical list
+of allowed prefixes
 and worked examples; it is not reproduced here.
 
 ## Standard branch workflow
@@ -252,7 +253,8 @@ Use a lightweight Conventional Commits format:
 type(scope): imperative summary
 ```
 
-`docs/NAMING-CONVENTION.md` section 4 is the canonical list of types and
+`docs/NAMING-CONVENTION.md` "Commit message convention" is the canonical list
+of types and
 worked examples; it is not reproduced here.
 
 Each commit should represent one coherent change. Avoid combining unrelated API, typography, CI, and documentation edits in one commit.

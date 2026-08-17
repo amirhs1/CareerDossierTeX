@@ -72,7 +72,9 @@ no phase heading here.
 A release that never ships has no phase number at all. `v0.3.0` **held**
 `Phase 3` and gave it up when it was dropped, and the Project reused the slot for
 `v0.4.0`; `v1.1.0` was closed empty before it had an option to give up. Both
-therefore appear unnumbered. See `docs/NAMING-CONVENTION.md` §10.
+therefore appear unnumbered. See `docs/NAMING-CONVENTION.md` "Phase numbering
+convention". Phase numbers are the one numbering this documentation set keeps;
+its headings carry none, and are cited by name.
 
 The two forms differ deliberately — this document keys each phase to its
 version, the Project uses a short label — so they cross-walk as follows:
@@ -223,8 +225,8 @@ These interfaces are released in `v0.2.0`.
 > **No phase number:** this section is deliberately unnumbered. The Project's
 > `Phase` field reused the `Phase 3` slot for the engine and accessibility work
 > that shipped as `v0.4.0`, and a dropped release does not retain a phase
-> number (see `docs/NAMING-CONVENTION.md` §10). Refer to this section by name,
-> never by number.
+> number (see `docs/NAMING-CONVENTION.md` "Phase numbering convention"). Refer
+> to this section by name, never by number.
 >
 > **Consequence:** mature RTL support via `bidi` was the main reason the
 > project stayed XeLaTeX-only. With multilingual work dropped, that constraint
@@ -300,10 +302,12 @@ keys, and commands; the build command changes from `latexmk -xelatex` to
 - tagged fixtures pass structure, extraction, and artifact checks, and the
   validator and screen-reader results are recorded with tool versions.
   **Status:** met for macOS. The four named profiles pass veraPDF `ua2` and a
-  three-extractor round trip (section 7.1), and a maintainer VoiceOver pass on
-  2026-07-20 confirmed correct reading order with all decorative and repeated
-  page furniture silent (section 7.2). NVDA on Windows stays platform-deferred;
-  the release documents that rather than claiming a Windows result;
+  three-extractor round trip (`docs/ATS-EXTRACTION.md`, "Recorded validation
+  results"), and a maintainer VoiceOver pass on 2026-07-20 confirmed correct
+  reading order with all decorative and repeated page furniture silent
+  ("Screen-reader reading-order checks"). NVDA on Windows stays
+  platform-deferred; the release documents that rather than claiming a Windows
+  result;
 - `docs/MIGRATION.md` gives XeTeX-preamble users an actionable upgrade path;
 - documentation claims no more than the fixtures actually verify.
 

@@ -148,8 +148,9 @@ After opening or updating the draft PR:
 
 For a newly opened draft PR:
 
-- **Status:** the in-progress option — `docs/NAMING-CONVENTION.md` section 9 for
-  what it means, the appendix's discovery query for how it is spelled
+- **Status:** the in-progress option — `docs/NAMING-CONVENTION.md` "Project
+  Status convention" for what it means, the appendix's discovery query for how
+  it is spelled
 - **Phase:** inherit from the focused issue
 - **Priority:** inherit from the focused issue
 - **Size:** estimate from the actual completed PR scope
@@ -199,21 +200,22 @@ permitted to execute, which is closer to build and CI configuration.
 
 ## Status transitions
 
-`docs/NAMING-CONVENTION.md` section 9 is the canonical statement of the `Status`
-vocabulary and of the issue and PR transitions through it — including which
-value a newly opened draft PR takes and when it changes. Read the value there;
-this skill does not restate it, and an answer derived from anywhere else is
-wrong.
+`docs/NAMING-CONVENTION.md` "Project Status convention" is the canonical
+statement of the `Status` vocabulary and of the issue and PR transitions through
+it — including which value a newly opened draft PR takes and when it changes.
+Read the value there; this skill does not restate it, and an answer derived from
+anywhere else is wrong.
 
-Two cases section 9 leaves to this skill, because they are procedure rather than
-naming:
+Two cases that section leaves to this skill, because they are procedure rather
+than naming:
 
 - PR closed without merge → restore or preserve the appropriate issue status;
 - blocked work → add `blocked` and keep an appropriate non-`Done` status.
 
 Prefer GitHub Project workflows for deterministic transitions such as merged PRs
-and closed issues becoming `Done`. Section 9 also carries the warning about
-transcribing option strings exactly, which applies to every value set here.
+and closed issues becoming `Done`. "Project Status convention" also carries the
+warning about transcribing option strings exactly, which applies to every value
+set here.
 
 ## Routine authorization
 
@@ -265,12 +267,12 @@ Which blanks are legitimate:
 
 - **Status, Size, assignee, and labels** are determinable from the PR itself, so
   none of them may be left unset. `Status` for a newly opened draft comes from
-  `docs/NAMING-CONVENTION.md` section 9; `Size` from "Size guide" above, judged
-  on the completed scope.
+  `docs/NAMING-CONVENTION.md` "Project Status convention"; `Size` from "Size
+  guide" above, judged on the completed scope.
 - **Milestone, Phase, and Priority** are inherited and must not be invented. Each
   may stay blank, and only when the focused issue itself has none — in which case
   name the missing *issue* field, not the PR field.
-  `docs/NAMING-CONVENTION.md` section 10 defines the Phase numbering.
+  `docs/NAMING-CONVENTION.md` "Phase numbering convention" defines it.
 
 A deliberately unmilestoned issue is the ordinary case for work the maintainer
 has postponed, and a PR against one inherits no milestone. Do not read the rule
@@ -508,8 +510,8 @@ or option string appears anywhere in this tree.
 The casing is the part that bites, because the lookup is by name. A
 `select(.name=="In progress")` against an option actually called `In Progress`
 yields an empty option id. This exact mismatch existed between the Project and
-`docs/NAMING-CONVENTION.md` section 9 until 2026-08-04, when the documentation
-was corrected to match the Project; assume it can recur.
+`docs/NAMING-CONVENTION.md` "Project Status convention" until 2026-08-04, when
+the documentation was corrected to match the Project; assume it can recur.
 
 Under `gh project item-edit` that empty id set nothing and reported no error.
 Under step 4 it is a `VALIDATION` error — `The single select option Id does not
@@ -519,6 +521,7 @@ the safe direction: the silent failure became a loud one. It is still not a
 substitute for step 5, which is what catches a *valid* id written to the wrong
 row.
 
-So: take `Status` semantics from `docs/NAMING-CONVENTION.md` section 9 and
-`Phase` from section 10, take `Priority` and `Size` from "Project field values"
-above, and take every literal option string and id from step 1.
+So: take `Status` semantics from `docs/NAMING-CONVENTION.md` "Project Status
+convention" and `Phase` from "Phase numbering convention", take `Priority` and
+`Size` from "Project field values" above, and take every literal option string
+and id from step 1.

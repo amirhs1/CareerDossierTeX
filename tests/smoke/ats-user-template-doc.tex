@@ -1,0 +1,52 @@
+% ats-user-template-doc.tex — issue #450. The user template published under
+% "Minimal reference template and class skeleton" in docs/ATS-EXTRACTION.md,
+% kept compilable. tests/smoke/run.sh compares the two texts before compiling
+% this one, so they cannot drift apart.
+%
+% #185 is why: an uncompiled example in a document nobody re-reads goes stale
+% silently, and a reader cannot tell which of several published templates is
+% current. The template compiled at the time this fixture was written, so this
+% is a guard against a future rename rather than a repair of a present break.
+%
+% What it exercises that no other fixture does: the documented \hypersetup
+% override of the derived PDF metadata sitting in a preamble beside
+% \CDossierSetup, and the profile's phone and website keys in one document with
+% an entry and a bullet list.
+\documentclass[fontsize=11pt]{careerdossier-resume}
+
+% Optional. pdftitle, pdfauthor, and pdflang are derived from the profile
+% automatically; set them only to override the derived values. A \hypersetup
+% anywhere in the preamble wins, before or after \CDossierSetup.
+\hypersetup{
+  pdftitle  = {Résumé — Zoë Dvořák},
+  pdfauthor = {Zoë Dvořák}
+}
+
+\CDossierSetup{
+  name     = {Zoë Dvořák},
+  headline = {Data Scientist},
+  email    = {zoe@example.org},
+  phone    = {+1 416 555 0199},
+  location = {Toronto, Ontario},
+  website  = {example.org/zoe}
+}
+
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Research and Development Engineer},
+  organization = {Northstar Analytics Inc.},
+  location     = {Toronto, Ontario},
+  dates        = {January 2023 -- Present}
+]
+  \begin{CDossierItemize}
+    \item Improved C++ data-processing throughput by 35 percent.
+    \item Led an R\&D team of five engineers.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\CDossierSection{Skills}
+C++, Python, SQL, data modelling, technical writing
+\end{document}

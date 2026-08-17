@@ -105,7 +105,8 @@ locally under TeX Live 2026 on macOS, and in GitHub Actions against a pinned
 verified toolchain are expected to work and are **not** tested; a report from
 one is welcome. The tagged-PDF preview additionally depends on
 `pdfmanagement-testphase` and `tagpdf`, whose exact verified versions are
-recorded in [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) §7.1.
+recorded in [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
+"Recorded validation results".
 
 ## Installation
 
@@ -354,7 +355,8 @@ Apple PDFKit**. A **macOS VoiceOver** reading-order pass covered the four
 correctly while decorative rules and repeated page furniture stay silent; the
 statement fixture has not received a screen-reader pass. Recorded results and
 the exact toolchain are in
-[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) §7.1–7.2.
+[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
+"Recorded validation results" and "Screen-reader reading-order checks".
 
 That automated verification covers **those five fixtures only**. It is **not** a PDF/UA,
 WCAG, ATS, or general accessibility conformance claim, it does not extend to

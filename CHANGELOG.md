@@ -191,6 +191,24 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   before, including every shipped example; the key is additive and its default
   is the shipped behaviour.
 
+- `make smoke` compiles the user template published in `docs/ATS-EXTRACTION.md`
+  "Minimal reference template and class skeleton" and fails if the guide's text
+  and the fixture disagree. It is the second documented template to get this
+  treatment, after the manual's header-stack example ([#252]);
+  `tests/smoke/ats-user-template-doc.tex` holds the published text verbatim, and
+  the drift unit diffs the two before compiling either.
+  ([#450])
+
+  The template compiled at the time this was added — verified by extracting and
+  building it — so this guards the next rename rather than repairing a present
+  break. The failure it exists for is [#185]'s: an uncompiled example in a
+  document nobody re-reads goes stale in silence, and a reader cannot tell which
+  of several published templates is current.
+
+  **Contributor tooling only.** No class, option, key, command, token, or
+  rendered output changed — `make smoke` compiles one more fixture and can fail
+  for one more reason.
+
 ### Changed
 
 - **`docs/API.md` is now a pointer rather than the interface reference.** The
@@ -308,6 +326,29 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   examples are untouched. Neither example repaginates: every word of both keeps
   the vertical position it had, the résumé's labels change only how its contact
   line packs into its two existing rows, and both still build to one page.
+
+- Headings in `docs/` carry no section number, and a cross-reference names the
+  heading instead of numbering it. `docs/ATS-EXTRACTION.md` and
+  `docs/NAMING-CONVENTION.md` were the two files of eight still numbered; the
+  rule is now written down in `docs/NAMING-CONVENTION.md`, "Documentation
+  heading convention". ([#447])
+
+  A name survives an edit that renumbers everything below it, which is the
+  argument the anchor lint added in [#407] already rests on: a numbered heading
+  carries its number inside its own anchor, so inserting one subsection breaks
+  every link below the insertion point. Roughly thirty cross-references now cite
+  a heading by name, and the release stamps that sat inside two
+  `docs/ARCHITECTURE.md` headings moved into the body under them.
+
+  Eight anchors into the renumbered files were repointed, four of them in this
+  file. Those are links, not text: shipped entries stay as written, including
+  the seven that cite a section number in prose, per [#259] and the precedent
+  [#263] set. Anchors elsewhere in the tree are unaffected, and `make lint`
+  resolves every Markdown anchor in it.
+
+  **Documentation only** — no class, option, key, command, token, or rendered
+  output changed; the one source file touched is a comment in
+  `careerdossier-typography.sty` citing a section by number.
 
 - `docs/MIGRATION.md` is a reader's document from top to bottom. Its `Purpose`
   and `Entry format` sections sat a third of the way in, between the two upgrade
@@ -607,7 +648,10 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#440]: https://github.com/amirhs1/CareerDossierTeX/issues/440
 [#442]: https://github.com/amirhs1/CareerDossierTeX/issues/442
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
+[#447]: https://github.com/amirhs1/CareerDossierTeX/issues/447
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
+[#252]: https://github.com/amirhs1/CareerDossierTeX/issues/252
+[#450]: https://github.com/amirhs1/CareerDossierTeX/issues/450
 
 ## [0.8.0] - 2026-08-12
 
@@ -763,7 +807,7 @@ similar entry today. See
   announce a vertical bar. Both validate as PDF/UA-2 in the repository's tagging
   fixtures. See [`docs/API.md`](docs/API.md) for the option and the separator
   token, and
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#34-dates-and-right-alignment)
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#dates-and-right-alignment)
   §3.4 for the measurements.
 
 - All four document classes accept `muted=plain|italic|gray|both`, controlling
@@ -1378,7 +1422,7 @@ similar entry today. See
   `\section`/`\subsection` moved one level down, so the hierarchy underneath
   the name is unskipped (`/H2`, then `/H3` where a statement uses
   `\CDossierSubsection`). See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#74-heading-hierarchy-issue-267)
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#heading-hierarchy-issue-267)
   §7.4 for the per-profile hierarchy.
 
   This is a structure-tree change under the opt-in `tagging=on` path only:
@@ -1402,7 +1446,7 @@ similar entry today. See
   The CV's manual publication list needs no division of its own — it sits under
   an ordinary `\CDossierSection`, so that section's division encloses it — and
   the section rule remains an artifact, contributing nothing to the tree. See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#75-section-divisions-issue-268)
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#section-divisions-issue-268)
   §7.5.
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
@@ -1449,7 +1493,7 @@ similar entry today. See
   Whether the run-on form actually misread in VoiceOver or NVDA was never
   confirmed, and this fix does not confirm it retrospectively; it corrects text
   that was wrong at the byte level. See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#76-structure-tree-by-profile)
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#structure-tree-by-profile)
   §7.6 for the decoded before-and-after.
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
