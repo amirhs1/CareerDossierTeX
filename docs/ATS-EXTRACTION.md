@@ -634,9 +634,16 @@ A font profile is releasable only if:
 
 ## 5. Semantic structure for each career-document type
 
+Why each document type is shaped the way it is, in extraction terms. What a
+class actually emits, and in what order, is documented in the manual — this
+section is the reasoning the manual's behavior was derived from, and where the
+two appear to disagree the manual is authoritative, per the scope banner above.
+
 ### 5.1 Shared rules
 
-All document types should provide:
+An extractor receives a single stream of text with no layout, so every property
+below is one a document loses if it is expressed in geometry instead of in
+structure. All document types should therefore provide:
 
 - a real document title in PDF metadata, and the `ViewerPreferences` flag that
   makes a viewer use it instead of the filename;
@@ -657,7 +664,10 @@ other entry kinds, such as references, without duplicating components per class.
 
 ### 5.2 Résumé **(Phase 1)**
 
-The résumé is the strictest profile:
+The résumé is the strictest profile, because it is the document most likely to
+be parsed by machine before a person sees it. Each constraint below buys one
+extraction property, and each is a choice the author makes in content rather
+than something a class can enforce:
 
 - one column;
 - one or two pages when appropriate, without forced compression;
@@ -736,23 +746,18 @@ so an extractor change and a real regression stay distinguishable.
 
 ### 5.5 Cover letter **(Phase 1)**
 
-Do not place the applicant's address, recipient, date, or subject only in a
-decorative letterhead or page header. Emit them in the document body in logical
-order:
+The applicant's address, recipient, date, and subject must reach the text layer
+in the body, not only in a decorative letterhead or page header: furniture is
+where an extractor is least likely to look, and page headers in particular are
+often dropped or hoisted out of order. The reading order that follows from this
+is a contract of `\MakeCDossierLetterhead` and `\MakeCDossierClosing`, and the
+manual states what those two emit and in what order — this guide does not
+restate it.
 
-```text
-Applicant name and contact
-Date
-Recipient name and organization
-Subject or position
-Salutation
-Letter body
-Closing and typed name
-```
-
-A scanned signature may be decorative, but the typed name must remain present as
-text. If a signature image is included, it must not interrupt reading order or
-replace the name.
+Two consequences the classes cannot enforce, because they are the author's:
+a scanned signature may be decorative, but the typed name must remain present
+as text; and a signature image must not interrupt reading order or replace the
+name.
 
 ### 5.6 Statements — default interest plus six other types **(v0.5.0)**
 
@@ -764,9 +769,14 @@ documents. These are closer to short articles:
 - avoid magazine-style columns;
 - keep citations and footnotes sparse and extractable;
 - use figures only when essential, with text alternatives when tagging is enabled;
-- keep the title, applicant name, and required identity fields in the page-one
-  body rather than only in running furniture; and
+  and
 - test page transitions and paragraph spacing in extracted text.
+
+Keeping the title, applicant name, and required identity fields in the page-one
+body rather than only in running furniture is the same argument as the cover
+letter's above, and is likewise a contract of the class:
+`\MakeCDossierStatementHeader` emits the present identity items in a fixed
+logical order, which the manual states.
 
 ### 5.7 Reference list **(planned — later phase)**
 
@@ -1694,6 +1704,13 @@ notes. Use clearly fictional but plausible names and organizations.
 
 ### User template **(Phase 1)**
 
+This template is compiled. `tests/smoke/ats-user-template-doc.tex` is the text
+below verbatim, and `make smoke` diffs the two before compiling either, so the
+template cannot go stale against the classes without failing a suite (#450).
+The manual's "Complete examples" chapter and `examples/` carry the same shape at
+greater length; this one exists here because the surrounding sections argue from
+it.
+
 ```tex
 \documentclass[fontsize=11pt]{careerdossier-resume}
 
@@ -1737,10 +1754,16 @@ C++, Python, SQL, data modelling, technical writing
 
 ### Class outline (illustrative)
 
+Unlike the template above, this one is not compiled and cannot be — it is a
+sketch of a class, not a document. It carries no version or date for the same
+reason: a stamp here would be a fourth place to update at every release, and
+`make lint` checks the three that are declarations. `docs/ARCHITECTURE.md` owns
+the real module boundaries and the load order the shipped classes use.
+
 ```tex
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesClass{careerdossier-resume}
-  [2026-07-30 v0.6.0 ATS-conscious résumé class]
+  [<date> v<version> ATS-conscious résumé class]
 
 % Declare and process class keys (fontsize, margin) here via l3keys,
 % before \LoadClass. Pass documented base-class options deliberately.
@@ -1750,9 +1773,10 @@ C++, Python, SQL, data modelling, technical writing
 % Shared foundation. Load order may be adjusted as implementation requires,
 % but dependency direction stays one-way (shared packages never depend on classes).
 \RequirePackage{careerdossier-base}        % metadata, keys, validation
+\RequirePackage{careerdossier-tokens}      % calibrated type, rhythm, geometry
 \RequirePackage{careerdossier-typography}  % LuaLaTeX check, fontspec,
                                            % semantic roles
-\RequirePackage{careerdossier-theme}       % monochrome tokens
+\RequirePackage{careerdossier-theme}       % monochrome colour and rule tokens
 \RequirePackage{careerdossier-components}  % identity block, contact line, entry primitives
 
 \RequirePackage{hyperref}
