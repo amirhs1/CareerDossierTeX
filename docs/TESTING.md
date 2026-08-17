@@ -514,8 +514,9 @@ elsewhere, because a summary is what drifts. Cover the relevant parts:
   accepted values, and rejection reported exactly once;
 - any user-facing template a change publishes or edits: a documented template is
   a promise that the code in it runs, and the only thing that keeps the promise
-  is a fixture compiling that exact text (see "Documented templates are
-  compiled" below);
+  is a fixture compiling that exact text. A template added to the manual's
+  "Complete examples" chapter needs a `manual-example-*.tex` fixture in the same
+  change, or `make smoke` fails (see "Documented templates are compiled" below);
 - all affected classes after changes to a shared package;
 - tagged and untagged output after changes to tagging or shared packages; and
 - bibliography sorting and field precedence after `careerdossier-biblatex.sty`
@@ -534,13 +535,15 @@ Inspect the output for logical reading order.
 
 ### Documented templates are compiled
 
-Two documents publish a template a reader is expected to copy, and each is
-compiled by a smoke fixture holding that text verbatim:
+**Every complete document this repository publishes for a reader to copy is
+compiled by a smoke fixture holding that text verbatim.** There are nine, in
+three groups:
 
-| Published in | Fixture | Drift unit |
+| Published in | Fixture | Drift check |
 |---|---|---|
-| `doc/careerdossier.tex`, "The header stack" | `tests/smoke/components-header-stack-doc.tex` | `components-header-stack-doc-drift` (#252) |
-| `docs/ATS-EXTRACTION.md`, "User template" | `tests/smoke/ats-user-template-doc.tex` | `ats-user-template-doc-drift` (#450) |
+| `doc/careerdossier.tex`, "The header stack" | `tests/smoke/components-header-stack-doc.tex` | smoke unit `components-header-stack-doc-drift` (#252) |
+| `docs/ATS-EXTRACTION.md`, "User template" | `tests/smoke/ats-user-template-doc.tex` | smoke unit `ats-user-template-doc-drift` (#450) |
+| `doc/careerdossier.tex`, "Complete examples" — all seven | `tests/smoke/manual-example-*.tex` | `make lint`, `tests/lint/run-manual-examples.sh` (#458) |
 
 Compiling the fixture is only half of it. A fixture that keeps building while
 its published twin is edited proves nothing about the twin, so each drift unit
@@ -557,12 +560,51 @@ scoping cannot leave a claim being made about something the run did not compile.
 
 The failure this guards is #185's: an uncompiled template in a document nobody
 re-reads goes stale silently, and a reader cannot tell which of several
-published templates is current. Neither template was broken when its guard was
-added; what a guard buys here is the next rename.
+published templates is current. No template was broken when its guard was added;
+what a guard buys here is the next rename.
 
-Not every published `latexcode` or fenced block is covered — the manual's
-"Complete examples" chapter is not, and `examples/` carries the compiled
-long-form equivalents instead.
+**The third row is a set assertion, not a seventh selector, and it lives in
+`lint` rather than in the smoke runner. Both differences are the point.**
+
+The first two units each name their example by content, which is right when a
+document publishes one. Seven hand-kept selectors would not have caught what
+#450 found: the chapter was uncovered precisely *because* the #252 control names
+one example, so the other six were matched by nothing and nothing said so — an
+example no selector names reads exactly like an example that does not exist.
+`tests/lint/run-manual-examples.sh` therefore asserts that the chapter's
+complete documents and the `manual-example-*.tex` fixtures are in **bijection**:
+every published example has a fixture, every fixture has a published example,
+and matching is by exact text, so renaming a fixture or reordering the chapter
+breaks nothing. Adding an eighth example without a fixture fails with
+`SET MISMATCH`.
+
+It is a lint rather than a smoke unit for two reasons. It is a claim about text
+and needs no TeX, so it belongs in the sub-second `lint` slot and on the
+TeX-free CI lint runner, where it reports drift before any compile is paid for.
+And it is owned by no single fixture, which `tests/lint/run-fixture-filter.sh`
+correctly refuses to let a dispatched smoke unit be: an extra unit must be named
+for a listed fixture, and this one would have to be named for seven. The seven
+per-fixture compiles stay in `make smoke`, where a compile belongs. Five
+committed self-test fixtures pin the lint's own verdicts, so a lint that had
+stopped detecting anything fails there rather than passing everything.
+
+A block counts as a complete document when it declares a class *and* opens a
+document environment. Fragments illustrating one command are neither, cannot be
+compiled as they stand, and are out of scope; `examples/` carries the long-form
+equivalents, which `make examples` builds.
+
+Three failure modes, each demonstrated against the real manual when the check was
+added (#458): editing one published example reports `DRIFTED` naming the
+fixtures that no longer match; injecting an eighth example reports
+`SET MISMATCH` with both counts; and renaming the chapter heading reports
+`NO COMPLETE DOCUMENT FOUND` rather than passing over an empty set, which is the
+#398 shape the sibling units also refuse.
+
+Four of the seven manual examples are statements whose classes and types already
+have `statement-*-valid` fixtures, so their *compiles* are close to redundant.
+Their value is the drift half: no other fixture asserts that the exact text the
+manual publishes is the text that builds. The cost is seven compiles, measured
+at roughly 8 s of `make smoke`'s wall clock at `JOBS=4`.
 
 ### Extraction round-trip test
 
@@ -1171,6 +1213,11 @@ Five fixtures, `tests/lint/fixtures/manualfixture-*.tex`, hold one manual per
 verdict — correct, private name, unknown name, wrong version, and a file the
 extraction finds nothing in — so a lint that had stopped detecting anything
 fails there rather than passing everything.
+
+`tests/lint/run-manual-examples.sh` is its sibling and asks the other question
+about the same file: not whether the names it documents exist, but whether the
+complete documents it publishes compile. "Documented templates are compiled"
+above is the one statement of that check and is not repeated here.
 
 The `lint` target runs two more scripts in the same slot:
 

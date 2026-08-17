@@ -147,6 +147,13 @@ cases=(
   "resume-shared-profile pass"
   "components-header-stack-doc pass"
   "ats-user-template-doc pass"
+  "manual-example-resume pass"
+  "manual-example-letter pass"
+  "manual-example-cv pass"
+  "manual-example-statement-interest pass"
+  "manual-example-statement-research pass"
+  "manual-example-statement-artist pass"
+  "manual-example-statement-purpose pass"
   "cv-valid pass"
   "cv-sans-body pass"
   "cv-shared-profile pass"
@@ -558,6 +565,14 @@ if fixture_matches ats-user-template-doc; then
   unit_names+=("ats-user-template-doc-drift")
   unit_cmds+=("smoke_ats_template_drift")
 fi
+
+# #458's manual-example-*.tex fixtures deliberately register no drift unit here.
+# Their published-text comparison is a source-level invariant over a whole
+# chapter, owned by no single fixture, and it needs no compile to make -- so it
+# lives in tests/lint/run-manual-examples.sh, which runs first in `make check'
+# and on the TeX-free CI lint runner. The two units above stay here because each
+# is a claim about one fixture, which is what a unit named for a fixture can
+# carry.
 
 for (( i = 0; i < ${#selected_cases[@]}; i++ )); do
   unit_names+=("${selected_cases[$i]%% *}")

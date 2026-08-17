@@ -209,6 +209,40 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   rendered output changed — `make smoke` compiles one more fixture and can fail
   for one more reason.
 
+- Every complete document the manual publishes is now compiled. `make smoke`
+  builds all seven templates from `doc/careerdossier.tex` "Complete examples" —
+  résumé, cover letter, academic CV, and four statement types — from
+  `tests/smoke/manual-example-*.tex` fixtures holding their published text
+  verbatim, and `make lint` gains an eighth script,
+  `tests/lint/run-manual-examples.sh`, asserting that the chapter's examples and
+  those fixtures are in **bijection**. ([#458])
+
+  This closes the gap [#450] left. That issue's premise was that the manual's
+  templates were already covered by [#252]'s control; measured, they were not —
+  that control selects the one block containing `\CDossierHeaderBegin`, so the
+  seven documents in this chapter were matched by nothing, in the file [#263]
+  made the interface reference. A reader copying a template out of the interface
+  reference has the strongest claim that it works.
+
+  The check is a set assertion rather than seven more per-example selectors,
+  because selectors are what let the gap open: an example no selector names
+  reads exactly like an example that does not exist. Adding an eighth example
+  without a fixture now fails. It lives in `lint` rather than in the smoke
+  runner because it is a claim about text that needs no TeX, and because it is
+  owned by no single fixture — `run-fixture-filter.sh` requires a dispatched
+  smoke unit to be named for a listed fixture, and this one would be named for
+  seven.
+
+  All seven compiled unchanged when the fixtures were written, so this guards
+  the next rename rather than repairing a break. Four of them are statements
+  whose types already had `statement-*-valid` fixtures, so their compiles are
+  close to redundant and their value is the drift half.
+
+  **Contributor tooling only.** No class, option, key, command, token, or
+  rendered output changed, and the manual's text is untouched — `make smoke`
+  compiles seven more fixtures, about 8 s at `JOBS=4`, and `make lint` runs one
+  more script.
+
 ### Changed
 
 - **`docs/API.md` is now a pointer rather than the interface reference.** The
@@ -652,6 +686,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
 [#252]: https://github.com/amirhs1/CareerDossierTeX/issues/252
 [#450]: https://github.com/amirhs1/CareerDossierTeX/issues/450
+[#458]: https://github.com/amirhs1/CareerDossierTeX/issues/458
 
 ## [0.8.0] - 2026-08-12
 
