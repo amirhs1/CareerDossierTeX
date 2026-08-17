@@ -133,6 +133,9 @@ the release archive from the handwritten source; there is no need to migrate to
 - [ ] Archive has one correctly named top-level directory.
 - [ ] No temporary or prohibited generated files are included.
 - [ ] Font and asset licences have been audited.
+- [ ] The archive installs and compiles on Overleaf, which has no personal
+      `texmf` tree — `README.md`'s "Route 3 — Overleaf" is the route it must
+      satisfy.
 - [ ] `l3build check`, extraction tests, documentation build, and `l3build ctan`
       pass, and the final archive has been opened and inspected manually.
 
