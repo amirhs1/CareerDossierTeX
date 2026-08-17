@@ -586,6 +586,31 @@ does not.
 - behavior changes incompatibly;
 - users need a replacement example.
 
+An entry takes this shape, and belongs in the same pull request as the change it
+describes:
+
+```text
+## [0.x.0] - YYYY-MM-DD
+
+### `\OldCommand` renamed to `\NewCommand`
+
+Before:
+
+\OldCommand{...}
+
+After:
+
+\NewCommand{...}
+
+Reason: <why the change was necessary>
+```
+
+A toolchain break is not an API rename and does not take that shape: the
+`v0.4.0` XeLaTeX-to-LuaLaTeX change is written as an upgrade guide in
+[`docs/MIGRATION.md`](docs/MIGRATION.md#upgrading-to-v040-xelatex--lualatex)
+instead. The stability policy both serve is in
+[`docs/API.md`](docs/API.md#stability-policy).
+
 ### Update `CHANGELOG.md` when:
 
 - a feature is added;

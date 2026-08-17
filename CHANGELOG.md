@@ -309,6 +309,22 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
   the vertical position it had, the résumé's labels change only how its contact
   line packs into its two existing rows, and both still build to one page.
 
+- `docs/MIGRATION.md` is a reader's document from top to bottom. Its `Purpose`
+  and `Entry format` sections sat a third of the way in, between the two upgrade
+  guides and the versioned entries, so a reader upgrading met contributor
+  procedure mid-file and a contributor adding an entry had to scroll past both
+  upgrade guides to find the shape to follow. ([#446])
+
+  The entry shape now lives in `CONTRIBUTING.md`, under "Update `MIGRATION.md`
+  when:", which already stated *when* an entry is required — the same split
+  `CHANGELOG.md`'s own bullet there already uses, pointing at
+  `.agents/skills/release-notes/reference.md` for format. `docs/MIGRATION.md`
+  says in its opening paragraph where that procedure is, and its restatement of
+  the stability policy is now a pointer to `docs/API.md`, which owns it.
+
+  **Documentation only** — no class, option, key, command, token, or rendered
+  output changed, and no versioned entry was touched.
+
 ### Fixed
 
 - A `--` you type yourself now reaches the PDF `/Title` and `/Author` spelled the
@@ -573,6 +589,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#439]: https://github.com/amirhs1/CareerDossierTeX/issues/439
 [#440]: https://github.com/amirhs1/CareerDossierTeX/issues/440
 [#442]: https://github.com/amirhs1/CareerDossierTeX/issues/442
+[#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
 
 ## [0.8.0] - 2026-08-12
 

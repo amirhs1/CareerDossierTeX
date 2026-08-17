@@ -6,6 +6,11 @@ renders. Read it before upgrading. It records the *differences* — the current
 interface itself is in the PDF manual,
 [`../doc/careerdossier.tex`](../doc/careerdossier.tex).
 
+Adding an entry rather than reading one?
+[`CONTRIBUTING.md`](../CONTRIBUTING.md#update-migrationmd-when) states when an
+entry is required and the shape it takes; the stability policy it serves is in
+[`API.md`](API.md#stability-policy).
+
 ## Status
 
 `v0.8.0` is the current published release. **It changes how every existing
@@ -322,41 +327,6 @@ requires no migration. To try it, add `\DocumentMetadata` before
 
 Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
-
-## Purpose
-
-This file records migration paths for incompatible public changes once
-implementation begins, per the stability policy in [`API.md`](API.md).
-
-Before `v1.0.0`, breaking changes are allowed but must be documented here and in
-[`CHANGELOG.md`](../CHANGELOG.md) in the same pull request that introduces the
-change.
-
-## Entry format
-
-When a public command, key, or option is renamed, changed, or removed, add an
-entry using this shape:
-
-```text
-## [0.x.0] - YYYY-MM-DD
-
-### `\OldCommand` renamed to `\NewCommand`
-
-Before:
-
-\OldCommand{...}
-
-After:
-
-\NewCommand{...}
-
-Reason: <why the change was necessary>
-```
-
-The `v0.4.0` engine change is a toolchain break rather than an API rename and
-is documented in
-[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) above rather than
-in this format.
 
 ## [Unreleased]
 
