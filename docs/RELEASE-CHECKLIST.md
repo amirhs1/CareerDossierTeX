@@ -78,14 +78,21 @@ package published in between.
 | Check | Command or source | Result |
 |---|---|---|
 | Package name | `ctan.org/pkg/careerdossier` | 404 — free (2026-08-05, re-confirmed 2026-08-17) |
-| Package name | `ctan.org/pkg/careerdossiertex` | 404 — free (2026-08-05) |
-| Index scan | `ctan.org/json/2.0/packages`, 7027 packages, grep `career`/`dossier` | no matches (2026-08-05) |
+| Package name | `ctan.org/pkg/careerdossiertex` | 404 — free (2026-08-05, re-confirmed 2026-08-17) |
+| Index scan | `ctan.org/json/2.0/packages`, 7037 packages, `career`/`dossier` in `key` or `name` | no matches (2026-08-17; 7027 packages, same result, 2026-08-05) |
 | Filenames | `kpsewhich careerdossier-*.sty careerdossier-*.cls` from **outside** the repository, TeX Live 2026 | nothing found (2026-08-17) |
 | Filenames | `find "$(kpsewhich -var-value TEXMFDIST)" -iname 'careerdossier*'`, and grep of `texlive.tlpdb` | no matches (2026-08-17) |
 
 Nearest neighbours by subject are `curriculum-vitae`, `resumecls`,
 `simple-resume-cv`, `moderncv`, `gradstudentresume`, `jsonresume`, and
 `pats-resume`; none shares a filename.
+
+Give each probe a control, and prefer a control that is *present*. A 404 and a
+failed fetch read alike, and an empty grep is the same shape whether the index
+was searched or never downloaded — so the name probe is run against
+`ctan.org/pkg/moderncv` (200), the index scan against `moderncv`, `resumecls`,
+and `lua-ul` (all found), and `kpsewhich` against `article.cls` and
+`moderncv.cls` (both found). Without them "no matches" is not evidence.
 
 Run the `kpsewhich` check from a directory outside this repository. Run inside
 it, every name resolves to `./careerdossier-*.sty` — the repository's own copy —
