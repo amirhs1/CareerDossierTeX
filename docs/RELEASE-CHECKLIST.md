@@ -26,18 +26,118 @@ of July 2026 the core expectations, verified against
 
 The PDF documentation is `careerdossier.pdf`, built by `make manual` from the
 committed `doc/careerdossier.tex` (#263). The source is tracked and the PDF is
-not, so the archive is what carries both; wiring that into `l3build ctan` is
-#264.
+not, so the archive is what carries both.
 
 Handwritten `.sty`/`.cls` files are source and are included as-is; a `.dtx`/`.ins`
 workflow is optional. CTAN in fact discourages *generated* `README` and `.ins`
-files because they tend to go stale against their source. TDS packaging
-(`.tds.zip`) is optional and, for a package without an elaborate install, generally
-unnecessary.
+files because they tend to go stale against their source. There is no need to
+migrate to `.dtx`, and the archive is generated from the handwritten source as
+it stands.
 
-When the project reaches this milestone, `l3build ctan` can generate and inspect
-the release archive from the handwritten source; there is no need to migrate to
-`.dtx`. Verify the archive manually before upload.
+### Building the archive
+
+```bash
+make ctan
+```
+
+Configured in `build.lua` under "CTAN packaging" (#264); `make ctan` is the
+entry point and `l3build ctan` is what it runs. That command runs the `l3build`
+regression suite first and skips the zip stage when it fails, so an archive only
+ever exists for a tree that passed — but it does **not** run the shell-driven
+suites, so `make check` is still the gate before a release.
+
+It produces `build/distrib/ctan/careerdossier/`, one top-level directory holding
+the ten Work files, `README.md`, `LICENSE`, `CHANGELOG.md`, `manifest.txt`, and
+`doc/` with the manual's source and the PDF typeset from it. Two artifacts land
+outside `build/` because l3build puts them there — `careerdossier-ctan.zip` at
+the repository root and `doc/careerdossier.pdf` beside its source. Both are
+ignored by `.gitignore`, and `make clean` removes both.
+
+`make ctan-lint` checks the configuration, and `make check` dispatches it on
+every run ([`TESTING.md`](TESTING.md#ctan-packaging-lint), "CTAN packaging
+lint"). It exists because `l3build ctan` cannot: its file lists are
+globs, and a glob matching nothing builds an archive missing that file and exits
+0. Extracting and reading the archive is still required before upload — the
+lint asserts what was configured, not what was produced.
+
+### TDS packaging
+
+`packtdszip = false`, set explicitly rather than left to l3build's identical
+default so that the decision has a value to point at. The package installs as
+ten files into `tex/latex/careerdossier/` with no scripts, fonts, or generated
+assets to place, so CTAN's installers derive that tree from the archive without
+help. `.tds.zip` is optional and, for a package without an elaborate install,
+generally unnecessary.
+
+### Name and filename availability
+
+CTAN requires both a free package *name* and filenames unique across TeX Live.
+Both were checked; re-run them before upload, because either can be taken by a
+package published in between.
+
+| Check | Command or source | Result |
+|---|---|---|
+| Package name | `ctan.org/pkg/careerdossier` | 404 — free (2026-08-05, re-confirmed 2026-08-17) |
+| Package name | `ctan.org/pkg/careerdossiertex` | 404 — free (2026-08-05, re-confirmed 2026-08-17) |
+| Index scan | `ctan.org/json/2.0/packages`, 7037 packages, `career`/`dossier` in `key` or `name` | no matches (2026-08-17; 7027 packages, same result, 2026-08-05) |
+| Filenames | `kpsewhich careerdossier-*.sty careerdossier-*.cls` from **outside** the repository, TeX Live 2026 | nothing found (2026-08-17) |
+| Filenames | `find "$(kpsewhich -var-value TEXMFDIST)" -iname 'careerdossier*'`, and grep of `texlive.tlpdb` | no matches (2026-08-17) |
+
+Nearest neighbours by subject are `curriculum-vitae`, `resumecls`,
+`simple-resume-cv`, `moderncv`, `gradstudentresume`, `jsonresume`, and
+`pats-resume`; none shares a filename.
+
+Give each probe a control, and prefer a control that is *present*. A 404 and a
+failed fetch read alike, and an empty grep is the same shape whether the index
+was searched or never downloaded — so the name probe is run against
+`ctan.org/pkg/moderncv` (200), the index scan against `moderncv`, `resumecls`,
+and `lua-ul` (all found), and `kpsewhich` against `article.cls` and
+`moderncv.cls` (both found). Without them "no matches" is not evidence.
+
+Run the `kpsewhich` check from a directory outside this repository. Run inside
+it, every name resolves to `./careerdossier-*.sty` — the repository's own copy —
+and the check reports a collision that does not exist.
+
+### The Overleaf route
+
+Overleaf has no personal `texmf` tree, so it exercises `README.md`'s "Route 1"
+mechanism: the class files sit in a flat directory beside the document, and
+`latexmk -lualatex` drives the build. That mechanism was run against the
+extracted archive on 2026-08-17 — the ten Work files from
+`build/distrib/ctan/careerdossier/`, an example document and its profile beside
+them, `TEXINPUTS` emptied and `TEXMFHOME` pointed at a nonexistent path — and
+`latexmk -lualatex` produced the résumé, resolving every class and package from
+that directory.
+
+**That is the route's mechanism, not Overleaf.** Overleaf pins its own TeX Live
+release and its own `latexmk`, and neither can be checked from here. The
+checklist item below stays open until someone uploads the extracted archive into
+an Overleaf project, sets the compiler to LuaLaTeX, and compiles.
+
+### Upload metadata
+
+`uploadconfig` in `build.lua` carries the CTAN upload form: package name,
+version, author, licence `lppl1.3c`, summary and description, topics, repository,
+bug tracker, and support channel. The version is **derived from the Work** rather
+than restated, so it cannot disagree with the ten `\ProvidesExpl*` declarations
+the version lint holds equal.
+
+Two fields need a decision at upload time rather than in the file:
+
+- **`email` is deliberately absent.** CTAN requires a reachable address for the
+  uploader and this repository publishes only a GitHub noreply address, so an
+  upload cannot complete from a checkout alone. Supply it on the command line —
+  `l3build upload --email <address>` — without editing `build.lua`.
+- **`update = false`** declares a new package. Flip it at the first revision.
+
+`ctanPath` is `/macros/luatex/latex/careerdossier`: LuaLaTeX-only packages are
+filed there rather than under `macros/latex/contrib` (confirmed against
+`ctan.org/pkg/lua-ul`, filed there for the same reason). CTAN staff may reassign
+it on upload.
+
+Nothing here uploads, and nothing should. `AGENTS.md` rule 11 reserves release
+publication to the maintainer, and a CTAN upload cannot be withdrawn the way a
+GitHub release can. Verify the archive manually before upload.
 
 ### Licence and fonts
 
@@ -140,8 +240,15 @@ the release archive from the handwritten source; there is no need to migrate to
 - [ ] The archive installs and compiles on Overleaf, which has no personal
       `texmf` tree — `README.md`'s "Route 3 — Overleaf" is the route it must
       satisfy.
-- [ ] `l3build check`, extraction tests, documentation build, and `l3build ctan`
-      pass, and the final archive has been opened and inspected manually.
+- [ ] The package name and the `careerdossier-*` filenames are still free
+      ("Name and filename availability" above); the `kpsewhich` check was run
+      from outside this repository.
+- [ ] `uploadconfig`'s two upload-time fields are settled: an `email` for the
+      uploader, and `update` matching new-versus-revision.
+- [ ] `make check`, documentation build, and `make ctan` pass, and the final
+      archive has been extracted and inspected by hand — one top-level
+      directory, README with licence and version, no prohibited generated
+      files, and a document that builds from the extracted tree.
 
 ---
 

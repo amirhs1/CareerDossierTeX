@@ -64,10 +64,10 @@
 # sources, so the source tree never picks up untracked build artifacts.
 #
 # Running the full suite (issues #378, #390, #399). `check` is the pre-push gate
-# and runs its eleven targets four at a time. The serial path survives under its
+# and runs its twelve targets four at a time. The serial path survives under its
 # own name:
 #
-#   make check                  the gate: eleven targets, four at a time
+#   make check                  the gate: twelve targets, four at a time
 #   make check JOBS=2           the same targets, two at a time
 #   make check-serial           one target after another, deterministic
 #
@@ -89,11 +89,11 @@
 # that variable is the only place the list exists; `check-targets` prints it for
 # the driver, and `make lint` asserts that the two would dispatch the same set.
 # The driver is tests/check-parallel.sh, which explains what it adds beyond
-# running the same eleven targets — an accounting assertion and a font-cache
+# running the same twelve targets — an accounting assertion and a font-cache
 # proof, both of which exist because a run that reports green without doing the
 # work is this repository's characteristic failure. It is not `make -j`: GNU make
 # 3.81, which is what macOS ships, has no `--output-sync`, so under `-j` the
-# eleven suites interleave and "which suite failed" stops being answerable.
+# twelve suites interleave and "which suite failed" stops being answerable.
 #
 # Fanning out inside a suite (issue #390). `smoke`, `layout`, and `tagging`
 # additionally take JOBS=N, which runs that many of their own fixtures at once:
@@ -141,7 +141,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements manual check check-serial check-parallel check-targets test lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements manual ctan check check-serial check-parallel check-targets test lint ctan-lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -182,6 +182,25 @@ $(MANUAL_BUILD_DIR):
 manual: | $(MANUAL_BUILD_DIR) ## Build the PDF manual into $(MANUAL_BUILD_DIR)/
 	$(MANUAL_LATEXMK) $(MANUAL)
 
+# The CTAN release archive (#264). Configuration lives in build.lua; this is
+# only the entry point, so that the command is discoverable from `make help'
+# like every other one and nobody has to remember the l3build spelling.
+#
+# It is not part of `check'. `l3build ctan' runs the regression suite itself and
+# then typesets the 40-page manual three times, so putting it in the gate would
+# pay for both again on every run to assert something that only matters at
+# release time. docs/RELEASE-CHECKLIST.md is where it is called for; what the
+# gate carries instead is tests/lint/run-ctan-config.sh, which checks the
+# configuration without building anything.
+#
+# Two artifacts land outside $(BUILD_DIR) because l3build puts them there:
+# careerdossier-ctan.zip at the repository root, and the typeset manual at
+# doc/careerdossier.pdf beside its source. Both are already ignored by
+# .gitignore, and `l3build clean' -- which `clean' below runs first -- removes
+# both.
+ctan: ## Build the CTAN release archive; runs l3build check first
+	l3build ctan
+
 # The suite list, in the order both entry points run it. It lives in one
 # variable because two of them dispatch it — `check` concurrently and
 # `check-serial` one at a time — and a hand-maintained second copy is how the
@@ -192,9 +211,9 @@ manual: | $(MANUAL_BUILD_DIR) ## Build the PDF manual into $(MANUAL_BUILD_DIR)/
 # catches is a source-level omission that every LaTeX-running suite below would
 # report as green. Sorting this list longest-first models a further ~50 s at
 # JOBS=4 and was rejected under #399 — it would sort the transcript too, since
-# the replay follows dispatch order, and push `lint` from first to eleventh.
-CHECK_TARGETS := lint regression extract-test smoke layout bibliography-test \
-                 links metadata annotations tagging examples
+# the replay follows dispatch order, and push `lint` from first to last.
+CHECK_TARGETS := lint ctan-lint regression extract-test smoke layout \
+                 bibliography-test links metadata annotations tagging examples
 
 check: ## Run the full supported local suite — the gate; JOBS=N sets the workers
 	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS)) \
@@ -230,6 +249,15 @@ lint: ## Static lint: option values, version declarations, fixture selection, AG
 
 regression: ## Module regression suite (l3build check); TEST=<name> runs one test
 	l3build check $(TEST)
+
+# Deliberately not part of `lint'. Every other script in that slot reads text
+# and needs no TeX, which is why the CI `lint' job runs on a bare runner rather
+# than pulling the TeX Live container. This one loads build.lua under `texlua'
+# to read the version l3build would publish -- a value build.lua derives and no
+# grep can see -- so it belongs with the targets that have an interpreter. Its
+# CI cover is a step of the `regression' job, which already loads build.lua.
+ctan-lint: ## Check build.lua's CTAN packaging configuration (needs texlua)
+	tests/lint/run-ctan-config.sh
 
 smoke: ## Supported builds and required failures; FIXTURE=<pattern> scopes it, JOBS=N fans out
 	tests/smoke/run.sh $(if $(JOBS),--jobs $(JOBS)) "$(FIXTURE)"

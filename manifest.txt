@@ -42,7 +42,8 @@ README.md                     overview, supported behaviour, licence, and versio
 CHANGELOG.md                  user-visible changes per release
 CONTRIBUTING.md               contribution and release workflow
 AGENTS.md                     operating contract for coding agents
-build.lua                     l3build configuration for the regression suite
+build.lua                     l3build configuration: the regression suite, and
+                              the CTAN release archive `make ctan' builds
 Makefile                      local build and test entry points
 doc/careerdossier.tex         the user manual; `make manual' builds
                               careerdossier.pdf from it, and the release

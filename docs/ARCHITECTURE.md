@@ -2048,7 +2048,8 @@ docs, and CI in their own directories — is fully acceptable for CTAN. This is
 the project's chosen path; a `.dtx`/`docstrip` workflow is an optional future
 consideration, not a requirement (see
 [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md) "CTAN readiness"). `build.lua`
-holds the `l3build` regression configuration under `tests/regression/`.
+holds the `l3build` regression configuration under `tests/regression/`, and the
+packaging configuration that turns that same layout into the release archive.
 
 Separate: public commands from internal implementation; content semantics from
 visual details; user documentation from programmer documentation as the package
@@ -2206,6 +2207,19 @@ references, so `checkruns` is 1.
 `l3build check` runs the whole suite, `l3build check <name>` one test, and
 `l3build save <name>` regenerates a baseline. The shell-driven runners under
 `tests/` are not invoked by `l3build`; `make check` runs both.
+
+### Release archive
+
+The same file lists serve packaging. `build.lua` also configures `l3build ctan`
+(#264) — `ctanpkg`, the manual as `typesetfiles` under `docfiledir`, the
+top-level `textfiles`, `packtdszip`, and `uploadconfig` — so the archive is
+generated from the handwritten sources with no `.dtx` step, and `make ctan` is
+the entry point.
+[`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#building-the-archive) states what
+it produces and what has to be checked before an upload; that is not repeated
+here. The version `uploadconfig` publishes is derived from
+`careerdossier-base.sty` rather than restated, because `build.lua` is not part
+of the Work and a literal here would sit outside the set the version lint reads.
 
 Because a `.lvt` test cannot run without the harness, the harness precedes the
 tests that depend on it: a module that relies on `l3build` coverage does not land

@@ -510,7 +510,9 @@ Release readiness:
   on a CTAN submission, **shipped 2026-08-16**, which also made
   `doc/careerdossier.tex` the interface reference and reduced `docs/API.md` to a
   pointer;
-- configure `l3build ctan` and inspect the resulting archive (#264);
+- configure `l3build ctan` and inspect the resulting archive (#264) — **shipped
+  2026-08-17**; `make ctan` builds it, and nothing is uploaded, which stays a
+  `v1.0.0` decision for the maintainer;
 - lint that every Work file declares the same version and date (#258).
 
 Tracked under
