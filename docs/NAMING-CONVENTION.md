@@ -501,22 +501,48 @@ When creating a new item, ask:
 
 ## Documentation heading convention
 
-Headings in this documentation set carry **no section number**, and a
-cross-reference names the heading rather than numbering it.
+**Number a heading only where a tool generates the number.** In practice that
+splits the documentation in two, and the split is not a compromise between two
+tastes — it follows from who maintains the number.
+
+**The PDF manual is numbered**, and stays that way. `doc/careerdossier.tex` is
+an `article`, so LaTeX numbers its sections automatically, and a
+cross-reference goes through `\label`/`\ref`. Inserting a section renumbers the
+heading and every citation of it in the same build, so the number costs nothing
+to maintain. This is also the near-universal convention for LaTeX package
+manuals — `hyperref`, `biblatex`, `fontspec`, PGF/TikZ, and LaTeX3's own
+`interface3.pdf` are all numbered, and an unnumbered one is the exception on
+CTAN.
+
+**Markdown headings carry no section number**, and a cross-reference names the
+heading rather than numbering it.
 
 ```text
 Correct:   `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
 Incorrect: `docs/ATS-EXTRACTION.md` §3.4
 ```
 
-The reason is the one `tests/lint/run-markdown-anchors.sh` rests on: a name
-survives an edit that renumbers everything below it, and a number does not. A
-numbered heading also puts its number inside its own anchor —
-`#34-dates-and-right-alignment` — so inserting one subsection silently breaks
-every link below the insertion point. Two of the eight files here were numbered
-until #447; six never were.
+Markdown has neither automatic numbering nor `\ref`. A number there is typed by
+hand in the heading *and* again in every citation of it — two hand-maintained
+copies of one fact — and GitHub bakes it into the anchor,
+`#34-dates-and-right-alignment`, so inserting one subsection silently breaks
+every link below the insertion point. That is the failure
+`tests/lint/run-markdown-anchors.sh` exists to catch, and de-numbering the two
+files that were numbered until #447 broke exactly eight anchors, all repaired
+there. Six of the eight files never were numbered; this makes it eight.
 
-Three things are deliberately outside this rule:
+This is also the ordinary convention for Markdown documentation generally —
+repository prose is unnumbered essentially everywhere, while numbered documents
+are normative specifications whose numbers a generator emits (RFCs, W3C specs,
+the C++ standard).
+
+**What would reopen the question:** a generator. Sphinx, mdBook, and Bikeshed
+can number a Markdown tree automatically, which restores the property the
+manual already has. If `docs/` is ever built by one of those rather than read on
+GitHub, numbering becomes defensible again — because the generator, not a
+contributor, would own the number. Until then the rule above holds.
+
+Three further things are deliberately outside the Markdown rule:
 
 - `CHANGELOG.md`, whose headings are versions, and whose shipped entries are
   history rather than a register to bring up to date. An entry that cites a
