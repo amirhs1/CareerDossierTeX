@@ -482,7 +482,14 @@ Documentation:
 - document how to install the classes (#261);
 - correct two source comments that document rejected behaviour (#275);
 - decide whether maintainer-tooling fixes belong in `CHANGELOG.md`, which #245
-  currently has no entry for (#260).
+  currently has no entry for (#260);
+- tidy the documentation set itself, from the survey that preceded the manual:
+  where `docs/MIGRATION.md` states its own purpose (#446), one heading
+  convention across `docs/` (#447), one home for the CTAN requirement list
+  (#448), the release table `README.md` restates from this file (#449), and what
+  `docs/ATS-EXTRACTION.md` sections 5 and 11 own now that the manual exists
+  (#450). All five are optional and none blocks the release; #451 corrects two
+  statements that went stale as they were filed.
 
 Examples:
 
@@ -496,7 +503,9 @@ Examples:
 Release readiness:
 
 - build a PDF manual and ship it with its source (#263) — the one hard blocker
-  on a CTAN submission;
+  on a CTAN submission, **shipped 2026-08-16**, which also made
+  `doc/careerdossier.tex` the interface reference and reduced `docs/API.md` to a
+  pointer;
 - configure `l3build ctan` and inspect the resulting archive (#264);
 - lint that every Work file declares the same version and date (#258).
 

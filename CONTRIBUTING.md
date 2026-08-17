@@ -766,14 +766,27 @@ branch protection, so read it with `gh api repos/<owner>/<repo>/rulesets` rather
 than from the older branch-protection endpoint or from this paragraph. As last
 derived, it requires a pull request, allows all three merge methods, requires
 **zero** approving reviews, forbids deletion and non-fast-forward pushes, and
-requires sixteen named job contexts to pass against an up-to-date branch. Green
-CI is therefore the merge gate; a branch that is not close-out complete when it
-goes green is one that can be merged incomplete.
+requires a named list of job contexts to pass against an up-to-date branch.
+Green CI is therefore the merge gate; a branch that is not close-out complete
+when it goes green is one that can be merged incomplete.
 
-Sixteen is the ruleset's list, not the workflow's job count: `manual` was added
-to `.github/workflows/build.yml` by #263 and is deliberately not required yet,
-per the rule below. Read the ruleset for the current list rather than counting
-jobs.
+**How many contexts, and which, is a question for the ruleset and not for this
+paragraph.** The list is not the workflow's job count — a job may exist without
+being required, which is the state every new check passes through under the rule
+below. Read it:
+
+```bash
+gh api repos/amirhs1/CareerDossierTeX/rulesets \
+  --jq '.[] | select(.name=="Protect Main") | .id'
+gh api repos/amirhs1/CareerDossierTeX/rulesets/<id> \
+  --jq '[.rules[] | select(.type=="required_status_checks")
+         | .parameters.required_status_checks[].context]'
+```
+
+A number written here instead would be wrong on the day someone adds a check.
+That is not hypothetical: this paragraph said sixteen, named `manual` as the job
+that was deliberately not yet required, and was falsified within the hour when
+the maintainer required it (#451).
 
 Do not require a status check in the ruleset until that check has completed
 successfully at least once. Once it has, delete the "this is a new check"
