@@ -354,7 +354,8 @@ component cannot own this, because the trigger is a page-level property of how
 the blocks group rather than anything `\__cdossier_components_entryhead:nnnn`
 emits; the gap below the heading is the only lever, so this token holds the
 bound. `tokens-invariants` states it and the `*-entry-dates-*` extraction
-fixtures enforce it. See `ATS-EXTRACTION.md` section 3.4 for the measurements.
+fixtures enforce it. See `ATS-EXTRACTION.md`, "Dates and right
+alignment", for the measurements.
 Since #206 the token ships *at* that floor rather than above it, so a further
 tightening of the list's opening edge is not available without first solving the
 extraction fault the floor stands in for.
@@ -1057,7 +1058,8 @@ Responsibilities:
 
 The XeTeX-only `\XeTeXgenerateactualtext` primitive is gone with the engine.
 LuaHBTeX emits real interword spaces in the text layer, so no per-word
-`/ActualText` workaround is needed or available; see the ATS guide, section 4.5,
+`/ActualText` workaround is needed or available; see the ATS guide, "`/ActualText`,
+`ToUnicode`, and their limits",
 for the history.
 
 Typography commands should express meaning:
@@ -1466,7 +1468,9 @@ never passes through `\__cdossier_letter_rcptline:N`. The redefinition is
 undone when the block closes, because past that point `\\` is the document
 author's ordinary line break again.
 
-### `careerdossier-statement.cls` (`v0.5.0`, calibrated in `v0.6.0`)
+### `careerdossier-statement.cls`
+
+Released in `v0.5.0`; calibrated in `v0.6.0`.
 
 Owns the shared statement document model approved in issue #103.
 
@@ -1531,7 +1535,9 @@ The statement class must not introduce statement-only option names or fallback
 behavior. Broader named or per-role font combinations remain design work in
 issue #120.
 
-### `careerdossier-cv.cls` (Phase 2, released in `v0.2.0`)
+### `careerdossier-cv.cls`
+
+Phase 2; released in `v0.2.0`.
 
 Owns academic-CV document behavior.
 

@@ -51,7 +51,7 @@ and academic dossier subset; the rest guides later phases.
    and OpenType feature combination as testable code.
 5. Do **not** add per-word `/ActualText` spans. Consumers disagree on how to
    honour `/ActualText`; LuaHBTeX writes real interword spaces, so nothing of the
-   kind is needed (section 4.5).
+   kind is needed ("`/ActualText`, `ToUnicode`, and their limits").
 6. Keep source text in logical reading order. Visual placement must never require
    the parser to reconstruct the intended order.
 7. Run automated round-trip extraction tests and manual copy-and-paste tests after
@@ -59,7 +59,7 @@ and academic dossier subset; the rest guides later phases.
 8. Keep ATS compatibility, PDF accessibility, and visual quality as separate
    release gates. They overlap, but passing one does not prove the others. In
    particular, tagged structure is opt-in and validated only for named fixtures
-   (section 7).
+   ("Tagged PDF and accessibility under current LaTeX").
 9. Follow the employer's requested file type. A sound PDF cannot satisfy a portal
    that requires DOCX.
 10. Never claim that a template is "ATS-proof" or "guaranteed." Say that it is
@@ -81,7 +81,7 @@ and [MIT's ATS guide](https://capd.mit.edu/resources/make-your-resume-ats-friend
 > size limit in [`TESTING.md`](TESTING.md#real-portal-acceptance) "Real portal
 > acceptance"), each release cycle.
 
-## 1. What "ATS-friendly" should mean in this package
+## What "ATS-friendly" should mean in this package
 
 Treat ATS-friendly as a testable set of properties, not a marketing label.
 
@@ -123,7 +123,7 @@ do not write documentation or examples that assume a `profile` key exists.
 A tagged PDF can still have a poor extraction order. An untagged PDF can sometimes
 extract cleanly. A beautiful PDF can fail both. Test all three.
 
-## 2. Sources and how to use this guide
+## Sources and how to use this guide
 
 This guide draws on the LaTeX community's authoritative documentation and on a set
 of practitioner reports about ATS behaviour. Give the most weight to current,
@@ -172,9 +172,9 @@ current manuals.
 > pages rather than deep links, to avoid dead links as documents are revised.
 > Confirm and, where useful, pin exact URLs when you next revise this file.
 
-## 3. Layout rules: safe defaults and risky patterns
+## Layout rules: safe defaults and risky patterns
 
-### 3.1 Default to one semantic stream
+### Default to one semantic stream
 
 The input order should already be the order in which a plain-text reader should
 encounter the content:
@@ -196,7 +196,7 @@ Skills
 The implementation may change font, spacing, weight, or alignment, but it should
 not move a later semantic block to an earlier visual position.
 
-### 3.2 Do not use these for essential content
+### Do not use these for essential content
 
 - `twocolumn`, `multicol`, `paracol`, sidebars, or parallel minipages;
 - `tabular`, `tabularx`, `longtable`, `array`, or nested boxes used merely to
@@ -217,7 +217,7 @@ Some of these constructs can generate extractable PDFs in controlled cases. They
 remain high-risk because different extractors make different ordering decisions.
 The default output should avoid the entire class of failure.
 
-### 3.3 Safe visual hierarchy
+### Safe visual hierarchy
 
 Prefer hierarchy created with:
 
@@ -232,7 +232,7 @@ Bold, italics, and dark accent colours are generally safe because the words rema
 words. Colour must not carry meaning by itself. Keep body text black or very dark,
 maintain strong contrast, and test grayscale output.
 
-### 3.4 Dates and right alignment
+### Dates and right alignment
 
 Putting a date at the far right with `\hfill` can preserve source order if the
 title precedes the date in the source, but it must be tested. A safer default is a
@@ -363,7 +363,7 @@ coming from a real interword space under `inline` and from `\pdffakespace`
 under `column` (see 7.6). `tests/tagging/resume-entrymeta-inline` pins that and
 validates as PDF/UA-2.
 
-### 3.5 Headers, footers, and page numbers
+### Headers, footers, and page numbers
 
 For a one- or two-page résumé, prefer no running header. For a long CV
 **(supported in v0.2.0)**, a simple name-derived header and page number can help
@@ -376,7 +376,7 @@ Greenhouse explicitly identifies complex headers and footers, and contact data
 placed within them, as parsing risks. Keep the canonical name and contact block in
 the first page's body.
 
-### 3.6 Page geometry and density
+### Page geometry and density
 
 Good defaults for most career documents are:
 
@@ -393,13 +393,13 @@ chooses paper and options and passes them down. Do not scatter unexplained
 numeric dimensions through the implementation. See `docs/ARCHITECTURE.md`
 ("File responsibilities") for the full ownership map.
 
-## 4. Typography and font engineering under LuaLaTeX
+## Typography and font engineering under LuaLaTeX
 
 Engine detection, `fontspec` loading, portable font selection, and semantic text
 roles are owned by `careerdossier-typography.sty`. The examples below illustrate
 the policy; in the implementation they live in that module.
 
-### 4.1 Font choice is a build dependency
+### Font choice is a build dependency
 
 With LuaLaTeX, `fontspec` makes OpenType fonts easy to use through `luaotfload`,
 but the output depends on:
@@ -413,7 +413,7 @@ but the output depends on:
 
 Do not describe a font as ATS-safe based on its family name alone.
 
-### 4.2 Package default versus user-selected fonts
+### Package default versus user-selected fonts
 
 For a portable, reproducible default:
 
@@ -440,7 +440,7 @@ families are resolved by exact TeX Live file name with all four common faces
 declared explicitly. Arbitrary installed fonts and per-role font selection are
 not part of this interface.
 
-### 4.3 Prefer literal Unicode source
+### Prefer literal Unicode source
 
 Use UTF-8 source and actual Unicode characters for names and languages. Do not
 require users to spell `Zoë`, `José`, `Łukasz`, or `İpek` with legacy accent
@@ -461,7 +461,7 @@ Include multilingual fixtures with:
 Normalize expected extraction to Unicode NFC for comparison, while also retaining a
 raw-output artifact for diagnosis.
 
-### 4.4 Ligatures and alternate glyphs
+### Ligatures and alternate glyphs
 
 The visible glyph and the extracted text are different layers. A ligature can
 display as one glyph but should extract as its original character sequence. An
@@ -472,8 +472,9 @@ The Inter 4.1 regression demonstrates the failure clearly: under XeLaTeX,
 contextual (`calt`) and tabular-figure (`tnum`) alternates for `(`, `)`, and `+`
 could extract as PUA characters, while Inter 3.19 extracted correctly. Enabling
 `\XeTeXgenerateactualtext=1` fixed Poppler extraction but not every PDF consumer,
-and introduced a worse defect of its own — see section 4.5. The engine has since
-changed, but the underlying lesson has not: a font version and feature
+and introduced a worse defect of its own — see "`/ActualText`, `ToUnicode`, and
+their limits". The engine has since changed, but the underlying lesson has not:
+a font version and feature
 combination is a build dependency that must be tested, not assumed.
 
 For a Latin-script default, begin conservatively:
@@ -512,7 +513,7 @@ Important qualifications:
 - If the package accepts arbitrary font features, its documentation must say that
   extraction guarantees no longer apply until the resulting PDF is retested.
 
-### 4.5 `/ActualText`, `ToUnicode`, and their limits
+### `/ActualText`, `ToUnicode`, and their limits
 
 **Do not introduce per-word `/ActualText` spans.** Under LuaLaTeX the question is
 moot — LuaHBTeX writes real interword spaces into the text layer, and the
@@ -554,8 +555,9 @@ PDFKit merge, so nothing was traded away. The `v0.4.0` move to LuaLaTeX removed
 the primitive along with the rest of the XeTeX code path; this class of defect
 is now structurally impossible rather than merely disabled.
 
-For this package the loss is small in any case: section 4.4's policy already
-disables every optional ligature and alternate, which is the main scenario
+For this package the loss is small in any case: the ligature policy in
+"Ligatures and alternate glyphs" already disables every optional ligature and
+alternate, which is the main scenario
 `/ActualText` protects against.
 
 More generally, `/ActualText` and `ToUnicode` are not sufficient evidence by
@@ -573,13 +575,13 @@ consumer-specific, so test more than one consumer.** The fixture runner gates on
 Poppler, on the absence of `/ActualText`, and — on macOS — on PDFKit itself.
 
 None of this is a tagging, PDF/UA, WCAG, or ATS-conformance claim. It concerns
-the text layer only; see section 7.
+the text layer only; see "Tagged PDF and accessibility under current LaTeX".
 
 Never search a decompressed PDF for the word `ToUnicode` and call the document
 validated. Use `pdffonts` for a quick inventory, inspect suspicious mappings when
 needed, and compare extracted output with known ground truth.
 
-### 4.6 A conservative font setup
+### A conservative font setup
 
 This is a starting point, not a substitute for tests. In the implementation it
 belongs in `careerdossier-typography.sty`, which owns the engine check and font
@@ -593,7 +595,7 @@ loading:
 %                Compile with lualatex, not xelatex or pdflatex."
 
 % No /ActualText workaround is needed: LuaHBTeX writes real interword
-% spaces. See section 4.5.
+% spaces. See "`/ActualText`, `ToUnicode`, and their limits".
 \RequirePackage{fontspec}
 
 \defaultfontfeatures+{
@@ -618,7 +620,7 @@ The shipped default is the opposite of this illustration: `bodyfont=serif`
 not the default. Run the full extraction suite for both profiles when either
 changes.
 
-### 4.7 Font acceptance criteria
+### Font acceptance criteria
 
 A font profile is releasable only if:
 
@@ -632,14 +634,14 @@ A font profile is releasable only if:
 - text copies correctly in at least two independent PDF engines; and
 - changes in font version trigger a fresh baseline review.
 
-## 5. Semantic structure for each career-document type
+## Semantic structure for each career-document type
 
 Why each document type is shaped the way it is, in extraction terms. What a
 class actually emits, and in what order, is documented in the manual — this
 section is the reasoning the manual's behavior was derived from, and where the
 two appear to disagree the manual is authoritative, per the scope banner above.
 
-### 5.1 Shared rules
+### Shared rules
 
 An extractor receives a single stream of text with no layout, so every property
 below is one a document loses if it is expressed in geometry instead of in
@@ -662,7 +664,7 @@ Do not define layout-only interfaces such as `\LeftColumn`, `\RightColumn`, or
 publication list on the same shared foundation; future document types may add
 other entry kinds, such as references, without duplicating components per class.
 
-### 5.2 Résumé **(Phase 1)**
+### Résumé **(Phase 1)**
 
 The résumé is the strictest profile, because it is the document most likely to
 be parsed by machine before a person sees it. Each constraint below buys one
@@ -678,14 +680,14 @@ than something a class can enforce:
 - skills as comma-separated or ordinary grouped text, not a grid; and
 - achievements in real `CDossierItemize` lists with a simple text bullet.
 
-### 5.3 Industry CV **(planned — later phase)**
+### Industry CV **(planned — later phase)**
 
 Use the same extraction constraints as the résumé, with more sections and pages.
 Long lists of presentations, publications, projects, or certifications should
 remain ordinary vertical lists. A compact table may look attractive, but a
 sequential list is safer and usually easier to maintain.
 
-### 5.4 Academic CV **(supported in v0.2.0)**
+### Academic CV **(supported in v0.2.0)**
 
 Academic readers often value structured publication and research sections, but the
 PDF may still pass through a central HR platform. Keep:
@@ -744,7 +746,7 @@ the one that stays meaningful if Poppler's grouping heuristic changes: it reads
 the geometry out of the PDF instead of trusting the extractor's line grouping,
 so an extractor change and a real regression stay distinguishable.
 
-### 5.5 Cover letter **(Phase 1)**
+### Cover letter **(Phase 1)**
 
 The applicant's address, recipient, date, and subject must reach the text layer
 in the body, not only in a decorative letterhead or page header: furniture is
@@ -759,7 +761,7 @@ a scanned signature may be decorative, but the typed name must remain present
 as text; and a signature image must not interrupt reading order or replace the
 name.
 
-### 5.6 Statements — default interest plus six other types **(v0.5.0)**
+### Statements — default interest plus six other types **(v0.5.0)**
 
 One class defaults to a statement of interest and also covers research,
 teaching, teaching-philosophy, diversity, artist, and statement-of-purpose
@@ -778,13 +780,13 @@ letter's above, and is likewise a contract of the class:
 `\MakeCDossierStatementHeader` emits the present identity items in a fixed
 logical order, which the manual states.
 
-### 5.7 Reference list **(planned — later phase)**
+### Reference list **(planned — later phase)**
 
 Emit each reference as a sequential block: name, title, organization, relationship
 if appropriate, email, phone, and address. Do not place references in two or three
 columns. Labels such as `Email:` and `Phone:` improve plain-text clarity.
 
-## 6. Hyperlinks, icons, symbols, bullets, and punctuation
+## Hyperlinks, icons, symbols, bullets, and punctuation
 
 ### Hyperlinks
 
@@ -811,9 +813,9 @@ line-breaking decision, and invisible in the rendered page.
 Two things follow. First, a change that adds stretch at a URL's breakpoints is
 an extraction change even though it touches no text: BibLaTeX's
 `\biburlbigskip` default of `0mu plus 3mu` did exactly this in issue #199, and
-`careerdossier-biblatex.sty` sets it rigid for that reason (§5.4 — it capped it
-at `0mu plus 1mu` until issue #312 found a real URL long enough to defeat the
-cap). Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
+`careerdossier-biblatex.sty` sets it rigid for that reason ("Academic CV" — it
+capped it at `0mu plus 1mu` until issue #312 found a real URL long enough to
+defeat the cap). Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
 additionally immune because each item is measured in its own `\hbox` rather
 than justified.
 
@@ -898,7 +900,7 @@ improves word integrity, but do not globally disable all language-aware shaping
 without testing. Compare extraction both with and without `pdftotext -layout`;
 different consumers infer line structure differently.
 
-## 7. Tagged PDF and accessibility under current LaTeX
+## Tagged PDF and accessibility under current LaTeX
 
 Tagged PDF is worth supporting because it provides a structure tree and can
 improve reuse and accessibility. It is not an ATS guarantee.
@@ -969,8 +971,8 @@ Therefore:
 - run the supported extractor matrix against tagged output, not only untagged;
 - claim no PDF/UA or WCAG conformance without a validator run and manual
   inspection of the exact release output — the validator half is now done for
-  five named fixtures and recorded in section 7.1, the manual screen-reader half
-  is tracked in section 7.2 and
+  five named fixtures and recorded in "Recorded validation results", the manual
+  screen-reader half is tracked in "Screen-reader reading-order checks" and
   [issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77); and
 - if strict PDF/UA conformance is an application requirement, state plainly that
   the current preview scope may be unsuitable.
@@ -992,7 +994,7 @@ Package-author rules:
 Do not advertise PDF/UA conformance until a validator and manual inspection pass
 for the exact release output.
 
-### 7.1 Recorded validation results **(v0.4.0 plus the `v0.5.0` statement fixture)**
+### Recorded validation results **(v0.4.0 plus the `v0.5.0` statement fixture)**
 
 `tests/tagging/run.sh` builds each profile twice — once as `<name>.tex`
 (`tagging=on`) and once as `<name>-ua2.tex`, which adds `pdfstandard=ua-2` over
@@ -1055,7 +1057,7 @@ conformance claim for arbitrary user documents, and it does not make `tagging=on
 safe to enable by default. A user document with different content, packages, or
 graphics is unvalidated until it is itself validated.
 
-### 7.2 Screen-reader reading-order checks
+### Screen-reader reading-order checks
 
 Automated validation cannot confirm that a document *reads* correctly. veraPDF
 checks that structure exists and is well-formed; only a screen reader shows
@@ -1113,7 +1115,7 @@ VoiceOver and NVDA differ in how they consume the structure tree, so the macOS
 result above is evidence rather than proof. One screen reader passing does not
 establish that both will.
 
-### 7.3 Tagged BibLaTeX: feasibility and limitations
+### Tagged BibLaTeX: feasibility and limitations
 
 `tests/tagging/biblatex-ua2.tex` records how tagged BibLaTeX output currently
 behaves. It is deliberately **non-blocking**: tagging support inside BibLaTeX
@@ -1148,7 +1150,7 @@ Known limitations, all observed rather than assumed:
 This result is recorded, not advertised. Tagged BibLaTeX is not a supported
 feature of `v0.4.0`; it is a feasibility measurement for a later phase.
 
-### 7.4 Heading hierarchy (issue #267)
+### Heading hierarchy (issue #267)
 
 Before `v0.8.0`, the document identity (the name) carried no heading role at
 all, while every résumé/CV section heading and the statement's own title
@@ -1246,7 +1248,7 @@ branch does not depend on the depth argument. `Sect` divisions around
 résumé/CV section headings were out of scope for this change and are covered
 in 7.5 below.
 
-### 7.5 Section divisions (issue #268)
+### Section divisions (issue #268)
 
 A heading element records that some words are a heading. On its own it records
 nothing about *extent* — where the section it names begins and ends. That is
@@ -1319,7 +1321,7 @@ and the statement's title line as well. Two notes on the shape this took:
   tagging fixture asserts the decoded value per profile rather than merely
   asserting that some title exists.
 
-### 7.6 Structure tree by profile
+### Structure tree by profile
 
 The table and diagram above show the heading skeleton only. This section shows
 the **complete** tagged structure of each named fixture — every heading, link,
@@ -1623,7 +1625,7 @@ their artifact-only separator invisible to the consumer, are any more legible
 than one glued run is exactly the kind of question 7.2's manual screen-reader
 pass, not a structural count, can actually answer.
 
-## 8. Compilation policy
+## Compilation policy
 
 ### Supported command
 
@@ -1651,7 +1653,7 @@ missing characters; option clashes; and deprecated interfaces. Do not make every
 harmless TeX warning fatal, but maintain an explicit allowlist; a new warning
 should fail CI until reviewed.
 
-## 9. Documentation requirements
+## Documentation requirements
 
 Keep documentation in sync with behaviour, in the same change; `CONTRIBUTING.md`
 ("Documentation requirements") maps each kind of change to the doc it belongs
@@ -1662,7 +1664,7 @@ Keep examples fictional and realistic. Obvious placeholders such as `First Last`
 `Company 1` can themselves be skipped by parsers, as Greenhouse's documentation
 notes. Use clearly fictional but plausible names and organizations.
 
-## 10. What to do and what not to do while writing the package
+## What to do and what not to do while writing the package
 
 ### Do
 
@@ -1675,7 +1677,8 @@ notes. Use clearly fictional but plausible names and organizations.
 - use real headings, lists, text, and URLs;
 - use reproducible TeX-distributed OpenType defaults and declare font faces
   explicitly;
-- do not introduce per-word `/ActualText` spans (section 4.5);
+- do not introduce per-word `/ActualText` spans ("`/ActualText`,
+  `ToUnicode`, and their limits");
 - disable risky optional substitutions in the Latin default;
 - test every font/feature combination and compare extraction with known source
   text;
@@ -1700,7 +1703,7 @@ notes. Use clearly fictional but plausible names and organizations.
 - present future features (named font combinations, CTAN packaging, or a
   consolidated profile interface) as if they were current.
 
-## 11. Minimal reference template and class skeleton
+## Minimal reference template and class skeleton
 
 ### User template **(Phase 1)**
 
@@ -1794,7 +1797,7 @@ The exact load order for `fontspec`, `hyperref`, language support, and any
 tagging-related packages must be verified against current manuals and the test
 suite. Do not freeze this illustrative order as policy without integration tests.
 
-## 12. Ongoing maintenance rule
+## Ongoing maintenance rule
 
 ATS parsing, PDF consumers, LaTeX's tagged-PDF implementation, `fontspec`,
 LuaHBTeX, and fonts all change. Treat this guide as a maintained compatibility
