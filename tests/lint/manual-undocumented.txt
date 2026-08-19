@@ -1,0 +1,44 @@
+# manual-undocumented.txt — the documented-public-name ratchet (issue #468)
+#
+# Every public name the Work defines should have an entry in the PDF manual.
+# `tests/lint/run-manual-names.sh' check (4) enforces that. This file is the
+# declared backlog of names that did not, measured on `main' at 51788f0 on
+# 2026-08-19: 9 of the 84 public names the Work defines outside comments.
+#
+# THIS LIST MAY ONLY SHRINK. A name neither documented nor listed here fails
+# the lint, which is the point: the gap is frozen at its measured size and
+# cannot grow while #243 works it down. When the last entry goes, delete this
+# file and check (4)'s backlog branch with it — the lint says so when it runs.
+#
+# Format: one name per line, without the leading backslash, then whitespace,
+# then the reason it is not yet documented. THE REASON IS MANDATORY; an entry
+# without one fails the lint. That follows control 8 of
+# `tests/lint/run-text-guards.sh': an exemption must cost an argument rather
+# than a keyword, or a ratchet becomes a formality. Blank lines and `#'
+# comments are ignored.
+#
+# A name listed here that the Work no longer defines also fails the lint, so
+# the list cannot rot behind the source. That check earned itself immediately:
+# the first draft of this file listed \CDossierRecordEntryBelowSkip,
+# \CDossierSharedHeaderAboveSkip, and \CDossierSharedHeaderBelowSkip, all three
+# retired by #204 and surviving only in comments. The lint rejected them.
+#
+# This file is NOT a statement that these names should stay undocumented. It
+# records what was true when the check was added. #243 decides, name by name,
+# whether each is documented or reclassified as private.
+#
+# All nine are calibrated dimensions, penalties, or size commands — the surface
+# #243 has to rule on as a group, because the question for every one of them is
+# the same: is a token a reader may inspect but is not invited to set part of
+# the documented interface, or an implementation detail with a public-looking
+# name? Documenting them one at a time before that ruling would prejudge it.
+
+CDossierBodySize            resolved body size; the manual documents the `fontsize' option that sets it (#243)
+CDossierPageMargin          resolved text-block margin; the manual documents the `margin' option that sets it (#243)
+CDossierRuleThickness       section-rule thickness; #243 rules on whether rule metrics are documented surface
+CDossierListLabelSep        list label separation; #243 rules on whether list metrics are documented surface
+CDossierFurnitureLeading    running-header and folio leading; furniture is documented, its leading is not (#243)
+CDossierHeadingKeepPenalty  keep-with-next penalty; #243 decides whether penalties are documented individually or as a policy table
+CDossierListOrphanPenalty   list-orphan penalty (#145); #243 decides whether penalties are documented individually or as a policy table
+CDossierSizeDocumentTitle   type-scale size command kept public by #242; #243 classifies which of the seven are documented
+CDossierSizeFurniture       type-scale size command kept public by #242; #243 classifies which of the seven are documented

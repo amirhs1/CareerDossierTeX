@@ -23,3 +23,34 @@ The `version/` subdirectory holds a separate set, for
 `tests/lint/run-version-declarations.sh` (issue #258); see its own `README.md`.
 Those are whole trees rather than single files, because that lint's subject is a
 manifest and the sources it lists taken together.
+
+## Manual-name fixtures
+
+`manualfixture-*.tex` pin the verdicts of
+`tests/lint/run-manual-names.sh` (issues #263, #468). Like the files above they
+are lint input and are never compiled.
+
+| Fixture | Driven check | Expected verdict |
+| --- | --- | --- |
+| `manualfixture-ok.tex` | all | `OK` |
+| `manualfixture-private.tex` | private names | `PRIVATE NAME` |
+| `manualfixture-unknown.tex` | public names | `UNKNOWN NAME` |
+| `manualfixture-nonames.tex` | public names | `NO NAMES FOUND` |
+| `manualfixture-version.tex` | declared release | `VERSION MISMATCH` |
+| `manualfixture-documented.tex` | documented names | varies with the backlog below |
+
+Check (4) — every public name the Work defines is documented — needs two inputs
+rather than one, so its fixtures come in a set:
+
+| Fixture | Role |
+| --- | --- |
+| `manual-defined-names.txt` | stands in for the Work's defined names, so a fixture manual need not document all 84 real ones |
+| `backlog-ok.txt` | the undocumented name is declared, with a reason → `OK` |
+| `backlog-empty.txt` | it is not declared at all → `UNDOCUMENTED NAME` |
+| `backlog-noreason.txt` | declared with no reason → `NO REASON` |
+| `backlog-stale.txt` | declares a name the fixture Work does not define → `STALE ENTRY` |
+
+`manualfixture-documented.tex` deliberately does not name the undocumented
+command even in a TeX comment: the lint's manual-side collector reads comments
+too, so naming it there would make it look documented and the
+`UNDOCUMENTED NAME` fixture would silently stop testing anything.

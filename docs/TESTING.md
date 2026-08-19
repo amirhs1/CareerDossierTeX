@@ -1191,12 +1191,13 @@ names, only as words in a document.
 tests/lint/run-manual-names.sh
 ```
 
-It reads `doc/careerdossier.tex` as text and asserts three things: that no
+It reads `doc/careerdossier.tex` as text and asserts four things: that no
 `\__cdossier_` name appears; that every `\CDossier…`, `\MakeCDossier…`, and
 `CDossier…` environment it mentions occurs in a file `manifest.txt` lists
-under "The Work"; and that the release the manual declares, and the one
-`README.md`'s "current release" block declares, both match the Work's
-`\ProvidesExpl*` declarations.
+under "The Work"; that every public name the Work *defines* is mentioned in the
+manual; and that the release the manual declares, and the one `README.md`'s
+"current release" block declares, both match the Work's `\ProvidesExpl*`
+declarations.
 
 The name check is deliberately weak: it asks whether a name occurs in the Work
 at all, not whether it occurs in a *definition*. A stricter form would have to
@@ -1205,6 +1206,45 @@ the ones it did not know — reporting its own gaps as the manual's, which is
 #398's failure mode. The weak form still catches both failures that happen: a
 name misspelled in the manual, and a name removed from the source while the
 manual keeps it.
+
+#### The documented-name direction, and its ratchet
+
+The third assertion is check (2)'s mirror, added by #468. Check (2) stops the
+manual naming something that does not exist; check (4) stops the Work exposing
+something the manual never mentions. Without it a new public command shipped
+undocumented and every suite passed.
+
+Two things about it are worth knowing before changing it.
+
+**It strips TeX comments from the Work, and check (2) does not.** A name
+mentioned in a comment is still a claim check (2) should validate, so its
+collector keeps them. Here the same inclusion would demand documentation for
+names that are deliberately private: three names in this tree appear *only* in
+comments recording that #242 privatised them, and three more —
+`\CDossierRecordEntryBelowSkip`, `\CDossierSharedHeaderAboveSkip`,
+`\CDossierSharedHeaderBelowSkip` — only in comments recording that #204 retired
+them. The two collectors are therefore separate on purpose.
+
+**It ships as a ratchet.** Nine public names were undocumented when the check
+was added, and a lint that fails on all of them at once is a lint that gets
+commented out. They are declared in `tests/lint/manual-undocumented.txt`, which
+may only shrink; #243 is what shrinks it, and the lint prints the remaining
+count on every run. What the check catches from day one is the tenth.
+
+The backlog is held honest by two further failures, both of which are about the
+*list* rather than the manual: an entry with no reason fails, following control
+8 of `run-text-guards.sh` — an exemption must cost an argument rather than a
+keyword — and an entry naming something the Work no longer defines fails, so
+the list cannot rot behind the source. That second one earned itself
+immediately: the first draft of the backlog listed the three #204-retired
+tokens above, and the lint rejected it.
+
+**What it does not check** is that a mention is a *definition* of the name for a
+reader. A name appearing anywhere in the manual counts, including inside a TeX
+comment. That is the same deliberate weakness as check (2) and for the same
+reason; today no name in the manual is comment-only, so the looser rule and the
+stricter one give identical answers, and the divergence is not worth a second
+collector until it does.
 
 The release check is the second half of a separate finding.
 `run-version-declarations.sh` checks the `.sty`/`.cls` declarations against

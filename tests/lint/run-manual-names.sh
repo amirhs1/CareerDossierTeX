@@ -62,6 +62,7 @@ root="$(cd "$here/../.." && pwd)"
 fixtures="$here/fixtures"
 
 manual="$root/doc/careerdossier.tex"
+backlog="$here/manual-undocumented.txt"
 readme="$root/README.md"
 
 # ---------------------------------------------------------------------------
@@ -135,8 +136,82 @@ manual_names() {
   ' "$file" | sort -u
 }
 
+# Every public name the Work *defines*, one per line, with TeX comments removed
+# first. Check (4) needs a different set from work_names() above, and that
+# difference is the whole subtlety of it.
+#
+# work_names() deliberately counts a name mentioned in a comment, because for
+# check (2) that is still a claim worth validating. Here the same inclusion
+# would be a false positive with teeth. Three names appear in this tree *only*
+# inside comments recording that issue #242 made them private --
+# \CDossierApplyBodySize, \CDossierApplyGeometry, and
+# \MakeCDossierPageFurniture. They are private now. Asking the manual to
+# document them would pressure an author into documenting a private name, which
+# is exactly what check (1) exists to reject.
+#
+# A TeX comment runs from the first unescaped `%' to end of line, so `\%' is a
+# literal percent and starts none. Stripping on a bare /%/ would truncate any
+# line containing one and lose every name after it.
+work_defined_names() {
+  local file
+  for file in $(work_files); do
+    [ -f "$root/$file" ] || continue
+    cat "$root/$file"
+  done | awk '
+    {
+      line = $0
+      out = ""
+      while (length(line) > 0) {
+        i = index(line, "%")
+        if (i == 0) { out = out line; break }
+        slashes = 0
+        j = i - 1
+        while (j >= 1 && substr(line, j, 1) == "\\") { slashes++; j-- }
+        if (slashes % 2 == 1) {
+          out = out substr(line, 1, i)
+          line = substr(line, i + 1)
+          continue
+        }
+        out = out substr(line, 1, i - 1)
+        break
+      }
+      print out
+    }
+  ' | awk '
+    {
+      line = $0
+      while (match(line, /\\?(Make)?CDossier[A-Za-z]+/)) {
+        name = substr(line, RSTART, RLENGTH)
+        sub(/^\\/, "", name)
+        print name
+        line = substr(line, RSTART + RLENGTH)
+      }
+    }
+  ' | sort -u
+}
+
+# The ratchet list: names accepted as undocumented, each with its reason.
+# Prints `name<TAB>reason'. An entry with no reason prints an empty second
+# field rather than being dropped, so the caller can reject it -- silently
+# skipping it is how the mandatory reason would stop being mandatory.
+backlog_entries() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  awk '
+    /^[[:space:]]*#/ { next }
+    /^[[:space:]]*$/ { next }
+    {
+      name = $1
+      reason = $0
+      sub(/^[[:space:]]*[^[:space:]]+/, "", reason)
+      sub(/^[[:space:]]+/, "", reason)
+      printf "%s\t%s\n", name, reason
+    }
+  ' "$file"
+}
+
 # ---------------------------------------------------------------------------
-# The three checks, each over one file so the self-check can drive them.
+# The four checks, each over one file so the self-check can drive them.
 # ---------------------------------------------------------------------------
 
 # 1. No private LaTeX3 name.
@@ -277,6 +352,110 @@ check_declared_release() {
   return "$bad"
 }
 
+
+# 4. Every public name the Work defines is documented in the manual.
+#
+# The mirror of check (2), and the direction that was missing: (2) stops the
+# manual naming something that does not exist, (4) stops the Work exposing
+# something the manual never mentions. A new public command could ship
+# undocumented and every suite passed (issue #468).
+#
+# It ships as a ratchet rather than a policy. 52 of the 84 names the Work
+# defines were undocumented when this was written, and a lint that fails on all
+# of them on day one is a lint that gets commented out. So the accepted set is
+# declared in tests/lint/manual-undocumented.txt, may only shrink, and #243 is
+# what shrinks it. What this catches from day one is the 53rd.
+#
+# Three ways to fail, and the second and third are what keep the list honest:
+# a name neither documented nor listed; a listed name with no reason, per
+# control 8 of run-text-guards.sh -- an exemption must cost an argument, or the
+# ratchet becomes a formality; and a listed name the Work no longer defines, so
+# the list cannot rot behind the source.
+check_documented_names() {
+  local file="$1" backlog="$2" defined_from="${3:-}"
+  local defined documented entries name reason bad=0 listed=0 remaining=0
+  local nl='
+'
+
+  # The self-check drives this against fixture files, and a fixture manual
+  # cannot document all 84 names the real Work defines. So the defined set is
+  # an optional third argument -- one name per line -- and defaults to the Work
+  # itself, which is what every real run uses.
+  if [ -n "$defined_from" ]; then
+    defined="$(sed -e 's/[[:space:]]*#.*$//' -e '/^[[:space:]]*$/d' "$defined_from" | sort -u)"
+  else
+    defined="$(work_defined_names)"
+  fi
+  if [ -z "$defined" ]; then
+    printf '  %-32s %s\n' "$(basename "$file")" "NO WORK NAMES FOUND"
+    printf '    -> %s\n' "the Work defines no CDossier name outside comments, so this check cannot have run; manifest.txt or the sources are unreadable"
+    return 1
+  fi
+
+  documented="$(manual_names "$file")"
+  if [ -z "$documented" ]; then
+    printf '  %-32s %s\n' "$(basename "$file")" "NO NAMES FOUND"
+    printf '    -> %s\n' "the manual mentions no public name at all, which no real manual does; the extraction has stopped matching"
+    return 1
+  fi
+
+  entries="$(backlog_entries "$backlog")"
+
+  # (a) A backlog entry must carry a reason, and must still name something the
+  #     Work defines.
+  while IFS="$(printf '\t')" read -r name reason; do
+    [ -n "$name" ] || continue
+    listed=$((listed + 1))
+    if [ -z "$reason" ]; then
+      printf '  %-32s %-24s %s\n' "$(basename "$backlog")" "NO REASON" "$name"
+      printf '    -> %s\n' "every backlog entry states why the name is not yet documented; an exemption must cost an argument, not a keyword (run-text-guards.sh control 8)"
+      bad=1
+      continue
+    fi
+    case "$nl$defined$nl" in
+      *"$nl$name$nl"*) ;;
+      *)
+        printf '  %-32s %-24s %s\n' "$(basename "$backlog")" "STALE ENTRY" "$name"
+        printf '    -> %s\n' "the Work no longer defines this name; delete the line rather than leave the list describing a tree that has moved on"
+        bad=1
+        ;;
+    esac
+  done <<EOF
+$entries
+EOF
+
+  # (b) Every defined name is documented, or listed.
+  for name in $defined; do
+    case "$nl$documented$nl" in
+      *"$nl$name$nl"*) continue ;;
+    esac
+    case "$nl$(printf '%s\n' "$entries" | cut -f1)$nl" in
+      *"$nl$name$nl"*) remaining=$((remaining + 1)); continue ;;
+    esac
+    if [ "$bad" -eq 0 ]; then
+      printf '  %-32s %s\n' "$(basename "$file")" "UNDOCUMENTED NAME"
+    fi
+    printf '    -> %s\n' "\\$name is defined in the Work but appears nowhere in $(basename "$file")"
+    bad=1
+  done
+
+  if [ "$bad" -ne 0 ]; then
+    printf '    %s\n' "Document the name in doc/careerdossier.tex, or -- if it should"
+    printf '    %s\n' "not be public -- rename it to \\__cdossier_<module>_<action>:<sig>."
+    printf '    %s\n' "Adding it to $(basename "$backlog") is for names #243 has yet to"
+    printf '    %s\n' "classify, not for new ones. See issue #468."
+    return 1
+  fi
+
+  if [ "$remaining" -eq 0 ]; then
+    printf '  %-32s %s\n' "$(basename "$file")" "every public name documented"
+    printf '    -> %s\n' "the backlog is empty: delete $(basename "$backlog") and this check's backlog branch (#468)"
+  else
+    printf '  %-32s %-24s %s\n' "$(basename "$file")" "documented, $remaining on backlog" "of $listed listed"
+  fi
+  return 0
+}
+
 # ---------------------------------------------------------------------------
 # The run.
 # ---------------------------------------------------------------------------
@@ -291,6 +470,7 @@ if [ ! -f "$manual" ]; then
 else
   check_private_names "$manual" || fail=1
   check_public_names  "$manual" || fail=1
+  check_documented_names "$manual" "$backlog" || fail=1
 fi
 
 echo
@@ -310,6 +490,7 @@ self_check() {
     private) out="$(check_private_names "$fixtures/$fixture")" ;;
     public)  out="$(check_public_names  "$fixtures/$fixture")" ;;
     release) out="$(check_declared_release "$fixtures/$fixture" manual)" ;;
+    documented) out="$(check_documented_names "$fixtures/$fixture" "$fixtures/$4" "$fixtures/manual-defined-names.txt")" ;;
   esac
   rc=$?
   if [ "$expected" = "OK" ]; then
@@ -351,6 +532,13 @@ self_check manualfixture-private.tex  private "PRIVATE NAME"
 self_check manualfixture-unknown.tex  public  "UNKNOWN NAME"
 self_check manualfixture-version.tex  release "VERSION MISMATCH"
 self_check manualfixture-nonames.tex  public  "NO NAMES FOUND"
+
+# Check (4). Each drives one verdict, and the backlog file is a parameter so a
+# fixture can carry a deliberately broken list without touching the real one.
+self_check manualfixture-documented.tex documented "OK"                 backlog-ok.txt
+self_check manualfixture-documented.tex documented "UNDOCUMENTED NAME"  backlog-empty.txt
+self_check manualfixture-documented.tex documented "NO REASON"          backlog-noreason.txt
+self_check manualfixture-documented.tex documented "STALE ENTRY"        backlog-stale.txt
 
 echo
 if [ "$fail" -ne 0 ]; then
