@@ -1,0 +1,4 @@
+# Gamma is properly declared; Delta is not defined by the fixture Work at all,
+# so the list has rotted behind the source and must fail.
+CDossierFixtureGamma   deliberately undocumented in this fixture, with a stated reason
+CDossierFixtureDelta   names something the fixture Work does not define

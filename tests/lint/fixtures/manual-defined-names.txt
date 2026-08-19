@@ -1,0 +1,5 @@
+# The public names the *fixture* Work defines, standing in for the real one so
+# a fixture manual need not document all 84. One per line, no backslash.
+CDossierFixtureAlpha
+CDossierFixtureBeta
+CDossierFixtureGamma
