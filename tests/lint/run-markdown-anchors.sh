@@ -64,6 +64,7 @@ fixtures="$here/fixtures"
 fail=0
 
 # Output guards that answer "could not check" apart from "absent" (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 # ---------------------------------------------------------------------------

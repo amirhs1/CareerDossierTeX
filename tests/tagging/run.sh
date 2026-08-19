@@ -67,6 +67,7 @@ root="$(cd "$here/../.." && pwd)"
 
 # Extracted-text guards that answer "could not check" apart from "absent"
 # (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 work="${TMPDIR:-/tmp}/careerdossier-tagging-$$"
@@ -1429,6 +1430,7 @@ if [ "$jobs" -eq 1 ]; then
     eval "${unit_cmds[$i]}" || fail=1
   done
 else
+  # shellcheck source=tests/lib/fanout.sh
   . "$root/tests/lib/fanout.sh"
   scratch="$root/build/fanout/tagging"
   rm -rf "$scratch"

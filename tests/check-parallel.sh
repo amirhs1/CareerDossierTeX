@@ -248,6 +248,7 @@ read_targets() {
 # only the result files on disk, which is what makes "a worker left no result"
 # a state it can actually observe.
 
+# shellcheck source=tests/lib/fanout.sh
 . "$here/lib/fanout.sh"
 
 batch_names=()

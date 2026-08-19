@@ -236,7 +236,7 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, manual names, manual examples, text guards, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, manual names, manual examples, text guards, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
@@ -245,6 +245,7 @@ lint: ## Static lint: option values, version declarations, fixture selection, AG
 	tests/lint/run-manual-names.sh
 	tests/lint/run-manual-examples.sh
 	tests/lint/run-text-guards.sh
+	tests/lint/run-shellcheck.sh
 	tests/check-parallel.sh --self-test
 
 regression: ## Module regression suite (l3build check); TEST=<name> runs one test
