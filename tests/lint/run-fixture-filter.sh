@@ -64,6 +64,7 @@ root="$(cd "$here/../.." && pwd)"
 
 # Membership and output guards that answer "could not check" apart from
 # "absent" (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 fail=0

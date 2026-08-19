@@ -38,7 +38,7 @@
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
-cd "$here"
+cd "$here" || exit 1
 # Put the repository root on TEXINPUTS so fixtures that load the CareerDossierTeX
 # classes and packages resolve them; standalone fixtures are unaffected.
 root="$(cd "$here/../.." && pwd)"
@@ -46,6 +46,7 @@ export TEXINPUTS="$root:${TEXINPUTS:-}"
 
 # Extracted-text guards that answer "could not check" apart from "absent"
 # (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 # Fixture selection (issue #359). The pattern is a shell glob matched anywhere
