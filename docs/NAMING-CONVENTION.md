@@ -312,7 +312,7 @@ v0.5.0 — Statements and Customization
 v0.6.0 — Calibrated Type Scale and Rhythm
 v0.7.0 — Page Furniture, Output Medium, and Spacing Ownership
 v0.8.0 — Semantic Structure and Tagged Output
-v1.0.0 — Stable Public API
+v0.10.0 — Stable Public API
 ```
 
 Rules:
@@ -349,7 +349,7 @@ Examples:
 ```text
 v0.1.0
 v0.2.0
-v1.0.0
+v0.10.0
 ```
 
 GitHub Release title:
