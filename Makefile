@@ -4,11 +4,12 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash, awk, and make — all seven of its
-# scripts, since the second one drives the other runners in their
-# compile-nothing `--list` mode, the third reads three Markdown files, the
-# fourth reads doc/careerdossier.tex and README.md, the fifth drives
-# tests/lib/text.sh over synthetic text, and the sixth exercises
+# pure text processing and needs only bash, awk, and make across all ten of
+# its scripts — with one exception, the harness lint, which needs shellcheck
+# and fails rather than skipping without it — since the second one drives the
+# other runners in their compile-nothing `--list` mode, the third reads three
+# Markdown files, the fourth reads doc/careerdossier.tex and README.md, the
+# fifth drives tests/lib/text.sh over synthetic text, and the sixth exercises
 # check-parallel's accounting controls against synthetic workers;
 # l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
