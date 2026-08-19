@@ -132,11 +132,13 @@ careerdossier-base.sty
             ▼
 careerdossier-components.sty
     │
-    ├── identity block
+    ├── identity block and header stack
     ├── contact line
-    ├── links
-    ├── entry primitives
-    └── page furniture
+    ├── link layer
+    ├── entry primitives and metadata placement
+    ├── page furniture and section rules
+    ├── list page-break policy
+    └── derived PDF metadata
             │
             ▼
 document class  (resume / letter / cv / statement)

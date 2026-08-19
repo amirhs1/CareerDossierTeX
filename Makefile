@@ -4,11 +4,12 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash, awk, and make — all seven of its
-# scripts, since the second one drives the other runners in their
-# compile-nothing `--list` mode, the third reads three Markdown files, the
-# fourth reads doc/careerdossier.tex and README.md, the fifth drives
-# tests/lib/text.sh over synthetic text, and the sixth exercises
+# pure text processing and needs only bash, awk, and make across all ten of
+# its scripts — with one exception, the harness lint, which needs shellcheck
+# and fails rather than skipping without it — since the second one drives the
+# other runners in their compile-nothing `--list` mode, the third reads three
+# Markdown files, the fourth reads doc/careerdossier.tex and README.md, the
+# fifth drives tests/lib/text.sh over synthetic text, and the sixth exercises
 # check-parallel's accounting controls against synthetic workers;
 # l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
@@ -80,10 +81,27 @@
 #
 # JOBS defaults to 4 because 4 is the fastest value measured green: serial 439 s,
 # JOBS=2 285 s, JOBS=4 211 s, all green, against JOBS=8 at 168-201 s and 4 red in
-# 8 clean-tree runs. Every one of those failures is a text-extraction assertion
-# against a document that is provably correct — a guard that reports present text
-# as missing under load (#398) — so it is not the classes, and 8 is unusable
-# until that is fixed rather than merely slower to trust.
+# 8 clean-tree runs. Every one of those failures was a text-extraction assertion
+# against a document that is provably correct — a guard that reported present
+# text as missing under load (#398).
+#
+# #398 is fixed (PR #403, `9bfc6d4`, the commit immediately after the one that
+# first wrote this paragraph): the extracted-text guards now answer three
+# states, and JOBS=8 then ran 5 green of 5 at 162-186 s. The sentence this
+# paragraph used to carry — that 8 is "unusable until that is fixed" — has been
+# false ever since, and the 24% is no longer blocked by a defect.
+#
+# The default is still 4, for a different and weaker reason: nothing has
+# measured 8 over enough runs to set a default from. Five green runs are not
+# that campaign; 4-red-in-8 above is exactly what a handful of green runs looks
+# like before the flaky half arrives. The campaign also wants a machine with
+# more cores than the maintainer's, so it is unrun rather than merely
+# unscheduled, and raising the default is not a decision this repository can
+# currently take on its own evidence.
+#
+# So 8 is unjustified, not barred. `make check JOBS=8` is a supported thing to
+# run on hardware that has the cores; the default stays 4 until someone with
+# that hardware runs the campaign and reports it.
 #
 # Both entry points dispatch $(CHECK_TARGETS) and cannot drift apart, because
 # that variable is the only place the list exists; `check-targets` prints it for
@@ -236,7 +254,7 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, manual names, manual examples, text guards, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, manual names, manual examples, text guards, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
@@ -245,6 +263,7 @@ lint: ## Static lint: option values, version declarations, fixture selection, AG
 	tests/lint/run-manual-names.sh
 	tests/lint/run-manual-examples.sh
 	tests/lint/run-text-guards.sh
+	tests/lint/run-shellcheck.sh
 	tests/check-parallel.sh --self-test
 
 regression: ## Module regression suite (l3build check); TEST=<name> runs one test

@@ -16,14 +16,27 @@
 %% This work consists of the files listed in manifest.txt.
 %%
 %% careerdossier-components owns the shared rendered document parts: the
-%% identity block, page furniture, section rules, the contact line, link
-%% wrappers, and separator handling.
+%% identity block and header stack, page furniture, section rules, the contact
+%% line, the entry-heading primitive and its metadata placement, the link layer,
+%% list page-break policy and its tagged closing edge, separator handling, and
+%% the document's derived PDF metadata.
 %% It carries no page geometry (see careerdossier-tokens) and no résumé- or
 %% letter-specific structure.
+%%
+%% That list is longer than a module description should be, and the length is
+%% the finding rather than the style. Two blocks dominate the file -- the link
+%% layer and PDF document metadata -- and until issue #466 the second was named
+%% in none of this package's three self-descriptions. Whether either belongs
+%% here is under review: #464 proposes moving the metadata block to its own
+%% package, #465 asks the same question of the link layer and may well answer
+%% no; both carry the measurements. Either landing will require rewriting this
+%% comment, manifest.txt, and docs/ARCHITECTURE.md again; describing the module
+%% accurately in the meantime is worth that cost, because AGENTS.md rule 4 sends
+%% an author here to find the module that owns a concern.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-components} {2026-08-12} {0.8.0}
-  {CareerDossierTeX shared identity block, page furniture, contact line, and links}
+  {CareerDossierTeX shared document parts, link layer, and PDF metadata}
 
 \RequirePackage { careerdossier-base }
 \RequirePackage { careerdossier-tokens }

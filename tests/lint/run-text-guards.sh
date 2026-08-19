@@ -30,6 +30,7 @@ fails=0
 scratch_dir="$root/build/text-guards-selftest"
 rm -rf "$scratch_dir"
 
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 # The text every control below asks about: the real page-two capture from the
