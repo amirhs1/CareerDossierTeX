@@ -67,6 +67,7 @@ root="$(cd "$here/../.." && pwd)"
 
 # Extracted-text guards that answer "could not check" apart from "absent"
 # (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 work="${TMPDIR:-/tmp}/careerdossier-tagging-$$"
@@ -1032,7 +1033,18 @@ check_display_doc_title_override() {
 }
 
 check_visual_equivalence() {
-  local base="$1" tagged="$work/$base.bbox" plain="$work/$base-untagged.bbox"
+  # Declared separately, for the reason validate_ua2 below already gives:
+  # `local` expands every argument before any of its assignments take effect,
+  # so the `$base` in the second and third would be the *caller's*, not the one
+  # being declared here. That resolves to the right value today only because
+  # tagging_profile happens to hold an identical `base`; a caller passing
+  # anything else would silently build another fixture's paths, and under
+  # `--jobs N` the units share one `$work`, so two of them would then race on
+  # the same pair of files and a fixture could pass having compared another
+  # fixture's geometry with itself.
+  local base="$1"
+  local tagged="$work/$base.bbox"
+  local plain="$work/$base-untagged.bbox"
   # Compare every rendered word and its bounding box with an explicit 0.11pt
   # tolerance. Numeric comparison is required: rounding or truncating decimal
   # strings can turn sub-tenth-point noise across a boundary into a false
@@ -1429,6 +1441,7 @@ if [ "$jobs" -eq 1 ]; then
     eval "${unit_cmds[$i]}" || fail=1
   done
 else
+  # shellcheck source=tests/lib/fanout.sh
   . "$root/tests/lib/fanout.sh"
   scratch="$root/build/fanout/tagging"
   rm -rf "$scratch"

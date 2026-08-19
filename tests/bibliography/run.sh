@@ -26,7 +26,7 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
-cd "$here"
+cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
 base="cv-bibliography"
