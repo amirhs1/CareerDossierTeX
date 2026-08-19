@@ -97,6 +97,9 @@ jobs:
           bash --version | head -1
           grep --version | head -1
           awk --version 2>&1 | head -1 || awk -W version 2>&1 | head -1
+          # The harness lint runs shellcheck, and it adds checks between
+          # releases, so which version ran is part of what a green lint means.
+          shellcheck --version | sed -n 's/^version: /shellcheck /p'
       - name: Static lint (source-level invariants no compiled fixture asserts)
         run: make lint
 

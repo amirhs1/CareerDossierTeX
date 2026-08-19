@@ -54,11 +54,12 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
-cd "$here"
+cd "$here" || exit 1
 
 # Extracted-text guards that answer "could not check" apart from "absent"
 # (issue #398). Sourced unconditionally: every furniture, contact, and
 # keep-together assertion below goes through it, fanned out or not.
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 # Fixture selection (issue #359).
@@ -640,6 +641,10 @@ EOF
 
     fill_fail=0
     floor_still_needed=0
+    # `goal`, `used`, and `nxt` are positional placeholders, not oversights:
+    # `read` fills by position, and the columns this loop does use sit after
+    # them, so they cannot be dropped without renumbering the record.
+    # shellcheck disable=SC2034
     while IFS="$(printf '\t')" read -r pg goal used pct pen kind nxt atom blank last; do
       [ -n "$pg" ] || continue
       if [ "$last" -eq 1 ] || [ "$kind" = "eject" ]; then continue; fi
@@ -818,6 +823,7 @@ if [ "$jobs" -eq 1 ]; then
     layout_fixture "$tex" || fail=1
   done
 else
+  # shellcheck source=tests/lib/fanout.sh
   . "$root/tests/lib/fanout.sh"
   scratch="$root/build/fanout/layout"
   rm -rf "$scratch"
