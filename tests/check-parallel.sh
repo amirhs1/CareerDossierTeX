@@ -280,7 +280,7 @@ run_batch() {
   # worker that died leaves its cache for it and for the end-of-run one.
   for (( i = 0; i < n; i++ )); do
     slot="$(fanout_slot "$i" "${batch_names[$i]}")"
-    rm -rf "$par_root/$slot"
+    rm -rf "${par_root:?}/$slot"
   done
 }
 
