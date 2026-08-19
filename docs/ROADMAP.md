@@ -489,6 +489,14 @@ Delivered scope and this release's criteria are recorded in the closed
 Consolidate the documentation set, revise and extend the examples, build the PDF
 manual, and configure the CTAN release archive.
 
+Three strands joined the release after that charter was set, and § "Scope" below
+records them rather than this goal: the behaviour and public-interface
+corrections that had to land before the `v0.10.0` freeze, the agent instruction
+set, and the build and test harness. Each is here because deferring it cost
+more than carrying it — a public-interface fix pushed past `v0.10.0` costs a
+major version instead of a minor one, and the harness and instruction-set work
+paid for itself across the rest of the milestone.
+
 ### Scope
 
 Documentation:
@@ -499,7 +507,8 @@ Documentation:
 - document how to install the classes (#261);
 - correct two source comments that document rejected behaviour (#275);
 - decide whether maintainer-tooling fixes belong in `CHANGELOG.md`, which #245
-  currently has no entry for (#260);
+  currently has no entry for (#260), and mark the entries that predate the
+  boundary that decision drew (#410, #413, #414);
 - tidy the documentation set itself, from the survey that preceded the manual:
   where `docs/MIGRATION.md` states its own purpose (#446), one heading
   convention across `docs/` (#447), one home for the CTAN requirement list
@@ -528,9 +537,59 @@ Release readiness:
   `v0.10.0` decision for the maintainer;
 - lint that every Work file declares the same version and date (#258).
 
+Behaviour and public interface, settled before the `v0.10.0` freeze:
+
+- accept a raw `#` in a profile value, which had failed with a
+  hyperref-internal error (#353);
+- give `CDossierPublications` a `numbering` key, so grouped publication lists
+  can carry one sequence across groups instead of restarting at each (#355).
+  This is the only public key this release adds, and the reason
+  `docs/MIGRATION.md` takes an entry for a milestone that is otherwise
+  documentation and packaging;
+- give the header-below tokens ownership of their gap in the prose classes
+  (#419), and keep a letter's closing text with its signature name across a
+  page break (#421);
+- make derived and user-supplied PDF metadata identical on the tagged and
+  untagged build paths (#428, #439, #440, #442). The tagged path had been
+  discarding a document's own `pdftitle` and `pdfauthor` outright, and every
+  text-layer suite passed while it did.
+
+The agent instruction set:
+
+- reduce `AGENTS.md` from its 523 lines to the always-loaded core, and move the
+  testing chapter out of `CONTRIBUTING.md` into `docs/TESTING.md` (#370, #371);
+- collapse the post-push metadata tail from sixteen `gh` round-trips to about
+  six (#379);
+- correct or assert what the instruction files claim about themselves (#380,
+  #382, #386, #387, #394, #400), and align the `release-notes` skill's step text
+  with the user-visible test it applies (#411, #433, #434).
+
+The build and test harness:
+
+- make the local gate parallel by default, both across independent targets and
+  within each runner's fixtures, and make it sandbox-tolerant and race-free
+  (#378, #390, #392, #395, #398, #399, #462);
+- add the lints and gates that now guard the release: each Work file's declared
+  name against its filename (#405), every cross-document Markdown anchor
+  (#407), every complete example the manual publishes (#458), every public name
+  the Work defines against the manual (#468), and `shellcheck` over the shell
+  harness (#469);
+- measure the visible gap at every boundary, and correct the records that
+  misstated it (#417).
+
+Documentation-set work filed after the 2026-08-16 extension:
+
+- correct what `careerdossier-components.sty` declares it owns (#466);
+- rename the stable-API release from `v1.0.0` to `v0.10.0` across the
+  documentation (#473), following the milestone's own rename on 2026-08-19;
+- record this section's real scope, which is this entry (#475).
+
 Tracked under
 [milestone `v0.9.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/12)
-and [epic #283](https://github.com/amirhs1/CareerDossierTeX/issues/283).
+and [epic #283](https://github.com/amirhs1/CareerDossierTeX/issues/283), which
+stay canonical for the delivered list. This section keeps the long-scope form
+until the release ships; #380 compressed the shipped phases to their goal,
+delivered list, and non-goals, and Phase 8 joins them at the tag.
 
 ## Phase 9: `v0.10.0 — Stable Public API`
 
