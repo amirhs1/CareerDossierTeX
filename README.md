@@ -29,7 +29,7 @@ code.
 > so `\verb` and other catcode-sensitive content must be defined outside it. See
 > [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 >
-> Before `v1.0.0` the public interface may still change between minor versions;
+> Before `v0.10.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
 > [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
@@ -482,7 +482,7 @@ Source archives and selected example PDFs are available through GitHub Releases.
 Everything in the support matrix above is in the current release, named under
 [Releases](#releases). Two releases remain planned: `v0.9.0` consolidates the
 documentation set, revises the examples, and prepares the CTAN archive, and
-`v1.0.0` declares the public interface stable and fully documented. Nothing is
+`v0.10.0` declares the public interface stable and fully documented. Nothing is
 scheduled after that.
 
 [`docs/ROADMAP.md`](docs/ROADMAP.md#release-overview) owns the release table —

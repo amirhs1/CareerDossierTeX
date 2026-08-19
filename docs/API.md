@@ -47,7 +47,7 @@ author using it. Everything else moved into the manual.
 
 ## Stability policy
 
-Before `v1.0.0`:
+Before `v0.10.0`:
 
 - breaking changes are allowed;
 - public changes must be documented in [`../CHANGELOG.md`](../CHANGELOG.md);
@@ -55,8 +55,8 @@ Before `v1.0.0`:
 - public API changes must update `doc/careerdossier.tex` in the same pull
   request.
 
-After `v1.0.0`, incompatible changes should require a major-version release or a
+After `v0.10.0`, incompatible changes should require a major-version release or a
 documented deprecation path.
 
-Calibrated token *values* are not stable API before `v1.0.0`; the token names
+Calibrated token *values* are not stable API before `v0.10.0`; the token names
 and the boundaries they own are.

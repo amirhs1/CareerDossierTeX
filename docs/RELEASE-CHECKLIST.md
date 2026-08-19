@@ -1,7 +1,7 @@
 # CareerDossierTeX release checklist
 
 The per-release gate: what a release has to satisfy before it is tagged, and
-what CTAN additionally requires of the uploaded archive at `v1.0.0`. It is the
+what CTAN additionally requires of the uploaded archive at `v0.10.0`. It is the
 one file that answers "is this releasable yet"; `docs/ROADMAP.md` owns which
 release a change belongs to, and `.agents/skills/release-notes/reference.md`
 owns how `CHANGELOG.md` and the GitHub Release notes are written.
@@ -10,7 +10,7 @@ The checks below reference [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) for the
 font, extraction, and tagging policy each one asserts, and
 [`TESTING.md`](TESTING.md) for the suites that run them.
 
-## CTAN readiness **(planned — v1.0.0)**
+## CTAN readiness **(planned — v0.10.0)**
 
 CTAN's requirements govern the uploaded archive, not the development repository. As
 of July 2026 the core expectations, verified against
@@ -160,7 +160,7 @@ GitHub release can. Verify the archive manually before upload.
 
 ## Release checklist
 
-> This is the full CTAN-quality release checklist, targeted at `v1.0.0`. For Phase
+> This is the full CTAN-quality release checklist, targeted at `v0.10.0`. For Phase
 > 1, the applicable subset is the **Document output** and **Extraction** groups
 > plus basic build CI; the CTAN group is out of Phase 1 scope.
 
@@ -229,7 +229,7 @@ GitHub release can. Verify the archive manually before upload.
       metadata agree. `make manual` builds the user manual, and `make lint`
       asserts that the release it declares matches the Work's.
 
-### CTAN **(v1.0.0)**
+### CTAN **(v0.10.0)**
 
 - [ ] README, licence, PDF manual, and documentation source are present —
       `careerdossier.pdf` and `doc/careerdossier.tex`, the PDF built from that

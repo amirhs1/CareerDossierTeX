@@ -4,7 +4,7 @@ All notable changes to CareerDossierTeX will be documented in this file.
 
 The project follows [Semantic Versioning](https://semver.org/). The structure of this file is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-Before `v1.0.0`, breaking changes may occur, but they must be documented here and in `docs/MIGRATION.md`.
+Before `v0.10.0`, breaking changes may occur, but they must be documented here and in `docs/MIGRATION.md`.
 
 ## [Unreleased]
 
