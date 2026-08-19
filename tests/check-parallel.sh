@@ -248,6 +248,7 @@ read_targets() {
 # only the result files on disk, which is what makes "a worker left no result"
 # a state it can actually observe.
 
+# shellcheck source=tests/lib/fanout.sh
 . "$here/lib/fanout.sh"
 
 batch_names=()
@@ -279,7 +280,7 @@ run_batch() {
   # worker that died leaves its cache for it and for the end-of-run one.
   for (( i = 0; i < n; i++ )); do
     slot="$(fanout_slot "$i" "${batch_names[$i]}")"
-    rm -rf "$par_root/$slot"
+    rm -rf "${par_root:?}/$slot"
   done
 }
 

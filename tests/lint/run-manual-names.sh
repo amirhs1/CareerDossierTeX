@@ -57,6 +57,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 
 # Output guards that answer "could not check" apart from "absent" (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 fixtures="$here/fixtures"

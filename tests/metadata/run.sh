@@ -297,9 +297,18 @@ $(ascii_utf16be_hex 'Twin')"
 expected_ligature_author_hex="\
 $(ascii_utf16be_hex 'Metadata Fixture')$en_dash_hex$(ascii_utf16be_hex 'Twin')"
 
+# The four below are written and read only through `eval` -- in the loop that
+# follows and in the comparison after it -- so shellcheck sees neither end and
+# reports each as unused. The initialisation is load-bearing rather than
+# defensive: it is what makes the `[ -n "$d" ]` test report "produced no /$key"
+# for a fixture that failed to compile, instead of tripping `set -u`.
+# shellcheck disable=SC2034
 ligature_default_title=""
+# shellcheck disable=SC2034
 ligature_tagged_title=""
+# shellcheck disable=SC2034
 ligature_default_author=""
+# shellcheck disable=SC2034
 ligature_tagged_author=""
 for job in letter-ligature-default letter-ligature-tagged; do
   if compile_fixture "$job.tex" "$job"; then

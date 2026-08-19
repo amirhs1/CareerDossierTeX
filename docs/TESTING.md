@@ -1317,16 +1317,19 @@ detecting a stale version, a missing file, a defaulted `packtdszip`, a renamed
 package, or a Work file left out of the archive fails there rather than
 reporting a clean tree.
 
-The `lint` target runs two more scripts in the same slot:
+The `lint` target runs three more scripts in the same slot:
 
 ```bash
 tests/lint/run-text-guards.sh
+tests/lint/run-shellcheck.sh
 tests/check-parallel.sh --self-test
 ```
 
-Both are committed negative controls, and both belong in this slot because they
-compile nothing and need neither TeX nor biber. What the second asserts is in
-"The parallel run" below; the first is the section immediately following.
+All three belong in this slot because they compile nothing and need neither TeX
+nor biber. Two are committed negative controls: what `check-parallel.sh
+--self-test` asserts is in "The parallel run" below, and `run-text-guards.sh` is
+the section immediately following. `run-shellcheck.sh` is static analysis rather
+than a control, and is "Shell-harness lint" below.
 
 ### A guard answers three states, not two
 
@@ -1435,6 +1438,52 @@ only the contiguous run of code lines beneath it, ending at the first blank line
 so it cannot spread down a file. The last control asserts both by re-running the
 scanner over a synthetic file containing a bare marker, a reasoned one, and an
 offence past a blank line.
+
+### Shell-harness lint
+
+`tests/` is around 10,900 lines of shell, and every verification claim this
+project makes is a claim about what those scripts did. `tests/lint/run-shellcheck.sh`
+is the only thing that reads them:
+
+```bash
+tests/lint/run-shellcheck.sh        # or: make lint
+```
+
+Three things about it are decisions rather than defaults.
+
+**The threshold is `-S warning`, not `-S error`.** The first defect it found —
+a `local` whose later assignments dereference the variable being declared,
+`tests/tagging/run.sh` — is reported as SC2318, which is *warning*-severity.
+`-S error` would have run clean over it and reported a healthy harness with a
+passing check's authority behind it.
+
+**Sourced libraries are resolved, not suppressed.** `-x` alone buys nothing
+here: the harness sources through variables (`. "$root/tests/lib/text.sh"`), and
+shellcheck cannot resolve a path it would have to run the script to know. Each
+such line carries a `# shellcheck source=` directive naming the file literally,
+which removed five findings from `tests/check-parallel.sh` by telling shellcheck
+where the definitions are — leaving SC2034 and SC2154 fully *active* in that
+file rather than silenced.
+
+**Suppressions are per-site and carry a reason.** A file-level
+`disable=SC2034` would switch that check off for a whole file permanently,
+including code not yet written, and SC2034 is exactly what catches a typo'd
+accounting counter — `fanout_faild=0` for `fanout_failed=0`, a variable set and
+never read, which would leave the counter untouched and the run reporting a
+clean suite. That is the hollow pass `tests/lib/fanout.sh` exists to remove. Two
+sites are suppressed: the positional placeholders in `tests/layout/run.sh`'s
+page-fill `read`, and the four `eval`-written, `eval`-read variables in
+`tests/metadata/run.sh`.
+
+A missing `shellcheck` fails the lint rather than skipping it, as
+`tests/lint/run-ctan-config.sh` does for a missing `texlua`: a check that could
+not be performed is not a check that passed.
+
+One version caveat. CI's `lint` job runs on the bare `ubuntu-latest` runner,
+whose image ships shellcheck 0.9.0; a contributor's own may be newer and
+therefore stricter, since shellcheck adds checks between releases. SC2318 exists
+in 0.9.0, so the gate is real on both. The `lint` job records the version it
+ran, for the same reason it records bash, grep, and awk.
 
 ### Running under a restricted sandbox
 

@@ -32,10 +32,11 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
-cd "$here"
+cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
 # Log guards that answer "could not check" apart from "absent" (issue #398).
+# shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 fail=0
@@ -594,6 +595,7 @@ if [ "$jobs" -eq 1 ]; then
     eval "${unit_cmds[$i]}" || fail=1
   done
 else
+  # shellcheck source=tests/lib/fanout.sh
   . "$root/tests/lib/fanout.sh"
   scratch="$root/build/fanout/smoke"
   rm -rf "$scratch"
