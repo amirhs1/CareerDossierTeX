@@ -16,7 +16,7 @@ test pass at the end of a milestone.
 
 > **Current status:** `v0.8.0 — Semantic Structure and Tagged Output` is
 > released. `v0.3.0` is dropped. The next planned release is `v0.9.0 —
-> Documentation, Examples, and Release Readiness`, followed by `v1.0.0 — Stable
+> Documentation, Examples, and Release Readiness`, followed by `v0.10.0 — Stable
 > Public API`.
 >
 > **Renumbered on 2026-08-01.** `v0.7.0` was numbered `v0.6.1` until then. It
@@ -36,6 +36,19 @@ test pass at the end of a milestone.
 > document previously did not have. `v1.1.0 — Themes and Font Families` was
 > closed empty; its deferred work has no milestone. See
 > [issue #279](https://github.com/amirhs1/CareerDossierTeX/issues/279).
+>
+> **Renumbered on 2026-08-19.** The stable-API release was numbered `v1.0.0`
+> until then and is now `v0.10.0 — Stable Public API`. The freeze itself did not
+> move: that release is still the one after which public commands, keys,
+> options, and documented behaviour are stable, which is what its milestone
+> description says and what "Definition of `0.10.0`" below states. What changed
+> is the number it carries. Every live statement that read *"before `v1.0.0` the
+> public interface may still change"* now reads `v0.10.0`; released
+> `CHANGELOG.md` and `MIGRATION.md` sections keep the number they published,
+> because those record what the project said at the time rather than what it
+> promises now. The two paragraphs above are left as written for the same
+> reason. See
+> [issue #473](https://github.com/amirhs1/CareerDossierTeX/issues/473).
 
 ## Release overview
 
@@ -52,7 +65,7 @@ test pass at the end of a milestone.
 | `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released |
 | `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Released |
 | `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Planned |
-| `v1.0.0` | Stable, documented public API | Planned |
+| `v0.10.0` | Stable, documented public API | Planned |
 | `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** |
 
 Repository milestones are tracked on the GitHub milestones page:
@@ -91,7 +104,7 @@ version, the Project uses a short label — so they cross-walk as follows:
 | `Phase 6: v0.7.0` | `Phase 6 — Spacing Ownership and Output Medium` |
 | `Phase 7: v0.8.0` | `Phase 7 — Semantic Structure and Tagged Output` |
 | `Phase 8: v0.9.0` | `Phase 8 — Documentation, Examples, and Release Readiness` |
-| `Phase 9: v1.0.0` | `Phase 9 — Stable API` |
+| `Phase 9: v0.10.0` | `Phase 9 — Stable API` |
 | `v1.1.0` **(closed empty, unnumbered)** | *(none — never had an option)* |
 
 The two patch releases have no heading of their own: `v0.1.1` carries
@@ -439,7 +452,7 @@ Delivered scope and this release's criteria are recorded in the closed
 ### Goal
 
 Complete the semantic structure and the tagged-output metadata, and settle the
-public typography and colour roles, before the `v1.0.0` API freeze. The
+public typography and colour roles, before the `v0.10.0` API freeze. The
 released output had carried less structure than it appeared to — no document
 from any of the four classes contained an `/H1`, `/Lang` was absent from the
 default build path, and the derived `/Title` never reached a viewer's window —
@@ -512,20 +525,20 @@ Release readiness:
   pointer;
 - configure `l3build ctan` and inspect the resulting archive (#264) — **shipped
   2026-08-17**; `make ctan` builds it, and nothing is uploaded, which stays a
-  `v1.0.0` decision for the maintainer;
+  `v0.10.0` decision for the maintainer;
 - lint that every Work file declares the same version and date (#258).
 
 Tracked under
 [milestone `v0.9.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/12)
 and [epic #283](https://github.com/amirhs1/CareerDossierTeX/issues/283).
 
-## Phase 9: `v1.0.0 — Stable Public API`
+## Phase 9: `v0.10.0 — Stable Public API`
 
 ### Goal
 
 Declare a stable and fully documented interface.
 
-### Definition of `1.0.0`
+### Definition of `0.10.0`
 
 - public commands, options, keys, and environments are documented;
 - supported engines and languages are tested;
@@ -537,11 +550,11 @@ Declare a stable and fully documented interface.
   fixture (#274) and NVDA on Windows (#96), so both sit together as one
   release criterion;
 - the uploaded archive satisfies the CTAN packaging requirements, which
-  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
+  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v0100)
   states in full and this file does not restate (#448).
 
 Tracked under
-[milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
+[milestone `v0.10.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
 and [epic #285](https://github.com/amirhs1/CareerDossierTeX/issues/285).
 
 ## Continuous testing policy
@@ -576,7 +589,7 @@ The live issue and Project metadata now follow the continuous-testing policy:
 - CTAN packaging via `l3build ctan`, and the PDF manual a submission requires —
   `v0.9.0`, under #264 and #263. Whether the manual is handwritten or generated
   from a `.dtx` is decided there, against what
-  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
+  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v0100)
   states CTAN requires.
 - Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
   LuaLaTeX transition supersedes that precondition, and opt-in tagged structure

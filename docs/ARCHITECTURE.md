@@ -2326,7 +2326,7 @@ inherited `article` defaults. Every type size and structural gap is now a
 ratio of the `fontsize` body size or baseline. The résumé and CV classes drop
 `density=compact|standard`, which the proportional rhythm makes redundant.
 
-### `v1.0.0`
+### `v0.10.0`
 
 Stabilize the public API, document deprecation policy, validate an Overleaf-ready package, and test every supported configuration.
 
