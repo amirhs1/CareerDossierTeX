@@ -6,12 +6,16 @@
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
 # pure text processing and needs only bash, awk, and make across all ten of
 # its scripts — with one exception, the harness lint, which needs shellcheck
-# and fails rather than skipping without it — since the second one drives the
-# other runners in their compile-nothing `--list` mode, the third reads three
-# Markdown files, the fourth reads doc/careerdossier.tex and README.md, the
-# fifth drives tests/lib/text.sh over synthetic text, and the sixth exercises
-# check-parallel's accounting controls against synthetic workers;
-# l3build for `regression`;
+# and fails rather than skipping without it. The `lint` recipe below is the
+# list of those ten, and the ones whose inputs are least obvious from their
+# names read text too — run-fixture-filter.sh drives the other runners in
+# their compile-nothing `--list` mode, run-agents-references.sh reads three
+# Markdown files, run-manual-names.sh reads doc/careerdossier.tex and
+# README.md, run-text-guards.sh drives tests/lib/text.sh over synthetic text,
+# and check-parallel.sh --self-test exercises check-parallel's accounting
+# controls against synthetic workers.
+#
+# Beyond `lint`: l3build for `regression`;
 # pdftotext (Poppler) for `layout`, `extract-test`, `bibliography-test`,
 # `links`, and `tagging`; pdftoppm (Poppler) for `review-page-two`; nothing
 # beyond LuaLaTeX for `metadata` and `annotations`, which read the PDF's own
