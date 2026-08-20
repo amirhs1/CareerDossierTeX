@@ -610,80 +610,27 @@ sets: TeX consults `\emergencystretch` only in a third line-breaking pass,
 reached only when the second finds no feasible breakpoints within `\tolerance`.
 
 The alternative derivation — a fraction of the measure, the form most other
-implementations use — was measured against this one and rejected. #272 chose
-`2.00` to preserve the value the classes already rendered; #310 asked whether
-the body size was the right quantity at all, since a pool is spent on a line and
-a line has a length. Holding a fixture, its text, and its body size fixed and
-varying only the measure in 8 pt steps from 400 pt to 560 pt, the smallest pool
-that clears every overfull box shows no trend: the résumé Summary prose needs
-1.00 pt at a 440 pt measure, 11.25 pt at 520 pt, and nothing at 528 pt, while
-the bullet path needs 33.75 pt at 416 pt and 0.75 pt at 512 pt. Across the two
-paths the correlation between measure and required pool comes out at `+0.417`
-and `−0.568` — opposite signs. The requirement is set by where one paragraph's
-break points happen to fall, and neither candidate predicts that.
+implementations use — was measured against this one and rejected (#310), which
+holds the sweep. Its premise, that what a pool buys is set by the line rather
+than the font size, was refuted rather than settled: holding a fixture and its
+body size fixed and varying only the measure, the smallest pool that clears
+every overfull box correlates `+0.417` with the measure on the prose path and
+`−0.568` on the bullet path — opposite signs, because the requirement is set by
+where one paragraph's break points happen to fall. Neither candidate predicts
+that, so the form cannot be chosen on rescue efficacy at all. At matched
+magnitudes the two are indistinguishable, overflowing the same cells and not
+merely the same count, and the tie breaks on the one criterion that does
+separate them: a measure-derived token would be the only entry in the
+derived-metrics table above not on the type scale, where
+`\CDossierRuleThickness` and `\CDossierListLabelSep` already sit.
 
-Only the magnitude is left to choose, and the two forms are indistinguishable
-wherever the magnitudes match. Swept over every layout fixture at all three body
-sizes and both margins, `1.50 ×` body size and `0.040 ×` measure leave the same
-five overfull boxes in the same five cells, and `2.50 ×` body size and
-`0.050 ×` measure leave the same two:
-
-| Derivation | Pool at `11pt` | Overfull boxes | Third pass |
-|---|---:|---:|---:|
-| `0` (negative control) | 0 pt | 60 | 0 |
-| `1.50 ×` body size | 16.5 pt | 5 | 51 |
-| `2.00 ×` body size (shipped) | 22 pt | 5 | 51 |
-| `2.50 ×` body size | 27.5 pt | 2 | 51 |
-| `0.030 ×` measure | 14.1 / 16.3 pt | 7 | 51 |
-| `0.035 ×` measure | 16.4 / 19.0 pt | 6 | 51 |
-| `0.040 ×` measure | 18.8 / 21.7 pt | 5 | 51 |
-| `0.045 ×` measure | 21.1 / 24.4 pt | 3 | 51 |
-| `0.050 ×` measure | 23.5 / 27.1 pt | 2 | 51 |
-
-Measure-derived pools are given at `margin=normal` / `margin=narrow`; a
-body-size-derived pool is the same at both. 216 cells per arm — 36 discovered
-fixtures at three body sizes and both margins.
-
-"The same five cells" is meant literally, and is checked rather than inferred
-from the counts matching. At `1.50 ×` body size and at `0.040 ×` measure the
-overflowing cells are the same five: `resume-long-fields` at `12pt/normal` and
-at `12pt/narrow`, `resume-emergency-stretch` at `11pt/narrow` and `12pt/narrow`,
-and `letter-long-fields` at `12pt/narrow`. At `2.50 ×` and `0.050 ×` they are
-the same two, both `resume-long-fields` at `12pt`. Two derivations that agree on
-a count could still disagree on which paragraph they rescue; these do not.
-
-The tie therefore breaks on the one criterion that does separate the forms: a
-measure-derived token would be the only entry in the derived-metrics table above
-not on the type scale, where `\CDossierRuleThickness` and
-`\CDossierListLabelSep` already sit. The ratio stays at `2.00`.
-
-Raising it is not free. 51 paragraphs in that sweep reach the third pass and set
-successfully within it, and a larger pool re-breaks those, so a rescue bought
-for an off-design stress fixture is paid for by reflowing documents that already
-set. That count is `51` at every non-zero pool and `0` at none, which is also
-why third-pass frequency, measured alongside the box counts, discriminates
-nothing between the candidates: the pool's size decides whether a paragraph
-succeeds in the third pass, never whether it enters one.
-
-Every figure above is reproducible with `make review-linebreak` (#316), the
-committed instrument this measurement was extracted into:
-
-```bash
-make review-linebreak SWEEP_ARGS="--corpus fixtures --param emergencystretch --values '0pt 1.50\CDossierBodySize 2.00\CDossierBodySize 2.50\CDossierBodySize 0.030\textwidth 0.035\textwidth 0.040\textwidth 0.045\textwidth 0.050\textwidth'"
-```
-
-Expressing an arm as a length register rather than a fixed dimension is what
-makes the comparison statable at all: both candidates vary per body size and
-margin, so neither can be swept as a constant. The per-document rows the
-instrument writes under `build/linebreak-sweep/` are what the same-cells check
-above reads.
-
-The residue the table cannot reach is a property of the fixtures, not of the
-token. Every remaining box belongs to a deliberately extreme stress fixture run
-at a size and margin it is not committed at; the worst, `resume-long-fields` at
-`fontsize=12pt, margin=normal`, needs an 83 pt pool — `3.46 ×` its body size, or
-`0.177 ×` its measure. At the combination each fixture is committed at, the
-suite is clean at the shipped ratio, which is what `make layout` asserts.
+Raising the ratio is not free. 51 paragraphs in that sweep reach the third pass
+and set successfully within it, and a larger pool re-breaks those, so a rescue
+bought for an off-design stress fixture is paid for by reflowing documents that
+already set. The boxes no defensible ratio reaches all belong to deliberately
+extreme stress fixtures run at a size and margin they are not committed at; at
+the combination each fixture is committed at, the suite is clean at the shipped
+ratio, which is what `make layout` asserts.
 
 #### Page-furniture placement
 
@@ -796,140 +743,47 @@ should override it, are in the manual.
 
 #### Page-break penalties
 
-`careerdossier-tokens.sty` also owns the named typographic page-break
-penalties (issue #171): `\CDossierBrokenPenalty`, `\CDossierClubPenalty`, and
-`\CDossierWidowPenalty`, applied through `\CDossierApplyPageBreakPenalties`.
-These sit alongside the structural keep-together penalties (issue #145,
-`\CDossierHeadingKeepPenalty` and `\CDossierListOrphanPenalty`) that only the
-résumé and CV use; the typographic penalties are shared by all four classes,
-each calling `\CDossierApplyPageBreakPenalties` once in its preamble.
+`careerdossier-tokens.sty` also owns the named typographic page-break penalties
+(issue #171): `\CDossierBrokenPenalty`, `\CDossierClubPenalty`, and
+`\CDossierWidowPenalty`, applied by `\CDossierApplyPageBreakPenalties` in all
+four classes. The structural keep-together penalties `\CDossierHeadingKeepPenalty`
+and `\CDossierListOrphanPenalty` (#145) are résumé/CV-only.
 
-All three default to `10000`, uniformly across families — there is no
-per-family split, despite the structural penalties being résumé/CV-specific.
-An earlier design discounted the club and widow values for the
-continuous-prose classes (letter, statement) on the theory that a page-break
-policy strict enough to survive a lone stranded line should also leave room to
-break inside a paragraph that cannot otherwise fit; measuring against the
-committed letter fixtures showed the discounted value still let a club line
-through, while the full value did not, with no overfull `\vbox` anywhere in
-the two-page corpus. `\raggedbottom` on all four classes is what makes the
-full-strength value safe: forbidding the club/widow break only removes the
-first and last line of a paragraph as legal break points, and every interior
-line break is still available, so an over-long paragraph still paginates
-rather than overflows. Nothing in the toolkit sets that `\raggedbottom`: it is
-inherited from `article.cls`, which selects it for a one-side, one-column
-document and `\flushbottom` otherwise. Because a penalty calibration depends on
-it, the four `tokens-*-defaults` regressions assert the effective bottom-fill
-state per class rather than leaving the assumption to prose (#335).
+All three default to `10000` uniformly, with no per-family split.
+`\raggedbottom` is what makes full strength safe: forbidding the club or widow
+break removes only a paragraph's first and last line as legal break points, so
+an over-long paragraph still paginates rather than overflows. Nothing here sets
+it — `article.cls` does — and because the calibration depends on it, the four
+`tokens-*-defaults` regressions assert the bottom-fill state per class, with
+`\topskip` and `\@secpenalty` beside it (#335).
 
-That inherited `\raggedbottom` also decides the *shape* of the club and widow
-values, not merely their safety (#342). A page under construction has no stretch
-to be judged on, so every candidate short of the goal scores badness `10000` and
-cost `deplorable`; they all tie, the last one that fits wins, and the penalty's
-magnitude is never consulted. The parameter is therefore binary — `10000`
-forbids, every other value permits — and a sweep over
-`10000, 4000, 1000, 300, 150, 50, 0` produces exactly two distinct paginations,
-with `9999` matching `0`. Under `\flushbottom` badness would vary with the fill
-and intermediate values would genuinely trade off; this conclusion is downstream
-of the state #335 guards.
+Two routes away from that default were measured and declined, and the toolkit
+keeps the white space: it is visible, an author can close it with a `\newpage` or
+a reworded sentence, and a declared page-fill floor guards it. The measurements
+are in the issues; the deterrent for each is here.
 
-The trade-off was then measured on the committed corpus. Forbidding costs 13.1%
-of page one on `statement-two-page` and 2.4–3.1% on the two letter fixtures that
-respond; permitting recovers all of it and introduces one club line and two widow
-lines, one per fixture recovered. Because the two move together with no value in
-between, the choice is the rule itself rather than its strength, and the project
-keeps the white space. A `\raggedbottom` document ending a page short is the
-posture the toolkit already takes everywhere else.
+- **Discounting club and widow for the prose classes**, so a letter or statement
+  can break inside a paragraph that would not otherwise fit. Under
+  `\raggedbottom` a page being built carries no stretch, so every candidate ties
+  on badness and the magnitude is never consulted: the parameter is binary,
+  `10000` forbids and every other value permits, `9999` paginating as `0`. So
+  there is no discount to apply, only the rule — and permitting it buys page
+  fill one-for-one with a stranded line (#342).
+- **Making the rule conditional** — fill the page unless doing so strands a line.
+  It needs no new primitive and no stretchable token, only `\topskip` tolerance
+  the builder can see, so it is a one-line change and will be proposed again. That
+  tolerance gains no fixture a point of fill on its own, and it wakes LaTeX's
+  `-300` `\@secpenalty`, which costs two shipped statement examples 11.8 points of
+  page-one fill unless that too is neutralised. What survives moves one stress
+  fixture, and none of the eleven shipped examples, which pay nothing (#351).
 
-**The conditional rule, and why it is declined.** The alternative that would
-dominate both — fill the page unless doing so strands a line — was specified,
-built, and measured (#351). It is declined, and the reasoning is recorded here
-because the change is one line long and will be proposed again.
-
-Two things it does *not* need. It does not need a new primitive: eTeX's
-`\clubpenalties` and `\widowpenalties` take a count and that many per-line
-values and both work under LuaTeX, though on their own they can only state a
-*stricter* minimum, which fills less rather than more. And it does not need a
-stretchable vertical token. The stretch the page builder is missing has a
-simpler source: LaTeX's `\raggedbottom` leaves `\topskip` rigid and puts its
-`plus .0001fil` in `\@textbottom`, which the output routine inserts when the
-column is shipped, so the builder never sees it. Plain TeX's `\raggedbottom` is
-`\topskip 10pt plus 60pt` — the same ragged bottom, with the tolerance where the
-builder *does* see it, and invisible on the page either way because the fil in
-`\@textbottom` still absorbs the whole shortfall at `\vpack` time.
-
-Supplied that way, the mechanism works exactly as the issue predicted. Page
-badness becomes finite — the 85.51pt hole on `statement-two-page` scores `b=4518`
-at 24pt of tolerance against `b=10000` with none — and the club and widow values
-become a genuine dial, whose policy is *strand a line only when refusing would
-leave more than* `S · (p/100)^⅓` *points blank*. Three measurements then decide
-against it.
-
-**One — the tolerance buys nothing by itself.** With the pair still at `10000`
-it never gains a page a single point of fill. Across all twenty committed
-two-page layout fixtures and the shipped examples, nothing fills more than it
-does today, and `statement-two-page` and the two letter fixtures are
-byte-identical. That is structural rather than a tuning result: the set of legal
-breakpoints is unchanged, and the fullest legal break already wins. Tolerance
-only changes how the builder *scores* breaks it was already choosing between, so
-every point of fill still has to be bought by permitting the break — the
-one-for-one trade above, now behind a threshold instead of a switch.
-
-**Two — the tolerance is not free elsewhere.** It also makes `\@secpenalty` live.
-LaTeX puts that `-300` before every `\section`, and under constant badness it is
-inert, because a bonus cannot break a tie in which every candidate already costs
-`deplorable`. Live, it wins whenever the hole it opens scores under badness
-`300`, which is up to `1.44 · S` points. Measured at `S = 60pt`: the shipped
-`artist-statement` and `teaching-philosophy-statement` fall from 98.9% of page
-one to **87.1%**, turning a 7.38pt hole into an 84.01pt one — the same defect the
-route exists to remove, introduced into two user-facing documents. Rescuing it
-means also setting `\@secpenalty` to `0`, so the classes stop preferring a
-section boundary as a page break: a second, unrelated behaviour change bought to
-pay for the first.
-
-**Three — what survives buys one fixture.** With `\@secpenalty` neutralised and
-the threshold at roughly three lines (`S = 60pt`, `p = 30`), across the eight
-documents measured that way exactly one moves: `statement-two-page` goes from
-86.9% of page one to 98.6%, closing 85.51pt of blank to 8.88pt — and gains the
-widow line the rule exists to prevent, reported by the same
-`page-break-check.awk` that `make layout` asserts with. The other seven —
-`letter-two-page`, `letter-a4-two-page`, `statement-a4-two-page`,
-`letter-academic-two-page`, and the `research`, `artist` and
-`teaching-philosophy` statement examples — are byte-identical. That is the
-conditionality working: the guarantee is kept where refusing is cheap and traded
-where it is expensive.
-
-That is the whole gain, and it points the other way once the corpus is read
-properly. On the eleven shipped examples the club/widow rule costs **nothing** —
-permitting the break everywhere leaves every one of them byte-identical. The
-13.1% is a property of a stress fixture built to produce it, not of any document
-the toolkit ships. So the route does not keep the guarantee and stop paying for
-it; it prices the guarantee, and the price list is one stress fixture trading
-white space for a stranded line, against a second behaviour change and two
-coupled parameters neither of which means anything alone.
-
-The toolkit keeps the white space. It is visible, an author can close it
-deliberately with a `\newpage` or a reworded sentence, and it is already guarded
-by a declared page-fill floor; a stranded line is none of those, and the detector
-that would catch it was blind for most of its life (#348). Conditionality would
-also dissolve the negative controls that made it honest: a shipped `\clubpenalty`
-of `30` and a control that sets `0` are the same policy, so the control stops
-being one. The `tokens-*-defaults` baselines now record `\topskip` and
-`\@secpenalty` beside the bottom-fill state, so a package that supplies either
-fails a baseline rather than switching this calibration on in silence.
-
-**One structural keep lives outside this module**, in `careerdossier-letter.cls`
-rather than here: the `\nobreak` that `\MakeCDossierClosing` emits between the
-closing text and the signature name (#421). The club and widow parameters cannot
-reach that boundary — the two are separate one-line paragraphs, not the first
-and last line of one — and the `\vspace` between them contributes glue after a
-box, which is an ordinary legal breakpoint. It is not a token, for the reason
-the paragraphs above establish for the parameters it sits beside: the penalty
-here is binary, so there is no value to choose and a named integer would
-advertise a dial the page builder never consults. It is not shared either,
-because the boundary is not shared: no other class emits two one-line paragraphs
-that have to paginate as one. The manual states it as a contract of
-`\MakeCDossierClosing`.
+**One structural keep lives outside this module**, in `careerdossier-letter.cls`:
+the `\nobreak` `\MakeCDossierClosing` emits between the closing text and the
+signature name (#421), which the manual states as a contract. The club and widow
+parameters cannot reach that boundary — two separate one-line paragraphs, not one
+paragraph's first and last line. It is not a token, because the penalty is binary
+and a named integer would advertise a dial the builder never consults; nor
+shared, because no other class paginates two one-line paragraphs as one.
 
 #### Hyphenation
 
