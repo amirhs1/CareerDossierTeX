@@ -1515,26 +1515,16 @@ diagnosis in comments at the repair site.
 
 ### The parallel run
 
-`make check` runs its eleven targets four at a time rather than one after
-another, and `make check-serial` is the same eleven singly. `CONTRIBUTING.md`
+`make check` runs its twelve targets four at a time rather than one after
+another, and `make check-serial` is the same twelve singly. `CONTRIBUTING.md`
 "The gate, and the serial path" is canonical for how to invoke either; this
-section is about what the thing actually does, what it costs, and what it is
-worth.
+section is what the thing does, what it costs, and what it is worth. The argument
+for allowing it at all — that CI's execution model is already fully concurrent,
+so nothing "CI-aligned" depends on scheduling — is in #399.
 
-The parallel path was opt-in when it arrived in #378 and became the gate in
-#399. The argument for keeping the gate serial had been that `check` is the
-CI-aligned entry point — but `.github/workflows/build.yml` runs seventeen jobs
-on seventeen runners with no `needs:` anywhere, so CI's execution model is fully
-concurrent and fully isolated, and local serial `check` was the one execution
-model nothing else in the project used. What "CI-aligned" buys is the same
-target set and the same commands, and both paths still dispatch
-`$(CHECK_TARGETS)` through the same `make <target>` invocations. Neither
-property depends on scheduling.
-
-That is the argument for allowing it. What makes it *safe* are the properties
-and proofs below, and they are the reason a scheduled run is permitted to be the
-thing a push happens behind — a gate that reports green without having done the
-work would be worse than a slow one.
+What makes it *safe* are the properties and proofs below, and they are why a
+scheduled run may be the thing a push happens behind: a gate that reports green
+without having done the work would be worse than a slow one.
 
 #### How it works
 
@@ -1543,72 +1533,63 @@ The unit of parallelism is the **target**, not the fixture and not the compile.
 dispatches each as its own `make <target>`, four at a time by default:
 
 ```text
-make check-targets  ->  lint regression extract-test smoke layout
+make check-targets  ->  lint ctan-lint regression extract-test smoke layout
                         bibliography-test links metadata annotations
                         tagging examples
 ```
 
-Nothing about how a suite decides anything changes. Every verdict is still made
-by the suite that made it serially; only how many of them are in flight at once
-is different. Three properties make that safe to believe:
+Nothing about how a suite decides anything changes: every verdict is still made
+by the suite that made it serially, and only how many are in flight at once is
+different. Three properties make that safe to believe:
 
 - **One target list.** Both paths expand the same `CHECK_TARGETS` variable, and
-  `make lint` compares what each of them would dispatch. A hand-maintained
-  second copy is how the `annotations` suite once dropped out of a run that was
-  then reported clean.
+  `make lint` compares what each would dispatch. A hand-maintained second copy is
+  how the `annotations` suite once dropped out of a run reported clean.
 - **Ordered replay.** Each worker's stdout and stderr is captured to
   `build/check-parallel/NN-<target>.log` and replayed in the `Makefile`'s order
   after the run, so "which suite failed" is answerable from the transcript. This
-  is one of the two reasons it is not `make -j check`: macOS ships GNU make
-  3.81, which has no `--output-sync`, so eleven suites would interleave line by
-  line. The other is that `-j` would also fan out *inside* `examples`, whose six
+  is one of the two reasons it is not `make -j check`: macOS ships GNU make 3.81,
+  which has no `--output-sync`, so twelve suites would interleave line by line.
+  The other is that `-j` would also fan out *inside* `examples`, whose six
   sub-targets share one `latexmk` output directory — a collision this driver
-  does not have, because it dispatches `examples` whole.
+  avoids by dispatching `examples` whole.
 - **Accounting.** Every dispatched target must leave a result file, and the run
   fails when the count of results is not the count dispatched, naming the ones
   that produced none. Concurrency adds a failure no suite can report on itself:
-  a worker that dies before its suite ever ran leaves no failure behind, only an
-  absence, and an absence reads exactly like a clean run unless something is
-  counting.
+  a worker that dies before its suite ever ran leaves only an absence, and an
+  absence reads exactly like a clean run unless something is counting.
 
 Two tool caches then have to be prepared before anything fans out, because a
-cache that several processes build at once is a cache built wrong — and the two
-need opposite treatment:
+cache several processes build at once is a cache built wrong — and the two need
+opposite treatment:
 
 - **luaotfload's font cache is warmed.** One small LuaLaTeX build before
   dispatch, required to prove it typeset real glyphs. Where the cache is
-  unwritable, `fontspec` falls back to `nullfont`, every document typesets
-  empty, and every suite passes having measured nothing.
+  unwritable, `fontspec` falls back to `nullfont`, every document typesets empty,
+  and every suite passes having measured nothing.
 - **biber's cache is isolated, because it cannot be warmed.** Issue #392
   measured why: biber re-unpacks its native binary into that cache on *every*
-  invocation, not the first — the extracted file's inode changes on each run —
-  so two invocations sharing one cache truncate each other's binary. Six
-  concurrent invocations failed against a fully warm shared cache exactly as
-  against a cold one; six with a private `PAR_TMPDIR` each failed zero times.
-  Each worker therefore gets its own, and one probe extraction before dispatch
-  proves biber can unpack here at all.
+  invocation, not the first, so two invocations sharing one cache truncate each
+  other's binary — a warm shared cache fails exactly as a cold one does. Each
+  worker therefore gets its own `PAR_TMPDIR`, and one probe extraction before
+  dispatch proves biber can unpack here at all.
 
 `--self-test` is the committed control for all of that, driven over synthetic
-workers and synthetic logs so it needs no TeX and no biber: a clean batch must
-pass and account for every member; a batch with one failing member must fail,
-name it, and replay its output; a batch with one result file removed — the state
-a killed worker leaves — must fail as an accounting failure rather than as two
-passes and a shrug; three workers must report three *distinct* biber caches,
-since an isolation that quietly stopped being applied would restore a failure
-that reads as a flaky bibliography fixture; and the extraction verdict must
-refuse a failure that still exited 0, because the status is not the proof, the
-log is. It also asserts that every dispatched name is `.PHONY`, since a
-dispatched name that is not `.PHONY` would make `make <target>` a no-op that
-exits 0. The font-cache proof is the one part not exercised here — it needs TeX,
-so every real run exercises it instead.
+workers and logs so it needs no TeX and no biber: a clean batch must pass and
+account for every member; a batch with one failing member must fail, name it,
+and replay its output; a batch with one result file removed — the state a killed
+worker leaves — must fail as an accounting failure rather than as two passes and
+a shrug; three workers must report three *distinct* biber caches, since an
+isolation that quietly stopped being applied would restore a failure that reads
+as a flaky bibliography fixture; the extraction verdict must refuse a failure
+that still exited 0, because the status is not the proof, the log is; and every
+dispatched name must be `.PHONY`, since one that is not would make
+`make <target>` a no-op exiting 0. The font-cache proof needs TeX, so every real
+run exercises it instead.
 
-Three further controls guard the target list itself, and #399 is why there are
-three rather than one. Until then a single grep asserted that `check`'s
-prerequisite list was literally `$(CHECK_TARGETS)`. Making `check` a recipe left
-that grep with nothing to say about the gate — it could only be pointed at
-`check-serial` — so the obvious move, retargeting it, would have quietly stopped
-covering the target that matters. Each control was therefore run against a
-Makefile broken in the way it claims to catch:
+Three further controls guard the target list itself, each run against a
+`Makefile` broken in the way it claims to catch. #399 records why there are
+three rather than one:
 
 | Divergence introduced | `check-serial` grep | gate grep | list comparison |
 |---|---|---|---|
@@ -1619,16 +1600,13 @@ Makefile broken in the way it claims to catch:
 The diagonal is the point: no control is redundant. The first row is the
 historical failure this whole arrangement exists to prevent — a suite silently
 absent from a run that is then reported clean — and only the list comparison
-catches it, because it is the only one comparing *what each path would dispatch*
-rather than how either is spelled. It reads the serial list out of `make -p`'s
-expanded rule database and the parallel one from `make check-targets`, the exact
-command the driver runs, so it fails for any way the two disagree rather than
-for the spellings someone anticipated. The two greps each catch a row it cannot
-see in turn, which is why the one #399 expected to become vestigial was kept.
+catches it, because it alone compares *what each path would dispatch* rather
+than how either is spelled, reading the serial list out of `make -p`'s expanded
+rule database and the parallel one from `make check-targets`.
 
 #### What it is worth, and what it costs
 
-The calibration sweep, measured on the maintainer's machine 2026-08-13 with
+The calibration sweep, measured on the maintainer's machine 2026-08-13, with
 `make clean` before every run so none inherited an up-to-date `examples`:
 
 | | Wall time | Result |
@@ -1638,109 +1616,51 @@ The calibration sweep, measured on the maintainer's machine 2026-08-13 with
 | **`make check JOBS=4`** (the default) | **211 s** | **green** |
 | `make check JOBS=8` | 168–201 s | **4 red in 8 runs** |
 
-That sweep is what settled the default at 4. It was confirmed at the default
-when #399 landed, by five consecutive clean-tree runs on the branch: **211, 225,
-247, 248, and 249 s, all green**, against `make check-serial` at **431 s** in
-the same session. So the speedup is **roughly 1.8×–2.0×**, saving about three
-minutes — and note the spread, which is the honest reading: a single 211 s run
-is the fast end of a range, not the figure to quote. Wall time here moves with
-whatever else the machine is doing.
+That sweep settled the default at 4, and five consecutive clean-tree runs when
+#399 landed confirmed it — **211, 225, 247, 248, and 249 s, all green**, against
+`make check-serial` at **431 s**. So the speedup is **roughly 1.8×–2.0×**: note
+the spread, since a single 211 s run is the fast end of a range rather than the
+figure to quote.
 
-`JOBS=8` is a further 20% and is not the default, because it fails about half
-the time: every one of those failures is a text-extraction assertion against a
+`JOBS=8` is a further 20% and is not the default, because it fails about half the
+time: every one of those failures is a text-extraction assertion against a
 document that is provably correct — a guard that reports present text as missing
-under load (#398) — so the ceiling is an open defect elsewhere rather than a
-property of the machine. The default carries that bound, and the honest form of
-the claim is not "a parallel gate is trustworthy" but **"a parallel gate is
-trustworthy at 4 and is not at 8"**. If a `JOBS=4` run is ever red for the #398
-reason, this arrangement should be reconsidered rather than retried.
+under load (#398) — so the ceiling is an open defect elsewhere, not a property of
+the machine. The honest form of the claim is **"a parallel gate is trustworthy at
+4 and is not at 8"**, and a `JOBS=4` run ever red for the #398 reason is a reason
+to reconsider this arrangement rather than to retry it.
 
-Four honest bounds on the speedup itself:
+**The ceiling is structural, not a matter of more workers.** Parallel wall time
+is the longest single target plus contention, not the sum divided by `JOBS`:
+`smoke` (124 s), `tagging` (116 s), and `layout` (114 s) dominate, while `lint`
+(2 s), `annotations` (5 s), and `metadata` (8 s) finish before the long ones are
+a third done. So the floor here is the longest single target, and only fanning
+out *inside* it goes lower — the next section. What more workers would buy, and
+why it is dispatch order rather than core count, was measured under #390.
 
-1. **The ceiling is structural, not a matter of more workers.** Parallel wall
-   time is the longest single target plus contention, not the sum divided by
-   `JOBS`. `smoke` (124 s), `tagging` (116 s), and `layout` (114 s) dominate,
-   while `lint` (2 s), `annotations` (5 s), and `metadata` (8 s) are finished
-   before the long ones are a third done.
-
-   How much more than four workers buys was measured on 2026-08-13, when #390
-   needed to know whether cheaper scheduling would do its job for it: `JOBS=8`
-   ran in **157 s** against `JOBS=4`'s 206 s, a further 24%, both from a clean
-   tree so that neither run inherited an up-to-date `examples`. The reason is
-   dispatch order, not core count — the eleven targets are dispatched in
-   `Makefile` order and `tagging`, the third-longest, sits tenth, so at four
-   slots it cannot start until t≈85 s and cannot finish before t≈204 s. That
-   models the measured 206 s almost exactly. At eight slots every target starts
-   at once and the makespan collapses to the longest one.
-
-   So the target-level floor is the longest single target, and only fanning out
-   *inside* it goes lower. That is what the next section does.
-2. **It is the smallest of the four costs of a change.** Reading the canonical
-   sources, following the procedure, and late rework each cost more than compute
-   does; those are addressed by the reading map, the batched metadata path, and
-   suite scoping respectively. This saves four minutes **once per branch**, not
-   once per edit — the development loop should be using `FIXTURE=`/`TEST=`
-   scoping, which takes the full layout suite from 95.1 s to 1.8 s.
-3. **CI gains nothing from it.** `.github/workflows/build.yml` already runs one
-   suite per job across roughly seventeen jobs. This is a local convenience
-   only,
-   and #399 changed no CI file.
-4. **The saving only counts because it lands on the gate.** #378 and #390 were
-   both justified by making a change cheaper to verify, and both left the gate
-   serial — so the saving landed on a run made *in addition to* the one pushed
-   behind, which is no saving for anyone who has to run the gate anyway. Moving
-   it onto `check` is what collects the debt those two issues ran up, and is
-   why the dispatch order below still matters.
-
-Dispatch order was the other candidate for that 50 s and was rejected under
-#399. Sorting longest-first models ~158 s at `JOBS=4`, but the replay follows
-dispatch order, so sorting for speed also sorts the transcript — and "which
-suite failed is answerable in `Makefile` order" is one of the two reasons this
-is not `make -j`. It would also push `lint` from first to eleventh, and pair
-`bibliography-test` with `examples`, two biber targets that never currently
-overlap. The queue only exists because there are fewer slots than targets;
-removing it means `JOBS≥11`, which #398 blocks.
+Sorting the dispatch longest-first is the one remaining candidate for the rest,
+and was rejected under #399, which also holds three further bounds on what the
+speedup is worth: the replay follows dispatch order, so sorting for speed also
+sorts the transcript, and "which suite failed is answerable in `Makefile` order"
+is one of the two reasons this is not `make -j`.
 
 Against that, the costs:
 
 - **Disk.** Each biber-using worker's private cache is about 208 MB of unpacked
-  Perl runtime, and three or four of them are made over a run. Each is freed as
-  its worker finishes rather than at the end, so the peak follows how much
-  actually overlaps rather than the whole run: sampled every five seconds at
-  `JOBS=4`, it reached **416 MB** — two caches at once — against the ~830 MB the
-  same run would hold if they lived to the end. The tree goes entirely when the
-  run ends, and with `make clean`.
-
-  That cost is the price of the only isolation biber allows, and the two cheaper
-  alternatives were measured and rejected under #392: a shared cache made
-  read-only after warming does not work, because biber cannot write it, falls
-  back to the *default* shared cache, and races there; and giving each worker
-  its own `PAR_TMPDIR` while sharing the modules through `PAR_GLOBAL_TMPDIR`
-  does not work either, because the global setting overrides the per-process one
-  and re-shares everything — the per-worker directories stayed empty at 0 B and
-  all four invocations raced.
-
-  Where that 208 MB goes, since the number is surprising: `inc/` (the bundled
-  Perl module tree) is 124 MB, `thin/biber` (the arm64 slice `lipo` extracts
-  from the 79 MB universal binary on every run) is 41 MB, and ICU's Unicode
-  collation data is 31 MB. biber is a PAR-packed self-contained application
-  rather than a script — Perl cannot `require` a module, and the loader cannot
-  `dlopen` a library, from inside a packed archive — so unpacking to a real
-  filesystem path is how it runs at all, not an optimisation.
+  Perl runtime, and three or four are made over a run, each freed as its worker
+  finishes rather than at the end. Sampled every five seconds at `JOBS=4` the
+  peak reached **416 MB** — two caches at once — against the ~830 MB the same
+  run would hold if they lived to the end, and the tree goes entirely when the
+  run ends or with `make clean`. That is the price of the only isolation biber
+  allows: the two cheaper alternatives, a shared cache made read-only after
+  warming and per-worker `PAR_TMPDIR` sharing modules through
+  `PAR_GLOBAL_TMPDIR`, were both built under #392 and both still race.
 - **Machinery.** Two cache workarounds, an accounting assertion, and eight
   committed controls exist so that a scheduled run cannot quietly report a clean
-  one. That is the right ratio for this repository, whose characteristic failure
-  is a check that passes without doing the work — and it is the whole of what
-  earns this path the gate. `make check-serial` is the standing answer to a
-  parallel result that looks wrong, since it removes scheduling as a variable
-  without removing any assertion.
-
-Parallelising *across targets* is ordinary build engineering rather than
-anything LaTeX-specific, and it is worth knowing that the LaTeX toolchain makes
-it harder than most: `l3build` has no parallel mode at all, and the two failures
-above are both global-state hazards — a per-user font cache and a per-user
-unpacking cache — of a kind a single-user, single-run toolchain accumulates
-freely.
+  one — the right ratio for a repository whose characteristic failure is a check
+  that passes without doing the work, and the whole of what earns this path the
+  gate. `make check-serial` is the standing answer to a parallel result that
+  looks wrong: it removes scheduling without removing an assertion.
 
 ### Fanning out inside a suite
 

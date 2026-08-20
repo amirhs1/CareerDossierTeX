@@ -541,6 +541,15 @@ documenting, and testing it.
 
 Update documentation in the same pull request as the related behavior.
 
+A reference document under `docs/` states the rule, the constraint that makes it
+non-obvious, and the issue that decided it; the alternatives considered and the
+measurements that discriminated between them belong in that issue. The test is
+which sentences a person about to re-propose the change would need to read in
+order to stop — those stay, and the rest is evidence for them. Check with
+`gh issue view <n> --comments` and write the derivation into the issue before
+cutting it from the document, because several issues do not carry their own
+(#479).
+
 ### Update the manual (`doc/careerdossier.tex`) when:
 
 - a public command is added, changed, or removed;

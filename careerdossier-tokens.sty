@@ -216,7 +216,8 @@
 %% fill it recovers is still bought one-for-one with a stranded line, and the
 %% same tolerance makes LaTeX's -300 \@secpenalty live, which moves breaks
 %% *earlier* and costs two shipped examples 11.8 points of page-one fill.
-%% docs/ARCHITECTURE.md ("Page-break penalties") holds the measurements.
+%% Issues #342 and #351 hold the measurements; docs/ARCHITECTURE.md
+%% ("Page-break penalties") states the rule and the deterrent for each route.
 \int_new:N \CDossierBrokenPenalty
 \int_set:Nn \CDossierBrokenPenalty { 10000 }
 \int_new:N \CDossierClubPenalty
