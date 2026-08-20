@@ -108,6 +108,8 @@ Three practical consequences:
 `CONTRIBUTING.md` "Issue workflow" carries the matching obligation on the other
 side: an issue that prescribes a mechanism records what would refute it.
 
+## Visual review targets
+
 Every review target below writes its PDFs, PNGs, logs, and review record under
 the gitignored `build/` directory. That output is generated evidence for a human
 reader: record the result in the pull request, and never commit the artifacts
@@ -434,6 +436,8 @@ re-prove that check, break the marker rule in `page-fill.awk` and run
 A parser that finds no page reports no hole, which reads exactly like a corpus
 that has none.
 
+## Baselines and layers
+
 ### Baselines are load-bearing
 
 A saved baseline (an `l3build` `.tlg`, or the committed extraction reference) is
@@ -537,6 +541,8 @@ pdftotext build/examples/resume-english.pdf \
 ```
 
 Inspect the output for logical reading order.
+
+## The suites
 
 ### Documented templates are compiled
 
@@ -994,6 +1000,8 @@ same gate. Do not describe a pull request as PDF/UA-validated on the strength of
 the PR checks alone; see `CONTRIBUTING.md` "Pinned dependencies" and
 [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
 "Recorded validation results".
+
+## The lints
 
 ### Option lint
 
@@ -1484,6 +1492,8 @@ whose image ships shellcheck 0.9.0; a contributor's own may be newer and
 therefore stricter, since shellcheck adds checks between releases. SC2318 exists
 in 0.9.0, so the gate is real on both. The `lint` job records the version it
 ran, for the same reason it records bash, grep, and awk.
+
+## Running and reading output
 
 ### Running under a restricted sandbox
 
