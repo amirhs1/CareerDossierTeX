@@ -526,6 +526,11 @@ elsewhere, because a summary is what drifts. Cover the relevant parts:
   added to the Work that no `sourcefiles` glob matches, or a file list naming
   something that no longer exists, costs the archive a file and costs
   `l3build ctan` no error — see "CTAN packaging lint" below;
+- the documented calibrated values after any retune of a spacing token, the
+  type scale, or a derived metric (`make lint`). The tables in
+  `docs/ARCHITECTURE.md` and the manual's `fontsize` table state the same
+  numbers the source declares, and a stale one typesets and reads as
+  authoritative — see "Token-value lint" below;
 - all affected classes after changes to a shared package;
 - tagged and untagged output after changes to tagging or shared packages; and
 - bibliography sorting and field precedence after `careerdossier-biblatex.sty`
@@ -1271,6 +1276,59 @@ fails there rather than passing everything.
 about the same file: not whether the names it documents exist, but whether the
 complete documents it publishes compile. "Documented templates are compiled"
 above is the one statement of that check and is not repeated here.
+
+### Token-value lint
+
+```bash
+tests/lint/run-token-values.sh         # part of make lint
+```
+
+The manual-name lint checks the names the documentation states. This one checks
+the other column: the numbers.
+
+Three surfaces state the same calibrated values and only the first ships —
+`careerdossier-tokens.sty`, the three value tables in `docs/ARCHITECTURE.md`,
+and the `fontsize` size table in `doc/careerdossier.tex`. A retune changes the
+first and nothing forces the other two to follow. That is not hypothetical:
+after the `v0.7.0` retune, ten sentences were left stale across three
+documents, one of them documenting a recipe that restored half the spacing it
+claimed to remove (#185).
+
+Compiling the manual cannot catch it. A manual stating `11 / 12 / 13 pt` for a
+token that now ships `12 / 13 / 14` typesets perfectly and reads as
+authoritative — LaTeX never sees those digits as a claim about the source. So
+the lint reads both sides as text and asserts four things:
+
+1. every ratio the vertical-rhythm table states equals the argument
+   `\__cdossier_tokens_set_skip:Nn` receives, and the two sides name the same
+   set of tokens;
+2. every resolved point value in that table equals ratio × body baseline for
+   its `fontsize`;
+3. every type-scale size/leading pair and every derived-metric row equals what
+   the source declares;
+4. the manual's `fontsize` table states the sizes the source declares.
+
+At the commit that added it: 27 ratios, 81 resolved values, 7 type-scale rows,
+and 12 derived values, all agreeing. It ships green, which is the right
+condition for a ratchet — it guards the accepted state rather than demanding a
+cleanup first.
+
+Two asymmetries are deliberate, and both are places a weaker check would pass
+by matching nothing. The *type scale's* ratio column is not compared, because
+that table says it is design intent and it does not resolve: 19/10 is 1.90 but
+21/11 is 1.909. Only its point columns are claims about the source. And the
+manual's rows name prose roles rather than tokens, so the lint carries an
+explicit role-to-token map and **fails on a row label it cannot map** rather
+than skipping it. A silently skipped row is the failure the lint exists to
+prevent — the trap #468 hit from the other side, where a pattern that did not
+match both sides faked a 62% gap.
+
+Twelve fixtures, `tests/lint/fixtures/tokenfixture-*`, hold one document per
+verdict against a fixed miniature source, plus a source the lint cannot read.
+The two "table not found" fixtures carry renamed near-miss headings rather than
+empty files, because a heading renamed in a documentation tidy-up is how that
+failure actually arrives, and "no mismatches" would be the lint quietly
+retiring itself. `tests/lint/fixtures/README.md` is canonical for the set.
 
 ### CTAN packaging lint
 

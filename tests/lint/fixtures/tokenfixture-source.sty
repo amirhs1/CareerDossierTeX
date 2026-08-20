@@ -1,0 +1,54 @@
+%% tokenfixture-source.sty — a miniature token source for run-token-values.sh
+%%
+%% Not a package: it is never loaded, and exists only so the lint's self-check
+%% has a source side it can hold fixed while the document side varies. It
+%% carries one token of each shape the real careerdossier-tokens.sty declares
+%% — a set_skip ratio, a size command, a per-fontsize dimension, and a derived
+%% metric. Its two ratios are declared under names the real source does not
+%% use, so a check that silently read the real source instead would report
+%% UNKNOWN TOKEN on the OK fixture rather than pass it.
+\ExplSyntaxOn
+\cs_new_protected:Npn \__cdossier_tokens_resolve:
+  {
+    \str_case:Vn \l__cdossier_tokens_fontsize_tl
+      {
+        { 10pt }
+          {
+            \dim_set:Nn \CDossierBodySize { 10pt }
+            \dim_set:Nn \CDossierBodyLeading { 12pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeName { 19pt } { 21pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeFurniture { 8pt } { 10pt }
+            \dim_set:Nn \CDossierFurnitureLeading { 10pt }
+          }
+        { 11pt }
+          {
+            \dim_set:Nn \CDossierBodySize { 11pt }
+            \dim_set:Nn \CDossierBodyLeading { 13.6pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeName { 21pt } { 23pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeFurniture { 9pt } { 11pt }
+            \dim_set:Nn \CDossierFurnitureLeading { 11pt }
+          }
+        { 12pt }
+          {
+            \dim_set:Nn \CDossierBodySize { 12pt }
+            \dim_set:Nn \CDossierBodyLeading { 14.5pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeName { 23pt } { 25pt }
+            \__cdossier_tokens_set_size_command:Nnn
+              \CDossierSizeFurniture { 10pt } { 12pt }
+            \dim_set:Nn \CDossierFurnitureLeading { 12pt }
+          }
+      }
+    \dim_set:Nn \CDossierRuleThickness
+      {
+        \fp_to_dim:n
+          { 0.04 * \dim_to_fp:n { \CDossierBodySize } }
+      }
+    \__cdossier_tokens_set_skip:Nn \CDossierFixtureAboveSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierFixtureBelowSkip { 0.375 }
+  }
+\ExplSyntaxOff
