@@ -1,0 +1,9 @@
+%% tokenfixture-nosource.sty — a source the lint cannot read (issue #398)
+%%
+%% Drives the third state. The file exists and is a plausible package, but
+%% declares no calibrated value in any shape the lint parses. Comparing a
+%% correct document against it must report "could not check" rather than "no
+%% mismatches": with nothing on the source side, every check passes vacuously.
+\ExplSyntaxOn
+\cs_new_protected:Npn \__cdossier_tokens_resolve: { }
+\ExplSyntaxOff

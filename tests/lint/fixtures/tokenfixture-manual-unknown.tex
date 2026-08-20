@@ -1,0 +1,25 @@
+% tokenfixture-manual-unknown.tex — the manual's fontsize table, agreeing with
+% tokenfixture-source.sty. The lint must accept it.
+%
+% The role labels are the real manual's, because the role-to-token map the
+% lint declares is keyed on them: a fixture that invented its own labels would
+% exercise the arithmetic while leaving the map untested.
+\subsubsection{\texttt{fontsize}}
+\label{sec:fontsize}
+
+\opt{fontsize} selects one whole-point type scale. The sizes it resolves to,
+in points:
+
+\begin{longtable}{@{}lrrr@{}}
+\toprule
+\textbf{Element} & \opt{10pt} & \opt{11pt} & \opt{12pt} \\
+\midrule
+\endhead
+Name & 19 & 21 & 23 \\
+Page furniture & 8 & 9 & 10 \\
+\bottomrule
+\end{longtable}
+
+\subsubsection{\texttt{margin}}
+
+Prose after the table, so the parser has a heading to stop at.

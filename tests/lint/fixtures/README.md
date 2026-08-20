@@ -54,3 +54,42 @@ rather than one, so its fixtures come in a set:
 command even in a TeX comment: the lint's manual-side collector reads comments
 too, so naming it there would make it look documented and the
 `UNDOCUMENTED NAME` fixture would silently stop testing anything.
+
+## Token-value fixtures
+
+`tokenfixture-*` pin the verdicts of `tests/lint/run-token-values.sh` (issue
+#487), which compares the calibrated numbers `docs/ARCHITECTURE.md` and the
+manual state against the ones `careerdossier-tokens.sty` declares. Like the
+files above they are lint input and are never compiled.
+
+That lint's fixtures come in two halves, because it compares two files rather
+than reading one. The source half is held fixed and the document half varies:
+
+| Fixture | Role |
+| --- | --- |
+| `tokenfixture-source.sty` | the source side for every case below — one token of each declared shape |
+| `tokenfixture-nosource.sty` | a source that declares nothing the lint parses → `NO SOURCE VALUES` |
+
+| Fixture | Driven check | Expected verdict |
+| --- | --- | --- |
+| `tokenfixture-arch-ok.md` | all three tables | `OK` |
+| `tokenfixture-arch-ratio.md` | vertical rhythm | `RATIO MISMATCH` |
+| `tokenfixture-arch-value.md` | vertical rhythm | `VALUE MISMATCH` |
+| `tokenfixture-arch-dropped.md` | vertical rhythm | `MISSING ROW` |
+| `tokenfixture-arch-extra.md` | vertical rhythm | `UNKNOWN TOKEN` |
+| `tokenfixture-arch-scale.md` | type scale | `SCALE MISMATCH` |
+| `tokenfixture-arch-derived.md` | derived metrics | `FACTOR MISMATCH` |
+| `tokenfixture-arch-notable.md` | all three tables | `NO TABLE FOUND` |
+| `tokenfixture-manual-ok.tex` | the manual's `fontsize` table | `OK` |
+| `tokenfixture-manual-value.tex` | the manual's `fontsize` table | `MANUAL VALUE MISMATCH` |
+| `tokenfixture-manual-unknown.tex` | the manual's `fontsize` table | `UNKNOWN ROLE` |
+| `tokenfixture-manual-notable.tex` | the manual's `fontsize` table | `NO TABLE FOUND` |
+
+`tokenfixture-source.sty` declares its two spacing ratios under names the real
+`careerdossier-tokens.sty` does not use, so a check that had quietly fallen
+back to reading the real source would report `UNKNOWN TOKEN` on the `OK`
+fixture rather than pass it. The two
+`-notable` fixtures carry near-miss headings rather than empty files, because
+that is how the failure actually arrives — a heading renamed in a
+documentation tidy-up, leaving a parser that finds nothing and a lint that
+reports no mismatches.
