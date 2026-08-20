@@ -171,7 +171,8 @@ appear here; they may be renamed or removed in any release.
 Before \texttt{v0.10.0} the public interface may still change between minor
 versions. Every such change is recorded in \file{CHANGELOG.md}, and a change
 that needs an edit to your source is additionally recorded, with a before-and-after
-example, in \file{docs/MIGRATION.md}. Read the latter before upgrading.
+example, in \file{docs/MIGRATION.md} in the repository. Read the latter before
+upgrading.
 
 Calibrated token \emph{values} are not stable before \texttt{v0.10.0}; the token
 names and the boundaries they own are.
@@ -1966,10 +1967,10 @@ among a paragraph's interword glue when it can find no set of breakpoints within
 \cmd{tolerance}. It is a fixed multiple of the body size, and it derives from
 the body size rather than the body leading because the quantity is horizontal.
 The ratio, and the points it resolves to at each \opt{fontsize}, are in
-\file{docs/ARCHITECTURE.md} with the rest of the calibrated values. It does
-not scale with the measure, and deliberately so: deriving it from the line width
-instead was measured and rejected, because the pool a paragraph needs tracks
-neither quantity.
+\file{docs/ARCHITECTURE.md} in the repository, with the rest of the calibrated
+values. It does not scale with the measure, and deliberately so: deriving it
+from the line width instead was measured and rejected, because the pool a
+paragraph needs tracks neither quantity.
 
 All four classes set \cmd{emergencystretch} from it, unconditionally and
 identically. Raising it lets a paragraph with few break points set looser
