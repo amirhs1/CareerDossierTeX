@@ -85,11 +85,15 @@
 # nothing else here used. Both paths dispatch $(CHECK_TARGETS) through the same
 # `make <target>` invocations, so that alignment is unchanged.
 #
-# JOBS defaults to 4 because 4 is the fastest value measured green: serial 439 s,
-# JOBS=2 285 s, JOBS=4 211 s, all green, against JOBS=8 at 168-201 s and 4 red in
-# 8 clean-tree runs. Every one of those failures was a text-extraction assertion
-# against a document that is provably correct — a guard that reported present
-# text as missing under load (#398).
+# JOBS defaults to 4 because 4 is the fastest value measured green: 211 s against
+# 439 s serial, measured 2026-08-13 on the maintainer's machine, which has four
+# cores. docs/TESTING.md "What it is worth, and what it costs" holds the full
+# sweep and is canonical for it. Only two figures are kept here, and only
+# because "why 4" cannot be read without them. JOBS=8 — twice that machine's
+# core count — was faster still, but went 4 red in 8 clean-tree runs, and every
+# one of those failures was a text-extraction assertion against a document that
+# is provably correct: a guard that reported present text as missing under load
+# (#398), not anything the classes did.
 #
 # #398 is fixed (PR #403, `9bfc6d4`, the commit immediately after the one that
 # first wrote this paragraph): the extracted-text guards now answer three
@@ -97,15 +101,15 @@
 # paragraph used to carry — that 8 is "unusable until that is fixed" — has been
 # false ever since, and the 24% is no longer blocked by a defect.
 #
-# The default is still 4, for a different and weaker reason: nothing has
-# measured 8 over enough runs to set a default from. Five green runs are not
-# that campaign; 4-red-in-8 above is exactly what a handful of green runs looks
-# like before the flaky half arrives. The campaign also wants a machine with
-# more cores than the maintainer's, so it is unrun rather than merely
-# unscheduled, and raising the default is not a decision this repository can
-# currently take on its own evidence.
+# The default is still 4, for a different and weaker reason: 8 is unmeasured,
+# not suspect. The only red runs 8 has ever produced had a cause, and that cause
+# is fixed; five green runs since are not the campaign a default should be set
+# from, and about the runs that campaign would make there is no evidence either
+# way. It also wants a machine with more cores than the maintainer's four, so it
+# is unrun rather than merely unscheduled, and raising the default is not a
+# decision this repository can currently take on its own evidence.
 #
-# So 8 is unjustified, not barred. `make check JOBS=8` is a supported thing to
+# So 8 is unmeasured, not barred. `make check JOBS=8` is a supported thing to
 # run on hardware that has the cores; the default stays 4 until someone with
 # that hardware runs the campaign and reports it.
 #
