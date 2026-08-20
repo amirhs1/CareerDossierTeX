@@ -1618,17 +1618,17 @@ The calibration sweep, measured on the maintainer's machine 2026-08-13, with
 
 That sweep settled the default at 4, and five consecutive clean-tree runs when
 #399 landed confirmed it — **211, 225, 247, 248, and 249 s, all green**, against
-`make check-serial` at **431 s**. So the speedup is **roughly 1.8×–2.0×**: note
-the spread, since a single 211 s run is the fast end of a range rather than the
-figure to quote.
+`make check-serial` at **431 s**. So the speedup is **roughly 1.8×–2.0×**: a
+single 211 s run is the fast end of a range rather than the figure to quote.
 
-`JOBS=8` is a further 20% and is not the default, because it fails about half the
-time: every one of those failures is a text-extraction assertion against a
-document that is provably correct — a guard that reports present text as missing
-under load (#398) — so the ceiling is an open defect elsewhere, not a property of
-the machine. The honest form of the claim is **"a parallel gate is trustworthy at
-4 and is not at 8"**, and a `JOBS=4` run ever red for the #398 reason is a reason
-to reconsider this arrangement rather than to retry it.
+`JOBS=8` is a further 20% and is still not the default, but not because it is
+barred. The 4-red-in-8 above was #398, a guard that reported present text as
+missing under load; that is fixed (PR #403), and `JOBS=8` then ran **5 green of
+5 at 162–186 s**. What is missing now is evidence, not a fix: five green runs
+are not the campaign a default should be set from, and that campaign wants more
+cores than the maintainer's machine has. So 8 is **unjustified, not barred**,
+and `make check JOBS=8` is a supported thing to run. The `Makefile` header holds
+that reasoning in full (#462).
 
 **The ceiling is structural, not a matter of more workers.** Parallel wall time
 is the longest single target plus contention, not the sum divided by `JOBS`:
