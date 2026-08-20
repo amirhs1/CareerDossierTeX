@@ -30,6 +30,14 @@ Why is this feature needed?
 
 ## Likely files
 
+Record the search that produced this list, not just the list. An issue scoped to
+the first file someone noticed the statement in is fixed in that file alone,
+which is how the same stale claim survives its own correction.
+
+```bash
+# The command that produced the list below.
+```
+
 -
 
 ## Acceptance criteria

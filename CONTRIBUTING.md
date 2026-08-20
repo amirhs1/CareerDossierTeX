@@ -146,8 +146,15 @@ A good implementation issue explains:
 1. the problem or deliverable;
 2. what is included;
 3. what is excluded;
-4. likely affected files;
-5. observable acceptance criteria;
+4. likely affected files, as the output of a search rather than of recall, with
+   the command that produced the list recorded beside it. An issue scoped to the
+   first file someone noticed the statement in is fixed in that file alone;
+5. observable acceptance criteria; where the issue concerns a statement or value
+   that could appear in more than one place, at least one of them is a command
+   over the repository rather than a check of the files named in item 4. A
+   criterion that reads only the named files cannot fail on the copy nobody
+   thought to look for — #275 wrote its criterion as a command instead, and the
+   command found four hits where the issue had named two;
 6. the test files under `tests/` that will prove those criteria;
 7. where the issue prescribes a *mechanism* rather than an outcome, the smallest
    command that would show that mechanism does not work, and the result of
