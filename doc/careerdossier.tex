@@ -361,6 +361,7 @@ Two settings are fixed and are not options: the language is English and the
 theme is monochrome.
 
 \subsubsection{\texttt{fontsize}}
+\label{sec:fontsize}
 
 \opt{fontsize} selects one whole-point type scale for the whole document. It is
 the only input to type size; there is no per-element size option. The sizes it
@@ -1089,8 +1090,9 @@ that and use the prose tokens rather than the record classes':
 \textbf{Property} & \textbf{Statement heading} \\
 \midrule
 \endhead
-Section size & \cmd{CDossierSizeSection} --- 11 / 12 / 13\,pt \\
-Subsection size & \cmd{CDossierSizeBody} --- 10 / 11 / 12\,pt \\
+Section size & \cmd{CDossierSizeSection} --- the section-heading step of the
+  type scale in \S\ref{sec:fontsize} \\
+Subsection size & \cmd{CDossierSizeBody} --- the body step of the same scale \\
 Typeface & \cmd{CDossierSectionStyle}, in both \opt{bodyfont} modes \\
 Space above & \cmd{CDossierProseSectionAboveSkip} / \cmd{CDossierProseSubsectionAboveSkip} \\
 Space below & \cmd{CDossierProseSectionBelowSkip} / \cmd{CDossierProseSubsectionBelowSkip} \\
@@ -1961,9 +1963,10 @@ token names and the boundaries they own are.
 
 \cmd{CDossierEmergencyStretch} is the extra flexibility \TeX{} may distribute
 among a paragraph's interword glue when it can find no set of breakpoints within
-\cmd{tolerance}. It is 2.00 times the body size --- 20\,pt, 22\,pt, and 24\,pt at
-\opt{fontsize=10pt}, \opt{11pt}, and \opt{12pt} --- and it derives from the body
-size rather than the body leading because the quantity is horizontal. It does
+\cmd{tolerance}. It is a fixed multiple of the body size, and it derives from
+the body size rather than the body leading because the quantity is horizontal.
+The ratio, and the points it resolves to at each \opt{fontsize}, are in
+\file{docs/ARCHITECTURE.md} with the rest of the calibrated values. It does
 not scale with the measure, and deliberately so: deriving it from the line width
 instead was measured and rejected, because the pool a paragraph needs tracks
 neither quantity.
