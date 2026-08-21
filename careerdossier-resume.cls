@@ -20,6 +20,17 @@
 %% entry, and list structures.
 %% Reusable identity and contact logic lives in careerdossier-components; this
 %% class only arranges it on the page.
+%%
+%% Responsibilities: load an appropriate base class; select Letter or A4 and
+%% delegate geometry to careerdossier-tokens; process the fontsize, margin,
+%% paper, bodyfont, medium, muted, and entrymeta options, forwarding medium,
+%% muted, and entrymeta to careerdossier-components, which owns the furniture,
+%% de-emphasis, and entry-metadata decisions; register the `Résumé' running
+%% label and enable shared page furniture; render sections, entries, and lists
+%% from the shared type, rhythm, rule, and list tokens; expose the shared second
+%% heading level as \CDossierSubsection (#337), so a resume, CV, and statement
+%% are all written with two heading levels; and preserve logical source and
+%% extraction order.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-resume} {2026-08-12} {0.8.0}

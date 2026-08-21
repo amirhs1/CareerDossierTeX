@@ -20,6 +20,38 @@
 %% the first-page identity block, and continuation-page furniture. Shared
 %% profile storage and link/separator rendering remain in the base and
 %% components modules.
+%%
+%% Responsibilities: require one of the seven documented `type' values and
+%% select its default title; process fontsize and margin, keeping 12pt,normal as
+%% the prose-oriented defaults; store statement-scoped title, running-title,
+%% subtitle, application-context, and application-ID metadata; validate name and
+%% email for every type, research affiliation, and artist website where the
+%% header renders; keep the full title in the page-one body and PDF metadata
+%% while a separately bounded running title identifies continuation pages, and
+%% register that short title with the shared furniture component; forward medium
+%% and muted to it; derive every header size, gap, and prose paragraph rhythm
+%% from careerdossier-tokens; restyle the two inherited unnumbered heading
+%% levels and offer them as \CDossierSection and \CDossierSubsection; keep
+%% running furniture out of tagged structure; and allow ordinary prose without
+%% imposing a type-specific narrative schema.
+%%
+%% Why the headings are restyled rather than replaced (#177): \@startsection is
+%% where the kernel's tagging support hooks in, so an unnumbered heading there
+%% opens a Sect division enclosing the content it introduces and records the
+%% heading text as that element's title. A heading hand-built on the shared
+%% display primitive -- what the resume and CV use, because their ruled heading
+%% needs it -- emits a bare heading element with neither. Replacing only the
+%% four visual arguments buys the tokens without paying for them in structure.
+%% A statement heading carries no rule: a rule is entry-structured furniture,
+%% not prose furniture. Levels below \subsection are outside the calibrated
+%% design.
+%%
+%% Field scoping: `affiliation' is reusable identity data and lives in the
+%% shared profile in careerdossier-base; this class decides when it is required
+%% or displayed. `application-context' and `application-id' describe one
+%% application document and stay class-scoped. The shared profile may hold
+%% fields a statement does not render -- linkedin, github, location -- which is
+%% ordinary cross-document reuse and must never warn.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-statement} {2026-08-12} {0.8.0}

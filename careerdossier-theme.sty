@@ -18,6 +18,14 @@
 %% careerdossier-theme owns the Phase 1 monochrome semantic colour, rule, and
 %% link tokens. Colour never carries meaning by itself; these tokens exist so
 %% components and classes do not hard-code colours.
+%%
+%% Responsibilities: \CDossierTextColor, \CDossierMutedColor,
+%% \CDossierRuleColor, and \CDossierLinkColor; print-safe contrast; and the
+%% extension points a later colour theme would use.
+%%
+%% Not this file: any dimension. Page geometry, the type scale, and vertical
+%% rhythm belong to careerdossier-tokens; resume margins and letter paragraph
+%% spacing are never decided here.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-theme} {2026-08-12} {0.8.0}

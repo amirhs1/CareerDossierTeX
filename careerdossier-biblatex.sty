@@ -18,6 +18,24 @@
 %% careerdossier-biblatex is the opt-in boundary around BibLaTeX and Biber. It
 %% owns the fixed academic bibliography profile and preferred-author emphasis;
 %% CV geometry, manual publications, and resource selection remain elsewhere.
+%%
+%% Responsibilities: load biblatex only when a document opts into this package;
+%% configure the fixed numeric, Biber-backed, year-descending profile the manual
+%% documents; expose repeatable author-highlighting declarations; implement DOI,
+%% then e-print, then URL display precedence; reuse the semantic typography and
+%% link tokens; inherit \CDossierRecordItemSepSkip and \CDossierListLabelSep
+%% from the host class when it provides them, falling back only when it does
+%% not, so this file never owns a competing spacing value; keep printed URLs
+%% extractable by removing the stretch biblatex applies at each URL break point
+%% and supplying the break points rigid glue then needs; and report an
+%% actionable error when BibLaTeX is unavailable.
+%%
+%% Not this file: it must never be loaded by careerdossier-cv.cls; it does not
+%% change the generic entry, list, section, or page-layout APIs, does not make
+%% Biber necessary for manual publications or a CV without publications, offers
+%% no undocumented citation-style pass-through, and never infers bibliographic
+%% identity from the display-oriented `name' profile field. Resource selection,
+%% \nocite, and bibliography printing stay with standard BibLaTeX commands.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-biblatex} {2026-08-12} {0.8.0}

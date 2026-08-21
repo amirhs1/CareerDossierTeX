@@ -18,6 +18,17 @@
 %% careerdossier-base owns shared profile metadata, the profile keys, and
 %% required-field validation. It carries no layout, geometry, typography, or
 %% colour; those concerns belong to other modules.
+%%
+%% Responsibilities: \CDossierSetup; storing profile fields; supported-field
+%% access and presence tests; required-field validation; actionable errors and
+%% warnings; and the shared key-value infrastructure other modules build on.
+%% Stored keys are emitted in one canonical order whatever the input order, and
+%% an absent optional key leaves no separator behind -- the extraction suites
+%% depend on both.
+%%
+%% Not this file: margins, section spacing, page styles, or final typography
+%% values. It stores values and enforces rules; it never decides how a page
+%% looks.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-base} {2026-08-12} {0.8.0}
