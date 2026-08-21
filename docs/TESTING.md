@@ -1689,14 +1689,10 @@ That sweep settled the default at 4, and five consecutive clean-tree runs when
 `make check-serial` at **431 s**. So the speedup is **roughly 1.8×–2.0×**: a
 single 211 s run is the fast end of a range rather than the figure to quote.
 
-`JOBS=8` is a further 20% and is still not the default, but not because it is
-barred. The 4-red-in-8 above was #398, a guard that reported present text as
-missing under load; that is fixed (PR #403), and `JOBS=8` then ran **5 green of
-5 at 162–186 s**. What is missing now is evidence, not a fix: five green runs
-are not the campaign a default should be set from, and that campaign wants more
-cores than the maintainer's machine has. So 8 is **unjustified, not barred**,
-and `make check JOBS=8` is a supported thing to run. The `Makefile` header holds
-that reasoning in full (#462).
+The 4-red-in-8 in that last row was #398, a guard that reported present text as
+missing under load, and is fixed (PR #403); `JOBS=8` is **unmeasured, not
+barred**. The `Makefile` header, where `JOBS` is defined and defaulted, owns why
+the default is 4 and what standing `JOBS=8` has, and states both in full (#462).
 
 **The ceiling is structural, not a matter of more workers.** Parallel wall time
 is the longest single target plus contention, not the sum divided by `JOBS`:
