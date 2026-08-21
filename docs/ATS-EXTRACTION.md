@@ -638,6 +638,12 @@ the one that stays meaningful if Poppler's grouping heuristic changes: it reads
 the geometry out of the PDF instead of trusting the extractor's line grouping,
 so an extractor change and a real regression stay distinguishable.
 
+### Reference list **(planned — later phase)**
+
+Emit each reference as a sequential block: name, title, organization, relationship
+if appropriate, email, phone, and address. Do not place references in two or three
+columns. Labels such as `Email:` and `Phone:` improve plain-text clarity.
+
 ## Copy-paste integrity
 
 A reader who copies a URL or an e-mail address out of the PDF must get
