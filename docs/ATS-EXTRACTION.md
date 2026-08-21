@@ -301,7 +301,9 @@ but the output depends on:
 - LuaHBTeX and `luaotfload` versions; and
 - how a PDF consumer interprets `ToUnicode` and `/ActualText`.
 
-Do not describe a font as ATS-safe based on its family name alone.
+Do not describe a font as ATS-safe based on its family name alone, and avoid
+system-font-only defaults: two users with the same family name can have
+different font files.
 
 ### Package default versus user-selected fonts
 
@@ -1335,34 +1337,6 @@ is what would.
 **Why nothing caught it.** Every extractor in the matrix rebuilds words from
 glyph geometry, so none could see a missing character; `docs/TESTING.md`
 § "Tagged-PDF suite" states that, and what `make tagging` does instead.
-
-## Compilation policy
-
-### Supported command
-
-```sh
-lualatex -file-line-error -halt-on-error -interaction=nonstopmode document.tex
-```
-
-Use `latexmk -lualatex` for examples that need multiple runs. Do not hide required
-shell escape, external converters, or non-TeX tools; the core should not need shell
-escape.
-
-### Reproducibility
-
-Record in CI artifacts: LuaHBTeX version; LaTeX format date; `fontspec` version;
-`luaotfload` version; `tagpdf` and `pdfmanagement-testphase` versions; font file
-names and hashes or package versions; operating system; and extraction-tool
-versions. Avoid system-font-only defaults, because two
-users with the same family name can have different font files.
-
-### Warnings as engineering signals
-
-Review the log for: missing font shapes; font substitutions; overfull boxes that
-clip or overlap text; duplicate destinations; unsupported tagging constructs;
-missing characters; option clashes; and deprecated interfaces. Do not make every
-harmless TeX warning fatal, but maintain an explicit allowlist; a new warning
-should fail CI until reviewed.
 
 ## Minimal reference template **(Phase 1)**
 
