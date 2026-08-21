@@ -526,12 +526,12 @@ A font profile is releasable only if:
 - text copies correctly in at least two independent PDF engines; and
 - changes in font version trigger a fresh baseline review.
 
-## Semantic structure for each career-document type
+## Semantic structure by document type
 
-Why each document type is shaped the way it is, in extraction terms. What a
+Why a document type is shaped the way it is, in extraction terms. What a
 class actually emits, and in what order, is documented in the manual — this
 section is the reasoning the manual's behavior was derived from, and where the
-two appear to disagree the manual is authoritative, per the scope banner above.
+two appear to disagree the manual is authoritative.
 
 ### Shared rules
 
