@@ -549,6 +549,11 @@ structure. All document types should therefore provide:
 - descriptive link text or visible URLs; and
 - source content in the same order a plain-text reader should receive it.
 
+One rule a class cannot enforce, because it is the author's: a scanned
+signature may be decorative, but the typed name must remain present as text,
+and the image must neither interrupt the reading order nor stand in for the
+name.
+
 Do not define layout-only interfaces such as `\LeftColumn`, `\RightColumn`, or
 `\SkillBar`. Define semantic interfaces. In Phase 1 the semantic primitive is the
 `CDossierEntry` environment (with `CDossierItemize` for bullets) and
