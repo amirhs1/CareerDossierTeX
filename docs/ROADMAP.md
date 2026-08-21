@@ -639,7 +639,8 @@ directory. Every shared package and every document class carries committed
 regression coverage — no module is exempt — alongside the extraction, layout,
 tagging, bibliography, and lint suites; extend the existing file for a module
 with the behavior each future change adds. `docs/ARCHITECTURE.md` ("Testing
-strategy") holds the current count and its per-module split.
+strategy") covers what `build.lua` configures; `tests/regression/` is the
+inventory of pairs, and no document restates it.
 
 ## Engineering work (tracked as issues)
 

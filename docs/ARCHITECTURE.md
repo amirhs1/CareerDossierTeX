@@ -1989,64 +1989,21 @@ Can the supported examples compile from a clean runner?
 
 ## Testing strategy
 
-### Continuous test development
+[`TESTING.md`](TESTING.md) is the test documentation, and none of it is
+summarized here: "Test-driven where practical; test-as-you-go always" for when a
+test is written, "What lives in `tests/`" for where its material goes, "Match
+the test to the module" for which kind of test a concern takes, "Coverage
+expectations" for the cases a change has to cover, "Baselines are load-bearing"
+for regenerating one, "The harness precedes the tests that need it" for the
+constraint that puts the configuration below ahead of the coverage depending on
+it, and "Visual verification" for what to inspect after a layout change.
 
-Tests are designed and committed with the behavior they protect. When practical,
-write a focused failing test before implementation, then make it pass. If the
-target file or public interface does not exist yet, add the fixture alongside the
-first usable implementation and record why a pre-implementation failure was not
-run.
-
-All automated test material belongs under `tests/`:
-
-- `tests/lint/` — source-level invariants no compiled fixture can assert, with
-  their own fixture packages;
-- `tests/regression/` — stable API behavior, options, diagnostics, load order,
-  and fixed bugs;
-- `tests/smoke/` — supported document builds and required failure paths;
-- `tests/extraction/` — expected text, Unicode mapping, and reading order;
-- `tests/layout/` — long fields, multi-page content, and page-break stress;
-- `tests/bibliography/` — Biber-backed sorting and rendered identifier
-  precedence;
-- `tests/metadata/` — PDF metadata on the default (untagged) build path, where
-  no `\DocumentMetadata` is in play;
-- `tests/annotations/` — the action type of each emitted link annotation, the
-  one link property no text-layer suite can see; and
-- `tests/tagging/` — tagged structure, the untagged path, and the extractor
-  matrix.
-
-`tests/metadata/` and `tests/tagging/` divide by build path, not by subject.
-Every tagging fixture opts into `\DocumentMetadata`, which supplies catalog
-entries of its own — so it is exactly the wrong place to ask what this package
-contributes without it. That masking is why the `/Lang` question in #276 had no
-suite that could answer it.
-
-User examples remain under `examples/`. CI should build them, but they are not a
-substitute for focused tests. A milestone release reruns the accumulated suite;
-it does not introduce tests that were already known to be required.
-
-The test type follows the module's concern, but no module is exempt from a log
-diff. Anything with observable logic — values, options, errors, or emitted
-structure — takes an `l3build` regression test (`.lvt` source with a saved `.tlg`
-baseline) in `tests/regression/`. Every shared package and every class already
-has that coverage: 28 `.lvt`/`.tlg` pairs, spread across
-`careerdossier-base.sty` (2), `careerdossier-tokens.sty` (8),
-`careerdossier-components.sty` (6), `careerdossier-typography.sty` (3),
-`careerdossier-theme.sty` (1), `careerdossier-biblatex.sty` (1), and the four
-classes (7). Extend the existing file for a module rather than assuming the
-module is exempt. Layout behavior additionally owns visual results that no log
-diff fully captures, so the classes also carry smoke, layout, extraction,
-tagging, and reviewed reference-PDF coverage, with final layout correctness
-confirmed by human inspection. A saved baseline is the assertion: regenerate one
-only for an intended, reviewed output change.
-
-### Coverage matrix
-
-Which document families, fields, errors, extraction, tagging, link, and
-bibliography cases a change has to cover is stated once, in
-[`TESTING.md`](TESTING.md) ("Coverage expectations"). It is not
-summarized here: the copy that used to sit in this section had already drifted,
-omitting the link copy-paste and link-annotation rows.
+Every second copy this chapter has held drifted. The coverage matrix that used
+to sit here omitted the link copy-paste and link-annotation rows; the `tests/`
+inventory beside it omitted three directories; and the count of `.lvt`/`.tlg`
+pairs next to that was maintained by hand, checked by nothing, and wrong (#504).
+What remains below is what `build.lua` configures, which is this document's own
+subject.
 
 ### Regression harness
 
@@ -2076,21 +2033,6 @@ it produces and what has to be checked before an upload; that is not repeated
 here. The version `uploadconfig` publishes is derived from
 `careerdossier-base.sty` rather than restated, because `build.lua` is not part
 of the Work and a literal here would sit outside the set the version lint reads.
-
-Because a `.lvt` test cannot run without the harness, the harness precedes the
-tests that depend on it: a module that relies on `l3build` coverage does not land
-ahead of the configuration that can execute it.
-
-Tests should focus on stable behavior, not every line break or font metric before the design settles.
-
-### Visual verification
-
-When layout changes:
-
-- compile the affected examples;
-- inspect PDFs;
-- inspect logs for overfull boxes and missing glyphs;
-- attach or link a preview in the pull request.
 
 ## Generated files policy
 
