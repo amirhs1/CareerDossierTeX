@@ -1375,45 +1375,6 @@ Keep examples fictional and realistic. Obvious placeholders such as `First Last`
 `Company 1` can themselves be skipped by parsers, as Greenhouse's documentation
 notes. Use clearly fictional but plausible names and organizations.
 
-## What to do and what not to do while writing the package
-
-### Do
-
-- design semantic commands before visual styling;
-- keep the ATS-oriented output the default and simplest path;
-- build on `article` or another stable base class;
-- use `\RequirePackage`, `\NewDocumentCommand`, `\NewDocumentEnvironment`, current
-  l3keys options, and kernel hooks;
-- keep meaningful content in source order;
-- use real headings, lists, text, and URLs;
-- use reproducible TeX-distributed OpenType defaults and declare font faces
-  explicitly;
-- do not introduce per-word `/ActualText` spans ("`/ActualText`,
-  `ToUnicode`, and their limits");
-- disable risky optional substitutions in the Latin default;
-- test every font/feature combination and compare extraction with known source
-  text;
-- inspect rendered pages and test tagging separately;
-- fail clearly on the wrong engine.
-
-### Do not
-
-- promise universal ATS compatibility;
-- use two columns or sidebars, or tables as a general layout engine;
-- place contact details only in page furniture;
-- use icon fonts for information without visible text;
-- assume Unicode input guarantees Unicode extraction, that embedded fonts guarantee
-  correct extraction, that `/ToUnicode` presence proves correctness, or that
-  `/ActualText` is honoured by every viewer;
-- globally disable required shaping for all languages;
-- bundle proprietary fonts or depend on an OS font for the default build;
-- copy code from a 2005 or 2007 class without checking modern interfaces;
-- patch the output routine when supported hooks exist;
-- hide keywords or make `/ActualText` disagree with visible content;
-- treat an online ATS score as proof;
-- present future features (named font combinations, CTAN packaging, or a
-  consolidated profile interface) as if they were current.
-
 ## Minimal reference template **(Phase 1)**
 
 This template is compiled. `tests/smoke/ats-user-template-doc.tex` is the text
