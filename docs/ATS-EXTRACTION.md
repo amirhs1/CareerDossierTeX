@@ -638,58 +638,7 @@ the one that stays meaningful if Poppler's grouping heuristic changes: it reads
 the geometry out of the PDF instead of trusting the extractor's line grouping,
 so an extractor change and a real regression stay distinguishable.
 
-### Cover letter **(Phase 1)**
-
-The applicant's address, recipient, date, and subject must reach the text layer
-in the body, not only in a decorative letterhead or page header: furniture is
-where an extractor is least likely to look, and page headers in particular are
-often dropped or hoisted out of order. The reading order that follows from this
-is a contract of `\MakeCDossierLetterhead` and `\MakeCDossierClosing`, and the
-manual states what those two emit and in what order — this guide does not
-restate it.
-
-Two consequences the classes cannot enforce, because they are the author's:
-a scanned signature may be decorative, but the typed name must remain present
-as text; and a signature image must not interrupt reading order or replace the
-name.
-
-### Statements — default interest plus six other types **(v0.5.0)**
-
-One class defaults to a statement of interest and also covers research,
-teaching, teaching-philosophy, diversity, artist, and statement-of-purpose
-documents. These are closer to short articles:
-
-- use ordinary paragraphs and semantic headings;
-- avoid magazine-style columns;
-- keep citations and footnotes sparse and extractable;
-- use figures only when essential, with text alternatives when tagging is enabled;
-  and
-- test page transitions and paragraph spacing in extracted text.
-
-Keeping the title, applicant name, and required identity fields in the page-one
-body rather than only in running furniture is the same argument as the cover
-letter's above, and is likewise a contract of the class:
-`\MakeCDossierStatementHeader` emits the present identity items in a fixed
-logical order, which the manual states.
-
-### Reference list **(planned — later phase)**
-
-Emit each reference as a sequential block: name, title, organization, relationship
-if appropriate, email, phone, and address. Do not place references in two or three
-columns. Labels such as `Email:` and `Phone:` improve plain-text clarity.
-
-## Hyperlinks, icons, symbols, bullets, and punctuation
-
-### Hyperlinks
-
-- The visible text must remain useful if the link annotation disappears.
-- Prefer `github.com/name` over an icon with an invisible destination.
-- Prefer a descriptive label plus a visible identifier for ORCID, DOI, or
-  LinkedIn.
-- Do not use URL shorteners in package examples.
-- Test URLs containing `_`, `-`, `~`, `?`, `&`, `%`, and non-ASCII characters.
-
-#### Copy-paste integrity
+## Copy-paste integrity
 
 A reader who copies a URL or an e-mail address out of the PDF must get
 something that pastes into a browser or a mail client. Stated checkably, that
@@ -731,21 +680,6 @@ pins the copy-paste invariant under `screen` as the fixtures above pin it under
 one body so their committed baselines can be diffed against each other — the
 text layer must be identical under both media, on every supported extractor.
 
-`ulem` was tried first and is worth recording as a negative result, because it
-passes everything except the check this project added in issue #302. `\uline`
-reboxes its argument and rebuilds interword spaces as its own leaders. Poppler,
-MuPDF, and PDFKit all read `public write-up` back correctly, because they
-rebuild words from glyph geometry and the visual gap is still there; veraPDF
-validates; no `/Artifact` appears. The structure tree is where it fails — the
-Link element's logical text becomes `publicwrite-up`, so a screen reader
-announces one word. Only `structure-text.pl` can see this, which is precisely
-why it exists.
-
-The address-as-text links this toolkit renders — the contact line,
-`\CDossierLink`, an ORCID iD, a bibliography DOI — are never decorated, under
-either medium. That is a legibility decision (see the manual), and under a
-reboxing underline it would also have been a correctness one.
-
 Second, plain extracted text cannot check this: a legitimate line wrap and a
 split token both read as whitespace. The decision needs word bounding boxes —
 pieces on different visual lines are a wrap, pieces sharing one line are the
@@ -763,34 +697,12 @@ implementation detail, each run records its `pdftotext` version, and the
 guarantee is scoped to that extraction model — the PDFKit baselines in
 `tests/extraction/` remain the second consumer the project checks.
 
-### Icons
-
-The default output should use no icons for essential information. If an optional
-display profile **(planned)** includes icons, follow each icon with ordinary text
-and test that the icon does not become a stray PUA character in extraction. Font
-Awesome and similar icon fonts are a common source of meaningless extracted code
-points.
-
-### Bullets
-
-Use the `CDossierItemize` environment and a simple bullet or hyphen. Do not
-simulate bullets with icons, drawings, or dingbat fonts. Check whether the
-extractor inserts a sensible space or line break after each label.
-
-### Punctuation
+## Punctuation
 
 Prefer plain, conventional punctuation. Curly quotes and en/em dashes are valid
 Unicode, but they must be included in the extraction fixture. Use an ordinary
 hyphen or a word such as `to` in date ranges if a target portal mishandles
 typographic dashes.
-
-### Hyphenation and line wrapping
-
-Do not insert discretionary hyphens into keywords, organization names,
-technologies, email addresses, or URLs. Consider a ragged-right setting if it
-improves word integrity, but do not globally disable all language-aware shaping
-without testing. Compare extraction both with and without `pdftotext -layout`;
-different consumers infer line structure differently.
 
 ## Tagged PDF and accessibility under current LaTeX
 
