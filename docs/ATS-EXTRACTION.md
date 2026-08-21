@@ -385,6 +385,11 @@ the first page's body.
 
 ### Page geometry and density
 
+**The rule applied:** margins are two presets rather than a free dimension —
+`margin=normal` is one inch and `margin=narrow` is half an inch, with nothing
+between them — and the résumé defaults to `narrow` at 11 pt while the CV,
+letter, and statement default to `normal` at 12 pt.
+
 Good defaults for most career documents are:
 
 - 0.5-1 inch margins, with approximately 0.65-0.8 inch as a useful default;
