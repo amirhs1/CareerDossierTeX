@@ -366,6 +366,12 @@ validates as PDF/UA-2.
 
 ### Headers, footers, and page numbers
 
+**The rule applied:** page furniture answers whether a page could be separated
+from its fellows, so `medium=print` emits a name-derived running header from
+page two and a `Page N of M` folio, `medium=screen` emits neither because an
+electronic PDF cannot lose a page, and a one-page document gets none under
+either.
+
 For a one- or two-page résumé, prefer no running header. For a long CV
 **(supported in v0.2.0)**, a simple name-derived header and page number can help
 humans, but they must not be
