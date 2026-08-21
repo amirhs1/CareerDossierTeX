@@ -21,7 +21,7 @@
 -- version, and PDF documentation together with its source.
 --
 -- Running the real thing would not help either, and not only because it
--- typesets a 39-page manual and runs the regression suite first. What it
+-- typesets the whole manual and runs the regression suite first. What it
 -- produces is an archive; nothing compares that archive to what the archive was
 -- supposed to contain. This does, from the two files that already know --
 -- `manifest.txt', which defines the Work, and a Work file's own

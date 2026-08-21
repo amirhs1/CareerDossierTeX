@@ -215,7 +215,7 @@ manual: | $(MANUAL_BUILD_DIR) ## Build the PDF manual into $(MANUAL_BUILD_DIR)/
 # like every other one and nobody has to remember the l3build spelling.
 #
 # It is not part of `check'. `l3build ctan' runs the regression suite itself and
-# then typesets the 40-page manual three times, so putting it in the gate would
+# then typesets the whole manual three times, so putting it in the gate would
 # pay for both again on every run to assert something that only matters at
 # release time. docs/RELEASE-CHECKLIST.md is where it is called for; what the
 # gate carries instead is tests/lint/run-ctan-config.sh, which checks the

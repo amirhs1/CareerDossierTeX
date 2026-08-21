@@ -13,9 +13,9 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 - A PDF manual, `doc/careerdossier.tex`, is the toolkit's interface reference,
   and `make manual` builds it into `build/manual/`. It documents every public
   class, option, key, command, environment, and design token, with its accepted
-  values and default, in one 39-page document. CTAN requires PDF documentation
-  together with its source, and this is the last of its requirements this
-  project did not meet. ([#263])
+  values and default, in one document. CTAN requires PDF documentation together
+  with its source, and this is the last of its requirements this project did not
+  meet. ([#263])
 
   The PDF is a build artifact and is not tracked, like every other one here; the
   release archive ships it beside its source, and `manifest.txt` lists that
