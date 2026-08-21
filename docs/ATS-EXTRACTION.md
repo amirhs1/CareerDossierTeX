@@ -797,26 +797,10 @@ different consumers infer line structure differently.
 Tagged PDF is worth supporting because it provides a structure tree and can
 improve reuse and accessibility. It is not an ATS guarantee.
 
-For the default (untagged) output, set ordinary PDF metadata through `hyperref`
-and do not invoke the tagging path:
-
-```tex
-\documentclass{careerdossier-resume}
-\hypersetup{
-  unicode = true,
-  pdflang = en
-}
-```
-
-`pdflang` records the PDF's natural language; it does not configure hyphenation or
-script support. CareerDossierTeX is English-only and multilingual support is
-dropped (see `docs/ROADMAP.md`), so hard-coding `pdflang = en` here is correct
-and does not need a language-abstraction layer.
-
-The title itself needs nothing set here: the classes derive `/Title` from the
-profile and ask the viewer to display it (`/DisplayDocTitle`), on this path as
-well as the tagged one. See the manual for the derived fields and how to
-override them.
+The default output is untagged and needs nothing set: the classes derive
+`/Title` from the profile, ask the viewer to display it (`/DisplayDocTitle`),
+and write `/Lang` themselves, on this path as well as the tagged one. See the
+manual for the derived fields and how to override them.
 
 Opt in to tagged structure with `\DocumentMetadata` before `\documentclass`:
 
@@ -844,14 +828,8 @@ and reports ongoing changes in
 both before adding or updating dependencies. **(Verify at release: confirm the
 current LaTeX News issue number and its tagging notes.)**
 
-The engine limitation that previously blocked this work is gone. `tagpdf` states
-that only pdfLaTeX and LuaLaTeX have real interword-space support; XeTeX emitted
-`engine/output mode xetex doesn't support the interword spaces`, and a TeX Live
-2026 fixture compiled for this guide reproduced it (MuPDF recovered the visible
-spaces while a PDFPlumber-based extraction merged some adjacent words — evidence
-that geometry-based consumers compensate differently, not evidence of a sound
-tagged text stream). Moving to LuaLaTeX in `v0.4.0` removed that constraint. See
-the current
+`tagpdf` supports real interword spaces under LuaLaTeX, which is the only
+supported engine; see the current
 [`tagpdf` implementation documentation](https://mirrors.ctan.org/macros/latex/contrib/tagpdf/tagpdf-code.pdf).
 
 Therefore:
