@@ -1,87 +1,16 @@
 # Engineering ATS-friendly career documents with LuaLaTeX
 
-## A design and reference guide for CareerDossierTeX
+This file is the engineering contract CareerDossierTeX is built toward for text
+extraction, tagging, and fonts: what a generated PDF's text layer, reading
+order, Unicode mapping, and semantic structure have to do, and what has been
+measured about each. It is design and reference material, not documentation of
+shipped behavior — the PDF manual and the compiled examples describe what is
+currently supported. Material tagged **(planned — vX.Y.Z)** is future work and
+must not be implemented or documented as if it were current. Where this guide
+and the rest of `docs/` disagree, the repository documentation is authoritative
+and this file is the one to correct.
 
-**Status:** Design and reference material — describes the engineering contract the
-package is built toward. It is **not** documentation of shipped behavior; only
-The PDF manual and the compiled examples describe what is currently supported.
-**Primary engine:** LuaLaTeX (LuaHBTeX). XeLaTeX was the engine through `v0.2.1`;
-sections that discuss XeTeX behavior are retained as rationale and history, and
-are marked as such.
-**Current published scope (`v0.8.0`):** English industry résumé, industry and academic
-cover-letter families, academic CV, statement documents, and optional publication
-support; US Letter (default) and opt-in A4, monochrome, LuaLaTeX, and opt-in
-tagged structure. The statement class supports a default statement of interest
-plus six other statement types — see the manual and `docs/ROADMAP.md`. Every
-class accepts the calibrated `fontsize=10pt|11pt|12pt` and `margin=normal|narrow`
-options plus `medium=print|screen`, which decides whether page furniture is
-emitted at all, and `muted=plain|italic|gray|both`, which decides how an entry's
-dates and location are de-emphasized; the résumé and CV additionally accept
-`entrymeta=column|inline`, which decides where that metadata is placed, and no
-longer accept `density`. Of these, only `entrymeta=inline` changes the text
-layer — it moves the metadata onto the entry's own line behind a separator — and
-none of them changes the reading order.
-**Maintainer:** Amir Sadeghi
-**Last reviewed:** 2026-08-12
-
-> **Scope banner.** Material tagged **(Phase 1)** records the released `v0.1.x`
-> foundation. Material tagged **(planned — vX.Y.Z)** describes future work
-> and must not be implemented or documented as if it were current. When this guide
-> and the repository's `docs/` disagree on names, module boundaries, or scope, the
-> repository documentation is authoritative and this guide should be corrected to
-> match it.
-
-## Executive standard
-
-An ATS does not read LaTeX source. It receives the generated PDF, extracts text,
-guesses reading order, and attempts to classify the result into fields. Therefore
-the package's real product is not merely a visually correct PDF. It is a PDF whose
-visible page, text layer, reading order, Unicode mapping, and semantic structure
-agree.
-
-Use these rules as the default design contract. `v0.2.0` realizes the industry
-and academic dossier subset; the rest guides later phases.
-
-1. Make the default output single-column, linear, text-first, and restrained.
-2. Put all essential information in the document body, not in headers, footers,
-   pictures, icons, text boxes, overlays, or sidebars.
-3. Use conventional section names and real text. Do not communicate meaning only
-   through position, colour, or graphics.
-4. Compile with LuaLaTeX, load fonts through `fontspec`, and treat every font file
-   and OpenType feature combination as testable code.
-5. Do **not** add per-word `/ActualText` spans. Consumers disagree on how to
-   honour `/ActualText`; LuaHBTeX writes real interword spaces, so nothing of the
-   kind is needed ("`/ActualText`, `ToUnicode`, and their limits").
-6. Keep source text in logical reading order. Visual placement must never require
-   the parser to reconstruct the intended order.
-7. Run automated round-trip extraction tests and manual copy-and-paste tests after
-   changes to layout, fonts, symbols, dependencies, or the TeX distribution.
-8. Keep ATS compatibility, PDF accessibility, and visual quality as separate
-   release gates. They overlap, but passing one does not prove the others. In
-   particular, tagged structure is opt-in and validated only for named fixtures
-   ("Tagged PDF and accessibility under current LaTeX").
-9. Follow the employer's requested file type. A sound PDF cannot satisfy a portal
-   that requires DOCX.
-10. Never claim that a template is "ATS-proof" or "guaranteed." Say that it is
-    designed and tested for robust text extraction, and publish the tested
-    environments.
-
-The strongest current ATS evidence is consistent on the main failure modes.
-Greenhouse lists columns, tables, headers, footers, text boxes, graphics, and
-images among causes of unsuccessful parsing. Lever accepts text-based PDFs but
-notes that a quick indicator is whether text can be highlighted. MIT recommends
-common fonts, at least 10 pt type, avoiding tables and text boxes, and converting
-to plain text to inspect loss or reordering. See
-[Greenhouse's parsing guidance](https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse),
-[Lever's parser documentation](https://help.lever.co/hc/en-us/articles/20087345054749-Understanding-resume-parsing),
-and [MIT's ATS guide](https://capd.mit.edu/resources/make-your-resume-ats-friendly/).
-
-> **Verify at release.** Vendor guidance and limits change. Re-check these three
-> pages, and any figure attributed to a vendor (for example the Greenhouse parser
-> size limit in [`TESTING.md`](TESTING.md#real-portal-acceptance) "Real portal
-> acceptance"), each release cycle.
-
-## What "ATS-friendly" should mean in this package
+## What "ATS-friendly" means, and the layout rules that follow
 
 Treat ATS-friendly as a testable set of properties, not a marketing label.
 
@@ -122,57 +51,6 @@ do not write documentation or examples that assume a `profile` key exists.
 
 A tagged PDF can still have a poor extraction order. An untagged PDF can sometimes
 extract cleanly. A beautiful PDF can fail both. Test all three.
-
-## Sources and how to use this guide
-
-This guide draws on the LaTeX community's authoritative documentation and on a set
-of practitioner reports about ATS behaviour. Give the most weight to current,
-primary documentation from the LaTeX Project and package maintainers; treat forum
-posts and commercial articles as supporting evidence, weighted toward recency.
-
-Primary authorities for class/package structure, keys, hooks, robustness, and
-release work:
-
-- **LaTeX for class and package authors** (`clsguide`), the LaTeX Project's own
-  guide to modern class/package construction, key-value options, hooks, and the
-  evolving output routine. Canonical documentation index:
-  <https://www.latex-project.org/help/documentation/>.
-- **The LaTeX Companion**, 3rd ed. (Mittelbach & Fischer, Addison-Wesley, 2023),
-  chapter 17, for documented source files, `docstrip`, `l3build`, regression
-  testing, documentation, and CTAN release work. (Book; no free URL.)
-- **The Not So Short Introduction to LaTeX2e** (`lshort`), chapter 6, for logical
-  formatting, font sizing, spacing, page layout, lengths, boxes, and rules:
-  <https://ctan.org/pkg/lshort-english>.
-- **`fontspec`** manual (2.9g, 2025-09-29) for OpenType feature selection under
-  LuaLaTeX: <https://ctan.org/pkg/fontspec>.
-- Historical tutorials on class inheritance and semantic commands (Peter Flynn,
-  *Rolling your own Document Class*, 2007; Jim Hefferon, *Minutes in Less Than
-  Hours*) remain useful for concepts, but their implementation techniques are
-  dated. Do not copy old internals without checking current kernel guidance.
-
-Supporting practitioner evidence, weighted by recency and reproducibility:
-
-- The Inter 4.1 XeLaTeX text-extraction regression is a reproducible warning about
-  font-version and OpenType-feature interactions:
-  <https://github.com/rsms/inter/issues/774>.
-- The distinction between a `ToUnicode` map's *presence*, *completeness*, and
-  *correctness* is well explained here:
-  <https://stackoverflow.com/questions/53890212/how-to-check-if-encoding-and-tounicode-are-properly-done-for-a-pdf>.
-- Recent practitioner overviews of ATS parsing and LaTeX résumés reinforce the
-  single-column and copy/paste-test advice. Cite the original web sources when you
-  add them; a commercial article or forum post is background, not authority.
-
-Where a local note and current documentation differ, follow the current primary
-source and re-test. For example, older `l3build` documentation used a different
-documentation-engine setting; the current `l3build` manual uses
-`typesetexe = "xelatex"`. That is exactly why every release is checked against
-current manuals.
-
-> **Maintainer note.** A few source URLs above point to canonical index or package
-> pages rather than deep links, to avoid dead links as documents are revised.
-> Confirm and, where useful, pin exact URLs when you next revise this file.
-
-## Layout rules: safe defaults and risky patterns
 
 ### Default to one semantic stream
 
@@ -1664,6 +1542,29 @@ reproducible fonts, defensive PDF text generation, and repeatable tests.
 - [Greenhouse: unsuccessful resume parse](https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse)
 - [Lever: understanding resume parsing](https://help.lever.co/hc/en-us/articles/20087345054749-Understanding-resume-parsing)
 - [MIT: make your resume ATS-friendly](https://capd.mit.edu/resources/make-your-resume-ats-friendly/)
+- [The Not So Short Introduction to LaTeX2e (`lshort`)](https://ctan.org/pkg/lshort-english)
+- *The LaTeX Companion*, 3rd ed. (Mittelbach & Fischer, Addison-Wesley, 2023),
+  chapter 17, for documented sources, `docstrip`, `l3build`, regression testing,
+  and CTAN release work. Book; no free URL.
+- Peter Flynn, *Rolling your own Document Class* (2007) and Jim Hefferon,
+  *Minutes in Less Than Hours*, for concepts only — their implementation
+  techniques are dated, so check current kernel guidance before copying any
+  internals.
+
+Give the most weight to current, primary documentation from the LaTeX Project
+and package maintainers; treat forum posts and commercial articles as
+supporting evidence, weighted toward recency. Where a local note and current
+documentation differ, follow the current primary source and re-test.
+
+> **Verify at release.** Vendor guidance and limits change. Re-check the
+> Greenhouse, Lever, and MIT pages above, and any figure attributed to a vendor
+> (for example the Greenhouse parser size limit in
+> [`TESTING.md`](TESTING.md#real-portal-acceptance) "Real portal acceptance"),
+> each release cycle.
+
+> **Maintainer note.** Some entries above point at canonical index or package
+> pages rather than deep links, to avoid dead links as documents are revised.
+> Confirm and, where useful, pin exact URLs when you next revise this file.
 
 ---
 
