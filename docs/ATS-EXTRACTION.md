@@ -305,7 +305,7 @@ consumer that reads the structure element's text, and Poppler discards it here
 exactly as recorded — none of the extraction baselines moved. The two problems
 are separate. This one is Poppler's *geometric* block grouping, which no
 character fixes; #302's is the *logical* text of a structure element, which no
-amount of geometry fixes. See 7.6.
+amount of geometry fixes. See ["Structure tree by profile"](#structure-tree-by-profile).
 
 #### The measured floor
 
@@ -360,7 +360,8 @@ On the tagged path the two values are equivalent. The separator is emitted as a
 layout artifact, as the contact line's `|` is, so the structure element text
 reads `Engineer 2024–2026` under both — the same string, with the word boundary
 coming from a real interword space under `inline` and from `\pdffakespace`
-under `column` (see 7.6). `tests/tagging/resume-entrymeta-inline` pins that and
+under `column` (see ["Structure tree by profile"](#structure-tree-by-profile)).
+`tests/tagging/resume-entrymeta-inline` pins that and
 validates as PDF/UA-2.
 
 ### Headers, footers, and page numbers
@@ -1128,7 +1129,8 @@ bibliography carries real structure rather than flat paragraphs — `/S /list`
 with `/item`, `/itemlabel`, and `/itembody` per entry, `/S /Link` with `/URI`
 for identifiers, and `/S /subsection` for the list heading (`\defbibheading`
 renders it through the CV's own `\CDossierSection`, so it moved from `/H1` to
-`/H2` alongside every other résumé/CV section heading — see 7.4). The
+`/H2` alongside every other résumé/CV section heading — see ["Heading hierarchy"](#heading-hierarchy-issue-267)).
+The
 document identity (`\MakeCDossierHeader`) supplies the fixture's one `/S
 /section`. The runner writes the observed role counts to
 `tests/tagging/reports/biblatex-ua2-structure.txt` so this claim stays tied to
@@ -1222,8 +1224,8 @@ the H key in NVDA/JAWS). This is what #267 changes:
 ```
 
 Every line on the "Say All" side reaches a screen-reader user either way, in
-the same order — that is what the extraction and word-geometry gates in 7.1
-already cover, and why this change touches none of them. The heading-jump
+the same order — that is what the extraction and word-geometry gates in
+["Recorded validation results"](#recorded-validation-results-v040-plus-the-v050-statement-fixture) already cover, and why this change touches none of them. The heading-jump
 list is the part that was silently broken: before #267 it read `H2
 Experience`, `H2 Education` and stopped there, because the identity carried
 no heading role to be listed at all. A screen-reader user who orients by
@@ -1246,7 +1248,7 @@ This is a structure-tree change only. It does not alter rendered layout, and
 the untagged path is unaffected because the heading primitive's untagged
 branch does not depend on the depth argument. `Sect` divisions around
 résumé/CV section headings were out of scope for this change and are covered
-in 7.5 below.
+in ["Section divisions"](#section-divisions-issue-268) below.
 
 ### Section divisions (issue #268)
 
@@ -1342,7 +1344,8 @@ its own; running headers, folios, rules, and separator characters, which are
 `/Artifact`s, so their absence is 7's "mark decorative content as artifact"
 rule working rather than an omission; and structure-only nodes carrying no
 marked content (`/Document`, `/text-unit`, `/Sect`, `/itemize`, `/item`,
-`/itembody`), whose nesting 7.4 and 7.5 above describe.
+`/itembody`), whose nesting ["Heading hierarchy"](#heading-hierarchy-issue-267) and ["Section divisions"](#section-divisions-issue-268)
+above describe.
 
 `tests/tagging/resume.structure.txt`, as committed, is the résumé in full:
 
@@ -1402,7 +1405,8 @@ and nothing — neither a space character nor a second structure element —
 separated the two halves in the content stream. A structure-aware consumer
 received the literal `Engineer2024–2026`, and, for a full recipient address,
 `Casey ReaderHead of EngineeringExample Company123 Discovery AvenueVancouver,
-BC V6T 1Z4`. Same root cause as 4.5's retired `/ActualText` history —
+BC V6T 1Z4`. Same root cause as the retired `/ActualText` history in
+["`/ActualText`, `ToUnicode`, and their limits"](#actualtext-tounicode-and-their-limits) —
 positioning glyphs by absolute coordinates rather than by a real interword
 space — in a location that history did not cover.
 
@@ -1415,7 +1419,8 @@ width next to a glyph, and `\hfill`'s **zero** natural width, not anything
 about two-column layout, is the whole reason these joins were skipped. Zero
 rendered width also means the fill still absorbs the line, so no glyph moves:
 the untagged example PDFs are byte-identical across the fix apart from their
-timestamps and `/ID`, and no Poppler, MuPDF, or PDFKit baseline in 7.1 changed.
+timestamps and `/ID`, and no Poppler, MuPDF, or PDFKit baseline in
+["Recorded validation results"](#recorded-validation-results-v040-plus-the-v050-statement-fixture) changed.
 
 Two details are worth keeping. In the letter the separator hangs off `\\` itself
 for the length of the recipient block, not off the four field call sites: a
@@ -1428,13 +1433,15 @@ One case looks the same and is not: the statement's context line
 (`statement.structure.txt`, page 1, MCIDs 4 and 5) is two adjacent leaves,
 because the `|` between them is its own `/Artifact` and interrupts the run
 where the cases above never opened a second one. #302 leaves it untouched, and
-whether an element boundary reads better than a glued run is 7.2's question.
+whether an element boundary reads better than a glued run is the question in
+["Screen-reader reading-order checks"](#screen-reader-reading-order-checks).
 
 **Still not verified against a live screen reader.** Everything above is
 established at the byte level. Whether the glued form actually misread in
 VoiceOver or NVDA — and so whether this was a real defect for a user rather
 than only a structurally wrong one — was never confirmed, and the fix does not
-confirm it retrospectively. 7.2's manual pass is what would.
+confirm it retrospectively. The manual pass in ["Screen-reader reading-order checks"](#screen-reader-reading-order-checks)
+is what would.
 
 **Why nothing caught it.** Every extractor in the matrix rebuilds words from
 glyph geometry, so none could see a missing character; `docs/TESTING.md`
