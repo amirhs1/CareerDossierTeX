@@ -29,8 +29,10 @@ A generated document is ATS-friendly enough to release only when:
   to the PDF consumer;
 - the document remains readable without colour and without hyperlink behaviour;
 - the portal's parsed preview or autofill is correct when such a preview is
-  available; and
-- the PDF remains easy for a human to skim.
+  available;
+- the PDF remains easy for a human to skim; and
+- the employer accepts a PDF at all — a sound PDF cannot satisfy a portal that
+  requires DOCX, so follow the requested file type whatever this list says.
 
 These properties improve the odds of successful parsing. They do not control an
 employer's ranking rules, keyword logic, AI models, or internal workflow.
@@ -276,12 +278,10 @@ Good defaults for most career documents are:
 - no forced one-page compression at the cost of legibility; and
 - no negative `\vspace` as a routine layout tool.
 
-Use named lengths for every public spacing control, defined in the module that
-owns the concern — page geometry, margins, and the vertical rhythm belong in
-`careerdossier-tokens.sty`, never in a class or in `careerdossier-base`. A class
-chooses paper and options and passes them down. Do not scatter unexplained
-numeric dimensions through the implementation. See `docs/ARCHITECTURE.md`
-("File responsibilities") for the full ownership map.
+Use named lengths for every public spacing control rather than scattered
+numeric dimensions, and see
+[`ARCHITECTURE.md`](ARCHITECTURE.md#file-responsibilities) for which module owns
+which of them.
 
 ## Typography and font engineering under LuaLaTeX
 
@@ -1414,9 +1414,7 @@ notes. Use clearly fictional but plausible names and organizations.
 - present future features (named font combinations, CTAN packaging, or a
   consolidated profile interface) as if they were current.
 
-## Minimal reference template and class skeleton
-
-### User template **(Phase 1)**
+## Minimal reference template **(Phase 1)**
 
 This template is compiled. `tests/smoke/ats-user-template-doc.tex` is the text
 below verbatim, and `make smoke` diffs the two before compiling either, so the
@@ -1465,69 +1463,6 @@ it.
 C++, Python, SQL, data modelling, technical writing
 \end{document}
 ```
-
-### Class outline (illustrative)
-
-Unlike the template above, this one is not compiled and cannot be — it is a
-sketch of a class, not a document. It carries no version or date for the same
-reason: a stamp here would be a fourth place to update at every release, and
-`make lint` checks the three that are declarations. `docs/ARCHITECTURE.md` owns
-the real module boundaries and the load order the shipped classes use.
-
-```tex
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesClass{careerdossier-resume}
-  [<date> v<version> ATS-conscious résumé class]
-
-% Declare and process class keys (fontsize, margin) here via l3keys,
-% before \LoadClass. Pass documented base-class options deliberately.
-
-\LoadClass[11pt]{article}
-
-% Shared foundation. Load order may be adjusted as implementation requires,
-% but dependency direction stays one-way (shared packages never depend on classes).
-\RequirePackage{careerdossier-base}        % metadata, keys, validation
-\RequirePackage{careerdossier-tokens}      % calibrated type, rhythm, geometry
-\RequirePackage{careerdossier-typography}  % LuaLaTeX check, fontspec,
-                                           % semantic roles
-\RequirePackage{careerdossier-theme}       % monochrome colour and rule tokens
-\RequirePackage{careerdossier-components}  % identity block, contact line, entry primitives
-
-\RequirePackage{hyperref}
-\hypersetup{ unicode = true, pdflang = en }
-% English-only; multilingual support is dropped (docs/ROADMAP.md), so pdflang
-% is hard-coded rather than routed through a language-abstraction layer.
-
-% Page geometry, margins, and the vertical rhythm belong to
-% careerdossier-tokens, NOT here and not in careerdossier-base: this class
-% chooses paper and options and passes them down. Build entries from the shared
-% semantic primitives — not from tables, columns, or positioned boxes.
-```
-
-The exact load order for `fontspec`, `hyperref`, language support, and any
-tagging-related packages must be verified against current manuals and the test
-suite. Do not freeze this illustrative order as policy without integration tests.
-
-## Ongoing maintenance rule
-
-ATS parsing, PDF consumers, LaTeX's tagged-PDF implementation, `fontspec`,
-LuaHBTeX, and fonts all change. Treat this guide as a maintained compatibility
-document. At least once per release cycle:
-
-1. read the latest LaTeX News;
-2. check the current class/package author guide;
-3. review current `fontspec` and `l3build` manuals;
-4. review the tagging-status table for every dependency;
-5. rerun the extraction matrix on current TeX Live;
-6. test any changed font files;
-7. update the compatibility statement with tested versions and known failures.
-
-CTAN's own rules change on the same cadence;
-[`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md) owns that review and the release
-gates that depend on it.
-
-Optimize for evidence, not folklore: simple structure, explicit semantics,
-reproducible fonts, defensive PDF text generation, and repeatable tests.
 
 ## Current external references
 
