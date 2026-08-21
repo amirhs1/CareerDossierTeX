@@ -1323,76 +1323,112 @@ and the statement's title line as well. Two notes on the shape this took:
 
 ### Structure tree by profile
 
-The table and diagram above show the heading skeleton only. This section shows
-the **complete** tagged structure of each named fixture — every heading, link,
-list, and paragraph, in document order, with its actual extracted text — so
-the reading and heading-navigation experience is visible for every component,
-not only headings.
+The table and diagram above show the heading skeleton only. The **complete**
+tagged structure of every named fixture — every heading, link, list item, and
+paragraph, in document order, with its extracted text — is committed as
+`tests/tagging/*.structure.txt`, one per fixture, re-decoded and diffed on every
+`make tagging` run by `tests/tagging/structure-text.pl`. Those ten files are the
+record; this section reproduces one and states what they established.
 
-Recorded 2026-08-06, refreshed 2026-08-07 for issue #302's separator fix,
-decoded byte-for-byte from the committed fixtures' `/StructTreeRoot` and
-content streams (`/K` → `/MCR` → `/MCID` → the marked-content run's own
-`Tj`/`TJ` glyph codes, resolved through each font's embedded `/ToUnicode`
-CMap) — not inferred from the source `.tex`. That decoding is no longer a
-one-off: `tests/tagging/structure-text.pl` performs it, and the trees below are
-the committed `tests/tagging/*.structure.txt` baselines it now asserts against.
-`=>` shows the exact text a consumer that reads structure (rather than glyph
-geometry) would receive for that element; an `[annotation: ...]` line is an
-`/OBJR` pointing at a link annotation, not text a screen reader announces on
-its own. Running headers, folios, decorative rules, and separator characters
-are `/Artifact`s and are correctly **absent** below — that is the intended
-result of 7's "mark decorative content as artifact" rule, not an omission.
+Each line is one marked-content run — `<page>`, `<MCID>`, `<structure tag>`,
+`<decoded text>` — decoded byte-for-byte from that fixture's `/StructTreeRoot`
+and content streams (`/K` → `/MCR` → `/MCID` → the run's own `Tj`/`TJ` glyph
+codes, resolved through each font's embedded `/ToUnicode` CMap), never inferred
+from the source `.tex` and never from a glyph coordinate. The text column is
+therefore exactly what a consumer reading structure rather than glyph geometry
+receives. Three things are absent, each deliberately: a link annotation's
+`/OBJR`, so a `/Link` line is the link's *text*, not an annotation announced on
+its own; running headers, folios, rules, and separator characters, which are
+`/Artifact`s, so their absence is 7's "mark decorative content as artifact"
+rule working rather than an omission; and structure-only nodes carrying no
+marked content (`/Document`, `/text-unit`, `/Sect`, `/itemize`, `/item`,
+`/itembody`), whose nesting 7.4 and 7.5 above describe.
+
+`tests/tagging/resume.structure.txt`, as committed, is the résumé in full:
+
+```text
+1	0	section	Tagged Industry Resume
+1	1	text	Accessibility Engineer
+1	2	Link	resume@example.test
+1	3	text	+1 555 0100
+1	4	Link	example.test/resume
+1	5	subsection	Experience
+1	6	text	
+1	7	text	
+1	8	text	Engineer 2024–2026
+1	9	text	Example Labs Toronto
+1	10	itemlabel	•
+1	11	text	First resume achievement in source order.
+1	12	itemlabel	•
+1	13	text	Second resume achievement with a meaningful 
+1	14	Link	work link
+1	15	text	.
+2	0	subsection	Additional Experience
+2	1	text	
+2	2	text	
+2	3	text	Senior Engineer 2022–2024
+2	4	text	Example Services Ottawa
+2	5	itemlabel	•
+2	6	text	Second-page resume content after the shared page furniture.
+```
+
+The other nine pin the rest of the matrix: the academic CV, the résumé's shape
+from the same `\MakeCDossierHeader` and `\CDossierSection`, with a blank
+`location` that `\tl_if_blank:nF` omits rather than leaving a stray separator
+(rule 5); the two letters, flat prose carrying no section-heading component and
+so no heading role below the identity; the statement, the profile with the most
+heading roles; and five option and defect fixtures.
 
 **Two things are worth reading closely, not just skimming past.**
 
-First, a handful of `/text` leaves below are marked `(no visible text)`. These
-are real, structurally-present elements that carry zero glyphs — they sit at
-the boundary where the shared header stack's closing `\addvspace` (and, in the
-résumé and CV, the section rule's own paragraph) ends one automatically-tagged
-paragraph and starts the next. A screen reader passes over an empty element
-silently, so these are inert, but they are why the tree below has more
-`/text-unit` nodes than a count of visible lines would predict — issue #267's
-own motivating résumé example undercounted them for the same reason.
+First, a handful of lines have an **empty text column** — MCIDs 6 and 7 on
+page 1 above, and 1 and 2 on page 2. These are real, structurally-present
+elements carrying zero glyphs: they sit where the shared header stack's closing
+`\addvspace` (and, in the résumé and CV, the section rule's own paragraph) ends
+one automatically-tagged paragraph and starts the next. A screen reader passes
+over an empty element silently, so they are inert — but they are why a tree has
+more `/text` elements than a count of visible lines predicts, and what issue
+#267's own motivating résumé example undercounted.
 
 Second, and more substantively: **a `/text` leaf that contains more than one
 run used to concatenate those runs with no separating character at all.** This
-is different from an ordinary sentence that happens to contain a link (marked
-`‖` below; that case is fine — the embedded `/Link` element supplies the
-reading-order gap). The genuine case was a two-column or two-line layout built
-with `\hfill` or `\\` alone: the entry heading's title/dates row, its
-organization/location row, and the letter's stacked recipient lines all land in
-**one** marked-content run, and nothing — neither a space character nor a
-second structure element — separated the two halves in the content stream. The
-decoded content a structure-aware consumer received was the literal string
-`Engineer2024–2026`, and, for a letter with a full recipient address,
+is different from an ordinary sentence that happens to contain a link — MCIDs
+13 to 15 on page 1 above, where the halves are already separate runs and the
+embedded `/Link` element supplies the reading-order gap. That case is fine. The
+genuine case was a two-column or two-line layout built with `\hfill` or `\\`
+alone: the entry heading's title/dates row, its organization/location row, and
+the letter's stacked recipient lines all land in **one** marked-content run,
+and nothing — neither a space character nor a second structure element —
+separated the two halves in the content stream. A structure-aware consumer
+received the literal `Engineer2024–2026`, and, for a full recipient address,
 `Casey ReaderHead of EngineeringExample Company123 Discovery AvenueVancouver,
 BC V6T 1Z4`. Same root cause as 4.5's retired `/ActualText` history —
 positioning glyphs by absolute coordinates rather than by a real interword
 space — in a location that history did not cover.
 
-Issue #302 fixed this, and the trees below show the fixed output. The remedy is
-tagpdf's own `\pdffakespace`, which emits a real U+0020 into the content stream
-at zero rendered width. Two things make that the right instrument rather than a
-workaround:
+Issue #302 fixed this, and the committed baselines are the fixed output. The
+remedy is tagpdf's own `\pdffakespace`, which emits a real U+0020 into the
+content stream at zero rendered width — the right instrument rather than a
+workaround, because ordinary prose's interword spaces already arrive by exactly
+this route. tagpdf inserts a real space glyph for any glue of positive natural
+width next to a glyph, and `\hfill`'s **zero** natural width, not anything
+about two-column layout, is the whole reason these joins were skipped. Zero
+rendered width also means the fill still absorbs the line, so no glyph moves:
+the untagged example PDFs are byte-identical across the fix apart from their
+timestamps and `/ID`, and no Poppler, MuPDF, or PDFKit baseline in 7.1 changed.
 
-- The interword spaces inside ordinary prose already arrive by exactly this
-  route. Tagged output carries real space glyphs where untagged output has only
-  `TJ` kerns; tagpdf inserts them for any glue of positive natural width that
-  sits next to a glyph. `\hfill` has **zero** natural width, and that — not
-  anything about two-column layout — is the whole reason these joins were
-  skipped.
-- Zero rendered width means the fill still absorbs the entire line, so no glyph
-  moves. The untagged example PDFs are byte-identical across the fix apart from
-  their timestamps and `/ID`, and not one of the Poppler, MuPDF, or PDFKit
-  baselines in 7.1 changed.
+Two details are worth keeping. In the letter the separator hangs off `\\` itself
+for the length of the recipient block, not off the four field call sites: a
+recipient address carries the user's own `\\` **inside a single field value**, so
+a call-site fix would have left that break glued. And `\pdffakespace` expands to
+a zero-width *skip*, discardable on either side of a forced line break — placed
+bare around the `\\` it is dropped again and nothing is emitted. It must be boxed.
 
-Two details are worth keeping. In the letter the separator hangs off `\\`
-itself for the length of the recipient block, not off the four field call
-sites: a recipient address carries the user's own `\\` **inside a single field
-value**, so a call-site fix would have left that break glued. And
-`\pdffakespace` expands to a zero-width *skip*, which is discardable on either
-side of a forced line break — placed bare before or after the `\\` it is
-dropped again and no character is emitted at all. It has to be boxed.
+One case looks the same and is not: the statement's context line
+(`statement.structure.txt`, page 1, MCIDs 4 and 5) is two adjacent leaves,
+because the `|` between them is its own `/Artifact` and interrupts the run
+where the cases above never opened a second one. #302 leaves it untouched, and
+whether an element boundary reads better than a glued run is 7.2's question.
 
 **Still not verified against a live screen reader.** Everything above is
 established at the byte level. Whether the glued form actually misread in
@@ -1400,230 +1436,9 @@ VoiceOver or NVDA — and so whether this was a real defect for a user rather
 than only a structurally wrong one — was never confirmed, and the fix does not
 confirm it retrospectively. 7.2's manual pass is what would.
 
-**Why nothing caught it.** Poppler's default extraction already separates these
-onto different lines (see 7.1's baselines), because it splits on the horizontal
-gap; MuPDF and PDFKit likewise rebuild words from glyph geometry. Every
-extractor in the matrix was therefore structurally incapable of seeing a
-missing character. `make tagging` now decodes the content stream itself
-(`tests/tagging/structure-text.pl`), diffs the result against a committed
-`*.structure.txt` baseline per fixture, and additionally asserts each two-cell
-row's separator by name so the defect cannot be waved through by regenerating a
-baseline. `tests/tagging/letter-recipient-address.tex` exists because no
-previous fixture set `recipient-address` at all.
-
-#### Résumé
-
-```text
-/Document
-  /section                              => 'Tagged Industry Resume'            [/H1]  (also its /T)
-  /text-unit
-    /text                                => 'Accessibility Engineer'
-  /Link                                  => 'resume@example.test'   (mailto: link)
-  /text                                  => '+1 555 0100'           (not a link)
-  /Link                                  => 'example.test/resume'   (https: link)
-  /text-unit
-    /text                                (no visible text)
-  /Sect
-    /subsection                          => 'Experience'                       [/H2]  (also its /T)
-    /text-unit
-      /text                              (no visible text)
-    /text-unit
-      /text                              => 'Engineer 2024–2026'
-    /text-unit
-      /text                              => 'Example Labs Toronto'
-    /text-unit
-      /itemize
-        /item
-          /itemlabel                     => '•'
-          /itembody
-            /text-unit
-              /text                      => 'First resume achievement in source order.'
-        /item
-          /itemlabel                     => '•'
-          /itembody
-            /text-unit
-              /text                      => 'Second resume achievement with a meaningful ' ‖ '.'
-                /Link                    => 'work link'
-  /Sect
-    /subsection                          => 'Additional Experience'            [/H2]  (also its /T)
-    /text-unit
-      /text                              (no visible text)
-    /text-unit
-      /text                              => 'Senior Engineer 2022–2024'
-    /text-unit
-      /text                              => 'Example Services Ottawa'
-    /text-unit
-      /itemize
-        /item
-          /itemlabel                     => '•'
-          /itembody
-            /text-unit
-              /text                      => 'Second-page resume content after the shared page furniture.'
-```
-
-The two `/Sect` divisions are issue #268's (7.5). Everything a section
-introduces is now inside the division its heading opens, and the heading's own
-text is repeated as the division-opening element's `/T` — the same shape the
-statement below has had since #177.
-
-#### Academic CV
-
-Identical shape to the résumé — the same `\MakeCDossierHeader` and
-`\CDossierSection` produce it — with its own field values and, on the second
-page, one entry whose `location` is blank (`\tl_if_blank:nF` correctly omits
-the row rather than leaving a stray separator, per rule 5):
-
-```text
-/Document
-  /section                              => 'Tagged Academic CV'               [/H1]
-  /text-unit
-    /text                                => 'Research Engineer'
-  /Link                                  => 'cv@example.test'
-  /text                                  => '+1 555 0101'
-  /Link                                  => 'example.test/cv'
-  /text-unit
-    /text                                (no visible text)
-  /subsection                            => 'Research Experience'             [/H2]
-  /text-unit
-    /text                                (no visible text)
-  /text-unit
-    /text                                => 'Researcher 2023–2026'
-  /text-unit
-    /text                                => 'Example University Toronto'
-  /text-unit
-    /itemize
-      /item /itemlabel => '•' /itembody /text-unit
-        /text                            => 'First CV achievement in source order.'
-      /item /itemlabel => '•' /itembody /text-unit
-        /text                            => 'Second CV achievement with a meaningful ' ‖ '.'
-          /Link                          => 'research link'
-  /subsection                            => 'Teaching Experience'             [/H2]
-  /text-unit
-    /text                                (no visible text)
-  /text-unit
-    /text                                => 'Instructor 2025'
-  /text-unit
-    /text                                => 'Example University'              (location blank, rule 5: no stray separator)
-  /text-unit
-    /itemize
-      /item /itemlabel => '•' /itembody /text-unit
-        /text                            => 'Second-page CV content after the running header.'
-```
-
-#### Industry letter
-
-No section-heading component at all, so nothing below the identity carries a
-heading role — flat prose, in reading order:
-
-```text
-/Document
-  /section                              => 'Tagged Industry Letter'            [/H1]
-  /Link                                  => 'letter@example.test'
-  /text                                  => '+1 555 0102'
-  /text-unit
-    /text                                (no visible text)
-  /text-unit
-    /text                                => 'July 20, 2026'
-  /text-unit
-    /text                                => 'Casey Reader Example Company'
-  /text-unit
-    /text                                => 'Application for Engineering Role'
-  /text-unit
-    /text                                => 'Dear Casey Reader,'
-  /text-unit
-    /text                                => 'The first industry-letter paragraph precedes the second in source order.'
-  /text-unit
-    /text                                => 'The second industry-letter paragraph contains a meaningful ' ‖ '.'
-      /Link                              => 'letter link'
-  /text-unit
-    /text                                => 'The third industry-letter paragraph appears on page two after the shared running header and above the folio.'
-  /text-unit
-    /text                                => 'Sincerely,'
-  /text-unit
-    /text                                => 'Tagged Industry Letter'
-```
-
-#### Academic letter
-
-Same shape as the industry letter (`family=academic` changes running-head
-wording and closing conventions, not structure):
-
-```text
-/Document
-  /section                              => 'Tagged Academic Letter'            [/H1]
-  /Link                                  => 'academic-letter@example.test'
-  /text                                  => '+1 555 0103'
-  /text-unit
-    /text                                (no visible text)
-  /text-unit
-    /text                                => 'July 20, 2026'
-  /text-unit
-    /text                                => 'Jordan Reader Example University'
-  /text-unit
-    /text                                => 'Application for Faculty Role'
-  /text-unit
-    /text                                => 'Dear Jordan Reader,'
-  /text-unit
-    /text                                => 'The first academic-letter paragraph appears on page one before the page break.'
-  /text-unit
-    /text                                => 'This page also contains a meaningful ' ‖ '.'
-      /Link                              => 'academic-letter link'
-  /text-unit
-    /text                                => 'The second academic-letter paragraph appears on page two after the repeated footer from page one and before the closing.'
-  /text-unit
-    /text                                => 'Sincerely,'
-  /text-unit
-    /text                                => 'Tagged Academic Letter'
-```
-
-#### Statement
-
-The profile with the most heading roles in one document: an `/H1` name, an
-`/H2` for both the title line and each section, and a `/Sect` division per
-section. The divisions come from the kernel's native
-`\section*`/`\CDossierSection` — see `careerdossier-statement.cls` and issue
-#177 — where the résumé and CV above open theirs explicitly (7.5); the
-resulting shape is the same. This fixture does not exercise
-`\CDossierSubsection`, so no `/H3` appears here; see 7.4's table for where one
-would:
-
-```text
-/Document
-  /section                              => 'Tagged Research Statement'         [/H1]  (also its /T)
-  /subsection                           => 'Research Statement'                [/H2]  (the title line; also its /T)
-  /text-unit
-    /text                                => 'Reliable computational inquiry'   (subtitle)
-  /text-unit
-    /text                                => 'Example University'              (affiliation)
-  /text-unit
-    /text                                => 'Application for Faculty Role' ‖ 'Application ID: APP-104'
-  /Link                                  => 'statement@example.test'
-  /text                                  => '+1 555 0104'
-  /Link                                  => 'example.test/statement'
-  /Link                                  => 'ORCID: 0000-0002-1825-0097'
-  /text-unit
-    /text                                (no visible text)
-  /Sect
-    /subsection                         => 'Research Vision'                   [/H2]
-    /text-unit
-      /text                              => 'The first statement paragraph contains a meaningful ' ‖ '.'
-        /Link                            => 'statement link'
-  /Sect
-    /subsection                         => 'Future Programme'                  [/H2]
-    /text-unit
-      /text                              => 'The second statement paragraph appears on page two.'
-```
-
-The context line (`'Application for Faculty Role' ‖ 'Application ID:
-APP-104'`) is structurally two adjacent leaves, not one glued run, because the
-`|` between them is its own `/Artifact` and interrupts the marked-content run
-— unlike the entry-heading and recipient-block cases above, which never opened
-a second run at all. It is therefore untouched by #302's fix and still carries
-no character between its halves: what separates them is an element boundary,
-not a space. Whether two separate accessible elements, read back to back with
-their artifact-only separator invisible to the consumer, are any more legible
-than one glued run is exactly the kind of question 7.2's manual screen-reader
-pass, not a structural count, can actually answer.
+**Why nothing caught it.** Every extractor in the matrix rebuilds words from
+glyph geometry, so none could see a missing character; `docs/TESTING.md`
+§ "Tagged-PDF suite" states that, and what `make tagging` does instead.
 
 ## Compilation policy
 
