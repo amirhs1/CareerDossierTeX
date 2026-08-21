@@ -1364,17 +1364,6 @@ missing characters; option clashes; and deprecated interfaces. Do not make every
 harmless TeX warning fatal, but maintain an explicit allowlist; a new warning
 should fail CI until reviewed.
 
-## Documentation requirements
-
-Keep documentation in sync with behaviour, in the same change; `CONTRIBUTING.md`
-("Documentation requirements") maps each kind of change to the doc it belongs
-in. This guide owns one of those docs: the font, extraction, and tagging policy
-that `docs/ARCHITECTURE.md` summarizes from here.
-
-Keep examples fictional and realistic. Obvious placeholders such as `First Last` or
-`Company 1` can themselves be skipped by parsers, as Greenhouse's documentation
-notes. Use clearly fictional but plausible names and organizations.
-
 ## Minimal reference template **(Phase 1)**
 
 This template is compiled. `tests/smoke/ats-user-template-doc.tex` is the text
@@ -1383,6 +1372,10 @@ template cannot go stale against the classes without failing a suite (#450).
 The manual's "Complete examples" chapter and `examples/` carry the same shape at
 greater length; this one exists here because the surrounding sections argue from
 it.
+
+Keep example names fictional but plausible. Obvious placeholders such as `First
+Last` or `Company 1` can themselves be skipped by parsers, as Greenhouse's
+documentation notes.
 
 ```tex
 \documentclass[fontsize=11pt]{careerdossier-resume}
