@@ -33,6 +33,28 @@
 %% comment, manifest.txt, and docs/ARCHITECTURE.md again; describing the module
 %% accurately in the meantime is worth that cost, because AGENTS.md rule 4 sends
 %% an author here to find the module that owns a concern.
+%%
+%% Responsibilities, in full: the public header-stack composition API; the
+%% identity block, token-sized and baseline-derived; the shared page-style pair,
+%% single-page suppression, running header, and folio; the medium=print|screen
+%% decision of whether furniture is emitted at all and whether a link carries a
+%% visible decoration; the link-decoration role \CDossierLinkStyle, the
+%% \CDossierPlainLinks suppression declaration, and the \href hook that reaches
+%% an author's own anchor text; the muted=italic|gray|both|plain de-emphasis
+%% role \CDossierMutedStyle and what it resolves to; the entrymeta=column|inline
+%% placement of an entry's dates and location and the
+%% \CDossierEntryMetaSeparator the inline form joins them with; the shared
+%% CV/resume section rule with its token-owned spacing and tagged
+%% layout-artifact treatment; the shared record subsection renderer (#337) that
+%% both record classes expose as \CDossierSubsection -- its depth-3 division and
+%% heading, its two tokens, its needs-N-lines bound, and the test for whether a
+%% section has typeset anything yet, one renderer so the tokens and the tagged
+%% structure cannot drift between two spellings; the contact line;
+%% optional-field separator handling; the hyperlink wrappers including
+%% \CDossierLink and the scheme normalisation shared with the web-profile
+%% fields; the entry-heading, date, and location primitives; letterhead pieces
+%% that impose no page geometry; PDF document metadata derived from the profile;
+%% and the no-op \pdffakespace fallback every class relies on when untagged.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-components} {2026-08-12} {0.8.0}

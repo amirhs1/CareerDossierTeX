@@ -21,6 +21,26 @@
 %% typography, and BibLaTeX formatting remain in their corresponding modules.
 %% BibLaTeX is intentionally not loaded here; a CV without an external
 %% bibliography must build without BibLaTeX or Biber.
+%%
+%% Responsibilities: select Letter or A4 and delegate geometry to
+%% careerdossier-tokens; process the fontsize, margin, paper, bodyfont, medium,
+%% muted, and entrymeta options, forwarding the last three to
+%% careerdossier-components; render the first-page identity in the body;
+%% register the `Curriculum Vitae' running label and enable shared page
+%% furniture without making contact details running-only content; render the
+%% generic section, entry, and item-list interfaces from the shared tokens and
+%% expose the second heading level as \CDossierSubsection (#337), which is what
+%% lets Publications carry journal, conference, and preprint groups without
+%% promoting each to a ruled section; own the manual-publication list and its
+%% source-order numbering, including whether a grouped list restarts or carries
+%% on (#355) -- a property of the list, so the key sits on CDossierPublications
+%% and not on \CDossierSubsection; keep entries together across page breaks
+%% where practical without boxing a whole long entry; and preserve logical
+%% source and extraction order.
+%%
+%% Not this file: shared metadata, contact-link normalisation, bibliography
+%% formatting, or font selection. A kernel page style is preferred to reviving
+%% the prototypes' fancyhdr/lastpage dependency solely for `Page n of m'.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-cv} {2026-08-12} {0.8.0}

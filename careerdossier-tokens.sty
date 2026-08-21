@@ -170,6 +170,30 @@
 \int_new:N \CDossierSubsectionNeedLines
 \int_set:Nn \CDossierSubsectionNeedLines { 3 }
 
+%% Hyphenation is deliberately NOT tokenised (issue #309). \hyphenpenalty and
+%% \exhyphenpenalty stay at TeX's default of 50 in all four families, and the
+%% `tokens-*-defaults' baselines record both values, so a later change --
+%% including one made indirectly by loading a language package -- argues with a
+%% reviewable diff instead of passing unnoticed.
+%%
+%% The case for raising it was that a resume bullet is scanned rather than read,
+%% so a hyphen at a short line's end costs more there than in prose. Measured
+%% across the committed examples, three findings refused it. The hyphenation is
+%% not where the case was: 48 of 56 hyphens are in the statements, which are
+%% continuous prose, against one each in the resume and CV. The trade is one for
+%% one: 50 -> 500 removes 18 hyphens and creates 10 lines looser than badness 99,
+%% at unchanged worst badness. And there is nothing to tune in the safe band --
+%% 500 and 1000 give identical output in the examples and across a 216-cell
+%% sweep. Forbidding hyphenation outright (10000) is decisively wrong: 68
+%% overfull boxes across the sweep, 72 loose lines, worst badness 2452, because
+%% removing break points is what sends a paragraph to the third line-breaking
+%% pass and then past the margin. No committed example changes page count at any
+%% value tested, 10000 included.
+%%
+%% Reproduce with `make review-linebreak' (#316):
+%%   make review-linebreak SWEEP_ARGS="--param hyphenation \
+%%     --values '50 200 500 1000 10000'"
+%%
 %% Typographic page-break penalties (issue #171). These control hyphenation
 %% and paragraph-remnant breaks at page boundaries, complementing the
 %% structural keep-together penalties above.
@@ -743,6 +767,31 @@
 %% is too small and the ink can overrun the box it is nominally inside. The
 %% furniture leading is that height by construction; `geometry''s fixed 12pt is
 %% short of the 12pt line at fontsize=12pt once the line's depth is counted.
+%% Furniture placement (issue #183). The running header and the folio are the
+%% only components positioned by page geometry rather than by the vertical
+%% rhythm, so their placement is derived here from the resolved margin M and the
+%% furniture line height H (\CDossierFurnitureLeading):
+%%
+%%   headheight = H
+%%   headsep    = M/2 - 0.2*H
+%%   footskip   = M/2 + 0.2*H
+%%
+%% Both resolve to a BASELINE, not a box edge, so both split the line box the
+%% way the kernel's strut does (0.7 height, 0.3 depth): centring a line of
+%% height H in a margin M puts its baseline at M/2 + 0.2H from the outer edge.
+%% footskip is measured from the text block and takes that directly; headsep is
+%% its mirror. That the header also lands on a baseline is not obvious -- the
+%% kernel builds the head as \vbox to \headheight {\vfil <head>} and forces
+%% its depth to zero, pinning the head baseline to the bottom of that box.
+%% Centring the head BOX instead renders it 2.05pt low at 11pt and 2.77pt low at
+%% 10pt, and breaks the mirror with the folio.
+%%
+%% Placement derives from the nominal line box rather than the ink of a
+%% particular string, so furniture does not move when a name carries a
+%% descender; the residual against rendered ink is under 1.5pt. Neither
+%% includehead nor includefoot is set, so \textheight/\textwidth do not depend
+%% on these three values. tokens-furniture-geometry.tlg pins the placement and
+%% asserts the text block did not move.
 \cs_new_protected:Npn \__cdossier_tokens_apply_geometry:n #1
   {
     \geometry

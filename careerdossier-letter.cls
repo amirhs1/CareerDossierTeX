@@ -23,6 +23,15 @@
 %% link wrappers) and the required-`name' validation live in
 %% careerdossier-components and careerdossier-base; this class only arranges
 %% that material and adds the letter body around it.
+%%
+%% Responsibilities: select Letter or A4 and delegate geometry to
+%% careerdossier-tokens; process fontsize=10pt|11pt|12pt and
+%% margin=normal|narrow, keeping 12pt,normal as the prose-oriented defaults;
+%% derive paragraph, letterhead-block, salutation, and signature rhythm from the
+%% shared tokens; define prose-friendly page breaking; render the date,
+%% recipient, optional subject, salutation, and closing; reuse the shared sender
+%% identity; and process family=industry|academic as a label- and metadata-only
+%% choice with industry as the default.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-letter} {2026-08-12} {0.8.0}

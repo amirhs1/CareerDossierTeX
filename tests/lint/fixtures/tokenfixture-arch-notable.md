@@ -14,6 +14,6 @@ Renamed, so the parser cannot find it.
 
 Renamed too.
 
-#### Derived metrics and page geometry
+#### Dimensions outside the vertical rhythm and page geometry
 
 And renamed again.

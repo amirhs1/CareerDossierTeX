@@ -638,8 +638,9 @@ all test material remains under `tests/` with no top-level `testfiles/`
 directory. Every shared package and every document class carries committed
 regression coverage — no module is exempt — alongside the extraction, layout,
 tagging, bibliography, and lint suites; extend the existing file for a module
-with the behavior each future change adds. `docs/ARCHITECTURE.md` ("Testing
-strategy") holds the current count and its per-module split.
+with the behavior each future change adds. `build.lua` states the reason for
+each harness setting in a comment beside it, and `tests/regression/` is the
+inventory of pairs, which no document restates.
 
 ## Engineering work (tracked as issues)
 

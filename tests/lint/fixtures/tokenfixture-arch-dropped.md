@@ -15,7 +15,7 @@ A declared token the table has stopped documenting.
 |---|---:|---:|---:|---:|
 | `\CDossierFixtureAboveSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
 
-#### Derived metrics
+#### Dimensions outside the vertical rhythm
 
 | Token | Derivation | `10pt` | `11pt` | `12pt` |
 |---|---|---:|---:|---:|

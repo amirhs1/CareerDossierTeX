@@ -17,7 +17,7 @@ A documented token the source no longer declares.
 | `\CDossierFixtureBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierFixtureRetiredSkip` | 0.50 | 6.0 pt | 6.8 pt | 7.25 pt |
 
-#### Derived metrics
+#### Dimensions outside the vertical rhythm
 
 | Token | Derivation | `10pt` | `11pt` | `12pt` |
 |---|---|---:|---:|---:|

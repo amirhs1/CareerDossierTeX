@@ -402,10 +402,10 @@ check_derived() {
 
   load_source "$src" "$label" || return 1
 
-  table="$(markdown_table "$doc" "Derived metrics")"
+  table="$(markdown_table "$doc" "Dimensions outside the vertical rhythm")"
   if [ -z "$table" ]; then
     printf '  %-30s %s\n' "$label" "NO TABLE FOUND"
-    printf '    -> %s\n' "no table under '#### Derived metrics' in $label; the heading or the table shape has changed, so no derivation was compared"
+    printf '    -> %s\n' "no table under '#### Dimensions outside the vertical rhythm' in $label; the heading or the table shape has changed, so no derivation was compared"
     return 1
   fi
 

@@ -16,7 +16,7 @@ One stated ratio no longer matches the declaration.
 | `\CDossierFixtureAboveSkip` | 0.80 | 9.0 pt | 10.2 pt | 10.875 pt |
 | `\CDossierFixtureBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 
-#### Derived metrics
+#### Dimensions outside the vertical rhythm
 
 | Token | Derivation | `10pt` | `11pt` | `12pt` |
 |---|---|---:|---:|---:|

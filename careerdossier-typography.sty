@@ -18,6 +18,24 @@
 %% careerdossier-typography owns the LuaLaTeX engine check, fontspec loading,
 %% the portable default fonts, and the semantic text roles. It carries no
 %% colour (see careerdossier-theme) and no page geometry (see the classes).
+%%
+%% Responsibilities: require LuaLaTeX and fail fatally under any other engine;
+%% load fontspec; select the portable default fonts and the opt-in sans body
+%% family, both from a normal TeX Live installation, bundling neither; own the
+%% cross-class bodyfont=serif|sans selection each class forwards; define the six
+%% semantic styles -- name, headline, section, entry title, letter subject, and
+%% body -- with the subject and entry-title roles defined independently (#299)
+%% so a change to one cannot move the other; render a display heading at a
+%% caller-supplied depth (#267) and, when tagged, record its plain text as the
+%% element's title; open the Sect division that heading introduces (#268) using
+%% the kernel's own sec/begin and sec/end sockets and section stack, so a
+%% sibling heading closes the previous division; apply the Latin
+%% ligature-suppression and lining-numbers defaults; resolve fonts by file name
+%% through luaotfload so the build depends on the TeX Live font tree rather than
+%% on OS-installed fonts; and record the tested font version.
+%%
+%% A style command names meaning (\CDossierSectionStyle), never an
+%% implementation (\Large\bfseries).
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-typography} {2026-08-12} {0.8.0}
