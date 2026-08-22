@@ -43,6 +43,7 @@ to "the ATS profile" it means that default output. A switchable decorative or
 "display" profile is a backlog idea (see `docs/ROADMAP.md`), not a current option;
 do not write documentation or examples that assume a `profile` key exists.
 
+
 ### Three related but distinct targets
 
 | Target | Main question | Useful evidence | What it does not prove |
@@ -53,28 +54,6 @@ do not write documentation or examples that assume a `profile` key exists.
 
 A tagged PDF can still have a poor extraction order. An untagged PDF can sometimes
 extract cleanly. A beautiful PDF can fail both. Test all three.
-
-### Default to one semantic stream
-
-The input order should already be the order in which a plain-text reader should
-encounter the content:
-
-```text
-Name
-Contact details
-Summary
-Experience
-  Job title
-  Organization
-  Location
-  Date range
-  Achievement bullets
-Education
-Skills
-```
-
-The implementation may change font, spacing, weight, or alignment, but it should
-not move a later semantic block to an earlier visual position.
 
 ### Do not use these for essential content
 
@@ -95,7 +74,9 @@ not move a later semantic block to an earlier visual position.
 
 Some of these constructs can generate extractable PDFs in controlled cases. They
 remain high-risk because different extractors make different ordering decisions.
-The default output should avoid the entire class of failure.
+The default output should avoid the entire class of failure. The rule underneath
+all of them: the implementation may change font, spacing, weight, or alignment,
+but it must never move a later semantic block to an earlier visual position.
 
 ### Safe visual hierarchy
 
