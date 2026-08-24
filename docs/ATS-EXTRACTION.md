@@ -245,14 +245,6 @@ name-derived running header from page two and a `Page N of M` folio,
 `medium=screen` emits neither because an electronic PDF cannot lose a page, and
 a one-page document gets none under either.
 
-Good defaults for most career documents are:
-
-- 0.5-1 inch margins, with approximately 0.65-0.8 inch as a useful default;
-- 10-12 pt body text, adjusted for the selected font's real x-height;
-- moderate line length and visible separation between entries;
-- no forced one-page compression at the cost of legibility; and
-- no negative `\vspace` as a routine layout tool.
-
 Use named lengths for every public spacing control rather than scattered
 numeric dimensions, and see
 [`ARCHITECTURE.md`](ARCHITECTURE.md#file-responsibilities) for which module owns
