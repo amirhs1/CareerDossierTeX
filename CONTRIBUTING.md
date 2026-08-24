@@ -594,7 +594,7 @@ does not.
 - extracted text content, order, or spacing changes;
 - tagged-structure behavior or a validator result changes;
 - a fixture, baseline, or extractor in the extraction or tagging suites changes;
-- the reproducibility or screen-reader procedure changes.
+- the screen-reader procedure changes.
 
 ### Update `TESTING.md` when:
 
@@ -811,6 +811,10 @@ The build workflow should:
 - compile every supported example;
 - fail when compilation fails;
 - upload PDFs and logs as artifacts;
+- record the tested toolchain beside the output it produced — TeX Live and
+  LuaHBTeX versions, the LaTeX format date, and the `fontspec`, `luaotfload`,
+  `tagpdf`, and `pdfmanagement-testphase` versions — so a result can be
+  attributed to the build that produced it;
 - keep its commands locally reproducible where practical;
 - pin every container and third-party action to an immutable reference.
 
