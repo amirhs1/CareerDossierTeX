@@ -234,31 +234,16 @@ under `column` (see ["Structure tree by profile"](#structure-tree-by-profile)).
 `tests/tagging/resume-entrymeta-inline` pins that and
 validates as PDF/UA-2.
 
-### Headers, footers, and page numbers
+### Page geometry, density, and furniture
 
-**The rule applied:** page furniture answers whether a page could be separated
-from its fellows, so `medium=print` emits a name-derived running header from
-page two and a `Page N of M` folio, `medium=screen` emits neither because an
-electronic PDF cannot lose a page, and a one-page document gets none under
-either.
-
-For a one- or two-page résumé, prefer no running header. For a long CV
-**(supported in v0.2.0)**, a simple name-derived header and page number can help
-humans, but they must not be
-the only appearance of the name or other essential data. Use standard page-style
-mechanisms so tagging code can treat running material as artifacts, and inspect
-the resulting structure.
-
-Greenhouse explicitly identifies complex headers and footers, and contact data
-placed within them, as parsing risks. Keep the canonical name and contact block in
-the first page's body.
-
-### Page geometry and density
-
-**The rule applied:** margins are two presets rather than a free dimension —
+**The rules applied.** Margins are two presets rather than a free dimension —
 `margin=normal` is one inch and `margin=narrow` is half an inch, with nothing
 between them — and the résumé defaults to `narrow` at 11 pt while the CV,
-letter, and statement default to `normal` at 12 pt.
+letter, and statement default to `normal` at 12 pt. Page furniture answers
+whether a page could be separated from its fellows, so `medium=print` emits a
+name-derived running header from page two and a `Page N of M` folio,
+`medium=screen` emits neither because an electronic PDF cannot lose a page, and
+a one-page document gets none under either.
 
 Good defaults for most career documents are:
 
