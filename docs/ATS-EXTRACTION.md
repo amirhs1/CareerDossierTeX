@@ -78,6 +78,15 @@ The default output should avoid the entire class of failure. The rule underneath
 all of them: the implementation may change font, spacing, weight, or alignment,
 but it must never move a later semantic block to an earlier visual position.
 
+The same rule governs the interface. Do not define layout-only commands such as
+`\LeftColumn`, `\RightColumn`, or `\SkillBar`; define semantic ones, so that a
+document's structure survives being flattened into a single stream of text.
+
+One case a class cannot enforce, because it is the author's: a scanned
+signature may be decorative, but the typed name must remain present as text,
+and the image must neither interrupt the reading order nor stand in for the
+name.
+
 ### Safe visual hierarchy
 
 Prefer hierarchy created with:
@@ -506,47 +515,6 @@ A font profile is releasable only if:
   platform;
 - text copies correctly in at least two independent PDF engines; and
 - changes in font version trigger a fresh baseline review.
-
-## Semantic structure by document type
-
-Why a document type is shaped the way it is, in extraction terms. What a
-class actually emits, and in what order, is documented in the manual — this
-section is the reasoning the manual's behavior was derived from, and where the
-two appear to disagree the manual is authoritative.
-
-### Shared rules
-
-An extractor receives a single stream of text with no layout, so every property
-below is one a document loses if it is expressed in geometry instead of in
-structure. All document types should therefore provide:
-
-- a real document title in PDF metadata, and the `ViewerPreferences` flag that
-  makes a viewer use it instead of the filename;
-- a language declaration;
-- a visible applicant name;
-- a body-level contact block when contact information is relevant;
-- standard headings;
-- real lists for lists;
-- descriptive link text or visible URLs; and
-- source content in the same order a plain-text reader should receive it.
-
-One rule a class cannot enforce, because it is the author's: a scanned
-signature may be decorative, but the typed name must remain present as text,
-and the image must neither interrupt the reading order nor stand in for the
-name.
-
-Do not define layout-only interfaces such as `\LeftColumn`, `\RightColumn`, or
-`\SkillBar`. Define semantic interfaces. In Phase 1 the semantic primitive is the
-`CDossierEntry` environment (with `CDossierItemize` for bullets) and
-`\CDossierSection` for headings. The `v0.2.0` academic CV adds a semantic manual
-publication list on the same shared foundation; future document types may add
-other entry kinds, such as references, without duplicating components per class.
-
-### Reference list **(planned — later phase)**
-
-Emit each reference as a sequential block: name, title, organization, relationship
-if appropriate, email, phone, and address. Do not place references in two or three
-columns. Labels such as `Email:` and `Phone:` improve plain-text clarity.
 
 ## Copy-paste integrity
 
