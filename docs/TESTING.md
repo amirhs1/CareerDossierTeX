@@ -443,8 +443,10 @@ what that order must be.
 ### Real portal acceptance
 
 Manual, unautomated: paste an example PDF into a real applicant-tracking portal
-and record the parsed result in the pull request. No runner covers it;
-`docs/ATS-EXTRACTION.md` holds the recorded results and the size limit.
+and record the parsed result in the pull request. No runner covers it, and no
+results are kept in the tree: the pull request is the record. Any vendor figure
+this turns up — a parser size limit, an accepted file type — belongs here, with
+the date it was read, because vendors change them without notice.
 
 ### Link copy-paste integrity suite
 

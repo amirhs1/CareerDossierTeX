@@ -1137,10 +1137,10 @@ supporting evidence, weighted toward recency. Where a local note and current
 documentation differ, follow the current primary source and re-test.
 
 > **Verify at release.** Vendor guidance and limits change. Re-check the
-> Greenhouse, Lever, and MIT pages above, and any figure attributed to a vendor
-> (for example the Greenhouse parser size limit in
-> [`TESTING.md`](TESTING.md#real-portal-acceptance) "Real portal acceptance"),
-> each release cycle.
+> Greenhouse, Lever, and MIT pages above, and any figure attributed to a vendor,
+> each release cycle. No such figure is recorded in the tree today;
+> [`TESTING.md`](TESTING.md#real-portal-acceptance) "Real portal acceptance" is
+> where one would go.
 
 > **Maintainer note.** Some entries above point at canonical index or package
 > pages rather than deep links, to avoid dead links as documents are revised.
