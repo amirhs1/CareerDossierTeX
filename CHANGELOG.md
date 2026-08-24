@@ -518,7 +518,7 @@ similar entry today. See
   fixtures. See [`docs/API.md`](docs/API.md) for the option and the separator
   token, and
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#dates-and-right-alignment)
-  §3.4 for the measurements.
+  for the measurements.
 
 - All four document classes accept `muted=plain|italic|gray|both`, controlling
   how de-emphasized runs are rendered — an entry's dates and location in the
@@ -1133,7 +1133,7 @@ similar entry today. See
   the name is unskipped (`/H2`, then `/H3` where a statement uses
   `\CDossierSubsection`). See
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#heading-hierarchy-issue-267)
-  §7.4 for the per-profile hierarchy.
+  for the per-profile hierarchy.
 
   This is a structure-tree change under the opt-in `tagging=on` path only:
   rendered layout, extracted text, and the untagged path are all unaffected,
@@ -1156,8 +1156,7 @@ similar entry today. See
   The CV's manual publication list needs no division of its own — it sits under
   an ordinary `\CDossierSection`, so that section's division encloses it — and
   the section rule remains an artifact, contributing nothing to the tree. See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#section-divisions-issue-268)
-  §7.5.
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#section-divisions-issue-268).
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
   class, option, key, or command changed, the tagged résumé and CV place every
@@ -1204,7 +1203,7 @@ similar entry today. See
   confirmed, and this fix does not confirm it retrospectively; it corrects text
   that was wrong at the byte level. See
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#structure-tree-by-profile)
-  §7.6 for the decoded before-and-after.
+  for the decoded before-and-after.
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
   class, option, key, or command changed, and all five named tagged fixtures
