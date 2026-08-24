@@ -542,72 +542,6 @@ Do not define layout-only interfaces such as `\LeftColumn`, `\RightColumn`, or
 publication list on the same shared foundation; future document types may add
 other entry kinds, such as references, without duplicating components per class.
 
-### Industry CV **(planned — later phase)**
-
-Use the same extraction constraints as the résumé, with more sections and pages.
-Long lists of presentations, publications, projects, or certifications should
-remain ordinary vertical lists. A compact table may look attractive, but a
-sequential list is safer and usually easier to maintain.
-
-### Academic CV **(supported in v0.2.0)**
-
-Academic readers often value structured publication and research sections, but the
-PDF may still pass through a central HR platform. Keep:
-
-- `Education`, `Academic Appointments`, `Publications`, `Research`, `Teaching`,
-  `Grants`, `Awards`, and `Service` as recognizable headings;
-- bibliographic entries in a predictable text order;
-- DOI, ORCID, and profile identifiers as visible text when important;
-- author emphasis as font weight, not a custom glyph or colour alone; and
-- page breaks between entries rather than inside an entry where practical.
-
-When using the optional `careerdossier-biblatex` integration, test the fixed
-bibliography profile and every field type used. A bibliography package update
-can change punctuation and extraction.
-
-Two properties of that profile exist specifically to survive the default
-extractor, and both are horizontal rather than vertical:
-
-- **Entry numbers.** `pdftotext`'s default (non-layout) mode groups a narrow
-  left column of short tokens once the gap to the text beside them reaches
-  roughly one em, and then emits the whole column ahead of the text. BibLaTeX's
-  default label separation sits on that threshold, so entry numbers extracted
-  as `1)`, `2)`, `3)` in a block before any entry. The profile therefore uses
-  the shared `\CDossierListLabelSep`, which is half the body size. Note what
-  this is not: the PDF was correct throughout — every label shared a baseline
-  with its entry, and `pdftotext -layout` reported source order — so the
-  symptom is a heuristic in one extractor, and the fix belongs in the label
-  geometry, never in the calibrated vertical gap between entries.
-- **URLs.** Poppler splits a word wherever an intra-word gap exceeds 0.1 em.
-  BibLaTeX stretches URLs at their break points to justify a line, which can
-  push a URL past that and extract it as `https : / / example . invalid /`.
-  The profile removes that stretch entirely rather than capping it. Capping was
-  the original fix and it was only a mitigation, for a reason that turned out
-  to be reachable with an ordinary address: TeX exceeds a stated stretch to set
-  an otherwise underfull line. A 262-character query-string URL — a Wikipedia
-  advanced-search result, not a contrived one — split at the CV's own
-  `fontsize=12pt, margin=normal` with the cap in place (issue #312). Rigid glue
-  is a guarantee where a cap was not, because TeX cannot stretch what has no
-  stretch component, at any measure or URL length.
-
-  Rigid glue has to be paid for in break points, exactly as body-text links are
-  (below). With nothing to absorb the remainder of a line, TeX set the same URL
-  5.09 pt into the margin instead; the profile therefore enables BibLaTeX's
-  three `biburl*penalty` counters, which are 0 by default, so a URL may break
-  inside a run of letters or digits when punctuation offers nowhere. Two
-  visible consequences, both intended: URLs now break where the line ends
-  rather than at the nearest earlier punctuation, so an address can wrap
-  mid-run; and a line holding nothing but URL has no glue to justify with, so
-  it is reported underfull and set ragged-right. Neither costs anything a
-  reader pastes, and the tidier break they replace was bought by stretching the
-  URL — which is the defect.
-
-`tests/bibliography/run.sh` checks both the extracted text and, separately, the
-label/entry baseline pairing read from `pdftotext -bbox`. The second check is
-the one that stays meaningful if Poppler's grouping heuristic changes: it reads
-the geometry out of the PDF instead of trusting the extractor's line grouping,
-so an extractor change and a real regression stay distinguishable.
-
 ### Reference list **(planned — later phase)**
 
 Emit each reference as a sequential block: name, title, organization, relationship
@@ -630,9 +564,9 @@ line-breaking decision, and invisible in the rendered page.
 Two things follow. First, a change that adds stretch at a URL's breakpoints is
 an extraction change even though it touches no text: BibLaTeX's
 `\biburlbigskip` default of `0mu plus 3mu` did exactly this in issue #199, and
-`careerdossier-biblatex.sty` sets it rigid for that reason ("Academic CV" — it
-capped it at `0mu plus 1mu` until issue #312 found a real URL long enough to
-defeat the cap). Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
+`careerdossier-biblatex.sty` sets it rigid for that reason, and its own header
+comment carries the derivation — it capped the stretch at `0mu plus 1mu` until
+issue #312 found a real URL long enough to defeat the cap. Everywhere else `\Urlmuskip` is url.sty's `0mu`, and the contact line is
 additionally immune because each item is measured in its own `\hbox` rather
 than justified.
 
