@@ -404,8 +404,8 @@ smoke_doc_drift() {
 }
 
 # Issue #450: the same guard for the second user-facing template in the tree.
-# docs/ATS-EXTRACTION.md publishes one under "Minimal reference template and
-# class skeleton", and until this it was compiled by nothing -- the #185 shape,
+# docs/ATS-EXTRACTION.md publishes one, and until this it was compiled by
+# nothing -- the #185 shape,
 # where an example in a document nobody re-reads goes stale in silence and a
 # reader cannot tell which of two published templates is current. It compiled at
 # the time this was added, so what it guards is the next rename.

@@ -1509,8 +1509,8 @@ precedent for adding a similar entry today. See
   on tagged and untagged output alike; the tag tree is correct in every case
   and veraPDF UA-2 still passes. `tests/regression/tokens-invariants` states the
   bound and the three `*-entry-dates-*` extraction fixtures enforce it.
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) section 3.4 records the
-  measurements and the alternatives ruled out.
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#dates-and-right-alignment)
+  records the measurements and the alternatives ruled out.
 
   **Documentation and tests only.** No class, option, key, command, environment,
   or calibrated value changed, and no document renders differently.
