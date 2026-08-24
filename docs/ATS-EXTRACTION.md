@@ -182,19 +182,11 @@ amount of geometry fixes. See ["Structure tree by profile"](#structure-tree-by-p
 `\CDossierRecordListEdgeAboveSkip` carries a measured extraction floor of
 `0.25`, stated in [`ARCHITECTURE.md`](ARCHITECTURE.md#file-responsibilities)
 and guarded by `tokens-invariants`. It cannot be removed *while the column
-exists*. Issue #230 takes the remaining option and removes the column, behind
-a key:
-
-```latex
-\documentclass[entrymeta=inline]{careerdossier-resume}
-```
-
-Under `inline` the dates and location follow the title and organization on the
-same line, joined by `\CDossierEntryMetaSeparator` (`~|~`). There is then no
-horizontal gap on any heading row, so Poppler never splits the row, never builds
-a short right-hand block, and never has two blocks to mistake for two columns.
-The floor is not lifted under `inline` — it is inapplicable, because the fault
-it stands in for cannot arise.
+exists*. Issue #230 removes the column instead, behind the `entrymeta=inline`
+key the manual documents: no heading row then carries a horizontal gap, so
+Poppler never has two blocks to mistake for two columns, and the floor is not
+lifted but inapplicable. `careerdossier-components.sty` states that mechanism
+where it is implemented.
 
 Measured on the committed `*-entry-inline-*` fixtures at `0.125`, half the
 floor and the value at which the column form reorders:
@@ -209,19 +201,10 @@ The last row is the result. `inline` at half the floor extracts *both* entries'
 metadata in place, including the final one that no value of the list edge ever
 fixed under `column`.
 
-This does not change the calibration. `column` is the default, the committed
-`0.25` is unchanged, and `tokens-invariants` still guards it; a document buys
-the lower edge by selecting `inline` and setting the token itself, and gets no
-warning if it sets the token without the option. See
-the manual for the option and the separator token.
-
-On the tagged path the two values are equivalent. The separator is emitted as a
-layout artifact, as the contact line's `|` is, so the structure element text
-reads `Engineer 2024–2026` under both — the same string, with the word boundary
-coming from a real interword space under `inline` and from `\pdffakespace`
-under `column` (see ["Structure tree by profile"](#structure-tree-by-profile)).
-`tests/tagging/resume-entrymeta-inline` pins that and
-validates as PDF/UA-2.
+One gap is worth knowing, because nothing reports it: a document buys the lower
+edge by selecting `inline` **and** setting the token itself, and gets no warning
+if it sets the token without the option. On the tagged path the two values are
+equivalent, which `tests/tagging/resume-entrymeta-inline` pins.
 
 ### Page geometry, density, and furniture
 
