@@ -177,24 +177,13 @@ are separate. This one is Poppler's *geometric* block grouping, which no
 character fixes; #302's is the *logical* text of a structure element, which no
 amount of geometry fixes. See ["Structure tree by profile"](#structure-tree-by-profile).
 
-#### The measured floor
-
-`\CDossierRecordListEdgeAboveSkip` has an extraction floor of **0.25**. On the
-`*-entry-dates-*` fixtures the column extracts with its entry at `0.25` and
-reorders at `0.1875`, identically for the résumé and CV classes at 10 pt, 11 pt,
-and 12 pt — so the floor is a property of the ratio, not of any body size. Since
-#206 the committed default sits exactly *at* the floor rather than clear of it.
-
-Any retune of this token must respect the floor. `tokens-invariants` states it
-as a relation, and the three `*-entry-dates-*` fixtures fail if it is breached.
-Note that it interacts with the design rule that a list sits nearer the entry
-above it than the material below (`ListEdgeAbove < RecordEntryAboveSkip`):
-holding both at once forces `RecordEntryAboveSkip` above `0.25` as well.
-
 #### The escape: `entrymeta=inline`
 
-Everything above says the floor cannot be removed *while the column exists*.
-Issue #230 takes the remaining option and removes the column, behind a key:
+`\CDossierRecordListEdgeAboveSkip` carries a measured extraction floor of
+`0.25`, stated in [`ARCHITECTURE.md`](ARCHITECTURE.md#file-responsibilities)
+and guarded by `tokens-invariants`. It cannot be removed *while the column
+exists*. Issue #230 takes the remaining option and removes the column, behind
+a key:
 
 ```latex
 \documentclass[entrymeta=inline]{careerdossier-resume}
