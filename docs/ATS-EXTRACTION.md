@@ -542,22 +542,6 @@ Do not define layout-only interfaces such as `\LeftColumn`, `\RightColumn`, or
 publication list on the same shared foundation; future document types may add
 other entry kinds, such as references, without duplicating components per class.
 
-### Résumé **(Phase 1)**
-
-The résumé is the strictest profile, because it is the document most likely to
-be parsed by machine before a person sees it. Each constraint below buys one
-extraction property, and each is a choice the author makes in content rather
-than something a class can enforce:
-
-- one column;
-- one or two pages when appropriate, without forced compression;
-- conventional headings such as `Summary`, `Experience`, `Education`, `Skills`,
-  `Projects`, and `Certifications`;
-- reverse-chronological entries where dates are used;
-- complete job titles rather than unexplained abbreviations;
-- skills as comma-separated or ordinary grouped text, not a grid; and
-- achievements in real `CDossierItemize` lists with a simple text bullet.
-
 ### Industry CV **(planned — later phase)**
 
 Use the same extraction constraints as the résumé, with more sections and pages.
