@@ -370,6 +370,67 @@ else
   fails=$((fails + 1))
 fi
 
+printf '\n== control 9: the code-point scan fires on genuinely bad text ==\n'
+# Issue #514. tests/extraction/run.sh asserts that extracted text carries no
+# U+FFFD and no Private Use Area code point. That guard passes on every fixture
+# in the suite today — which is exactly what a guard that cannot fire at all
+# also does. So it is re-proved here against text known to be bad, on every run,
+# rather than trusted because the suite is green.
+#
+# The bad text is synthetic rather than a fixture. The route #509 observed —
+# `Z` + U+0327, a base-plus-mark pair with no precomposed form — does reach the
+# text layer as U+FFFD, but it also emits `Missing character`, which every
+# runner under tests/ treats as fatal. A fixture carrying the defect could not
+# compile, so the controlled form is the text, not the document.
+#
+# The bytes are written with printf rather than pasted as literals so that the
+# control cannot be silently defeated by an editor normalising the file, and so
+# that the code point under test is readable at the call site.
+c9_fail=0
+
+# The boundaries are the point: U+E000 and U+F8FF are the first and last PUA
+# code points and must fire, U+D7FF-adjacent and U+F900 sit just outside and
+# must not. An off-by-one in either direction is a guard that misses real
+# defects or fails correct output.
+c9_expect() { # <want-rc> <label> <text>
+  text_bad_codepoints "$3" > /dev/null
+  local got="$?"
+  [ "$got" -eq "$1" ] && return 0
+  printf '  FAIL: %s answered %s, expected %s\n' "$2" "$got" "$1"
+  c9_fail=1
+}
+
+c9_expect 0 'U+FFFD (replacement)'   "$(printf 'name: Z\357\277\275ali')"
+c9_expect 0 'U+E000 (first PUA)'     "$(printf 'glyph \356\200\200 here')"
+c9_expect 0 'U+F8FF (last PUA)'      "$(printf 'glyph \357\243\277 here')"
+c9_expect 0 'U+EFFF (mid PUA)'       "$(printf 'glyph \356\277\277 here')"
+c9_expect 1 'U+F900 (just past PUA)' "$(printf 'glyph \357\244\200 here')"
+c9_expect 1 'plain ASCII'            'Ada Lovelace – Cover Letter'
+c9_expect 1 'the text the suite ships' \
+  "$(printf 'caf\303\251 \342\200\223 en dash, \342\200\231 quote, \342\200\242 bullet')"
+c9_expect 2 'an extraction that never ran' "$unavailable"
+
+# The report has to name where and what, or a failure says only that something
+# somewhere is wrong across a 22-fixture suite.
+c9_report="$(text_bad_codepoints "$(printf 'clean line\nbad \356\200\201 line\n')")"
+case "$c9_report" in
+  *'line 2'*'U+E001'*) ;;
+  *)
+    printf '  FAIL: the report did not name the line and code point: %s\n' \
+      "$c9_report"
+    c9_fail=1
+    ;;
+esac
+
+if [ "$c9_fail" -eq 0 ]; then
+  printf '  ok: both ranges fire, both boundaries hold, and the report locates the hit\n'
+else
+  printf '  FAIL: the extracted-text code-point scan is not doing its job.\n'
+  printf '        A guard that cannot fire is indistinguishable from a clean\n'
+  printf '        suite, and the suite it protects is green either way.\n'
+  fails=$((fails + 1))
+fi
+
 printf '\n'
 if [ "$fails" -ne 0 ]; then
   printf 'text guards: %d control(s) FAILED.\n' "$fails"

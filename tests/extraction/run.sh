@@ -154,6 +154,61 @@ compare_to_baseline() { # <baseline> <observed text> <slot>
   diff -u "$1" "$3.got" > "$3.diff"
 }
 
+# Well-formedness of the extracted text, independent of any baseline (issue
+# #514). `docs/ATS-EXTRACTION.md` "What ATS-friendly means" requires the
+# extracted text to carry the intended Unicode characters, and names the
+# replacement character and Private Use Area code points among the things it
+# must not contain instead.
+#
+# This is deliberately not a baseline comparison, because a baseline cannot
+# make this claim. The comparisons above assert that the text equals a
+# committed file; regenerate that file over a defect and every later run goes
+# green on the defect. So the property is asserted twice below — once against
+# the text this run produced, and once against the committed baseline itself,
+# which is the half that catches a blessed regression.
+#
+# Nor is it covered by the log triage further down. That greps `Missing
+# character`, which is a *font coverage* warning, and coverage and mapping come
+# apart: a font that has the glyph but carries a wrong or absent ToUnicode
+# entry renders a correct page, warns about nothing, and still extracts as
+# U+FFFD or as a PUA code point. The Inter 4.1 regression cited in
+# "Current external references" is exactly that shape.
+#
+# Returns 0 clean, 1 not clean — the caller's polarity, not the predicate's.
+#
+# Clean scans are counted rather than announced one by one, and the count is
+# reported per fixture below. Announcing nothing would be wrong here in a way
+# it is not for the other checks: a scan that silently never happened looks
+# exactly like four scans that passed, and this suite's characteristic failure
+# is a run that reports green without having done the work.
+wf_scans=0
+wf_bad=0
+check_wellformed() { # <what> <text>
+  local report
+  report="$(text_bad_codepoints "$2")"
+  case "$?" in
+    1) wf_scans=$(( wf_scans + 1 )); return 0 ;;
+    0)
+      wf_scans=$(( wf_scans + 1 )); wf_bad=$(( wf_bad + 1 ))
+      echo "  MALFORMED EXTRACTED TEXT ($1):"
+      printf '%s\n' "$report" | sed 's/^/    /'
+      echo "    Extracted text must carry the intended Unicode characters, not"
+      echo "    replacement (U+FFFD) or Private Use Area (U+E000-U+F8FF) code"
+      echo "    points. A page that renders correctly can still extract this"
+      echo "    way through a wrong or absent ToUnicode entry, which is why no"
+      echo "    log warning accompanies it. See docs/ATS-EXTRACTION.md"
+      echo "    \"What ATS-friendly means\" and issue #514."
+      return 1
+      ;;
+    *)
+      echo "  UNCHECKABLE EXTRACTED TEXT ($1): the code-point scan could not run."
+      echo "    This is not a clean result — nothing was established about the"
+      echo "    text. See tests/lib/text.sh and issue #398."
+      return 1
+      ;;
+  esac
+}
+
 # Log lines that are allowed to appear. Keep this list short and justified.
 #  - clig/hlig "not available": TeX Gyre Heros has no contextual/historic
 #    ligature tables to disable; the common-ligature suppression still applies.
@@ -162,6 +217,7 @@ allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOf
 for tex in "${fixtures[@]}"; do
   base="${tex%.tex}"; exp="$base.expected.txt"; kexp="$base.pdfkit.txt"
   echo "== $tex =="
+  wf_scans=0; wf_bad=0
   if [ ! -f "$exp" ] && [ "$update" -eq 0 ]; then
     echo "  MISSING baseline $exp (run with --update to create)"; fail=1; continue
   fi
@@ -176,6 +232,11 @@ for tex in "${fixtures[@]}"; do
     echo "  RERUN FAILED (see $base.log)"; fail=1; continue; }
 
   got="$(pdftotext -enc UTF-8 "$base.pdf" - | normalize)"
+
+  # Before any baseline is consulted, and before `--update` can write one.
+  # A regeneration that would bless malformed text says so on the run that
+  # performs it, rather than on some later run against the blessed file.
+  check_wellformed "poppler, this run" "$got" || fail=1
 
   if [ "$base" = "resume-contact-wrap" ]; then
     contact_text="$(text_extract "$base.pdf" -layout | normalize)"
@@ -270,6 +331,15 @@ EOF
     continue
   fi
 
+  # Both committed baselines, on every platform. Reading a file needs no
+  # macOS, so the PDFKit baseline is scanned on Linux CI too — it is committed
+  # there and can be regenerated over a defect there just the same. Only the
+  # *capture* above is platform-gated.
+  check_wellformed "baseline $exp" "$(cat "$exp")" || fail=1
+  if [ -f "$kexp" ]; then
+    check_wellformed "baseline $kexp" "$(cat "$kexp")" || fail=1
+  fi
+
   if ! compare_to_baseline "$exp" "$got" "$base"; then
     echo "  EXTRACTION MISMATCH:"; sed 's/^/    /' "$base.diff"; fail=1
   else
@@ -298,6 +368,7 @@ EOF
     else
       kgot="$(osascript -l JavaScript "$here/pdfkit-extract.js" "$here/$base.pdf" \
               | normalize)"
+      check_wellformed "pdfkit, this run" "$kgot" || fail=1
       if ! compare_to_baseline "$kexp" "$kgot" "$base.pdfkit"; then
         echo "  PDFKIT EXTRACTION MISMATCH:"; sed 's/^/    /' "$base.pdfkit.diff"
         fail=1
@@ -315,6 +386,19 @@ EOF
     fail=1
   else
     echo "  log clean (allowlisted warnings only)"
+  fi
+
+  # Named as a count so a fixture that scanned nothing is legible as such.
+  # Expect 3 off macOS (poppler capture, both baselines) and 4 on it. The clean
+  # wording is claimed only when nothing was found: a summary asserting "no
+  # U+FFFD" directly beneath a MALFORMED report is the kind of contradictory
+  # green line this suite exists to avoid.
+  if [ "$wf_scans" -eq 0 ]; then
+    echo "  NO CODE-POINT SCAN RAN for $base — the guard covered nothing."; fail=1
+  elif [ "$wf_bad" -ne 0 ]; then
+    echo "  code-point scan: $wf_bad of $wf_scans scans found forbidden characters"
+  else
+    echo "  text well-formed: $wf_scans scans, no U+FFFD, no U+E000-U+F8FF"
   fi
 done
 

@@ -252,3 +252,83 @@ text_page() {
   shift 2
   text_extract "$pdf" -f "$page" -l "$page" "$@"
 }
+
+# text_bad_codepoints <text>
+#
+# The well-formedness half. Every predicate above asks whether the extracted
+# text matches something expected; this one asks whether it is *valid at all* --
+# free of the replacement character U+FFFD and of any Private Use Area code
+# point U+E000-U+F8FF. `docs/ATS-EXTRACTION.md` "What ATS-friendly means"
+# names both as things extracted text must not contain, and until issue #514
+# neither was asserted anywhere.
+#
+# Why a baseline comparison does not already cover this. The suite asserts that
+# the text equals a committed file; it never asserts that the file is
+# well-formed. A baseline regenerated over a defect blesses the defect, and
+# every run afterwards goes green on it.
+#
+# Why the log scan does not cover it either. Every runner here already treats
+# `Missing character` as fatal, which blocks the one route #509 observed -- a
+# base-plus-mark pair with no precomposed form, dropped from the page and
+# reaching the text layer as U+FFFD. But `Missing character` is a *font
+# coverage* warning, and coverage and mapping come apart: a font that has the
+# glyph and carries an absent, incomplete, or wrong ToUnicode entry for it
+# renders a correct page, emits no warning, and still extracts as U+FFFD or as a
+# PUA code point. The Inter 4.1 regression this repository cites in
+# "Current external references" is exactly that shape.
+#
+# Prints one `line N: U+XXXX` record per occurrence, plus the offending line, so
+# a failure names where and what rather than only that something is wrong.
+#
+# The contract is the file's: 0 found, 1 clean, 2 could not be checked.
+# Note the polarity -- 0 means the text is BAD -- which matches every other
+# predicate here answering 0 for "the thing you asked about is present", and is
+# why the callers spell the branches out rather than using `if`.
+#
+# The scan is a byte-level UTF-8 decode in awk rather than a `grep` range,
+# because that was measured not to work: the greps on this project's machines
+# (ugrep, standing in for grep) read `[\200-\277]` as the *characters*
+# U+0080-U+00BF and not as bytes, even under LC_ALL=C, so a byte-range ERE
+# silently misses every real PUA character while still matching U+FFFD. A guard
+# that fires on one of the two things it claims to cover, and reports clean for
+# the other, is worse than no guard.
+#
+# Both ranges are exactly the three-byte UTF-8 forms with lead byte 0xEE or
+# 0xEF, so only those two leads are decoded. A continuation byte can never hold
+# either value, so scanning every offset cannot misread the tail of some other
+# sequence as a lead.
+text_bad_codepoints() {
+  [ "$#" -eq 1 ] || return 2
+  text_is_unavailable "$1" && return 2
+  command -v awk > /dev/null 2>&1 || return 2
+  local out rc
+  out="$(LC_ALL=C awk '
+    BEGIN {
+      # The decode needs sprintf("%c", n) to yield the single byte n. Under a
+      # UTF-8 locale some awks encode it as a character instead, which would
+      # make every comparison below silently false -- a guard reporting clean
+      # because it could not read. Answer "could not check" rather than "clean".
+      if (length(sprintf("%c", 238)) != 1) exit 3
+      for (i = 128; i < 256; i++) val[sprintf("%c", i)] = i
+    }
+    {
+      n = length($0)
+      for (i = 1; i <= n - 2; i++) {
+        b1 = val[substr($0, i, 1)]
+        if (b1 != 238 && b1 != 239) continue
+        b2 = val[substr($0, i + 1, 1)]
+        b3 = val[substr($0, i + 2, 1)]
+        if (b2 < 128 || b2 > 191 || b3 < 128 || b3 > 191) continue
+        cp = (b1 - 224) * 4096 + (b2 - 128) * 64 + (b3 - 128)
+        # 57344 = U+E000, 63743 = U+F8FF, 65533 = U+FFFD.
+        if ((cp >= 57344 && cp <= 63743) || cp == 65533)
+          printf "line %d: U+%04X in: %s\n", FNR, cp, $0
+      }
+    }
+  ' <<< "$1")"
+  rc="$?"
+  [ "$rc" -eq 0 ] || return 2
+  [ -n "$out" ] || return 1
+  printf '%s\n' "$out"
+  return 0
+}

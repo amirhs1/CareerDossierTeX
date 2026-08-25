@@ -441,6 +441,32 @@ into one glyph whose `ToUnicode` entry is the precomposed code point;
 the result. Normalising the comparison would hide the regression that fixture
 exists to catch (#509).
 
+Alongside the comparison, each fixture's text is asserted **well-formed**: no
+replacement character (`U+FFFD`) and no Private Use Area code point
+(`U+E000`–`U+F8FF`), the properties `docs/ATS-EXTRACTION.md` "What ATS-friendly
+means" requires of extracted text. The scan runs over the text captured this
+run *and* over the committed baselines, because those are different claims — a
+baseline regenerated over a defect would otherwise be blessed, and every later
+comparison would agree with it. Both baselines are scanned on every platform;
+only the PDFKit *capture* is macOS-only.
+
+This is not covered by the log triage. That treats `Missing character` as
+fatal, which blocks the route #509 observed, but `Missing character` is a
+font-coverage warning and coverage and mapping come apart: a font that has the
+glyph and carries a wrong or absent `ToUnicode` entry renders a correct page,
+warns about nothing, and still extracts as `U+FFFD` or as a PUA code point.
+
+The scan is a byte-level UTF-8 decode in `awk` (`text_bad_codepoints` in
+`tests/lib/text.sh`), not a `grep` byte-range. That is measured, not stylistic:
+the `grep` on a maintainer machine (ugrep) reads `[\200-\277]` as the characters
+`U+0080`–`U+00BF` rather than as bytes even under `LC_ALL=C`, so a range ERE
+matches `U+FFFD` and silently misses every real PUA character. It answers the
+three states of that file's contract, so a scan that could not run is reported
+as unchecked rather than as clean. Its negative control is control 9 in
+`tests/lint/run-text-guards.sh`, which drives it over synthetic bad text and
+over both range boundaries on every run — the guard passes on all current
+fixtures, which is also what a guard that cannot fire would do (#514).
+
 ### Reading-order assertions
 
 Part of the extraction suite: the committed `*.expected.txt` baselines fix the
