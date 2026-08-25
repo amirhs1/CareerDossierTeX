@@ -448,6 +448,64 @@ results are kept in the tree: the pull request is the record. Any vendor figure
 this turns up — a parser size limit, an accepted file type — belongs here, with
 the date it was read, because vendors change them without notice.
 
+### Screen-reader reading-order checks
+
+Automated validation cannot confirm that a document *reads* correctly. veraPDF
+checks that structure exists and is well-formed; only a screen reader shows
+whether decorative rules stay silent and whether headings, entries, and contact
+lines arrive in a sensible order.
+
+> **Status: macOS done, Windows outstanding.** A VoiceOver pass was performed by
+> the maintainer on 2026-07-20; results below. The NVDA pass has not been run.
+
+**macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
+Read top to bottom with `VO`+`→` over all four tagged fixtures.
+
+- [x] headings announced as headings, in source order;
+- [x] list items announced as list items;
+- [x] the contact line announced as one coherent run — no merged words, no
+      character-by-character spelling (the issue #72 regression stays fixed);
+- [x] links announced as links;
+- [x] horizontal rules and separators **not** announced;
+- [x] the `cv` running header (`<name> -- Curriculum Vitae`) and its folio
+      **not** announced on page two; and
+- [x] the `academic-letter` repeated footer and `Page N of M` folio **not**
+      announced on either page.
+
+**Every artifact-suppression check passed.** Decorative and repeated page
+furniture is silent to VoiceOver on all four profiles, which is the property
+tagging was added to provide.
+
+One behavior was observed and judged acceptable rather than defective. A
+sentence ending in a link is announced in three parts — the leading prose, then
+the link, then the final period as "period". For example, *"This page also
+contains a meaningful academic-letter link."* reads as
+`This page also contains a meaningful` / `academic-letter link` / `period`.
+
+That split is the structure working correctly, not failing: the `/S /Link`
+element genuinely is a separate node, and VoiceOver announces the trailing
+period as its own run because it is a short isolated text run following that
+node. HTML behaves the same way for `<a>…</a>.` — the split marks where the
+link stops, which is information a listener needs. Merging the period into the
+link would misreport the link's extent. No change is warranted.
+
+> **Note:** the VoiceOver pass above covered the CV folio in its previous
+> `Page N` wording. The folio now reads `Page N of M`; its artifact marking was
+> re-verified programmatically and is unchanged, but a quick re-listen to
+> `cv.pdf` page two would fully close this out.
+
+**Windows / NVDA — deferred.** This project has no Windows machine and CI has no
+Windows runner, so the NVDA pass is platform-deferred rather than complete. The
+checklist is identical to the VoiceOver one, read with NVDA in Adobe Acrobat
+Reader (browse mode, `↓` through the document). Anyone on Windows can run it and
+record the result here; until then the release must not claim a Windows
+screen-reader result. Tracked in
+[issue #96](https://github.com/amirhs1/CareerDossierTeX/issues/96).
+
+VoiceOver and NVDA differ in how they consume the structure tree, so the macOS
+result above is evidence rather than proof. One screen reader passing does not
+establish that both will.
+
 ### Link copy-paste integrity suite
 
 `make links` — `tests/links/run.sh` asserts a URL or e-mail address never picks

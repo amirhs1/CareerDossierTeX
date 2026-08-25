@@ -28,8 +28,24 @@
 %   to the component reaches it. 0.25 is a floor this fixture enforces, not a
 %   value awaiting a fix, and the trailing column on the *last* entry is
 %   expected output rather than a defect. Do not regenerate this baseline to
-%   accommodate a lower list edge. See
-%   docs/ATS-EXTRACTION.md#dates-and-right-alignment.
+%   accommodate a lower list edge.
+%
+%   Measured with `pdftotext -bbox-layout' (#219; the token then carried
+%   0.3125, retuned to 0.25 by #206):
+%
+%     list gap        blocks Poppler builds
+%     -------------   ------------------------------------------------------
+%     wide (0.3125)   [Senior Engineer / Example Labs],
+%                     [2024-Present / Toronto, ON], [bullets] -- one flow,
+%                     sorted top-to-bottom then left-to-right, so the column
+%                     lands in place
+%     tight (0.125)   [Senior Engineer / Example Labs / bullets], then
+%                     [2024-Present / Toronto, ON] -- heading and list merge
+%                     into one *tall* block, which is Poppler's signature for
+%                     a two-column page, so it emits the left column first
+%
+%   docs/ATS-EXTRACTION.md#dates-and-right-alignment states the rule these
+%   numbers support.
 %
 %   The committed baseline (resume-entry-dates-order.expected.txt) is the
 %   assertion; regenerate it only for an intended, reviewed output change.

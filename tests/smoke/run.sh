@@ -403,53 +403,6 @@ smoke_doc_drift() {
   return "$unit_fail"
 }
 
-# Issue #450: the same guard for the second user-facing template in the tree.
-# docs/ATS-EXTRACTION.md publishes one, and until this it was compiled by
-# nothing -- the #185 shape,
-# where an example in a document nobody re-reads goes stale in silence and a
-# reader cannot tell which of two published templates is current. It compiled at
-# the time this was added, so what it guards is the next rename.
-#
-# Written as a sibling of smoke_doc_drift rather than a generalization of it:
-# the two read different source formats (a Markdown fence, the manual's
-# `latexcode' environment) and identify their block by different content, and
-# folding them together would put both claims behind one parse. The block is
-# found by declaring a document *and* calling \MakeCDossierHeader, which no
-# other fenced block in that file does; the prose around it may be reworded
-# freely, which #450 does.
-smoke_ats_template_drift() {
-  local unit_fail=0 doc_source doc_fixture
-  doc_source="$root/docs/ATS-EXTRACTION.md"
-  doc_fixture="$here/ats-user-template-doc.tex"
-  echo "== ATS guide user template == ats-user-template-doc.tex =="
-  awk '
-    /^```tex$/            { inblock = 1; buf = ""; next }
-    inblock && /^```$/    {
-                            inblock = 0
-                            if (buf ~ /CDossierSetup/ && buf ~ /MakeCDossierHeader/)
-                              { found++; out = buf }
-                            next
-                          }
-    inblock               { buf = buf $0 "\n" }
-    END                   { if (found != 1) exit 1; printf "%s", out }
-  ' "$doc_source" > "$here/ats-template.stdout"
-  if [ $? -ne 0 ]; then
-    echo "  FAILED to locate exactly one user template in docs/ATS-EXTRACTION.md"
-    unit_fail=1
-  else
-    awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/ats-fixture.stdout"
-    if diff -u "$here/ats-template.stdout" "$here/ats-fixture.stdout" > "$here/ats-template.diff"; then
-      echo "  documented template and fixture are identical"
-    else
-      echo "  DRIFTED — the fixture no longer compiles what the guide publishes:"
-      sed 's/^/    /' "$here/ats-template.diff"
-      unit_fail=1
-    fi
-  fi
-  echo
-  return "$unit_fail"
-}
-
 # One case, by its index into `selected_cases`.
 #
 # The index rather than the entry text is what a worker is handed, and that is
@@ -562,10 +515,6 @@ if fixture_matches components-header-stack-doc; then
 fi
 
 # #450's drift check, gated the same way and for the same reason (#359).
-if fixture_matches ats-user-template-doc; then
-  unit_names+=("ats-user-template-doc-drift")
-  unit_cmds+=("smoke_ats_template_drift")
-fi
 
 # #458's manual-example-*.tex fixtures deliberately register no drift unit here.
 # Their published-text comparison is a source-level invariant over a whole

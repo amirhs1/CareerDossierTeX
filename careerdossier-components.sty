@@ -1679,7 +1679,7 @@
 %% inside ordinary prose already arrive by this same route:
 %% tagged output carries real space glyphs where untagged output has only TJ
 %% kerns. The gap here was that tagpdf marks only glue with a positive natural
-%% width, and `\hfill' has none. See docs/ATS-EXTRACTION.md#structure-tree-by-profile.
+%% width, and `\hfill' has none. See tests/tagging/*.structure.txt.
 %%
 %% #1 title (required, nonblank), #2 organization, #3 location, #4 dates.
 %% ---------------------------------------------------------------------------
@@ -1951,7 +1951,7 @@
 %%
 %% Precedence: each field is written only when the document has not already set
 %% it, so a user's own \hypersetup wins wherever it appears in the preamble.
-%% That matters because the documented template in docs/ATS-EXTRACTION.md
+%% That matters because tests/smoke/ats-user-template-doc.tex
 %% places \hypersetup *before* \CDossierSetup; a blind write here would silently
 %% discard it.
 %%

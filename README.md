@@ -89,6 +89,8 @@ should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
 | LaTeX kernel | `2022-06-01` | `2026-06-01` |
 | TeX Live | 2022 — the release carrying that kernel | 2026 |
 | Engine | LuaHBTeX (any release providing the above) | LuaHBTeX 1.24.0 |
+| `pdfmanagement-testphase` (tagged preview only) | — | 0.97c (2026-05-26) |
+| `tagpdf` (tagged preview only) | — | 1.0c (2026-05-17) |
 
 The two columns answer different questions, and the difference is deliberate.
 
@@ -103,10 +105,7 @@ shipping that kernel or newer.
 locally under TeX Live 2026 on macOS, and in GitHub Actions against a pinned
 `texlive/texlive` image digest. Releases between the declared minimum and the
 verified toolchain are expected to work and are **not** tested; a report from
-one is welcome. The tagged-PDF preview additionally depends on
-`pdfmanagement-testphase` and `tagpdf`, whose exact verified versions are
-recorded in [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
-"Recorded validation results".
+one is welcome. The last two rows apply only to the opt-in tagged-PDF preview.
 
 ## Installation
 
@@ -353,10 +352,10 @@ PDF/UA-2 validator, their text extraction agrees across **Poppler, MuPDF, and
 Apple PDFKit**. A **macOS VoiceOver** reading-order pass covered the four
 `v0.4.0` profiles and confirmed that headings, lists, and links are announced
 correctly while decorative rules and repeated page furniture stay silent; the
-statement fixture has not received a screen-reader pass. Recorded results and
-the exact toolchain are in
-[`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#recorded-validation-results-v040-plus-the-v050-statement-fixture),
-"Recorded validation results" and "Screen-reader reading-order checks".
+statement fixture has not received a screen-reader pass. The screen-reader procedure and its
+recorded result are in
+[`docs/TESTING.md`](docs/TESTING.md#screen-reader-reading-order-checks); the
+toolchain each run was measured on is written to `tests/tagging/reports/`.
 
 That automated verification covers **those five fixtures only**. It is **not** a PDF/UA,
 WCAG, ATS, or general accessibility conformance claim, it does not extend to
