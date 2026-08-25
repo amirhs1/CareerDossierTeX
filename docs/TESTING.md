@@ -433,6 +433,14 @@ compares Poppler output against its `*.expected.txt` baseline, asserts no
 via `pdfkit-extract.js`. The two extractors keep separate baselines because they
 impose different line structure. `./run.sh --update` regenerates, deliberately.
 
+The comparison performs no Unicode normalisation, and must not start. Accented
+source written in decomposed form — a base letter plus a combining mark —
+reaches the text layer already precomposed, because the shaper composes the pair
+into one glyph whose `ToUnicode` entry is the precomposed code point;
+`resume-decomposed-name` is written entirely that way and its baseline records
+the result. Normalising the comparison would hide the regression that fixture
+exists to catch (#509).
+
 ### Reading-order assertions
 
 Part of the extraction suite: the committed `*.expected.txt` baselines fix the
