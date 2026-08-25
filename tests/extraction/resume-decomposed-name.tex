@@ -1,0 +1,53 @@
+% resume-decomposed-name.tex — extraction fixture for decomposed Unicode input.
+%
+% Purpose (issue #509)
+%   Every accented character in this file is written in DECOMPOSED form: base
+%   letter plus a combining mark (U+0300-U+036F), not a precomposed code point.
+%   `Zoë' here is Z o e U+0308, not Z o U+00EB. The name, organization,
+%   location, and one bullet all carry one, so the profile fields and ordinary
+%   body text are both covered.
+%
+%   The assertion is the committed baseline, and what it records is that the
+%   text layer comes back PRECOMPOSED regardless. Measured before this fixture
+%   was written: a document whose fields are decomposed and one whose fields are
+%   precomposed extract byte-identically, because the shaper composes the pair
+%   into a single glyph whose ToUnicode entry is the precomposed code point.
+%
+%   That is why the runner performs no Unicode normalisation and needs none.
+%   #509 was filed expecting to add NFC comparison; the probe refuted it. If a
+%   future engine or font change breaks the composition, this baseline fails
+%   with combining marks appearing in the extracted text, which is the signal
+%   the normalisation would have hidden.
+%
+% What this fixture does NOT cover, deliberately
+%   A base-plus-mark pair with no precomposed form — `Z' + U+0327, say — is a
+%   different case: TeX Gyre Termes has no combining cedilla, so the mark is
+%   dropped from the page and the text layer receives U+FFFD. That is caught
+%   already: `Missing character' in the log is fatal to every runner here, so
+%   such a document cannot pass. It is not exercised here because a fixture may
+%   not carry a fatal log warning.
+%
+%   The committed baseline (resume-decomposed-name.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+
+\documentclass[fontsize=10pt, margin=narrow]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Zoë Dvořák},
+  headline = {Research Engineer},
+  email    = {zoe@example.com},
+  location = {Montréal, QC},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Engineer},
+  organization = {Institut Élan},
+  location     = {Montréal, QC},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item Led the Ångström calibration réview.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
