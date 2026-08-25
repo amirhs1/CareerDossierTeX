@@ -200,6 +200,11 @@ GitHub release can. Verify the archive manually before upload.
       ([`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#what-a-file-claims-about-its-own-text),
       "What a file claims about its own text").
 - [ ] Default and `-layout` extraction have been inspected.
+- [ ] The `last checked` date on every entry in
+      [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md#current-external-references)
+      "Current external references" has been refreshed this cycle, or the entry
+      re-verified and the date advanced. Vendor guidance and limits change
+      without notice, and a stale date is the only signal that one was missed.
 - [ ] Punctuation, accents, symbols, URLs, and ligature sequences pass.
 - [ ] Ordered-block assertions pass.
 - [ ] Copy/paste passes in at least two independent PDF engines.
