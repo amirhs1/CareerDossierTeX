@@ -253,9 +253,9 @@
     %% splits the block; and every invisible character that could bridge the gap
     %% is either discarded by Poppler (U+0020, U+00A0, U+200B) or absent from
     %% TeX Gyre Heros (U+2000, U+2002, U+2003, U+2007, U+2009, and U+205F were
-    %% each tried). Bridging with a character Poppler
-    %% does keep needs a dense run of them -- about 130 per heading row, which
-    %% draws visible ink and fills the text layer with junk. Widening the gap
+    %% each tried). U+00AD is the one Poppler does keep, and bridging with it
+    %% needs a dense run -- about 130 per heading row, which draws a visible
+    %% dashed rule and fills the text layer with soft hyphens. Widening the gap
     %% below the heading is the only lever, so this token carries the constraint.
     %%
     %% 0.25 is measured, not assumed: on the committed fixtures the column
@@ -264,7 +264,8 @@
     %% a property of the ratio rather than of any body size. Retuning this token
     %% below it silently breaks extraction on both classes at once; the three
     %% `*-entry-dates-*' fixtures in tests/extraction/ catch it, and this
-    %% relation states the bound they enforce. See docs/ATS-EXTRACTION.md 3.4.
+    %% relation states the bound they enforce. See
+    %% docs/ATS-EXTRACTION.md#dates-and-right-alignment.
     %%
     %% The 2 sp tolerance is the rounding artefact documented above: the token is
     %% rounded to a whole scaled point independently of the comparison value, so

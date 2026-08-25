@@ -68,6 +68,40 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 
 ### Changed
 
+- **`docs/ATS-EXTRACTION.md` is the design contract for extraction, tagging, and
+  fonts, and nothing else.** It stated each rule and then reproduced the
+  measurement, procedure, or fixture inventory behind it, so a reader met the
+  same fact twice and a maintainer had two copies to keep true — the duplication
+  [#259] exists to stop, in the file that had the most of it. It is now 3,425
+  words, from 12,528. ([#508])
+
+  Nothing that existed only there was deleted. Each measurement moved to
+  whatever produces it: Poppler's block grouping and the `entrymeta=column`
+  against `entrymeta=inline` comparison into the `tests/extraction/` fixtures
+  they were measured on, the per-word `/ActualText` consumer comparison into
+  `extraction-torture.tex`, the screen-reader procedure and its recorded result
+  into `docs/TESTING.md` beside the other manual pass, the OpenType
+  `...Off`-versus-AAT spelling trap into `careerdossier-typography.sty` beside
+  the line it governs, and the toolchain record CI must keep into
+  `CONTRIBUTING.md` "CI expectations", which the workflow implementing it now
+  cites instead. Everything else was already stated in `AGENTS.md`,
+  `CONTRIBUTING.md`, `docs/TESTING.md`, `docs/ARCHITECTURE.md`, the manual, or a
+  package comment.
+
+  `README.md` gains the two versions the opt-in tagged-PDF preview was verified
+  against — `pdfmanagement-testphase` 0.97c and `tagpdf` 1.0c — as rows of the
+  table that already answers what this release was built and tested on, rather
+  than as a pointer into another document. `docs/API.md` states what makes a
+  command or environment public: intentionally named and documented in the
+  manual, used by a supported example, covered by a repeatable test, and
+  recorded here when it is introduced. Anything else is internal and may change
+  without a migration note.
+
+  **Documentation only** — no class, option, key, command, token, or rendered
+  output changed. The source files touched carry comments only, and the one
+  removed test compared the published template against its fixture, which the
+  fixture now is.
+
 - **`docs/API.md` is now a pointer rather than the interface reference.** The
   manual above supersedes it: what is left is where to find the manual, how to
   build it, and the interface stability policy, which binds a contributor
@@ -362,6 +396,7 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
 [#447]: https://github.com/amirhs1/CareerDossierTeX/issues/447
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
+[#508]: https://github.com/amirhs1/CareerDossierTeX/issues/508
 
 ## [0.8.0] - 2026-08-12
 
@@ -518,7 +553,8 @@ similar entry today. See
   fixtures. See [`docs/API.md`](docs/API.md) for the option and the separator
   token, and
   [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#dates-and-right-alignment)
-  §3.4 for the measurements.
+  for the rule, and the `*-entry-dates-*` and `*-entry-inline-*` fixtures under
+  `tests/extraction/` for the measurements.
 
 - All four document classes accept `muted=plain|italic|gray|both`, controlling
   how de-emphasized runs are rendered — an entry's dates and location in the
@@ -1132,8 +1168,8 @@ similar entry today. See
   `\section`/`\subsection` moved one level down, so the hierarchy underneath
   the name is unskipped (`/H2`, then `/H3` where a statement uses
   `\CDossierSubsection`). See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#heading-hierarchy-issue-267)
-  §7.4 for the per-profile hierarchy.
+  the committed `tests/tagging/*.structure.txt`
+  baselines for the per-profile hierarchy.
 
   This is a structure-tree change under the opt-in `tagging=on` path only:
   rendered layout, extracted text, and the untagged path are all unaffected,
@@ -1156,8 +1192,7 @@ similar entry today. See
   The CV's manual publication list needs no division of its own — it sits under
   an ordinary `\CDossierSection`, so that section's division encloses it — and
   the section rule remains an artifact, contributing nothing to the tree. See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#section-divisions-issue-268)
-  §7.5.
+  the committed `tests/tagging/*.structure.txt` baselines.
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
   class, option, key, or command changed, the tagged résumé and CV place every
@@ -1203,8 +1238,8 @@ similar entry today. See
   Whether the run-on form actually misread in VoiceOver or NVDA was never
   confirmed, and this fix does not confirm it retrospectively; it corrects text
   that was wrong at the byte level. See
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#structure-tree-by-profile)
-  §7.6 for the decoded before-and-after.
+  the committed `tests/tagging/*.structure.txt`
+  baselines for the before-and-after.
 
   This is a structure-tree change under the opt-in `tagging=on` path only: no
   class, option, key, or command changed, and all five named tagged fixtures
@@ -1510,8 +1545,9 @@ precedent for adding a similar entry today. See
   on tagged and untagged output alike; the tag tree is correct in every case
   and veraPDF UA-2 still passes. `tests/regression/tokens-invariants` states the
   bound and the three `*-entry-dates-*` extraction fixtures enforce it.
-  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md) section 3.4 records the
-  measurements and the alternatives ruled out.
+  [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md#dates-and-right-alignment)
+  records the rule; the `*-entry-dates-*` fixtures under `tests/extraction/`
+  record the measurements and the alternatives ruled out.
 
   **Documentation and tests only.** No class, option, key, command, environment,
   or calibrated value changed, and no document renders differently.

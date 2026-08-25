@@ -1,6 +1,13 @@
-% ats-user-template-doc.tex — issue #450. The user template published under
-% "Minimal reference template and class skeleton" in docs/ATS-EXTRACTION.md,
-% kept compilable. tests/smoke/run.sh compares the two texts before compiling
+% ats-user-template-doc.tex — issue #450. The minimal user template, kept
+% compilable. This file is the template: it was published as prose in
+% docs/ATS-EXTRACTION.md until that document was reduced to design rules, and a
+% copy in a document nobody compiles is what #185 and #450 exist to prevent.
+% The manual's "Complete examples" chapter and examples/ carry the same shape at
+% greater length, and smoke_doc_drift guards the manual's copy separately.
+%
+% Keep the names fictional but plausible. Obvious placeholders such as `First
+% Last' or `Company 1' can themselves be skipped by parsers, as Greenhouse's
+% documentation notes. tests/smoke/run.sh compares the two texts before compiling
 % this one, so they cannot drift apart.
 %
 % #185 is why: an uncompiled example in a document nobody re-reads goes stale

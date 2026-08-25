@@ -23,6 +23,21 @@
 %   extraction constraint rather than a rhythm decision (PR #229). Remove the
 %   column and there is no gap, no split, and nothing for the floor to protect.
 %
+%   Measured at 0.125, half the floor and the value at which the column form
+%   reorders:
+%
+%     form     list edge   first entry's dates   last entry's dates
+%     ------   ---------   -------------------   ----------------------------
+%     column   0.25        in place              after its bullets (a property
+%                                                of being the last block, at
+%                                                every value)
+%     column   0.125       after its bullets     after its bullets
+%     inline   0.125       in place              in place
+%
+%   The last row is the result: inline at half the floor extracts *both*
+%   entries' metadata in place, including the final one that no value of the
+%   list edge ever fixed under `column'.
+%
 %   The 0.125 override is the assertion, not incidental. At that value the
 %   column form reorders — resume-entry-dates-order.tex exists to pin exactly
 %   that — and this fixture must not. Do not raise it back to 0.25 to make a

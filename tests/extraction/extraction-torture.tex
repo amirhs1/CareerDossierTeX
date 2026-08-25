@@ -69,6 +69,26 @@ email@example.org +1 416 555 0199
 % Interword spacing (issue #72). Every line below merged under
 % per-word /ActualText was enabled when read through Apple PDFKit. Keep them:
 % the assertion that per-word /ActualText spans have not returned.
+%
+% What was measured. XeTeX's \XeTeXgenerateactualtext wrapped every word in its
+% own marked-content sequence, with no space token between adjacent spans --
+%
+%   /Span << /ActualText (Research) >> BDC ... EMC
+%   /Span << /ActualText (&) >>        BDC ... EMC
+%
+% -- so the interword space existed only as glyph geometry, and a consumer's
+% answer depended on which layer it trusted:
+%
+%   Poppler (pdftotext), MuPDF   fall back to glyph positions   `Research & Development'
+%   Apple PDFKit (PDFDocument)   concatenates /ActualText       `Research& Development'
+%
+% Measured on this fixture, removing the setting changed Poppler output by ZERO
+% bytes while fixing every PDFKit merge, so nothing was traded away for the fix.
+% That is why a Poppler-only regression could not see the defect, and why it
+% shipped in v0.2.0. The v0.4.0 move to LuaLaTeX removed the primitive with the
+% rest of the XeTeX path, making this class of defect structurally impossible
+% rather than merely disabled -- the lines below remain the guard against it
+% returning by some other route.
 Built a reproducible analytical workflow used across teams.
 
 I moved analyses into a shared reporting pipeline.

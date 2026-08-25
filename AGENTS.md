@@ -296,7 +296,7 @@ Rule 7 requires the affected documentation in the same change.
 `CONTRIBUTING.md` "Documentation requirements" states which document each kind
 of change lands in, and "Licensing contributions" the obligations that attach
 to adding or changing a licensed source file. `docs/ATS-EXTRACTION.md` is
-scoped to extraction, tagging, and reproducibility; the release gates and the
+scoped to extraction and tagging; the release gates and the
 CTAN packaging requirements live in `docs/RELEASE-CHECKLIST.md`. The `release-notes` skill and its
 `reference.md` state `CHANGELOG.md` house style and how GitHub Release notes
 are drafted; rule 11 bounds what may then be done with them. None of the three

@@ -1649,12 +1649,15 @@
 %% Do not try to repair that from inside this macro. The heading row is already
 %% a single line box in source order, which is not what Poppler groups on;
 %% adjusting the two heading lines' spacing does not split the block; and every
-%% invisible bridging character is either discarded (U+0020, U+00A0, U+200B) or
-%% missing from TeX Gyre Heros (U+2000, U+2002, U+2003, U+2007, U+2009, and
-%% U+205F were each tried). The constraint is
+%% invisible bridging character fails, though not all in the same way: Poppler
+%% discards U+0020, U+00A0, and U+200B, while U+2000, U+2002, U+2003, U+2007,
+%% U+2009, and U+205F are each absent from TeX Gyre Heros. U+00AD is the one
+%% Poppler does keep, and it bridges only as a dense run -- about 130 per
+%% heading row, which draws a visible dashed rule across the heading and breaks
+%% phrase search across it; ten evenly spaced glyphs do nothing. The constraint is
 %% carried by `\CDossierRecordListEdgeAboveSkip', which has a measured floor of
 %% 0.25; `tokens-invariants' states it and tests/extraction/ enforces it.
-%% See docs/ATS-EXTRACTION.md 3.4.
+%% See docs/ATS-EXTRACTION.md#dates-and-right-alignment.
 %%
 %% Issue #230 does not repair that from inside this macro either -- it removes
 %% the column the fault needs. Under `entrymeta=inline' the heading rows carry
@@ -1676,7 +1679,7 @@
 %% inside ordinary prose already arrive by this same route:
 %% tagged output carries real space glyphs where untagged output has only TJ
 %% kerns. The gap here was that tagpdf marks only glue with a positive natural
-%% width, and `\hfill' has none. See docs/ATS-EXTRACTION.md 7.5.
+%% width, and `\hfill' has none. See tests/tagging/*.structure.txt.
 %%
 %% #1 title (required, nonblank), #2 organization, #3 location, #4 dates.
 %% ---------------------------------------------------------------------------
@@ -1948,7 +1951,7 @@
 %%
 %% Precedence: each field is written only when the document has not already set
 %% it, so a user's own \hypersetup wins wherever it appears in the preamble.
-%% That matters because the documented template in docs/ATS-EXTRACTION.md
+%% That matters because tests/smoke/ats-user-template-doc.tex
 %% places \hypersetup *before* \CDossierSetup; a blind write here would silently
 %% discard it.
 %%

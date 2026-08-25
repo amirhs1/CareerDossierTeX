@@ -106,6 +106,18 @@
 %% ---------------------------------------------------------------------------
 \RequirePackage { fontspec }
 
+%% Use the `...Off' spellings, not `NoCommon', `NoContextual', and so on. Those
+%% are the AAT (legacy macOS) convention rather than an older spelling of the
+%% same thing: applied to an OpenType face they select nothing and disable
+%% nothing, silently, so the substitutions this line exists to switch off stay
+%% on. fontspec's manual, Table 11 ("Ligatures"), is the authority for which
+%% spelling a given face takes; verify against the installed version.
+%%
+%% Not listed here, and deliberately: `Ligatures=TeX' (OpenType `tlig') maps
+%% TeX-style input for quotes and dashes and is the modern spelling of
+%% `Mapping=tex-text'. It is unrelated to the `fi'-class ligatures above, and
+%% stays enabled -- tests/regression/typography-bodyfont.tlg pins `+tlig' in the
+%% resolved feature string alongside the four `-...' entries below.
 \defaultfontfeatures+
   {
     Ligatures = { CommonOff , ContextualOff , DiscretionaryOff , HistoricOff } ,

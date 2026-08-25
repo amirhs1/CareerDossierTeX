@@ -28,7 +28,7 @@
 # gates below it never skips.
 #
 # Screen-reader review (VoiceOver, NVDA) stays manual and is NOT run here; see
-# docs/ATS-EXTRACTION.md for the checklists and recorded results.
+# docs/TESTING.md "Screen-reader reading-order checks".
 #
 # Scope: these fixtures validate four named artifacts. Passing them is not a
 # PDF/UA, WCAG, accessibility, or ATS conformance claim for arbitrary user

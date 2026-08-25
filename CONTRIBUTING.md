@@ -591,17 +591,26 @@ does not.
 
 ### Update `ATS-EXTRACTION.md` when:
 
-- extracted text content, order, or spacing changes;
-- tagged-structure behavior or a validator result changes;
-- a fixture, baseline, or extractor in the extraction or tagging suites changes;
-- the reproducibility or screen-reader procedure changes.
+It holds the design rules for extraction, tagging, and fonts — what the output
+has to do and why — and no fixture, baseline, procedure, or recorded result.
+Update it when:
+
+- the reading order a document must extract in changes;
+- a rule about the text layer, its Unicode mapping, or copy-paste integrity
+  changes;
+- what tagged structure is required to say, or what a validator result is taken
+  to license, changes;
+- a font or ligature policy that extraction depends on changes.
 
 ### Update `TESTING.md` when:
 
 - a suite, review target, fixture group, or runner selector changes;
 - a threshold, floor, or accepted exception changes;
 - the coverage a kind of change owes changes;
-- a baseline regeneration procedure changes.
+- a baseline regeneration procedure changes;
+- a fixture, baseline, or extractor in the extraction or tagging suites
+  changes; or
+- a manual procedure, such as the screen-reader or portal pass, changes.
 
 ### Update `RELEASE-CHECKLIST.md` when:
 
@@ -811,6 +820,10 @@ The build workflow should:
 - compile every supported example;
 - fail when compilation fails;
 - upload PDFs and logs as artifacts;
+- record the tested toolchain beside the output it produced — TeX Live and
+  LuaHBTeX versions, the LaTeX format date, and the `fontspec`, `luaotfload`,
+  `tagpdf`, and `pdfmanagement-testphase` versions — so a result can be
+  attributed to the build that produced it;
 - keep its commands locally reproducible where practical;
 - pin every container and third-party action to an immutable reference.
 

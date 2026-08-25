@@ -60,3 +60,8 @@ documented deprecation path.
 
 Calibrated token *values* are not stable API before `v0.10.0`; the token names
 and the boundaries they own are.
+
+A command or environment becomes public only when it is intentionally named and
+documented in the manual, used by a supported example, covered by a repeatable
+test, and recorded in [`../CHANGELOG.md`](../CHANGELOG.md) when it is
+introduced. Anything else is internal, and may change without a migration note.
