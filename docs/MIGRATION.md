@@ -13,7 +13,16 @@ entry is required and the shape it takes; the stability policy it serves is in
 
 ## Status
 
-`v0.8.0` is the current published release. **It changes how every existing
+`v0.9.0` is the current published release. **It changes how letters and
+statements render in one place:** the gap below the header stack no longer adds
+`\parskip` on top of the token that names it, so the header-to-body gap tightens
+by one `\parskip` — 3.625 pt at `fontsize=12pt` — once per document. No source
+edit is required; the recipe below restores the previous gap. No public name is
+added, renamed, or removed. `CDossierPublications` gains an optional `numbering`
+key whose default is the shipped behaviour, so no existing document moves.
+Résumé and CV are unaffected. See [`[0.9.0]`](#090---2026-08-26) below.
+
+`v0.8.0` was the previous release. **It changes how every existing
 document renders in one place:** an entry's dates and location, and a statement's
 application-context line, were italic and are now upright black body text. No
 source edit is required for that; `muted=italic` restores the previous
@@ -328,7 +337,7 @@ requires no migration. To try it, add `\DocumentMetadata` before
 Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
-## [Unreleased]
+## [0.9.0] - 2026-08-26
 
 ### The gap below the header stack no longer adds `\parskip`
 

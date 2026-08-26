@@ -43,7 +43,7 @@
 %% the prototypes' fancyhdr/lastpage dependency solely for `Page n of m'.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-cv} {2026-08-12} {0.8.0}
+\ProvidesExplClass {careerdossier-cv} {2026-08-26} {0.9.0}
   {CareerDossierTeX English academic CV class}
 
 \RequirePackage { l3keys2e }

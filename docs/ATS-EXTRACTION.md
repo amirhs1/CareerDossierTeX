@@ -379,16 +379,16 @@ rules produce, and are what a change to any of them has to be diffed against.
 ## Current external references
 
 - [LaTeX package/class tagging status](https://latex3.github.io/tagging-project/tagging-status/)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
 - [`fontspec` documentation and package record](https://ctan.org/pkg/fontspec)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
 - [Inter issue 774: XeLaTeX text-extraction regression](https://github.com/rsms/inter/issues/774)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
 - [Checking PDF encoding and ToUnicode](https://stackoverflow.com/questions/53890212/how-to-check-if-encoding-and-tounicode-are-properly-done-for-a-pdf)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
 - [Greenhouse: unsuccessful resume parse](https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
 - [Lever: understanding resume parsing](https://help.lever.co/hc/en-us/articles/20087345054749-Understanding-resume-parsing)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
 - [MIT: make your resume ATS-friendly](https://capd.mit.edu/resources/make-your-resume-ats-friendly/)
-  — last checked 2026-08-24
+  — last checked 2026-08-26
