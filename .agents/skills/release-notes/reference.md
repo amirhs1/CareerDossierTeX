@@ -62,6 +62,14 @@ adopted in #518 after the file drifted to 195 words per entry against 4.9–17.8
 for six comparable projects — `l3build`'s entire changelog, 272 entries since
 2018, is shorter than one of this project's release sections was.
 
+It applies to every entry, released or not. #518 rewrote all 112 entries that
+cite an issue, across `[Unreleased]` and `[0.2.1]`–`[0.8.0]`, on the ground
+that a cited entry's displaced reasoning is already in that issue and its PR.
+The thirty-five entries in `[0.1.0]`–`[0.4.0]` that cite nothing were left
+verbose and are the one exception: with no issue to point at, compressing them
+would delete the only record. Do not use them as a model, and do not extend the
+exception to a new entry — a new entry always cites its issue.
+
 ```markdown
 ### Added
 
@@ -70,7 +78,7 @@ for six comparable projects — `l3build`'s entire changelog, 272 entries since
 ### Fixed
 
 - Fix `#` in a profile value truncating the link it appears in. ([#353])
-- **Breaking:** rename `\CDossierSizeTitle` to `\CDossierSizeDocumentTitle`. ([#243])
+- **Breaking:** Rename `\CDossierSizeTitle` to `\CDossierSizeDocumentTitle`. ([#243])
 ```
 
 4. **One line, no continuation.** §3.6: *"A change should be brief and to the
@@ -78,20 +86,36 @@ for six comparable projects — `l3build`'s entire changelog, 272 entries since
    sub-bullets, no code blocks, no measurements. At this file's wrap a full
    line carries about twelve words, which is the budget — there is no separate
    word count to argue about.
-5. **Open with a present-tense imperative verb** (§2.4.1) — `Add`, `Fix`,
-   `Change`, `Remove`, `Rename`, `Move`, `Split`, `Document`, `Correct`,
-   `Bump`, `Deprecate`, `Support`, `Drop`, `Require`, `Allow`, `Stop`. It tells
-   the reader what *upgrading* does, and a sentence opening with a verb cannot
-   grow into a paragraph.
+5. **Open with a present-tense imperative verb** (§2.4.1), from this
+   controlled vocabulary:
+
+   ```text
+   Add       Adopt     Allow     Bump      Change    Correct   Demonstrate
+   Deprecate Derive    Document  Drop      Extend    Fix       Move
+   Reduce    Reject    Remove    Rename    Replace   Report    Require
+   Restore   Retune    Scale     Shorten   Split     Stop      Suppress
+   Support   Tighten   Validate  Warn
+   ```
+
+   It tells the reader what *upgrading* does, and a sentence opening with a
+   verb cannot grow into a paragraph. The list is closed on purpose — a
+   vocabulary of thirty-two is what keeps "The résumé now…" from creeping
+   back — but it is not sacred: add a verb when one is genuinely missing, to
+   this list **and** to #518's acceptance command, which repeats it because a
+   command cannot cite a document.
 6. **Make it self-describing without its category heading** (§2.4.1): "Add
    `numbering` key", not "`numbering` key" under `### Added`. The test is
    whether the line survives being quoted out of context.
-7. **Mark a breaking change `**Breaking:**` immediately after the dash**, when
+7. **Mark a breaking change `**Breaking:**` immediately after the dash**, with
+   the verb still capitalised after it — `**Breaking:** Rename …`, not
+   `**Breaking:** rename …`, because the verb still opens the sentence. Use it
+   when
    it alters a public command, environment, class option, key, or documented
    behaviour incompatibly. This file has no separate top-level "Breaking
    changes" heading; that structure belongs to the GitHub Release body (below).
-   Entries shipped before #518 use `**BREAKING (scope):**` and are not
-   rewritten.
+   `**BREAKING (scope):**` is the retired spelling and survives only on the
+   thirty-five shipped entries #518 left untouched, in `[0.1.0]`–`[0.4.0]`;
+   every entry #518 rewrote carries the new one.
 8. **End with the closing issue**, reference-style: `([#355])`, with the
    matching `[#NNN]: https://github.com/amirhs1/CareerDossierTeX/issues/NNN`
    definition added to the block after that version's section, not at the
