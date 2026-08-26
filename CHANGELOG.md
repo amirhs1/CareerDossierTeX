@@ -300,10 +300,7 @@ fixtures. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 - Change the academic CV folio to `Page N of M`, so a reader holding page two can tell whether the document ended. ([#91])
 - Change the academic cover letter to share the CV's running header and `Page N of M` folio. ([#98])
 
-- Default fonts now resolve by file name through `luaotfload` (`texgyretermes`
-  and `texgyreheros` with explicit faces) instead of by fontconfig family name.
-  The build no longer depends on OS-installed fonts. Documents that override
-  fonts with a system font name should recheck their logs for substitutions.
+- Change default font resolution to `luaotfload` file names, so the build needs no OS-installed font. ([#75], [#76])
 
 - Move the `Makefile`, `l3build` config, test runners, and CI workflow to LuaLaTeX. ([#76])
 - Extend CI with a `tagging` job carrying both command-line extractors; veraPDF needs an approved pin and stays local-only. ([#77])
@@ -333,11 +330,7 @@ fixtures. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 
 ### Changed
 
-- The extraction fixture suite now gates on three checks instead of one: the
-  Poppler baseline, the absence of `/ActualText` spans in the PDF, and — on
-  macOS — an Apple PDFKit baseline extracted through `PDFDocument.string`.
-  Fixtures build uncompressed so the `/ActualText` check needs no tool beyond
-  `grep`. The PDFKit check is skipped with a notice on other platforms.
+- Extend the extraction suite from one gate to three, adding an `/ActualText` check and a PDFKit baseline. ([#72])
 
 [#72]: https://github.com/amirhs1/CareerDossierTeX/issues/72
 
@@ -345,81 +338,43 @@ fixtures. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 
 ### Added
 
-- `careerdossier-cv`: the English academic-CV class. It provides US
-  Letter, monochrome, multi-page CV layout with `fontsize` (`10pt` or `11pt`;
-  default `11pt`) and `density` (`compact` or `standard`; default `standard`).
-  The first page uses the shared dossier header; subsequent pages carry a
-  name-derived running header, and every page has a `Page n` folio. The class
-  uses the existing section, entry, and list interface and does not load
-  BibLaTeX or require Biber.
-- Optional shared-profile `orcid` metadata. It renders as descriptive visible
-  text and a link; bare identifiers resolve through `https://orcid.org/` while
-  complete URLs retain their scheme. Academic profiles can therefore be shared
-  with the existing résumé without leaving stray contact separators.
-- A supported academic-CV example, shared academic profile, CV smoke and
-  extraction fixtures, and long-field/two-page layout checks. CI and `make`
-  now build the academic-CV example.
-- `careerdossier-letter` now accepts `family=academic` for the
-  academic cover-letter family. `industry` remains the default and existing
-  letter metadata, optional recipient handling, and public commands are shared
-  unchanged. Academic letters derive the PDF title `Academic Cover Letter –
-  <name>` and carry a print-oriented footer with the name and `Page n of N`.
-  A supported academic-letter example and its smoke, extraction, and layout
-  coverage build through `make` and CI.
-- Dependency-free manual publication lists through `CDossierPublications` and
-  `\CDossierPublication`, with source-order numbering, clean optional-field
-  punctuation, and DOI-over-URL link precedence.
-- Optional `careerdossier-biblatex` integration with the fixed numeric,
-  Biber-backed, year-descending academic profile; repeatable exact author-name
-  highlighting; DOI → e-print → URL precedence; an actionable missing-package
-  diagnostic; and a fictional Biber example built by `latexmk`, `make`, and CI.
+- Add `careerdossier-cv`, the English academic-CV class, with a running header, a `Page n` folio, and no BibLaTeX dependency. ([#44])
+- Add optional `orcid` profile metadata, resolving a bare identifier through `https://orcid.org/`. ([#44])
+- Add a supported academic-CV example and shared academic profile, with smoke, extraction, and two-page layout coverage. ([#44])
+- Add `family=academic` to `careerdossier-letter`, with its own PDF title and print-oriented footer; `industry` stays the default. ([#45])
+- Add dependency-free manual publication lists through `CDossierPublications` and `\CDossierPublication`. ([#46])
+- Add optional `careerdossier-biblatex` integration: fixed numeric, Biber-backed, year-descending, with DOI over e-print over URL. ([#46])
 
 ### Changed
 
-- The supported no-BibLaTeX academic-CV example now demonstrates manual
-  publications. README, API, roadmap, contributor requirements, and build
-  guidance now distinguish `v0.1.1` behavior from released `v0.2.0` support,
-  map every academic interface to a complete example, document the Biber
-  verification path, and state the release's explicit non-goals.
+- Change the no-BibLaTeX academic-CV example to demonstrate manual publications. ([#47])
+
+[#44]: https://github.com/amirhs1/CareerDossierTeX/issues/44
+[#45]: https://github.com/amirhs1/CareerDossierTeX/issues/45
+[#46]: https://github.com/amirhs1/CareerDossierTeX/issues/46
+[#47]: https://github.com/amirhs1/CareerDossierTeX/issues/47
 
 ## [0.1.1] - 2026-07-17
 
 ### Added
 
-- `AI-POLICY.md` and contribution guidance for disclosed, human-reviewed AI
-  assistance; accurate non-duplicated commit attribution; prompt-injection
-  handling; and licensing, provenance, privacy, and verification duties. Claude
-  Code project settings now deny built-in read and edit access to declared
-  private paths and enable sandbox enforcement for Bash when supported.
-- PDF document metadata derived from the shared profile, applied automatically
-  at `\begin{document}` by `careerdossier-components`. A résumé now carries
-  `/Title` `Résumé – <name>`, a cover letter `Cover Letter – <name>`, both carry
-  `/Author` `<name>`, and both declare `/Lang` `en`. Previously the classes set
-  no PDF metadata at all, so viewers and file managers showed the filename
-  instead of a title, and the document declared no language. The document type is
-  part of the title so a résumé and a letter built from one profile stay
-  distinguishable. Any field set with `\hypersetup` is left untouched, in either
-  order relative to `\CDossierSetup`; fields left alone are still derived. When
-  `name` is absent, `/Title` and `/Author` are omitted rather than raising a
-  second error. See `docs/API.md`, "PDF document metadata".
+- Add `AI-POLICY.md` and contribution guidance for disclosed, human-reviewed AI assistance. ([#62])
+- Add `/Title`, `/Author`, and `/Lang` derived from the shared profile; a field set with `\hypersetup` is left alone. ([#50])
 
 ### Changed
 
-- The LPPL Work is now defined in one place by `manifest.txt`; each source
-  file's licence notice refers to the manifest instead of naming itself as a
-  separate Work. The licence (LPPL 1.3c), maintenance status, and maintainer are
-  unchanged. `latexmkrc` was removed and its references dropped, since the
-  supported build already passes `-xelatex` explicitly.
-- `make` now builds both supported examples, and the test suites are exposed as
-  Make targets (`make check`, `regression`, `smoke`, `layout`, `extract-test`,
-  `clean`) that mirror the CI commands. The README build instruction is
-  corrected accordingly.
+- Change `manifest.txt` to define the LPPL Work in one place, and remove `latexmkrc`. ([#52])
+- Change `make` to build both supported examples, and expose every test suite as a target mirroring its CI command. ([#53])
 
 ### Fixed
 
-- CI now pins the TeX Live container to an image digest and every GitHub Action
-  to a commit SHA, and records the resolved toolchain versions as an artifact,
-  so a run is reproducible and an upstream retag cannot change what executes.
+- Fix CI depending on mutable tags, by pinning the TeX Live image to a digest and every action to a commit SHA. ([#51])
+
+[#50]: https://github.com/amirhs1/CareerDossierTeX/issues/50
+[#51]: https://github.com/amirhs1/CareerDossierTeX/issues/51
+[#52]: https://github.com/amirhs1/CareerDossierTeX/issues/52
+[#53]: https://github.com/amirhs1/CareerDossierTeX/issues/53
+[#62]: https://github.com/amirhs1/CareerDossierTeX/pull/62
 
 ## [0.1.0] - 2026-07-15
 
@@ -427,74 +382,49 @@ First tagged release: an English industry résumé and a matching industry cover
 letter driven by shared profile metadata, built with XeLaTeX on US Letter paper
 in a monochrome theme.
 
+Eight entries below carry no reference. They record the repository's initial
+commit, which predates both the issue tracker and the pull-request workflow, so
+there is nothing to cite; see `.agents/skills/release-notes/reference.md`.
+
 ### Added
 
-- `l3build` regression harness (`build.lua`) configured for XeTeX and
-  `tests/regression/`, run with `l3build check`. Backfilled committed regression
-  coverage for the Phase 1 packages: `careerdossier-base` field storage,
-  trimming, presence, overwrite, and the unknown-key, unknown-field, and
-  missing-name diagnostics; `careerdossier-components` link-target scheme
-  normalization and contact-line separator placement; `careerdossier-theme`
-  monochrome palette values and color tokens; and `careerdossier-typography`
-  semantic role classes and the ATS actual-text setting.
-- `careerdossier-letter.cls`: the English industry cover-letter class. US Letter
-  geometry with one-inch margins; no user-facing class options (family, paper,
-  language, and theme are fixed, and any option is rejected with an actionable
-  message); page numbers disabled by default. `\CDossierLetterSetup` for letter
-  metadata (`date`, `recipient-name`, `recipient-title`,
-  `recipient-organization`, `recipient-address`, `subject`, `salutation`,
-  `closing`) with English defaults for `date`, `salutation`, and `closing` and
-  unknown keys rejected. `\MakeCDossierLetterhead` (centered sender identity,
-  date, collapsing recipient block, optional subject, salutation) and
-  `\MakeCDossierClosing` (closing, signature space, validated `name`). An absent
-  recipient field, subject, or contact field leaves no stray line or separator.
-- `examples/industry/letter-industry.tex`: the supported cover-letter example,
-  sharing `examples/profiles/profile-english.tex` with the résumé example.
-- Cover-letter tests: smoke fixtures for the supported builds and the required
-  failure paths (missing `name`, unknown class option, unknown
-  `\CDossierLetterSetup` key), layout-stress fixtures (`tests/layout/`) for long
-  fields and a two-page letter, and a letter extraction fixture
-  (`tests/extraction/`) pinning the recipient block, contact line, and reading
-  order when optional fields are absent.
-- `careerdossier-resume.cls`: the English industry résumé class. US Letter
-  geometry; `fontsize` (`10pt`, `11pt`) and `density` (`compact`, `standard`)
-  options with actionable rejection of unsupported keys and values; page numbers
-  disabled by default; `\CDossierSection`, the `CDossierEntry` environment, and
-  the `CDossierItemize` list.
-- Shared entry-heading primitive in `careerdossier-components.sty` that renders a
-  required title with optional organization, location, and dates and leaves no
-  stray separators when fields are absent.
-- `examples/industry/resume-english.tex` and `examples/profiles/profile-english.tex`:
-  the supported résumé example and its shared profile data.
-- Smoke tests (`tests/smoke/`) for the supported builds and the required failure
-  paths, layout-stress fixtures (`tests/layout/`) for long fields and a two-page
-  résumé, and a résumé extraction fixture (`tests/extraction/`) that pins the
-  contact line and reading order.
-- Initial project scope, phased roadmap, and Phase 1 implementation plan.
-- Repository architecture and documentation plan.
-- GitHub issue, branch, pull-request, CI, and release workflow documentation.
-- Draft user documentation for the planned `v0.1.0` public interface.
-- Contributor workflow and coding conventions.
-- LaTeX Project Public License version 1.3c.
-- `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, and `docs/MIGRATION.md`, resolving links that `README.md` and `CONTRIBUTING.md` already pointed to.
-- GitHub issue templates (`.github/ISSUE_TEMPLATE/bug_report.md`, `.github/ISSUE_TEMPLATE/feature_request.md`) and a pull-request template (`.github/pull_request_template.md`).
-- `docs/guides/ats-and-extraction.md`: design and reference guide for ATS-safe, extractable XeLaTeX output (single-column layout, font/ligature policy, `/ActualText` limits, extraction testing, tagging status). Reference material only; scope-gated to distinguish Phase 1 from planned work.
+- Add the `l3build` regression harness and backfill committed coverage for the four Phase 1 packages. ([#10], [#25])
+- Add `careerdossier-resume.cls`, the English industry résumé class, with `\CDossierSection`, `CDossierEntry`, and `CDossierItemize`. ([#8])
+- Add `careerdossier-letter.cls`, the English industry cover-letter class, with `\CDossierLetterSetup` and its letterhead commands. ([#9])
+- Add a shared entry-heading primitive in `careerdossier-components.sty`, leaving no stray separator when a field is absent. ([#8])
+- Add the supported résumé example and the shared profile it reads. ([#8])
+- Add the supported cover-letter example, sharing the résumé's profile. ([#9])
+- Add résumé smoke, layout-stress, and extraction fixtures covering the supported builds and the required failure paths. ([#8])
+- Add cover-letter smoke, layout-stress, and extraction fixtures, pinning the recipient block and reading order. ([#9])
+- Add `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, and `docs/MIGRATION.md`. ([#4], [#20])
+- Add GitHub issue templates and a pull-request template. ([#20])
+- Add `docs/guides/ats-and-extraction.md`, the design and reference guide for ATS-safe extractable output. ([#22])
+- Add the initial project scope, phased roadmap, and Phase 1 implementation plan.
+- Add the repository architecture and documentation plan.
+- Add GitHub issue, branch, pull-request, CI, and release workflow documentation.
+- Add draft user documentation for the planned `v0.1.0` public interface.
+- Add contributor workflow and coding conventions.
+- Add the LaTeX Project Public License version 1.3c.
 
 ### Changed
 
-- Clarified that the résumé, cover-letter class, shared profile interface, and CI workflow remain pre-release targets until implemented and verified.
-- Standardized licensing language around LPPL maintenance status and the current maintainer.
+- Clarify that the résumé, cover-letter class, shared profile interface, and CI workflow remain pre-release targets until verified.
+- Standardize the licensing language around LPPL maintenance status and the current maintainer.
 
 ### Fixed
 
-- `careerdossier-components.sty`: a `website`, `linkedin`, `github`, or `scholar`
-  value that already carried a scheme (for example `https://example.com`) had a
-  second `https://` prepended to its link target, producing a broken href such as
-  `https://https://example.com`. The scheme is now detected by string comparison,
-  which is insensitive to the colon's category code, so an existing scheme is
-  preserved and `https://` is added only when none is present. The visible text
-  was already correct, so extraction output is unaffected.
-- Corrected relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` instead of the repository root.
+- Fix a profile value that already carried a scheme having a second `https://` prepended to its link target. ([#38])
+- Fix relative links in `CONTRIBUTING.md` that assumed the file lived under `docs/` rather than the repository root. ([#21])
+
+[#4]: https://github.com/amirhs1/CareerDossierTeX/issues/4
+[#8]: https://github.com/amirhs1/CareerDossierTeX/issues/8
+[#9]: https://github.com/amirhs1/CareerDossierTeX/issues/9
+[#10]: https://github.com/amirhs1/CareerDossierTeX/issues/10
+[#20]: https://github.com/amirhs1/CareerDossierTeX/issues/20
+[#21]: https://github.com/amirhs1/CareerDossierTeX/pull/21
+[#22]: https://github.com/amirhs1/CareerDossierTeX/pull/22
+[#25]: https://github.com/amirhs1/CareerDossierTeX/issues/25
+[#38]: https://github.com/amirhs1/CareerDossierTeX/pull/38
 
 [Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.8.0...HEAD
 [0.8.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.7.0...v0.8.0

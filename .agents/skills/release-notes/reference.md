@@ -62,13 +62,16 @@ adopted in #518 after the file drifted to 195 words per entry against 4.9–17.8
 for six comparable projects — `l3build`'s entire changelog, 272 entries since
 2018, is shorter than one of this project's release sections was.
 
-It applies to every entry, released or not. #518 rewrote all 112 entries that
-cite an issue, across `[Unreleased]` and `[0.2.1]`–`[0.8.0]`, on the ground
-that a cited entry's displaced reasoning is already in that issue and its PR.
-The thirty-five entries in `[0.1.0]`–`[0.4.0]` that cite nothing were left
-verbose and are the one exception: with no issue to point at, compressing them
-would delete the only record. Do not use them as a model, and do not extend the
-exception to a new entry — a new entry always cites its issue.
+It applies to every entry, released or not. #518 rewrote all 139 entries in
+the file that have a citable issue or pull request, on the ground that the
+reasoning a one-line rewrite displaces is already there.
+Eight entries in `[0.1.0]` carry no reference at all, and are the one
+exception. They record the repository's initial commit of 2026-07-08, which
+predates both the issue tracker (issue #1 was opened 2026-07-09) and the
+pull-request workflow, so there is nothing to cite. They still follow every
+other rule — one line, opening with a verb — and they are invisible to #518's
+acceptance command, which checks only entries that cite something. Do not
+extend the exception to a new entry.
 
 ```markdown
 ### Added
@@ -119,7 +122,12 @@ exception to a new entry — a new entry always cites its issue.
 8. **End with the closing issue**, reference-style: `([#355])`, with the
    matching `[#NNN]: https://github.com/amirhs1/CareerDossierTeX/issues/NNN`
    definition added to the block after that version's section, not at the
-   bottom of the file. Several when §3.4 merges related changes:
+   bottom of the file. Where a change closed no issue, cite the **pull
+   request** instead and point the definition at `/pull/NNN`; GitHub numbers
+   issues and PRs from one sequence, so the citation reads the same. Four
+   historical entries do this. A *new* entry always has an issue to cite —
+   `CONTRIBUTING.md` "Work item structure" requires one — so this is a
+   backfill allowance, not a licence to skip filing. Several when §3.4 merges related changes:
    `([#428], [#439], [#440])`. No commit hashes — §2.4.2 asks for them because
    §6.2 writes at release time, and an entry written inside its own PR cannot
    know its squash-merge hash.
