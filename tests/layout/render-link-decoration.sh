@@ -147,8 +147,9 @@ fi
   echo "                  descenders in 'p', 'g', 'y'? does a wrapped anchor keep"
   echo "                  its rule on both lines?"
   echo "  print file    - must be indistinguishable from the shipped appearance"
-  echo "  contact line  - undecorated under BOTH media, by the decision recorded"
-  echo "                  in issue #278 §5; confirm it still reads as links"
+  echo "  contact line  - undecorated under BOTH media, by the decision"
+  echo "                  recorded in issue #278 section 5; confirm it still"
+  echo "                  reads as links"
   echo "  letter-screen - its \\href anchor text is itself an address, so it IS"
   echo "                  ruled; confirm a ruled address reads and wraps well"
   echo

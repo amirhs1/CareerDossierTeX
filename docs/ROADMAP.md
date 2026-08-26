@@ -489,13 +489,13 @@ Delivered scope and this release's criteria are recorded in the closed
 Consolidate the documentation set, revise and extend the examples, build the PDF
 manual, and configure the CTAN release archive.
 
-Three strands joined the release after that charter was set, and § "Scope" below
-records them rather than this goal: the behaviour and public-interface
-corrections that had to land before the `v0.10.0` freeze, the agent instruction
-set, and the build and test harness. Each is here because deferring it cost
-more than carrying it — a public-interface fix pushed past `v0.10.0` costs a
-major version instead of a minor one, and the harness and instruction-set work
-paid for itself across the rest of the milestone.
+Three strands joined the release after that charter was set, and section
+"Scope" below records them rather than this goal: the behaviour and
+public-interface corrections that had to land before the `v0.10.0` freeze, the
+agent instruction set, and the build and test harness. Each is here because
+deferring it cost more than carrying it — a public-interface fix pushed past
+`v0.10.0` costs a major version instead of a minor one, and the harness and
+instruction-set work paid for itself across the rest of the milestone.
 
 ### Scope
 

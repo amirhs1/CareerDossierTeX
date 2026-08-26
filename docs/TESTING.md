@@ -630,6 +630,17 @@ quoted string in that section as a section name.
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree
 resolves to a real heading.
 
+### Section-sign lint
+
+`tests/lint/run-section-sign.sh` — no tracked file contains U+00A7 SECTION
+SIGN. A cross-reference names its heading instead, per
+`docs/NAMING-CONVENTION.md` section "Documentation heading convention". The ban
+is over the character rather than over a spelling of it, so the check needs no
+exception list — including for its own source, which builds the pattern from
+bytes rather than writing the character. Control 1 plants an occurrence in a
+scratch file and asserts the same search still finds it, so a clean run is
+distinguishable from a search that stopped working.
+
 ### Manual-name lint
 
 `tests/lint/run-manual-names.sh` — every public name the Work declares is
