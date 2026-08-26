@@ -64,7 +64,7 @@ test pass at the end of a milestone.
 | `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
 | `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released |
 | `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Released |
-| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Planned |
+| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Released |
 | `v0.10.0` | Stable, documented public API | Planned |
 | `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** |
 

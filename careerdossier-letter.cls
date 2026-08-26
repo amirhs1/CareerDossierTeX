@@ -34,7 +34,7 @@
 %% choice with industry as the default.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-letter} {2026-08-12} {0.8.0}
+\ProvidesExplClass {careerdossier-letter} {2026-08-26} {0.9.0}
   {CareerDossierTeX English cover-letter class}
 
 %% ---------------------------------------------------------------------------

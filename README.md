@@ -8,25 +8,28 @@ and the options at a glance. The PDF manual — `make manual`, or the
 reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing the
 code.
 
-> **Status:** `v0.8.0 — Semantic Structure and Tagged Output` is the current
-> published release. A document's structure was visible on the page but largely
-> absent from the file: headings carried no heading role, sections opened no
-> division, and the document's own title and language never reached the
-> catalogue. This release gives the structure a name — a document-title heading
-> role, `Sect` divisions around résumé and CV sections, `\CDossierSubsection` as
-> a second heading level, and `/Lang` and `/DisplayDocTitle` on the default
-> build path. It also makes the de-emphasis of entry metadata a decision the
-> author makes, through `muted=italic|gray|both|plain` and
-> `entrymeta=column|inline`, and it stops several classes of silent failure:
-> links that degraded to plain text without `hyperref`, a mistyped `orcid`
-> value, a scheme-less profile link that emitted a remote-PDF action, and a
-> body-less entry that stranded up to a fifth of a page.
-> **Breaking:** entry metadata is **no longer italic by default**, so every
-> existing document renders differently in that one respect; `muted=italic`
-> restores it. `\CDossierSizeTitle` is renamed to `\CDossierSizeDocumentTitle`,
-> `\CDossierPrimaryColor` is removed in favour of the identical
-> `\CDossierTextColor`, and `CDossierEntry` now reads its body as an argument,
-> so `\verb` and other catcode-sensitive content must be defined outside it. See
+> **Status:** `v0.9.0 — Documentation, Examples, and Release Readiness` is the
+> current published release. The toolkit worked, but it was hard to learn: no
+> reference described its public interface, nothing said how to install it, and
+> the documentation set had grown to restate itself. This release adds
+> [`doc/careerdossier.tex`](doc/careerdossier.tex), a PDF manual documenting
+> every public class, option, key, command, environment, and design token with
+> its accepted values and default; an `## Installation` section covering the
+> three routes onto a path where the classes resolve; and a configured CTAN
+> release archive. The documentation set is reduced to one home per rule, and
+> the examples are revised — a two-page bibliography CV, and tagging and contact
+> labels demonstrated in shipped documents.
+>
+> It also settles the last public-interface work before the `v0.10.0` freeze:
+> `CDossierPublications` gains `numbering=restart|continue`, a raw `#` in a
+> profile value no longer truncates the link it appears in, and a document's PDF
+> metadata is now identical on the tagged and untagged build paths.
+>
+> **No public command, environment, class option, or key is added, renamed, or
+> removed.** One change moves the page: the gap below the header stack in a
+> cover letter or statement no longer adds `\parskip` on top of the token that
+> names it, tightening the header-to-body gap by one `\parskip` once per
+> document. Résumé and CV are unaffected. See
 > [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 >
 > Before `v0.10.0` the public interface may still change between minor versions;
@@ -471,7 +474,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.8.0 — Semantic Structure and Tagged Output
+v0.9.0 — Documentation, Examples, and Release Readiness
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.

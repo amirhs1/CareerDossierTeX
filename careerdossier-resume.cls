@@ -33,7 +33,7 @@
 %% extraction order.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
-\ProvidesExplClass {careerdossier-resume} {2026-08-12} {0.8.0}
+\ProvidesExplClass {careerdossier-resume} {2026-08-26} {0.9.0}
   {CareerDossierTeX English industry résumé class}
 
 %% ---------------------------------------------------------------------------

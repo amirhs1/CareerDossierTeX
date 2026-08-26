@@ -8,6 +8,10 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-26
+
+_If you are upgrading: please see [`docs/MIGRATION.md`](docs/MIGRATION.md)._
+
 ### Added
 
 - Add `doc/careerdossier.tex`, the PDF interface manual, built by `make manual`. ([#263])
@@ -16,11 +20,11 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 
 ### Changed
 
-- Reduce `docs/ATS-EXTRACTION.md` to design rules and rehome its evidence. ([#508])
+- Reduce `docs/ATS-EXTRACTION.md` to design rules and rehome its evidence. ([#262], [#480], [#508])
 - Change `docs/API.md` to a pointer at the manual plus the stability policy. ([#263])
 - Shorten `README.md`'s quick start to the profile and résumé, tabling the other five. ([#263])
 - Replace `README.md`'s twelve-row roadmap table with a pointer to `docs/ROADMAP.md`. ([#449])
-- Move contributor guidance out of the reader's path in `docs/MIGRATION.md`. ([#446])
+- Move contributor guidance out of the reader's path in `docs/MIGRATION.md`. ([#446], [#481])
 - Drop section numbers from `docs/` headings and name targets in cross-references. ([#447])
 - Extend `examples/academic/publications.bib` to twenty entries, so the CV runs two pages. ([#197])
 - Demonstrate tagging and contact labels in two shipped examples. ([#273])
@@ -36,6 +40,7 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 
 [#197]: https://github.com/amirhs1/CareerDossierTeX/issues/197
 [#261]: https://github.com/amirhs1/CareerDossierTeX/issues/261
+[#262]: https://github.com/amirhs1/CareerDossierTeX/issues/262
 [#263]: https://github.com/amirhs1/CareerDossierTeX/issues/263
 [#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
 [#353]: https://github.com/amirhs1/CareerDossierTeX/issues/353
@@ -48,6 +53,8 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
 [#447]: https://github.com/amirhs1/CareerDossierTeX/issues/447
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
+[#480]: https://github.com/amirhs1/CareerDossierTeX/issues/480
+[#481]: https://github.com/amirhs1/CareerDossierTeX/issues/481
 [#508]: https://github.com/amirhs1/CareerDossierTeX/issues/508
 
 ## [0.8.0] - 2026-08-12
@@ -426,7 +433,8 @@ there is nothing to cite; see `.agents/skills/release-notes/reference.md`.
 [#25]: https://github.com/amirhs1/CareerDossierTeX/issues/25
 [#38]: https://github.com/amirhs1/CareerDossierTeX/pull/38
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.5.0...v0.6.0
