@@ -9,8 +9,10 @@ Read and follow, in order:
 
 1. `AGENTS.md`
 2. `reference.md`, alongside this file
-3. `CHANGELOG.md` — existing entries for house style, and the current
-   `[Unreleased]` section
+3. `CHANGELOG.md` — the current `[Unreleased]` section, for what is already
+   recorded. Take the entry style from `reference.md`, not from the file:
+   sections `[0.1.0]`–`[0.8.0]` predate the one-line rule (#518) and are
+   deliberately not rewritten, so imitating them reproduces the style it retired.
 4. `docs/NAMING-CONVENTION.md` (tag, milestone, and release-title naming)
 5. `CONTRIBUTING.md`'s "Update `CHANGELOG.md` when" and "Release
    contributions" sections
@@ -24,9 +26,12 @@ Read and follow, in order:
 2. Add or update the entry under `## [Unreleased]` in the correct Keep a
    Changelog category (`Added`, `Changed`, `Fixed`, `Removed`, or
    `Deprecated`/`Security` when applicable).
-3. Write the entry in user-impact terms and mark a breaking change with a
-   bold inline prefix, not a separate heading.
-4. Add the `([#NN])` issue citation and its reference-link definition.
+3. Write it as one line, opening with a present-tense verb, self-describing
+   without its heading — `reference.md` "The shape of an entry" is the rule.
+   Send the reasoning to the PR body and anything a user must *type* to
+   `docs/MIGRATION.md`.
+4. Add the `([#NN])` issue citation and its reference-link definition, and
+   prefix a breaking change `**Breaking:**` inline, not under a heading.
 5. Confirm optional-field and separator behavior is unaffected, or documented
    if it changed.
 

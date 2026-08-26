@@ -50,29 +50,89 @@ CHANGELOG" link has gone decorative.
 3. Use only the categories already in play (`Added`, `Changed`, `Fixed`,
    `Removed`, or `Deprecated`/`Security` when genuinely applicable). One
    `### Category` heading per category in use; do not split one category's
-   entries across two blocks.
-4. Write in user-impact terms, not implementation terms: "Added `--dry-run`
-   support" beats "Refactored CLI executor."
-5. Mark a breaking change with a bold inline prefix inside its `Added` or
-   `Changed` entry — for example `**BREAKING (toolchain): ...**` — the way
-   the `v0.4.0` LuaLaTeX entry does it. This file has no separate top-level
-   "Breaking changes" heading; that structure belongs to the GitHub Release
-   body instead (below).
-6. Cite the closing issue(s) in parentheses at the end of the bullet, e.g.
-   `([#91])`. These are markdown reference-style links, not GitHub
-   autolinks — add the matching `[#NN]: https://github.com/amirhs1/CareerDossierTeX/issues/NN`
-   definition. Existing files place that block right after the version
-   section that cites it, not at the bottom of the file.
-7. Longer or higher-stakes entries may add unlabeled follow-up paragraphs
-   after the lead bullet — what changed, why, and an explicit scope note
-   (e.g. "this changes rendered output; no class, option, key, or command
-   changed"). See the `v0.4.0` LuaLaTeX and CV-folio entries for the shape.
-8. At release-preparation time, add the version's own compare-link
-   definition at the very bottom of the file (`[X.Y.Z]: .../compare/vPREV...vX.Y.Z`)
-   and repoint `[Unreleased]` at `.../compare/vX.Y.Z...HEAD`.
-9. At release-preparation time, and **before** the retitle in step 2, sweep
-   `[Unreleased]` for contributor-tooling entries and remove them. See
-   "The tooling sweep" below.
+   entries across two blocks. `Deprecate` reads naturally under `Changed`, so
+   a `Deprecated` heading is rarely the one to open.
+
+### The shape of an entry
+
+An entry is **one line**. It says what upgrading does and cites its issue;
+everything else has another home. This is the [Common
+Changelog](https://common-changelog.org) shape (§2.4.1, §3.2, §3.4, §3.6),
+adopted in #518 after the file drifted to 195 words per entry against 4.9–17.8
+for six comparable projects — `l3build`'s entire changelog, 272 entries since
+2018, is shorter than one of this project's release sections was.
+
+```markdown
+### Added
+
+- Add `numbering=restart|continue` to `CDossierPublications`. ([#355])
+
+### Fixed
+
+- Fix `#` in a profile value truncating the link it appears in. ([#353])
+- **Breaking:** rename `\CDossierSizeTitle` to `\CDossierSizeDocumentTitle`. ([#243])
+```
+
+4. **One line, no continuation.** §3.6: *"A change should be brief and to the
+   point, no more than one line long."* No follow-up paragraphs, no
+   sub-bullets, no code blocks, no measurements. At this file's wrap a full
+   line carries about twelve words, which is the budget — there is no separate
+   word count to argue about.
+5. **Open with a present-tense imperative verb** (§2.4.1) — `Add`, `Fix`,
+   `Change`, `Remove`, `Rename`, `Move`, `Split`, `Document`, `Correct`,
+   `Bump`, `Deprecate`, `Support`, `Drop`, `Require`, `Allow`, `Stop`. It tells
+   the reader what *upgrading* does, and a sentence opening with a verb cannot
+   grow into a paragraph.
+6. **Make it self-describing without its category heading** (§2.4.1): "Add
+   `numbering` key", not "`numbering` key" under `### Added`. The test is
+   whether the line survives being quoted out of context.
+7. **Mark a breaking change `**Breaking:**` immediately after the dash**, when
+   it alters a public command, environment, class option, key, or documented
+   behaviour incompatibly. This file has no separate top-level "Breaking
+   changes" heading; that structure belongs to the GitHub Release body (below).
+   Entries shipped before #518 use `**BREAKING (scope):**` and are not
+   rewritten.
+8. **End with the closing issue**, reference-style: `([#355])`, with the
+   matching `[#NNN]: https://github.com/amirhs1/CareerDossierTeX/issues/NNN`
+   definition added to the block after that version's section, not at the
+   bottom of the file. Several when §3.4 merges related changes:
+   `([#428], [#439], [#440])`. No commit hashes — §2.4.2 asks for them because
+   §6.2 writes at release time, and an entry written inside its own PR cannot
+   know its squash-merge hash.
+9. **No author attribution.** Common Changelog carries one per line; this
+   project is solo-maintained and the field would be constant.
+10. **Send the reasoning to the PR body, and anything a user must *type* to
+    `docs/MIGRATION.md`.** Mechanism, measurements, rejected alternatives, and
+    scope notes belong in the PR that made the change — permanently readable,
+    and correctable. A source edit, an opt-out recipe, or a command belongs in
+    `docs/MIGRATION.md`, whose version heading then carries one notice line
+    (§2.3):
+
+    ```markdown
+    ## [X.Y.Z] - YYYY-MM-DD
+
+    _If you are upgrading: please see [`docs/MIGRATION.md`](docs/MIGRATION.md)._
+    ```
+
+    If an entry's reasoning genuinely has no home, write it into the document
+    that owns the behaviour and cite that — do not keep the paragraph here.
+    `CHANGELOG.md` is append-only, so a measurement written here can never be
+    corrected once it goes stale.
+11. **Do not wrap an entry line.** The rest of the file wraps at 76–79 columns;
+    an entry does not, or wrapping re-creates the continuation rule 4 forbids.
+    Nothing in `make lint` enforces a column limit.
+12. **Merge related changes** (§3.4) and **remove noise** (§3.2). §3.4 merges
+    one change spread over several commits — not several distinct defects in
+    one area, which stay separate entries because a user can hit them
+    separately.
+
+### Release preparation
+
+13. Add the version's own compare-link definition at the very bottom of the
+    file (`[X.Y.Z]: .../compare/vPREV...vX.Y.Z`) and repoint `[Unreleased]` at
+    `.../compare/vX.Y.Z...HEAD`.
+14. **Before** the retitle in step 2, sweep `[Unreleased]` for
+    contributor-tooling entries and remove them. See "The tooling sweep" below.
 
 ## The tooling sweep (release-preparation time only)
 
@@ -94,8 +154,10 @@ grep -n 'Contributor tooling only' CHANGELOG.md   # the marker, but not the test
 
 1. **Do not trust the marker.** It finds entries that declared themselves; it
    misses one that is tooling-only without carrying it, and #414 found exactly
-   one such entry. Read every lead bullet in `[Unreleased]` and apply the
-   `CONTRIBUTING.md` test to each: *what* changed, not who ran it.
+   one such entry. Read every entry in `[Unreleased]` and apply the
+   `CONTRIBUTING.md` test to each: *what* changed, not who ran it. Under the
+   one-line rule this is a short read, and rule 12's §3.2 "remove noise" is the
+   same test applied when the entry is written rather than at release time.
 2. **Confirm the content has a home before deleting it.** A contributor-facing
    target belongs in `CONTRIBUTING.md`, a suite or guard in `docs/TESTING.md`.
    Usually it is already there and nothing is needed; where it is not, write it

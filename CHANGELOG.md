@@ -10,389 +10,41 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 
 ### Added
 
-- A PDF manual, `doc/careerdossier.tex`, is the toolkit's interface reference,
-  and `make manual` builds it into `build/manual/`. It documents every public
-  class, option, key, command, environment, and design token, with its accepted
-  values and default, in one document. CTAN requires PDF documentation together
-  with its source, and this is the last of its requirements this project did not
-  meet. ([#263])
-
-  The PDF is a build artifact and is not tracked, like every other one here; the
-  release archive ships it beside its source, and `manifest.txt` lists that
-  source under "Distributed with the Work". A CI job builds the manual on every
-  pull request, so one that stops compiling fails a check rather than a release.
-
-  **Documentation only** — no class, option, key, command, token, or rendered
-  output changed.
-
-- `README.md` gains an `## Installation` section covering the three routes onto
-  a path where `\documentclass{careerdossier-resume}` resolves: beside the
-  document, a local `texmf` tree, and Overleaf. Nothing in the repository had
-  said how, so a user who was not cloning it to develop the toolkit was blocked
-  before the first build. ([#261])
-
-  `## Requirements` now states a supported floor rather than "a reasonably
-  complete TeX Live or MiKTeX installation": LaTeX kernel `2022-06-01`, the
-  version every file of the Work already declares through `\NeedsTeXFormat`,
-  and TeX Live 2022 as the release carrying it — held apart from the toolchain
-  the release was verified against, which is TeX Live 2026 and LuaHBTeX 1.24.0.
-  The required packages are named too.
-
-  The file list points at `manifest.txt` instead of restating the ten
-  filenames, so adding or removing a module cannot leave the instructions
-  stale. **Documentation only** — no class, option, key, command, token, or
-  rendered output changed.
-
-- `CDossierPublications` takes a `numbering` key. `restart` is the default and
-  is what the class has always done — each list numbers from `1)`. `numbering =
-  continue` carries on from the previous list instead, so a document whose
-  publication numbers are cited from a cover letter or a grant form can have one
-  sequence across every group. ([#355])
-
-  `\CDossierSubsection` ([#337]) is what made the question visible: before it, a
-  second publication list meant a second ruled section, and restarting read as
-  correct. With grouping, the natural markup is one `Selected Publications`
-  section carrying `Journal Articles` and `Conference Papers`, and both groups
-  opened at `1)` with no way to say which publication `1` meant. Restarting
-  stays the default because a group is a self-contained list and "journal
-  article 1" is unambiguous given the group; continuing is the document's
-  choice, made per list.
-
-  `continue` resumes from the final number of the preceding list wherever it
-  was — a subsection heading and a section rule are equally invisible to it —
-  and behaves identically on the tagged and untagged paths.
-
-  **No existing output moves.** A document that does not set the key renders as
-  before, including every shipped example; the key is additive and its default
-  is the shipped behaviour.
+- Add `doc/careerdossier.tex`, the PDF interface manual, built by `make manual`. ([#263])
+- Add `numbering=restart|continue` to `CDossierPublications`; `restart` is the default. ([#355])
+- Document the three installation routes and the supported kernel floor in `README.md`. ([#261])
 
 ### Changed
 
-- **`docs/ATS-EXTRACTION.md` is the design contract for extraction, tagging, and
-  fonts, and nothing else.** It stated each rule and then reproduced the
-  measurement, procedure, or fixture inventory behind it, so a reader met the
-  same fact twice and a maintainer had two copies to keep true — the duplication
-  [#259] exists to stop, in the file that had the most of it. It is now 3,425
-  words, from 12,528. ([#508])
-
-  Nothing that existed only there was deleted. Each measurement moved to
-  whatever produces it: Poppler's block grouping and the `entrymeta=column`
-  against `entrymeta=inline` comparison into the `tests/extraction/` fixtures
-  they were measured on, the per-word `/ActualText` consumer comparison into
-  `extraction-torture.tex`, the screen-reader procedure and its recorded result
-  into `docs/TESTING.md` beside the other manual pass, the OpenType
-  `...Off`-versus-AAT spelling trap into `careerdossier-typography.sty` beside
-  the line it governs, and the toolchain record CI must keep into
-  `CONTRIBUTING.md` "CI expectations", which the workflow implementing it now
-  cites instead. Everything else was already stated in `AGENTS.md`,
-  `CONTRIBUTING.md`, `docs/TESTING.md`, `docs/ARCHITECTURE.md`, the manual, or a
-  package comment.
-
-  `README.md` gains the two versions the opt-in tagged-PDF preview was verified
-  against — `pdfmanagement-testphase` 0.97c and `tagpdf` 1.0c — as rows of the
-  table that already answers what this release was built and tested on, rather
-  than as a pointer into another document. `docs/API.md` states what makes a
-  command or environment public: intentionally named and documented in the
-  manual, used by a supported example, covered by a repeatable test, and
-  recorded here when it is introduced. Anything else is internal and may change
-  without a migration note.
-
-  **Documentation only** — no class, option, key, command, token, or rendered
-  output changed. The source files touched carry comments only, and the one
-  removed test compared the published template against its fixture, which the
-  fixture now is.
-
-- **`docs/API.md` is now a pointer rather than the interface reference.** The
-  manual above supersedes it: what is left is where to find the manual, how to
-  build it, and the interface stability policy, which binds a contributor
-  changing the interface rather than an author using it. Every other section
-  moved into the manual. ([#263])
-
-  Two documents describing one interface is the duplication [#259] exists to
-  stop, and it had already cost this project once — [#185] found ten sentences
-  left stale across three documents after the `v0.7.0` retune, one of them
-  documenting a recipe that restored half the spacing it claimed to remove. A
-  PDF manual as the reference is also the ordinary shape for a LaTeX package.
-  What it costs a reader of this repository on the web is the inline, browsable
-  reference; `README.md` links the built PDF and `docs/API.md` says how to get
-  one.
-
-  Fifty-three references across nine files were retargeted. `CHANGELOG.md`'s own
-  references are historical and stay as they are, except that two of them
-  carried a section anchor into a file that no longer has that section — those
-  two now link to the file without the anchor, so `make lint` still resolves
-  every Markdown anchor in the tree.
-
-- `README.md`'s quick start covers the shared profile and the résumé, then
-  names the other five document types with their shipped examples in a table.
-  It used to walk through all seven, which the manual now does in full.
-  ([#263])
-
-- `examples/academic/publications.bib` now declares twenty fictional entries
-  across four types (`article`, `inproceedings`, `unpublished` preprints, and
-  `book`) instead of three, so `examples/academic/cv-bibliography.tex` renders
-  two pages under its default `fontsize=12pt` rather than one. ([#197])
-
-  The previous three-entry database was too thin to show the multi-page
-  pagination, varied entry lengths, and list-edge behavior across a page break
-  that [#196]'s calibrated item spacing actually has to handle. The expanded
-  database still builds cleanly — Biber reports no warnings, LuaLaTeX reports
-  no overfull boxes or undefined references — and `tests/bibliography/run.sh`,
-  which derives its shipped-example assertion from the database's own entry
-  count rather than pinning content, passes unchanged.
-
-  **Example content only.** No class, option, key, command, or token changed.
-
-- Two shipped examples now demonstrate the package's two accessibility opt-ins,
-  which no example used before. `examples/industry/resume-english.tex` sets
-  `contact-labels = true`, so its contact line reads `Email: …`, `Phone: …`,
-  `Website: …`; `examples/industry/letter-industry.tex` carries
-  `\DocumentMetadata{lang=en, tagging=on}` and ships tagged. Each explains in
-  its own source comment what the feature does and why a reader might want it.
-  ([#273])
-
-  Both features were implemented, documented, and fixture-covered, but invisible
-  where users actually start. `contact-labels` is the one that matters most: it
-  is the only mechanism that identifies a phone number as a phone number in
-  *untagged* output — the default path, and the one plain extraction and ATS
-  parsers see. It is demonstrated on the résumé, which stays untagged for that
-  reason, while the letter demonstrates the tagged path.
-
-  The tagged letter's source comment repeats the same scope caveat `README.md`
-  uses: the tagged path is a tested preview covering five fixture profiles, and
-  neither that example nor a document derived from it carries a PDF/UA, WCAG,
-  ATS, or general accessibility conformance claim.
-
-  **Example content only.** No class, option, key, command, token, or default
-  changed; both features remain opt-in and off by default, and the other nine
-  examples are untouched. Neither example repaginates: every word of both keeps
-  the vertical position it had, the résumé's labels change only how its contact
-  line packs into its two existing rows, and both still build to one page.
-
-- Headings in `docs/` carry no section number, and a cross-reference names the
-  heading instead of numbering it. `docs/ATS-EXTRACTION.md` and
-  `docs/NAMING-CONVENTION.md` were the two files of eight still numbered; the
-  rule is now written down in `docs/NAMING-CONVENTION.md`, "Documentation
-  heading convention". ([#447])
-
-  A name survives an edit that renumbers everything below it, which is the
-  argument the anchor lint added in [#407] already rests on: a numbered heading
-  carries its number inside its own anchor, so inserting one subsection breaks
-  every link below the insertion point. Roughly thirty cross-references now cite
-  a heading by name, and the release stamps that sat inside two
-  `docs/ARCHITECTURE.md` headings moved into the body under them.
-
-  Eight anchors into the renumbered files were repointed, four of them in this
-  file. Those are links, not text: shipped entries stay as written, including
-  the seven that cite a section number in prose, per [#259] and the precedent
-  [#263] set. Anchors elsewhere in the tree are unaffected, and `make lint`
-  resolves every Markdown anchor in it.
-
-  **Documentation only** — no class, option, key, command, token, or rendered
-  output changed; the one source file touched is a comment in
-  `careerdossier-typography.sty` citing a section by number.
-
-- `docs/MIGRATION.md` is a reader's document from top to bottom. Its `Purpose`
-  and `Entry format` sections sat a third of the way in, between the two upgrade
-  guides and the versioned entries, so a reader upgrading met contributor
-  procedure mid-file and a contributor adding an entry had to scroll past both
-  upgrade guides to find the shape to follow. ([#446])
-
-  The entry shape now lives in `CONTRIBUTING.md`, under "Update `MIGRATION.md`
-  when:", which already stated *when* an entry is required — the same split
-  `CHANGELOG.md`'s own bullet there already uses, pointing at
-  `.agents/skills/release-notes/reference.md` for format. `docs/MIGRATION.md`
-  says in its opening paragraph where that procedure is, and its restatement of
-  the stability policy is now a pointer to `docs/API.md`, which owns it.
-
-  **Documentation only** — no class, option, key, command, token, or rendered
-  output changed, and no versioned entry was touched.
-
-- `README.md`'s "Roadmap" is two paragraphs instead of a twelve-row table of
-  every release and its goal. `docs/ROADMAP.md` "Release overview" carries the
-  same information with a `Status` column the README's copy did not have, and
-  owns it; nothing kept the two in step, and the list changes at every release
-  boundary. What a reader landing on the README wants is what release this is
-  and where the project is going, which is what is left, with the table one
-  link away. ([#449])
-
-  The dropped and deferred milestones are not lost with the table: the support
-  matrix above already states that the toolkit is English-only, that Farsi,
-  bilingual, and right-to-left support is dropped, and that themes, named font
-  families, and icons remain later work.
-
-  **Documentation only** — no class, option, key, command, token, or rendered
-  output changed, and the "current release" block `make lint` reads is
-  untouched.
+- Reduce `docs/ATS-EXTRACTION.md` to design rules and rehome its evidence. ([#508])
+- Change `docs/API.md` to a pointer at the manual plus the stability policy. ([#263])
+- Shorten `README.md`'s quick start to the profile and résumé, tabling the other five. ([#263])
+- Replace `README.md`'s twelve-row roadmap table with a pointer to `docs/ROADMAP.md`. ([#449])
+- Move contributor guidance out of the reader's path in `docs/MIGRATION.md`. ([#446])
+- Drop section numbers from `docs/` headings and name targets in cross-references. ([#447])
+- Extend `examples/academic/publications.bib` to twenty entries, so the CV runs two pages. ([#197])
+- Demonstrate tagging and contact labels in two shipped examples. ([#273])
 
 ### Fixed
 
-- A `--` you type yourself now reaches the PDF `/Title` and `/Author` spelled the
-  same way on both build paths. A `name` of `Ada Lovelace--Byron` shipped
-  `Ada Lovelace–Byron` without `\DocumentMetadata` and `Ada Lovelace--Byron`
-  with it, so turning tagging on changed the name a viewer displays and a screen
-  reader announces. The en dash — what the default path has always produced — is
-  now what both produce. ([#439])
-
-  This is the half [#428] left out of scope. That entry removed the package's own
-  `--` from the derived string by naming the separator as the character it is;
-  that cannot reach a `--` arriving from your profile, because the package does
-  not choose how you spell your own name. Every class is affected, and a
-  statement's `title` is covered too, since it becomes the document type in front
-  of the name.
-
-  Four TeX input ligatures are converted, and `docs/API.md` now lists them:
-  `--`, `---`, `` !` ``, and `` ?` ``. ` `` ` and `''` are **not** among them —
-  measured, not assumed — and reach the PDF as the ASCII characters you typed on
-  both paths, as they always did.
-
-  Values you set yourself are unchanged and still follow `hyperref`'s own
-  behaviour, which does differ between the paths; `docs/API.md` records that
-  under "Overriding the derived metadata". Rewriting them would mean overriding
-  the pass-through [#440] just established, so the package leaves them alone.
-  [#442] settled that as a decision rather than an open residue, and `make
-  metadata` now pins it with the one check in the tree that requires two build
-  paths to *disagree*: the day upstream converges them is the day the suite
-  says `docs/API.md` needs correcting. `pdfsubject`, which this package never
-  reads or writes, diverges the same way, and so does a plain `article` with
-  `hyperref` and none of these classes loaded; that is what places it upstream.
-
-  `make metadata` gains a fixture pair carrying a double-barrelled name and
-  requiring the two paths to agree on `/Title` *and* `/Author`, which are
-  different routes out of `name`. The conversion table itself, including the two
-  sequences that must stay unconverted, is pinned in
-  `tests/regression/components-pdfmeta.lvt`.
-
-  **Metadata only.** No class, option, key, command, token, or default changed,
-  and nothing rendered on the page moves.
-
-- A document's own `\hypersetup{pdftitle=…, pdfauthor=…}` now survives on the
-  tagged build path. Under `\DocumentMetadata` both fields were discarded and
-  replaced by the values derived from the profile, so a document asking for
-  `Draft – Title` by `Someone Else` shipped `Cover Letter – Ada Lovelace` by
-  `Ada Lovelace` instead — silently, with nothing in the log and a clean
-  compile. `docs/API.md`'s "a field you set is never overwritten" is now true on
-  both paths, as it always claimed to be. ([#440])
-
-  Only the tagged path was affected, and it was so from the start rather than by
-  regression. `hyperref`'s `\DocumentMetadata` driver writes the value straight
-  into the LaTeX kernel's PDF management and leaves the `\@pdftitle` and
-  `\@pdfauthor` macros the package reads defined and empty — which is exactly
-  what an unset field looks like, so the package concluded the document had
-  supplied nothing. The fix asks the kernel as well, through
-  `\pdfmanagement_get:nnN`, and treats a field as the document's own when either
-  route carries it. This is the same trap `/Lang` hit in [#276] and the same
-  shape of fix; `/Title` and `/Author` had never been given the equivalent.
-
-  `make metadata` gains a fixture pair that sets both fields and requires both
-  to reach the PDF, tagged and untagged. The default half is not redundant: it
-  is what would catch a repair that traded one path for the other.
-
-  A separate difference — how a `--` you type yourself is spelled on each path —
-  was tracked in [#439] and is fixed in this same release; see its entry above.
-  That is about how your text is spelled, not about whether it arrives, and the
-  fixtures here keep to plain ASCII so the two questions stay apart.
-
-  **Metadata only.** No class, option, key, command, token, or default changed,
-  and nothing rendered on the page moves.
-
-- A document built with `\DocumentMetadata{tagging=on}` now carries the same PDF
-  `/Title` as the same document built without it. Tagged output showed
-  `Cover Letter -- Ada Lovelace` where the default path showed
-  `Cover Letter – Ada Lovelace`, so turning tagging on changed the title a
-  viewer puts in its window and a screen reader announces. The en dash — the
-  form `docs/API.md` has always documented and the default path has always
-  shipped — is now what both paths produce. ([#428])
-
-  Every class is affected, since all four derive their title through one
-  builder; the cover letter is simply where it was noticed. It is not a
-  regression: the builder joined the document type to the name with a literal
-  `--` from the start, and only the default path converted it, because hyperref's
-  `\pdfstringdef` applies the usual ligature substitution on the way to the PDF
-  string. Under `\DocumentMetadata` the kernel's PDF management writes the Info
-  dictionary itself and no such conversion happens.
-
-  `make metadata` now asserts the two paths agree, which is the half of this
-  that closes the gap rather than the instance: nothing logged the difference,
-  and no suite read the title, so both paths passed everything while disagreeing.
-
-  **Metadata only.** No class, option, key, command, token, or default changed,
-  and nothing rendered on the page moves.
-
-- A raw `#` in a profile value or a `\CDossierLink` argument now builds, and the
-  address reaches the link target intact. It used to stop the build with
-  `! Illegal parameter number in definition of \Hy@tempa.` — hyperref's own
-  diagnostic, naming neither the field, nor the value, nor the fix. `\#` keeps
-  working and produces the same annotation, so no existing document changes, and
-  `docs/API.md` no longer asks for the escape. ([#353])
-
-  Every link the toolkit emits is covered: the contact line's `website` and web
-  profiles, `\CDossierLink` in body text, the ORCID resolver, and the academic
-  CV's manual publication list. Both arguments of a link needed the repair, not
-  just the target — `\nolinkurl` is built on the same hyperref internal as
-  `\href`, so the displayed address failed for the same reason.
-
-  The tempting repair is worse than the bug and is worth naming so it is not
-  attempted again: handing hyperref a catcode-12 string compiles with zero
-  errors and silently drops everything from the `#` onwards, because an
-  unescaped `#` is hyperref's fragment delimiter. `example.com/a#b` emitted
-  `/URI(https://example.com/a)` — a loud build failure traded for a link that
-  looks right on the page and points somewhere else, the same class of defect as
-  [#328]. No text-layer suite can see it, so two `tests/annotations/` fixtures
-  pin the emitted action for both spellings side by side.
-
-  `%` is unchanged and still must be written `\%`. TeX's lexer discards it while
-  `\CDossierSetup` is still reading its argument, so no package code can recover
-  it; `docs/API.md` continues to say so.
-
-- A cover letter no longer breaks a page between the closing and the signature
-  name. `\MakeCDossierClosing` keeps the two on the same page, whichever page
-  that turns out to be: when they do not both fit under the body, the break now
-  falls above the closing and the whole block opens the next page. ([#421])
-
-  The two are separate one-line paragraphs, so `\clubpenalty` and
-  `\widowpenalty` — which govern the first and last line of *one* paragraph —
-  never saw the boundary, and the signature gap between them was an ordinary
-  legal breakpoint. The gap was latent in every release since the command was
-  introduced; [#419]'s tightened header boundary is what first moved a committed
-  fixture across the edge that exposes it.
-
-  No public command, class option, key, or token value changes, and no gap
-  moves. Only a letter whose closing did not fit repaginates, and it gains a
-  page rather than losing one.
-
-- The gap below the header stack in a statement or letter now equals the token
-  that names it, at every body size. `\CDossierProseHeaderBelowSkip` and
-  `\CDossierLetterHeaderBelowSkip` measured the boundary between the header
-  stack and the paragraph after it, and a paragraph boundary contributes
-  `\parskip` on top of whatever token guards it — 3.00 pt to 3.625 pt across
-  the three body sizes — so the rendered gap was one `\parskip` wider than
-  either token claimed, under-stating it by up to 27% at 12 pt. The header
-  stack already zeroed and subtracted `\parskip` for the gaps between its own
-  lines; the boundary below the stack now routes through the same emission
-  contract, the way the section rule and the prose headings already do
-  ([#168], [#177]). The résumé and CV's `\CDossierRecordHeaderBelowSkip` was
-  already correct, because those classes' `\parskip` is `0`. No public
-  command, class option, key, or token value changes; the tightened gap moves
-  every statement and letter document and their pagination should be
-  reviewed. ([#419])
+- Fix `--` and `---` in PDF metadata being written literally on the tagged path. ([#439])
+- Fix a document's own `\hypersetup{pdftitle=…}` being overwritten on the tagged path. ([#440])
+- Fix tagged and untagged builds carrying different PDF metadata. ([#428])
+- Fix a raw `#` in a profile value or `\CDossierLink` argument truncating the link. ([#353])
+- Fix the header-to-body gap adding `\parskip` on top of its token in letters and statements. ([#419])
+- Fix a cover letter breaking the page between the closing and the signature. ([#421])
 
 [#197]: https://github.com/amirhs1/CareerDossierTeX/issues/197
-[#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
 [#261]: https://github.com/amirhs1/CareerDossierTeX/issues/261
+[#263]: https://github.com/amirhs1/CareerDossierTeX/issues/263
 [#273]: https://github.com/amirhs1/CareerDossierTeX/issues/273
 [#353]: https://github.com/amirhs1/CareerDossierTeX/issues/353
 [#355]: https://github.com/amirhs1/CareerDossierTeX/issues/355
-[#185]: https://github.com/amirhs1/CareerDossierTeX/issues/185
-[#259]: https://github.com/amirhs1/CareerDossierTeX/issues/259
-[#263]: https://github.com/amirhs1/CareerDossierTeX/issues/263
-[#407]: https://github.com/amirhs1/CareerDossierTeX/issues/407
 [#419]: https://github.com/amirhs1/CareerDossierTeX/issues/419
 [#421]: https://github.com/amirhs1/CareerDossierTeX/issues/421
 [#428]: https://github.com/amirhs1/CareerDossierTeX/issues/428
 [#439]: https://github.com/amirhs1/CareerDossierTeX/issues/439
 [#440]: https://github.com/amirhs1/CareerDossierTeX/issues/440
-[#442]: https://github.com/amirhs1/CareerDossierTeX/issues/442
 [#446]: https://github.com/amirhs1/CareerDossierTeX/issues/446
 [#447]: https://github.com/amirhs1/CareerDossierTeX/issues/447
 [#449]: https://github.com/amirhs1/CareerDossierTeX/issues/449
