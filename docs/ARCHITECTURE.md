@@ -194,40 +194,24 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierLetterBodyBelowSkip` | 0.625 | 7.5 pt | 8.5 pt | 9.0625 pt |
 | `\CDossierLetterSignatureGapSkip` | 2.00 | 24.0 pt | 27.2 pt | 29.0 pt |
 
-Four constraints bind a retune. The derivations are in the issues named; the
-mechanisms are commented at the code that implements them.
+Two ordering relations bind a retune, and neither can be stated at a single
+declaration because each relates one token to another:
 
-- **The rule gap is not a visible gap.**
-  `\CDossierRecordSectionRuleGapSkip` is measured from the section heading's
-  baseline since #169, so it spends the heading's own depth — about 0.20 line —
-  before the rule is reached. Its 0.3125 renders as roughly 0.11 line, and is
-  the smallest sixteenth that clears the descender. It must stay unambiguously
-  smaller than the rule-to-content gap (0.4375), about 1:4; at 1:2 the rule
-  starts to read as a divider between two blocks rather than as part of the
-  heading above it. A retune may move both numbers but not their order, and may
-  not take the rule skip below the heading's depth.
-- **A token that claims a boundary owns all of it.** The two list-edge tokens
-  own the complete distance between a list and its surroundings, which costs
-  every shared list a `partopsep = 0pt` beside its `topsep` (#176); the four
-  `Prose…` tokens own the complete heading gap, which costs the statement class
-  a `\parskip` subtraction on both skips it passes to `\@startsection`. That
-  subtraction has a floor — `\@xsect` reads a non-positive after-skip as a
-  run-in heading request — and `careerdossier-statement.cls` comments it at the
-  code.
-- **Two ordering relations are load-bearing.** Both list-edge ratios stay below
-  `\CDossierRecordSectionBelowSkip` (#191, #206), or entering a list would look
-  like entering a section; and both prose below-tokens stay strictly above
-  `\CDossierProseParSkip`, or every statement heading turns run-in. The prose
-  pair is stated against the paragraph gap rather than against the ruled
-  section, because one pair is calibrated against a zero paragraph gap and the
-  other against a non-zero one, so neither can serve both classes (#177).
-- **`\CDossierRecordListEdgeAboveSkip` carries a floor of 0.25** that does not
-  come from the type scale: below it the entry heading's right-hand dates column
-  stops extracting with its entry (#219). The token ships *at* the floor since
-  #206, so tightening it further is not available without first solving the
-  extraction fault. `entrymeta=inline` (#230) removes the two-column region the
-  floor protects, which is why the inline fixtures may set 0.125 — it does not
-  move the default. `tokens-invariants` guards both.
+- The heading-to-rule gap must stay unambiguously smaller than the
+  rule-to-content gap — `\CDossierRecordSectionRuleGapSkip` against
+  `\CDossierRecordSectionBelowSkip`, currently about 1:4. At 1:2 the rule starts
+  to read as a divider floating between two blocks rather than as part of the
+  heading above it. A retune may move both numbers, but not their order.
+- Both list-edge ratios stay below `\CDossierRecordSectionBelowSkip` (#191,
+  #206), or entering a list would look like entering a section.
+
+Every other constraint on these values is commented at the declaration it
+governs in `careerdossier-tokens.sty`, which is also where the measurement
+behind it lives: the rule gap's hard lower bound, the heading's own depth
+(#169); why the four `Prose…` tokens own the complete gap including the
+`\parskip` an adjacent paragraph contributes, and must stay above
+`\CDossierProseParSkip` (#177); and the `0.25` floor on the list opening edge,
+which Poppler's reading order imposes rather than this design (#219, #230).
 
 The tagged path reaches the same closing edge by a different route (#193):
 LaTeX Lab's block templates leave `\@topsepadd` at 0 pt, so
