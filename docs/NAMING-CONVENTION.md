@@ -515,12 +515,27 @@ manuals — `hyperref`, `biblatex`, `fontspec`, PGF/TikZ, and LaTeX3's own
 CTAN.
 
 **Markdown headings carry no section number**, and a cross-reference names the
-heading rather than numbering it.
+heading rather than numbering it. One form, joined by the literal word
+`section`:
 
 ```text
-Correct:   `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
-Incorrect: `docs/ATS-EXTRACTION.md` §3.4
+Correct:   `docs/ATS-EXTRACTION.md` section "Dates and right alignment"
+Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7>3.4
+Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7> "Dates and right alignment"
+Incorrect: `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
 ```
+
+`<U+00A7>` above stands for the SECTION SIGN, which this repository does not
+contain — see "The section sign is banned outright" below, which is why the
+character cannot be shown here even as a counter-example.
+
+**`section` does not vary with depth.** Not `subsection`, not `subsubsection`.
+Varying it asks the writer to count `#`s in the target file to choose a word,
+and hands the reader a fact — where the heading sits in a hierarchy — that a
+citation does not need to carry, since the heading name alone locates it. The
+same word cites a heading at any level. (`\section`, `\subsection`, and
+`\subsubsection` are LaTeX's names for document levels and are untouched by
+this rule, which governs prose citations only.)
 
 Markdown has neither automatic numbering nor `\ref`. A number there is typed by
 hand in the heading *and* again in every citation of it — two hand-maintained
@@ -553,10 +568,34 @@ Three further things are deliberately outside the Markdown rule:
 - A heading's release stamp, which is content and belongs in the body under the
   heading, not in the heading a reader navigates by.
 
-The two lints that hold this to account are `run-markdown-anchors.sh`, which
-fails when a `](TARGET.md#anchor)` names a heading that no longer exists, and
+### The section sign is banned outright
+
+U+00A7 SECTION SIGN appears in no tracked file, no commit message, no issue
+body, and no pull request body. Not before a number, not before a quoted
+heading, not as a bare noun for the notation. `tests/lint/run-section-sign.sh`,
+which `make lint` runs, fails the build naming every file and line that carries
+it.
+
+The ban is over the character rather than over any particular spelling of it,
+because an exception list is what let four forms coexist here until #520: the
+tree carried U+00A7 with a quoted heading twelve times, U+00A7 with a number
+eleven times, U+00A7 as a bare noun once, and the plain comma this section used
+to show as correct. A rule that permits the character somewhere has to be read
+before it can be obeyed, and a contributor copying the nearest example never
+reads it. A character that appears nowhere needs no reading, and a lint over
+one character needs no carve-out for its own source.
+
+Two consequences follow. A citation of an external numbered document spells the
+word out — Common Changelog's `section 2.4.1`, not the sign — keeping the
+number, which belongs to that document. And Git history, closed issues, and
+merged pull request bodies are left as written; the ban is forward-looking, and
+nothing in the repository can lint prose typed into GitHub, so the rule is the
+only mechanism there.
+
+Three lints hold this section to account: `run-markdown-anchors.sh`, which
+fails when a `](TARGET.md#anchor)` names a heading that no longer exists,
 `run-agents-references.sh`, which fails when `AGENTS.md` quotes a section name
-that no longer exists.
+that no longer exists, and `run-section-sign.sh` above.
 
 ---
 

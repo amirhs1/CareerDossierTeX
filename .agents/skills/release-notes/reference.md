@@ -57,8 +57,9 @@ CHANGELOG" link has gone decorative.
 
 An entry is **one line**. It says what upgrading does and cites its issue;
 everything else has another home. This is the [Common
-Changelog](https://common-changelog.org) shape (§2.4.1, §3.2, §3.4, §3.6),
-adopted in #518 after the file drifted to 195 words per entry against 4.9–17.8
+Changelog](https://common-changelog.org) shape (sections 2.4.1, 3.2, 3.4, and
+3.6), adopted in #518 after the file drifted to 195 words per entry against
+4.9–17.8
 for six comparable projects — `l3build`'s entire changelog, 272 entries since
 2018, is shorter than one of this project's release sections was.
 
@@ -84,12 +85,12 @@ extend the exception to a new entry.
 - **Breaking:** Rename `\CDossierSizeTitle` to `\CDossierSizeDocumentTitle`. ([#243])
 ```
 
-4. **One line, no continuation.** §3.6: *"A change should be brief and to the
-   point, no more than one line long."* No follow-up paragraphs, no
+4. **One line, no continuation.** Section 3.6: *"A change should be brief and
+   to the point, no more than one line long."* No follow-up paragraphs, no
    sub-bullets, no code blocks, no measurements. At this file's wrap a full
    line carries about twelve words, which is the budget — there is no separate
    word count to argue about.
-5. **Open with a present-tense imperative verb** (§2.4.1), from this
+5. **Open with a present-tense imperative verb** (section 2.4.1), from this
    controlled vocabulary:
 
    ```text
@@ -106,7 +107,8 @@ extend the exception to a new entry.
    back — but it is not sacred: add a verb when one is genuinely missing, to
    this list **and** to #518's acceptance command, which repeats it because a
    command cannot cite a document.
-6. **Make it self-describing without its category heading** (§2.4.1): "Add
+6. **Make it self-describing without its category heading** (section 2.4.1):
+   "Add
    `numbering` key", not "`numbering` key" under `### Added`. The test is
    whether the line survives being quoted out of context.
 7. **Mark a breaking change `**Breaking:**` immediately after the dash**, with
@@ -127,9 +129,10 @@ extend the exception to a new entry.
    issues and PRs from one sequence, so the citation reads the same. Four
    historical entries do this. A *new* entry always has an issue to cite —
    `CONTRIBUTING.md` "Work item structure" requires one — so this is a
-   backfill allowance, not a licence to skip filing. Several when §3.4 merges related changes:
-   `([#428], [#439], [#440])`. No commit hashes — §2.4.2 asks for them because
-   §6.2 writes at release time, and an entry written inside its own PR cannot
+   backfill allowance, not a licence to skip filing. Several when section 3.4
+   merges related changes: `([#428], [#439], [#440])`. No commit hashes —
+   section 2.4.2 asks for them because section 6.2 writes at release time, and
+   an entry written inside its own PR cannot
    know its squash-merge hash.
 9. **No author attribution.** Common Changelog carries one per line; this
    project is solo-maintained and the field would be constant.
@@ -138,7 +141,7 @@ extend the exception to a new entry.
     scope notes belong in the PR that made the change — permanently readable,
     and correctable. A source edit, an opt-out recipe, or a command belongs in
     `docs/MIGRATION.md`, whose version heading then carries one notice line
-    (§2.3):
+    (section 2.3):
 
     ```markdown
     ## [X.Y.Z] - YYYY-MM-DD
@@ -153,10 +156,10 @@ extend the exception to a new entry.
 11. **Do not wrap an entry line.** The rest of the file wraps at 76–79 columns;
     an entry does not, or wrapping re-creates the continuation rule 4 forbids.
     Nothing in `make lint` enforces a column limit.
-12. **Merge related changes** (§3.4) and **remove noise** (§3.2). §3.4 merges
-    one change spread over several commits — not several distinct defects in
-    one area, which stay separate entries because a user can hit them
-    separately.
+12. **Merge related changes** (section 3.4) and **remove noise** (section 3.2).
+    Section 3.4 merges one change spread over several commits — not several
+    distinct defects in one area, which stay separate entries because a user
+    can hit them separately.
 
 ### Release preparation
 
@@ -188,8 +191,9 @@ grep -n 'Contributor tooling only' CHANGELOG.md   # the marker, but not the test
    misses one that is tooling-only without carrying it, and #414 found exactly
    one such entry. Read every entry in `[Unreleased]` and apply the
    `CONTRIBUTING.md` test to each: *what* changed, not who ran it. Under the
-   one-line rule this is a short read, and rule 12's §3.2 "remove noise" is the
-   same test applied when the entry is written rather than at release time.
+   one-line rule this is a short read, and rule 12's section 3.2 "remove
+   noise" is the same test applied when the entry is written rather than at
+   release time.
 2. **Confirm the content has a home before deleting it.** A contributor-facing
    target belongs in `CONTRIBUTING.md`, a suite or guard in `docs/TESTING.md`.
    Usually it is already there and nothing is needed; where it is not, write it

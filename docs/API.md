@@ -36,8 +36,8 @@ Two assertions keep the manual honest, and neither is a claim in prose.
 `tests/lint/run-manual-names.sh`, which `make lint` runs, fails the build if the
 manual documents a private LaTeX3 name, if it documents a public name that
 appears in no file of the Work, or if the release it declares disagrees with the
-one the Work declares. `docs/TESTING.md` § "Manual-name lint" states what it
-does and does not check.
+one the Work declares. `docs/TESTING.md` section "Manual-name lint" states what
+it does and does not check.
 
 ## What is still here
 
