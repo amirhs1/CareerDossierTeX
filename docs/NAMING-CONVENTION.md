@@ -323,13 +323,11 @@ Rules:
   of that rule and its exception; this section states only the naming
   residue — which issues currently qualify.
 
-  As of 2026-08-05 exactly two issues qualify:
+  As of 2026-08-29 exactly one issue qualifies:
   [#120](https://github.com/amirhs1/CareerDossierTeX/issues/120) (semantic font
   families, deferred on 2026-07-22, and the reason `v1.1.0 — Themes and Font
-  Families` was closed empty) and
-  [#280](https://github.com/amirhs1/CareerDossierTeX/issues/280) (structural
-  templates). An unmilestoned issue beyond these two is an oversight, not the
-  exception.
+  Families` was closed empty). An unmilestoned issue beyond it is an oversight,
+  not the exception.
 - An epic parent is conditional; the milestone is all but unconditional. See
   "Work item structure" in `CONTRIBUTING.md`.
 - Do not create labels like `v0.1.0`; the milestone already tracks this.
