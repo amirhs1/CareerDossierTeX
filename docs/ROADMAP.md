@@ -479,8 +479,8 @@ Delivered scope and this release's criteria are recorded in the closed
   milestone; `v1.1.0 — Themes and Font Families` was closed empty on 2026-08-05
   ([issue #120](https://github.com/amirhs1/CareerDossierTeX/issues/120)).
 - a `templates/` folder. Proposed in
-  [issue #280](https://github.com/amirhs1/CareerDossierTeX/issues/280) and
-  deliberately unmilestoned; the release that carries it is undecided.
+  [issue #280](https://github.com/amirhs1/CareerDossierTeX/issues/280), which
+  now carries `v0.10.0`; a non-goal of this release, not of the project.
 
 ## Phase 8: `v0.9.0 — Documentation, Examples, and Release Readiness`
 
