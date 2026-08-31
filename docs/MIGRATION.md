@@ -20,7 +20,7 @@ by one `\parskip` — 3.625 pt at `fontsize=12pt` — once per document. No sour
 edit is required; the recipe below restores the previous gap. No public name is
 added, renamed, or removed. `CDossierPublications` gains an optional `numbering`
 key whose default is the shipped behaviour, so no existing document moves.
-Résumé and CV are unaffected. See [`[0.9.0]`](#090---2026-08-26) below.
+Resume and CV are unaffected. See [`[0.9.0]`](#090---2026-08-26) below.
 
 `v0.8.0` was the previous release. **It changes how every existing
 document renders in one place:** an entry's dates and location, and a statement's
@@ -65,7 +65,7 @@ letter's page furniture — and neither requires a source edit; see step 5.
 
 `v0.6.0` adds `fontsize=12pt` and
 `margin=normal|narrow` consistently across all four document classes. The
-résumé now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
+resume now defaults to `fontsize=11pt,margin=narrow`; the CV, letter, and
 statement classes default to `fontsize=12pt,margin=normal`. `normal` is one
 inch and `narrow` is half an inch.
 
@@ -76,22 +76,22 @@ size or margin has changed. A document that took two pages may now take three,
 or one. No source edit is required unless you pass `density`, but do not ship
 an upgraded document without looking at it.
 
-The measure changes too. The résumé defaults to `11pt` at `margin=narrow`, and
+The measure changes too. The resume defaults to `11pt` at `margin=narrow`, and
 the CV, letter, and statement classes to `12pt` at `margin=normal`; the measured
 characters per line for every combination are tabulated in
 [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
 
-The résumé's default is the longest measure in the project, kept deliberately
+The resume's default is the longest measure in the project, kept deliberately
 for one-page capacity; see the manual for when to override it.
 
 On US Letter paper, `margin=narrow` increases the physical text block from the
-v0.5.0 résumé's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
+v0.5.0 resume's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
 more printable area than `margin=normal`. After accounting for the change from
 10pt/12pt body size and leading to 11pt/13.6pt, estimated line-and-page capacity
 is about 16.8% lower than v0.5.0, compared with about 35.1% lower for
 `fontsize=11pt,margin=normal`.
 
-The résumé and CV no longer accept `density=compact|standard`; their vertical
+The resume and CV no longer accept `density=compact|standard`; their vertical
 rhythm is derived from `fontsize`. Remove the option and select the intended
 size and margin directly:
 
@@ -115,7 +115,7 @@ For the CV:
 
 Passing `density` to either class now stops with that class's actionable
 unknown-option error. The CV's former roomier `standard` spacing is intentionally
-retired: the CV and résumé now share proportional rhythm, while the CV remains
+retired: the CV and resume now share proportional rhythm, while the CV remains
 roomier by default because its body size is larger. The manual publication
 list's label separation also moves from `0.6em` to the shared list token.
 
@@ -170,7 +170,7 @@ going forward.
 All four classes now suppress the folio on a single-page document and print
 `Page N of M` on a multi-page one. Both decisions need the document's final
 page count, which LaTeX only knows from the auxiliary file written by the
-previous run. The résumé and CV page-break policy also records list lengths
+previous run. The resume and CV page-break policy also records list lengths
 there.
 
 A first build from a clean tree therefore shows a folio on a one-page document
@@ -267,7 +267,7 @@ missing glyphs before trusting the output.
 ### 4. Re-check pagination
 
 LuaHBTeX's line breaking is not byte-identical to XeTeX's. Page breaks can shift
-by a line in long documents. Review multi-page CVs and two-page résumés after
+by a line in long documents. Review multi-page CVs and two-page resumes after
 upgrading rather than assuming identical pagination.
 
 ### 5. Review the academic CV and letter page furniture
@@ -278,8 +278,8 @@ is required** — this is rendered output only, and no class, option, key, or
 command changed.
 
 Affects `careerdossier-cv` and `careerdossier-letter` with `family=academic`.
-The industry letter and the résumé are **unaffected**: the industry letter keeps
-its `v0.1` empty page style, and the résumé still prints no folio.
+The industry letter and the resume are **unaffected**: the industry letter keeps
+its `v0.1` empty page style, and the resume still prints no folio.
 
 | | Before (`v0.2.x`) | After (`v0.4.0`) |
 | --- | --- | --- |
@@ -337,6 +337,39 @@ requires no migration. To try it, add `\DocumentMetadata` before
 Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
+## [Unreleased]
+
+### The resume `/Title` and running page label are spelled `Resume`
+
+`careerdossier-resume` registered the document type and the running page label
+with an acute accent on both vowels, so a document built from it carried a PDF
+`/Title` of `Resume – <name>` spelled that way, and repeated the same spelling in
+the running header of every page after the first. The class file, the shipped
+example, the `make` target, and the CI job all spelled the word in ASCII, and
+nothing stated which was right. Both strings are now `Resume`.
+
+**No source edit is required, and nothing reflows.** The replacement is one
+character shorter in each of two places; the running label sits in page
+furniture that is set ragged against a fixed width, and no example and no
+class × margin × size combination changes its page count. Only the resume class
+is affected — the letter, CV, and statement document types never carried an
+accent.
+
+Two places outside the document may notice. Tooling that matches the PDF `/Title`
+by string — an applicant-tracking pipeline, a document-management rule, a script
+that names files from metadata — should be updated to expect `Resume`. And a
+`/Title` set explicitly by the document still wins, so a document that needs the
+previous spelling can ask for it:
+
+```latex
+\hypersetup{ pdftitle = {R\'esum\'e -- Ada Lovelace} }
+```
+
+The running page label has no public interface and cannot be overridden the same
+way. If you need it, say so on
+[#543](https://github.com/amirhs1/CareerDossierTeX/issues/543) and it can be
+published as a key.
+
 ## [0.9.0] - 2026-08-26
 
 ### The gap below the header stack no longer adds `\parskip`
@@ -361,7 +394,7 @@ value changes.
 one `\parskip` — 3.625 pt at `fontsize=12pt` — once per document. Measured on
 the shipped examples and on the size/margin matrix, no example and no
 class × margin × size combination changes its page count, but a letter or
-statement fits marginally more body text on page one. Résumé and CV are
+statement fits marginally more body text on page one. Resume and CV are
 unaffected, because `\CDossierRecordParSkip` is `0.00` and the subtraction was
 already a no-op there.
 
@@ -377,7 +410,7 @@ gap back after `\documentclass`:
 Use `\CDossierProseHeaderBelowSkip` with `\CDossierProseParSkip` in
 `careerdossier-statement`. Unlike the `v0.7.0` note above, the token may be read
 here rather than written out, because no retune accompanies this change. Do not
-apply it in the résumé or CV, whose gap never moved.
+apply it in the resume or CV, whose gap never moved.
 
 ## [0.8.0] - 2026-08-12
 
@@ -390,7 +423,7 @@ names.
 No source edit is required unless an entry body contains catcode-sensitive
 content. Nothing renders differently, and no vertical token changed.
 
-`CDossierEntry` now takes its body as a `+b` argument in both the résumé and the
+`CDossierEntry` now takes its body as a `+b` argument in both the resume and the
 CV class. The consequence is the usual one for an environment that grabs its
 body: characters are tokenized when the body is read, so anything that depends
 on rescanning them no longer works directly inside an entry.
@@ -466,7 +499,7 @@ differing only in name
 ### Entry metadata is no longer italic by default
 
 **This changes rendered output in every existing document.** An entry's dates
-and location in the résumé and CV, and the statement's application-context
+and location in the resume and CV, and the statement's application-context
 line, were italic; they are now upright black body text. No source edit is
 required, no command, option, or key is renamed, and the text layer and reading
 order are unchanged — but a document that wants the previous appearance must now
@@ -606,7 +639,7 @@ scope, so the letter's and statement's document-wide paragraph gap no longer
 lands in every header boundary on top of the header token.
 
 **Letters and statements reflow.** Each header boundary tightens by 0.50 of a
-line — 7.25 pt at `fontsize=12pt`. No example changes page count. Résumé and CV
+line — 7.25 pt at `fontsize=12pt`. No example changes page count. Resume and CV
 are unaffected: `\CDossierRecordParSkip` is already `0.00`.
 
 To keep the previous letter or statement header spacing, add back what the old
@@ -621,7 +654,7 @@ To keep the previous letter or statement header spacing, add back what the old
 
 That figure is for `fontsize=12pt`; use `6.8pt` at `11pt` and `6pt` at `10pt`.
 Write it out rather than reading `\CDossierProseParSkip`, which the retune above
-halves. Do not apply it in the résumé or CV.
+halves. Do not apply it in the resume or CV.
 
 ### `\CDossierRecordEntryGapSkip` became a floor rather than added space
 
@@ -629,7 +662,7 @@ No source edit is required. The entry heading → body gap is now contributed wi
 `\addvspace`, so the gap above a bullet list was `\CDossierRecordEntryGapSkip`
 **plus** `\CDossierRecordListEdgeAboveSkip` and is now the larger of the two.
 
-**Résumés and CVs reflow slightly.** That gap tightens by
+**Resumes and CVs reflow slightly.** That gap tightens by
 `\CDossierRecordEntryGapSkip` — 0.85 pt at `fontsize=11pt`, 0.91 pt at `12pt`.
 An entry whose body is ordinary prose is unchanged, and no example changes page
 count. Why a `\vspace` made the two add is under
@@ -641,7 +674,7 @@ No source edit is required. Position now decides which token guards a boundary,
 not presence: the gap below the name is always
 `\CDossierSharedHeaderNameGapSkip`.
 
-**A résumé, CV, or letter with no `headline` reflows.** That boundary previously
+**A resume, CV, or letter with no `headline` reflows.** That boundary previously
 fell through to `\CDossierSharedHeaderMetaGapSkip` (0.1875), so it gains
 `0.0625` of a line — 0.85 pt at `fontsize=11pt`. Setting `headline` is
 unaffected.

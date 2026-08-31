@@ -456,7 +456,7 @@ check_structure() {
 # sibling with nothing tying content to the heading that introduces it.
 #
 # veraPDF UA-2 passes either way, so this count is the only thing that sees it.
-# Before the fix, résumé and CV emitted zero divisions around two headings each
+# Before the fix, resume and CV emitted zero divisions around two headings each
 # while the statement, which keeps the kernel's `\@startsection', emitted two.
 #
 # The expected number is per profile and is stated rather than derived, so a
@@ -538,7 +538,7 @@ check_heading_title() {
 # heading primitive -- the kernel's dflt namespace maps that depth to `/H1' --
 # so it must be the document's *only* `/H1', and it must outrank every other
 # heading. Every one of the five named profiles carries exactly one `/S
-# /section' element (the name); a résumé/CV/statement section heading is `/S
+# /section' element (the name); a resume/CV/statement section heading is `/S
 # /subsection' (`/H2') and a statement subsection would be `/S /subsubsection'
 # (`/H3'). These three literal tags cannot collide as substrings of one
 # another once each is anchored to its own `/S ' key, so a plain count is
@@ -600,7 +600,7 @@ check_subsection_hierarchy() {
 check_two_page_furniture() {
   local base="$1"
   local pdf="$work/$base.pdf"
-  local pages page_one page_two running_label
+  local pages page_one page_two running_label running_title
 
   pages="$(pdfinfo "$pdf" | awk '/^Pages:/ { print $2 }')"
   if [ "$pages" -ne 2 ]; then
@@ -616,6 +616,7 @@ check_two_page_furniture() {
   case "$base" in
     cv)
       running_label="Curriculum Vitae"
+      running_title="Tagged Academic CV"
       require_text "$page_two" "Tagged Academic CV" \
         "cv page two has no running header"
       require_text "$page_two" "$running_label" \
@@ -625,6 +626,7 @@ check_two_page_furniture() {
       ;;
     academic-letter)
       running_label="Cover Letter"
+      running_title="Tagged Academic Letter"
       require_text "$page_two" "Tagged Academic Letter" \
         "academic-letter page two has no running header"
       require_text "$page_two" "$running_label" \
@@ -634,6 +636,7 @@ check_two_page_furniture() {
       ;;
     statement)
       running_label="Research Programme"
+      running_title="Tagged Research Statement"
       require_text "$page_two" "Tagged Research Statement" \
         "statement page two has no running header"
       require_text "$page_two" "$running_label" \
@@ -642,7 +645,8 @@ check_two_page_furniture() {
         "statement page two has no folio"
       ;;
     resume)
-      running_label="Résumé"
+      running_label="Resume"
+      running_title="Tagged Industry Resume"
       require_text "$page_two" "Tagged Industry Resume" \
         "resume page two has no running header"
       require_text "$page_two" "$running_label" \
@@ -652,6 +656,7 @@ check_two_page_furniture() {
       ;;
     letter)
       running_label="Cover Letter"
+      running_title="Tagged Industry Letter"
       require_text "$page_two" "Tagged Industry Letter" \
         "letter page two has no running header"
       require_text "$page_two" "$running_label" \
@@ -661,8 +666,13 @@ check_two_page_furniture() {
       ;;
   esac
 
-  forbid_text "$page_one" "$running_label" \
-    "$base page one unexpectedly contains its running label"
+  # Over the whole running-header line, not the bare label. The resume's label
+  # is a substring of its own identity name -- page one opens with `Tagged
+  # Industry Resume' -- so a bare-label assertion reports ordinary page-one body
+  # text as leaked furniture (#543). The header emits title and label as one
+  # unit, so the line is what a leak would actually put on page one.
+  forbid_text "$page_one" "$running_title – $running_label" \
+    "$base page one unexpectedly carries its running header"
 }
 
 check_page_two_artifact_stream() {

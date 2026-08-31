@@ -1,8 +1,8 @@
 % cv-entry-keep-penalty.lvt — issue #332, the CV half.
 %
 % careerdossier-cv declares its own CDossierEntry rather than sharing the
-% résumé's, so the guard that decides whether the keep penalty is emitted exists
-% twice and can drift. resume-entry-edges.lvt asserts the résumé copy; this file
+% resume's, so the guard that decides whether the keep penalty is emitted exists
+% twice and can drift. resume-entry-edges.lvt asserts the resume copy; this file
 % asserts the CV copy, and exists at all because the CV class had no entry-edge
 % regression of its own.
 %

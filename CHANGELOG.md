@@ -8,6 +8,12 @@ Before `v0.10.0`, breaking changes may occur, but they must be documented here a
 
 ## [Unreleased]
 
+### Changed
+
+- Change the resume `/Title` and running page label to `Resume`, spelled in ASCII. ([#543])
+
+[#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
+
 ## [0.9.0] - 2026-08-26
 
 _If you are upgrading: please see [`docs/MIGRATION.md`](docs/MIGRATION.md)._
@@ -22,7 +28,7 @@ _If you are upgrading: please see [`docs/MIGRATION.md`](docs/MIGRATION.md)._
 
 - Reduce `docs/ATS-EXTRACTION.md` to design rules and rehome its evidence. ([#262], [#480], [#508])
 - Change `docs/API.md` to a pointer at the manual plus the stability policy. ([#263])
-- Shorten `README.md`'s quick start to the profile and résumé, tabling the other five. ([#263])
+- Shorten `README.md`'s quick start to the profile and resume, tabling the other five. ([#263])
 - Replace `README.md`'s twelve-row roadmap table with a pointer to `docs/ROADMAP.md`. ([#449])
 - Move contributor guidance out of the reader's path in `docs/MIGRATION.md`. ([#446], [#481])
 - Drop section numbers from `docs/` headings and name targets in cross-references. ([#447])
@@ -66,7 +72,7 @@ changes only; a change to contributor tooling is documented in
 produced stays as written: `make review-pagefill` and its 90% page-fill floor
 under `### Added
 
-- Add `\CDossierSubsection{<title>}`, a second heading level for the résumé and CV. ([#337])
+- Add `\CDossierSubsection{<title>}`, a second heading level for the resume and CV. ([#337])
 - Add `make review-pagefill`; `make layout` now asserts a 90% page-fill floor on every page a policy governs. ([#334])
 - Add `\CDossierLink{<url>}`, the supported way to put a breakable, linked address in body text. ([#308])
 - Add `entrymeta=column|inline`, choosing whether an entry's dates and location sit in a flush-right column or inline. ([#230])
@@ -105,7 +111,7 @@ under `### Added
 - Fix a bibliography's entry numbers extracting as a block ahead of the entry text under a plain `pdftotext` run. ([#199])
 - Fix a bibliography URL ending a justified line extracting as separated tokens. ([#199])
 - Fix tagged output giving the document identity no heading role, so it now opens its own top-level `/H1`. ([#267])
-- Fix a tagged résumé or CV section heading opening no enclosing `Sect` division, leaving the tree flat. ([#268])
+- Fix a tagged resume or CV section heading opening no enclosing `Sect` division, leaving the tree flat. ([#268])
 - Fix the identity heading and the statement's title line recording no title on their heading element. ([#305])
 - Fix an entry heading's parts and a letter's recipient block reaching the structure tree as one run-on string. ([#302])
 
@@ -225,13 +231,13 @@ precedent for adding a similar entry today. See
 ### Changed
 
 - Retune the shared baseline-derived spacing tokens onto a compact one-sixteenth-line vocabulary; every document may reflow. ([#166])
-- **Breaking:** Change the résumé's default to `fontsize=11pt,margin=narrow`, and the other three to `12pt,normal`. ([#138], [#141], [#142])
+- **Breaking:** Change the resume's default to `fontsize=11pt,margin=narrow`, and the other three to `12pt,normal`. ([#138], [#141], [#142])
 - Scale the shared identity block's name, headline, contact text, and vertical gaps from the calibrated `fontsize` tokens. ([#139])
 - Change all four classes to one component-owned page furniture: no folio on a one-page document, `Page N of M` beyond it. ([#140])
-- Derive the résumé and CV section, entry, rule, and bullet-list metrics from the calibrated type and rhythm tokens. ([#141], [#142])
+- Derive the resume and CV section, entry, rule, and bullet-list metrics from the calibrated type and rhythm tokens. ([#141], [#142])
 - **Breaking:** Change the industry and academic letters to share one token-derived geometry; `family=academic` becomes label-only. ([#143])
 - **Breaking:** Scale statement headers and prose from the calibrated tokens; the name is no longer fixed at LaTeX's `\Huge`. ([#144])
-- Change the résumé and CV to apply a stated page-break policy, keeping each heading with what it introduces. ([#145])
+- Change the resume and CV to apply a stated page-break policy, keeping each heading with what it introduces. ([#145])
 
 ### Fixed
 
@@ -247,7 +253,7 @@ precedent for adding a similar entry today. See
 
 ### Removed
 
-- **Breaking:** Remove `density=compact|standard` from the résumé and CV; use `fontsize` with `margin` instead. ([#141], [#142])
+- **Breaking:** Remove `density=compact|standard` from the resume and CV; use `fontsize` with `margin` instead. ([#141], [#142])
 
 [#138]: https://github.com/amirhs1/CareerDossierTeX/issues/138
 [#139]: https://github.com/amirhs1/CareerDossierTeX/issues/139
@@ -385,7 +391,7 @@ fixtures. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 
 ## [0.1.0] - 2026-07-15
 
-First tagged release: an English industry résumé and a matching industry cover
+First tagged release: an English industry resume and a matching industry cover
 letter driven by shared profile metadata, built with XeLaTeX on US Letter paper
 in a monochrome theme.
 
@@ -396,12 +402,12 @@ there is nothing to cite; see `.agents/skills/release-notes/reference.md`.
 ### Added
 
 - Add the `l3build` regression harness and backfill committed coverage for the four Phase 1 packages. ([#10], [#25])
-- Add `careerdossier-resume.cls`, the English industry résumé class, with `\CDossierSection`, `CDossierEntry`, and `CDossierItemize`. ([#8])
+- Add `careerdossier-resume.cls`, the English industry resume class, with `\CDossierSection`, `CDossierEntry`, and `CDossierItemize`. ([#8])
 - Add `careerdossier-letter.cls`, the English industry cover-letter class, with `\CDossierLetterSetup` and its letterhead commands. ([#9])
 - Add a shared entry-heading primitive in `careerdossier-components.sty`, leaving no stray separator when a field is absent. ([#8])
-- Add the supported résumé example and the shared profile it reads. ([#8])
-- Add the supported cover-letter example, sharing the résumé's profile. ([#9])
-- Add résumé smoke, layout-stress, and extraction fixtures covering the supported builds and the required failure paths. ([#8])
+- Add the supported resume example and the shared profile it reads. ([#8])
+- Add the supported cover-letter example, sharing the resume's profile. ([#9])
+- Add resume smoke, layout-stress, and extraction fixtures covering the supported builds and the required failure paths. ([#8])
 - Add cover-letter smoke, layout-stress, and extraction fixtures, pinning the recipient block and reading order. ([#9])
 - Add `docs/API.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, and `docs/MIGRATION.md`. ([#4], [#20])
 - Add GitHub issue templates and a pull-request template. ([#20])
@@ -415,7 +421,7 @@ there is nothing to cite; see `.agents/skills/release-notes/reference.md`.
 
 ### Changed
 
-- Clarify that the résumé, cover-letter class, shared profile interface, and CI workflow remain pre-release targets until verified.
+- Clarify that the resume, cover-letter class, shared profile interface, and CI workflow remain pre-release targets until verified.
 - Standardize the licensing language around LPPL maintenance status and the current maintainer.
 
 ### Fixed

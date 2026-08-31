@@ -4,11 +4,11 @@
 %   The CV counterpart of resume-entry-dates-order.tex. Both classes render
 %   their entry headings through the same shared component,
 %   `\__cdossier_components_entryhead:nnnn', but they do not share geometry: the
-%   CV is 12pt/normal against the résumé's 11pt/narrow, so the same list-edge
+%   CV is 12pt/normal against the resume's 11pt/narrow, so the same list-edge
 %   ratio resolves to a different measured gap and the reading-order threshold
 %   has to be asserted for each.
 %
-%   As in the résumé fixture, the *first* entry is the assertion — its dates and
+%   As in the resume fixture, the *first* entry is the assertion — its dates and
 %   location must extract between its heading and its bullets. The last entry on
 %   a page trails its own column regardless of the list edge, so it discriminates
 %   nothing. Lower `\CDossierRecordListEdgeAboveSkip' below 0.25 and the first
@@ -17,7 +17,7 @@
 %   #219 established that the component cannot keep its column unconditionally:
 %   Poppler groups blocks at page level, so the gap below the heading is the
 %   only lever. The floor measured 0.25 for this class too — identical to the
-%   résumé's, at 10pt, 11pt, and 12pt — which is why the bound is stated as a
+%   resume's, at 10pt, 11pt, and 12pt — which is why the bound is stated as a
 %   ratio in tokens-invariants rather than per class.
 %   docs/ATS-EXTRACTION.md#dates-and-right-alignment states the rule;
 %   resume-entry-dates-order.tex carries the block-grouping measurement.

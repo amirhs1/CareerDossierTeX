@@ -103,7 +103,7 @@ extend the exception to a new entry.
 
    It tells the reader what *upgrading* does, and a sentence opening with a
    verb cannot grow into a paragraph. The list is closed on purpose — a
-   vocabulary of thirty-two is what keeps "The résumé now…" from creeping
+   vocabulary of thirty-two is what keeps "The resume now…" from creeping
    back — but it is not sacred: add a verb when one is genuinely missing, to
    this list **and** to #518's acceptance command, which repeats it because a
    command cannot cite a document.

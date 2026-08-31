@@ -173,7 +173,7 @@
 
 %% Issue #299: \CDossierSubjectStyle and \CDossierEntryTitleStyle resolve to the
 %% same shape, and that is deliberate rather than duplication. A letter's subject
-%% line and a résumé entry's heading are two independent semantic decisions that
+%% line and a resume entry's heading are two independent semantic decisions that
 %% currently agree; either may change without the other, and a future retune of
 %% entry headings must not silently restyle every letter. Do not factor one into
 %% the other, and do not define either in terms of the other.
@@ -237,7 +237,7 @@
 %% they must not collide. `sec/<n>/title' is the kernel's own generic
 %% structure name for a level-<n> sectioning title; its default role mapping
 %% resolves depth 1 to `/H1', depth 2 to `/H2', and so on. Depth 1 is reserved
-%% for the document identity (the name), so every other heading -- a résumé or
+%% for the document identity (the name), so every other heading -- a resume or
 %% CV `\CDossierSection', a statement's title -- passes a depth of 2 or
 %% deeper, keeping the identity the document's one and only `/H1' and the
 %% heading hierarchy unskipped beneath it.

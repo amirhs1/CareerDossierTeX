@@ -27,7 +27,7 @@
 #      set of links in the screen rendering, since that is the reading this
 #      choice rests on.
 #
-# The letter fixture is included because it carries the one case the résumé does
+# The letter fixture is included because it carries the one case the resume does
 # not: an author's own \href whose anchor text is itself an address. The toolkit
 # suppresses decoration on the links it renders, not on the ones an author
 # writes, so that anchor is decorated — a reviewer should confirm a ruled
@@ -115,7 +115,7 @@ render_medium_pair() {
   done
 }
 
-echo "Building résumé link-decoration pair (resume-link-decoration-screen.tex)"
+echo "Building resume link-decoration pair (resume-link-decoration-screen.tex)"
 render_medium_pair resume-link-decoration-screen.tex resume
 
 echo
@@ -135,7 +135,7 @@ fi
   echo "combinations: 2 media x 2 families = 4"
   echo "file naming: <family>-<medium>.pdf"
   echo "sources:"
-  echo "  résumé - tests/layout/resume-link-decoration-screen.tex"
+  echo "  resume - tests/layout/resume-link-decoration-screen.tex"
   echo "  letter - tests/layout/letter-long-fields.tex"
   echo "only the 'medium' option differs between the two files of a pair"
   echo

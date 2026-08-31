@@ -68,5 +68,5 @@
 \__cdossier_test_assert_header:
 \ExplSyntaxOff
 \CDossierSection{Experience}
-The identity block remains followed by ordinary résumé content.
+The identity block remains followed by ordinary resume content.
 \end{document}

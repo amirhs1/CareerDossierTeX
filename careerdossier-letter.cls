@@ -197,7 +197,7 @@
   }
 
 %% A prose letter reads best at a slightly larger default body size than the
-%% résumé. Explicit fontsize options remain available for all letter families.
+%% resume. Explicit fontsize options remain available for all letter families.
 \use:x
   {
     \exp_not:N \LoadClass
@@ -217,7 +217,7 @@
 \__cdossier_tokens_apply_body_size:
 
 %% Declare the document type so the shared PDF-metadata code can title this
-%% document distinctly from a résumé built off the same profile. The title
+%% document distinctly from a resume built off the same profile. The title
 %% itself is assembled in careerdossier-components, which owns identity.
 \str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
   { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
@@ -399,7 +399,7 @@
 %%
 %% Issue #299: the subject line uses \CDossierSubjectStyle, the role that
 %% describes it. It previously borrowed \CDossierEntryTitleStyle, which names a
-%% résumé or CV entry heading -- a shape that happens to match, attached to a
+%% resume or CV entry heading -- a shape that happens to match, attached to a
 %% name that does not describe this line. Nothing on the page moved.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \MakeCDossierLetterhead { }

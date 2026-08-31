@@ -1,4 +1,4 @@
-% tokens-resume-defaults.lvt — résumé class layout-input defaults.
+% tokens-resume-defaults.lvt — resume class layout-input defaults.
 \input{regression-test}
 \documentclass{careerdossier-resume}
 \ExplSyntaxOn

@@ -316,17 +316,17 @@ same margin yields about 106. Capping `\textwidth` from a target measure
 instead was rejected for this release: reaching roughly 80 characters at 11 pt
 needs side margins near 1.68 in, which no career-services guidance endorses.
 
-The résumé is the deliberate exception — `11pt` at `margin=narrow`, the longest
+The resume is the deliberate exception — `11pt` at `margin=narrow`, the longest
 measure in the project — because one-page capacity was judged worth more than
 the measure. The trade is bounded, since `\hfill`-split entry lines and short
 bullets never approach the full measure, but it is real in a full-width summary
-paragraph. Do not narrow the résumé's default without revisiting the capacity
+paragraph. Do not narrow the resume's default without revisiting the capacity
 argument: it is an accepted limitation, not an oversight.
 
 #### Page-break penalties
 
 `careerdossier-tokens.sty` owns the named typographic penalties (#171) and the
-résumé/CV-only structural keep-together penalties (#145), applied by
+resume/CV-only structural keep-together penalties (#145), applied by
 `\CDossierApplyPageBreakPenalties`. All default to `10000`, which `\raggedbottom`
 is what makes safe — and that `\raggedbottom` is inherited from `article.cls`
 rather than set here, which is why the `tokens-*-defaults` baselines assert each
@@ -417,7 +417,7 @@ insert separators between them, so an absent `phone` leaves no separator behind.
 
 ### `careerdossier-resume.cls`
 
-Résumé-specific page behaviour for the English industry dossier. The file's own
+Resume-specific page behaviour for the English industry dossier. The file's own
 header comment states the responsibilities. Reusable contact or identity logic
 belongs in `careerdossier-components.sty`, not in the class.
 
@@ -462,7 +462,7 @@ under "Dependency direction" above.
 ### Build on a stable base class
 
 Use `\LoadClass` rather than reimplementing LaTeX's entire page, list, footnote,
-and section machinery. `article` is a suitable base for the résumé; the letter
+and section machinery. `article` is a suitable base for the resume; the letter
 class may build on `article` or `letter` if its output order is tested. Override
 only what the document type requires.
 
@@ -473,7 +473,7 @@ Every file should identify itself and its minimum kernel date:
 ```tex
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesClass{careerdossier-resume}
-  [2026-07-30 v0.6.0 ATS-conscious résumé class]
+  [2026-07-30 v0.6.0 ATS-conscious resume class]
 ```
 
 Choose the actual date based on the newest kernel interface used. The current LaTeX

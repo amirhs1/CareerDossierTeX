@@ -15,7 +15,7 @@
 %%
 %% This work consists of the files listed in manifest.txt.
 %%
-%% careerdossier-resume owns résumé-specific page behaviour for the English
+%% careerdossier-resume owns resume-specific page behaviour for the English
 %% industry dossier: Letter/A4 geometry, class options, and the section,
 %% entry, and list structures.
 %% Reusable identity and contact logic lives in careerdossier-components; this
@@ -25,7 +25,7 @@
 %% delegate geometry to careerdossier-tokens; process the fontsize, margin,
 %% paper, bodyfont, medium, muted, and entrymeta options, forwarding medium,
 %% muted, and entrymeta to careerdossier-components, which owns the furniture,
-%% de-emphasis, and entry-metadata decisions; register the `Résumé' running
+%% de-emphasis, and entry-metadata decisions; register the `Resume' running
 %% label and enable shared page furniture; render sections, entries, and lists
 %% from the shared type, rhythm, rule, and list tokens; expose the shared second
 %% heading level as \CDossierSubsection (#337), so a resume, CV, and statement
@@ -34,7 +34,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplClass {careerdossier-resume} {2026-08-26} {0.9.0}
-  {CareerDossierTeX English industry résumé class}
+  {CareerDossierTeX English industry resume class}
 
 %% ---------------------------------------------------------------------------
 %% Class options (l3keys). Unsupported keys and choice values are rejected with
@@ -228,17 +228,17 @@
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a letter built off the same profile. The title
 %% itself is assembled in careerdossier-components, which owns identity.
-\__cdossier_components_doctype:n { Résumé }
+\__cdossier_components_doctype:n { Resume }
 
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_resume_paper_tl
 
-\__cdossier_components_runninglabel:n { Résumé }
+\__cdossier_components_runninglabel:n { Resume }
 \__cdossier_components_apply_page_furniture:
 
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierRecordParSkip }
 %% Issue #272: the shared line-breaking flexibility every family applies. The
-%% résumé set none until then, though it is fully justified and its bullet text
+%% resume set none until then, though it is fully justified and its bullet text
 %% carries the toolkit's longest unbreakable strings. The policy and its
 %% reasoning live with the token in careerdossier-tokens.
 \setlength { \emergencystretch } { \CDossierEmergencyStretch }
@@ -251,7 +251,7 @@
 \__cdossier_components_headerbelow:N \CDossierRecordHeaderBelowSkip
 
 %% ---------------------------------------------------------------------------
-%% \CDossierSection {title} -- a résumé section heading followed by a full-width
+%% \CDossierSection {title} -- a resume section heading followed by a full-width
 %% rule. Uses the semantic section style with class-controlled size, spacing,
 %% and rule colour. The keep-together penalty (issue #145) after the heading
 %% and rule keeps the title with the content that follows it, so a section
@@ -259,7 +259,7 @@
 %%
 %% Issue #267: depth 2, not 1 -- the document identity (the name, in
 %% \MakeCDossierHeader) is the document's one depth-1 heading, so every
-%% résumé/CV section heading sits one level under it.
+%% resume/CV section heading sits one level under it.
 %%
 %% Issue #268: the heading also opens the division that encloses it and the
 %% entries it introduces, and passes its plain title so the heading element
@@ -299,10 +299,10 @@
   { \__cdossier_components_subsection:n {#1} }
 
 %% ---------------------------------------------------------------------------
-%% CDossierEntry -- one résumé entry (job, degree, project, ...). Named keys are
+%% CDossierEntry -- one resume entry (job, degree, project, ...). Named keys are
 %% self-documenting and extensible; only title is required. The heading itself
 %% is rendered by the shared components primitive so the optional-field and
-%% separator rules stay in one place; this environment supplies only résumé
+%% separator rules stay in one place; this environment supplies only resume
 %% spacing around it. The body is free content, typically a CDossierItemize.
 %% ---------------------------------------------------------------------------
 \tl_new:N \l__cdossier_resume_entry_title_tl
@@ -393,7 +393,7 @@
   }
 
 %% ---------------------------------------------------------------------------
-%% CDossierItemize -- a résumé-appropriate flush-left bullet list using shared
+%% CDossierItemize -- a resume-appropriate flush-left bullet list using shared
 %% list and rhythm tokens. Prefer this over redefining itemize globally.
 %%
 %% Issue #145: `beginpenalty' keeps the first bullet with whatever precedes the

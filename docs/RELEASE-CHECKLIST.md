@@ -106,7 +106,7 @@ mechanism: the class files sit in a flat directory beside the document, and
 extracted archive on 2026-08-17 — the ten Work files from
 `build/distrib/ctan/careerdossier/`, an example document and its profile beside
 them, `TEXINPUTS` emptied and `TEXMFHOME` pointed at a nonexistent path — and
-`latexmk -lualatex` produced the résumé, resolving every class and package from
+`latexmk -lualatex` produced the resume, resolving every class and package from
 that directory.
 
 **That is the route's mechanism, not Overleaf.** Overleaf pins its own TeX Live

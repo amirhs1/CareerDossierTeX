@@ -15,7 +15,7 @@
 #           under it TeX stops at the first report and a second one further
 #           down the preamble would never reach the log.
 #
-# This is the supported-build and required-failure gate for the résumé class.
+# This is the supported-build and required-failure gate for the resume class.
 # It complements the layout runner (page stress) and the extraction runner
 # (text layer and reading order).
 #

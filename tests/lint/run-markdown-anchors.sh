@@ -30,10 +30,11 @@
 # derivation here is that rule, with one deliberate narrowing: it strips ASCII
 # punctuation by name, plus the two non-ASCII punctuation marks the headings in
 # this repository actually contain (em dash and rightwards arrow), and keeps
-# every other byte. That keeps `é` — `## Résumé class` is `#résumé-class`, and a
-# whitelist of `[a-z0-9 _-]` would have made it `#rsum-class` and reported a
-# working link as broken. Enumerated, not assumed: the only non-ASCII characters
-# in any heading in the tree are `é`, `—`, and `→`.
+# every other byte. That keeps accented letters — `## Dvořák profile` is
+# `#dvořák-profile`, and a whitelist of `[a-z0-9 _-]` would have made it
+# `#dvok-profile` and reported a working link as broken. Enumerated, not
+# assumed: the only non-ASCII characters in any heading in the tree are `á`,
+# `ř`, `—`, and `→`.
 #
 # It is therefore not a general GitHub-compatible implementation and does not
 # claim to be. It is good enough for the headings this repository writes, and
@@ -83,7 +84,7 @@ function anchor(h,   s) {
   # pass because a byte-wise class cannot name them.
   gsub(/—/, "", s)
   gsub(/→/, "", s)
-  # ASCII punctuation, by blacklist. A whitelist would eat `é`; see the header.
+  # ASCII punctuation, by blacklist. A whitelist would eat `ř`; see the header.
   gsub(/[][!"#$%&'"'"'()*+,.\/:;<=>?@^`{|}~\\]/, "", s)
   sub(/^ +/, "", s); sub(/ +$/, "", s)
   # One hyphen per space, NOT per run of spaces. Removing a `—` or a `→` leaves

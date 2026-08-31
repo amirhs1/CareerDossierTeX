@@ -255,7 +255,7 @@
 %% ---------------------------------------------------------------------------
 %% Section headings (issue #177).
 %%
-%% A statement is continuous prose, so its headings are not the résumé's ruled
+%% A statement is continuous prose, so its headings are not the resume's ruled
 %% section furniture: no decorative rule, and a smaller, quieter break in the
 %% text. What they are is `article''s heading defaults -- \Large (17.28 pt at a
 %% 12 pt base), the body typeface, and `article''s own display skips -- none of
@@ -271,7 +271,7 @@
 %% carry visual design change here; the sectioning mechanism does not.
 %%
 %% Size and typeface come from the shared semantic role and type scale, so a
-%% statement heading is the same size as a résumé or CV section heading, and
+%% statement heading is the same size as a resume or CV section heading, and
 %% the sans heading face is used in both body-font modes. A subsection is set
 %% in the same role one step down the scale, at body size: the level is carried
 %% by size and spacing, not by a second heading typeface.
@@ -319,7 +319,7 @@
 \ExplSyntaxOn
 
 %% \CDossierSection {title} and \CDossierSubsection {title} -- the class's own
-%% names for the two calibrated heading levels, matching the résumé and CV
+%% names for the two calibrated heading levels, matching the resume and CV
 %% interface so one profile's documents are written the same way. Each is a
 %% thin wrapper over the restyled unnumbered heading above rather than a second
 %% implementation: a statement numbers nothing, and one renderer means the

@@ -166,7 +166,7 @@ not defer their creation.
 ### Coverage expectations
 
 Changes affecting a shared package should test every affected class. There are
-four: résumé, cover letter (industry and academic families), academic CV, and
+four: resume, cover letter (industry and academic families), academic CV, and
 statement.
 
 This is the one statement of the coverage matrix — which document families,
@@ -174,7 +174,7 @@ required and optional fields, engine and option errors, extraction, tagging,
 links, and bibliography cases a change has to cover. Nothing summarizes it
 elsewhere, because a summary is what drifts. Cover the relevant parts:
 
-- each affected document family: résumé, industry letter, academic letter,
+- each affected document family: resume, industry letter, academic letter,
   academic CV, and each affected statement `type`;
 - missing required `name` with a clear error, per affected class;
 - missing optional `phone` and `website` without stray separators;

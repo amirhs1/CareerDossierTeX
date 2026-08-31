@@ -18,7 +18,7 @@
 #   fixtures  tests/layout/*.tex across three body sizes and both margins.
 #             Deliberately hostile content: what breaks, and at which value.
 #             Its hyphen counts are NOT representative of real documents --
-#             measured here the résumé family hyphenates more than any other,
+#             measured here the resume family hyphenates more than any other,
 #             which is an artifact of the keep-together fixtures repeating
 #             filler bullets, and argues the opposite of the truth.
 #   examples  examples/*/*.tex at the settings they ship with. Real documents:

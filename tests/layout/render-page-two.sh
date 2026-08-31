@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # render-page-two.sh — build the five-family and statement page-two review set.
 #
-# The canonical short-name set covers résumé, industry letter, academic CV,
+# The canonical short-name set covers resume, industry letter, academic CV,
 # academic letter, and the existing two-page research statement. The CV,
 # academic letter, and statement are also rendered with a deliberately long
 # name. The set also renders all six existing specialized statement examples

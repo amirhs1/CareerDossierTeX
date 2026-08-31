@@ -136,7 +136,7 @@
 \begin{minipage}{0.86\textwidth}
 \small
 A reusable LuaLaTeX toolkit for producing a consistent set of career documents
---- résumé, cover letter, academic CV, and seven kinds of statement --- from one
+--- resume, cover letter, academic CV, and seven kinds of statement --- from one
 shared profile.
 
 Distributed under the \LaTeX{} Project Public License, version 1.3c or, at your
@@ -200,7 +200,7 @@ states the scope of what has actually been verified.
         \textsf{TeX Gyre} fonts (Termes and Heros), \textsf{fontspec},
         \textsf{geometry}, \textsf{hyperref}, \textsf{enumitem}, and
         \textsf{xcolor}. Nothing is bundled with this toolkit.
-  \item \textbf{latexmk}, recommended: a résumé or CV needs two passes, and
+  \item \textbf{latexmk}, recommended: a resume or CV needs two passes, and
         latexmk performs them.
   \item \textbf{Biber and BibLaTeX}, only if you opt into the bibliography
         integration of \S\ref{sec:biblatex}.
@@ -238,7 +238,7 @@ root, so this is Route 1 with an upload.
 \section{A first document}
 \label{sec:first}
 
-A complete résumé, in the shape every document in the toolkit follows: load a
+A complete resume, in the shape every document in the toolkit follows: load a
 class, set the profile once, render the header, then write content.
 
 \begin{latexcode}
@@ -282,7 +282,7 @@ Build it with:
 latexmk -lualatex resume.tex
 \end{plaincode}
 
-Two passes are required, and latexmk performs them. A résumé and a CV record
+Two passes are required, and latexmk performs them. A resume and a CV record
 each list's length in the auxiliary file so the page-break policy of
 \S\ref{sec:pagination} can be applied, and the \texttt{Page N of M} folio needs
 the final page count. On a first build from a clean tree the page breaks and the
@@ -321,10 +321,10 @@ Margins & \opt{margin=normal} (1\,in) or \opt{margin=narrow} (0.5\,in) \\
 Body font & Serif (default) and opt-in sans \\
 Output medium & \opt{medium=print} (default) or \opt{medium=screen} \\
 Entry-metadata de-emphasis & \opt{muted=plain} (default), \opt{italic}, \opt{gray}, \opt{both} \\
-Entry-metadata placement & \opt{entrymeta=column} (default) or \opt{inline}; résumé and CV \\
+Entry-metadata placement & \opt{entrymeta=column} (default) or \opt{inline}; resume and CV \\
 Theme & Monochrome \\
 Tagged structure & Opt-in, off by default \\
-Résumé class & \file{careerdossier-resume} \\
+Resume class & \file{careerdossier-resume} \\
 CV class & \file{careerdossier-cv} \\
 Letter class & \file{careerdossier-letter}, industry and academic families \\
 Statement class & \file{careerdossier-statement}, default interest type plus six others \\
@@ -346,13 +346,13 @@ order to act on the error. An option is rejected rather than silently ignored.
 \textbf{Option} & \textbf{Accepted values} & \textbf{Classes} & \textbf{Default} \\
 \midrule
 \endhead
-\opt{fontsize} & \opt{10pt}, \opt{11pt}, \opt{12pt} & all four & \opt{11pt} résumé; \opt{12pt} others \\
-\opt{margin} & \opt{normal}, \opt{narrow} & all four & \opt{narrow} résumé; \opt{normal} others \\
+\opt{fontsize} & \opt{10pt}, \opt{11pt}, \opt{12pt} & all four & \opt{11pt} resume; \opt{12pt} others \\
+\opt{margin} & \opt{normal}, \opt{narrow} & all four & \opt{narrow} resume; \opt{normal} others \\
 \opt{paper} & \opt{letter}, \opt{a4} & all four & \opt{letter} \\
 \opt{bodyfont} & \opt{serif}, \opt{sans} & all four & \opt{serif} \\
 \opt{medium} & \opt{print}, \opt{screen} & all four & \opt{print} \\
 \opt{muted} & \opt{plain}, \opt{italic}, \opt{gray}, \opt{both} & all four & \opt{plain} \\
-\opt{entrymeta} & \opt{column}, \opt{inline} & résumé, CV & \opt{column} \\
+\opt{entrymeta} & \opt{column}, \opt{inline} & resume, CV & \opt{column} \\
 \opt{family} & \opt{industry}, \opt{academic} & letter & \opt{industry} \\
 \opt{type} & seven values, \S\ref{sec:statement} & statement & \opt{interest} \\
 \bottomrule
@@ -413,12 +413,12 @@ The prose classes default to \opt{12pt} at \opt{margin=normal} because that is
 the only combination whose measure lands near the conventional 45--90 character
 guidance at a one-inch margin.
 
-\paragraph{Known limitation.} The résumé's default \opt{11pt} with
+\paragraph{Known limitation.} The resume's default \opt{11pt} with
 \opt{margin=narrow} produces the longest measure in the project, roughly
 118--127 characters per line. It is chosen for one-page capacity and is fine for
 entry lines and short bullets, which are split across the measure and never
 reach its full width. It is visibly long in a full-width summary paragraph. If a
-résumé opens with a dense prose summary, prefer \opt{margin=normal},
+resume opens with a dense prose summary, prefer \opt{margin=normal},
 \opt{fontsize=12pt}, or a shorter summary.
 
 The classes load \textsf{geometry}. An advanced user may call \cmd{geometry}
@@ -492,7 +492,7 @@ extracted text is identical under both values.
 \subsubsection{\texttt{muted}}
 
 \opt{muted} decides how de-emphasised runs are rendered: an entry's dates and
-location in the résumé and CV, and the statement's application-context line.
+location in the resume and CV, and the statement's application-context line.
 Note the spelling \opt{gray}, not \emph{grey}.
 
 \begin{longtable}{@{}L{0.28\textwidth}L{0.24\textwidth}L{0.40\textwidth}@{}}
@@ -524,7 +524,7 @@ order is identical under each. Colour is never the only carrier of meaning.
 
 \subsubsection{\texttt{entrymeta}}
 
-Accepted by the résumé and CV; the letter and statement classes do not accept it
+Accepted by the resume and CV; the letter and statement classes do not accept it
 because neither has entry headings.
 
 \opt{entrymeta} decides where an entry's dates and location sit. Under the
@@ -574,7 +574,7 @@ Under \opt{column} that override still breaks reading order, and nothing detects
 it for you.
 
 \opt{inline} is not the default because it is a visible design change --- it
-discards the column the résumé's layout is built around --- and because making it
+discards the column the resume's layout is built around --- and because making it
 the default would reflow every existing document to buy a constraint only some
 documents care about. Design, a clean text layer, and a sub-\texttt{0.25} list
 edge are mutually exclusive; any two are available.
@@ -635,7 +635,7 @@ report an unsupported value the same way a class does:
 
 \textbf{A package default is not a class default.} Loading
 \file{careerdossier-tokens} directly gives \opt{12pt} and \opt{normal}, where
-the résumé class resolves to \opt{11pt} and \opt{narrow} --- because the class
+the resume class resolves to \opt{11pt} and \opt{narrow} --- because the class
 passes its own values down before it loads the package. Set the option
 explicitly when loading a package directly; do not assume it inherits a class's
 choice.
@@ -1075,7 +1075,7 @@ furniture.
 The class introduces no command for research aims, teaching themes, EDI
 commitments, artistic methods, or statement-of-purpose paragraphs. Authors write
 ordinary prose and may add headings where the content benefits. Two unnumbered
-heading levels are available, spelled exactly as in the résumé and CV:
+heading levels are available, spelled exactly as in the resume and CV:
 
 \begin{latexcode}
 \CDossierSection{Research Vision and Significance}
@@ -1102,7 +1102,7 @@ Decorative rule & None \\
 \end{longtable}
 
 A statement heading carries no rule: the full-width rule under
-\cmd{CDossierSection} in the résumé and CV is entry-structured section
+\cmd{CDossierSection} in the resume and CV is entry-structured section
 furniture, and a prose document reads better without it.
 
 Numbered sectioning and levels below \cmd{subsection} are inherited from
@@ -1113,7 +1113,7 @@ Numbered sectioning and levels below \cmd{subsection} are inherited from
 
 \subsection{\cmd{MakeCDossierHeader}}
 
-Renders the résumé or CV identity block from the shared profile. It validates
+Renders the resume or CV identity block from the shared profile. It validates
 \key{name}; sets the name, optional headline, and contact line on the calibrated
 type scale; renders \key{headline} only when present and leaves no gap behind
 when it is absent; renders the available contact fields, inserting separators
@@ -1177,7 +1177,7 @@ a blank line nor a gap behind. Emit a line conditionally by calling
   \item No validation is performed: the wrapper commands keep their own.
 \end{itemize}
 
-A worked example --- a résumé wanting \key{location} on a line of its own
+A worked example --- a resume wanting \key{location} on a line of its own
 \emph{between} the headline and the contact line, which is a position no
 append-only hook can reach. It is a complete document, and
 \file{tests/smoke/components-header-stack-doc.tex} compiles this exact text on
@@ -1233,7 +1233,7 @@ header renders three lines with no gap left behind.
 \CDossierSection{Experience}
 \end{latexcode}
 
-Creates a résumé or CV section heading followed by a full-width decorative rule.
+Creates a resume or CV section heading followed by a full-width decorative rule.
 Class-controlled spacing places the rule closer to its heading than to the
 content below.
 
@@ -1260,7 +1260,7 @@ prose heading rhythm.
 \CDossierSubsection{Industry}
 \end{latexcode}
 
-A second-level heading inside a résumé or CV section, for natural groupings that
+A second-level heading inside a resume or CV section, for natural groupings that
 are not themselves sections --- \emph{Experience} split into industry and
 academic, \emph{Publications} split into journal, conference, and preprint.
 Without it such a group has to be promoted to a full ruled section, which
@@ -1328,7 +1328,7 @@ defined outside the entry, or placed outside it.
 \end{CDossierItemize}
 \end{latexcode}
 
-A résumé-appropriate itemized list with controlled indentation and spacing.
+A resume-appropriate itemized list with controlled indentation and spacing.
 Prefer it over globally redefining \env{itemize}.
 
 The space above the list is \cmd{CDossierRecordListEdgeAboveSkip} and the space
@@ -1342,7 +1342,7 @@ preference. The entry heading sets its dates and location in a right-hand
 column, and a geometric extractor keeps that column with its entry only while
 the entry's vertical band stays distinct from the list beneath it. Below
 \texttt{0.25} the two merge and the dates extract after the bullets --- on the
-résumé and the CV alike, at every supported body size, and on tagged and
+resume and the CV alike, at every supported body size, and on tagged and
 untagged output equally. Overriding this token below \texttt{0.25} therefore
 breaks reading order; \opt{entrymeta=inline} is the supported way to go lower.
 
@@ -1630,13 +1630,13 @@ needs to be called; the derived values are applied automatically at
 \textbf{PDF field} & \textbf{Derived from} & \textbf{Value} \\
 \midrule
 \endhead
-\texttt{/Title} & \key{name} & \texttt{Résumé – <name>}, \texttt{Cover Letter – <name>}, \texttt{Curriculum Vitae – <name>}, \texttt{Academic Cover Letter – <name>}, or the statement's title \\
+\texttt{/Title} & \key{name} & \texttt{Resume – <name>}, \texttt{Cover Letter – <name>}, \texttt{Curriculum Vitae – <name>}, \texttt{Academic Cover Letter – <name>}, or the statement's title \\
 \texttt{/Author} & \key{name} & \texttt{<name>} \\
 \texttt{/Lang} & fixed & \texttt{en} \\
 \bottomrule
 \end{longtable}
 
-The document type is part of the title so that a résumé and a cover letter built
+The document type is part of the title so that a resume and a cover letter built
 from one profile are distinguishable in a viewer's tab bar, in document
 properties, and in a file manager. The separator is an en dash, and the derived
 values are the same whether or not the document opts into tagging.
@@ -1745,7 +1745,7 @@ while under \cmd{DocumentMetadata} your value goes to the \LaTeX{} kernel
 instead and arrives as typed. So
 
 \begin{latexcode}
-\hypersetup{ pdftitle = {Résumé -- Ada Lovelace} }
+\hypersetup{ pdftitle = {Resume -- Ada Lovelace} }
 \end{latexcode}
 
 gives an en dash without \cmd{DocumentMetadata} and two hyphens with it. The
@@ -1766,7 +1766,7 @@ All four classes use the same page-furniture policy. Under the default
         \texttt{Page N of M} folio;
   \item pages two and later add a centred \texttt{<name> -- <document label>}
         running header above the body and retain the folio;
-  \item the résumé label is \texttt{Résumé}, the CV label is
+  \item the resume label is \texttt{Resume}, the CV label is
         \texttt{Curriculum Vitae}, both letter families use
         \texttt{Cover Letter}, and a statement uses its independently
         configurable short running title.
@@ -1793,7 +1793,7 @@ shows a provisional folio.
 \section{Pagination}
 \label{sec:pagination}
 
-The résumé and CV classes state where a page may break rather than leaving every
+The resume and CV classes state where a page may break rather than leaving every
 break to \LaTeX's defaults:
 
 \begin{itemize}
@@ -1903,7 +1903,7 @@ each token is the complete gap a reader measures. The names follow
 \endhead
 Shared (all four) & \cmd{CDossierSharedHeaderNameGapSkip},
   \cmd{CDossierSharedHeaderMetaGapSkip} \\
-Record (résumé, CV) & \cmd{CDossierRecordHeaderBelowSkip},
+Record (resume, CV) & \cmd{CDossierRecordHeaderBelowSkip},
   \cmd{CDossierRecordSectionAboveSkip},
   \cmd{CDossierRecordSectionRuleGapSkip},
   \cmd{CDossierRecordSectionBelowSkip},
@@ -1996,7 +1996,7 @@ particular font family, weight, or size:
   smaller step of the size scale, the statement's subsection headings, and at a
   larger one its document title \\
 \cmd{CDossierEntryTitleStyle} & the title line a \env{CDossierEntry} renders, in
-  the résumé and the CV \\
+  the resume and the CV \\
 \cmd{CDossierSubjectStyle} & a cover letter's subject line \\
 \cmd{CDossierBodyStyle} & running prose, and every line set as prose: the
   contact line, an entry's organization, and the letter's date, recipient block,
@@ -2062,7 +2062,7 @@ depth-3 heading role-mapped to \texttt{/H3}, opening a depth-3 division nested
 inside its section's.
 
 \paragraph{Scope of the claim.} Tagged output is a tested preview for five
-fixture profiles --- industry résumé, industry letter, academic CV, academic
+fixture profiles --- industry resume, industry letter, academic CV, academic
 letter, and statement. It is \textbf{not} a PDF/UA, WCAG, ATS, or general
 accessibility conformance claim. The macOS VoiceOver reading-order pass covers
 four of the five; the statement fixture and Windows/NVDA remain
@@ -2105,7 +2105,7 @@ absent. Each explains the likely effect and the corrective action.
 \section{Complete examples}
 \label{sec:examples}
 
-\subsection{Résumé}
+\subsection{Resume}
 
 \begin{latexcode}
 \documentclass{careerdossier-resume}
