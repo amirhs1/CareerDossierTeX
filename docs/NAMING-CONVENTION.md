@@ -10,7 +10,7 @@ Use different naming styles for different GitHub objects:
 
 | Object | Convention | Example |
 |---|---|---|
-| Issue title | `[area] Verb object` | `[resume] Implement the English résumé class` |
+| Issue title | `[area] Verb object` | `[resume] Implement the English resume class` |
 | Epic issue title | `[epic] Release version goal` | `[epic] Release v0.1.0 English industry dossier` |
 | Branch name | `type/short-description` | `feat/resume-class` |
 | Commit message | `type(scope): imperative summary` | `feat(resume): add entry environment` |
@@ -34,12 +34,12 @@ Use:
 Examples:
 
 ```text
-[docs] Inventory current résumé and cover-letter implementations
+[docs] Inventory current resume and cover-letter implementations
 [docs] Define the v0.1 public API
 [core] Implement metadata storage and validation
 [theme] Implement LuaLaTeX typography and monochrome tokens
 [components] Implement shared header and contact line
-[resume] Implement the English résumé class
+[resume] Implement the English resume class
 [letter] Implement the English industry cover-letter class
 [test] Establish the shared regression harness
 [ci] Build Phase 1 examples in GitHub Actions
@@ -203,7 +203,7 @@ docs(github): add setup scripts for labels and Phase 1 issues
 docs(planning): add Phase 1 planning documents
 docs(api): define v0.1 public API
 feat(core): add shared metadata foundation
-feat(resume): implement English résumé class
+feat(resume): implement English resume class
 feat(letter): implement industry cover-letter class
 test(build): establish Phase 1 regression harness
 ci(build): compile Phase 1 examples with LuaLaTeX
@@ -594,6 +594,46 @@ Three lints hold this section to account: `run-markdown-anchors.sh`, which
 fails when a `](TARGET.md#anchor)` names a heading that no longer exists,
 `run-agents-references.sh`, which fails when `AGENTS.md` quotes a section name
 that no longer exists, and `run-section-sign.sh` above.
+
+---
+
+## One ASCII spelling for a word that has one
+
+An English word with an ordinary ASCII spelling is written that way in every
+tracked file — source, tests, examples, documentation, the `Makefile`, and CI
+workflows alike — even where a loanword accent would be defensible. The word
+this repository kept two spellings of is `resume`: it is spelled `resume` and
+`Resume`, never with an acute accent on either `e`.
+`tests/lint/run-accented-spellings.sh`, which `make lint` runs, fails the build
+naming every file and line that carries an accented spelling, in precomposed and
+decomposed form alike.
+
+The ban is over the word rather than over the accent, and this is the whole of
+the distinction: an accented character that carries *meaning* is data, and stays.
+`Montréal`, `Zoë`, `Dvořák`, `José`, `Łukasz`, `İpek`, and `Ångström` appear in
+`tests/extraction/` and are the subject under test —
+`resume-decomposed-name.tex` exists only to prove that decomposed input extracts
+as precomposed, and `docs/ATS-EXTRACTION.md` documents the rest as deliberate
+coverage. Removing those accents would delete the coverage rather than tidy it.
+No name this repository tests with contains the letters the lint searches for,
+so the rule needs no exception list and the lint carries none.
+
+Until #543 the tree spelled `resume` with accents 225 times across 80 files
+while the class was `careerdossier-resume`, the example was
+`resume-english.tex`, the target was `make resume`, and the CI job was `resume`.
+Two of those 225 were not prose: `careerdossier-resume.cls` registered the
+accented spelling as the PDF `/Title` and as the running page label, so every
+document the toolkit produced disagreed with the class that produced it. A rule
+that permits the accented form in some position has to be read before it can be
+obeyed, and a contributor copying the nearest example never reads it.
+
+Two consequences follow. Prose about the document *genre* is unaffected — a
+`curriculum vitae` is still a CV, and nothing here renames it. And Git history,
+closed issues, and merged pull request bodies are left as written; the ban is
+forward-looking, and nothing in the repository can lint prose typed into GitHub,
+so the rule is the only mechanism there. The `area:resume` label description is
+repository configuration rather than a tracked file, and is the maintainer's to
+change.
 
 ---
 

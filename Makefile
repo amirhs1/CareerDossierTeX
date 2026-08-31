@@ -183,7 +183,7 @@ examples: resume letter academic-cv academic-bibliography academic-letter statem
 $(EXAMPLES_BUILD_DIR):
 	@mkdir -p $(EXAMPLES_BUILD_DIR)
 
-resume: | $(EXAMPLES_BUILD_DIR) ## Build the résumé example
+resume: | $(EXAMPLES_BUILD_DIR) ## Build the resume example
 	$(LATEXMK) $(RESUME)
 
 letter: | $(EXAMPLES_BUILD_DIR) ## Build the cover-letter example
@@ -264,13 +264,14 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, the section sign, manual names, manual examples, documented token values, text guards, shellcheck over the harness, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
 	tests/lint/run-agents-references.sh
 	tests/lint/run-markdown-anchors.sh
 	tests/lint/run-section-sign.sh
+	tests/lint/run-accented-spellings.sh
 	tests/lint/run-manual-names.sh
 	tests/lint/run-manual-examples.sh
 	tests/lint/run-token-values.sh
