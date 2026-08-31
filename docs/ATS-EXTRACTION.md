@@ -50,7 +50,7 @@ sometimes extract cleanly. A beautiful PDF can fail both. Test all three.
 
 - `twocolumn`, `multicol`, `paracol`, sidebars, or parallel minipages;
 - `tabular`, `tabularx`, `longtable`, `array`, or nested boxes used merely to
-  align résumé fields;
+  align resume fields;
 - TikZ nodes, `textpos`, `picture`, overlays, absolute positioning, or floating
   text boxes;
 - text converted to paths or embedded in SVG/PDF artwork;

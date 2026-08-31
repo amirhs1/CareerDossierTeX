@@ -68,7 +68,7 @@ Development requires:
 - BibLaTeX and Biber when running the optional bibliography example or the full
   `make check` suite.
 
-The ordinary résumé, letter, and no-BibLaTeX CV paths do not require BibLaTeX
+The ordinary resume, letter, and no-BibLaTeX CV paths do not require BibLaTeX
 or Biber. Install LuaLaTeX: `AGENTS.md` rule 1 states the engine scope and what
 the unsupported engines do, and is not repeated here.
 

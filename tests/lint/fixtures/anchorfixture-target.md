@@ -15,7 +15,7 @@ A heading with backticks and a dot, whose anchor drops both.
 
 A release heading, the shape that broke three CHANGELOG.md links.
 
-## Résumé class
+## Dvořák profile
 
 A heading with a non-ASCII letter, which the derivation must keep.
 

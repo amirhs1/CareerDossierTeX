@@ -30,7 +30,7 @@
 # which is where the wrap-versus-split distinction lives; see its header for why
 # extracted text cannot make that call.
 #
-# Coverage, one fixture per site that renders a link: the résumé contact line,
+# Coverage, one fixture per site that renders a link: the resume contact line,
 # the CV contact line and its manual publication list, both letter families, and
 # the BibLaTeX bibliography.
 #

@@ -24,7 +24,7 @@
 #
 # 1. **Not every `%%` group is a page.** The page builder is exercised whenever
 #    material passes through it, including the `\clearpage` at `\end{document}`
-#    and a probe taken before `geometry` has set `\vsize`. On a two-page résumé
+#    and a probe taken before `geometry` has set `\vsize`. On a two-page resume
 #    fixture that is five `%%` groups for two pages, and the spurious ones look
 #    exactly like real ones — same goal, same candidate syntax. A group counts
 #    as a page only when a shipout marker (` [1`, ` [2]`, TeX's own

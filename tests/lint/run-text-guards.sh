@@ -135,7 +135,7 @@ expect_state() {
 
 expect_misses=0
 expect_state 0 text_contains "$present_text" "$label"
-expect_state 1 text_contains "$present_text" "Résumé"
+expect_state 1 text_contains "$present_text" "Resume"
 expect_state 2 text_contains "$unavailable" "$label"
 
 expect_state 0 text_contains_line "$present_text" "Page 2 of 2"
@@ -143,7 +143,7 @@ expect_state 1 text_contains_line "$present_text" "Page 2"
 expect_state 2 text_contains_line "$unavailable" "Page 2 of 2"
 
 expect_state 0 text_matches "$present_text" 'Page [0-9]+ of [0-9]+'
-expect_state 1 text_matches "$present_text" '^Résumé$'
+expect_state 1 text_matches "$present_text" '^Resume$'
 expect_state 2 text_matches "$unavailable" 'Page [0-9]+ of [0-9]+'
 
 if [ "$expect_misses" -eq 0 ]; then
@@ -184,8 +184,8 @@ fi
 # or control 3 would pass for a predicate that answered 2 to everything.
 c3b_fail=0
 probe_require "$present_text" "$label" x > /dev/null || c3b_fail=1
-probe_forbid  "$present_text" "Résumé" x > /dev/null || c3b_fail=1
-probe_require "$present_text" "Résumé" x > /dev/null && c3b_fail=1
+probe_forbid  "$present_text" "Resume" x > /dev/null || c3b_fail=1
+probe_require "$present_text" "Resume" x > /dev/null && c3b_fail=1
 probe_forbid  "$present_text" "$label" x > /dev/null && c3b_fail=1
 if [ "$c3b_fail" -eq 0 ]; then
   printf '  ok: over real text both polarities still reach their real verdicts\n'
@@ -242,7 +242,7 @@ printf '\n== control 6: a count answers three states too ==\n'
 c6_fail=0
 counted="$(text_count_lines "$present_text" "Cover Letter")"
 [ "$?" -eq 0 ] && [ "$counted" = "1" ] || c6_fail=1
-counted="$(text_count_lines "$present_text" "Résumé")"
+counted="$(text_count_lines "$present_text" "Resume")"
 [ "$?" -eq 0 ] && [ "$counted" = "0" ] || c6_fail=1
 text_count_lines "$unavailable" "Cover Letter" > /dev/null
 [ "$?" -eq 2 ] || c6_fail=1

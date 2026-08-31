@@ -20,7 +20,7 @@
 %% line, the entry-heading primitive and its metadata placement, the link layer,
 %% list page-break policy and its tagged closing edge, separator handling, and
 %% the document's derived PDF metadata.
-%% It carries no page geometry (see careerdossier-tokens) and no résumé- or
+%% It carries no page geometry (see careerdossier-tokens) and no resume- or
 %% letter-specific structure.
 %%
 %% That list is longer than a module description should be, and the length is
@@ -191,7 +191,7 @@
 %% So it is offered as a choice rather than taken as a default. Design, a clean
 %% text layer, and a sub-0.25 list edge are mutually exclusive; any two are
 %% available. `column' stays the default because it is the layout every existing
-%% document was written against and the one the résumé's visual identity rests
+%% document was written against and the one the resume's visual identity rests
 %% on, and because making `inline' the default would reflow every document in
 %% the world to buy a number that only some of them care about.
 %%
@@ -1025,7 +1025,7 @@
     \group_end:
   }
 
-%% Default identity contact line used by the released résumé, CV, and letter
+%% Default identity contact line used by the released resume, CV, and letter
 %% classes. Its order and output remain unchanged.
 \cs_new_protected:Npn \__cdossier_components_contactline:
   {
@@ -1183,7 +1183,7 @@
 %% Identity block.
 %%
 %% A centered block of name, optional headline, and the contact line, shared by
-%% the résumé header and the cover-letter sender identity. Requires `name`.
+%% the resume header and the cover-letter sender identity. Requires `name`.
 %% A thin wrapper over the public header stack above: it owns the validation and
 %% the choice of the three lines, and nothing else.
 %% ---------------------------------------------------------------------------
@@ -1343,7 +1343,7 @@
 %% ---------------------------------------------------------------------------
 %% Section rule.
 %%
-%% Shared by the résumé and CV. The rule is a rendered component rather than a
+%% Shared by the resume and CV. The rule is a rendered component rather than a
 %% paragraph line: suppressing interline glue on both sides makes the calibrated
 %% rule skips own the complete heading-to-rule and rule-to-content gaps. The
 %% rule remains a layout artifact in tagged output, and the keep penalty still
@@ -1626,7 +1626,7 @@
 %% ---------------------------------------------------------------------------
 %% Entry heading primitive.
 %%
-%% Renders a single entry heading shared by résumé sections (experience,
+%% Renders a single entry heading shared by resume sections (experience,
 %% education, projects, ...). It takes a required title and up to three optional
 %% metadata fields, and carries no page geometry or vertical spacing of its own:
 %% the owning class decides how much room surrounds an entry. Layout:
@@ -1727,7 +1727,7 @@
 %% ---------------------------------------------------------------------------
 %% Bullet-list page-break policy (issue #145).
 %%
-%% Shared by the entry-structured classes (résumé and CV); the continuous-prose
+%% Shared by the entry-structured classes (resume and CV); the continuous-prose
 %% classes keep ordinary \widowpenalty/\clubpenalty handling.
 %%
 %% A uniform inter-item penalty cannot express this policy. TeX chooses a page
@@ -1802,7 +1802,7 @@
 %% internals with its own block templates. `\@topsepadd' measures 0 pt inside a
 %% tagged list, so the mechanism above cannot reach that path and the closing
 %% gap was LaTeX Lab's own instance default -- 12 pt against the token's 4.25 pt
-%% at the résumé default, enough to shift the last line of a one-page résumé by
+%% at the resume default, enough to shift the last line of a one-page resume by
 %% a full line of body text relative to the untagged build of the same source.
 %%
 %% The block template does expose the closing edge, as two separate keys:
@@ -1814,7 +1814,7 @@
 %% to the two opening keys and maps nothing to the closing pair, so a list that
 %% sets `partopsep = 0pt' still closes with the interface default of
 %% `end-extra-vspace', which is `\partopsep' as the `article' class left it:
-%% a fixed 3 pt that no token owns. Measured on the résumé fixture, setting
+%% a fixed 3 pt that no token owns. Measured on the resume fixture, setting
 %% `end-vspace' alone gives token + 3 pt, and setting both gives the token.
 %%
 %% One CDossier-owned key therefore stands for the whole closing edge, and it is
@@ -1915,7 +1915,7 @@
     %% carries that space onto a line of its own: a box with no glyphs, zero
     %% height, and zero depth, preceded by a full `\baselineskip'. The result is
     %% an invisible extra line that inflates the next structural gap -- 27.84 pt
-    %% instead of 14.28 pt above the following section in the default résumé.
+    %% instead of 14.28 pt above the following section in the default resume.
     %%
     %% Only the final item is affected; an inter-item boundary discards the
     %% space already. The guard is needed because this runs in vertical mode

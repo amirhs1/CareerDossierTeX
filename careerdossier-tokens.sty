@@ -101,7 +101,7 @@
 %% per-class one; the classes apply the token and none of them names a value.
 \dim_new:N \CDossierEmergencyStretch
 
-%% Keep-together penalties (issue #145). Entry-structured documents (résumé,
+%% Keep-together penalties (issue #145). Entry-structured documents (resume,
 %% CV) state their page-break policy as named, tokenised penalties rather than
 %% bare \nobreak calls, so the policy is visible and independently tunable.
 %% Continuous-prose documents (letter, statement) are unaffected and keep
@@ -421,7 +421,7 @@
       }
     %% Issue #272: one \emergencystretch policy for all four families. Three
     %% classes each wrote `2em' -- the letter and the statement unconditionally,
-    %% the CV only at `a4paper' -- and the résumé wrote nothing, so four classes
+    %% the CV only at `a4paper' -- and the resume wrote nothing, so four classes
     %% held three policies and none of them could say why they differed.
     %%
     %% The value is a multiple of \CDossierBodySize rather than of
@@ -440,7 +440,7 @@
     %% and it should not, because the quantity it has to cover tracks neither.
     %% Holding one fixture, its text, and its body size fixed and varying only
     %% the measure in 8pt steps from 400pt to 560pt, the smallest pool that
-    %% clears every overfull box is a sawtooth with no trend: the résumé Summary
+    %% clears every overfull box is a sawtooth with no trend: the resume Summary
     %% prose needs 1.00pt at a 440pt measure and 11.25pt at 520pt, then nothing
     %% at 528pt, and the bullet path needs 33.75pt at 416pt and 0.75pt at 512pt.
     %% Across the two paths the correlation between measure and required pool
@@ -461,7 +461,7 @@
     %% and a larger pool re-breaks them, so a rescue bought for an off-design
     %% stress fixture is paid for by reflowing documents that already set.
     %%
-    %% It is applied unconditionally, including by the résumé, which is fully
+    %% It is applied unconditionally, including by the resume, which is fully
     %% justified and carries the longest unbreakable strings in the toolkit --
     %% technical terms and URLs in bullet text. Extending it there and to the
     %% letter-paper CV cannot loosen a paragraph that already sets: TeX consults
@@ -632,13 +632,13 @@
     %%
     %% Issue #206 gave them the asymmetry the split exists for: a bullet list
     %% belongs to the entry above it, so it sits closer to that entry than to
-    %% the next one. Measured on the résumé at 11 pt, 2.30 pt above the list
+    %% the next one. Measured on the resume at 11 pt, 2.30 pt above the list
     %% against 4.99 pt below -- 2.17:1.
     %%
     %% The opening edge is not a free choice. 0.25 is a hard floor imposed by
     %% Poppler's reading order, not by this design: below it the entry head's
     %% date column extracts after the bullets. The column extracts with its
-    %% entry at 0.25 and reorders at 0.1875, identically for the résumé and CV
+    %% entry at 0.25 and reorders at 0.1875, identically for the resume and CV
     %% at 10pt, 11pt, and 12pt, so all of the asymmetry has to come from the
     %% closing edge. See the block comment in careerdossier-components.sty,
     %% `tokens-invariants', the `*-entry-dates-*' extraction fixtures, and

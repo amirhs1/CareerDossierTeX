@@ -29,7 +29,7 @@ code.
 > removed.** One change moves the page: the gap below the header stack in a
 > cover letter or statement no longer adds `\parskip` on top of the token that
 > names it, tightening the header-to-body gap by one `\parskip` once per
-> document. Résumé and CV are unaffected. See
+> document. Resume and CV are unaffected. See
 > [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 >
 > Before `v0.10.0` the public interface may still change between minor versions;
@@ -38,13 +38,13 @@ code.
 
 ## What it provides
 
-CareerDossierTeX separates personal information from document content and presentation. A shared profile file can be reused across a résumé and matching cover letter, helping keep names, contact details, links, and visual styling consistent.
+CareerDossierTeX separates personal information from document content and presentation. A shared profile file can be reused across a resume and matching cover letter, helping keep names, contact details, links, and visual styling consistent.
 
 ### Support matrix
 
 | Capability | Current support | Notes |
 |---|---|---|
-| Industry résumé | Supported | Multi-page output gains a continuation header and folios; one-page output stays clean |
+| Industry resume | Supported | Multi-page output gains a continuation header and folios; one-page output stays clean |
 | Industry cover letter | Supported | `family=industry` remains the default; shared multi-page furniture applies |
 | Academic CV | Supported | Multi-page layout with running headers and folios; one-page folios are suppressed |
 | Academic cover letter | Supported | Select with `family=academic`; shares the cross-class page furniture |
@@ -209,7 +209,7 @@ Optional fields may be omitted. Contact separators should adjust automatically w
 
 `linkedin`, `github`, and `scholar` also accept a bare handle — `linkedin = {example}` displays and links `linkedin.com/in/example`. See the manual for the accepted forms per key.
 
-### 2. Create a résumé
+### 2. Create a resume
 
 ```latex
 \documentclass[
@@ -248,14 +248,14 @@ Every document class accepts `fontsize=10pt|11pt|12pt`,
 `margin=normal|narrow`, `paper=letter|a4`, `bodyfont=serif|sans`,
 `medium=print|screen`, and `muted=plain|italic|gray|both`. US Letter remains the
 default.
-The résumé defaults to `11pt,narrow`; the CV, letter, and statement classes
+The resume defaults to `11pt,narrow`; the CV, letter, and statement classes
 default to `12pt,normal`. `normal` is one inch and `narrow` is half an inch.
 One `fontsize` drives every type size and every structural gap, so the three
 sizes are one design at three scales rather than three separate designs.
 
 The prose classes default to `12pt` deliberately: at a one-inch margin that is
 the only body size whose full-measure line lands near the conventional 45–90
-character range. The résumé instead keeps `11pt,narrow` for one-page capacity,
+character range. The resume instead keeps `11pt,narrow` for one-page capacity,
 which runs long in full-width prose — see the manual for the measured figures
 and when to override it.
 
@@ -315,7 +315,7 @@ Three things worth knowing before you open one:
   interest, which requires only `name` and `email`; `type=research` also requires
   profile `affiliation`, and `type=artist` profile `website`.
 
-`\CDossierSubsection` is available in the résumé and the CV as the level between
+`\CDossierSubsection` is available in the resume and the CV as the level between
 a section and an entry — `Publications` split into journal, conference, and
 preprint, or `Experience` into industry and academic — so a group need not be
 promoted to a ruled section of its own.
@@ -345,10 +345,10 @@ supported examples at the same vertical position as the untagged build of the
 same source — turning tagging on does not repaginate a document.
 
 **What is and is not claimed.** This is a tested preview for five profiles
-covered by fixtures — industry résumé, industry letter, academic CV, academic
+covered by fixtures — industry resume, industry letter, academic CV, academic
 letter, and statement. Those fixtures assert that a structure tree exists and
 check heading, link, and artifact structure plus text extraction and
-tagged-versus-untagged geometry; list checks apply to the résumé and CV.
+tagged-versus-untagged geometry; list checks apply to the resume and CV.
 
 Those five profiles were independently verified: each passes the **veraPDF**
 PDF/UA-2 validator, their text extraction agrees across **Poppler, MuPDF, and
@@ -443,7 +443,7 @@ target that wraps it.
 
 The full suite requires `l3build` and `pdftotext` (Poppler) in addition to
 LuaLaTeX and `latexmk`. Because `make check` exercises the optional bibliography
-profile, it also requires BibLaTeX and Biber. Ordinary résumé, letter, and
+profile, it also requires BibLaTeX and Biber. Ordinary resume, letter, and
 no-BibLaTeX CV builds do not.
 
 Release preparation reruns the accumulated suite. It is a final verification

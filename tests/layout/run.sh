@@ -321,7 +321,7 @@ layout_fixture() {
 
     furniture_label=""
     case "$base" in
-      resume-*)           furniture_label="Résumé" ;;
+      resume-*)           furniture_label="Resume" ;;
       cv-*)               furniture_label="Curriculum Vitae" ;;
       letter-*)           furniture_label="Cover Letter" ;;
       statement-interest-long-fields-two-page)
@@ -697,7 +697,7 @@ EOF
       #
       # The broken-word check applies to every family. The club/widow checks
       # are enabled only for letter and statement, matching the split
-      # docs/API.md's page-break policy already draws: résumé and CV are
+      # docs/API.md's page-break policy already draws: resume and CV are
       # entry-structured and governed by the structural keep-together
       # penalties, and their entry headings and datelines end without
       # sentence punctuation exactly as an unfinished prose line does, so a

@@ -1,4 +1,4 @@
-% Shared zero-token regression for the CV and résumé section rule.
+% Shared zero-token regression for the CV and resume section rule.
 %
 % The heading, decorative rule, and first content line intentionally form one
 % short vertical list. With every explicit section skip at zero, that list must

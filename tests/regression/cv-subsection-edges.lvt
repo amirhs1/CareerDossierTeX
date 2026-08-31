@@ -7,7 +7,7 @@
 % 1. The CV's \CDossierSection is a separate definition in a separate class, and
 %    the guard reads what that definition leaves behind — see
 %    cv-section-structure.lvt for the same argument about the division. A
-%    résumé-only fixture would assert nothing about it.
+%    resume-only fixture would assert nothing about it.
 %
 % 2. CDossierPublications is the second neighbour the single token pair has to
 %    serve, and it exists only here. It is a numbered list rather than an entry
@@ -84,7 +84,7 @@
 
 % Point 1, measured. A section opening with a subsection must leave the same
 % opening userskip as a section opening with an entry, on this class as on the
-% résumé.
+% resume.
 \TEST{opening-gap-by-shape}{
   \setbox9=\vbox{\CDossierSection{S}\CDossierSubsection{T}}
   \cdossiertestList{section-then-subsection}

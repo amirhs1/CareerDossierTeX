@@ -1,4 +1,4 @@
-% resume-section-structure.lvt — issue #268 the résumé section's tagged shape.
+% resume-section-structure.lvt — issue #268 the resume section's tagged shape.
 %
 % A section heading has to do two things: name the section, and open the `Sect'
 % division that encloses the heading and everything under it until the next

@@ -23,7 +23,7 @@
 %    the section gap governs it. TEST 1 alone therefore reports the token's
 %    value without ever rendering it, which is exactly the unreachable-token
 %    condition issue #204 exists to prevent. TEST 3 supplies the missing shape
-%    -- two bodiless entries, as the résumé's Education and Certificates
+%    -- two bodiless entries, as the resume's Education and Certificates
 %    sections are written -- so a change to the ratio moves a recorded number.
 %
 % \pagetotal is the assertion: it is the height of the page so far, so the

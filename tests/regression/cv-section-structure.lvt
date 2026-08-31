@@ -1,6 +1,6 @@
 % cv-section-structure.lvt — issue #268 the CV section's tagged shape.
 %
-% The CV's \CDossierSection is a separate definition from the résumé's, in a
+% The CV's \CDossierSection is a separate definition from the resume's, in a
 % separate class, so it gets its own fixture rather than being assumed to
 % follow. See resume-section-structure.lvt for what the three assertions are
 % and why both stubs are installed before \START rather than inside a \TEST.

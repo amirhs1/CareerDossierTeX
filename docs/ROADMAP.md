@@ -54,7 +54,7 @@ test pass at the end of a milestone.
 
 | Version | Release goal | Status |
 |---|---|---|
-| `v0.1.0` | English industry résumé and cover letter | Released |
+| `v0.1.0` | English industry resume and cover letter | Released |
 | `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
 | `v0.2.0` | Academic CV, academic letter, and bibliography support | Released |
 | `v0.2.1` | PDFKit text-extraction correction | Released |
@@ -116,11 +116,11 @@ the pre-release baseline and has no milestone.
 
 ### Goal
 
-Understand and preserve the strongest existing résumé and cover-letter implementations before refactoring.
+Understand and preserve the strongest existing resume and cover-letter implementations before refactoring.
 
 ### Deliverables
 
-- select baseline résumé and letter designs;
+- select baseline resume and letter designs;
 - compile and save reference PDFs;
 - record dependencies and public commands;
 - identify duplicated code;
@@ -144,14 +144,14 @@ Publish the smallest useful CareerDossierTeX release.
 - English;
 - US Letter paper;
 - monochrome theme;
-- one résumé layout;
+- one resume layout;
 - one industry cover-letter layout;
 - shared profile metadata;
 - required-field validation;
 - optional-field separator handling;
 - package/class regression coverage for implemented Phase 1 behavior;
 - smoke, error-path, layout-stress, and extraction fixtures under `tests/`;
-- example résumé and letter;
+- example resume and letter;
 - local `latexmk` builds;
 - GitHub Actions compilation;
 - release documentation.
@@ -170,11 +170,11 @@ Publish the smallest useful CareerDossierTeX release.
 
 ### Release criteria
 
-- résumé and letter compile locally with XeLaTeX;
+- resume and letter compile locally with XeLaTeX;
 - both reuse the same profile file;
 - missing required metadata produces a clear error;
 - missing optional fields do not leave empty separators;
-- extracted résumé text follows logical reading order;
+- extracted resume text follows logical reading order;
 - every implemented behavior has the relevant committed test under `tests/`;
 - the accumulated regression, smoke, layout, and extraction suites pass;
 - CI builds both examples;
@@ -369,7 +369,7 @@ Delivered scope and this release's criteria are recorded in the closed
 ### Agreed defaults and their measured cost
 
 Defaults are per class, not uniform, because document conventions differ: the
-résumé is `11pt` at `margin=narrow`, and the CV, letter, and statement classes
+resume is `11pt` at `margin=narrow`, and the CV, letter, and statement classes
 are `12pt` at `margin=normal`. The measured characters per line for each
 combination live in [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty),
 which records the `\textwidth` values and the counting method alongside them.
@@ -380,7 +380,7 @@ inside it. Capping `\textwidth` from a
 target measure was considered and rejected — reaching 80 characters at `11pt`
 needs side margins near 1.68 in, which no career-services guidance endorses.
 
-**Known accepted limitation:** the résumé default is the longest measure in the
+**Known accepted limitation:** the resume default is the longest measure in the
 project, accepted for one-page capacity rather than overlooked. It is stated
 for authors in the manual, with the rationale in `docs/ARCHITECTURE.md`.
 

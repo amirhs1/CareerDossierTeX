@@ -7,7 +7,7 @@
 % and zero depth, preceded by a full `\baselineskip'. Nothing is visible, but the
 % following `\addvspace' cannot see past it, so the next structural gap grows by
 % a whole line -- 27.84 pt instead of 14.28 pt above the section that follows, in
-% the shipped default résumé.
+% the shipped default resume.
 %
 % Whether a given item fills the measure depends on the font, the body size, and
 % the line width, so the fixture does not rely on one magic sentence. It steps

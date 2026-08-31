@@ -24,7 +24,7 @@
 %    of that second reader are pinned: no accessor (the default path), the key
 %    absent, the key present and empty, and the key carrying a value.
 %
-% 2. The title join. The owning class declares a document type so a résumé and a
+% 2. The title join. The owning class declares a document type so a resume and a
 %    cover letter built from one profile do not receive identical titles; with no
 %    doctype the title is the bare name.
 %

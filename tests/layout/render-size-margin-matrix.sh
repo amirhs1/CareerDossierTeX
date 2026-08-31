@@ -7,7 +7,7 @@
 # margin preset together — the order a reviewer compares them in (issue #195).
 #
 # Each document class is represented by its existing canonical two-page
-# fixture — résumé, CV, industry letter, research statement — so the matrix
+# fixture — resume, CV, industry letter, research statement — so the matrix
 # exercises entries, itemized lists, prose paragraphs, and section/statement
 # headings under real page-break pressure, not a one-page stub. The statement
 # class is represented by a single type (research); statement-type-specific
@@ -105,7 +105,7 @@ render_class_matrix() {
   done
 }
 
-echo "Building résumé size/margin matrix (resume-two-page.tex)"
+echo "Building resume size/margin matrix (resume-two-page.tex)"
 render_class_matrix careerdossier-resume "" resume-two-page.tex resume
 
 echo
@@ -133,7 +133,7 @@ fi
   echo "combinations: 2 margins x 3 sizes x 4 document types = 24"
   echo "file naming: <type>-<margin>-<fontsize>.pdf"
   echo "document types:"
-  echo "  résumé   - resume-two-page.tex"
+  echo "  resume   - resume-two-page.tex"
   echo "  CV       - cv-two-page.tex"
   echo "  letter   - letter-two-page.tex (industry family)"
   echo "  statement - statement-two-page.tex (type=research; single representative type)"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # render-entrymeta-muted-matrix.sh — build the {column,inline} x
-# {italic,gray,both,plain} reference matrix for the résumé and CV
+# {italic,gray,both,plain} reference matrix for the resume and CV
 # (issues #230, #271, #324).
 #
 # `entrymeta' and `muted' are the two options that both land on the same piece
@@ -282,7 +282,7 @@ render_class_matrix() {
   } >"$work/$prefix-options.txt"
 }
 
-echo "Building résumé entrymeta/muted matrix (resume-two-page.tex)"
+echo "Building resume entrymeta/muted matrix (resume-two-page.tex)"
 render_class_matrix careerdossier-resume resume-two-page.tex resume
 
 echo
@@ -304,7 +304,7 @@ fi
   echo "record classes (fontsize/margin/paper/bodyfont are every other option;"
   echo "resolved values below are read from the build, not asserted; <unset> means"
   echo "the fixture leaves that key to the class default):"
-  echo "  résumé - resume-two-page.tex"
+  echo "  resume - resume-two-page.tex"
   cat "$work/resume-options.txt"
   echo "  CV     - cv-two-page.tex"
   cat "$work/cv-options.txt"
