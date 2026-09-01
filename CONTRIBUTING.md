@@ -82,6 +82,10 @@ These three rules are documentation, not enforcement. What actually gates a
 merge to `main` is the `Protect Main` ruleset; see "What actually gates a merge"
 under "CI expectations".
 
+Attractive but nonessential features belong in the backlog until the current
+milestone is complete. Filing one is welcome; scheduling it into the active
+milestone is a separate decision.
+
 ### 1. Every issue carries a milestone
 
 The milestone answers *which release*, and almost every issue can answer it. An

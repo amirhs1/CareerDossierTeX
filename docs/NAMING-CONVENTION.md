@@ -435,8 +435,8 @@ Rules:
 - **A patch release does not get its own phase.** Its issues carry the phase of
   the minor release they correct, because a patch continues that stage of the
   plan rather than opening a new one, and it gets no phase heading in
-  `docs/ROADMAP.md` — only a release-overview row. This is why `v0.1.1` sits in
-  `Phase 1 — Industry` and `v0.2.1` in `Phase 2 — Academic`.
+  `docs/ROADMAP.md` — only a row in its "Releases and phases" table. This is why
+  `v0.1.1` sits in `Phase 1 — Industry` and `v0.2.1` in `Phase 2 — Academic`.
 - **A release that never ships has no phase number.** This is one rule, not two,
   and the two recorded cases differ only in when it applied:
 
@@ -456,7 +456,8 @@ Rules:
   not the reverse — do not create a milestone to give an existing phase a
   release.
 - When adding, dropping, or reordering a phase, change the Project field first,
-  then update `docs/ROADMAP.md` and its cross-walk table to match.
+  then update `docs/ROADMAP.md` — its phase heading and its "Releases and
+  phases" table, which is the cross-walk — to match.
 - Check `git grep -nE "Phase [0-9]"` after any renumbering: references to
   `Phase 0`, `Phase 1`, and `Phase 2` appear in several files and are stable,
   but any higher number outside `docs/ROADMAP.md` needs review.
