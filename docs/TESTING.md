@@ -32,6 +32,10 @@ If a pre-implementation failure cannot be demonstrated safely—for example, a
 new class does not exist yet—add the fixture alongside the first implementation
 commit and explain the limitation in the pull request.
 
+Dedicated test issues are reserved for shared harness work, cross-cutting
+quality improvements, or explicit legacy test debt. They are not a substitute
+for the tests a feature's own acceptance criteria require.
+
 ### What lives in `tests/`
 
 All automated test sources, expected outputs, fixtures, and runners belong

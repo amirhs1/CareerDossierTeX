@@ -482,15 +482,15 @@ Source archives and selected example PDFs are available through GitHub Releases.
 ## Roadmap
 
 Everything in the support matrix above is in the current release, named under
-[Releases](#releases). Two releases remain planned: `v0.9.0` consolidates the
-documentation set, revises the examples, and prepares the CTAN archive, and
-`v0.10.0` declares the public interface stable and fully documented. Nothing is
+[Releases](#releases). Two releases remain planned: `v0.10.0` removes
+duplication and fixes defects without changing the public interface, and
+`v1.0.0` declares that interface stable and fully documented. Nothing is
 scheduled after that.
 
-[`docs/ROADMAP.md`](docs/ROADMAP.md#release-overview) owns the release table —
-every version, its goal, and its status, including the two milestones closed
-without shipping — together with the boundary between releases and each one's
-non-goals.
+[`docs/ROADMAP.md`](docs/ROADMAP.md#releases-and-phases) owns the release table —
+every version, its goal, its status, and its phase, including the two milestones
+closed without shipping — together with the boundary between releases and each
+one's non-goals.
 
 ## Contributing
 

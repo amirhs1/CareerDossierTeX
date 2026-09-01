@@ -1,24 +1,12 @@
 # CareerDossierTeX Roadmap
 
-Release scope, phase boundaries, and explicit non-goals — what each release is
-for, and what it deliberately excludes. **Nothing here is a support statement.**
-A feature described in a planned phase does not exist yet; `README.md` and
-the PDF manual describe what is actually released.
+This document acts as the strategic compass and sets the expectations in the
+project. It is not a support statement.
 
-## Product direction
+## Renumbering and retitling history
 
-CareerDossierTeX is a reusable LuaLaTeX toolkit for creating consistent career documents from shared profile data.
+These entries keep the numbers they were written with.
 
-The project follows incremental releases. Each implementation issue should
-produce one complete, documented, and tested vertical slice. Tests are added
-under `tests/` with the behavior they protect, not collected into a separate
-test pass at the end of a milestone.
-
-> **Current status:** `v0.8.0 — Semantic Structure and Tagged Output` is
-> released. `v0.3.0` is dropped. The next planned release is `v0.9.0 —
-> Documentation, Examples, and Release Readiness`, followed by `v0.10.0 — Stable
-> Public API`.
->
 > **Renumbered on 2026-08-01.** `v0.7.0` was numbered `v0.6.1` until then. It
 > adds new public API — the `medium` option and new spacing tokens — which is a
 > minor release under Semantic Versioning, not a patch; it also renames public
@@ -28,45 +16,62 @@ test pass at the end of a milestone.
 >
 > **Reorganised on 2026-08-05.** By then `v0.8.0` held eleven structure and
 > semantics issues against three examples issues, so its title no longer
-> described its contents. It was retitled `v0.8.0 — Semantic Structure and
-> Tagged Output`, and the examples and documentation work moved into `v0.9.0`,
-> retitled from `Documentation, Packaging, and Release Readiness` to
+> described its contents. It was retitled
+> `v0.8.0 — Semantic Structure and Tagged Output`, and the examples and
+> documentation work moved into `v0.9.0`, retitled from
+> `Documentation, Packaging, and Release Readiness` to
 > `Documentation, Examples, and Release Readiness`. `v1.0.0` moved from
-> `Phase 8` to `Phase 9` to make room for the `v0.9.0` phase section, which this
-> document previously did not have. `v1.1.0 — Themes and Font Families` was
-> closed empty; its deferred work has no milestone. See
+> `Phase 8` to `Phase 9` to make room for the `v0.9.0` phase section, which
+> this document previously did not have. `v1.1.0 — Themes and Font Families`
+> was closed empty; its deferred work has no milestone. See
 > [issue #279](https://github.com/amirhs1/CareerDossierTeX/issues/279).
 >
 > **Renumbered on 2026-08-19.** The stable-API release was numbered `v1.0.0`
-> until then and is now `v0.10.0 — Stable Public API`. The freeze itself did not
-> move: that release is still the one after which public commands, keys,
-> options, and documented behaviour are stable, which is what its milestone
-> description says and what "Definition of `0.10.0`" below states. What changed
-> is the number it carries. Every live statement that read *"before `v1.0.0` the
-> public interface may still change"* now reads `v0.10.0`; released
-> `CHANGELOG.md` and `MIGRATION.md` sections keep the number they published,
-> because those record what the project said at the time rather than what it
-> promises now. The two paragraphs above are left as written for the same
-> reason. See
+> until then and became `v0.10.0 — Stable Public API`. The freeze itself did
+> not move; only the number it carried. Released `CHANGELOG.md` and
+> `MIGRATION.md` sections keep the number they published, because those record
+> what the project said at the time rather than what it promises now. See
 > [issue #473](https://github.com/amirhs1/CareerDossierTeX/issues/473).
+>
+> **Split on 2026-08-30.** `v0.10.0` was retitled
+> `v0.10.0 — Consolidation and Correctness` and a new
+> `v1.0.0 — Stable Public API` was created to carry the freeze, with eight
+> interface issues moved to it (#96, #243, #265, #274, #280, #288, #327, #420)
+> under new epic #539 and release #540. The freeze point still did not move —
+> it is still the release after which public commands, keys, options, and
+> documented behaviour are stable — but the release carrying it is now
+> `v1.0.0`, restoring the number it held before 2026-08-19. `v0.10.0` adds no
+> public interface: it removes duplication and fixes defects so that the freeze
+> applies to a deduplicated surface. The Project gained `Phase 10 — Stable API`
+> and `Phase 9` was retitled `Phase 9 — Consolidation and Correctness`.
 
-## Release overview
+## Releases and phases
 
-| Version | Release goal | Status |
-|---|---|---|
-| `v0.1.0` | English industry resume and cover letter | Released |
-| `v0.1.1` | English industry dossier plus metadata and build corrections | Released |
-| `v0.2.0` | Academic CV, academic letter, and bibliography support | Released |
-| `v0.2.1` | PDFKit text-extraction correction | Released |
-| `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Released |
-| `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** |
-| `v0.5.0` | Statement classes and broader customization | Released |
-| `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released |
-| `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released |
-| `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Released |
-| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Released |
-| `v0.10.0` | Stable, documented public API | Planned |
-| `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** |
+One row per release, in phase order. `docs/NAMING-CONVENTION.md` "Phase
+numbering convention" is canonical for how phases are numbered; this table is
+the cross-walk, and the two label forms differ deliberately — only the numbers
+must agree.
+
+| Version | Release goal | Status | Phase | Project `Phase` option |
+| --- | --- | --- | --- | --- |
+| — | Pre-release inventory and baseline | Complete | 0 | `Phase 0 — Inventory` |
+| `v0.1.0` | English industry resume and cover letter | Released | 1 | `Phase 1 — Industry` |
+| `v0.1.1` | English industry dossier plus metadata and build corrections | Released | 1 | `Phase 1 — Industry` |
+| `v0.2.0` | Academic CV, academic letter, and bibliography support | Released | 2 | `Phase 2 — Academic` |
+| `v0.2.1` | PDFKit text-extraction correction | Released | 2 | `Phase 2 — Academic` |
+| `v0.3.0` | Farsi, bilingual, and right-to-left support | **Dropped — 2026-07-16** | — | _(none — slot reused)_ |
+| `v0.4.0` | LuaLaTeX transition and opt-in tagged-PDF preview | Released | 3 | `Phase 3 — Engine and Accessibility` |
+| `v0.5.0` | Statement classes and broader customization | Released | 4 | `Phase 4 — Expansion` |
+| `v0.6.0` | Calibrated type scale, vertical rhythm, and page geometry | Released | 5 | `Phase 5 — Calibration` |
+| `v0.7.0` | Page furniture placement, the `medium` output-context option, and spacing ownership | Released | 6 | `Phase 6 — Spacing Ownership and Output Medium` |
+| `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Released | 7 | `Phase 7 — Semantic Structure and Tagged Output` |
+| `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Released | 8 | `Phase 8 — Documentation, Examples, and Release Readiness` |
+| `v0.10.0` | Duplication removed, defects fixed, and each rule given one home | Planned | 9 | `Phase 9 — Consolidation and Correctness` |
+| `v1.0.0` | Stable, documented public API — the freeze | Planned | 10 | `Phase 10 — Stable API` |
+| `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** | — | _(none — never had an option)_ |
+
+A patch release shares the phase of the minor release it corrects, a release
+that never shipped has no phase number, and `Phase 0` has no milestone.
 
 Repository milestones are tracked on the GitHub milestones page:
 
@@ -74,158 +79,75 @@ Repository milestones are tracked on the GitHub milestones page:
 https://github.com/amirhs1/CareerDossierTeX/milestones
 ```
 
-## Phase numbering
+## Standing non-goals
 
-The Project's `Phase` field is the canonical numbering; the headings below
-follow it. Every shipped major or minor release has a phase of its own. A patch
-release does not — its issues carry the phase of the minor release they correct,
-which is why `v0.1.1` and `v0.2.1` appear in the release overview above but have
-no phase heading here.
+These hold for the project, not for one release, and a phase below repeats one
+only where it has release-specific detail to add.
 
-A release that never ships has no phase number at all. `v0.3.0` **held**
-`Phase 3` and gave it up when it was dropped, and the Project reused the slot for
-`v0.4.0`; `v1.1.0` was closed empty before it had an option to give up. Both
-therefore appear unnumbered. See `docs/NAMING-CONVENTION.md` "Phase numbering
-convention". Phase numbers are the one numbering this documentation set keeps;
-its headings carry none, and are cited by name.
-
-The two forms differ deliberately — this document keys each phase to its
-version, the Project uses a short label — so they cross-walk as follows:
-
-| This document | Project `Phase` option |
-|---|---|
-| `Phase 0: inventory and baseline` | `Phase 0 — Inventory` |
-| `Phase 1: v0.1.0` | `Phase 1 — Industry` |
-| `Phase 2: v0.2.0` | `Phase 2 — Academic` |
-| `v0.3.0` **(dropped, unnumbered)** | *(none — slot reused)* |
-| `Phase 3: v0.4.0` | `Phase 3 — Engine and Accessibility` |
-| `Phase 4: v0.5.0` | `Phase 4 — Expansion` |
-| `Phase 5: v0.6.0` | `Phase 5 — Calibration` |
-| `Phase 6: v0.7.0` | `Phase 6 — Spacing Ownership and Output Medium` |
-| `Phase 7: v0.8.0` | `Phase 7 — Semantic Structure and Tagged Output` |
-| `Phase 8: v0.9.0` | `Phase 8 — Documentation, Examples, and Release Readiness` |
-| `Phase 9: v0.10.0` | `Phase 9 — Stable API` |
-| `v1.1.0` **(closed empty, unnumbered)** | *(none — never had an option)* |
-
-The two patch releases have no heading of their own: `v0.1.1` carries
-`Phase 1 — Industry` and `v0.2.1` carries `Phase 2 — Academic`, alongside the
-minor release each one corrects. `Phase 0 — Inventory` runs the other way — it is
-the pre-release baseline and has no milestone.
+- **Farsi, bilingual, and right-to-left documents.** Dropped 2026-07-16; see the
+  `v0.3.0 — Farsi and Bilingual Support` section for the design record and the
+  architectural rule that would govern a revival.
+- **Colour themes, named or per-role font combinations, and icons.** Deferred by
+  the maintainer on 2026-07-22 with the milestone left undecided.
+  `theme=monochrome` is fixed. `v1.1.0 — Themes and Font Families` was closed
+  empty on 2026-08-05, and
+  [issue #120](https://github.com/amirhs1/CareerDossierTeX/issues/120) carries
+  no milestone deliberately.
+- **Engines other than LuaLaTeX.** XeLaTeX and pdfLaTeX fail early with an
+  actionable diagnostic.
+- **Tagging enabled by default.** Tagged structure stays opt-in through
+  `\DocumentMetadata{tagging=on}`, and the untagged path is unchanged by it.
+- **PDF/UA, WCAG, or broad ATS conformance claims** for arbitrary user
+  documents. What the fixtures verify is recorded in `docs/ATS-EXTRACTION.md`
+  and claimed no more widely.
+- **Alternate bibliography or citation styles**, and **automatic import from
+  ORCID, Scholar, DOI services, or external APIs.**
+- **Uploading to CTAN.** `make ctan` builds and inspects the archive;
+  submission is a separate, maintainer-only act.
 
 ## Phase 0: inventory and baseline
 
 ### Goal
 
-Understand and preserve the strongest existing resume and cover-letter implementations before refactoring.
+Understand and preserve the strongest existing resume and cover-letter
+implementations before refactoring: baseline designs selected, reference PDFs
+compiled, dependencies and public commands recorded, and duplication
+identified.
 
-### Deliverables
-
-- select baseline resume and letter designs;
-- compile and save reference PDFs;
-- record dependencies and public commands;
-- identify duplicated code;
-- begin `docs/MIGRATION.md`;
-- define the initial public interface (in `docs/API.md`, which `v0.9.0` replaced
-  with the PDF manual).
-
-### Completion condition
-
-The project has a documented baseline against which later changes can be compared.
+It completed when the project had a documented baseline against which later
+changes could be compared.
 
 ## Phase 1: `v0.1.0 — English Industry Dossier`
 
 ### Goal
 
-Publish the smallest useful CareerDossierTeX release.
+Publish the smallest useful CareerDossierTeX release: one resume layout, one
+industry cover-letter layout, shared profile metadata, and required-field
+validation, under XeLaTeX on US Letter paper in a monochrome theme.
 
-### Included
+### Delivered
 
-- XeLaTeX;
-- English;
-- US Letter paper;
-- monochrome theme;
-- one resume layout;
-- one industry cover-letter layout;
-- shared profile metadata;
-- required-field validation;
-- optional-field separator handling;
-- package/class regression coverage for implemented Phase 1 behavior;
-- smoke, error-path, layout-stress, and extraction fixtures under `tests/`;
-- example resume and letter;
-- local `latexmk` builds;
-- GitHub Actions compilation;
-- release documentation.
-
-### Explicit non-goals
-
-- academic CV;
-- bibliography or Biber;
-- Farsi or bilingual documents;
-- RTL layout;
-- statement classes;
-- A4 paper;
-- color themes;
-- icons;
-- CTAN packaging.
-
-### Release criteria
-
-- resume and letter compile locally with XeLaTeX;
-- both reuse the same profile file;
-- missing required metadata produces a clear error;
-- missing optional fields do not leave empty separators;
-- extracted resume text follows logical reading order;
-- every implemented behavior has the relevant committed test under `tests/`;
-- the accumulated regression, smoke, layout, and extraction suites pass;
-- CI builds both examples;
-- README and API documentation match actual behavior;
-- tag and GitHub Release `v0.1.0` are published.
+[`v0.1.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/1)
+and its [`CHANGELOG.md` entry](../CHANGELOG.md#010---2026-07-15). `v0.1.1`
+corrects metadata and the build and is recorded at
+[milestone 6](https://github.com/amirhs1/CareerDossierTeX/milestone/6) and
+[its entry](../CHANGELOG.md#011---2026-07-17).
 
 ## Phase 2: `v0.2.0 — Academic Dossier`
 
 ### Goal
 
-Extend the shared foundation to academic applications.
+Extend the shared foundation to academic applications: `careerdossier-cv.cls`,
+the academic cover-letter family, optional `careerdossier-biblatex.sty` and
+Biber integration, multi-page CV support, and running headers.
 
-### Included
+### Delivered
 
-- `careerdossier-cv.cls`;
-- academic cover-letter family;
-- `careerdossier-biblatex.sty`;
-- optional Biber integration;
-- manual publication entries;
-- multi-page CV support;
-- running headers and page numbers;
-- Scholar and ORCID fields;
-- long-entry and page-break tests added with the academic features they cover;
-- supported no-BibLaTeX CV, Biber-backed CV, and academic-letter examples; and
-- user, contributor, API, architecture, migration, roadmap, and changelog
-  documentation matched to implemented behavior.
-
-These interfaces are released in `v0.2.0`.
-
-### Release criteria
-
-- long CVs page-break safely;
-- bibliography support remains optional;
-- a CV without `biblatex` still builds;
-- a Biber example builds through `latexmk`;
-- academic and industry documents reuse the same profile;
-- every supported example builds locally and in CI;
-- the accumulated regression, extraction, smoke, layout, and bibliography
-  suites pass; and
-- README and API documentation match the tagged behavior.
-
-### Explicit non-goals
-
-- pdfLaTeX or LuaLaTeX;
-- Farsi, bilingual, or RTL documents;
-- A4 paper;
-- color themes, font presets, icons, or bundled fonts;
-- statement classes;
-- alternate bibliography or citation styles;
-- automatic import from ORCID, Scholar, DOI services, or external APIs; and
-- PDF/UA or broad ATS-conformance claims.
+[`v0.2.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/2)
+and its [`CHANGELOG.md` entry](../CHANGELOG.md#020---2026-07-17). `v0.2.1`
+corrects PDFKit text extraction and is recorded at
+[milestone 7](https://github.com/amirhs1/CareerDossierTeX/milestone/7) and
+[its entry](../CHANGELOG.md#021---2026-07-19).
 
 ## `v0.3.0 — Farsi and Bilingual Support` **(dropped — 2026-07-16)**
 
@@ -243,12 +165,13 @@ These interfaces are released in `v0.2.0`.
 >
 > **Consequence:** mature RTL support via `bidi` was the main reason the
 > project stayed XeLaTeX-only. With multilingual work dropped, that constraint
-> no longer applies, which removes the structural argument against evaluating
-> a LuaLaTeX migration.
+> no longer applies, which removes the structural argument against evaluating a
+> LuaLaTeX migration.
 
 ### Goal
 
-Add multilingual and mixed-direction documents without duplicating the class system.
+Add multilingual and mixed-direction documents without duplicating the class
+system.
 
 ### Deliverables if revived
 
@@ -270,79 +193,54 @@ Extend existing classes:
 \documentclass[language=farsi]{careerdossier-cv}
 ```
 
-Do not create separate language-specific classes unless a future document model is genuinely different.
+Do not create separate language-specific classes unless a future document model
+is genuinely different.
 
 ## Phase 3: `v0.4.0 — LuaLaTeX Transition and Tagged-PDF Preview`
 
 ### Goal
 
 Replace XeLaTeX with LuaLaTeX as the sole supported engine, preserving the
-English public API and visual design, and add a validated opt-in tagged-PDF path
-for the named fixture profiles.
+English public API and visual design, and add a validated opt-in tagged-PDF
+path for the named fixture profiles.
 
 This is a **breaking toolchain change**. Documents keep their classes, options,
 keys, and commands; the build command changes from `latexmk -xelatex` to
 `latexmk -lualatex`, and XeTeX-specific preamble code stops working.
 
-### Included
+### Delivered
 
-- LuaLaTeX-only engine guard; XeLaTeX and pdfLaTeX fail early with an actionable
-  diagnostic;
-- removal of the XeTeX-only `\XeTeXgenerateactualtext` primitive;
-- portable font resolution through `luaotfload` on macOS and pinned Linux CI;
-- re-baselined visual layout and extraction against `v0.2.0`;
-- `Makefile`, `l3build`, test runners, and CI migrated to LuaLaTeX;
-- opt-in `\DocumentMetadata{tagging=on}` semantic structure covering headings,
-  lists, links, and layout artifacts;
-- validation of the four named fixtures with an independent validator and
-  screen-reader reading-order checks;
-- migration notes, canonical documentation, and release preparation.
+[`v0.4.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/8)
+and its [`CHANGELOG.md` entry](../CHANGELOG.md#040---2026-07-20).
+
+**One release criterion is only partly discharged and stays live.** Tagged
+fixtures pass structure, extraction, and artifact checks on macOS: the four
+named profiles pass veraPDF `ua2` and a three-extractor round trip
+(`docs/ATS-EXTRACTION.md`, "Recorded validation results"), and a maintainer
+VoiceOver pass on 2026-07-20 confirmed correct reading order with all
+decorative and repeated page furniture silent ("Screen-reader reading-order
+checks"). NVDA on Windows stays platform-deferred under
+[issue #96](https://github.com/amirhs1/CareerDossierTeX/issues/96), now in
+`v1.0.0`; the release documents that rather than claiming a Windows result.
 
 ### Explicit non-goals
 
-- Farsi, bilingual, or RTL support (dropped);
-- tagging enabled by default;
-- any broad PDF/UA, WCAG, or ATS conformance claim for arbitrary user documents;
-- public API, paper-size, or theme changes.
-
-### Release criteria
-
-- every supported example compiles locally and in CI under LuaLaTeX;
-- XeLaTeX and pdfLaTeX produce a clear, tested engine error;
-- layout and extraction are reviewed against `v0.2.0` rather than silently
-  re-baselined;
-- untagged output is unchanged when tagging is not enabled;
-- tagged fixtures pass structure, extraction, and artifact checks, and the
-  validator and screen-reader results are recorded with tool versions.
-  **Status:** met for macOS. The four named profiles pass veraPDF `ua2` and a
-  three-extractor round trip (`docs/ATS-EXTRACTION.md`, "Recorded validation
-  results"), and a maintainer VoiceOver pass on 2026-07-20 confirmed correct
-  reading order with all decorative and repeated page furniture silent
-  ("Screen-reader reading-order checks"). NVDA on Windows stays
-  platform-deferred; the release documents that rather than claiming a Windows
-  result;
-- `docs/MIGRATION.md` gives XeTeX-preamble users an actionable upgrade path;
-- documentation claims no more than the fixtures actually verify.
+- public API, paper-size, or theme changes. This release moves the engine and
+  nothing else.
 
 ## Phase 4: `v0.5.0 — Statements and Customization`
 
 ### Goal
 
-Support additional application documents and broader visual configuration.
+Support additional application documents and broader visual configuration:
+`careerdossier-statement.cls` with its `research`, `teaching`,
+`teaching-philosophy`, `diversity`, `artist`, and `purpose` types, A4 paper,
+and a cross-class `bodyfont=serif|sans` option.
 
-### Planned deliverables
+### Delivered
 
-- `careerdossier-statement.cls`;
-- one class with `research`, `teaching`, `teaching-philosophy`, `diversity`,
-  `artist`, and `purpose` types;
-- A4 paper;
-- a cross-class `bodyfont=serif|sans` option with the current serif default;
-- additional stress tests and documentation.
-
-The maintainer deferred color themes, named or per-role font combinations,
-optional icons, and the Windows/NVDA reading-order check on 2026-07-22. Their
-future milestone remains undecided; they are not release blockers for
-`v0.5.0`.
+[`v0.5.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/4)
+and its [`CHANGELOG.md` entry](../CHANGELOG.md#050---2026-07-24).
 
 ## Phase 5: `v0.6.0 — Calibrated Type Scale and Rhythm`
 
@@ -359,39 +257,25 @@ one shared, proportional design system, driven by two public inputs —
 3. Therefore `10pt`, `11pt`, and `12pt` are one design at three scales, not
    three differently proportioned designs.
 
-### Included
+### Delivered
 
-Delivered scope and this release's criteria are recorded in the closed
 [`v0.6.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/9),
 [epic #137](https://github.com/amirhs1/CareerDossierTeX/issues/137), and its
 [`CHANGELOG.md` entry](../CHANGELOG.md#060---2026-07-30).
 
-### Agreed defaults and their measured cost
+### Agreed defaults
 
-Defaults are per class, not uniform, because document conventions differ: the
-resume is `11pt` at `margin=narrow`, and the CV, letter, and statement classes
-are `12pt` at `margin=normal`. The measured characters per line for each
-combination live in [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty),
-which records the `\textwidth` values and the counting method alongside them.
-
-The prose classes take `12pt` specifically to control measure: at `normal`,
-`11pt` runs longer than the conventional 45–90 guidance while `12pt` lands just
-inside it. Capping `\textwidth` from a
-target measure was considered and rejected — reaching 80 characters at `11pt`
-needs side margins near 1.68 in, which no career-services guidance endorses.
-
-**Known accepted limitation:** the resume default is the longest measure in the
-project, accepted for one-page capacity rather than overlooked. It is stated
-for authors in the manual, with the rationale in `docs/ARCHITECTURE.md`.
+Defaults are per class, not uniform: the resume is `11pt` at `margin=narrow`,
+the CV, letter, and statement classes `12pt` at `margin=normal`.
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty) is canonical for
+the measured characters per line, why `12pt` is required for the prose classes,
+and why the resume's longer measure is an accepted limitation rather than an
+oversight.
 
 ### Explicit non-goals
 
-- color themes, named or per-role font combinations, and icons — still
-  deferred, undecided future milestone (see Phase 4);
-- any change to public content commands, key names, contact rendering,
-  colours, or fonts;
-- a language- or direction-abstraction option (see the dropped
-  `v0.3.0 — Farsi and Bilingual Support` section).
+- any change to public content commands, key names, contact rendering, colours,
+  or fonts. This release changes proportions, not the interface.
 
 ### Removed
 
@@ -407,30 +291,24 @@ system released in `v0.6.0`, make page furniture selectable by output context,
 and retune the vertical-rhythm ratios once every gap is owned by a token.
 Several vertical dimensions had been decided by a third-party default or a
 hard-coded constant rather than by the design system meant to own them —
-`geometry`'s header and folio placement, LaTeX's single `topsep`, a
-hard-coded bibliography inter-entry gap, LaTeX Lab's tagged-path list default,
-and headers unable to escape the prose `\parskip` among them — and each is
-handed back to its owning token, with the vertical-rhythm ratios retuned once
-every gap can express itself. Rendered output therefore moves in two ways: it
-is *corrected* where a spacing decision was never the design system's to begin
-with, and it *reflows by design* where the ratios are retuned; no type-scale
-step or margin preset changes value. The release also adds a `medium`
-(`screen`/`print`) class option, three header-composition commands, and a
-renamed and split vertical-spacing token vocabulary, every rename and
-retirement source-compatible for a document that does not read a token by
-name.
+`geometry`'s header and folio placement, LaTeX's single `topsep`, a hard-coded
+bibliography inter-entry gap, LaTeX Lab's tagged-path list default, and headers
+unable to escape the prose `\parskip` among them — and each is handed back to
+its owning token. Rendered output therefore moves in two ways: it is
+_corrected_ where a spacing decision was never the design system's to begin
+with, and it _reflows by design_ where the ratios are retuned; no type-scale
+step or margin preset changes value.
 
-### Included
+### Delivered
 
-Delivered scope and this release's criteria are recorded in the closed
 [`v0.7.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/10),
 [epic #182](https://github.com/amirhs1/CareerDossierTeX/issues/182), and its
 [`CHANGELOG.md` entry](../CHANGELOG.md#070---2026-08-04).
 
 ### Explicit non-goals
 
-- any change to the *value* of a type-scale step or a margin preset. The
-  vertical-rhythm ratios *are* retuned in this release, but only under #206 and
+- any change to the _value_ of a type-scale step or a margin preset. The
+  vertical-rhythm ratios _are_ retuned in this release, but only under #206 and
   only against its stated design rules; a ratio changed incidentally by any
   other issue here is out of scope. The list-edge split and the token renames
   are mechanism and naming changes that preserve every rendered gap;
@@ -452,152 +330,85 @@ Delivered scope and this release's criteria are recorded in the closed
 ### Goal
 
 Complete the semantic structure and the tagged-output metadata, and settle the
-public typography and colour roles, before the `v0.10.0` API freeze. The
-released output had carried less structure than it appeared to — no document
-from any of the four classes contained an `/H1`, `/Lang` was absent from the
-default build path, and the derived `/Title` never reached a viewer's window —
-and three public roles were still unsettled: the `Title` collision between the
-type scale and the entry primitives, entry metadata's de-emphasis role, and
-several semantic colour tokens declared but never consumed. Two further
-defects were corrected rather than chosen: links had no visible affordance
-under `medium=screen`, and `emergencystretch` was set in more than one place
-with no named token.
+public typography and colour roles, before the API freeze. The released output
+had carried less structure than it appeared to — no document from any of the
+four classes contained an `/H1`, `/Lang` was absent from the default build
+path, and the derived `/Title` never reached a viewer's window — and three
+public roles were still unsettled: the `Title` collision between the type scale
+and the entry primitives, entry metadata's de-emphasis role, and several
+semantic colour tokens declared but never consumed.
 
-### Included
+### Delivered
 
-Delivered scope and this release's criteria are recorded in the closed
 [`v0.8.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/11),
 [epic #281](https://github.com/amirhs1/CareerDossierTeX/issues/281), and its
 [`CHANGELOG.md` entry](../CHANGELOG.md#080---2026-08-12).
 
 ### Explicit non-goals
 
-- PDF/UA-2 conformance claims. Tagged structure remains opt-in through
-  `\DocumentMetadata{tagging=on}`, and veraPDF validation runs on the scheduled
-  workflow, not on the per-PR tagging job.
-- colour themes and named font families. Deferred on 2026-07-22 with no
-  milestone; `v1.1.0 — Themes and Font Families` was closed empty on 2026-08-05
-  ([issue #120](https://github.com/amirhs1/CareerDossierTeX/issues/120)).
+- veraPDF validation on the per-PR tagging job. It runs on the scheduled
+  workflow instead.
 - a `templates/` folder. Proposed in
   [issue #280](https://github.com/amirhs1/CareerDossierTeX/issues/280), which
-  now carries `v0.10.0`; a non-goal of this release, not of the project.
+  now carries `v1.0.0`; a non-goal of this release, not of the project.
 
 ## Phase 8: `v0.9.0 — Documentation, Examples, and Release Readiness`
 
 ### Goal
 
-Consolidate the documentation set, revise and extend the examples, build the PDF
-manual, and configure the CTAN release archive.
+Consolidate the documentation set, revise and extend the examples, build the
+PDF manual, and configure the CTAN release archive.
 
-Three strands joined the release after that charter was set, and section
-"Scope" below records them rather than this goal: the behaviour and
-public-interface corrections that had to land before the `v0.10.0` freeze, the
-agent instruction set, and the build and test harness. Each is here because
+Three strands joined the release after that charter was set: the behaviour and
+public-interface corrections that had to land before the freeze, the agent
+instruction set, and the build and test harness. Each is there because
 deferring it cost more than carrying it — a public-interface fix pushed past
-`v0.10.0` costs a major version instead of a minor one, and the harness and
+the freeze costs a major version instead of a minor one, and the harness and
 instruction-set work paid for itself across the rest of the milestone.
 
-### Scope
+### Delivered
 
-Documentation:
+[`v0.9.0` milestone](https://github.com/amirhs1/CareerDossierTeX/milestone/12),
+[epic #283](https://github.com/amirhs1/CareerDossierTeX/issues/283), and its
+[`CHANGELOG.md` entry](../CHANGELOG.md#090---2026-08-26).
 
-- split `docs/ATS-EXTRACTION.md` into its charter and the documents that own the
-  rest of its material (#262);
-- give each duplicated mechanism explanation one canonical home (#259);
-- document how to install the classes (#261);
-- correct two source comments that document rejected behaviour (#275);
-- decide whether maintainer-tooling fixes belong in `CHANGELOG.md`, which #245
-  currently has no entry for (#260), and mark the entries that predate the
-  boundary that decision drew (#410, #413, #414);
-- tidy the documentation set itself, from the survey that preceded the manual:
-  where `docs/MIGRATION.md` states its own purpose (#446), one heading
-  convention across `docs/` (#447), one home for the CTAN requirement list
-  (#448), the release table `README.md` restates from this file (#449), and what
-  `docs/ATS-EXTRACTION.md` sections 5 and 11 own now that the manual exists
-  (#450). All five are optional and none blocks the release; #451 corrects two
-  statements that went stale as they were filed.
+Two outcomes are cited elsewhere and are recorded here because a later release
+depends on them: the PDF manual (#263) made `doc/careerdossier.tex` the
+interface reference and reduced `docs/API.md` to a pointer; and `make ctan`
+(#264) builds the archive, but **nothing has been uploaded**, which stays a
+maintainer decision.
 
-Examples:
+## Phase 9: `v0.10.0 — Consolidation and Correctness`
 
-- review each example under `examples/` for currency against the calibrated
-  token system, consistency with the others, and whether it still demonstrates
-  its intended feature clearly;
-- add a longer, multi-page `cv-bibliography` example where the current fixture is
-  too thin to show real behavior (#197);
-- demonstrate tagging and contact labels in a shipped example (#273).
+### Goal
 
-Release readiness:
+Remove duplication, fix defects, and give each rule one home, so that the
+`v1.0.0` freeze applies to a deduplicated surface.
 
-- build a PDF manual and ship it with its source (#263) — the one hard blocker
-  on a CTAN submission, **shipped 2026-08-16**, which also made
-  `doc/careerdossier.tex` the interface reference and reduced `docs/API.md` to a
-  pointer;
-- configure `l3build ctan` and inspect the resulting archive (#264) — **shipped
-  2026-08-17**; `make ctan` builds it, and nothing is uploaded, which stays a
-  `v0.10.0` decision for the maintainer;
-- lint that every Work file declares the same version and date (#258).
+### Definition of `0.10.0`
 
-Behaviour and public interface, settled before the `v0.10.0` freeze:
+- every rule stated in one place, with the other mentions reduced to pointers;
+- fixture bodies shared rather than repeated, and a lint that every fixture
+  declares what it asserts;
+- shared class options declared once rather than once per class;
+- module boundaries corrected before they are frozen;
+- measured correctness and optimization work on the ten Work files.
 
-- accept a raw `#` in a profile value, which had failed with a
-  hyperref-internal error (#353);
-- give `CDossierPublications` a `numbering` key, so grouped publication lists
-  can carry one sequence across groups instead of restarting at each (#355).
-  This is the only public key this release adds, and the reason
-  `docs/MIGRATION.md` takes an entry for a milestone that is otherwise
-  documentation and packaging;
-- give the header-below tokens ownership of their gap in the prose classes
-  (#419), and keep a letter's closing text with its signature name across a
-  page break (#421);
-- make derived and user-supplied PDF metadata identical on the tagged and
-  untagged build paths (#428, #439, #440, #442). The tagged path had been
-  discarding a document's own `pdftitle` and `pdfauthor` outright, and every
-  text-layer suite passed while it did.
-
-The agent instruction set:
-
-- reduce `AGENTS.md` from its 523 lines to the always-loaded core, and move the
-  testing chapter out of `CONTRIBUTING.md` into `docs/TESTING.md` (#370, #371);
-- collapse the post-push metadata tail from sixteen `gh` round-trips to about
-  six (#379);
-- correct or assert what the instruction files claim about themselves (#380,
-  #382, #386, #387, #394, #400), and align the `release-notes` skill's step text
-  with the user-visible test it applies (#411, #433, #434).
-
-The build and test harness:
-
-- make the local gate parallel by default, both across independent targets and
-  within each runner's fixtures, and make it sandbox-tolerant and race-free
-  (#378, #390, #392, #395, #398, #399, #462);
-- add the lints and gates that now guard the release: each Work file's declared
-  name against its filename (#405), every cross-document Markdown anchor
-  (#407), every complete example the manual publishes (#458), every public name
-  the Work defines against the manual (#468), and `shellcheck` over the shell
-  harness (#469);
-- measure the visible gap at every boundary, and correct the records that
-  misstated it (#417).
-
-Documentation-set work filed after the 2026-08-16 extension:
-
-- correct what `careerdossier-components.sty` declares it owns (#466);
-- rename the stable-API release from `v1.0.0` to `v0.10.0` across the
-  documentation (#473), following the milestone's own rename on 2026-08-19;
-- record this section's real scope, which is this entry (#475).
+**This release adds no public interface.** Public commands, keys, and options
+may still change here; work that defines, documents, or freezes them belongs to
+`v1.0.0`.
 
 Tracked under
-[milestone `v0.9.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/12)
-and [epic #283](https://github.com/amirhs1/CareerDossierTeX/issues/283), which
-stay canonical for the delivered list. This section keeps the long-scope form
-until the release ships; #380 compressed the shipped phases to their goal,
-delivered list, and non-goals, and Phase 8 joins them at the tag.
+[milestone `v0.10.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
+and [epic #285](https://github.com/amirhs1/CareerDossierTeX/issues/285).
 
-## Phase 9: `v0.10.0 — Stable Public API`
+## Phase 10: `v1.0.0 — Stable Public API`
 
 ### Goal
 
 Declare a stable and fully documented interface.
 
-### Definition of `0.10.0`
+### Definition of `1.0.0`
 
 - public commands, options, keys, and environments are documented;
 - supported engines and languages are tested;
@@ -606,67 +417,15 @@ Declare a stable and fully documented interface.
 - examples are complete;
 - CI verifies all supported configurations;
 - manual screen-reader passes are recorded for VoiceOver on the statement
-  fixture (#274) and NVDA on Windows (#96), so both sit together as one
-  release criterion;
+  fixture (#274) and NVDA on Windows (#96), so both sit together as one release
+  criterion;
 - the uploaded archive satisfies the CTAN packaging requirements, which
   [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v0100)
   states in full and this file does not restate (#448).
 
+After this release, public commands, keys, options, and documented behaviour
+should be treated as stable. This is the freeze.
+
 Tracked under
-[milestone `v0.10.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
-and [epic #285](https://github.com/amirhs1/CareerDossierTeX/issues/285).
-
-## Continuous testing policy
-
-Testing is part of each implementation issue and pull request:
-
-1. define the observable behavior and its test before implementation;
-2. place automated sources, fixtures, runners, and baselines under `tests/`;
-3. write the test first when practical, or alongside the first usable
-   implementation when a pre-implementation run is not possible;
-4. run the focused test plus affected existing suites before merge;
-5. rerun the accumulated suite at release time without deferring new feature
-   coverage to release preparation.
-
-Dedicated test issues are reserved for shared harness work, cross-cutting quality
-improvements, or explicit legacy test debt. They are not a substitute for tests
-required by a feature's acceptance criteria.
-
-The repository uses an `l3build` regression harness (`build.lua`, run with
-`l3build check`) whose sources and baselines live under `tests/regression/`, so
-all test material remains under `tests/` with no top-level `testfiles/`
-directory. Every shared package and every document class carries committed
-regression coverage — no module is exempt — alongside the extraction, layout,
-tagging, bibliography, and lint suites; extend the existing file for a module
-with the behavior each future change adds. `build.lua` states the reason for
-each harness setting in a comment beside it, and `tests/regression/` is the
-inventory of pairs, which no document restates.
-
-## Engineering work (tracked as issues)
-
-The live issue and Project metadata now follow the continuous-testing policy:
-
-- CTAN packaging via `l3build ctan`, and the PDF manual a submission requires —
-  `v0.9.0`, under #264 and #263. Whether the manual is handwritten or generated
-  from a `.dtx` is decided there, against what
-  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v0100)
-  states CTAN requires.
-- Tagged PDF is no longer gated on XeTeX gaining real interword spaces. The
-  LuaLaTeX transition supersedes that precondition, and opt-in tagged structure
-  is now in-scope for `v0.4.0` via
-  [issue #28](https://github.com/amirhs1/CareerDossierTeX/issues/28), with
-  validation in [issue #77](https://github.com/amirhs1/CareerDossierTeX/issues/77).
-  No PDF/UA conformance is claimed.
-
-## Scope-control rule
-
-A feature may enter a release only when:
-
-1. its public behavior is defined;
-2. a minimal example exists;
-3. it is documented;
-4. its repeatable or automated test was added with the implementation under
-   `tests/`;
-5. it does not require claiming unsupported configurations.
-
-Attractive but nonessential features belong in the backlog until the current milestone is complete.
+[milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/14)
+and [epic #539](https://github.com/amirhs1/CareerDossierTeX/issues/539).
