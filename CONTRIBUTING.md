@@ -186,10 +186,21 @@ A good implementation issue explains:
 
 Use focused issues that can be completed on one branch. Split work that becomes too broad.
 
-The templates in `.github/ISSUE_TEMPLATE/` encode that structure —
-`bug_report.md`, `feature_request.md`, and `epic.md`. File from one of them
-rather than a blank body; blank issues are disabled. From the command line:
-`gh issue create --template feature_request.md`.
+The templates in `.github/ISSUE_TEMPLATE/` encode that structure. Pick by what
+the issue delivers, not by which one you filed last:
+
+| Template | For |
+|---|---|
+| `development.md` | documentation, tests, refactoring, CI, or agent tooling |
+| `feature_request.md` | a user-visible or maintainer-visible new capability |
+| `bug_report.md` | a reproducible LaTeX, layout, or build defect |
+| `epic.md` | work that genuinely decomposes into several issues |
+
+`development.md` is the ordinary case here — most issues in this repository are
+`type:docs` or `type:test` — and it is the only one that pre-applies no `type:*`
+label, because the kind varies across the work it covers. File from one of the
+four rather than a blank body; blank issues are disabled. From the command line:
+`gh issue create --template development.md`.
 
 ### Bug reports
 
