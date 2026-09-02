@@ -420,7 +420,7 @@ Declare a stable and fully documented interface.
   fixture (#274) and NVDA on Windows (#96), so both sit together as one release
   criterion;
 - the uploaded archive satisfies the CTAN packaging requirements, which
-  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v0100)
+  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
   states in full and this file does not restate (#448).
 
 After this release, public commands, keys, options, and documented behaviour

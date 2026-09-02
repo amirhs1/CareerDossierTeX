@@ -710,7 +710,7 @@ A public API change should answer:
 - Can it be tested with a minimal example?
 - Does it create unnecessary future compatibility obligations?
 
-Before `v0.10.0`, breaking changes are allowed but must be documented in `CHANGELOG.md` and `MIGRATION.md`.
+Before `v1.0.0`, breaking changes are allowed but must be documented in `CHANGELOG.md` and `MIGRATION.md`.
 
 ## Pull requests
 

@@ -20,7 +20,7 @@ code.
 > the examples are revised — a two-page bibliography CV, and tagging and contact
 > labels demonstrated in shipped documents.
 >
-> It also settles the last public-interface work before the `v0.10.0` freeze:
+> It also settles the last public-interface work before the `v1.0.0` freeze:
 > `CDossierPublications` gains `numbering=restart|continue`, a raw `#` in a
 > profile value no longer truncates the link it appears in, and a document's PDF
 > metadata is now identical on the tagged and untagged build paths.
@@ -32,7 +32,7 @@ code.
 > document. Resume and CV are unaffected. See
 > [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 >
-> Before `v0.10.0` the public interface may still change between minor versions;
+> Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
 > [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
