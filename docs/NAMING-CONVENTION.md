@@ -379,7 +379,7 @@ In review
 Listed in the Project's own option order. Copy the exact string from
 `gh project field-list 2 --owner amirhs1`; option lookup is by name, so a
 mismatched transcription resolves to an empty option id. The documented write
-path in `.agents/skills/open-draft-pr/reference.md` rejects that with a
+path in `.agents/skills/project-metadata/reference.md` rejects that with a
 `VALIDATION` error and a non-zero exit; a hand-run `gh project item-edit`
 accepts it silently.
 
@@ -401,8 +401,9 @@ Rules:
   yet a review request. Only once the maintainer marks it ready does it become
   `In review`. This is the one place the `In Progress` and `In review` meanings
   above both read as true, and draft status is the tie-breaker. This is the only
-  statement of the rule: `.agents/skills/open-draft-pr/SKILL.md` and its
-  `reference.md` ("Status transitions") both defer here rather than repeat it.
+  statement of the rule: `.agents/skills/open-draft-pr/SKILL.md` and
+  `.agents/skills/project-metadata/reference.md` ("Status transitions") both
+  defer here rather than repeat it.
 - Merged PRs and closed issues should become `Done`.
 
 ---

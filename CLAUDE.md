@@ -16,8 +16,9 @@ the relevant `.agents/skills/` entry, not in this file.
   entries are symlinks into `.agents/skills/`:
 
 ```text
-.claude/skills/open-draft-pr  -> ../../.agents/skills/open-draft-pr
-.claude/skills/release-notes  -> ../../.agents/skills/release-notes
+.claude/skills/open-draft-pr     -> ../../.agents/skills/open-draft-pr
+.claude/skills/project-metadata  -> ../../.agents/skills/project-metadata
+.claude/skills/release-notes     -> ../../.agents/skills/release-notes
 ```
 
 Each skill states its own procedure, entry point, and boundaries; `AGENTS.md`
@@ -79,8 +80,8 @@ the loop row already rules out, and buying it back with a permission entry is
 the weakening "Permissions and enforcement" above forbids. `gh api graphql` is
 the form that survives: it leads the invocation, needs no permission change, and
 batches inside one request rather than around several.
-`.agents/skills/open-draft-pr/reference.md` (appendix) is where that is spent,
-and is canonical for the procedure.
+`.agents/skills/project-metadata/reference.md` (appendix) is where that is
+spent, and is canonical for the procedure.
 
 ### The sandbox `allowWrite` grant
 

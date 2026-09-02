@@ -1,6 +1,6 @@
 ---
 name: open-draft-pr
-description: Open or update a CareerDossierTeX draft pull request and populate its GitHub labels, milestone, assignee, and Project fields.
+description: Open or update a CareerDossierTeX draft pull request — the close-out gate, the PR body, AI disclosure, and the push. Calls project-metadata for the fields.
 ---
 
 # Open or update a draft PR
@@ -9,8 +9,9 @@ Read and follow, in order:
 
 1. `AGENTS.md`
 2. `reference.md`, alongside this file
-3. `docs/NAMING-CONVENTION.md`
-4. the focused GitHub issue and its current Project metadata
+3. `.agents/skills/project-metadata/`, which owns every field this skill sets
+4. `docs/NAMING-CONVENTION.md`
+5. the focused GitHub issue and its current Project metadata
 
 ## When this runs
 
@@ -47,32 +48,26 @@ here.
    opening a draft PR"). Steps 2–6 are that gate; nothing on it may be deferred
    to a commit after the push, and green CI does not discharge any of it.
 9. Push only the focused feature branch.
-10. Open or update the PR as a draft.
-11. Assign `amirhs1`.
-12. Add the PR to the `CareerDossierTeX Development` Project.
-13. Apply one existing primary `type:*` label and all relevant `area:*` labels.
-14. Inherit the focused issue's milestone, Phase, and Priority.
-15. Set Status to the Project's in-progress option.
-16. Estimate Size from the actual completed scope, using the measured
-    thresholds in `reference.md` ("Size guide").
-17. Read every field back from GitHub, fill anything still blank, and read back
-    again. A blank is unfinished work, not a reporting line. `reference.md`
-    ("Verification") says which fields have no legitimate blank value and holds
-    the queries.
-18. Close with the completion report `AGENTS.md` ("Completion report")
-    defines, covering the branch as a whole. The step-17 read-back is the
+10. Open or update the PR as a draft, then confirm the items in `reference.md`
+    ("The four PR-only read-back items"): URL, draft status, base and head
+    branches, and the focused issue the body links.
+11. Set and verify every field through the `project-metadata` skill — assignee,
+    Project membership, labels, milestone, `Status`, `Phase`, `Priority`, and
+    `Size`, then the read-back that closes them out. That skill is canonical for
+    all of it, including which `Status` a newly opened draft takes and how
+    `Size` is scored from the completed diff.
+12. Close with the completion report `AGENTS.md` ("Completion report")
+    defines, covering the branch as a whole. The step-11 read-back is the
     metadata payload of that report's `Test criteria` section, not a separate
     report.
 
-Steps 10–16 are the metadata this skill owes, not a count of commands: the
-appendix in `reference.md` sets all of it in three `gh` calls, and step 17 reads
-it back in a fourth. Follow that appendix rather than issuing one call per field.
-
-`docs/NAMING-CONVENTION.md` "Project Status convention" defines which `Status`
-to use and "Phase numbering convention" the `Phase` numbering; `reference.md`
-("Project field values") covers the rest. Read every literal option string and id live, from the appendix's
-discovery query, never from prose in this file or any other — the
-transcriptions drift, and a name that does not match resolves to no option id.
+Step 11 is one skill call, not eight fields.
+`.agents/skills/project-metadata/reference.md`'s appendix opens the PR fully configured and
+sets the rest in three `gh` calls, then reads it all back in a fourth — follow
+that appendix rather than issuing one call per field, and read every literal
+option string and id live from its discovery query. Never take one from prose in
+this file or any other: the transcriptions drift, and a name that does not match
+resolves to no option id.
 
 ## PR body template
 
@@ -129,5 +124,5 @@ satisfying it, not a second statement of it.
 delegation; it is not restated here.
 
 When Project access is unavailable — a missing `project` token scope, or
-missing identifiers — `reference.md` ("Verification") states the fallback; it
-is not restated here.
+missing identifiers — `.agents/skills/project-metadata/SKILL.md` ("Boundaries") states the
+fallback; it is not restated here.
