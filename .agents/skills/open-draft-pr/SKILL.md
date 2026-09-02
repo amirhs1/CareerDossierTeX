@@ -53,7 +53,8 @@ here.
 13. Apply one existing primary `type:*` label and all relevant `area:*` labels.
 14. Inherit the focused issue's milestone, Phase, and Priority.
 15. Set Status to the Project's in-progress option.
-16. Estimate Size from the actual completed scope.
+16. Estimate Size from the actual completed scope, using the measured
+    thresholds in `reference.md` ("Size guide").
 17. Read every field back from GitHub, fill anything still blank, and read back
     again. A blank is unfinished work, not a reporting line. `reference.md`
     ("Verification") says which fields have no legitimate blank value and holds
