@@ -646,6 +646,24 @@ quoted string in that section as a section name.
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree
 resolves to a real heading.
 
+### Prose section pointer lint
+
+`tests/lint/run-prose-pointers.sh` — every pointer of the form
+
+```text
+`PATH.md` ("Section Name")
+```
+
+in the tree names a file that exists and a heading it actually has. (That
+example is fenced deliberately: the lint resolves this form wherever it appears
+outside fenced code, so an unfenced illustration of it would be checked as a
+real pointer — as this line was, on the first run.) The anchor lint
+above covers the `[text](file.md#anchor)` form; this covers the prose form the
+agent contract uses for rules, which nothing checked before #559. Every quoted
+name in a parenthetical is resolved, not just the first — one parenthetical can
+carry two. Paths resolve against the repository root, then against the citing
+file's own directory, because both forms are in use.
+
 ### Section-sign lint
 
 `tests/lint/run-section-sign.sh` — no tracked file contains U+00A7 SECTION
