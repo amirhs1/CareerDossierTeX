@@ -32,7 +32,7 @@ because running all of it on a one-line docs fix costs more than the fix.
 
 5. Milestone, Project fields, and parent epic — up front when the release
    boundary, the public API, or the parent decomposition is genuinely in
-   question; otherwise once, at PR time, where `open-draft-pr` reads them
+   question; otherwise once, at PR time, where `project-metadata` reads them
    anyway.
 6. Confirm the work belongs to the active milestone whenever it adds, renames,
    or retires a public name, or could plausibly belong to a later release.
@@ -52,7 +52,7 @@ rows that apply.
 
 | Change kind                        | Beyond the always-row, read                                                                                                                                                                                                                     |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Always**                         | `Makefile` (through `make help`); at PR time `AI-POLICY.md` ("Attribution" — every PR discloses), `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, and `gh label list --limit 100` |
+| **Always**                         | `Makefile` (through `make help`); at PR time `AI-POLICY.md` ("Attribution" — every PR discloses), `docs/NAMING-CONVENTION.md`, `.github/pull_request_template.md`, `.agents/skills/open-draft-pr/reference.md`, `.agents/skills/project-metadata/reference.md`, and `gh label list --limit 100` |
 | **Any behavior change**            | `docs/TESTING.md` section "Coverage expectations" (the test coverage matrix); `.agents/skills/release-notes/reference.md` section "The shape of an entry" — how to write the `CHANGELOG.md` entry rule 7 requires; the rows below name that *file*, not this *rule*                                                                                                                                                              |
 | Token, spacing, or vertical rhythm | `doc/careerdossier.tex` (the token chapter), `docs/TESTING.md` section "Spacing tokens: reporting a value is not rendering a gap", `CHANGELOG.md`                                                                                               |
 | Layout, page break, or typography  | `doc/careerdossier.tex`, `docs/TESTING.md` section "Visual review targets", `CHANGELOG.md`                                                                                                                                                       |
@@ -172,7 +172,10 @@ documentation, and the correct milestone before implementation.
 4. **Verify:** run relevant checks, then the supported suite when available.
 5. **Self-review:** inspect the full branch diff, logs, artifacts, and docs.
 6. **Commit:** create coherent commits on the focused feature branch.
-7. **Draft PR:** follow `.agents/skills/open-draft-pr/reference.md`.
+7. **Draft PR:** follow `.agents/skills/open-draft-pr/reference.md` for the
+   gate, the body, and the push, then `.agents/skills/project-metadata/` for
+   every field. Filing an issue uses `project-metadata` alone — its body comes
+   from a form in `.github/ISSUE_TEMPLATE/`, not from a skill.
 8. **Report:** distinguish completed, verified, and unverified work.
 
 Ask a focused question only for a material product, scope, design, release,
@@ -260,9 +263,10 @@ that reads the branch's real trailers. Read it before writing either. Nothing
 in this file or in a skill restates it, and where any of them appears to
 differ, `AI-POLICY.md` governs. When implementation of a focused issue is
 authorized, the agent may commit, push the focused branch, open or update a
-draft PR, and populate routine PR and Project metadata without separate
-approval for every field, following the `open-draft-pr` skill and its
-`reference.md`. Rule 11 states the complete boundary on this delegation.
+draft PR, and populate routine repository and Project metadata without separate
+approval for every field, following the `open-draft-pr` and `project-metadata`
+skills and their `reference.md` files. Rule 11 states the complete boundary on
+this delegation.
 
 ## High-risk changes
 
@@ -346,7 +350,7 @@ so. It is the author's attestation that the push gate is discharged; green CI is
 not that attestation and does not substitute for it.
 
 Two other fixed lists exist — the metadata read-back in
-`.agents/skills/open-draft-pr/reference.md` ("Verification"), and the
+`.agents/skills/project-metadata/reference.md` ("Verification"), and the
 release-notes list in `.agents/skills/release-notes/reference.md`
 ("Verification"). Both are payloads of the `Test criteria` section above, not
 reports of their own: one report, seven sections, one verdict, and neither
