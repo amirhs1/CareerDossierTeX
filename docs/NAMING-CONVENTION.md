@@ -458,6 +458,17 @@ Rules:
 - When adding, dropping, or reordering a phase, change the Project field first,
   then update `docs/ROADMAP.md` — its phase heading and its "Releases and
   phases" table, which is the cross-walk — to match.
+- **A `Phase` option's description is identity only**, in the shape
+  `<what the phase is>. <release(s)>. docs/ROADMAP.md "Phase N" is canonical.`
+  It names the phase and its release and then points; it does not summarise the
+  release's scope, and it carries no renumbering or retitling provenance.
+
+  Both of those live in `docs/ROADMAP.md`, which is reviewed. The option is not
+  in the repository, so no pull request touches it and `make lint` cannot see
+  it — it went stale twice in two weeks, once on scope and once on numbering,
+  and both were found by accident. Identity and release number are the only
+  parts that do not drift, because a phase's subject does not move; only its
+  contents do (#477).
 - Check `git grep -nE "Phase [0-9]"` after any renumbering: references to
   `Phase 0`, `Phase 1`, and `Phase 2` appear in several files and are stable,
   but any higher number outside `docs/ROADMAP.md` needs review.
