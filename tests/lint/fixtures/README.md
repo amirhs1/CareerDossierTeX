@@ -93,3 +93,35 @@ fixture rather than pass it. The two
 that is how the failure actually arrives — a heading renamed in a
 documentation tidy-up, leaving a parser that finds nothing and a lint that
 reports no mismatches.
+
+## Prose section pointer fixtures
+
+`pointerfixture-*.md` pin the verdicts of
+`tests/lint/run-prose-pointers.sh` (issue #559). They resolve against each
+other, never against the real tree, and `pointerfixture-target.md` is the only
+one any of them cites.
+
+| Fixture | Expected verdict |
+| --- | --- |
+| `pointerfixture-resolvable.md` | `OK` |
+| `pointerfixture-bad-file.md` | `no such file` |
+| `pointerfixture-bad-heading.md` | `no heading of that name` |
+| `pointerfixture-wrapped.md` | `OK` |
+| `pointerfixture-sibling.md` | `OK` |
+| `pointerfixture-fenced.md` | `OK` |
+| `pointerfixture-second-name.md` | `no heading of that name` |
+
+Four of the seven pin an `OK`, which is unusual for a fixture set here and is
+the point: this lint's plausible failure is reporting a present pointer as
+broken, not missing a broken one. `-wrapped` carries a pointer split across a
+newline and a section name split across one, because at 80 columns that is how
+most of them are written. `-sibling` cites a file that exists only beside it and
+not at the repository root, so a lint that resolved only root-relative paths
+would fail it. `-fenced` puts an unresolvable pointer inside a fence, where it
+is illustration rather than a pointer.
+
+`-second-name.md` is the one that pins a resolution rather than a pointer: its
+single parenthetical carries two names, the first valid and the second not. The
+hand-written checker that motivated #559 read only the first name of each
+parenthetical and reported the tree clean, so this fixture fails any
+reimplementation that regresses to counting pointers instead of resolutions.
