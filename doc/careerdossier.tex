@@ -1609,9 +1609,26 @@ set ragged-right and reported underfull, since it has no glue to justify with. A
 wrapped address still concatenates back exactly.
 
 \cmd{CDossierHighlightAuthor} may be repeated for spelling or initial variants.
-It bolds an exact BibLaTeX-parsed family/given-name pair in the bibliography and
-does not alter citations. Both keys are required; an incomplete declaration
-produces an actionable package error.
+It bolds a BibLaTeX-parsed family/given-name pair in the bibliography and does
+not alter citations. Both keys are required; an incomplete declaration produces
+an actionable package error.
+
+\paragraph{Write the name as Biber parsed it.} The declaration is compared
+against the name parts Biber stored, not against the text of the
+\file{.bib} file, and the two differ in one respect. A name part the database
+protects with braces is stored without them, so
+\texttt{author = \{\{Van den Berg\}, Maria Elena\}} is declared as
+\texttt{family = \{Van den Berg\}}; the doubled \texttt{family = \{\{Van den
+Berg\}\}} matches nothing. Within a part, ordinary spaces are what to write:
+\texttt{given = \{Maria Elena\}} matches, even though Biber separates those two
+words internally with a delimiter macro rather than a space. Where a declaration
+is in doubt, the \file{.bbl} file the build wrote holds the parsed spelling.
+
+A declaration that matched no name in a bibliography the document rendered is
+reported as a package warning at \cmd{end}\texttt{\{document\}}, naming the pair
+it looked for. Nothing else reveals it: an unmatched declaration leaves a
+document that compiles, a bibliography that renders, and one name set in the
+regular weight.
 
 Loading \file{careerdossier-biblatex} when \textsf{biblatex} is unavailable
 reports the missing optional dependency and explains that you may either install

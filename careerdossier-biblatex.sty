@@ -21,7 +21,10 @@
 %%
 %% Responsibilities: load biblatex only when a document opts into this package;
 %% configure the fixed numeric, Biber-backed, year-descending profile the manual
-%% documents; expose repeatable author-highlighting declarations; implement DOI,
+%% documents; expose repeatable author-highlighting declarations, matched against
+%% the name parts Biber parsed rather than against raw strings, and report the
+%% ones that matched nothing rather than leaving a name silently unemphasised;
+%% implement DOI,
 %% then e-print, then URL display precedence; reuse the semantic typography and
 %% link tokens; inherit \CDossierRecordItemSepSkip and \CDossierListLabelSep
 %% from the host class when it provides them, falling back only when it does
@@ -190,14 +193,24 @@
 %% ---------------------------------------------------------------------------
 %% Preferred-author emphasis.
 %%
-%% Store repeatable exact family/given pairs. BibLaTeX exposes the complete
-%% parsed name parts while formatting both full names and initials, so matching
-%% those parts avoids the prototype's slash parsing and pgffor dependency.
+%% Store repeatable family/given pairs. BibLaTeX exposes the complete parsed
+%% name parts while formatting both full names and initials, so matching those
+%% parts avoids the prototype's slash parsing and pgffor dependency.
+%%
+%% The pairs are matched after normalisation, not as raw strings: Biber writes
+%% the words of a multi-word name part separated by a delimiter macro rather
+%% than by a space, so a declaration written the way the name reads could never
+%% match one (issue #541). Two further variables record what the matching found,
+%% so that a declaration matching nothing is reported instead of being silent.
 %% ---------------------------------------------------------------------------
 \seq_new:N  \g__cdossier_biblatex_highlight_authors_seq
 \tl_new:N   \l__cdossier_biblatex_highlight_family_tl
 \tl_new:N   \l__cdossier_biblatex_highlight_given_tl
 \bool_new:N \l__cdossier_biblatex_highlight_bool
+\str_new:N  \l__cdossier_biblatex_highlight_name_str
+\str_new:N  \l__cdossier_biblatex_highlight_decl_str
+\prop_new:N \g__cdossier_biblatex_highlight_matched_prop
+\bool_new:N \g__cdossier_biblatex_highlight_tested_bool
 
 \msg_new:nnnn { careerdossier-biblatex } { missing-highlight-key }
   { \c_backslash_str CDossierHighlightAuthor~requires~a~nonblank~'#1'~key. }
@@ -209,6 +222,17 @@
 \msg_new:nnnn { careerdossier-biblatex } { unknown-highlight-key }
   { Unknown~\c_backslash_str CDossierHighlightAuthor~key~'#1'. }
   { The~supported~keys~are:~family,~given. }
+%% A warning, not an error: a preamble shared across several documents may
+%% legitimately declare a name that a particular bibliography does not contain.
+%% One message, not \msg_new:nnnn -- a warning prints its body and never its
+%% second argument, so the actionable part has to be in the body.
+\msg_new:nnn { careerdossier-biblatex } { unmatched-highlight }
+  {
+    \c_backslash_str CDossierHighlightAuthor~matched~no~name~in~the~
+    bibliography:~family='#1',~given='#2'.~Write~each~part~as~Biber~parsed~it,~
+    which~\c_sys_jobname_str .bbl~records:~without~the~database's~protective~
+    braces,~and~with~ordinary~spaces~between~the~words~of~one~part.
+  }
 
 \keys_define:nn { cdossier / biblatex / highlight }
   {
@@ -250,13 +274,54 @@
       }
   }
 
+%% Reduce a name part to the spelling a declaration is written in. Biber does
+%% not separate the words of a multi-word name part with a space: it writes a
+%% delimiter macro, so `given = {Maria Elena}' reaches \namepartgiven as
+%% `Maria\bibnamedelima Elena'. Comparing that against an ordinary space can
+%% never succeed, and nothing says so -- the document compiles, the entry
+%% renders, and the name is simply not bold (issue #541).
+%%
+%% Both sides are normalised rather than only the parsed one. That is what keeps
+%% a document carrying the old workaround -- a literal \bibnamedelima written
+%% into the declaration -- matching after this change.
+%%
+%% The three delimiters below are the ones Biber emits *inside* a name part,
+%% measured against biber 2.21 over a fixture of multi-word, initialised,
+%% prefixed, and suffixed names: \bibnamedelima and \bibnamedelimb between
+%% words, \bibnamedelimi after an initial. \bibnamedelimc and \bibnamedelimd
+%% separate whole name parts from one another and so never appear within one;
+%% handling them here would be dead code.
+\cs_new_protected:Npn \__cdossier_biblatex_highlight_normalize:Nn #1#2
+  {
+    \str_set:Nx #1 {#2}
+    \str_replace_all:Nnn #1 { \bibnamedelima } { ~ }
+    \str_replace_all:Nnn #1 { \bibnamedelimb } { ~ }
+    \str_replace_all:Nnn #1 { \bibnamedelimi } { ~ }
+  }
+
+\prg_new_protected_conditional:Npnn
+  \__cdossier_biblatex_highlight_part:nn #1#2 { T , TF }
+  {
+    \__cdossier_biblatex_highlight_normalize:Nn
+      \l__cdossier_biblatex_highlight_name_str {#1}
+    \__cdossier_biblatex_highlight_normalize:Nn
+      \l__cdossier_biblatex_highlight_decl_str {#2}
+    \str_if_eq:VVTF
+      \l__cdossier_biblatex_highlight_name_str
+      \l__cdossier_biblatex_highlight_decl_str
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
 \cs_new_protected:Npn \__cdossier_biblatex_highlight_candidate:nn #1#2
   {
-    \str_if_eq:eeT { \namepartfamily } {#1}
+    \__cdossier_biblatex_highlight_part:nnT { \namepartfamily } {#1}
       {
-        \str_if_eq:eeT { \namepartgiven } {#2}
+        \__cdossier_biblatex_highlight_part:nnT { \namepartgiven } {#2}
           {
             \bool_set_true:N \l__cdossier_biblatex_highlight_bool
+            \prop_gput:Nnn \g__cdossier_biblatex_highlight_matched_prop
+              { {#1} {#2} } { }
             \seq_map_break:
           }
       }
@@ -264,6 +329,7 @@
 
 \prg_new_protected_conditional:Npnn \__cdossier_biblatex_highlight_if: { T , F , TF }
   {
+    \bool_gset_true:N \g__cdossier_biblatex_highlight_tested_bool
     \bool_set_false:N \l__cdossier_biblatex_highlight_bool
     \seq_map_inline:Nn \g__cdossier_biblatex_highlight_authors_seq
       { \__cdossier_biblatex_highlight_candidate:nn ##1 }
@@ -271,6 +337,35 @@
       { \prg_return_true: }
       { \prg_return_false: }
   }
+
+%% Report each declaration that matched nothing. Guarded on the predicate having
+%% run at least once, which happens only while a bibliography is being set: a
+%% document that declares an author and prints no bibliography has not failed to
+%% match anything, and warning there would fire on every such document rather
+%% than on the defect. Deferred to \end{document} because a later
+%% \printbibliography may still supply the match.
+\cs_new_protected:Npn \__cdossier_biblatex_highlight_report:nn #1#2
+  {
+    \prop_if_in:NnF \g__cdossier_biblatex_highlight_matched_prop { {#1} {#2} }
+      {
+        \msg_warning:nnnn { careerdossier-biblatex }
+          { unmatched-highlight } {#1} {#2}
+      }
+  }
+%% The sweep is a macro of its own rather than the hook's body. A hook stores
+%% its code the way a macro definition does, so the `##' an inline sequence
+%% mapping needs would be halved to `#' on the way in and the mapping would
+%% report the parameter token instead of the declaration.
+\cs_new_protected:Npn \__cdossier_biblatex_highlight_report_all:
+  {
+    \bool_if:NT \g__cdossier_biblatex_highlight_tested_bool
+      {
+        \seq_map_inline:Nn \g__cdossier_biblatex_highlight_authors_seq
+          { \__cdossier_biblatex_highlight_report:nn ##1 }
+      }
+  }
+\hook_gput_code:nnn { enddocument } { careerdossier-biblatex }
+  { \__cdossier_biblatex_highlight_report_all: }
 
 %% Wrap the name-part formatters, but bold only while BibLaTeX is rendering a
 %% bibliography. Numeric citations therefore retain their ordinary formatting,

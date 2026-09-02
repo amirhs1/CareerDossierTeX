@@ -319,8 +319,15 @@ jobs:
       # present for the ydnt-ordering and identifier-precedence assertions to
       # run at all. It is also what reads the rendered entry labels for the
       # shipped-example guard (issue #319).
-      - name: Install poppler-utils
-        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
+      # mupdf-tools supplies mutool, which is the only tool here that reports
+      # which font a run of text is set in. The multi-word author-highlighting
+      # assertion (issue #541) needs that and nothing else does: the defect it
+      # guards changes the weight of a name and not one character of the
+      # extracted text, so poppler cannot see it. The runner skips that one
+      # assertion when mutool is absent, and installing it here is what keeps CI
+      # from being the run that skips it.
+      - name: Install poppler-utils and mupdf-tools
+        run: apt-get update && apt-get install -y --no-install-recommends poppler-utils mupdf-tools
       # Also builds examples/academic/cv-bibliography.tex from the repository
       # root and asserts it rendered every entry its database declares, which is
       # why this job's artifacts reach outside tests/bibliography/ as well

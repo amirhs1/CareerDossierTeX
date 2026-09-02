@@ -583,6 +583,18 @@ rendered identifier precedence over `publications.bib`, plus the
 missing-`\addbibresource` diagnostic. Needs Biber; a run without it skips and
 says so.
 
+It also owns the two author-highlighting fixtures over `highlight-names.bib`.
+`highlight-multiword.tex` asserts the **bold run** rather than the extracted
+text, because a name part that failed to match renders identically and differs
+only in weight; its undeclared second author is the negative control against a
+matcher that bolds everything. `highlight-unmatched.tex` asserts that a
+declaration matching nothing warns and names itself. The bold-run assertion
+reads font switches and so needs `mutool`, which the run skips and reports when
+absent; CI installs `mupdf-tools` in this job so it is always performed.
+`tests/regression/biblatex-profile.lvt` covers the matching itself and needs no
+toolchain — put a new name-shape there, and reach for these two only when the
+question is what reached the page.
+
 ### Documented templates are compiled
 
 A documented template is a promise that the code in it runs. Every complete

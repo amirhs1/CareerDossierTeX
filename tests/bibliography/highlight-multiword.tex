@@ -1,0 +1,17 @@
+% highlight-multiword.tex — a multi-word name part is bolded (issue #541).
+%
+% The declaration is written the way the name reads, with an ordinary space.
+% Biber writes the parsed part as `Maria\bibnamedelima Elena', and comparing
+% that against the space matched nothing and reported nothing.
+%
+% No header is drawn: \MakeCDossierHeader would set the profile name in bold
+% too, and the assertion reads the bold run of the whole page.
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{highlight-names.bib}
+\CDossierHighlightAuthor{family={Van den Berg}, given={Maria Elena}}
+\CDossierSetup{name={Fixture}}
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}

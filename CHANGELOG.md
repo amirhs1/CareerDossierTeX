@@ -8,10 +8,19 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 ## [Unreleased]
 
+### Added
+
+- Warn when a `\CDossierHighlightAuthor` declaration matches no name in the bibliography. ([#541])
+
 ### Changed
 
 - Change the resume `/Title` and running page label to `Resume`, spelled in ASCII. ([#543])
 
+### Fixed
+
+- Fix `\CDossierHighlightAuthor` never matching a multi-word family or given name. ([#541])
+
+[#541]: https://github.com/amirhs1/CareerDossierTeX/issues/541
 [#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
 
 ## [0.9.0] - 2026-08-26
