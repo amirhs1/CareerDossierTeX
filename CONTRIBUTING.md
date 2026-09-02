@@ -145,6 +145,11 @@ values and saved `.tlg` baselines faster than it accumulates review.
 Open or select an issue before starting a meaningful change, subject to the
 exceptions in "Every pull request links an issue" above.
 
+An issue has two halves. A form in `.github/ISSUE_TEMPLATE/` fills the body;
+it cannot set the Project fields, which are required too. `AGENTS.md` "What a
+template owns and what a skill owns" states that division, and why a pull
+request additionally needs a skill where an issue does not.
+
 A good implementation issue explains:
 
 1. the problem or deliverable;

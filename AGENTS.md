@@ -174,8 +174,8 @@ documentation, and the correct milestone before implementation.
 6. **Commit:** create coherent commits on the focused feature branch.
 7. **Draft PR:** follow `.agents/skills/open-draft-pr/reference.md` for the
    gate, the body, and the push, then `.agents/skills/project-metadata/` for
-   every field. Filing an issue uses `project-metadata` alone — its body comes
-   from a form in `.github/ISSUE_TEMPLATE/`, not from a skill.
+   every field. "What a template owns and what a skill owns" below says which
+   of the two an issue uses, and why it is not both.
 8. **Report:** distinguish completed, verified, and unverified work.
 
 Ask a focused question only for a material product, scope, design, release,
@@ -253,6 +253,29 @@ bounds this workflow and is not restated here.
 milestone, epic-decomposition, linked-issue, and branch-lifetime rules above;
 the bullets here are the short agent-facing form, and where the two differ the
 canonical statement governs.
+
+### What a template owns and what a skill owns
+
+**Templates own bodies. Skills own gates and metadata.** An issue therefore
+needs no skill for its body and a pull request does, and the asymmetry is real
+rather than an oversight — read symmetrically, the rules above would otherwise
+suggest that a PR template makes `open-draft-pr` redundant the way the issue
+forms make an `open-issue` skill redundant.
+
+They do different fractions of the job. A form in `.github/ISSUE_TEMPLATE/` is
+applied by GitHub at creation and pre-fills `title:` and `labels:` itself, so it
+delivers the whole body-side deliverable. `.github/pull_request_template.md`
+delivers the body alone — and `open-draft-pr` already delegates the body to it
+verbatim. What that skill adds is what no template can reach: the close-out gate
+before the first push, and the push itself.
+
+Neither template can set a Project field. That half is shared by both objects
+and covered by neither, which is why `project-metadata` exists and why it is the
+one skill an issue does use.
+
+The practical consequence: do not propose deleting a skill because a template
+covers the same object, and do not propose a template to carry a rule that only
+runs at push time. Check which fraction is at stake first.
 
 ### AI attribution and disclosure
 
