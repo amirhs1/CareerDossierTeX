@@ -195,6 +195,119 @@ if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
 fi
 echo "  biblabelsep tracks CDossierListLabelSep"
 
+# LaTeX wraps a package warning over several lines and prefixes every
+# continuation with the package name, so no multi-word phrase in a message
+# survives a grep for it. Undo the wrapping before matching on the text; the
+# blank line after the last continuation ends the block.
+biblatex_warning_text() { # <log-file>
+  sed -n '/careerdossier-biblatex Warning/,/^$/p' "$1" \
+    | sed 's/^(careerdossier-biblatex)[[:space:]]*//' \
+    | tr '\n' ' '
+}
+
+# --------------------------------------------------------------------------
+# Multi-word name parts in \CDossierHighlightAuthor (issue #541).
+#
+# Biber does not separate the words of a multi-word name part with a space: it
+# writes a delimiter macro, so `given = {Maria Elena}' reaches the comparison as
+# `Maria\bibnamedelima Elena'. A declaration written the way the name reads
+# therefore matched nothing and reported nothing -- the document compiled, the
+# entry rendered, and the name was left in the regular weight.
+#
+# Only the weight distinguishes the two outcomes, so this asserts the bold run
+# and not the extracted text, which is character-for-character identical either
+# way. tests/regression/biblatex-profile.lvt covers the matcher itself and needs
+# no toolchain at all; this is the end-to-end statement, over a real database, a
+# real Biber run, and the weight actually in the PDF.
+echo "== highlight-multiword.tex (a multi-word name part is bolded) =="
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
+    "highlight-multiword.tex" > "highlight-multiword.stdout" 2>&1; then
+  echo "  BUILD FAILED (see highlight-multiword.log)"
+  exit 1
+fi
+# A declaration that matched is silent, and one that matched nothing warns. This
+# fixture declares a name the database contains, so a warning here is the
+# matcher regressing rather than the fixture being wrong.
+if grep -q 'careerdossier-biblatex Warning' "highlight-multiword.log"; then
+  echo "  THE DECLARATION MATCHED NOTHING:"
+  echo "    $(biblatex_warning_text "highlight-multiword.log")"
+  exit 1
+fi
+# The weight is only readable from the content stream's font switches, which
+# needs MuPDF; poppler reports no font alongside extracted text.
+# tests/tagging/run.sh skips its MuPDF gates the same way rather than failing a
+# run without it, and the workflow installs mupdf-tools in this job so CI always
+# performs it.
+if command -v mutool >/dev/null 2>&1; then
+  bold="$(mutool draw -F stext -o - "highlight-multiword.pdf" 2>/dev/null | awk '
+    /<font /{ f = $0; sub(/.*name="/, "", f); sub(/".*/, "", f) }
+    /<char /{ if (f ~ /Bold/) { c = $0; sub(/.*c="/, "", c); sub(/".*/, "", c)
+                               printf "%s", c } }
+    END { print "" }')"
+  echo "    bold run: [$bold]"
+  bold_ok=1
+  # The declared author, both parts. The given name is the one the delimiter
+  # broke, and the family name is what a reader sees, so assert both.
+  case "$bold" in *"Van den Berg"*) ;; *) bold_ok=0 ;; esac
+  case "$bold" in *"M. E."*)        ;; *) bold_ok=0 ;; esac
+  if [ "$bold_ok" -ne 1 ]; then
+    echo "  THE MULTI-WORD NAME IS NOT BOLD."
+    echo "  This is issue #541 and it is silent by construction: the build"
+    echo "  exits 0, the entry renders, and only the weight is wrong."
+    exit 1
+  fi
+  # Negative control. The second author is shaped exactly like the first and is
+  # not declared; if it is bold too, the matcher is matching everything and the
+  # assertion above proves nothing.
+  case "$bold" in
+    *Cruz*|*"A. S."*)
+      echo "  NEGATIVE CONTROL FIRED: the undeclared author is bold as well,"
+      echo "    so the assertion above cannot see a matcher that bolds every"
+      echo "    name. Do not relax it."
+      exit 1
+      ;;
+  esac
+  echo "  the declared multi-word name is bold and the undeclared one is not"
+else
+  echo "  SKIPPED bold-run assertion (mutool not installed)"
+fi
+
+# --------------------------------------------------------------------------
+# An unmatched declaration is diagnosable (issue #541).
+#
+# The silence was half the defect: with no warning, the only way to discover
+# that a declaration had not taken effect was to read the .bbl by hand. This
+# fixture declares a family name spelled with the database's protective braces,
+# which Biber strips, so it cannot match -- and the warning is the assertion.
+echo "== highlight-unmatched.tex (an unmatched declaration is reported) =="
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
+    "highlight-unmatched.tex" > "highlight-unmatched.stdout" 2>&1; then
+  echo "  BUILD FAILED (see highlight-unmatched.log)"
+  exit 1
+fi
+warned="$(biblatex_warning_text "highlight-unmatched.log")"
+case "$warned" in
+  *"matched no name in the bibliography"*) ;;
+  *)
+    echo "  NO DIAGNOSTIC: a declaration that matched nothing was silent."
+    echo "  That silence is what made issue #541 expensive to find; the build"
+    echo "  still exits 0 and the PDF still renders, so nothing else notices."
+    exit 1
+    ;;
+esac
+# The message has to name the pair it looked for, or it cannot be acted on: a
+# preamble may carry several declarations and only one of them be wrong.
+case "$warned" in
+  *"family='{Van den Berg}'"*) ;;
+  *)
+    echo "  THE DIAGNOSTIC DOES NOT NAME THE DECLARATION:"
+    echo "    $warned"
+    exit 1
+    ;;
+esac
+echo "    $warned"
+echo "  the unmatched declaration is reported, and named"
+
 # --------------------------------------------------------------------------
 # The shipped example rendered its entries (issue #319).
 #

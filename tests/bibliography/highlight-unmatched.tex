@@ -1,0 +1,17 @@
+% highlight-unmatched.tex — a declaration matching nothing is diagnosable
+% (issue #541).
+%
+% The database protects this family name with braces, and Biber stores it
+% without them, so `family={{Van den Berg}}' can never match. That is the
+% documented asymmetry between the two name parts, and it is also the general
+% case the fixture exists for: before #541 an unmatched declaration produced no
+% signal at all, and the only way to find one was to read the .bbl by hand.
+\documentclass{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{highlight-names.bib}
+\CDossierHighlightAuthor{family={{Van den Berg}}, given={Maria Elena}}
+\CDossierSetup{name={Fixture}}
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}

@@ -6,6 +6,10 @@
 
 \CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
 \CDossierHighlightAuthor{family={Lovelace}, given={A.}}
+% Issue #541. Declared with ordinary spaces, the way the name reads; Biber
+% writes the parsed part with a delimiter macro between the words instead, and
+% the tests below drive the matcher with both spellings.
+\CDossierHighlightAuthor{family={Van den Berg}, given={Maria Elena}}
 
 \ExplSyntaxOn
 \cs_new_protected:Npn \cdossiertestBibName #1#2
@@ -15,6 +19,21 @@
     \__cdossier_biblatex_highlight_if:TF
       { \TYPE{ [#1/#2]=highlight } }
       { \TYPE{ [#1/#2]=ordinary } }
+  }
+% The declaration side of issue #541, which \cdossiertestBibName cannot reach:
+% that one drives the parsed name part, and this drives the declared one. The
+% declaration is stored globally and a group would not contain it, but it is
+% matched here, so it is not among the ones reported at \end{document}.
+\cs_new_protected:Npn \cdossiertestBibDeclaredDelimiter
+  {
+    \CDossierHighlightAuthor{family={Hopper}, given={Grace\bibnamedelima Brewster}}
+    \group_begin:
+      \cs_set:Npn \namepartfamily { Hopper }
+      \cs_set:Npn \namepartgiven  { Grace~Brewster }
+      \__cdossier_biblatex_highlight_if:TF
+        { \TYPE{ [declared-delimiter]=highlight } }
+        { \TYPE{ [declared-delimiter]=ordinary } }
+    \group_end:
   }
 \cs_new_protected:Npn \cdossiertestBibFormatting #1
   {
@@ -48,6 +67,34 @@
 
 \TEST{different-family-does-not-match}{
   \cdossiertestBibName{Hopper}{Grace}
+}
+
+% Issue #541. Biber does not separate the words of a multi-word name part with
+% a space: `given = {Maria Elena}' reaches \namepartgiven as
+% `Maria\bibnamedelima Elena'. Comparing that against the declaration's
+% ordinary space matched nothing and said nothing, so the only symptom was a
+% name left in the regular weight. The delimiter spellings here are copied from
+% a .bbl Biber wrote, not invented: \bibnamedelima between words,
+% \bibnamedelimb where a longer word follows, \bibnamedelimi after an initial.
+\TEST{multi-word-given-matches-across-the-delimiter}{
+  \cdossiertestBibName{Van den Berg}{Maria\bibnamedelima Elena}
+}
+
+\TEST{multi-word-given-matches-the-b-delimiter}{
+  \cdossiertestBibName{Van den Berg}{Maria\bibnamedelimb Elena}
+}
+
+% The delimiter spelling was the documented workaround before the normalisation
+% existed, so a document carrying it must keep matching rather than trade one
+% silent failure for another.
+\TEST{declaration-written-with-a-delimiter-still-matches}{
+  \cdossiertestBibDeclaredDelimiter
+}
+
+% Normalising the delimiter must not make the comparison indiscriminate: a
+% different multi-word name still has to miss.
+\TEST{different-multi-word-given-does-not-match}{
+  \cdossiertestBibName{Van den Berg}{Maria\bibnamedelima Teresa}
 }
 
 \TEST{bibliography-name-is-emphasized}{
