@@ -1736,20 +1736,56 @@
 %% the boundary that strands a single bullet. The penalty therefore has to
 %% depend on the item's position in its list:
 %%
-%%   - the boundary after the first item is forbidden, so one bullet is never
-%%     left behind alone;
-%%   - the boundary before the last item is forbidden, so one bullet is never
-%%     carried over alone;
-%%   - every interior boundary is merely discouraged, so a list longer than a
-%%     page still breaks instead of overflowing.
+%%   - the boundary after the first item is forbidden when the first item is a
+%%     single typeset line, so one line is never left behind alone;
+%%   - the boundary before the last item is forbidden when the last item is a
+%%     single typeset line, so one line is never carried over alone;
+%%   - every other boundary is merely discouraged, so a list longer than a page
+%%     still breaks instead of overflowing.
 %%
-%% Knowing which item is last requires the list's length before the list is
-%% typeset, so each list records its own item count in the auxiliary file under
-%% a per-list serial and reads it back on the next run. This is the same
-%% two-pass arrangement the page furniture above already relies on for the
-%% total page count. On a first clean pass the count is unknown and only the
-%% first-item boundary is protected, so the breaks are provisional until the
-%% second run.
+%% Issue #562: those first two conditions are the whole of that issue. Measured
+%% in items rather than lines, the two guards *compose*: for a list of n items
+%% the interior boundaries are those before items 2..n, so at n = 3 the two
+%% guards are every one of them and at n = 2 they are the same one. Together
+%% with `beginpenalty' and the two heading keeps, the entry -- heading and list
+%% -- then had no legal breakpoint anywhere inside it, and moved whole to the
+%% next page however little it was short by: a measured 132.60pt atom that
+%% missed its page by 1.03pt and left 131.57pt blank, 81.8% of the goal against
+%% the 90% floor tests/layout/run.sh enforces. Three or four bullets is the
+%% ordinary length of an entry, so that was the common case.
+%%
+%% The value was never the problem; the unit was. What #145 set out to prevent is
+%% a *single-line* remnant, and the prose families already state that in lines --
+%% \clubpenalty and \widowpenalty at 10000. A two-line bullet carried to the
+%% next page is an ordinary paragraph remnant, not an orphan, and the list guard
+%% was the one place in the policy that counted items. Conditioning it on the
+%% edge item's line count makes the whole policy line-based, and the guarantee
+%% survives intact between the two halves: these guards forbid stranding a
+%% one-line *item*, and club/widow forbid splitting a two- or three-line item so
+%% as to strand one of its lines. A single line is therefore never left alone on
+%% either side of a break, whatever the item lengths.
+%%
+%% Three quantities are needed before the list is typeset: its length, and the
+%% line counts of its first and last items. Each list records all three in the
+%% auxiliary file under a per-list serial and reads them back on the next run --
+%% the same two-pass arrangement the page furniture above relies on for the total
+%% page count. The line counts are read from `\prevgraf', which holds the line
+%% count of the paragraph that has just ended: immediately after the real
+%% `\item' that is the preceding item, and at the list's end it is the last item.
+%% Measured identical on the tagged and untagged paths, so the two builds cannot
+%% paginate differently here.
+%%
+%% Unknown counts stay conservative. On a first clean pass nothing is recorded
+%% and both guards apply, which is the behaviour before this policy became
+%% line-aware, so the breaks are provisional until the second run. The edge line
+%% counts are a *separate* aux record from the item count rather than a wider
+%% one, for the same reason: an auxiliary file written by an earlier version
+%% carries the count and not the line counts, and a record it has never heard of
+%% is absent rather than misread.
+%%
+%% `\prevgraf' reports the last paragraph of a multi-paragraph item, so an item
+%% built from several paragraphs is measured by its final one. Every item in this
+%% project's classes and examples is a single paragraph.
 %% ---------------------------------------------------------------------------
 \ExplSyntaxOff
 \makeatletter
@@ -1759,12 +1795,26 @@
 \newcommand\cdossier@writelistlen[2]{%
   \protected@write\@auxout{}{\string\cdossier@setlistlen{#1}{#2}}%
 }
+\newcommand\cdossier@setlistedge[3]{%
+  \expandafter\gdef\csname cdossier@listfirst@#1\endcsname{#2}%
+  \expandafter\gdef\csname cdossier@listlast@#1\endcsname{#3}%
+}
+\newcommand\cdossier@writelistedge[3]{%
+  \protected@write\@auxout{}{\string\cdossier@setlistedge{#1}{#2}{#3}}%
+}
 \makeatother
 \ExplSyntaxOn
 
 \int_new:N \g__cdossier_components_listid_int
 \int_new:N \l__cdossier_components_itemidx_int
 \int_new:N \l__cdossier_components_itemtotal_int
+%% This run's measurements, written to the aux at the list's end.
+\int_new:N \l__cdossier_components_firstlines_int
+\int_new:N \l__cdossier_components_lastlines_int
+%% Last run's, read back from the aux; 0 means "not recorded", which keeps both
+%% guards applied.
+\int_new:N \l__cdossier_components_wasfirstlines_int
+\int_new:N \l__cdossier_components_waslastlines_int
 \tl_new:N  \l__cdossier_components_listkey_tl
 \cs_new_eq:NN \l__cdossier_components_saved_item \relax
 
@@ -1862,19 +1912,38 @@
 %% before the real \item runs rather than contributed as a separate penalty
 %% node: two adjacent penalties would give TeX the cheaper of the two as a
 %% legal breakpoint and defeat the protection.
+%% Issue #562: each guard now carries the condition that makes it a *line*
+%% guard. The boundary after the first item is forbidden only when item 1 is one
+%% line, and the boundary before the last only when the last item is one line;
+%% a recorded 0 means the count is not known yet and forbids the break, which is
+%% the conservative first-pass state.
+%%
+%% The two conditions are or'd rather than chained because at n = 2 the one
+%% interior boundary is both guards at once, and a one-line remnant on either
+%% side of it is enough to forbid the break.
 \cs_new_protected:Npn \__cdossier_components_itempenalty:
   {
     \int_compare:nNnT { \l__cdossier_components_itemidx_int } > { 1 }
       {
         \bool_lazy_or:nnTF
-          { \int_compare_p:nNn { \l__cdossier_components_itemidx_int } = { 2 } }
           {
             \bool_lazy_and_p:nn
               { \int_compare_p:nNn
-                  { \l__cdossier_components_itemtotal_int } > { 0 } }
+                  { \l__cdossier_components_itemidx_int } = { 2 } }
               { \int_compare_p:nNn
-                  { \l__cdossier_components_itemidx_int }
-                  = { \l__cdossier_components_itemtotal_int } }
+                  { \l__cdossier_components_wasfirstlines_int } < { 2 } }
+          }
+          {
+            \bool_lazy_all_p:n
+              {
+                { \int_compare_p:nNn
+                    { \l__cdossier_components_itemtotal_int } > { 0 } }
+                { \int_compare_p:nNn
+                    { \l__cdossier_components_itemidx_int }
+                    = { \l__cdossier_components_itemtotal_int } }
+                { \int_compare_p:nNn
+                    { \l__cdossier_components_waslastlines_int } < { 2 } }
+              }
           }
           { \use:c { @itempenalty } = \CDossierHeadingKeepPenalty \scan_stop: }
           { \use:c { @itempenalty } = \CDossierListOrphanPenalty \scan_stop: }
@@ -1893,19 +1962,48 @@
         \int_set:Nn \l__cdossier_components_itemtotal_int
           { \use:c { \l__cdossier_components_listkey_tl } }
       }
+    \int_zero:N \l__cdossier_components_firstlines_int
+    \int_zero:N \l__cdossier_components_lastlines_int
+    \__cdossier_components_listedge_read:Nn
+      \l__cdossier_components_wasfirstlines_int { cdossier@listfirst@ }
+    \__cdossier_components_listedge_read:Nn
+      \l__cdossier_components_waslastlines_int { cdossier@listlast@ }
     \cs_set_eq:NN \l__cdossier_components_saved_item \item
     \cs_set_protected:Npn \item
       {
         \int_incr:N \l__cdossier_components_itemidx_int
         \__cdossier_components_itempenalty:
         \l__cdossier_components_saved_item
+        %% The real `\item' has just ended the preceding item's paragraph, so
+        %% `\prevgraf' is that item's line count -- and at item 2 the preceding
+        %% item is item 1. This is measurement for the *next* run; this run's
+        %% penalty above was decided from the last one.
+        \int_compare:nNnT { \l__cdossier_components_itemidx_int } = { 2 }
+          {
+            \int_set:Nn \l__cdossier_components_firstlines_int
+              { \tex_prevgraf:D }
+          }
       }
   }
 
-%% Warn only when a previously recorded count disagrees with this run, which
-%% means the document changed and the page breaks have not settled. A first
-%% clean pass has nothing recorded yet and stays silent, exactly as the page
-%% furniture above does while the total page count is still unknown.
+%% Read one recorded edge line count, leaving the register at 0 when the
+%% auxiliary file does not carry it -- an unwritten first pass, or an auxiliary
+%% file from a version that predates the record.
+\cs_new_protected:Npn \__cdossier_components_listedge_read:Nn #1#2
+  {
+    \int_zero:N #1
+    \tl_set:Nx \l__cdossier_components_listkey_tl
+      { #2 \int_use:N \g__cdossier_components_listid_int }
+    \cs_if_exist:cT { \l__cdossier_components_listkey_tl }
+      { \int_set:Nn #1 { \use:c { \l__cdossier_components_listkey_tl } } }
+  }
+
+%% Warn only when a previously recorded quantity disagrees with this run -- the
+%% item count, or either edge line count -- which means the document changed and
+%% the page breaks have not settled. A first clean pass has nothing recorded yet
+%% and stays silent, exactly as the page furniture above does while the total
+%% page count is still unknown. Any one of the three is enough: each is an input
+%% to a boundary's penalty, so a stale one can have chosen the wrong break.
 \cs_new_protected:Npn \__cdossier_components_listpolicy_end:
   {
     %% Issue #170: discard the space that ends the final item's text before the
@@ -1922,19 +2020,50 @@
     %% when the item body ended with its own `\par', and there `\unskip' would
     %% remove the list's own vertical spacing instead.
     \mode_if_horizontal:T { \unskip }
+    %% Issue #562: end the final item's paragraph here rather than leaving it to
+    %% `\endtrivlist', which does the same `\unskip\par' a moment later. That
+    %% is what makes `\prevgraf' the last item's line count at this point; in
+    %% vertical mode -- an item body that ended with its own `\par' -- the
+    %% `\par' is a no-op and `\prevgraf' already holds it.
+    \par
+    \int_set:Nn \l__cdossier_components_lastlines_int { \tex_prevgraf:D }
+    %% A one-item list has no item 2 at which to measure the first item, and its
+    %% first item is its last.
+    \int_compare:nNnT { \l__cdossier_components_itemidx_int } = { 1 }
+      {
+        \int_set_eq:NN \l__cdossier_components_firstlines_int
+          \l__cdossier_components_lastlines_int
+      }
     \bool_lazy_and:nnT
       { \int_compare_p:nNn { \l__cdossier_components_itemtotal_int } > { 0 } }
       {
-        \int_compare_p:n
+        \bool_lazy_any_p:n
           {
-            \l__cdossier_components_itemidx_int
-            != \l__cdossier_components_itemtotal_int
+            { \int_compare_p:n
+                {
+                  \l__cdossier_components_itemidx_int
+                  != \l__cdossier_components_itemtotal_int
+                } }
+            { \int_compare_p:n
+                {
+                  \l__cdossier_components_wasfirstlines_int
+                  != \l__cdossier_components_firstlines_int
+                } }
+            { \int_compare_p:n
+                {
+                  \l__cdossier_components_waslastlines_int
+                  != \l__cdossier_components_lastlines_int
+                } }
           }
       }
       { \msg_warning:nn { careerdossier-components } { list-rerun } }
     \use:c { cdossier@writelistlen }
       { \int_use:N \g__cdossier_components_listid_int }
       { \int_use:N \l__cdossier_components_itemidx_int }
+    \use:c { cdossier@writelistedge }
+      { \int_use:N \g__cdossier_components_listid_int }
+      { \int_use:N \l__cdossier_components_firstlines_int }
+      { \int_use:N \l__cdossier_components_lastlines_int }
   }
 
 %% ---------------------------------------------------------------------------

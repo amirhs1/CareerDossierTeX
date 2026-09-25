@@ -14,6 +14,16 @@
 % of bodiless entries then welds into a single block. A penalty contributes 0pt,
 % so no page-total measurement distinguishes those cases.
 %
+%
+% Issue #562: the two `whatsit' nodes at the list's closing edge are the
+% auxiliary-file writes that carry the list's item count and its edge line
+% counts. They moved into the vertical list when the policy began ending the
+% final item's paragraph itself in order to read `\prevgraf'; before that the
+% writes were contributed while the last item's paragraph was still open, so they
+% sat in a horizontal list this dump cannot see. Every skip and penalty around
+% them is unchanged, and the breakpoints are too — the `P-51' beside them was
+% already one — which is the whole of why the baseline moved and the 55 layout
+% fixtures' PDFs did not.
 % Consecutive glue collapses to a single `g': the assertion is where the penalty
 % sits relative to the heading box and the body's first box, not how much space
 % surrounds it.

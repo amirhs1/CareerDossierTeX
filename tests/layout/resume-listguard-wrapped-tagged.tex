@@ -1,0 +1,21 @@
+% resume-listguard-wrapped-tagged.tex — the tagged arm of the list-guard pair
+% (issue #562).
+%
+% #562 derives each edge item's line count from `\prevgraf', and the tagged path
+% does not build lists the way the untagged one does: under
+% \DocumentMetadata{tagging=on} LaTeX Lab replaces LaTeX's list internals with
+% its own block templates, which is why `\@topsepadd' measures 0pt there (#193).
+% If those templates set an item's paragraph anywhere the primitive cannot see,
+% the recorded counts would differ, the guards would differ, and the two builds
+% of one source would paginate differently.
+%
+% The assertion is the page-fill floor, as in the untagged arm: the tagged arm
+% clears it only if it took the same breakpoint. Measured identical, with both
+% arms recording 3 and 2 lines for the probe list's edge items.
+%
+% This is the only tagged fixture in this suite. It earns that because the
+% quantity at issue is a pagination input read from a primitive, which neither
+% the tagging suite (structure) nor the regression suite (untagged) can see.
+\DocumentMetadata{lang=en,tagging=on}
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\input{resume-listguard-wrapped.inc}

@@ -110,8 +110,19 @@
 %% CDossierHeadingKeepPenalty is a hard \nobreak-strength value (10000). It
 %% guards the boundaries that must never be broken: an entry heading's own two
 %% lines, the entry heading and the first line of its body, and the two list
-%% boundaries that would leave a single bullet stranded. Each spans a bounded
-%% amount of material, so forbidding the break cannot overflow a page.
+%% boundaries that would leave a single typeset line stranded.
+%%
+%% Issue #562: "a bounded amount of material" used to be claimed here, and it was
+%% true of each of those boundaries alone and false of them together. A list's
+%% interior boundaries are those before items 2..n, so at n = 3 the two list
+%% guards were every one of them and at n = 2 they were the same one; with the
+%% heading keeps above them the entry became a single atom whose height grows
+%% with its bullets, and an entry that missed its page by a point moved whole,
+%% measured at 132.60pt of atom for 131.57pt of hole. The two list guards are
+%% therefore conditional on the edge item being one typeset line -- the unit the
+%% club and widow values below already use, and the one #145 meant. The guard on
+%% each is bounded by a line; what is not bounded is the material between two
+%% guards, which is why the condition and not the value is what changed.
 %%
 %% Issue #333: the section heading is deliberately *not* in that list any more.
 %% Read literally, a penalty after the section rule does not say "keep the
@@ -126,11 +137,14 @@
 %% CDossierSectionNeedLines -- which bounds it and leaves the boundaries inside
 %% the section legal.
 %%
-%% CDossierListOrphanPenalty guards every interior list boundary and is
+%% CDossierListOrphanPenalty guards every other list boundary and is
 %% deliberately below 10000, so a list longer than a page still breaks
 %% somewhere in its middle instead of overflowing. Together the two values
-%% mean an over-long list breaks, but never at a position that isolates one
-%% item.
+%% mean an over-long list breaks, but never at a position that isolates a
+%% single line: these penalties refuse to strand a one-line item, and the club
+%% and widow values below refuse to split a longer one so as to strand one of
+%% its lines. careerdossier-components.sty owns the conditions and states the
+%% mechanism that measures them.
 \int_new:N \CDossierHeadingKeepPenalty
 \int_set:Nn \CDossierHeadingKeepPenalty { 10000 }
 \int_new:N \CDossierListOrphanPenalty

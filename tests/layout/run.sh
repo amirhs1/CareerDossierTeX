@@ -471,6 +471,15 @@ EOF
         # *-orphan* fixtures mark the list under test so its items can be
         # counted apart from the filler bullets sharing the same page; the
         # remaining fixtures hold a single list, so every bullet belongs to it.
+        #
+        # Issue #562 narrowed what this may be applied to. The policy forbids
+        # stranding a single *line*, not a single item, so a page carrying one
+        # wrapped item of a split list is now correct and this count would fail
+        # it. Every fixture below has single-line items at the edges of the list
+        # it marks, which is where the two readings agree, and the wrapped case
+        # is asserted by resume-listguard-wrapped.tex through the page-fill floor
+        # instead. Before marking a new fixture *keeptogether*, check that its
+        # marked list's first and last items are single lines.
         case "$base" in
           *-orphan*) item_pattern='^• Probe' ;;
           *)         item_pattern='^•' ;;

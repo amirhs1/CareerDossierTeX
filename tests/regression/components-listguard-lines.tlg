@@ -1,0 +1,18 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: components-listguard-lines
+============================================================
+one-line-edges nodes = P10000 g H P10000 g H P10000 g H whatsit whatsit P-51 g
+Package careerdossier-components Warning: Bullet-list page-break policy needs another run: rerun LaTeX to settle the list page breaks.
+wrapped-edges nodes = P10000 g H P9997 g H P9997 g H whatsit whatsit P-51 g
+Package careerdossier-components Warning: Bullet-list page-break policy needs another run: rerun LaTeX to settle the list page breaks.
+wrapped-first-only nodes = P10000 g H P9997 g H P10000 g H whatsit whatsit P-51 g
+Package careerdossier-components Warning: Bullet-list page-break policy needs another run: rerun LaTeX to settle the list page breaks.
+two-items-wrapped nodes = P10000 g H P9997 g H whatsit whatsit P-51 g
+============================================================
+============================================================
+TEST 2: components-listguard-lines-unrecorded
+============================================================
+unrecorded nodes = P10000 g H P10000 g H P9997 g H whatsit whatsit P-51 g
+============================================================

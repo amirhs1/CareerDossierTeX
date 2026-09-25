@@ -1,0 +1,107 @@
+% components-listguard-lines.lvt — issue #562: the list-orphan guard measures
+% lines, not items.
+%
+% The layout fixtures assert the *consequence* — a page that fills — and cannot
+% see the decision. This file asserts the decision itself, boundary by boundary,
+% by dumping the vertical list's penalty nodes the way cv-entry-keep-penalty.lvt
+% does. It is the test that fails if the two conditions are ever inverted,
+% dropped, or left reading the wrong register, including in the case no
+% pagination can reveal: a corpus where every list happens to break elsewhere.
+%
+% Each list's recorded state is seeded directly rather than produced by a second
+% pass. The values are what \cdossier@setlistlen and \cdossier@setlistedge write
+% into the auxiliary file, the list serial is the document's own list counter, and
+% the four lists below are serials 1 to 4 in source order. Seeding is also the
+% only way to test one combination at a time: a real two-pass run couples the
+% recorded line counts to the measure the fixture happens to set.
+%
+% Three `rerun' warnings are part of the baseline, not noise. Seeding a state the
+% short items below do not actually measure is exactly the disagreement the
+% warning exists to report, so it fires for lists 2, 3 and 4 and not for list 1,
+% whose seeded values match. The baseline therefore pins the drift warning's
+% condition as well as the penalties.
+%
+% The two `whatsit' nodes before each closing `P-51' are the auxiliary-file
+% writes; cv-entry-keep-penalty.lvt explains why they are visible here.
+%
+% P10000 is \CDossierHeadingKeepPenalty, P9997 \CDossierListOrphanPenalty, and
+% P-51 LaTeX's own \@endparpenalty where the list closes. Consecutive glue
+% collapses to a single `g'.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\makeatletter
+\newcommand\cdossiertestNodes[1]{%
+  \TYPE{#1 nodes = \directlua{
+    local t = {}
+    local lastglue = false
+    for n in node.traverse(tex.box[9].list) do
+      if n.id == node.id("penalty") then
+        table.insert(t, "P" .. n.penalty) lastglue = false
+      elseif n.id == node.id("glue") then
+        if not lastglue then table.insert(t, "g") end
+        lastglue = true
+      elseif n.id == node.id("hlist") then
+        table.insert(t, "H") lastglue = false
+      else
+        table.insert(t, node.type(n.id)) lastglue = false
+      end
+    end
+    tex.sprint(table.concat(t, " "))
+  }}%
+}
+
+% List 1: three items, both edge items recorded as one line. Both guards apply,
+% which for a three-item list is every interior boundary — the pre-#562 state,
+% and still correct here because either break would strand a single line.
+\cdossier@setlistlen{1}{3}
+\cdossier@setlistedge{1}{1}{1}
+% List 2: three items, both edge items recorded as wrapped. Neither guard
+% applies, so both interior boundaries are merely discouraged and the entry is no
+% longer an atom. This line is #562.
+\cdossier@setlistlen{2}{3}
+\cdossier@setlistedge{2}{3}{2}
+% List 3: three items, first wrapped and last one line. The guards are
+% independent: the boundary after item 1 is free, the one before item 3 is not.
+\cdossier@setlistlen{3}{3}
+\cdossier@setlistedge{3}{2}{1}
+% List 4: two items, both wrapped. The single interior boundary is both guards at
+% once, and with neither edge a single line it is free.
+\cdossier@setlistlen{4}{2}
+\cdossier@setlistedge{4}{2}{2}
+\makeatother
+
+\begin{document}
+\START
+
+\TEST{components-listguard-lines}{
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
+    Three.\end{CDossierItemize}}
+  \cdossiertestNodes{one-line-edges}
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
+    Three.\end{CDossierItemize}}
+  \cdossiertestNodes{wrapped-edges}
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
+    Three.\end{CDossierItemize}}
+  \cdossiertestNodes{wrapped-first-only}
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item
+    Two.\end{CDossierItemize}}
+  \cdossiertestNodes{two-items-wrapped}
+}
+
+% Nothing recorded: a first clean pass, or an auxiliary file written before the
+% edge record existed. The item total is unknown too, so only the boundary after
+% the first item is protected — the conservative state the policy has always
+% taken when it cannot know, and the one a stale auxiliary file must land in
+% rather than misreading a record it has never seen.
+\TEST{components-listguard-lines-unrecorded}{
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
+    Three.\end{CDossierItemize}}
+  \cdossiertestNodes{unrecorded}
+}
+
+\END
