@@ -1818,8 +1818,22 @@ break to \LaTeX's defaults:
         something;
   \item an entry heading stays with its own second line and with the first line
         of its body;
-  \item a bullet list is never split leaving one item alone on either side.
+  \item a bullet list is never split leaving a single typeset line alone on
+        either side.
 \end{itemize}
+
+The last of those is stated in lines rather than in bullets on purpose. A bullet
+that wraps and is carried to the next page is an ordinary paragraph remnant; a
+bullet of one line, carried over alone, is the orphan the policy exists to
+prevent. Two halves deliver it: the list penalties refuse to strand a one-line
+item, and \cmd{clubpenalty} and \cmd{widowpenalty} refuse to split a longer item
+so as to strand one of its lines.
+
+Counting bullets instead would make an entry of three or fewer bullets
+unbreakable, because a list of $n$ items has its interior boundaries before items
+$2$ to $n$: at $n = 3$ the two guarded boundaries are every one of them. Such an
+entry moves to the next page whole however little room it lacks, and the hole it
+leaves grows with its bullets rather than with what is missing.
 
 The policy uses page-break penalties, not boxing, so material that genuinely
 does not fit still breaks: an entry or bullet list longer than a page paginates

@@ -30,7 +30,7 @@ entry-then-subsection list = userskip:4.25pt parskip:0.0pt parskip:0.0pt box use
 TEST 4: below-skip-owns-both-neighbours
 ============================================================
 subsection-then-entry list = box penalty:10000 penalty:0 userskip:5.1pt parskip:0.0pt parskip:0.0pt baselineskip:6.04pt box userskip:0.85pt
-subsection-then-list list = box penalty:10000 penalty:0 userskip:5.1pt userskip:-5.1pt penalty:10000 userskip:5.1pt parskip:0.0pt parskip:0.0pt baselineskip:6.09pt box penalty:-51 userskip:6.8pt
+subsection-then-list list = box penalty:10000 penalty:0 userskip:5.1pt userskip:-5.1pt penalty:10000 userskip:5.1pt parskip:0.0pt parskip:0.0pt baselineskip:6.09pt box whatsit whatsit penalty:-51 userskip:6.8pt
 ============================================================
 ============================================================
 TEST 5: empty-subsection-run-breakpoints

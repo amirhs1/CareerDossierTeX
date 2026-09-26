@@ -1,0 +1,26 @@
+% resume-listguard-wrapped.tex — layout stress: the list-orphan guard measured in
+% lines rather than items (issue #562).
+%
+% The probe entry at the end carries three bullets, every one of which wraps.
+% Before #562 the guard before item 2 and the guard before item 3 were both at
+% \CDossierHeadingKeepPenalty, and for a three-item list those are *every*
+% interior boundary, so heading and list together were one atom with no legal
+% breakpoint inside it. Whatever it was short by, the whole entry moved to the
+% next page: measured 81.8% fill and a 131.57pt hole on a real resume, against
+% an atom of 132.60pt that missed the page by 1.03pt.
+%
+% The assertion here is the page-fill floor, and it is the whole point of the
+% fixture: nothing about *togetherness* was ever violated, which is why the keep
+% assertions passed throughout. `make review-pagefill` reports the same number.
+%
+% Deliberately not named *keeptogether*: the item-counting ORPHANED BULLET
+% assertion in run.sh would fail this fixture, and correctly so under the rule it
+% encodes. Under the line-based rule a page carrying exactly one *wrapped* item
+% of a split list is the intended outcome, and a single-line remnant remains
+% impossible — guard B still forbids carrying over a one-line item, and
+% \clubpenalty/\widowpenalty at 10000 forbid splitting a two- or three-line item
+% so as to leave one line behind. Every fixture the item-based assertion does
+% govern has single-line edge items, where the two rules agree; see the note at
+% that assertion.
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-resume}
+\input{resume-listguard-wrapped.inc}

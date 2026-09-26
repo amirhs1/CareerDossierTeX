@@ -429,6 +429,12 @@ page-level properties: no overfull boxes, correct furniture and folios,
 across a break, and the page-fill floor. `tests/layout/page-break-check.awk` and
 `page-fill.awk` do the log parsing.
 
+One fixture here declares `\DocumentMetadata{tagging=on}`, sharing its body with
+an untagged twin: `resume-listguard-wrapped` asserts that both build paths take
+the same page break, which is a pagination input neither the tagging suite
+(structure) nor the regression suite (untagged) can see. Pagination parity is the
+only reason to put a tagged fixture in this suite.
+
 ### Extraction round-trip test
 
 `make extract-test` — `tests/extraction/run.sh` compiles each fixture and

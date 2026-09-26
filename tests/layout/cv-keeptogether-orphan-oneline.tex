@@ -1,0 +1,94 @@
+% cv-keeptogether-orphan-oneline.tex — layout stress: the case the list-orphan
+% guard was written for, kept working (issues #145, #562).
+%
+% The negative control for resume-listguard-wrapped.tex, and the CV half of the
+% pair: the policy lives in the shared components package, so the two
+% entry-structured classes are checked one each rather than twice over.
+%
+% Same shape as the wrapped fixture, one difference: every probe bullet is a
+% single typeset line. #562 made the two guards conditional on the remnant being
+% one line, so here both still apply, the entry stays whole, and the hole below
+% it is the price of that — there is no breakpoint inside this entry that would
+% not strand a single line.
+%
+% Sized so that a guard which stopped applying would actually be taken: the
+% entry's atom overflows the page, while the atom less its last item does not.
+% Outside that window a freed guard would overflow too, TeX could not take it,
+% and this fixture would pass while testing nothing. Verified by freeing the
+% guard and watching both assertions below fire.
+%
+% Two independent assertions catch a guard that stops applying: the KEEPTOGETHER
+% directive, and the ORPHANED BULLET assertion's `^• Probe' pattern, which sees
+% page two carrying exactly one probe item.
+%
+% No `% PAGEFILLFLOOR:' declaration, and that is what #562 measures: three
+% single-line bullets form a short atom, whose hole still clears the 90% floor.
+% Wrap the same three bullets and the atom is 132.60pt, whose hole does not —
+% which is why a corpus already full of three-item lists never caught #562.
+%
+% KEEPTOGETHER: Probe item one ||| Probe item three
+\documentclass[fontsize=11pt, margin=narrow]{careerdossier-cv}
+\CDossierSetup{
+  name     = {Grace Hopper},
+  headline = {Systems Engineer},
+  email    = {grace.hopper@example.com},
+  phone    = {+1 416 555 0198},
+  location = {Toronto, Ontario, Canada},
+}
+\begin{document}
+\MakeCDossierHeader
+
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Modernization Program}, organization = {Continental Reliability Consortium}, location = {Ottawa, ON}, dates = {2019--Present}]
+  \begin{CDossierItemize}
+    \item Filler line 1 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 2 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 3 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 4 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 5 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 6 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 7 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 8 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 9 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 10 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 11 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 12 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 13 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 14 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 15 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 16 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 17 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 18 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 19 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 20 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 21 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 22 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 23 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 24 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 25 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 26 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 27 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 28 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 29 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 30 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 31 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 32 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 33 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 34 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 35 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 36 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 37 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 38 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 39 covering additional operational reporting responsibilities and review duties.
+    \item Filler line 40 covering additional operational reporting responsibilities and review duties.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[title = {Reporting Platform Review}, organization = {Regional Data Cooperative}, location = {Kitchener, ON}, dates = {2015--2019}]
+  \begin{CDossierItemize}
+    \item Probe item one consolidated duplicate metric definitions across teams.
+    \item Probe item two documented the dataset style guide contributors follow.
+    \item Probe item three paired graduates with senior modernization engineers.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}

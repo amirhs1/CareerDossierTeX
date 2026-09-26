@@ -19,9 +19,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Fixed
 
 - Fix `\CDossierHighlightAuthor` never matching a multi-word family or given name. ([#541])
+- Fix an entry of three or fewer bullets never breaking across a page. ([#562])
 
 [#541]: https://github.com/amirhs1/CareerDossierTeX/issues/541
 [#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
+[#562]: https://github.com/amirhs1/CareerDossierTeX/issues/562
 
 ## [0.9.0] - 2026-08-26
 
