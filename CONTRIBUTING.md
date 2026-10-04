@@ -34,7 +34,7 @@ other contribution.
 **Disclose material assistance.** If an agent or model wrote or substantially
 shaped code, tests, documentation, or other submitted content, fill in the
 `AI assistance` section of the pull-request template. `AI-POLICY.md`
-("Attribution") is normative for what that section must contain and how it
+("Disclosure") is normative for what that section must contain and how it
 relates to commit trailers; neither is repeated here. A short statement is
 enough, and it must not include prompts, private reasoning, secrets, or personal
 data.
@@ -765,17 +765,17 @@ Before marking a pull request ready:
 
 ## Merge strategy
 
-Recommended:
+Pull requests merge with a merge commit, the only merge method the repository
+allows. The merge commit takes the pull request's title as its subject and the
+pull request's description as its body, so write the title as a final commit
+subject:
 
 ```text
-Squash and merge
+feat(resume): add English industry resume class
 ```
 
-Use a final squash title such as:
-
-```text
-feat(resume): add English industry resume class (#12)
-```
+Every commit on the branch lands on `main` unchanged, so keep each one
+coherent.
 
 After merging:
 

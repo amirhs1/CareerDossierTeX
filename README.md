@@ -460,7 +460,7 @@ gate, not the stage where feature tests are first created. See
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, and pull-request workflow
 - [`docs/TESTING.md`](docs/TESTING.md): the test suites, review targets, and coverage expectations
 - [`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md): naming for issues, branches, commits, labels, milestones, and releases
-- [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
+- [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution policy: verification, disclosure, and accountability
 - [`AGENTS.md`](AGENTS.md): the operating contract for coding agents
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md): the per-release gate and the CTAN packaging requirements
@@ -507,6 +507,33 @@ Three rules shape how work is divided here:
 
 See [Work item structure](CONTRIBUTING.md#work-item-structure) for the full
 statement and the reasoning behind each.
+
+## AI-assisted development
+
+I use AI tools in this project. Each part has a tier, set by whether I can
+evaluate AI output there. The table records the checks or human review applied
+to each part:
+
+- **Instrumented** — I could write it myself. AI is used for review,
+  refactoring, and alternative implementations, not first drafts of core logic.
+- **Supervised** — AI drafts; I read every line and set the acceptance criteria
+  and test values.
+- **Delegated** — AI generates; I can't fully evaluate it. It is covered by
+  tests, kept isolated and low-risk, and not presented as my work.
+
+| Part                                                    | Tier       | Checks or human review                                                                      |
+| ------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------- |
+| `careerdossier-*.sty` (packages)                        | Supervised | `regression`, `smoke`, `layout`, `extraction`, and `tagging` checks; line-by-line review    |
+| `careerdossier-*.cls` (document classes)                | Supervised | `smoke`, `layout`, and the example-build checks; line-by-line review                        |
+| `tests/`, `Makefile`, `build.lua`, `.github/workflows/` | Supervised | All 17 required checks; line-by-line review                                                 |
+| `doc/`, `docs/`, `examples/`                            | Supervised | `lint`, `manual`, and the example-build checks; line-by-line review                         |
+
+Nothing that handles security, credentials, private data, or published results,
+or that can block a merge, is Delegated. Where a tier is unclear, I treat the
+part as Supervised. Tiers last reviewed: 2026-10-03.
+
+Rules for contributors: [`AI-POLICY.md`](AI-POLICY.md). Instructions for AI
+agents: [`AGENTS.md`](AGENTS.md).
 
 ## License
 
