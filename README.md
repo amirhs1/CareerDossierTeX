@@ -508,6 +508,33 @@ Three rules shape how work is divided here:
 See [Work item structure](CONTRIBUTING.md#work-item-structure) for the full
 statement and the reasoning behind each.
 
+## AI-assisted development
+
+I use AI tools in this project. Each part has a tier, set by whether I can
+evaluate AI output there. The table records the checks or human review applied
+to each part:
+
+- **Instrumented** — I could write it myself. AI is used for review,
+  refactoring, and alternative implementations, not first drafts of core logic.
+- **Supervised** — AI drafts; I read every line and set the acceptance criteria
+  and test values.
+- **Delegated** — AI generates; I can't fully evaluate it. It is covered by
+  tests, kept isolated and low-risk, and not presented as my work.
+
+| Part                                                    | Tier       | Checks or human review                                                                      |
+| ------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------- |
+| `careerdossier-*.sty` (packages)                        | Supervised | `regression`, `smoke`, `layout`, `extraction`, and `tagging` checks; line-by-line review    |
+| `careerdossier-*.cls` (document classes)                | Supervised | `smoke`, `layout`, and the example-build checks; line-by-line review                        |
+| `tests/`, `Makefile`, `build.lua`, `.github/workflows/` | Supervised | All 17 required checks; line-by-line review                                                 |
+| `doc/`, `docs/`, `examples/`                            | Supervised | `lint`, `manual`, and the example-build checks; line-by-line review                         |
+
+Nothing that handles security, credentials, private data, or published results,
+or that can block a merge, is Delegated. Where a tier is unclear, I treat the
+part as Supervised. Tiers last reviewed: 2026-10-03.
+
+Rules for contributors: [`AI-POLICY.md`](AI-POLICY.md). Instructions for AI
+agents: [`AGENTS.md`](AGENTS.md).
+
 ## License
 
 CareerDossierTeX is distributed under the LaTeX Project Public License, version 1.3c or, at your option, any later version.

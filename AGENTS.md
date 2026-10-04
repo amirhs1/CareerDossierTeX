@@ -149,6 +149,25 @@ options and does not set margins itself. And `careerdossier-cv.cls` must not
 load `careerdossier-biblatex.sty`: the CV works without a bibliography
 toolchain, and BibLaTeX stays opt-in.
 
+## Where you may write
+
+Every part of this repository has a tier, set by whether the maintainer can
+evaluate AI output there. `README.md` ("AI-assisted development") carries the
+same table; change both in the same commit.
+
+| Path                                                    | Tier       | Your role                                                                     |
+| ------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| `careerdossier-*.sty` (packages)                        | Supervised | Draft against acceptance criteria the maintainer set. Expect every line read. |
+| `careerdossier-*.cls` (document classes)                | Supervised | Draft against acceptance criteria the maintainer set. Expect every line read. |
+| `tests/`, `Makefile`, `build.lua`, `.github/workflows/` | Supervised | Draft against acceptance criteria the maintainer set. Expect every line read. |
+| `doc/`, `docs/`, `examples/`                            | Supervised | Draft against acceptance criteria the maintainer set. Expect every line read. |
+
+- A path not listed is Supervised. Work that touches security, credentials,
+  private data, or published results is never Delegated, whatever the table
+  says.
+- Apply only wording the maintainer supplies: `AI-POLICY.md` and the two tier
+  tables.
+
 ## Code and API conventions
 
 `CONTRIBUTING.md` "Coding conventions" states these in full and is not
