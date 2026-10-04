@@ -119,7 +119,7 @@ section order and fill every section. In order:
 - **Notes for review** — design decisions, known limitations, follow-up work,
   and documentation/changelog impact;
 - **AI assistance** — last, and never omitted or left as template text.
-  `AI-POLICY.md` ("Attribution") is normative for the obligation and
+  `AI-POLICY.md` ("Disclosure") is normative for the obligation and
   `SKILL.md` ("AI assistance") holds the procedure; neither is repeated here.
 
 The `Testing` section carries no `GitHub Actions passes` checkbox, and one must

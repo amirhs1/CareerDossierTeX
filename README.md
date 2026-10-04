@@ -460,7 +460,7 @@ gate, not the stage where feature tests are first created. See
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, and pull-request workflow
 - [`docs/TESTING.md`](docs/TESTING.md): the test suites, review targets, and coverage expectations
 - [`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md): naming for issues, branches, commits, labels, milestones, and releases
-- [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution, attribution, security, and accountability policy
+- [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution policy: verification, disclosure, and accountability
 - [`AGENTS.md`](AGENTS.md): the operating contract for coding agents
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
 - [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md): the per-release gate and the CTAN packaging requirements

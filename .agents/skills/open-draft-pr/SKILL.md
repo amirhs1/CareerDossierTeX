@@ -93,30 +93,30 @@ that copy outside the repository so it is never staged.
 
 Never leave this section as unfilled template text, and never omit it.
 
-1. Read the branch's real trailers before writing the section — the command is
-   in `AI-POLICY.md` ("Attribution"), which is normative for this section.
+1. Read the branch's real `Assisted-by:` lines before writing the section:
+
+   ```bash
+   git log --format='%(trailers:key=Assisted-by,unfold)' "$(git merge-base origin/main HEAD)"..HEAD | sed '/^$/d' | sort -u
+   ```
+
+   The merge base keeps a stale local `main` from widening the range, `unfold`
+   joins a value wrapped onto a second line, and `sed` drops the blank line
+   each commit without the trailer prints.
 2. Name each AI tool that materially shaped the contribution and summarize what
-   it did in one clause. `AI-POLICY.md` governs what counts as material and what
-   the section says when nothing qualifies.
-3. For every AI `Co-authored-by` trailer the branch commits carry, repeat that
-   trailer's exact identity and email in the section so the commit record and
+   it did in one clause. `AI-POLICY.md` ("Disclosure") governs what is
+   disclosed; the template's `None` covers a contribution with no AI help.
+3. Repeat every line step 1 printed in the section, so the commit record and
    the PR record agree — `.github/pull_request_template.md`'s `AI assistance`
-   section has the worked example.
-
-   The trailer identity is whatever the agent emitted, not one fixed string;
-   `AI-POLICY.md` ("Attribution") has the concrete identities, Codex's
-   included. Codex additionally adds `Generated with Codex.` to the PR body.
-   Prose may name the tool loosely; the trailer line must match the commit byte
-   for byte.
-
-4. Copy the identity from the commits, not from an example in this file or in
-   `AI-POLICY.md` — the examples drift, the commits do not.
+   section has the worked example. Prose may name the tool loosely; each
+   `Assisted-by:` line must match the commit byte for byte. Codex additionally
+   adds `Generated with Codex.` to the PR body.
+4. Copy the lines from the commits, not from an example in this file or in the
+   template — the examples drift, the commits do not.
 5. Do not include prompts, private reasoning, secrets, or personal data.
 
-`AI-POLICY.md` ("Attribution") is normative for everything in this section —
-the trailer rules, the disclosure obligation, and the fact that disclosure does
-not transfer responsibility for the change. These steps are the procedure for
-satisfying it, not a second statement of it.
+`AI-POLICY.md` ("Disclosure") is normative for what is disclosed and for who
+stays responsible. These steps are the procedure for satisfying it, not a
+second statement of it.
 
 ## Boundaries
 
