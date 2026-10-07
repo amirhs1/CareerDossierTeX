@@ -4,15 +4,15 @@
 # same entry points. When a command is wired into CI, keep both places aligned.
 #
 # Requirements: LuaLaTeX and latexmk for everything except `lint`, which is
-# pure text processing and needs only bash, awk, and make across all eleven of
-# its scripts — with one exception, the harness lint, which needs shellcheck
-# and fails rather than skipping without it. The `lint` recipe below is the
-# list of those eleven, and the ones whose inputs are least obvious from their
-# names read text too — run-fixture-filter.sh drives the other runners in
-# their compile-nothing `--list` mode, run-agents-references.sh reads three
-# Markdown files, run-manual-names.sh reads doc/careerdossier.tex and
-# README.md, run-token-values.sh reads careerdossier-tokens.sty against the
-# value tables in docs/ARCHITECTURE.md and the manual,
+# pure text processing and needs only bash, awk, and make across all of its
+# scripts — with one exception, the harness lint, which needs shellcheck and
+# fails rather than skipping without it. The `lint` recipe below is the list
+# of them, and the ones whose inputs are least obvious from their names read
+# text too — run-fixture-filter.sh drives the other runners in their
+# compile-nothing `--list` mode, run-manual-names.sh reads
+# doc/careerdossier.tex and README.md, run-token-values.sh reads
+# careerdossier-tokens.sty against the value tables in docs/ARCHITECTURE.md
+# and the manual,
 # run-text-guards.sh drives tests/lib/text.sh over synthetic text,
 # and check-parallel.sh --self-test exercises check-parallel's accounting
 # controls against synthetic workers.
@@ -264,11 +264,10 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, AGENTS.md pointers, Markdown anchors, prose section pointers, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, shellcheck over the harness, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, Markdown anchors, prose section pointers, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
-	tests/lint/run-agents-references.sh
 	tests/lint/run-markdown-anchors.sh
 	tests/lint/run-prose-pointers.sh
 	tests/lint/run-section-sign.sh

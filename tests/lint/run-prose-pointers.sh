@@ -44,12 +44,11 @@
 #
 # WHY IT FLATTENS BEFORE IT PARSES
 #
-# The same trap `run-agents-references.sh` documents, in a second place. These
-# files wrap at 80 columns, so a pointer straddles a newline — the path on one
-# line and `("Name")` on the next, or the name itself split. A line-based scan
-# misses those entirely and reports a clean run over a subset. So each file is
-# flattened to one line before matching, with a line index kept alongside so a
-# failure still names the line the pointer starts on.
+# These files wrap at 80 columns, so a pointer straddles a newline — the path
+# on one line and `("Name")` on the next, or the name itself split. A
+# line-based scan misses those entirely and reports a clean run over a subset.
+# So each file is flattened to one line before matching, with a line index kept
+# alongside so a failure still names the line the pointer starts on.
 #
 # Each line is trimmed before it is joined. Without that, a name split across
 # the wrap flattens to "Releases and   phases" — three spaces where the source

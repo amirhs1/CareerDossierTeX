@@ -640,13 +640,6 @@ its `--list` exactly and that the `Makefile` can reach the `--jobs` path. A
 runner whose fan-out dispatched a subset would report a clean run of something
 other than the suite.
 
-### AGENTS.md reference lint
-
-`tests/lint/run-agents-references.sh` — every section name `AGENTS.md` quotes in
-"Build and test" resolves to a real heading here or in `CONTRIBUTING.md`, and
-every `###` of `CONTRIBUTING.md` "Local builds" is named there. Treats every
-quoted string in that section as a section name.
-
 ### Markdown anchor lint
 
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree

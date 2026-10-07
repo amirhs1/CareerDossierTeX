@@ -49,7 +49,7 @@
 # reports that condition rather than guessing at it.
 #
 # It compiles nothing and reads Markdown, so it lives in the sub-second `lint`
-# slot beside the option lint and the AGENTS.md reference lint, and runs on the
+# slot beside the option lint and the prose-pointer lint, and runs on the
 # TeX-free CI lint runner.
 #
 # Requirements: bash, awk, and git (for the tracked-file list). Run from
