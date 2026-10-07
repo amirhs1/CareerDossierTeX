@@ -56,8 +56,8 @@ here.
     `Size`, then the read-back that closes them out. That skill is canonical for
     all of it, including which `Status` a newly opened draft takes and how
     `Size` is scored from the completed diff.
-12. Close with the full report `.agents/skills/report-back/SKILL.md` ("Full form")
-    defines, covering the branch as a whole. The step-11 read-back is the
+12. Close with the full report `.agents/skills/report-back/SKILL.md` ("Full
+    form") defines, covering the branch as a whole. The step-11 read-back is the
     metadata payload of that report's `Test criteria` section, not a separate
     report.
 

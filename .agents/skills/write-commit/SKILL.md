@@ -16,8 +16,8 @@ description: Write and make a commit in this project's format, ending with one t
 4. `Why:` only for a reason the maintainer supplied, in the issue, the pull
    request, or this session, or for an outside report the change answers.
    Otherwise leave it out.
-5. End with one trailer block, after a blank line, with no blank line in it
-   and nothing after it: `Assisted-by: <tool>, <model id or not recorded> (<role>)`,
+5. End with one trailer block, after a blank line, with no blank line in it and
+   nothing after it: `Assisted-by: <tool>, <model id or not recorded> (<role>)`,
    then `Checks-run:` for each check you ran on this commit's tree, then
    `Ground-truth-source:` if a reference value changed. Pick the role as
    `AGENTS.md` ("Commit format") defines it.

@@ -277,10 +277,10 @@ considered ready for the maintainer, and again before any tag is authorized:
 
 ## Verification
 
-This list is not a report of its own. `.agents/skills/report-back/SKILL.md` ("Full form") defines
-the one report shape, and this list is the release payload of its
-`Test criteria` section. Report it there, under the single verdict that report
-carries.
+This list is not a report of its own. `.agents/skills/report-back/SKILL.md`
+("Full form") defines the one report shape, and this list is the release
+payload of its `Test criteria` section. Report it there, under the single
+verdict that report carries.
 
 After drafting either document, verify:
 

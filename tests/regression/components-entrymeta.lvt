@@ -17,8 +17,9 @@
 %      baseline showing both would mean the branch leaks.
 %   2. the optional-field matrix under `inline'. A separator is punctuation
 %      *between* two present cells; an entry with a location and no organization
-%      must not open its second line with one. That is the optional-field rule of
-%      AGENTS.md on the horizontal axis, and it is the shape most likely to regress.
+%      must not open its second line with one. That is the optional-field rule
+%      of AGENTS.md on the horizontal axis, and it is the shape most likely to
+%      regress.
 %   3. that the separator is never italic. The cell it precedes on the second
 %      line is set in \CDossierMutedStyle, which is italic under `muted=italic'
 %      and under `muted=both'. An italic `|' is a visibly slanted rule, which

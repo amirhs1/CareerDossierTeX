@@ -179,7 +179,8 @@ repository metadata
 and both items' Project fields in **one** query, PR-only fields included, so
 these four cost no call of their own.
 
-The read-back is not a report of its own. `.agents/skills/report-back/SKILL.md` ("Full form")
-defines the one report shape, and this list is the metadata payload of its
-`Test criteria` section. Close with that report — seven sections, one
-verdict, covering the branch as a whole and not only its metadata.
+The read-back is not a report of its own.
+`.agents/skills/report-back/SKILL.md` ("Full form") defines the one report
+shape, and this list is the metadata payload of its `Test criteria` section.
+Close with that report — seven sections, one verdict, covering the branch as a
+whole and not only its metadata.

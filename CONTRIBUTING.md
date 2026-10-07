@@ -579,8 +579,8 @@ Avoid:
 ### Optional fields
 
 `AGENTS.md` ("Conventions a linter cannot express") states how optional fields
-are rendered and is not repeated here. The implementation consequence: do not generate every separator first and
-attempt to remove the empty ones later.
+are rendered and is not repeated here. The implementation consequence: do not
+generate every separator first and attempt to remove the empty ones later.
 
 ### Engine support
 
