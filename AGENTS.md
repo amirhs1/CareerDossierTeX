@@ -264,8 +264,8 @@ improvements separately.
   issue an epic parent only when the work genuinely decomposes into several
   issues.
 - Work on one focused issue per branch where practical, branched from an
-  up-to-date `main`. Merge or rebase a branch onto `main` within three days, or
-  split it.
+  up-to-date `main`. Once review has begun, bring the branch up to date by
+  merging `main` into it.
 - Every pull request links its issue with `Closes #n`, except a revert, a
   release chore, or a CI, tooling, or lint repair that restores an existing
   check; those carry the problem, the proposal, and the acceptance criteria in

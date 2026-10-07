@@ -143,17 +143,17 @@ issue is the usual vehicle for it, not the only one.
 An issue whose body would only restate its pull request's title is a sign that
 an exception applies, not a form to fill in.
 
-### 3. Every pull request comes from a focused branch, merged within three days
+### 3. Every pull request comes from a focused branch
 
 Branch from an up-to-date `main`, one issue per branch where practical. Direct
 commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`
 ("Git") states that reservation and the rest of the maintainer-only action set,
 which this guide does not repeat.
 
-Three days is the assessable part of "short-lived". A branch that outlives it is
-rebased onto `main`, split into smaller pieces, or closed — not silently
-carried. A long-running branch accumulates conflicts against calibrated token
-values and saved `.tlg` baselines faster than it accumulates review.
+A branch has no deadline: it lives until it merges or is closed, and the
+`Protect Main` ruleset already requires it to be up to date with `main` before
+it merges. Bring it up to date by merging `main` into it; once review has
+begun, do not rebase it.
 
 ## Issue workflow
 
@@ -302,8 +302,8 @@ git push -u origin feat/resume-class
 
 Open a draft pull request early when the work is incomplete but ready for CI or design discussion.
 
-Keep the branch short-lived, on the terms "Every pull request comes from a
-focused branch, merged within three days" sets out above.
+Keep the branch focused, on the terms "Every pull request comes from a focused
+branch" sets out above.
 
 ## Commit messages
 
