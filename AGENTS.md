@@ -298,19 +298,6 @@ improvements separately.
 
 ## Report back
 
-Report in chat while a task runs and at its end.
-
-- When the maintainer is not at the keyboard, send one progress line at each
-  step of "How to work here", not one per tool call:
-
-  ```text
-  **[n/8] <step>** — <what just happened, one line>
-  Next: <one line>
-  Blocked: <only when true>
-  ```
-
-  `n` is the step's number and the step's name follows it. Step 4 covers the
-  failing test and the implementation together and is reported once.
 - End every task with a report: the full form when the session changed a file,
   opened or updated an issue or pull request, or needs a decision; otherwise
   the short form. Posting a comment gets the short form.
