@@ -1,6 +1,6 @@
 ---
 name: release-notes
-description: Write or update a CareerDossierTeX CHANGELOG.md entry, or draft GitHub Release notes at release-preparation time, following the project's house style and LaTeX-package compatibility checklist.
+description: Write or update a CareerDossierTeX CHANGELOG.md entry, or draft GitHub Release notes at release-preparation time, following the project's house style and LaTeX-package compatibility checklist. Use for a CHANGELOG.md entry or release notes.
 ---
 
 # Write CHANGELOG entries and release notes
@@ -51,8 +51,8 @@ Read and follow, in order:
 
 ## Boundaries
 
-Publishing a release is reserved by `AGENTS.md` rule 11 (Maintainer authority),
-which is not restated here. In this skill that reservation reaches tagging and
+Publishing a release is reserved by `AGENTS.md` ("Git"), which is not restated
+here. In this skill that reservation reaches tagging and
 any `gh release create` or `gh release edit` that leaves the release in a
 non-draft state. Drafting the CHANGELOG entry and the release-note text is
 routine; tagging and publishing are not.

@@ -135,7 +135,7 @@ filed there rather than under `macros/latex/contrib` (confirmed against
 `ctan.org/pkg/lua-ul`, filed there for the same reason). CTAN staff may reassign
 it on upload.
 
-Nothing here uploads, and nothing should. `AGENTS.md` rule 11 reserves release
+Nothing here uploads, and nothing should. `AGENTS.md` ("Git") reserves release
 publication to the maintainer, and a CTAN upload cannot be withdrawn the way a
 GitHub release can. Verify the archive manually before upload.
 

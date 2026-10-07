@@ -1,6 +1,6 @@
 ---
 name: open-draft-pr
-description: Open or update a CareerDossierTeX draft pull request — the close-out gate, the PR body, AI disclosure, and the push. Calls project-metadata for the fields.
+description: Open or update a CareerDossierTeX draft pull request — the close-out gate, the PR body, AI disclosure, and the push. Calls project-metadata for the fields. Use to open or update a draft pull request.
 ---
 
 # Open or update a draft PR
@@ -15,7 +15,7 @@ Read and follow, in order:
 
 ## When this runs
 
-This skill is entered at step 7 of `AGENTS.md` "Default work sequence" — after
+This skill is entered at step 7 of `AGENTS.md` ("How to work here") — after
 the change has been implemented, verified, self-reviewed, and committed on a
 focused branch. It opens a pull request; it does not implement anything.
 
@@ -56,7 +56,7 @@ here.
     `Size`, then the read-back that closes them out. That skill is canonical for
     all of it, including which `Status` a newly opened draft takes and how
     `Size` is scored from the completed diff.
-12. Close with the completion report `AGENTS.md` ("Completion report")
+12. Close with the full report `.agents/skills/report-back/SKILL.md` ("Full form")
     defines, covering the branch as a whole. The step-11 read-back is the
     metadata payload of that report's `Test criteria` section, not a separate
     report.
@@ -120,8 +120,8 @@ second statement of it.
 
 ## Boundaries
 
-`AGENTS.md` rule 11 (Maintainer authority) states the complete boundary on this
-delegation; it is not restated here.
+`AGENTS.md` ("Git") states the complete boundary on this delegation; it is not
+restated here.
 
 When Project access is unavailable — a missing `project` token scope, or
 missing identifiers — `.agents/skills/project-metadata/SKILL.md` ("Boundaries") states the

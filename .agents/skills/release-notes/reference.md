@@ -269,16 +269,16 @@ considered ready for the maintainer, and again before any tag is authorized:
       stated.
 - [ ] Known incompatibilities or unvalidated scope are stated explicitly, not
       implied — do not let a preview feature read as a general capability
-      (`AGENTS.md`'s "No unsupported claims" rule: no ATS, WCAG, or PDF/UA
-      conformance claim without validation backing it).
+      (`AGENTS.md` ("Settled decisions"): no ATS, WCAG, or PDF/UA conformance
+      claim without validation backing it).
 - [ ] Distribution channel is accurate: this toolkit is not currently
       distributed via CTAN, TeX Live, or MiKTeX package managers; note this
       only if it changes.
 
 ## Verification
 
-This list is not a report of its own. `AGENTS.md` ("Completion report") defines
-the one report shape and states that this list is the release payload of its
+This list is not a report of its own. `.agents/skills/report-back/SKILL.md` ("Full form") defines
+the one report shape, and this list is the release payload of its
 `Test criteria` section. Report it there, under the single verdict that report
 carries.
 

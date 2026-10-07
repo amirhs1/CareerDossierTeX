@@ -55,8 +55,8 @@ symptom. Name the smallest command that would show the diagnosis is wrong, and
 record what happened when you ran it. `N/A` when the report stops at what was
 observed, which is the ordinary case and is not a lesser report.
 
-A symptom is evidence; a diagnosis is a claim. `AGENTS.md` rule 2 already
-requires that a claim about a result be backed by a run, and a claim about a
+A symptom is evidence; a diagnosis is a claim. `AGENTS.md` ("Do not")
+already requires that a claim about a result be backed by a run, and a claim about a
 cause is inherited unexamined by whoever implements the fix.
 
 ## Acceptance criteria

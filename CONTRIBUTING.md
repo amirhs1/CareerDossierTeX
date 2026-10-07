@@ -69,8 +69,9 @@ Development requires:
   `make check` suite.
 
 The ordinary resume, letter, and no-BibLaTeX CV paths do not require BibLaTeX
-or Biber. Install LuaLaTeX: `AGENTS.md` rule 1 states the engine scope and what
-the unsupported engines do, and is not repeated here.
+or Biber. Install LuaLaTeX: `AGENTS.md` ("Conventions a linter cannot express")
+states the engine scope and what the unsupported engines do, and is not repeated
+here.
 
 ## Work item structure
 
@@ -131,9 +132,9 @@ an exception applies, not a form to fill in.
 ### 3. Every pull request comes from a focused branch, merged within three days
 
 Branch from an up-to-date `main`, one issue per branch where practical. Direct
-commits and pushes to `main` are reserved to the maintainer; `AGENTS.md` rule
-11 (Maintainer authority) states that reservation and the rest of the
-maintainer-only action set, which this guide does not repeat.
+commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`
+("Git") states that reservation and the rest of the maintainer-only action set,
+which this guide does not repeat.
 
 Three days is the assessable part of "short-lived". A branch that outlives it is
 rebased onto `main`, split into smaller pieces, or closed — not silently
@@ -146,9 +147,9 @@ Open or select an issue before starting a meaningful change, subject to the
 exceptions in "Every pull request links an issue" above.
 
 An issue has two halves. A form in `.github/ISSUE_TEMPLATE/` fills the body;
-it cannot set the Project fields, which are required too. `AGENTS.md` "What a
-template owns and what a skill owns" states that division, and why a pull
-request additionally needs a skill where an issue does not.
+it cannot set the Project fields, which are required too. `AGENTS.md`
+("Settled decisions") records that division, and why a pull request
+additionally needs a skill where an issue does not.
 
 A good implementation issue explains:
 
@@ -535,7 +536,7 @@ Do not use private commands in examples or documentation.
 
 Place code according to ownership. `docs/ARCHITECTURE.md` ("File
 responsibilities") carries the concern-to-module map and the per-file detail,
-and `AGENTS.md` ("Module ownership") the dependency direction and the two
+and `AGENTS.md` ("Layout") the dependency direction and the two
 standing rules about page geometry and the CV's independence from BibLaTeX.
 Neither is reproduced here.
 
@@ -563,13 +564,14 @@ Avoid:
 
 ### Optional fields
 
-`AGENTS.md` rule 5 states how optional fields are rendered and is not repeated
-here. The implementation consequence: do not generate every separator first and
+`AGENTS.md` ("Conventions a linter cannot express") states how optional fields
+are rendered and is not repeated here. The implementation consequence: do not generate every separator first and
 attempt to remove the empty ones later.
 
 ### Engine support
 
-`AGENTS.md` rule 1 states the engine scope and is not repeated here. Two things
+`AGENTS.md` ("Conventions a linter cannot express") states the engine scope and
+is not repeated here. Two things
 specific to writing the code: `careerdossier-typography` owns the guard, and
 partial XeLaTeX or pdfLaTeX support is not to be added without defining,
 documenting, and testing it.

@@ -8,10 +8,8 @@
 #
 #   `.agents/skills/project-metadata/reference.md` ("Verification")
 #
-# Nothing looked at those. `AGENTS.md` "Precedence" requires every rule to have
-# exactly one home and every other mention to be a pointer, so the count of
-# these grows with how well that rule is followed — 35 resolutions across 34
-# pointers when this was written.
+# Nothing looked at those, though the instruction set navigates by them — 35
+# resolutions across 34 pointers when this was written.
 #
 # The failure it catches is silent in the worst way: renaming a heading is a
 # normal edit, the pointer elsewhere still reads correctly in review, `make

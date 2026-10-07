@@ -1,5 +1,3 @@
-# CLAUDE.md — CareerDossierTeX
-
 @AGENTS.md
 
 ## Shared contract
@@ -17,14 +15,17 @@ the relevant `.agents/skills/` entry, not in this file.
 
 ```text
 .claude/skills/open-draft-pr     -> ../../.agents/skills/open-draft-pr
+.claude/skills/post-comment      -> ../../.agents/skills/post-comment
 .claude/skills/project-metadata  -> ../../.agents/skills/project-metadata
 .claude/skills/release-notes     -> ../../.agents/skills/release-notes
+.claude/skills/report-back       -> ../../.agents/skills/report-back
+.claude/skills/write-commit      -> ../../.agents/skills/write-commit
 ```
 
 Each skill states its own procedure, entry point, and boundaries; `AGENTS.md`
-says when to load it. Edit the file in `.agents/`, never the link, and never
-replace a link with a copy — a second copy is what let the two skill sets drift
-apart before this layout.
+("Git") says when to load it. Edit the file in `.agents/`, never the link, and
+never replace a link with a copy — a second copy is what let the two skill sets
+drift apart before this layout.
 
 ## Permissions and enforcement
 
@@ -97,6 +98,6 @@ and fail every baseline, fast — never regenerate one from such a run. #386, #3
 Claude Code's own attribution is turned off: `.claude/settings.json` sets
 `attribution.commit` and `attribution.pr` to empty strings, so Claude Code adds
 no `Co-authored-by:` trailer and no pull-request footer. Write the
-`Assisted-by:` trailer yourself, in the form `AGENTS.md` ("AI attribution and
-disclosure") gives; `AI-POLICY.md` ("Disclosure") governs. Do not rely on the
+`Assisted-by:` trailer yourself, in the form `AGENTS.md` ("Commit format")
+gives; `AI-POLICY.md` ("Disclosure") governs. Do not rely on the
 deprecated `includeCoAuthoredBy` setting.

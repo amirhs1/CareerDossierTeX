@@ -508,7 +508,7 @@ Three rules shape how work is divided here:
 See [Work item structure](CONTRIBUTING.md#work-item-structure) for the full
 statement and the reasoning behind each.
 
-## AI-assisted development
+## AI assistance
 
 I use AI tools in this project. Each part has a tier, set by whether I can
 evaluate AI output there. The table records the checks or human review applied

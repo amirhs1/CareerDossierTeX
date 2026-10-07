@@ -11,8 +11,8 @@ When implementation of a focused issue is authorized, the agent may create
 feature-branch commits, push that non-`main` branch, open or update a draft PR,
 and populate routine metadata.
 
-`AGENTS.md` rule 11 (Maintainer authority) states the complete boundary on this
-delegation; it is not restated here.
+`AGENTS.md` ("Git") states the complete boundary on this delegation; it is not
+restated here.
 
 ## Sources of truth
 
@@ -57,8 +57,8 @@ and preserve the existing remote value until the maintainer decides.
 The maintainer's merge trigger is green CI. A branch that arrives incomplete is
 therefore either approved before its missing parts land, or loses them with the
 deleted branch. Push only a **close-out-complete** branch — one that needs
-nothing further before it could be approved. This section is the canonical
-statement of that gate, and `AGENTS.md` "Git and draft PR policy" points here.
+nothing further before it could be approved. `AGENTS.md` ("Git") states that
+rule; this section is the procedure for it.
 
 An agent that wants early signal runs `make check` locally. It does not push a
 partial branch to borrow CI.
@@ -125,7 +125,7 @@ section order and fill every section. In order:
 The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
 not be added by hand. The body is written before the first push, so no workflow
 has run when it is composed — the box could only be left unticked or ticked
-against `AGENTS.md` rule 2 (verification honesty). The live check-run status is
+against `AGENTS.md` ("Do not"). The live check-run status is
 already on the PR, and green CI is not a completion signal, so it is not
 something the author attests to.
 
@@ -179,7 +179,7 @@ repository metadata
 and both items' Project fields in **one** query, PR-only fields included, so
 these four cost no call of their own.
 
-The read-back is not a report of its own. `AGENTS.md` "Completion report"
-defines the one report shape and states that this list is the metadata payload
-of its `Test criteria` section. Close with that report — seven sections, one
+The read-back is not a report of its own. `.agents/skills/report-back/SKILL.md` ("Full form")
+defines the one report shape, and this list is the metadata payload of its
+`Test criteria` section. Close with that report — seven sections, one
 verdict, covering the branch as a whole and not only its metadata.
