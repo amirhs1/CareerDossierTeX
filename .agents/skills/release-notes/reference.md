@@ -133,7 +133,7 @@ extend the exception to a new entry.
    merges related changes: `([#428], [#439], [#440])`. No commit hashes —
    section 2.4.2 asks for them because section 6.2 writes at release time, and
    an entry written inside its own PR cannot
-   know its squash-merge hash.
+   know its merge-commit hash.
 9. **No author attribution.** Common Changelog carries one per line; this
    project is solo-maintained and the field would be constant.
 10. **Send the reasoning to the PR body, and anything a user must *type* to

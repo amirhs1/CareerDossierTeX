@@ -35,6 +35,9 @@ Never bypass a denied command or weaken a permission rule. The committed
 and enables sandbox enforcement for Bash — with `gh` excluded — when the
 effective settings and local installation support it; verify the effective state
 and do not claim OS-level isolation when the sandbox is inactive or unavailable.
+These settings bind Claude Code only, not other agents. Higher-precedence
+settings can change whether the sandbox is active, and an environment that
+cannot start it gains no OS-level isolation from permission rules alone.
 
 ### `gh` must lead the Bash invocation
 
@@ -91,8 +94,9 @@ and fail every baseline, fast — never regenerate one from such a run. #386, #3
 
 ## Git attribution
 
-Use Claude Code's current `attribution` configuration, and do not rely on the
-deprecated `includeCoAuthoredBy` setting. That configuration is how this tool
-satisfies `AI-POLICY.md` ("Attribution"), which is normative for the trailer
-format, when a tool may be attributed at all, the separate PR-disclosure
-obligation, and why the trailer identity is not a fixed string.
+Claude Code's own attribution is turned off: `.claude/settings.json` sets
+`attribution.commit` and `attribution.pr` to empty strings, so Claude Code adds
+no `Co-authored-by:` trailer and no pull-request footer. Write the
+`Assisted-by:` trailer yourself, in the form `AGENTS.md` ("AI attribution and
+disclosure") gives; `AI-POLICY.md` ("Disclosure") governs. Do not rely on the
+deprecated `includeCoAuthoredBy` setting.

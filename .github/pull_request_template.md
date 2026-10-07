@@ -42,16 +42,16 @@ Describe any design decision, uncertainty, or follow-up issue.
 Keep this section last, and always fill it in.
 
 State `None`, or name each AI tool that materially shaped the contribution and
-briefly describe its role. If any commit on the branch carries an AI
-`Co-authored-by` trailer, repeat that trailer's exact identity and email here so
-the commit record and the PR record agree, for example:
+briefly describe its role. If any commit on the branch carries an
+`Assisted-by:` trailer, repeat each distinct `Assisted-by:` line here exactly
+so the commit record and the PR record agree, for example:
 
 ```text
 Claude Code — drafted the token refactor and its regression test.
-Co-authored-by: Claude Opus 5 <noreply@anthropic.com>
+Assisted-by: Claude Code, claude-opus-5-5 (drafted the refactor and its test)
 ```
 
-Copy the identity from the actual commits (`git log`), not from this example —
-each agent emits its own configured identity, and it is not a fixed string.
+Copy the lines from the actual commits (`git log`), not from this example —
+each commit records its own tool, model identifier, and role.
 Do not include prompts, secrets, or personal data. This disclosure does not
 transfer responsibility for the change; see `AI-POLICY.md`.
