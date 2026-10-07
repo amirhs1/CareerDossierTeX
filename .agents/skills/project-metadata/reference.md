@@ -177,8 +177,8 @@ Obtain explicit approval before:
 - creating or changing Project fields, allowed values, workflows, or views;
 - changing Phase or Priority contrary to the issue.
 
-Everything `AGENTS.md` rule 11 (Maintainer authority) reserves is reserved here
-too. Rule 11 states that action set; this list does not repeat it, and adds only
+Everything `AGENTS.md` ("Git") reserves to the maintainer is reserved here too.
+That section states the action set; this list does not repeat it, and adds only
 the GitHub-object cases an agent meets while populating metadata.
 
 
@@ -231,11 +231,12 @@ If Project API access is unavailable, still set every field that is reachable
 without it. Report the exact fields that could not be updated rather than
 claiming completion.
 
-The read-back above is not a report of its own. `AGENTS.md`
-("Completion report") defines the one report shape and states that this list is
-the metadata payload of its `Test criteria` section. Close with that report —
-seven sections, one verdict, covering the work as a whole and not only its
-metadata. Neither the shape nor the verdict wording is repeated here.
+The read-back above is not a report of its own. `AGENTS.md` ("Report back")
+defines the one report shape, and this list is the metadata payload of its
+`Test criteria` section.
+Close with that report — seven sections, one verdict, covering the work as a
+whole and not only its metadata. Neither the shape nor the verdict wording is
+repeated here.
 
 
 ## Appendix: gh command reference
@@ -263,9 +264,8 @@ branch.
 `gh api graphql` removes the id-discovery and per-field calls without removing
 anything the rules require: it batches inside one request, and it still reads
 every id and option string live in the same run, so nothing is cached into the
-tree. `CLAUDE.md` ("`gh` must lead the Bash invocation") is canonical for why
-this is the only form that batches here and why a wrapper script is not; that
-reasoning is not repeated.
+tree. `CLAUDE.md` ("Sandbox and permissions") says why it is the only form that
+batches here.
 
 The five steps below cost five calls, and with `gh label list` and `gh issue
 view` the whole path from "branch ready" to "metadata verified" is **seven**.

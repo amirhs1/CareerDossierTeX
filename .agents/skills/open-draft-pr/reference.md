@@ -11,8 +11,8 @@ When implementation of a focused issue is authorized, the agent may create
 feature-branch commits, push that non-`main` branch, open or update a draft PR,
 and populate routine metadata.
 
-`AGENTS.md` rule 11 (Maintainer authority) states the complete boundary on this
-delegation; it is not restated here.
+`AGENTS.md` ("Git") states the complete boundary on this delegation; it is not
+restated here.
 
 ## Sources of truth
 
@@ -31,11 +31,11 @@ If directly authorized work has no focused issue, stop before the first push and
 ask the maintainer whether to create or select one and which release metadata
 applies. Do not invent a milestone, Phase, or Priority to fill the gap.
 
-`CONTRIBUTING.md` "Work item structure" names the three kinds of work exempt
-from needing a focused issue, and is not repeated here. For those, proceed
-without stopping, but state the problem, the proposal, and the acceptance
-criteria in the PR body — the exemption is from the issue object, not from the
-reasoning. Set the milestone from the release the work lands in; leave
+Three kinds of work are exempt from needing a focused issue: a revert, a release
+chore, and a CI, tooling, or lint repair that restores an existing check. For
+those, proceed without stopping, but state the problem, the proposal, and the
+acceptance criteria in the PR body — the exemption is from the issue object, not
+from the reasoning. Set the milestone from the release the work lands in; leave
 Phase and Priority to follow it as usual. Anything outside those three still
 stops for the maintainer.
 
@@ -57,8 +57,8 @@ and preserve the existing remote value until the maintainer decides.
 The maintainer's merge trigger is green CI. A branch that arrives incomplete is
 therefore either approved before its missing parts land, or loses them with the
 deleted branch. Push only a **close-out-complete** branch — one that needs
-nothing further before it could be approved. This section is the canonical
-statement of that gate, and `AGENTS.md` "Git and draft PR policy" points here.
+nothing further before it could be approved. `AGENTS.md` ("Git") states that
+rule; this section is the procedure for it.
 
 An agent that wants early signal runs `make check` locally. It does not push a
 partial branch to borrow CI.
@@ -108,28 +108,34 @@ green CI discharges none of it.
 `.github/pull_request_template.md` is the canonical section set. Keep its
 section order and fill every section. In order:
 
-- **Summary** — concise statement of the change and its purpose;
-- **Related issues** — `Closes #NN` for the focused issue when the PR should
-  complete it;
-- **Changes** — the change list;
+- **Summary** — what changed and why, with the reason only as the maintainer
+  or an outside report supplied it;
+- **Related issues** — `Closes #NN` for each issue the PR completes, and
+  `Refs #NN` for one it covers only in part; close the focused sub-issue,
+  never an epic, from an early pull request;
+- **Problem** — what was wrong or missing, with evidence;
+- **What changed** — files as `path:line`, plus reasoning the diff does not
+  show;
 - **Public API impact**;
-- **Testing** — tests run and exact outcomes, and tests added or updated under
-  `tests/`, including the expected pre-fix failure when it was demonstrated;
+- **Checks run** — each command run in this session with its actual outcome,
+  tests added or updated under `tests/`, the expected pre-fix failure when it
+  was demonstrated, and a `Not verified:` line for anything not checked;
 - **Visual verification** — visual and accessibility checks when relevant;
-- **Notes for review** — design decisions, known limitations, follow-up work,
-  and documentation/changelog impact;
+- **Decisions and risks** — choices made, alternatives rejected, and what could
+  break;
+- **Notes for review** — what needs line-by-line review, every wording or
+  design the agent proposed, known limitations, follow-up work, and
+  documentation/changelog impact;
 - **AI assistance** — last, and never omitted or left as template text.
   `AI-POLICY.md` ("Disclosure") is normative for the obligation and
   `SKILL.md` ("AI assistance") holds the procedure; neither is repeated here.
 
-The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
-not be added by hand. The body is written before the first push, so no workflow
-has run when it is composed — the box could only be left unticked or ticked
-against `AGENTS.md` rule 2 (verification honesty). The live check-run status is
+The `Checks run` section carries no `GitHub Actions passes` checkbox, and one
+must not be added by hand. The body is written before the first push, so no
+workflow has run when it is composed — the box could only be left unticked or
+ticked against `AGENTS.md` ("Do not"). The live check-run status is
 already on the PR, and green CI is not a completion signal, so it is not
 something the author attests to.
-
-Do not close the parent epic from a focused implementation PR.
 
 ## Routine metadata
 
@@ -179,7 +185,8 @@ repository metadata
 and both items' Project fields in **one** query, PR-only fields included, so
 these four cost no call of their own.
 
-The read-back is not a report of its own. `AGENTS.md` "Completion report"
-defines the one report shape and states that this list is the metadata payload
-of its `Test criteria` section. Close with that report — seven sections, one
-verdict, covering the branch as a whole and not only its metadata.
+The read-back is not a report of its own. `AGENTS.md` ("Report back") defines
+the one report shape, and this list is the metadata payload of its
+`Test criteria` section.
+Close with that report — seven sections, one verdict, covering the branch as a
+whole and not only its metadata.

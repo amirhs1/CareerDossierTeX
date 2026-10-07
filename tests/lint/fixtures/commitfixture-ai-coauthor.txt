@@ -1,0 +1,5 @@
+docs(agents): reword the commit format section
+
+- Say which trailer block a commit ends with.
+
+Co-authored-by: Claude <noreply@anthropic.com>

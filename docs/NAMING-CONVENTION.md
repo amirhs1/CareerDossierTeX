@@ -605,7 +605,7 @@ only mechanism there.
 
 Three lints hold this section to account: `run-markdown-anchors.sh`, which
 fails when a `](TARGET.md#anchor)` names a heading that no longer exists,
-`run-agents-references.sh`, which fails when `AGENTS.md` quotes a section name
+`run-prose-pointers.sh`, which fails when a prose pointer quotes a section name
 that no longer exists, and `run-section-sign.sh` above.
 
 ---

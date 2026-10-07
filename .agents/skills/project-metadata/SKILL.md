@@ -1,6 +1,6 @@
 ---
 name: project-metadata
-description: Populate and verify the GitHub Project fields, labels, milestone, and assignee on a CareerDossierTeX issue or pull request.
+description: Populate and verify the GitHub Project fields, labels, milestone, and assignee on a CareerDossierTeX issue or pull request. Use to set the fields of an issue or pull request.
 ---
 
 # Populate and verify GitHub Project metadata
@@ -46,8 +46,8 @@ canonical for the shape and for why a wrapper script is not an option here.
 
 ## Boundaries
 
-`AGENTS.md` rule 11 (Maintainer authority) states the complete boundary on this
-delegation; it is not restated here. `reference.md` ("Routine authorization")
+`AGENTS.md` ("Git") states the complete boundary on this delegation; it is not
+restated here. `reference.md` ("Routine authorization")
 adds only the GitHub-object cases an agent meets while setting fields.
 
 When Project access is unavailable — a missing `project` token scope, or missing

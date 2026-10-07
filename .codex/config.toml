@@ -4,6 +4,6 @@
 # root. Skills live in .agents/skills/, which Codex already scans. Nothing
 # agent-neutral belongs in this file.
 #
-# See AGENTS.md, "Sources of truth", for which file owns what.
+# AGENTS.md states every rule; its "Further reading" says where detail lives.
 
 sandbox_mode = "workspace-write"

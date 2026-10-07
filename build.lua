@@ -22,7 +22,7 @@
 -- an archive only exists for a tree that passed the regression suite. It does
 -- not run the shell-driven suites; `make check' is still the gate.
 --
--- Nothing here uploads. `AGENTS.md' rule 11 reserves release publication to the
+-- Nothing here uploads. `AGENTS.md' ("Git") reserves release publication to the
 -- maintainer, and `uploadconfig' below deliberately omits the one mandatory
 -- field that would let `l3build upload' complete unattended.
 
@@ -150,7 +150,7 @@ flatten = false
 packtdszip = false
 
 -- CTAN upload metadata. `l3build upload' is not run here and must not be:
--- AGENTS.md rule 11 reserves release publication to the maintainer, and a CTAN
+-- AGENTS.md ("Git") reserves release publication to the maintainer, and a CTAN
 -- upload cannot be withdrawn the way a GitHub release can.
 --
 -- `email' is absent deliberately. CTAN requires a reachable address for the

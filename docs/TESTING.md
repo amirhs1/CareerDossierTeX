@@ -640,13 +640,6 @@ its `--list` exactly and that the `Makefile` can reach the `--jobs` path. A
 runner whose fan-out dispatched a subset would report a clean run of something
 other than the suite.
 
-### AGENTS.md reference lint
-
-`tests/lint/run-agents-references.sh` — every section name `AGENTS.md` quotes in
-"Build and test" resolves to a real heading here or in `CONTRIBUTING.md`, and
-every `###` of `CONTRIBUTING.md` "Local builds" is named there. Treats every
-quoted string in that section as a section name.
-
 ### Markdown anchor lint
 
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree
@@ -707,6 +700,14 @@ costs the archive a file and costs `l3build ctan` no error. It is its own
 `tests/lint/run-text-guards.sh` — the extracted-text guards in `tests/lib/text.sh`
 answer three states, not two, so an unperformable check reports as unperformable
 rather than as absent text.
+
+### Commit-message hook lint
+
+`tests/lint/run-commit-msg-hook.sh` — runs `.githooks/commit-msg` over four
+fixture messages: an AI-assisted commit with a fixed role and a commit with no
+trailers are accepted; a free-text `Assisted-by:` role and an AI
+`Co-authored-by:` line are rejected. A missing fixture, or an exit status other
+than 0 or 1, fails the lint rather than counting as a rejection.
 
 ### Shell-harness lint
 

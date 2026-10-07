@@ -53,6 +53,20 @@ data.
 Large, unrequested, or unreviewed generated changes may be closed without a
 line-by-line review. Open or claim a focused issue first for substantial work.
 
+### Setup
+
+- [ ] `.claude/settings.json` is committed with the attribution block.
+- [ ] `git config core.hooksPath .githooks` has been run in this clone.
+- [ ] A test commit made by each tool in use ends with `Assisted-by:` and no
+      AI `Co-authored-by:` (`git log -1 --format=%B`).
+- [ ] `.gitignore` ignores the agent files kept local: `CLAUDE.local.md`,
+      `AGENTS.local.md`, `.claude/settings.local.json`, `.claude/worktrees/`,
+      and `.claude/.cc-writes/`.
+
+The `commit-msg` hook does not run for `git commit --no-verify`, for commits
+made in the GitHub web interface, or for the merge commits GitHub creates, and
+it passes any message that starts with `Merge` or `Revert`.
+
 ## Development requirements
 
 Development requires:
@@ -69,8 +83,9 @@ Development requires:
   `make check` suite.
 
 The ordinary resume, letter, and no-BibLaTeX CV paths do not require BibLaTeX
-or Biber. Install LuaLaTeX: `AGENTS.md` rule 1 states the engine scope and what
-the unsupported engines do, and is not repeated here.
+or Biber. Install LuaLaTeX: `AGENTS.md` ("Conventions a linter cannot express")
+states the engine scope and what the unsupported engines do, and is not repeated
+here.
 
 ## Work item structure
 
@@ -128,17 +143,17 @@ issue is the usual vehicle for it, not the only one.
 An issue whose body would only restate its pull request's title is a sign that
 an exception applies, not a form to fill in.
 
-### 3. Every pull request comes from a focused branch, merged within three days
+### 3. Every pull request comes from a focused branch
 
 Branch from an up-to-date `main`, one issue per branch where practical. Direct
-commits and pushes to `main` are reserved to the maintainer; `AGENTS.md` rule
-11 (Maintainer authority) states that reservation and the rest of the
-maintainer-only action set, which this guide does not repeat.
+commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`
+("Git") states that reservation and the rest of the maintainer-only action set,
+which this guide does not repeat.
 
-Three days is the assessable part of "short-lived". A branch that outlives it is
-rebased onto `main`, split into smaller pieces, or closed — not silently
-carried. A long-running branch accumulates conflicts against calibrated token
-values and saved `.tlg` baselines faster than it accumulates review.
+A branch has no deadline: it lives until it merges or is closed, and the
+`Protect Main` ruleset already requires it to be up to date with `main` before
+it merges. Bring it up to date by merging `main` into it; once review has
+begun, do not rebase it.
 
 ## Issue workflow
 
@@ -146,9 +161,9 @@ Open or select an issue before starting a meaningful change, subject to the
 exceptions in "Every pull request links an issue" above.
 
 An issue has two halves. A form in `.github/ISSUE_TEMPLATE/` fills the body;
-it cannot set the Project fields, which are required too. `AGENTS.md` "What a
-template owns and what a skill owns" states that division, and why a pull
-request additionally needs a skill where an issue does not.
+it cannot set the Project fields, which are required too. `AGENTS.md`
+("Settled decisions") records that division, and why a pull request
+additionally needs a skill where an issue does not.
 
 A good implementation issue explains:
 
@@ -287,8 +302,8 @@ git push -u origin feat/resume-class
 
 Open a draft pull request early when the work is incomplete but ready for CI or design discussion.
 
-Keep the branch short-lived, on the terms "Every pull request comes from a
-focused branch, merged within three days" sets out above.
+Keep the branch focused, on the terms "Every pull request comes from a focused
+branch" sets out above.
 
 ## Commit messages
 
@@ -535,7 +550,7 @@ Do not use private commands in examples or documentation.
 
 Place code according to ownership. `docs/ARCHITECTURE.md` ("File
 responsibilities") carries the concern-to-module map and the per-file detail,
-and `AGENTS.md` ("Module ownership") the dependency direction and the two
+and `AGENTS.md` ("Layout") the dependency direction and the two
 standing rules about page geometry and the CV's independence from BibLaTeX.
 Neither is reproduced here.
 
@@ -563,13 +578,14 @@ Avoid:
 
 ### Optional fields
 
-`AGENTS.md` rule 5 states how optional fields are rendered and is not repeated
-here. The implementation consequence: do not generate every separator first and
-attempt to remove the empty ones later.
+`AGENTS.md` ("Conventions a linter cannot express") states how optional fields
+are rendered and is not repeated here. The implementation consequence: do not
+generate every separator first and attempt to remove the empty ones later.
 
 ### Engine support
 
-`AGENTS.md` rule 1 states the engine scope and is not repeated here. Two things
+`AGENTS.md` ("Conventions a linter cannot express") states the engine scope and
+is not repeated here. Two things
 specific to writing the code: `careerdossier-typography` owns the guard, and
 partial XeLaTeX or pdfLaTeX support is not to be added without defining,
 documenting, and testing it.
@@ -702,8 +718,9 @@ would not have produced is removed at release preparation rather than annotated
 release to sweep it, and eleven entries came out (#414); the sweep is a standing
 step in `.agents/skills/release-notes/reference.md`, "The tooling sweep".
 
-For entry format, house style, and how `CHANGELOG.md` relates to GitHub
-Release notes, see `.agents/skills/release-notes/reference.md`.
+For entry format and house style, see
+`.agents/skills/update-changelog/reference.md`; for how `CHANGELOG.md` relates
+to GitHub Release notes, see `.agents/skills/release-notes/reference.md`.
 
 ## Proposing public API changes
 
@@ -733,6 +750,7 @@ Before `v1.0.0`, breaking changes are allowed but must be documented in `CHANGEL
 A pull request should include:
 
 - a concise summary;
+- the problem, with evidence;
 - linked issues using `Closes #...` or `Fixes #...`, or, under one of the three
   exceptions in "Work item structure", the problem, proposal, and acceptance
   criteria stated in the body instead;
@@ -741,7 +759,7 @@ A pull request should include:
 - tests added or updated under `tests/`;
 - testing performed, including the expected pre-fix failure when demonstrated;
 - visual verification when layout changed;
-- design decisions or follow-up work.
+- decisions, risks, and follow-up work.
 
 Use draft pull requests when implementation is incomplete.
 
@@ -949,7 +967,8 @@ Release preparation should verify:
 - `LICENSE` and `manifest.txt` remain accurate;
 - the working tree is clean.
 
-See `.agents/skills/release-notes/reference.md` for CHANGELOG and release-note
-format, house style, and the LaTeX-package compatibility checklist.
+See `.agents/skills/update-changelog/reference.md` for CHANGELOG entry format
+and house style, and `.agents/skills/release-notes/reference.md` for release
+notes and the LaTeX-package compatibility checklist.
 
 Tagging and publishing a release should occur only after the release-preparation pull request is merged.

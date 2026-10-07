@@ -15,9 +15,10 @@
 #
 # So this lint reads the manual as text and asserts three things:
 #
-#   1. No private LaTeX3 name (`\__cdossier_...') appears. AGENTS.md "Code and
-#      API conventions" requires private names to stay out of public
-#      documentation; CONTRIBUTING.md "Coding conventions" is canonical.
+#   1. No private LaTeX3 name (`\__cdossier_...') appears. AGENTS.md
+#      ("Conventions a linter cannot express") requires private names to stay
+#      out of public documentation, as CONTRIBUTING.md "Coding conventions"
+#      does for contributors.
 #   2. Every public name the manual mentions -- `\CDossier...',
 #      `\MakeCDossier...', and the `CDossier...' environments -- appears in a
 #      file the manifest lists under "The Work". A name that appears nowhere in

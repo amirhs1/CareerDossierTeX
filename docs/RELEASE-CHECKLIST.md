@@ -3,8 +3,9 @@
 The per-release gate: what a release has to satisfy before it is tagged, and
 what CTAN additionally requires of the uploaded archive at `v1.0.0`. It is the
 one file that answers "is this releasable yet"; `docs/ROADMAP.md` owns which
-release a change belongs to, and `.agents/skills/release-notes/reference.md`
-owns how `CHANGELOG.md` and the GitHub Release notes are written.
+release a change belongs to, and `.agents/skills/update-changelog/reference.md`
+and `.agents/skills/release-notes/reference.md` own how `CHANGELOG.md` entries
+and the GitHub Release notes are written.
 
 The checks below reference [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) for the
 font, extraction, and tagging policy each one asserts, and
@@ -135,7 +136,7 @@ filed there rather than under `macros/latex/contrib` (confirmed against
 `ctan.org/pkg/lua-ul`, filed there for the same reason). CTAN staff may reassign
 it on upload.
 
-Nothing here uploads, and nothing should. `AGENTS.md` rule 11 reserves release
+Nothing here uploads, and nothing should. `AGENTS.md` ("Git") reserves release
 publication to the maintainer, and a CTAN upload cannot be withdrawn the way a
 GitHub release can. Verify the archive manually before upload.
 

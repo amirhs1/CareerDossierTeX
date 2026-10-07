@@ -8,10 +8,8 @@
 #
 #   `.agents/skills/project-metadata/reference.md` ("Verification")
 #
-# Nothing looked at those. `AGENTS.md` "Precedence" requires every rule to have
-# exactly one home and every other mention to be a pointer, so the count of
-# these grows with how well that rule is followed — 35 resolutions across 34
-# pointers when this was written.
+# Nothing looked at those, though the instruction set navigates by them — 35
+# resolutions across 34 pointers when this was written.
 #
 # The failure it catches is silent in the worst way: renaming a heading is a
 # normal edit, the pointer elsewhere still reads correctly in review, `make
@@ -44,12 +42,11 @@
 #
 # WHY IT FLATTENS BEFORE IT PARSES
 #
-# The same trap `run-agents-references.sh` documents, in a second place. These
-# files wrap at 80 columns, so a pointer straddles a newline — the path on one
-# line and `("Name")` on the next, or the name itself split. A line-based scan
-# misses those entirely and reports a clean run over a subset. So each file is
-# flattened to one line before matching, with a line index kept alongside so a
-# failure still names the line the pointer starts on.
+# These files wrap at 80 columns, so a pointer straddles a newline — the path
+# on one line and `("Name")` on the next, or the name itself split. A
+# line-based scan misses those entirely and reports a clean run over a subset.
+# So each file is flattened to one line before matching, with a line index kept
+# alongside so a failure still names the line the pointer starts on.
 #
 # Each line is trimmed before it is joined. Without that, a name split across
 # the wrap flattens to "Releases and   phases" — three spaces where the source

@@ -502,13 +502,12 @@ Three rules shape how work is divided here:
   spans several issues;
 - every pull request links an issue, except a revert, a release chore, or a
   CI/tooling repair, which state their rationale in the pull request body;
-- every pull request comes from a focused branch, merged or rebased onto `main`
-  within three days.
+- every pull request comes from a focused branch, one issue per branch.
 
 See [Work item structure](CONTRIBUTING.md#work-item-structure) for the full
 statement and the reasoning behind each.
 
-## AI-assisted development
+## AI assistance
 
 I use AI tools in this project. Each part has a tier, set by whether I can
 evaluate AI output there. The table records the checks or human review applied
