@@ -749,6 +749,7 @@ Before `v1.0.0`, breaking changes are allowed but must be documented in `CHANGEL
 A pull request should include:
 
 - a concise summary;
+- the problem, with evidence;
 - linked issues using `Closes #...` or `Fixes #...`, or, under one of the three
   exceptions in "Work item structure", the problem, proposal, and acceptance
   criteria stated in the body instead;
@@ -757,7 +758,7 @@ A pull request should include:
 - tests added or updated under `tests/`;
 - testing performed, including the expected pre-fix failure when demonstrated;
 - visual verification when layout changed;
-- design decisions or follow-up work.
+- decisions, risks, and follow-up work.
 
 Use draft pull requests when implementation is incomplete.
 

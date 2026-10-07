@@ -50,7 +50,8 @@ here.
 9. Push only the focused feature branch.
 10. Open or update the PR as a draft, then confirm the items in `reference.md`
     ("The four PR-only read-back items"): URL, draft status, base and head
-    branches, and the focused issue the body links.
+    branches, and the focused issue the body links. Read the body back
+    (`gh pr view <n> --json body`) and check it is the one you wrote.
 11. Set and verify every field through the `project-metadata` skill — assignee,
     Project membership, labels, milestone, `Status`, `Phase`, `Priority`, and
     `Size`, then the read-back that closes them out. That skill is canonical for
@@ -75,15 +76,16 @@ resolves to no option id.
 as the skeleton, keep its section order, and fill every section rather than
 deleting the ones that seem empty. In order:
 
-`Summary` → `Related issues` → `Changes` → `Public API impact` → `Testing` →
-`Visual verification` → `Notes for review` → `AI assistance`
+`Summary` → `Related issues` → `Problem` → `What changed` → `Public API impact`
+→ `Checks run` → `Visual verification` → `Decisions and risks` →
+`Notes for review` → `AI assistance`
 
 `reference.md` states what belongs in each section.
 **`AI assistance` is always last.**
 
-The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
-not be added by hand. `reference.md` ("PR body") gives the reason; it is not
-repeated here.
+The `Checks run` section carries no `GitHub Actions passes` checkbox, and one
+must not be added by hand. `reference.md` ("PR body") gives the reason; it is
+not repeated here.
 
 When writing the body to a file for `gh pr create --body-file`, start from a
 copy of the committed template so a section is never silently dropped, and keep
@@ -102,9 +104,12 @@ Never leave this section as unfilled template text, and never omit it.
    The merge base keeps a stale local `main` from widening the range, `unfold`
    joins a value wrapped onto a second line, and `sed` drops the blank line
    each commit without the trailer prints.
-2. Name each AI tool that materially shaped the contribution and summarize what
-   it did in one clause. `AI-POLICY.md` ("Disclosure") governs what is
-   disclosed; the template's `None` covers a contribution with no AI help.
+2. Name each AI tool that materially shaped the contribution, its model if
+   known (`not recorded` otherwise; never a guess), its role, and what it did
+   in one clause. Each `Assisted-by:` line carries one of the six roles
+   `AGENTS.md` ("Commit format") defines. `AI-POLICY.md` ("Disclosure")
+   governs what is disclosed; the template's `None` covers a contribution with
+   no AI help.
 3. Repeat every line step 1 printed in the section, so the commit record and
    the PR record agree — `.github/pull_request_template.md`'s `AI assistance`
    section has the worked example. Prose may name the tool loosely; each

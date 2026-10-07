@@ -108,24 +108,31 @@ green CI discharges none of it.
 `.github/pull_request_template.md` is the canonical section set. Keep its
 section order and fill every section. In order:
 
-- **Summary** — concise statement of the change and its purpose;
-- **Related issues** — `Closes #NN` for the focused issue when the PR should
-  complete it;
-- **Changes** — the change list;
+- **Summary** — what changed and why, with the reason only as the maintainer
+  or an outside report supplied it;
+- **Related issues** — `Closes #NN` for each issue the PR completes, and
+  `Refs #NN` for one it covers only in part;
+- **Problem** — what was wrong or missing, with evidence;
+- **What changed** — files as `path:line`, plus reasoning the diff does not
+  show;
 - **Public API impact**;
-- **Testing** — tests run and exact outcomes, and tests added or updated under
-  `tests/`, including the expected pre-fix failure when it was demonstrated;
+- **Checks run** — each command run in this session with its actual outcome,
+  tests added or updated under `tests/`, the expected pre-fix failure when it
+  was demonstrated, and a `Not verified:` line for anything not checked;
 - **Visual verification** — visual and accessibility checks when relevant;
-- **Notes for review** — design decisions, known limitations, follow-up work,
-  and documentation/changelog impact;
+- **Decisions and risks** — choices made, alternatives rejected, and what could
+  break;
+- **Notes for review** — what needs line-by-line review, every wording or
+  design the agent proposed, known limitations, follow-up work, and
+  documentation/changelog impact;
 - **AI assistance** — last, and never omitted or left as template text.
   `AI-POLICY.md` ("Disclosure") is normative for the obligation and
   `SKILL.md` ("AI assistance") holds the procedure; neither is repeated here.
 
-The `Testing` section carries no `GitHub Actions passes` checkbox, and one must
-not be added by hand. The body is written before the first push, so no workflow
-has run when it is composed — the box could only be left unticked or ticked
-against `AGENTS.md` ("Do not"). The live check-run status is
+The `Checks run` section carries no `GitHub Actions passes` checkbox, and one
+must not be added by hand. The body is written before the first push, so no
+workflow has run when it is composed — the box could only be left unticked or
+ticked against `AGENTS.md` ("Do not"). The live check-run status is
 already on the PR, and green CI is not a completion signal, so it is not
 something the author attests to.
 
