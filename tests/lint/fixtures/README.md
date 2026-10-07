@@ -125,3 +125,19 @@ single parenthetical carries two names, the first valid and the second not. The
 hand-written checker that motivated #559 read only the first name of each
 parenthetical and reported the tree clean, so this fixture fails any
 reimplementation that regresses to counting pointers instead of resolutions.
+
+## Commit-message hook fixtures
+
+`commitfixture-*.txt` pin the verdicts of `tests/lint/run-commit-msg-hook.sh`
+(issue #573). Each is a whole commit message, given to `.githooks/commit-msg`
+as git would give it.
+
+| Fixture | Expected verdict |
+| --- | --- |
+| `commitfixture-accepted.txt` | accepted |
+| `commitfixture-no-trailers.txt` | accepted |
+| `commitfixture-free-role.txt` | rejected |
+| `commitfixture-ai-coauthor.txt` | rejected |
+
+`-free-role.txt` is the case that made the hook necessary: both AI-assisted
+commits on `main` before #573 gave a sentence as the `Assisted-by:` role.

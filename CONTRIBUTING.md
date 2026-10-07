@@ -53,6 +53,20 @@ data.
 Large, unrequested, or unreviewed generated changes may be closed without a
 line-by-line review. Open or claim a focused issue first for substantial work.
 
+### Setup
+
+- [ ] `.claude/settings.json` is committed with the attribution block.
+- [ ] `git config core.hooksPath .githooks` has been run in this clone.
+- [ ] A test commit made by each tool in use ends with `Assisted-by:` and no
+      AI `Co-authored-by:` (`git log -1 --format=%B`).
+- [ ] `.gitignore` ignores the agent files kept local: `CLAUDE.local.md`,
+      `AGENTS.local.md`, `.claude/settings.local.json`, `.claude/worktrees/`,
+      and `.claude/.cc-writes/`.
+
+The `commit-msg` hook does not run for `git commit --no-verify`, for commits
+made in the GitHub web interface, or for the merge commits GitHub creates, and
+it passes any message that starts with `Merge` or `Revert`.
+
 ## Development requirements
 
 Development requires:

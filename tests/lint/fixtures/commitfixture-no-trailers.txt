@@ -1,0 +1,3 @@
+docs(agents): reword the commit format section
+
+- Say which trailer block a commit ends with.

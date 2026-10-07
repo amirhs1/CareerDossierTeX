@@ -701,6 +701,14 @@ costs the archive a file and costs `l3build ctan` no error. It is its own
 answer three states, not two, so an unperformable check reports as unperformable
 rather than as absent text.
 
+### Commit-message hook lint
+
+`tests/lint/run-commit-msg-hook.sh` — runs `.githooks/commit-msg` over four
+fixture messages: an AI-assisted commit with a fixed role and a commit with no
+trailers are accepted; a free-text `Assisted-by:` role and an AI
+`Co-authored-by:` line are rejected. A missing fixture, or an exit status other
+than 0 or 1, fails the lint rather than counting as a rejection.
+
 ### Shell-harness lint
 
 `tests/lint/run-shellcheck.sh` — shellcheck at `-S warning` over every runner

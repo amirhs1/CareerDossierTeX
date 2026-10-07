@@ -60,8 +60,10 @@
 
 # --- Secrets, local preferences, and private personal data ---
 CLAUDE.local.md
+AGENTS.local.md
 .claude/settings.local.json
 .claude/worktrees/
+.claude/.cc-writes/
 .env
 *.local
 secrets/

@@ -1,0 +1,8 @@
+docs(agents): reword the commit format section
+
+- Say which trailer block a commit ends with.
+
+Why: the maintainer asked for it in the issue.
+
+Assisted-by: Claude Code, claude-opus-5-5 (full implementation)
+Checks-run: make lint — passed (exit 0)
