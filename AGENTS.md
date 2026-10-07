@@ -133,9 +133,8 @@ From `docs/ROADMAP.md` ("Standing non-goals"):
 
 From the agent tooling work:
 
-- No `open-issue` skill. An issue form fills an issue's body and
-  `project-metadata` sets its fields; a pull request also needs
-  `open-draft-pr`, for the gate and the push — #558.
+- An issue form supplies an issue's body and the `open-issue` skill the
+  procedure around it, so neither replaces the other — #573, reversing #558.
 - Pull requests merge with a merge commit, and AI help is recorded with
   `Assisted-by:` and a fixed role, never as an AI co-author — #571.
 - Every path is Supervised — #571.
@@ -190,8 +189,7 @@ change both in the same commit.
 5. **Verify.** Run the relevant checks, then the gate.
 6. **Self-review.** Read the full branch diff, the logs, the artifacts, and the
    documentation.
-7. **Commit and open a draft pull request,** as "Git" and "Commit format"
-   below say.
+7. **Commit and open a draft pull request,** as "Git" below says.
 8. **Report back,** as "Report back" below says.
 
 State material assumptions, and change only what was asked. Propose unrelated
@@ -262,89 +260,26 @@ improvements separately.
   fix.
 - You may open issues and pull requests, write commits, and post comments. The
   person running you is responsible for what you submit.
-- File an issue from a form in `.github/ISSUE_TEMPLATE/`, never with a blank
-  body. Every issue carries a milestone, unless its release is genuinely
-  undecided (today only #120); never invent a placeholder milestone. Give an
-  issue an epic parent only when the work genuinely decomposes into several
-  issues.
-- Work on one focused issue per branch where practical, branched from an
-  up-to-date `main`. Once review has begun, bring the branch up to date by
-  merging `main` into it.
-- Every pull request links its issue with `Closes #n`, except a revert, a
-  release chore, or a CI, tooling, or lint repair that restores an existing
-  check; those carry the problem, the proposal, and the acceptance criteria in
-  the pull request body. Close the focused sub-issue, never an epic, from an
-  early pull request.
+- Work on one focused issue per branch, branched from an up-to-date `main` and
+  named `type/short-description`: lowercase and hyphenated, with `type` one of
+  `feat`, `fix`, `docs`, `test`, `ci`, `refactor`, `release`, or `chore`. Once
+  review has begun, bring the branch up to date by merging `main` into it, and
+  do not amend, rebase, or force-push published commits unless asked.
 - Push only the focused branch, and only when it is close-out-complete. Green
   CI says nothing about the documentation, `CHANGELOG.md`, the AI disclosure,
   or the Project fields. Anything found after a push goes in the first line of
   your next message; a discovery outside the issue's scope becomes a follow-up
   issue.
-- A pull request's "AI assistance" section repeats every distinct
-  `Assisted-by:` line on the branch verbatim. A commit trailer alone is not a
-  disclosure.
 - Pull requests merge with a merge commit, so each commit lands on `main`
   unchanged; keep each one coherent. Show any history-rewriting command before
-  running it, and once review has begun, do not amend, rebase, or force-push
-  published commits unless asked.
-- Names: branches `type/short-description`, lowercase with hyphens, where
-  `type` is `feat`, `fix`, `docs`, `test`, `ci`, `refactor`, `release`, or
-  `chore`; commit subjects and pull request titles as "Commit format" below
-  says, with no agent or tool prefix; issue titles `[area] Verb object`, and
-  `[epic] Release vX.Y.Z goal` for an epic; one primary `type:*` label and
-  every relevant `area:*` label, from `gh label list --limit 100`, which
-  defines them; milestones `vX.Y.Z — Release Name`; tags `vX.Y.Z`.
-- Procedures live in skills: `write-commit` for every commit, `open-draft-pr`
-  to open or update a draft pull request, `project-metadata` for the fields of
-  an issue or pull request, `post-comment` for a comment, `update-changelog` for
-  a `CHANGELOG.md` entry, `release-notes` for release notes, and `report-back`
-  at the end of every task.
-
-## Commit format
-
-Every AI-assisted commit follows this format and ends with `Assisted-by:`.
-
-```text
-<type>(<scope>): <imperative summary>
-
-<what changed>
-
-Why: <reason supplied by the maintainer; omit for a trivial change>
-
-Assisted-by: <tool>, <model identifier or not recorded> (<role>)
-Checks-run: <check actually run> — <observed result>
-Ground-truth-source: <independent source of a reference value>
-```
-
-- `type` is one of the branch types under "Git". `scope` names the part of the
-  repository affected, such as `core`, `tokens`, `components`, `resume`,
-  `test`, `build`, or `agents`; prefer a scope already in
-  `git log --format='%s' main`. Keep the subject short and imperative, and one
-  coherent change in each commit. A pull request title takes the same form and
-  describes the whole branch.
-- Write the subject and what changed. Add the reason only if the maintainer
-  gave you one; otherwise leave it out or ask. Never write a placeholder.
-- All trailers sit in one final paragraph, one per line, with no blank line
-  between them and nothing after them. `Why:` stays in the body above it.
-- `Assisted-by:` names your actual model and one role, with no free detail; the
-  body carries the detail. If you don't know the model, write `not recorded`;
-  never guess or fill it in later from memory. Pick the first role that fits:
-  - `full implementation`: you wrote essentially all of the committed content.
-  - `partial implementation`: you wrote part of it; a person wrote the rest.
-  - `refactor`: you chose how to restructure existing content without changing
-    what it does or says.
-  - `plan`: you proposed the approach or steps; a person wrote the content.
-  - `review`: you reviewed or tested a person's work and wrote none of it.
-  - `transcription`: a person wrote or fully specified the change; you
-    entered, moved, formatted, or committed it without adding content.
-- Add `Checks-run:` only for a check actually run, with its observed result.
-- Add `Ground-truth-source:` only when the commit adds or changes a reference
-  value, such as a baseline, naming its independent source. A property test
-  without a reference value does not need it.
-- Do not add a `Co-authored-by:` line for an AI tool; write `Assisted-by:`
-  instead.
-- If the `commit-msg` hook rejects a commit, fix the message. Never use
-  `--no-verify`.
+  running it.
+- Make every commit with the `write-commit` skill. Never add an AI
+  `Co-authored-by:` line, and never use `--no-verify`.
+- The other tasks have skills too: `open-issue` to open an issue,
+  `open-draft-pr` to open or update a draft pull request, `project-metadata`
+  for the fields of an issue or pull request, `post-comment` for a comment,
+  `update-changelog` for a `CHANGELOG.md` entry, and `release-notes` at
+  release-preparation time.
 
 ## When stuck
 
@@ -363,11 +298,22 @@ Ground-truth-source: <independent source of a reference value>
 
 ## Report back
 
-End every task with a report in chat, in a form the `report-back` skill gives.
+Report in chat while a task runs and at its end.
 
-- Use the full form when the session changed a file, opened or updated an
-  issue or pull request, or needs a decision; otherwise the short form.
-  Posting a comment gets the short form.
+- When the maintainer is not at the keyboard, send one progress line at each
+  step of "How to work here", not one per tool call:
+
+  ```text
+  **[n/8] <step>** — <what just happened, one line>
+  Next: <one line>
+  Blocked: <only when true>
+  ```
+
+  `n` is the step's number and the step's name follows it. Step 4 covers the
+  failing test and the implementation together and is reported once.
+- End every task with a report: the full form when the session changed a file,
+  opened or updated an issue or pull request, or needs a decision; otherwise
+  the short form. Posting a comment gets the short form.
 - Before a full report, confirm the change meets this file and, when a branch
   was pushed, the push rules under "Git".
 - Fill every section; a section that does not apply says `None`, and none is
@@ -375,13 +321,42 @@ End every task with a report in chat, in a form the `report-back` skill gives.
   it. The verdict is your attestation that the work is close-out-complete;
   green CI is not.
 - Report actual output, not expected output, and say what was not run and
-  why.
+  why. List each decision you made that was the maintainer's.
 - A skill's read-back, such as the Project metadata or the release notes, goes
-  in the report's checks; it is not a second report and has no verdict.
+  in section 4 of the full form; it is not a second report and has no verdict.
 - A pull request body is the full report, in the sections of
   `.github/pull_request_template.md`.
-- When the maintainer is not at the keyboard, send one progress line at each
-  step of "How to work here", not one per tool call.
+
+The short form:
+
+```text
+<Answer in one or two sentences.>
+Based on: <files read or commands run; "memory only" if nothing was checked>
+Open: <anything unverified, or None>
+```
+
+The full form opens with a `##` heading, the branch's own commit and pull
+request title with a `closes #<issue>` suffix, then the verdict:
+
+```text
+<type>(<scope>): <summary> — closes #<issue>
+
+**Verdict: COMPLETE — nothing further, safe to approve on green.**
+(or) **Verdict: NOT COMPLETE — remaining: <what is outstanding>.**
+```
+
+Then seven numbered sections, in this order, each a few lines; reasoning a
+reviewer needs in order to judge the change belongs in the pull request body:
+
+| Section                            | Carries                                                                                                       |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 1 Problem                          | the observable symptom first, then the mechanism behind it                                                    |
+| 2 What changed                     | every file touched, as `path:line`, and the reasoning a reader cannot reconstruct from the diff               |
+| 3 Visual impact                    | `None`, with the evidence establishing it — or what moves, and how that was confirmed                         |
+| 4 Test criteria                    | the criteria this change had to meet, the exact commands run and their outcomes, and what was not run and why |
+| 5 Decisions I made that were yours | each call made without asking, the alternative rejected, and what reversing it would cost                     |
+| 6 What I need from you             | each item tagged `Action Needed:` or `Decision Needed:`, blocking items first; then what is worth knowing but is not blocking; then follow-up issues opened or proposed. `None` when nothing is needed |
+| 7 Close-out actions                | approve on green or not; what to do with the branch; anything to preserve before the session ends             |
 
 ## Further reading
 

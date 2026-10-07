@@ -31,11 +31,11 @@ If directly authorized work has no focused issue, stop before the first push and
 ask the maintainer whether to create or select one and which release metadata
 applies. Do not invent a milestone, Phase, or Priority to fill the gap.
 
-`CONTRIBUTING.md` "Work item structure" names the three kinds of work exempt
-from needing a focused issue, and is not repeated here. For those, proceed
-without stopping, but state the problem, the proposal, and the acceptance
-criteria in the PR body — the exemption is from the issue object, not from the
-reasoning. Set the milestone from the release the work lands in; leave
+Three kinds of work are exempt from needing a focused issue: a revert, a release
+chore, and a CI, tooling, or lint repair that restores an existing check. For
+those, proceed without stopping, but state the problem, the proposal, and the
+acceptance criteria in the PR body — the exemption is from the issue object, not
+from the reasoning. Set the milestone from the release the work lands in; leave
 Phase and Priority to follow it as usual. Anything outside those three still
 stops for the maintainer.
 
@@ -111,7 +111,8 @@ section order and fill every section. In order:
 - **Summary** — what changed and why, with the reason only as the maintainer
   or an outside report supplied it;
 - **Related issues** — `Closes #NN` for each issue the PR completes, and
-  `Refs #NN` for one it covers only in part;
+  `Refs #NN` for one it covers only in part; close the focused sub-issue,
+  never an epic, from an early pull request;
 - **Problem** — what was wrong or missing, with evidence;
 - **What changed** — files as `path:line`, plus reasoning the diff does not
   show;
@@ -135,8 +136,6 @@ workflow has run when it is composed — the box could only be left unticked or
 ticked against `AGENTS.md` ("Do not"). The live check-run status is
 already on the PR, and green CI is not a completion signal, so it is not
 something the author attests to.
-
-Do not close the parent epic from a focused implementation PR.
 
 ## Routine metadata
 
@@ -186,8 +185,8 @@ repository metadata
 and both items' Project fields in **one** query, PR-only fields included, so
 these four cost no call of their own.
 
-The read-back is not a report of its own.
-`.agents/skills/report-back/SKILL.md` ("Full form") defines the one report
-shape, and this list is the metadata payload of its `Test criteria` section.
+The read-back is not a report of its own. `AGENTS.md` ("Report back") defines
+the one report shape, and this list is the metadata payload of its
+`Test criteria` section.
 Close with that report — seven sections, one verdict, covering the branch as a
 whole and not only its metadata.

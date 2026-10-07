@@ -39,8 +39,9 @@ here.
    PR body. Re-run anything whose recorded result is older than the last commit.
 4. Confirm the documentation the change requires is updated, and `CHANGELOG.md`
    when the change is user-visible.
-5. Build the PR title from `docs/NAMING-CONVENTION.md` and the PR body from the
-   template below.
+5. Title the PR like a commit subject, `type(scope): imperative summary`,
+   describing the whole branch, with no agent or tool prefix; `write-commit`
+   lists the types and scopes. Build the body from the template below.
 6. Complete the AI-assistance section from the branch's actual commit trailers.
 7. If no focused issue exists, stop before pushing and obtain the maintainer's
    explicit decision about issue creation and release metadata.
@@ -57,8 +58,8 @@ here.
     `Size`, then the read-back that closes them out. That skill is canonical for
     all of it, including which `Status` a newly opened draft takes and how
     `Size` is scored from the completed diff.
-12. Close with the full report `.agents/skills/report-back/SKILL.md` ("Full
-    form") defines, covering the branch as a whole. The step-11 read-back is the
+12. Close with the full report `AGENTS.md` ("Report back") defines, covering
+    the branch as a whole. The step-11 read-back is the
     metadata payload of that report's `Test criteria` section, not a separate
     report.
 
@@ -93,7 +94,8 @@ that copy outside the repository so it is never staged.
 
 ### AI assistance
 
-Never leave this section as unfilled template text, and never omit it.
+Never leave this section as unfilled template text, and never omit it: a
+commit trailer alone is not a disclosure.
 
 1. Read the branch's real `Assisted-by:` lines before writing the section:
 
@@ -107,9 +109,9 @@ Never leave this section as unfilled template text, and never omit it.
 2. Name each AI tool that materially shaped the contribution, its model if
    known (`not recorded` otherwise; never a guess), its role, and what it did
    in one clause. Each `Assisted-by:` line carries one of the six roles
-   `AGENTS.md` ("Commit format") defines. `AI-POLICY.md` ("Disclosure")
-   governs what is disclosed; the template's `None` covers a contribution with
-   no AI help.
+   `.agents/skills/write-commit/SKILL.md` ("Rules") defines. `AI-POLICY.md`
+   ("Disclosure") governs what is disclosed; the template's `None` covers a
+   contribution with no AI help.
 3. Repeat every line step 1 printed in the section, so the commit record and
    the PR record agree — `.github/pull_request_template.md`'s `AI assistance`
    section has the worked example. Prose may name the tool loosely; each

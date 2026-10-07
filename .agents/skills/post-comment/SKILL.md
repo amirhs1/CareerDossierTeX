@@ -6,8 +6,7 @@ description: Post a short comment on an issue or pull request, in the short repo
 # Post a comment
 
 1. Comment only on the issue or pull request the person running you named.
-2. Write the comment in the short form of `report-back`
-   (`.agents/skills/report-back/SKILL.md` ("Short form")):
+2. Write the comment in the short form `AGENTS.md` ("Report back") gives:
 
    ```text
    <Answer in one or two sentences.>

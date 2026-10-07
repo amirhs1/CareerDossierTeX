@@ -231,9 +231,9 @@ If Project API access is unavailable, still set every field that is reachable
 without it. Report the exact fields that could not be updated rather than
 claiming completion.
 
-The read-back above is not a report of its own.
-`.agents/skills/report-back/SKILL.md` ("Full form") defines the one report
-shape, and this list is the metadata payload of its `Test criteria` section.
+The read-back above is not a report of its own. `AGENTS.md` ("Report back")
+defines the one report shape, and this list is the metadata payload of its
+`Test criteria` section.
 Close with that report — seven sections, one verdict, covering the work as a
 whole and not only its metadata. Neither the shape nor the verdict wording is
 repeated here.
