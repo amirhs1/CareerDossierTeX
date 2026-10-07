@@ -292,9 +292,9 @@ improvements separately.
   defines them; milestones `vX.Y.Z — Release Name`; tags `vX.Y.Z`.
 - Procedures live in skills: `write-commit` for every commit, `open-draft-pr`
   to open or update a draft pull request, `project-metadata` for the fields of
-  an issue or pull request, `post-comment` for a comment, `release-notes` for a
-  `CHANGELOG.md` entry or release notes, and `report-back` at the end of every
-  task.
+  an issue or pull request, `post-comment` for a comment, `update-changelog` for
+  a `CHANGELOG.md` entry, `release-notes` for release notes, and `report-back`
+  at the end of every task.
 
 ## Commit format
 
@@ -385,7 +385,7 @@ Background and detail. Nothing here adds a rule to this file.
 
 | Change kind                                          | Read                                                                                                                                      |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Any behaviour change                                 | `docs/TESTING.md` ("Coverage expectations"); `.agents/skills/release-notes/reference.md` ("The shape of an entry") for `CHANGELOG.md`     |
+| Any behaviour change                                 | `docs/TESTING.md` ("Coverage expectations"); `.agents/skills/update-changelog/reference.md` ("The shape of an entry") for `CHANGELOG.md`  |
 | Token, spacing, or vertical rhythm                   | the manual's token chapter; `docs/TESTING.md` ("Spacing tokens: reporting a value is not rendering a gap")                                |
 | Layout, page break, or typography                    | the manual; `docs/TESTING.md` ("Visual review targets")                                                                                   |
 | Tagging, PDF structure, extraction, or reading order | `docs/ATS-EXTRACTION.md`, the manual; `docs/TESTING.md` ("Tagged-PDF suite" and "Extraction round-trip test")                             |
