@@ -36,6 +36,10 @@ Never bypass a denied command or weaken a permission rule. The committed
 and enables sandbox enforcement for Bash — with `gh` excluded — when the
 effective settings and local installation support it; verify the effective state
 and do not claim OS-level isolation when the sandbox is inactive or unavailable.
+It also asks before the commands only the maintainer may run: merging,
+readying, or reviewing a pull request; creating, editing, or deleting a
+release; editing the repository; and a force or deleting push. `gh api` is not
+covered, because `project-metadata` needs it for its GraphQL mutations.
 These settings bind Claude Code only, not other agents. Higher-precedence
 settings can change whether the sandbox is active, and an environment that
 cannot start it gains no OS-level isolation from permission rules alone.
