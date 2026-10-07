@@ -264,9 +264,8 @@ branch.
 `gh api graphql` removes the id-discovery and per-field calls without removing
 anything the rules require: it batches inside one request, and it still reads
 every id and option string live in the same run, so nothing is cached into the
-tree. `CLAUDE.md` ("`gh` must lead the Bash invocation") is canonical for why
-this is the only form that batches here and why a wrapper script is not; that
-reasoning is not repeated.
+tree. `CLAUDE.md` ("Sandbox and permissions") says why it is the only form that
+batches here.
 
 The five steps below cost five calls, and with `gh label list` and `gh issue
 view` the whole path from "branch ready" to "metadata verified" is **seven**.
