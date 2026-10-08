@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   toolchain:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -88,7 +88,7 @@ jobs:
   # ugrep and local `awk` is the one-true-awk, so a pattern that works on the
   # maintainer's machine is not thereby proven to work here.
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -104,7 +104,7 @@ jobs:
         run: make lint
 
   regression:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -127,7 +127,7 @@ jobs:
           if-no-files-found: warn
 
   extraction:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -149,7 +149,7 @@ jobs:
           if-no-files-found: warn
 
   tagging:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -190,7 +190,7 @@ jobs:
   # lets them start in parallel with every other job; the `resume` job below is
   # once again only as slow as the example it builds.
   smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -213,7 +213,7 @@ jobs:
           if-no-files-found: warn
 
   layout:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -238,7 +238,7 @@ jobs:
           if-no-files-found: warn
 
   resume:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -262,7 +262,7 @@ jobs:
   # to compile. Keep it that way, or add `manual` to CHECK_TARGETS; do not leave
   # it in neither place.
   manual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -281,7 +281,7 @@ jobs:
           if-no-files-found: warn
 
   letter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -310,7 +310,7 @@ jobs:
   # that tells a local Biber fault apart from a general one. Fold it back into
   # `cv` if the runner is ever worth more than that.
   bibliography:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -362,7 +362,7 @@ jobs:
   # is the only site that puts stretchable glue at a URL's breakpoints, and the
   # suite's negative control lives there.
   links:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -394,7 +394,7 @@ jobs:
   # fixtures build uncompressed and the runner reads the catalog itself — so it
   # is the cheapest job in this workflow.
   metadata:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -415,7 +415,7 @@ jobs:
   # `metadata` it needs no PDF tooling: the fixtures build uncompressed and the
   # runner reads the annotations itself.
   annotations:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -425,7 +425,7 @@ jobs:
       # No artifact upload, for the reason given under `metadata` above.
 
   cv:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -449,7 +449,7 @@ jobs:
           if-no-files-found: warn
 
   academic-letter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
@@ -468,7 +468,7 @@ jobs:
           if-no-files-found: warn
 
   statement:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
