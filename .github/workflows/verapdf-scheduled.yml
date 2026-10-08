@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   verapdf:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
