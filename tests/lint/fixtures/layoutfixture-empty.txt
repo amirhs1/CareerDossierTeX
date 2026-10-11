@@ -1,0 +1,11 @@
+# Fixture
+
+## Layout
+
+Introductory text.
+
+No block here.
+
+## Next section
+
+Not read.

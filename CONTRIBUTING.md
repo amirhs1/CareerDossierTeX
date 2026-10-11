@@ -3,9 +3,8 @@
 Thank you for helping improve CareerDossierTeX.
 
 For people changing the code: how to propose, build, test, and submit a change.
-[`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md) owns the naming rules
-this file refers to, and [`AGENTS.md`](AGENTS.md) is the equivalent contract for
-AI coding agents.
+"Names" below owns the naming rules, and [`AGENTS.md`](AGENTS.md) is the
+equivalent contract for AI coding agents.
 
 This project uses focused issues, short-lived branches, pull requests, repeatable LuaLaTeX builds, and incremental releases. The goal is not process for its own sake; the goal is a repository whose behavior and history remain understandable.
 
@@ -24,41 +23,40 @@ Read:
 
 Do not implement a planned feature as though it is already part of the current release. Confirm that it belongs to the active milestone.
 
+Large, unrequested, or unreviewed generated changes may be closed without a
+line-by-line review. Open or claim a focused issue first for substantial work.
+
 ## AI-assisted contributions
 
 AI coding assistants are welcome. The maintainer uses them, and the repository
 publishes an [`AI-POLICY.md`](AI-POLICY.md) and agent contract (`AGENTS.md`) for
 that reason. An AI-assisted contribution is held to the same standard as any
-other contribution.
+other contribution. The rules most often missed:
 
-**Disclose material assistance.** If an agent or model wrote or substantially
-shaped code, tests, documentation, or other submitted content, fill in the
-`AI assistance` section of the pull-request template. `AI-POLICY.md`
-("Disclosure") is normative for what that section must contain and how it
-relates to commit trailers; neither is repeated here. A short statement is
-enough, and it must not include prompts, private reasoning, secrets, or personal
-data.
+Own what you submit. Before opening the pull request:
 
-**Own what you submit.** Before opening the pull request:
+- Read and understand the change, and be prepared to explain it and respond to
+  review feedback.
+- Meet the same `tests/` obligation as any behavior change and actually run
+  every check you claim passed.
+- Say in the pull request which AI tools you used and for what.
+- Write issues, pull request descriptions, and replies in your own words. If
+  an AI agent writes them for you, you answer for every word, and its text
+  ends with its `Assisted-by:` trailer, with `not recorded` for an unknown
+  model.
 
-- read and understand the change, and be prepared to explain it and respond to
-  review feedback;
-- meet the same `tests/` obligation as any behavior change and actually run
-  every check you claim passed;
-- verify citations, links, and factual claims against primary sources; and
-- confirm that no code, prose, font, image, data, or other asset has uncertain
-  provenance or a license incompatible with LPPL v1.3c or later (see
-  "Licensing contributions").
-
-Large, unrequested, or unreviewed generated changes may be closed without a
-line-by-line review. Open or claim a focused issue first for substantial work.
+Pull requests that don't follow the policy may be closed without review.
 
 ### Setup
 
 - [ ] `.claude/settings.json` is committed with the attribution block.
 - [ ] `git config core.hooksPath .githooks` has been run in this clone.
-- [ ] A test commit made by each tool in use ends with `Assisted-by:` and no
-      AI `Co-authored-by:` (`git log -1 --format=%B`).
+- [ ] `.gitmessage` is committed.
+- [ ] `git config commit.template .gitmessage` has been run, for commits
+      written in an editor.
+- [ ] A test commit made by each tool in use ends with one trailer block that
+      includes `Assisted-by:` and no AI `Co-authored-by:`
+      (`git log -1 --format=%B`).
 - [ ] `.gitignore` ignores the agent files kept local: `CLAUDE.local.md`,
       `AGENTS.local.md`, `.claude/settings.local.json`, `.claude/worktrees/`,
       and `.claude/.cc-writes/`.
@@ -83,7 +81,7 @@ Development requires:
   `make check` suite.
 
 The ordinary resume, letter, and no-BibLaTeX CV paths do not require BibLaTeX
-or Biber. Install LuaLaTeX: `AGENTS.md` ("Conventions a linter cannot express")
+or Biber. Install LuaLaTeX: `AGENTS.md`, "Conventions a linter cannot express",
 states the engine scope and what the unsupported engines do, and is not repeated
 here.
 
@@ -112,9 +110,10 @@ work with no scheduled release, or a proposal whose home has not been chosen.
 Such an issue stays unmilestoned rather than take a milestone that would
 misstate the plan, and it stays invisible to release planning on purpose until
 that decision is made. Do not invent a placeholder milestone for it, and do not
-park it in the furthest-out open milestone. `docs/NAMING-CONVENTION.md`
-"Milestone naming convention" names the issues that currently qualify; anything
-unmilestoned beyond those is an oversight.
+park it in the furthest-out open milestone.
+`gh issue list --state open --search "no:milestone"` lists the issues that
+currently qualify; each records why its release is undecided, and an
+unmilestoned issue without that reason is an oversight.
 
 An **epic parent** is for work that genuinely decomposes into several issues — a
 release epic, or a cross-cutting effort spanning more than one class or package.
@@ -146,8 +145,8 @@ an exception applies, not a form to fill in.
 ### 3. Every pull request comes from a focused branch
 
 Branch from an up-to-date `main`, one issue per branch where practical. Direct
-commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`
-("Git") states that reservation and the rest of the maintainer-only action set,
+commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`,
+"Git", states that reservation and the rest of the maintainer-only action set,
 which this guide does not repeat.
 
 A branch has no deadline: it lives until it merges or is closed, and the
@@ -155,15 +154,80 @@ A branch has no deadline: it lives until it merges or is closed, and the
 it merges. Bring it up to date by merging `main` into it; once review has
 begun, do not rebase it.
 
+## Names
+
+Two axes name every change. _Type_, the kind of change, is one word list, used
+unchanged as the branch prefix, the commit type, the pull request title's
+type, and the label `type:<word>`. _Area_, the part of the repository, is one
+list, used unchanged as the commit scope, the issue title's bracket, and the
+label `area:<word>`. Scope and area are one list.
+
+```text
+types: feat fix docs test refactor ci chore release
+areas: core tokens typography theme components bibliography resume letter cv statement i18n build documentation agents
+```
+
+| Area                                  | Covers                                                                                         |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `core`                                | `careerdossier-base.sty`: profile metadata, keys, validation                                   |
+| `tokens`                              | `careerdossier-tokens.sty`: type scale, vertical rhythm, lists, page geometry                  |
+| `typography`                          | `careerdossier-typography.sty`: engine guard, fonts, semantic text roles                       |
+| `theme`                               | `careerdossier-theme.sty`: colour, rule, and link tokens                                       |
+| `components`                          | `careerdossier-components.sty`: shared document parts, links, PDF metadata                     |
+| `bibliography`                        | `careerdossier-biblatex.sty` and the BibLaTeX and Biber path                                   |
+| `resume`, `letter`, `cv`, `statement` | each class, its layout, and its examples                                                       |
+| `i18n`                                | document language and translated strings                                                       |
+| `build`                               | `Makefile`, `build.lua`, the test harness and lints, `.github/workflows/`                      |
+| `documentation`                       | `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `doc/`, `docs/`, the issue and pull request templates |
+| `agents`                              | `AGENTS.md`, `CLAUDE.md`, `AI-POLICY.md`, `.agents/`, `.claude/`, `.githooks/`, `.gitmessage`  |
+
+A test for one module takes that module's area.
+
+| Name                          | Form                                        |
+| ----------------------------- | ------------------------------------------- |
+| Branch                        | `<type>/<short-name>`, with no issue number |
+| Commit and pull request title | `<type>(<area>): <imperative summary>`      |
+| Issue title                   | `[<area>] <imperative summary>`             |
+| Epic                          | A parent issue, titled as an issue          |
+| Milestone                     | `v<MAJOR>.<MINOR>.<PATCH>`, the release     |
+| Tag and release title         | `v<MAJOR>.<MINOR>.<PATCH>`                  |
+
+A short name is a few lowercase words joined by hyphens. Pick the type for the
+main purpose of the work.
+
+Labels combine: one `type:` plus one or more `area:`. There are no
+combination labels. Status, priority, and release are not labels. Three labels
+sit outside the two axes: `breaking-change`, `technical-debt`, and
+`help-wanted`.
+
+Issue templates set a default type: `type:fix` for a bug report, `type:feat`
+for a feature request; the development and epic templates set none.
+
+### Where these names are used
+
+- `.gitmessage`
+- `.github/pull_request_template.md`
+- `.github/ISSUE_TEMPLATE/*`
+- `.agents/skills/create-branch/SKILL.md`,
+  `.agents/skills/draft-release/SKILL.md`,
+  `.agents/skills/open-issue/SKILL.md`,
+  `.agents/skills/open-pull-request/SKILL.md`,
+  `.agents/skills/write-commit/SKILL.md`
+- `.agents/skills/project-metadata/SKILL.md`,
+  `.agents/skills/project-metadata/reference.md`
+- `AGENTS.md`, "Git"
+
+Each of these cites this section.
+
 ## Issue workflow
 
 Open or select an issue before starting a meaningful change, subject to the
 exceptions in "Every pull request links an issue" above.
 
 An issue has two halves. A form in `.github/ISSUE_TEMPLATE/` fills the body;
-it cannot set the Project fields, which are required too. `AGENTS.md`
-("Settled decisions") records that division, and why a pull request
-additionally needs a skill where an issue does not.
+it cannot set the Project fields, which are required too. `AGENTS.md`,
+"Settled decisions", records that division: the form supplies the body, and
+the `open-issue` skill the procedure around it, fields included.
 
 A good implementation issue explains:
 
@@ -252,17 +316,59 @@ Describe:
 
 Public API proposals should include example LaTeX syntax before implementation begins.
 
-## Branch naming
+### Project Status convention
 
-Use:
+The Project `Status` field holds workflow state. Its options, in the Project's
+own order:
 
-```text
-type/short-description
-```
+| Status      | Meaning                                            |
+| ----------- | -------------------------------------------------- |
+| Backlog     | Accepted but not ready or not currently scheduled  |
+| Ready       | Defined enough to start                            |
+| In Progress | Active branch or implementation exists             |
+| Done        | Merged, closed, or otherwise completed             |
+| In review   | Pull request is open and awaiting checks or review |
 
-`docs/NAMING-CONVENTION.md` "Branch naming convention" is the canonical list
-of allowed prefixes
-and worked examples; it is not reproduced here.
+Option lookup is by name, so copy an option's exact string from the Project,
+never from this table; `.agents/skills/project-metadata/reference.md`,
+"Read option strings live, never from prose", says how.
+
+- A parent epic can be `In Progress` while its release is active; its
+  sub-issues move through the workflow individually.
+- A newly opened draft pull request is `In Progress`: it is still active work,
+  not yet a review request. It becomes `In review` only once the maintainer
+  marks it ready, so draft status decides where both meanings read as true.
+  This is the only statement of the rule; the skills defer here.
+- Merged pull requests and closed issues become `Done`.
+
+### Phase numbering convention
+
+Phases group releases into stages of the product plan. The Project `Phase`
+field is canonical; its options carry a number and a short label, such as
+`Phase 2 — Academic`. `docs/ROADMAP.md` follows that numbering, and its headings
+keep a longer form keyed to the release version. Only the numbers must agree.
+
+- Every shipped major or minor release has its own phase: `vX.0.0` and `v0.Y.0`
+  each get one `Phase` option and one `docs/ROADMAP.md` phase heading.
+- A patch release has no phase of its own. Its issues carry the phase of the
+  minor release they correct, and it gets a row in the `docs/ROADMAP.md`,
+  "Releases and phases", table but no heading.
+- A release that never ships has no phase number, and is referred to by name:
+  `v0.3.0` gave up `Phase 3` when it was dropped, and `v1.1.0` closed empty
+  without one.
+- A phase may exist with no milestone, as `Phase 0 — Inventory` does. Do not
+  create a milestone to give an existing phase a release.
+- To add, drop, or reorder a phase, change the Project field first, then
+  `docs/ROADMAP.md`: its phase heading and its "Releases and phases" table,
+  which is the cross-walk.
+- A `Phase` option's description is identity only, in the shape
+  `<what the phase is>. <release(s)>. docs/ROADMAP.md "Phase N" is canonical.`
+  The option lives outside the repository, where no pull request or lint
+  reaches it, so scope and renumbering history stay in `docs/ROADMAP.md`
+  (#477).
+- After a renumbering, check `git grep -nE "Phase [0-9]"`: references to
+  `Phase 0`, `Phase 1`, and `Phase 2` are stable, but any higher number outside
+  `docs/ROADMAP.md` needs review.
 
 ## Standard branch workflow
 
@@ -300,7 +406,9 @@ git commit -m "feat(resume): add initial English resume class"
 git push -u origin feat/resume-class
 ```
 
-Open a draft pull request early when the work is incomplete but ready for CI or design discussion.
+A person may open a draft pull request early, when the work is incomplete but
+ready for CI or design discussion. An agent pushes only a close-out-complete
+branch, as `AGENTS.md`, "Git", says.
 
 Keep the branch focused, on the terms "Every pull request comes from a focused
 branch" sets out above.
@@ -313,9 +421,7 @@ Use a lightweight Conventional Commits format:
 type(scope): imperative summary
 ```
 
-`docs/NAMING-CONVENTION.md` "Commit message convention" is the canonical list
-of types and
-worked examples; it is not reproduced here.
+"Names" above sets the types and scopes.
 
 Each commit should represent one coherent change. Avoid combining unrelated API, typography, CI, and documentation edits in one commit.
 
@@ -395,9 +501,9 @@ the standing of `JOBS=8` — which is **unmeasured rather than barred**, so
 `make check JOBS=8` is a supported thing to run on hardware with the cores for
 it. Neither question is answered here.
 
-The driver is `tests/check-parallel.sh`. `docs/TESTING.md` "The parallel run" is
-canonical for how it works, what it asserts beyond running the same targets, the
-two tool caches it has to prepare first, its measured speedup, its ordered
+The driver is `tests/check-parallel.sh`. `docs/TESTING.md`, "The parallel run",
+is canonical for how it works, what it asserts beyond running the same targets,
+the two tool caches it has to prepare first, its measured speedup, its ordered
 replay of per-target output under `build/check-parallel/`, its disk cost, and
 what a scheduled run had to prove before it could be the gate; none of that is
 repeated here beyond the orientation figure above.
@@ -460,7 +566,7 @@ gate reports it under `SELECTED BUT NOT RUN` rather than letting "not selected"
 and "selected, checked nothing" print as the same blank space.
 
 `tests/lint/run-fixture-filter.sh` holds this contract to account and runs in
-the `lint` slot; see `docs/TESTING.md` "Option lint".
+the `lint` slot; see `docs/TESTING.md`, "Option lint".
 
 ### Running one suite's fixtures concurrently
 
@@ -489,7 +595,7 @@ make check JOBS=4 INNER_JOBS=2
 That pinning is why making the gate parallel did not quietly quadruple the
 process budget along with it.
 
-`docs/TESTING.md` "Fanning out inside a suite" is canonical for the measured
+`docs/TESTING.md`, "Fanning out inside a suite", is canonical for the measured
 speedups, the shared dispatcher, the accounting assertion that makes a
 concurrent run safe to believe, and the process budget; none of it is repeated
 here.
@@ -548,9 +654,9 @@ Do not use private commands in examples or documentation.
 
 ### Package responsibility
 
-Place code according to ownership. `docs/ARCHITECTURE.md` ("File
-responsibilities") carries the concern-to-module map and the per-file detail,
-and `AGENTS.md` ("Layout") the dependency direction and the two
+Place code according to ownership. `docs/ARCHITECTURE.md`, "File
+responsibilities", carries the concern-to-module map and the per-file detail,
+and `AGENTS.md`, "Layout", the dependency direction and the two
 standing rules about page geometry and the CV's independence from BibLaTeX.
 Neither is reproduced here.
 
@@ -578,13 +684,13 @@ Avoid:
 
 ### Optional fields
 
-`AGENTS.md` ("Conventions a linter cannot express") states how optional fields
+`AGENTS.md`, "Conventions a linter cannot express", states how optional fields
 are rendered and is not repeated here. The implementation consequence: do not
 generate every separator first and attempt to remove the empty ones later.
 
 ### Engine support
 
-`AGENTS.md` ("Conventions a linter cannot express") states the engine scope and
+`AGENTS.md`, "Conventions a linter cannot express", states the engine scope and
 is not repeated here. Two things
 specific to writing the code: `careerdossier-typography` owns the guard, and
 partial XeLaTeX or pdfLaTeX support is not to be added without defining,
@@ -602,6 +708,70 @@ order to stop — those stay, and the rest is evidence for them. Check with
 `gh issue view <n> --comments` and write the derivation into the issue before
 cutting it from the document, because several issues do not carry their own
 (#479).
+
+### Documentation heading convention
+
+Number a heading only where a tool generates the number. The PDF manual,
+`doc/careerdossier.tex`, is numbered: LaTeX numbers its sections and resolves
+every `\ref`, so inserting a section renumbers each citation of it in the same
+build. Markdown headings carry no section number. There a number is typed by
+hand in the heading and again in every citation, and GitHub bakes it into the
+anchor, so inserting one heading silently breaks every link below it (#447).
+
+A Markdown cross-reference names the heading in the form the shared agent
+templates use: the path, a comma, and the heading in double quotes. The same
+form cites a heading at any depth.
+
+```text
+Correct:   `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
+Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7>3.4
+Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7> "Dates and right alignment"
+```
+
+`<U+00A7>` stands for the section sign, which no tracked file contains (see
+"The section sign is banned outright" below).
+
+A generator would reopen the question: if Sphinx, mdBook, or Bikeshed ever
+builds `docs/`, the generator owns the number and numbering becomes defensible.
+Three things sit outside the rule: `CHANGELOG.md`, whose headings are versions
+and whose shipped entries stay as written, with only their links repointed when
+a heading moves (#259, #263); Phase numbers, which are a Project field; and a
+heading's release stamp, which belongs in the body under the heading.
+
+`tests/lint/run-markdown-anchors.sh` fails when a `](TARGET.md#anchor)` names a
+heading that no longer exists, and `tests/lint/run-prose-pointers.sh` when a
+citation names a file or heading that does not exist, or takes any other form
+than the one above.
+
+### The section sign is banned outright
+
+U+00A7 SECTION SIGN appears in no tracked file, commit message, issue body, or
+pull request body: not before a number, not before a quoted heading, and not as
+a noun. `tests/lint/run-section-sign.sh`, which `make lint` runs, fails naming
+every file and line that carries it. The ban covers the character, not a
+spelling of it, because an exception list let four forms coexist until #520,
+and a contributor copying the nearest example never reads the exception.
+
+A citation of an external numbered document spells the word out, as in Common
+Changelog's `section 2.4.1`. Git history, closed issues, and merged pull request
+bodies stay as written; nothing in the repository can lint prose typed into
+GitHub, so there the rule is the only mechanism.
+
+### One ASCII spelling for a word that has one
+
+An English word with an ordinary ASCII spelling is written that way in every
+tracked file, even where a loanword accent is defensible: `resume` and
+`Resume`, never with an acute accent on either `e` (#543).
+`tests/lint/run-accented-spellings.sh`, which `make lint` runs, fails naming
+every file and line that carries an accented spelling, precomposed or
+decomposed.
+
+The ban covers the word, not the accent. An accented character that carries
+meaning is data and stays: the names under `tests/extraction/`, such as
+`Montréal`, `Zoë`, and `Dvořák`, are the subject under test, and none contains
+the letters the lint searches for, so it needs no exception list. Prose about
+the document genre is unaffected, and Git history, closed issues, and merged
+pull request bodies stay as written.
 
 ### Update the manual (`doc/careerdossier.tex`) when:
 
@@ -693,34 +863,24 @@ instead. The stability policy both serve is in
 
 ### Update `CHANGELOG.md` when:
 
-- a feature is added;
-- behavior changes;
-- a bug is fixed;
-- a breaking change is introduced.
+- a release is drafted, and at no other time.
 
-Each of those four is qualified by *user-visible*: `manifest.txt` calls
-`CHANGELOG.md` "user-visible changes per release", and that is the whole test —
-what changed, not who ran it. A change that alters rendered output, a public
-name, or a documented behavior earns an entry however internal its cause looks.
+A pull request adds no entry. The `draft-release` skill writes each release's
+section in [Common Changelog](https://common-changelog.org) form from the
+commits since the last tag. Until the next release, `[Unreleased]` keeps the
+entries it has, and that release's section replaces it; earlier sections stay
+as written.
+
+A change earns a line by being *user-visible*: `manifest.txt` describes
+`CHANGELOG.md` as "user-visible changes per release", and that is the whole test
+— what changed, not who ran it. A change that alters rendered output, a public
+name, or a documented behavior earns a line however internal its cause looks.
 Maintainer tooling and agent instructions do not: `.agents/`, `.claude/`, a CI
-workflow, a maintainer-only script. Neither does a `Makefile` target a
-contributor is told to run, which is documented here instead. The boundary is
-not applied backwards — entries already shipped stay as written, including five
-in `[0.7.0]` (#188, #195, #211, #233, #236) and one in `[0.8.0]` (#334) that it
-would not have produced (#260). `CHANGELOG.md` carries a note under each
-release's own heading saying so, listing the same entries, so a reader who
-opens the register first is not left reading them as precedent (#410, #413).
-
-`[Unreleased]` is the one section this is *not* true of. It sits inside the
-boundary's own era and is still editable, so an entry there that the boundary
-would not have produced is removed at release preparation rather than annotated
-— a note saying it predates the rule would be false. `v0.9.0` was the first
-release to sweep it, and eleven entries came out (#414); the sweep is a standing
-step in `.agents/skills/release-notes/reference.md`, "The tooling sweep".
-
-For entry format and house style, see
-`.agents/skills/update-changelog/reference.md`; for how `CHANGELOG.md` relates
-to GitHub Release notes, see `.agents/skills/release-notes/reference.md`.
+workflow, a maintainer-only script, or a `Makefile` target a contributor is told
+to run, which is documented here instead. The boundary is not applied backwards:
+five entries in `[0.7.0]` (#188, #195, #211, #233, #236) and one in `[0.8.0]`
+(#334) that it would not have produced stay as written (#260), and
+`CHANGELOG.md` notes them under each release's own heading (#410, #413).
 
 ## Proposing public API changes
 
@@ -761,7 +921,12 @@ A pull request should include:
 - visual verification when layout changed;
 - decisions, risks, and follow-up work.
 
-Use draft pull requests when implementation is incomplete.
+Its title, in the form "Names" sets, describes the whole branch rather than any
+one commit. Do not close an epic from an early implementation pull request;
+close the focused sub-issue instead.
+
+A person uses a draft pull request while implementation is incomplete; an
+agent opens every pull request as a draft, from a close-out-complete branch.
 
 ### Self-review checklist
 
@@ -777,7 +942,6 @@ Before marking a pull request ready:
 - confirm new behavior has a focused committed test under `tests/`;
 - test missing optional fields;
 - update documentation;
-- update the changelog when appropriate;
 - confirm CI passes;
 - resolve review conversations.
 
@@ -820,7 +984,7 @@ When adding or changing licensed source files:
 - identify third-party code, fonts, images, or other assets and confirm that their licenses are compatible;
 - do not copy code from another project without preserving its required notices.
 
-The public class and package files should state that the Work has LPPL maintenance status `maintained` and that the current maintainer is Amir Sadeghi.
+The public class and package files should state that the Work has LPPL maintenance status `maintained` and that the current maintainer is the maintainer `manifest.txt` names.
 
 ## Generated files
 
@@ -947,7 +1111,7 @@ silently building an unpinned `HEAD` if a fetch ever resolved differently.
 4. Inspect the full suite. A bump is expected to be behavior-neutral. If a
    `.tlg` baseline or an extraction reference changes, that is a finding to
    investigate and report — never regenerate a baseline merely to turn the
-   suite green (see `docs/TESTING.md` "Baselines are load-bearing").
+   suite green (see `docs/TESTING.md`, "Baselines are load-bearing").
 
 ## Release contributions
 
@@ -962,13 +1126,12 @@ Release preparation should verify:
   caught, but nothing checks the pair against the tag you are about to cut;
 - `README.md` reflects current support;
 - the manual matches implementation;
-- `CHANGELOG.md` is updated;
-- GitHub Release notes are drafted;
+- the `draft-release` skill has drafted the `CHANGELOG.md` section and the
+  GitHub Release notes;
 - `LICENSE` and `manifest.txt` remain accurate;
 - the working tree is clean.
 
-See `.agents/skills/update-changelog/reference.md` for CHANGELOG entry format
-and house style, and `.agents/skills/release-notes/reference.md` for release
-notes and the LaTeX-package compatibility checklist.
+`.agents/skills/draft-release/SKILL.md` says how the section and the notes are
+written, and which LaTeX-package details a release states.
 
 Tagging and publishing a release should occur only after the release-preparation pull request is merged.

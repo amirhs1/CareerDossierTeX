@@ -7,10 +7,11 @@ assignees: ""
 ---
 
 <!--
-Apply one `type:*` label from `gh label list --limit 100` — `type:docs`,
-`type:test`, `type:refactor`, `type:ci`, or `type:release` — and the relevant
-`area:*` labels. This form pre-applies none, because the kind varies; the
-bug and feature forms can pre-apply one because theirs does not.
+Title and labels: CONTRIBUTING.md ("Names"). Apply one `type:*` label —
+`type:docs`, `type:test`, `type:refactor`, `type:ci`, `type:chore`, or
+`type:release` — and the relevant `area:*` labels. This form pre-applies none,
+because the kind varies; the bug and feature forms can pre-apply one because
+theirs does not.
 
 For a user-visible feature use `feature_request.md`; for a reproducible defect
 use `bug_report.md`; for work that genuinely decomposes into several issues use
@@ -52,8 +53,8 @@ tracked files, so `build/` is excluded by construction.
 Where the issue concerns a statement or value that could appear in more than one
 place, make at least one criterion a command over the repository rather than a
 check of the files listed above. A criterion that reads only the named files
-cannot fail on the copy nobody thought to look for. See `CONTRIBUTING.md`
-section "Issue workflow" item 5.
+cannot fail on the copy nobody thought to look for. See `CONTRIBUTING.md`,
+"Issue workflow", item 5.
 
 ```bash
 # The command a reviewer runs to confirm no copy was missed.

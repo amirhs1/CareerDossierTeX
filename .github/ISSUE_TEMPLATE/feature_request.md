@@ -2,9 +2,11 @@
 name: Feature
 about: Propose or implement a scoped feature
 title: "[area] "
-labels: "type:feature"
+labels: "type:feat"
 assignees: ""
 ---
+
+<!-- Title and labels: CONTRIBUTING.md ("Names"). -->
 
 ## Goal
 
@@ -46,7 +48,7 @@ Where the issue concerns a statement or value that could appear in more than one
 place, make at least one criterion a command over the repository rather than a
 check of the files listed above. Scope it by excluding directories, never by
 filtering in on extension — `--include='*.md'` is blind to `Makefile` and
-`LICENSE`. See `CONTRIBUTING.md` section "Issue workflow" item 5.
+`LICENSE`. See `CONTRIBUTING.md`, "Issue workflow", item 5.
 
 ```bash
 # The command a reviewer runs to confirm no copy was missed.

@@ -22,12 +22,20 @@
 #
 # WHAT IT ASSERTS
 #
-# For every `` `PATH.md` ("Section Name") `` in a tracked Markdown file, outside
-# fenced code:
+# For every citation of a heading in a tracked Markdown file, outside fenced
+# code, in the form `CONTRIBUTING.md`, "Documentation heading convention" sets
+# (issue #583) — the shared templates' two forms, with or without backticks:
+#
+#   `PATH.md`, "Section Name"          (several names joined by "and" or commas)
+#   "Section Name" in `PATH.md`
 #
 #   1. PATH.md exists — resolved against the repository root, then against the
 #      citing file's own directory;
-#   2. every quoted name in that parenthetical is a heading in PATH.md.
+#   2. every quoted name is a heading in PATH.md;
+#   3. the citation takes one of those two forms. A backticked path followed by
+#      a parenthetical ("Name"), by section "Name", or by a bare "Name" is
+#      resolved too, and then fails with the form to write instead — except in
+#      CHANGELOG.md, whose shipped entries stay as written.
 #
 # WHY "EVERY QUOTED NAME", NOT "THE NAME"
 #
@@ -160,27 +168,51 @@ function lineof(off,   i) {
 }
 
 function flush_file(   rest, base, path, names, n, i, tgt, nm, ms, ml,
-                     after, cp, paren) {
+                     after, trimmed, before, bt, cp, form, oldok) {
   if (curfile == "") return
   rest = buf
   base = 0
+  # CHANGELOG.md keeps its shipped citations as written: their headings are
+  # still resolved, but their form is not checked.
+  oldok = (curfile ~ /(^|\/)CHANGELOG\.md$/)
   # One SIMPLE regex for the path, then index()/substr() for everything else.
   # See the header: the obvious single regex for the whole pointer is
-  # mis-evaluated by the local awk, so the parenthetical is delimited by hand.
-  while (match(rest, /`[^`]+\.md`/)) {
+  # mis-evaluated by the local awk, so each form is recognised by hand.
+  while (match(rest, /[A-Za-z0-9_.\/-]+\.md/)) {
     ms = RSTART
     ml = RLENGTH
-    path = substr(rest, ms + 1, ml - 2)
-    after = substr(rest, ms + ml)
-    sub(/^ +/, "", after)
-    if (substr(after, 1, 1) != "(") { base += ms + ml - 1; rest = substr(rest, ms + ml); continue }
-    cp = index(after, ")")
-    if (cp == 0) { base += ms + ml - 1; rest = substr(rest, ms + ml); continue }
-    paren = substr(after, 2, cp - 2)
-    n = split_quoted(paren, names)
+    path = substr(rest, ms, ml)
+    bt = (ms > 1 && substr(rest, ms - 1, 1) == "`" && substr(rest, ms + ml, 1) == "`")
+    after = substr(rest, ms + ml + bt)
+    before = substr(rest, 1, ms - 1 - bt)
+    trimmed = after
+    sub(/^ +/, "", trimmed)
+    n = 0
+    form = ""
+    if (substr(after, 1, 3) == ", \"") {
+      form = "template"
+      n = names_from(substr(after, 3), names)
+    } else if (length(before) >= 5 && substr(before, length(before) - 4) == "\" in ") {
+      form = "template"
+      n = name_before(substr(before, 1, length(before) - 4), names)
+    } else if (bt && substr(trimmed, 1, 1) == "(") {
+      cp = index(trimmed, ")")
+      if (cp > 0) { form = "parenthetical"; n = split_quoted(substr(trimmed, 2, cp - 2), names) }
+    } else if (bt && substr(trimmed, 1, 9) == "section \"") {
+      form = "section"
+      n = names_from(substr(trimmed, 9), names)
+    } else if (bt && substr(trimmed, 1, 1) == "\"") {
+      form = "bare-quoted"
+      n = names_from(trimmed, names)
+    }
     if (n == 0) { base += ms + ml - 1; rest = substr(rest, ms + ml); continue }
 
     pointers++
+    if (form != "template" && !oldok) {
+      printf "UNRESOLVED\t%s:%d\t%s\twrite this %s citation as `%s`, \"%s\"\n",
+             curfile, lineof(base + ms), path, form, path, names[1]
+      bad = 1
+    }
     tgt = resolve(curfile, path)
     if (tgt == "") {
       printf "UNRESOLVED\t%s:%d\t%s\tno such file, from the root or from %s/\n",
@@ -209,6 +241,35 @@ function flush_file(   rest, base, path, names, n, i, tgt, nm, ms, ml,
 }
 
 function dirof(p,   d) { d = p; sub(/\/[^\/]*$/, "", d); return d }
+
+# The names that follow a template-form path: "A", then any further names
+# joined by " and ", ", and ", or ", ". Starts at the first quote.
+function names_from(s, out,   n, b, q) {
+  n = 0
+  while (substr(s, 1, 1) == "\"") {
+    b = index(substr(s, 2), "\"")
+    if (b == 0) break
+    q = substr(s, 2, b - 1)
+    if (q == "") break
+    out[++n] = q
+    s = substr(s, b + 2)
+    if (substr(s, 1, 6) == " and \"") s = substr(s, 6)
+    else if (substr(s, 1, 7) == ", and \"") s = substr(s, 7)
+    else if (substr(s, 1, 3) == ", \"") s = substr(s, 3)
+    else break
+  }
+  return n
+}
+
+# The one name of a "Name" in PATH.md citation: the quoted text that ends s.
+function name_before(s, out,   e, i) {
+  e = length(s)
+  if (substr(s, e, 1) != "\"") return 0
+  for (i = e - 1; i >= 1; i--) if (substr(s, i, 1) == "\"") break
+  if (i < 1 || e - i - 1 < 1) return 0
+  out[1] = substr(s, i + 1, e - i - 1)
+  return 1
+}
 
 # The quoted names inside a pointer's parenthetical. The path itself is
 # backtick-delimited, never quote-delimited, so it cannot be picked up here.
@@ -294,8 +355,8 @@ else
   checked="$(printf '%s\n' "$out" | awk -F'\t' '$1 == "CHECKED" { print $2 }')"
   if [ "${pointers:-0}" -eq 0 ]; then
     echo "  FAIL: ${#tracked[@]} Markdown files contain no prose section pointers"
-    echo "        at all. There were 34 when this lint was written, so the parse"
-    echo "        has broken rather than the tree having changed."
+    echo "        at all. The tree has dozens, so the parse has broken rather"
+    echo "        than the tree having changed."
     fail=1
   fi
   if [ "$rc" -ne 0 ]; then
@@ -358,6 +419,11 @@ self_check pointerfixture-wrapped.md      "OK"
 self_check pointerfixture-sibling.md      "OK"
 self_check pointerfixture-fenced.md       "OK"
 self_check pointerfixture-second-name.md  "no heading of that name"
+self_check pointerfixture-in-form.md      "OK"
+self_check pointerfixture-in-bad-heading.md "no heading of that name"
+self_check pointerfixture-old-parenthetical.md "write this parenthetical citation as"
+self_check pointerfixture-old-section.md  "write this section citation as"
+self_check pointerfixture-old-bare-quoted.md "write this bare-quoted citation as"
 
 echo
 if [ "$fail" -eq 0 ]; then

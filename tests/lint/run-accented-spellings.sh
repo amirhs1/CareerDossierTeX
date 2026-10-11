@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run-accented-spellings.sh — one ASCII spelling of `resume' (issue #543)
 #
-# `docs/NAMING-CONVENTION.md', "One ASCII spelling for a word that has one",
+# `CONTRIBUTING.md', "One ASCII spelling for a word that has one",
 # says an English word with an ordinary ASCII spelling is written that way even
 # where a loanword accent would be defensible. Before #543 the tree carried the
 # accented spelling of `resume' 225 times across 80 files while the class was
@@ -162,8 +162,7 @@ if [ -n "$hits" ]; then
   echo
   echo "  Each line above spells 'resume' with an accent. Write it in ASCII:"
   echo "    the resume class, a resume entry, Resume - <name>"
-  echo '  See docs/NAMING-CONVENTION.md, "One ASCII spelling for a word that'
-  echo '  has one".'
+  echo '  See CONTRIBUTING.md, "One ASCII spelling for a word that has one".'
   fail=1
 else
   echo "  none"

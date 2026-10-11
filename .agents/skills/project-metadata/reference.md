@@ -6,15 +6,15 @@ request**. It applies to every agent.
 
 The fields, their option ids, and the read-back obligation do not depend on
 which of the two objects carries them. Where a rule genuinely does depend on it,
-this file says so at that point; `.agents/skills/open-draft-pr/reference.md`
+this file says so at that point; `.agents/skills/open-pull-request/SKILL.md`
 holds what is PR-only — the close-out gate, the PR body, and the push.
 
 ## Project field values
 
 For a **newly opened draft pull request**:
 
-- **Status:** the in-progress option — `docs/NAMING-CONVENTION.md` "Project
-  Status convention" for what it means, the appendix's discovery query for how
+- **Status:** the in-progress option — `CONTRIBUTING.md`, "Project Status
+  convention", for what it means, the appendix's discovery query for how
   it is spelled
 - **Phase:** inherit from the focused issue
 - **Priority:** inherit from the focused issue
@@ -26,8 +26,8 @@ For a **newly filed issue**, the same four fields are required and only their
 sources differ:
 
 - **Status:** `Ready` when the issue is defined enough to start, `Backlog` when
-  it is accepted but not scheduled — `docs/NAMING-CONVENTION.md` "Project Status
-  convention" for the vocabulary
+  it is accepted but not scheduled — `CONTRIBUTING.md`, "Project Status
+  convention", for the vocabulary
 - **Phase:** the phase paired with the issue's milestone
 - **Priority:** judged from the work, since there is nothing to inherit from
 - **Size:** estimated, not measured — see "Sizing an item that has no diff yet"
@@ -78,7 +78,7 @@ Three cases the table does not cover:
 - **An issue closed `not_planned` has no diff to score.** Its `Size` is an
   estimate from the issue body, not a measurement — #395 (`M`) and #433
   (`XS`) are the current examples.
-- **`[epic]` and `[release]` issues do not follow this rule.** Copy the
+- **Epics and release-preparation issues do not follow this rule.** Copy the
   previous release's pair instead.
 
 **An issue takes the size of the PR that closed it**, except the three cases
@@ -108,8 +108,8 @@ inherited and its source has none, leave it unset and report it.
 
 ## Label selection
 
-Use only labels that already exist on the repository. Read them live rather than
-from any list in the tree:
+Use only the labels `CONTRIBUTING.md`, "Names", lists; they exist on the
+repository, and this command shows them live:
 
 ```bash
 gh label list --limit 100
@@ -117,10 +117,10 @@ gh label list --limit 100
 
 | Change | Labels |
 | --- | --- |
-| Public resume feature | `type:feature`, `area:resume` |
-| Contact-line bug | `type:bug`, `area:components` |
+| Public resume feature | `type:feat`, `area:resume` |
+| Contact-line bug | `type:fix`, `area:components` |
 | API documentation clarification | `type:docs`, `area:documentation` |
-| Typography implementation | `type:feature`, `area:typography` |
+| Typography implementation | `type:feat`, `area:typography` |
 | GitHub Actions change | `type:ci`, `area:build` |
 | Theme restructuring without behavior change | `type:refactor`, `area:theme` |
 | Agent instructions, skills, or workflow docs | `type:docs`, `area:agents` |
@@ -128,7 +128,7 @@ gh label list --limit 100
 
 An issue or a pull request may carry several area labels but should normally
 carry exactly one primary type label. An issue filed from `development.md`
-pre-applies no `type:*` label at all — that form spans five of them — so
+pre-applies no `type:*` label at all — that form spans six of them — so
 applying one is part of filing the issue, not an optional extra.
 
 The two `area:agents` rows differ by what the change *is*, not what it touches.
@@ -139,7 +139,7 @@ permitted to execute, which is closer to build and CI configuration.
 
 ## Status transitions
 
-`docs/NAMING-CONVENTION.md` "Project Status convention" is the canonical
+`CONTRIBUTING.md`, "Project Status convention", is the canonical
 statement of the `Status` vocabulary and of the issue and PR transitions through
 it — including which value a newly opened draft PR takes and when it changes.
 Read the value there; this skill does not restate it, and an answer derived from
@@ -149,7 +149,8 @@ Two cases that section leaves to this skill, because they are procedure rather
 than naming:
 
 - PR closed without merge → restore or preserve the appropriate issue status;
-- blocked work → add `blocked` and keep an appropriate non-`Done` status.
+- blocked work → keep an appropriate non-`Done` status, and say in the issue
+  what blocks it; there is no `blocked` label.
 
 Prefer GitHub Project workflows for deterministic transitions such as merged PRs
 and closed issues becoming `Done`. "Project Status convention" also carries the
@@ -177,7 +178,7 @@ Obtain explicit approval before:
 - creating or changing Project fields, allowed values, workflows, or views;
 - changing Phase or Priority contrary to the issue.
 
-Everything `AGENTS.md` ("Git") reserves to the maintainer is reserved here too.
+Everything `AGENTS.md`, "Git", reserves to the maintainer is reserved here too.
 That section states the action set; this list does not repeat it, and adds only
 the GitHub-object cases an agent meets while populating metadata.
 
@@ -197,9 +198,11 @@ what you intended to set — and confirm each of:
 - Size;
 - fields intentionally left unset and why.
 
-A pull request additionally confirms its URL and draft status, its base and head
-branches, and its focused issue; `.agents/skills/open-draft-pr/reference.md`
-("The four PR-only read-back items") carries those four and nothing else.
+A pull request additionally confirms four items, which
+`.agents/skills/open-pull-request/SKILL.md` lists too: its URL and draft status;
+its base and head branches; the focused issue its body links; and, when it
+scores `L`, its extra obligation — stay draft and recommend splitting, unless
+broad scope was already approved.
 
 A blank field in that read-back is unfinished work, not a reporting line. Fill
 it and read back again. The appendix has the queries, and reads the list back in
@@ -211,16 +214,16 @@ Which blanks are legitimate:
 
 - **Status, Size, assignee, and labels** are determinable from the item itself,
   so none of them may be left unset. `Status` comes from
-  `docs/NAMING-CONVENTION.md` "Project Status convention"; `Size` from "Size
-  guide" above — judged on the completed diff for a pull request, and predicted
+  `CONTRIBUTING.md`, "Project Status convention"; `Size` from "Size guide"
+  above — judged on the completed diff for a pull request, and predicted
   per "Sizing an item that has no diff yet" for a freshly filed issue.
 - **Milestone, Phase, and Priority** on a *pull request* are inherited and must
   not be invented. Each may stay blank, and only when the focused issue itself
   has none — in which case name the missing *issue* field, not the PR field.
   On an *issue* there is nothing to inherit from: the milestone is required by
-  `CONTRIBUTING.md` "Every issue carries a milestone" (with the one exception
-  that section names), and `Phase` follows the milestone.
-  `docs/NAMING-CONVENTION.md` "Phase numbering convention" defines it.
+  `CONTRIBUTING.md`, "1. Every issue carries a milestone" (with the one
+  exception that section names), and `Phase` follows the milestone.
+  `CONTRIBUTING.md`, "Phase numbering convention", defines it.
 
 A deliberately unmilestoned issue is the ordinary case for work the maintainer
 has postponed, and a PR against one inherits no milestone. Do not read the rule
@@ -231,12 +234,10 @@ If Project API access is unavailable, still set every field that is reachable
 without it. Report the exact fields that could not be updated rather than
 claiming completion.
 
-The read-back above is not a report of its own. `AGENTS.md` ("Report back")
-defines the one report shape, and this list is the metadata payload of its
-`Test criteria` section.
-Close with that report — seven sections, one verdict, covering the work as a
-whole and not only its metadata. Neither the shape nor the verdict wording is
-repeated here.
+The read-back above is not a report of its own. `AGENTS.md`, "Report back",
+defines the one report shape, and this list goes in its "2 Checks run" section,
+under the report's one verdict, which covers the work as a whole and not only
+its metadata.
 
 
 ## Appendix: gh command reference
@@ -264,7 +265,7 @@ branch.
 `gh api graphql` removes the id-discovery and per-field calls without removing
 anything the rules require: it batches inside one request, and it still reads
 every id and option string live in the same run, so nothing is cached into the
-tree. `CLAUDE.md` ("Sandbox and permissions") says why it is the only form that
+tree. `CLAUDE.md`, "Sandbox and permissions", says why it is the only form that
 batches here.
 
 The five steps below cost five calls, and with `gh label list` and `gh issue
@@ -447,9 +448,9 @@ two projects would otherwise be checked against whichever row came back first,
 which is the same class of mistake as writing a field to the wrong item.
 
 `halt_error(1)` prints the offending table to stderr and exits 1, so a mismatch
-cannot be read as a pass. Report the printed table; it is the metadata payload
-of the completion report's `Test criteria` section. The issue's own Status comes
-back in the same response and is confirmed the same way.
+cannot be read as a pass. Report the printed table in the report's "2 Checks
+run" section. The issue's own Status comes back in the same response and is
+confirmed the same way.
 
 ### Filing an issue instead
 
@@ -491,16 +492,18 @@ order is maintainer-curated.
 ### Read option strings live, never from prose
 
 The live Project is authoritative for the exact text and id of an option; this
-document and `docs/NAMING-CONVENTION.md` are authoritative for *which* option to
+document and `CONTRIBUTING.md` are authoritative for *which* option to
 choose and what it means. Those are different questions, and a transcription of
-the first into prose drifts silently — which is why step 1 exists and why no id
-or option string appears anywhere in this tree.
+the first into prose drifts silently — which is why step 1 exists, why no id
+appears anywhere in this tree, and why the option names `CONTRIBUTING.md`,
+"Project Status convention", lists are there for their meaning, never for a
+lookup.
 
 The casing is the part that bites, because the lookup is by name. A
 `select(.name=="In progress")` against an option actually called `In Progress`
 yields an empty option id. This exact mismatch existed between the Project and
-`docs/NAMING-CONVENTION.md` "Project Status convention" until 2026-08-04, when
-the documentation was corrected to match the Project; assume it can recur.
+the "Project Status convention" section until 2026-08-04, when the
+documentation was corrected to match the Project; assume it can recur.
 
 Under `gh project item-edit` that empty id set nothing and reported no error.
 Under step 4 it is a `VALIDATION` error — `The single select option Id does not
@@ -510,10 +513,10 @@ the safe direction: the silent failure became a loud one. It is still not a
 substitute for step 5, which is what catches a *valid* id written to the wrong
 row.
 
-So: take `Status` semantics from `docs/NAMING-CONVENTION.md` "Project Status
-convention" and `Phase` from "Phase numbering convention", take `Priority` and
-`Size` from "Project field values" above, and take every literal option string
-and id from step 1.
+So: take `Status` semantics from `CONTRIBUTING.md`, "Project Status
+convention", and `Phase` from its "Phase numbering convention", take `Priority`
+and `Size` from "Project field values" above, and take every literal option
+string and id from step 1.
 
 ### Re-measuring the Size fit
 

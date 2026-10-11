@@ -1,18 +1,18 @@
 ---
 name: Epic
 about: Group work that genuinely decomposes into several issues
-title: "[epic] Release vX.Y.Z release goal"
+title: "[area] "
 labels: ""
 assignees: ""
 ---
 
 <!--
-Title form: `docs/NAMING-CONVENTION.md`, "Epic issue titles".
+Title and labels: `CONTRIBUTING.md`, "Names"; an epic is titled as an issue.
 Open an epic only for work that genuinely decomposes into several issues —
 a release epic, or a cross-cutting effort spanning more than one class or
-package. `CONTRIBUTING.md` "Work item structure" is canonical for when an epic
+package. `CONTRIBUTING.md`, "Work item structure", is canonical for when an epic
 is warranted. Apply one `type:*` label and the relevant `area:*` labels from
-`gh label list --limit 100`; there is no epic-specific label.
+"Names"; there is no epic-specific label.
 -->
 
 ## Goal

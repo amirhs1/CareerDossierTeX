@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # run-section-sign.sh — no SECTION SIGN in tracked files (issue #520)
 #
-# `docs/NAMING-CONVENTION.md', "Markdown headings carry no section number",
-# says a cross-reference names its heading rather than numbering it, and gives
-# the form: `path' section "Heading". Before #520 the tree carried four
+# `CONTRIBUTING.md', "Documentation heading convention", says a cross-reference
+# names its heading rather than numbering it, and gives
+# the form: `path', "Heading". Before #520 the tree carried four
 # spellings of that join at once -- U+00A7 with a quoted heading (12 lines, the
 # de-facto form since #502), U+00A7 with a number against an external document
 # (11 lines), U+00A7 as a bare noun in the rule itself, and a plain comma in
@@ -80,9 +80,8 @@ if [ -n "$hits" ]; then
   echo "$hits" | sed 's/^/  /'
   echo
   echo "  Each line above carries U+00A7. Cite the heading instead:"
-  echo '    `docs/TESTING.md` section "Coverage expectations"'
-  echo "  See docs/NAMING-CONVENTION.md, \"Markdown headings carry no section"
-  echo "  number\"."
+  echo '    `docs/TESTING.md`, "Coverage expectations"'
+  echo "  See CONTRIBUTING.md, \"The section sign is banned outright\"."
   fail=1
 else
   echo "  none"
