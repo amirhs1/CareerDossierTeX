@@ -6,7 +6,7 @@ request**. It applies to every agent.
 
 The fields, their option ids, and the read-back obligation do not depend on
 which of the two objects carries them. Where a rule genuinely does depend on it,
-this file says so at that point; `.agents/skills/open-draft-pr/reference.md`
+this file says so at that point; `.agents/skills/open-pull-request/SKILL.md`
 holds what is PR-only — the close-out gate, the PR body, and the push.
 
 ## Project field values
@@ -198,9 +198,11 @@ what you intended to set — and confirm each of:
 - Size;
 - fields intentionally left unset and why.
 
-A pull request additionally confirms its URL and draft status, its base and head
-branches, and its focused issue; `.agents/skills/open-draft-pr/reference.md`
-("The four PR-only read-back items") carries those four and nothing else.
+A pull request additionally confirms four items, which
+`.agents/skills/open-pull-request/SKILL.md` lists too: its URL and draft status;
+its base and head branches; the focused issue its body links; and, when it
+scores `L`, its extra obligation — stay draft and recommend splitting, unless
+broad scope was already approved.
 
 A blank field in that read-back is unfinished work, not a reporting line. Fill
 it and read back again. The appendix has the queries, and reads the list back in
@@ -233,11 +235,9 @@ without it. Report the exact fields that could not be updated rather than
 claiming completion.
 
 The read-back above is not a report of its own. `AGENTS.md` ("Report back")
-defines the one report shape, and this list is the metadata payload of its
-`Test criteria` section.
-Close with that report — seven sections, one verdict, covering the work as a
-whole and not only its metadata. Neither the shape nor the verdict wording is
-repeated here.
+defines the one report shape, and this list goes in its "2 Checks run" section,
+under the report's one verdict, which covers the work as a whole and not only
+its metadata.
 
 
 ## Appendix: gh command reference
@@ -448,9 +448,9 @@ two projects would otherwise be checked against whichever row came back first,
 which is the same class of mistake as writing a field to the wrong item.
 
 `halt_error(1)` prints the offending table to stderr and exits 1, so a mismatch
-cannot be read as a pass. Report the printed table; it is the metadata payload
-of the completion report's `Test criteria` section. The issue's own Status comes
-back in the same response and is confirmed the same way.
+cannot be read as a pass. Report the printed table in the report's "2 Checks
+run" section. The issue's own Status comes back in the same response and is
+confirmed the same way.
 
 ### Filing an issue instead
 
@@ -494,8 +494,10 @@ order is maintainer-curated.
 The live Project is authoritative for the exact text and id of an option; this
 document and `CONTRIBUTING.md` are authoritative for *which* option to
 choose and what it means. Those are different questions, and a transcription of
-the first into prose drifts silently — which is why step 1 exists and why no id
-or option string appears anywhere in this tree.
+the first into prose drifts silently — which is why step 1 exists, why no id
+appears anywhere in this tree, and why the option names `CONTRIBUTING.md`
+("Project Status convention") lists are there for their meaning, never for a
+lookup.
 
 The casing is the part that bites, because the lookup is by name. A
 `select(.name=="In progress")` against an option actually called `In Progress`

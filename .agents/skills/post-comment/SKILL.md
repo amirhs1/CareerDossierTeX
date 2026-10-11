@@ -1,21 +1,18 @@
 ---
 name: post-comment
-description: Post a short comment on an issue or pull request, in the short report form. Use when asked to reply or comment.
+description: Post a short comment on a GitHub issue or pull request. Use when asked to reply to, comment on, or revise your comment on an issue or pull request, not for comments in code.
 ---
 
 # Post a comment
 
 1. Comment only on the issue or pull request the person running you named.
-2. Write the comment in the short form `AGENTS.md` ("Report back") gives:
-
-   ```text
-   <Answer in one or two sentences.>
-   Based on: <files read or commands run>
-   Open: <anything unverified, or None>
-   ```
-
-3. Cite evidence as `path:line` or `command → result`. Include no secrets or
-   personal data.
-4. Write the body to a file outside the repository, and post it with
-   `gh issue comment <n> --body-file <file>` or
-   `gh pr comment <n> --body-file <file>`. Then give the short chat report.
+2. Give the answer first, in the short form AGENTS.md, "Report back", gives:
+   the answer in one or two sentences, then its `Based on:` and `Open:` lines.
+   Cite evidence as `path:line` or `command → result`. Include no secrets or
+   personal data. End with your trailer block, as AGENTS.md, "Provenance",
+   gives it.
+3. Write the body to a file outside the repository, by absolute path, and post
+   it with `gh issue comment <n> --body-file <file>` or
+   `gh pr comment <n> --body-file <file>`.
+4. To revise your last comment there, run the same command with
+   `--edit-last`.

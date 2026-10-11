@@ -226,8 +226,8 @@ exceptions in "Every pull request links an issue" above.
 
 An issue has two halves. A form in `.github/ISSUE_TEMPLATE/` fills the body;
 it cannot set the Project fields, which are required too. `AGENTS.md`
-("Settled decisions") records that division, and why a pull request
-additionally needs a skill where an issue does not.
+("Settled decisions") records that division: the form supplies the body, and
+the `open-issue` skill the procedure around it, fields included.
 
 A good implementation issue explains:
 
@@ -406,7 +406,9 @@ git commit -m "feat(resume): add initial English resume class"
 git push -u origin feat/resume-class
 ```
 
-Open a draft pull request early when the work is incomplete but ready for CI or design discussion.
+A person may open a draft pull request early, when the work is incomplete but
+ready for CI or design discussion. An agent pushes only a close-out-complete
+branch, as `AGENTS.md` ("Git") says.
 
 Keep the branch focused, on the terms "Every pull request comes from a focused
 branch" sets out above.
@@ -932,7 +934,8 @@ Its title, in the form "Names" sets, describes the whole branch rather than any
 one commit. Do not close an epic from an early implementation pull request;
 close the focused sub-issue instead.
 
-Use draft pull requests when implementation is incomplete.
+A person uses a draft pull request while implementation is incomplete; an
+agent opens every pull request as a draft, from a close-out-complete branch.
 
 ### Self-review checklist
 
