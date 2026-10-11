@@ -23,34 +23,29 @@ Read:
 
 Do not implement a planned feature as though it is already part of the current release. Confirm that it belongs to the active milestone.
 
+Large, unrequested, or unreviewed generated changes may be closed without a
+line-by-line review. Open or claim a focused issue first for substantial work.
+
 ## AI-assisted contributions
 
 AI coding assistants are welcome. The maintainer uses them, and the repository
 publishes an [`AI-POLICY.md`](AI-POLICY.md) and agent contract (`AGENTS.md`) for
 that reason. An AI-assisted contribution is held to the same standard as any
-other contribution.
+other contribution. The rules most often missed:
 
-**Disclose material assistance.** If an agent or model wrote or substantially
-shaped code, tests, documentation, or other submitted content, fill in the
-`AI assistance` section of the pull-request template. `AI-POLICY.md`
-("Disclosure") is normative for what that section must contain and how it
-relates to commit trailers; neither is repeated here. A short statement is
-enough, and it must not include prompts, private reasoning, secrets, or personal
-data.
+Own what you submit. Before opening the pull request:
 
-**Own what you submit.** Before opening the pull request:
-
-- read and understand the change, and be prepared to explain it and respond to
+- Read and understand the change, and be prepared to explain it and respond to
   review feedback;
-- meet the same `tests/` obligation as any behavior change and actually run
+- Meet the same `tests/` obligation as any behavior change and actually run
   every check you claim passed;
-- verify citations, links, and factual claims against primary sources; and
-- confirm that no code, prose, font, image, data, or other asset has uncertain
-  provenance or a license incompatible with LPPL v1.3c or later (see
-  "Licensing contributions").
+- Say in the pull request which AI tools you used and for what.
+- Write issues, pull request descriptions, and replies in your own words. If
+  an AI agent writes them for you, you answer for every word, and its text
+  ends with its `Assisted-by:` trailer, with `not recorded` for an unknown
+  model.
 
-Large, unrequested, or unreviewed generated changes may be closed without a
-line-by-line review. Open or claim a focused issue first for substantial work.
+Pull requests that don't follow the policy may be closed without review.
 
 ### Setup
 
