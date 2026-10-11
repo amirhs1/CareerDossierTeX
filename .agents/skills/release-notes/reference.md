@@ -185,12 +185,11 @@ gh release view vX.Y.Z --json body -q .body
 # https://github.com/amirhs1/CareerDossierTeX/compare/vPREV...vX.Y.Z
 
 # Maintainer-authorized only: create a draft release from a notes file
-gh release create vX.Y.Z --draft --title "CareerDossierTeX vX.Y.Z — Release Name" \
+gh release create vX.Y.Z --draft --title vX.Y.Z \
   --notes-file <notes.md>
 
 # Maintainer-authorized only: publish a previously drafted release
 gh release edit vX.Y.Z --draft=false
 ```
 
-Release titles follow `docs/NAMING-CONVENTION.md`:
-`CareerDossierTeX vX.Y.Z — Release Name`.
+Release titles follow `CONTRIBUTING.md` ("Names"): `vX.Y.Z`.

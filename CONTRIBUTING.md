@@ -3,9 +3,8 @@
 Thank you for helping improve CareerDossierTeX.
 
 For people changing the code: how to propose, build, test, and submit a change.
-[`docs/NAMING-CONVENTION.md`](docs/NAMING-CONVENTION.md) owns the naming rules
-this file refers to, and [`AGENTS.md`](AGENTS.md) is the equivalent contract for
-AI coding agents.
+"Names" below owns the naming rules, and [`AGENTS.md`](AGENTS.md) is the
+equivalent contract for AI coding agents.
 
 This project uses focused issues, short-lived branches, pull requests, repeatable LuaLaTeX builds, and incremental releases. The goal is not process for its own sake; the goal is a repository whose behavior and history remain understandable.
 
@@ -112,9 +111,10 @@ work with no scheduled release, or a proposal whose home has not been chosen.
 Such an issue stays unmilestoned rather than take a milestone that would
 misstate the plan, and it stays invisible to release planning on purpose until
 that decision is made. Do not invent a placeholder milestone for it, and do not
-park it in the furthest-out open milestone. `docs/NAMING-CONVENTION.md`
-"Milestone naming convention" names the issues that currently qualify; anything
-unmilestoned beyond those is an oversight.
+park it in the furthest-out open milestone.
+`gh issue list --state open --search "no:milestone"` lists the issues that
+currently qualify; each records why its release is undecided, and an
+unmilestoned issue without that reason is an oversight.
 
 An **epic parent** is for work that genuinely decomposes into several issues — a
 release epic, or a cross-cutting effort spanning more than one class or package.
@@ -154,6 +154,71 @@ A branch has no deadline: it lives until it merges or is closed, and the
 `Protect Main` ruleset already requires it to be up to date with `main` before
 it merges. Bring it up to date by merging `main` into it; once review has
 begun, do not rebase it.
+
+## Names
+
+Two axes name every change. _Type_, the kind of change, is one word list, used
+unchanged as the branch prefix, the commit type, the pull request title's
+type, and the label `type:<word>`. _Area_, the part of the repository, is one
+list, used unchanged as the commit scope, the issue title's bracket, and the
+label `area:<word>`. Scope and area are one list.
+
+```text
+types: feat fix docs test refactor ci chore release
+areas: core tokens typography theme components bibliography resume letter cv statement i18n build documentation agents
+```
+
+| Area                                  | Covers                                                                                         |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `core`                                | `careerdossier-base.sty`: profile metadata, keys, validation                                   |
+| `tokens`                              | `careerdossier-tokens.sty`: type scale, vertical rhythm, lists, page geometry                  |
+| `typography`                          | `careerdossier-typography.sty`: engine guard, fonts, semantic text roles                       |
+| `theme`                               | `careerdossier-theme.sty`: colour, rule, and link tokens                                       |
+| `components`                          | `careerdossier-components.sty`: shared document parts, links, PDF metadata                     |
+| `bibliography`                        | `careerdossier-biblatex.sty` and the BibLaTeX and Biber path                                   |
+| `resume`, `letter`, `cv`, `statement` | each class, its layout, and its examples                                                       |
+| `i18n`                                | document language and translated strings                                                       |
+| `build`                               | `Makefile`, `build.lua`, the test harness and lints, `.github/workflows/`                      |
+| `documentation`                       | `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `doc/`, `docs/`, the issue and pull request templates |
+| `agents`                              | `AGENTS.md`, `CLAUDE.md`, `AI-POLICY.md`, `.agents/`, `.claude/`, `.githooks/`, `.gitmessage`  |
+
+A test for one module takes that module's area.
+
+| Name                          | Form                                        |
+| ----------------------------- | ------------------------------------------- |
+| Branch                        | `<type>/<short-name>`, with no issue number |
+| Commit and pull request title | `<type>(<area>): <imperative summary>`      |
+| Issue title                   | `[<area>] <imperative summary>`             |
+| Epic                          | A parent issue, titled as an issue          |
+| Milestone                     | `v<MAJOR>.<MINOR>.<PATCH>`, the release     |
+| Tag and release title         | `v<MAJOR>.<MINOR>.<PATCH>`                  |
+
+A short name is a few lowercase words joined by hyphens. Pick the type for the
+main purpose of the work.
+
+Labels combine: one `type:` plus one or more `area:`. There are no
+combination labels. Status, priority, and release are not labels. Three labels
+sit outside the two axes: `breaking-change`, `technical-debt`, and
+`help-wanted`.
+
+Issue templates set a default type: `type:fix` for a bug report, `type:feat`
+for a feature request; the development and epic templates set none.
+
+### Where these names are used
+
+- `.gitmessage`
+- `.github/pull_request_template.md`
+- `.github/ISSUE_TEMPLATE/*`
+- `.agents/skills/create-branch/SKILL.md`,
+  `.agents/skills/draft-release/SKILL.md`,
+  `.agents/skills/open-issue/SKILL.md`,
+  `.agents/skills/open-pull-request/SKILL.md`,
+  `.agents/skills/write-commit/SKILL.md`
+- `.agents/skills/project-metadata/SKILL.md`,
+  `.agents/skills/project-metadata/reference.md`
+- `AGENTS.md`, "Git"
+
+Each of these cites this section.
 
 ## Issue workflow
 
@@ -252,17 +317,59 @@ Describe:
 
 Public API proposals should include example LaTeX syntax before implementation begins.
 
-## Branch naming
+### Project Status convention
 
-Use:
+The Project `Status` field holds workflow state. Its options, in the Project's
+own order:
 
-```text
-type/short-description
-```
+| Status      | Meaning                                            |
+| ----------- | -------------------------------------------------- |
+| Backlog     | Accepted but not ready or not currently scheduled  |
+| Ready       | Defined enough to start                            |
+| In Progress | Active branch or implementation exists             |
+| Done        | Merged, closed, or otherwise completed             |
+| In review   | Pull request is open and awaiting checks or review |
 
-`docs/NAMING-CONVENTION.md` "Branch naming convention" is the canonical list
-of allowed prefixes
-and worked examples; it is not reproduced here.
+Option lookup is by name, so copy an option's exact string from the Project,
+never from this table; `.agents/skills/project-metadata/reference.md`
+("Read option strings live, never from prose") says how.
+
+- A parent epic can be `In Progress` while its release is active; its
+  sub-issues move through the workflow individually.
+- A newly opened draft pull request is `In Progress`: it is still active work,
+  not yet a review request. It becomes `In review` only once the maintainer
+  marks it ready, so draft status decides where both meanings read as true.
+  This is the only statement of the rule; the skills defer here.
+- Merged pull requests and closed issues become `Done`.
+
+### Phase numbering convention
+
+Phases group releases into stages of the product plan. The Project `Phase`
+field is canonical; its options carry a number and a short label, such as
+`Phase 2 — Academic`. `docs/ROADMAP.md` follows that numbering, and its headings
+keep a longer form keyed to the release version. Only the numbers must agree.
+
+- Every shipped major or minor release has its own phase: `vX.0.0` and `v0.Y.0`
+  each get one `Phase` option and one `docs/ROADMAP.md` phase heading.
+- A patch release has no phase of its own. Its issues carry the phase of the
+  minor release they correct, and it gets a row in the `docs/ROADMAP.md`
+  "Releases and phases" table but no heading.
+- A release that never ships has no phase number, and is referred to by name:
+  `v0.3.0` gave up `Phase 3` when it was dropped, and `v1.1.0` closed empty
+  without one.
+- A phase may exist with no milestone, as `Phase 0 — Inventory` does. Do not
+  create a milestone to give an existing phase a release.
+- To add, drop, or reorder a phase, change the Project field first, then
+  `docs/ROADMAP.md`: its phase heading and its "Releases and phases" table,
+  which is the cross-walk.
+- A `Phase` option's description is identity only, in the shape
+  `<what the phase is>. <release(s)>. docs/ROADMAP.md "Phase N" is canonical.`
+  The option lives outside the repository, where no pull request or lint
+  reaches it, so scope and renumbering history stay in `docs/ROADMAP.md`
+  (#477).
+- After a renumbering, check `git grep -nE "Phase [0-9]"`: references to
+  `Phase 0`, `Phase 1`, and `Phase 2` are stable, but any higher number outside
+  `docs/ROADMAP.md` needs review.
 
 ## Standard branch workflow
 
@@ -313,9 +420,7 @@ Use a lightweight Conventional Commits format:
 type(scope): imperative summary
 ```
 
-`docs/NAMING-CONVENTION.md` "Commit message convention" is the canonical list
-of types and
-worked examples; it is not reproduced here.
+"Names" above sets the types and scopes.
 
 Each commit should represent one coherent change. Avoid combining unrelated API, typography, CI, and documentation edits in one commit.
 
@@ -603,6 +708,69 @@ order to stop — those stay, and the rest is evidence for them. Check with
 cutting it from the document, because several issues do not carry their own
 (#479).
 
+### Documentation heading convention
+
+Number a heading only where a tool generates the number. The PDF manual,
+`doc/careerdossier.tex`, is numbered: LaTeX numbers its sections and resolves
+every `\ref`, so inserting a section renumbers each citation of it in the same
+build. Markdown headings carry no section number. There a number is typed by
+hand in the heading and again in every citation, and GitHub bakes it into the
+anchor, so inserting one heading silently breaks every link below it (#447).
+
+A Markdown cross-reference names the heading, joined by the literal word
+`section`, which does not vary with the heading's depth:
+
+```text
+Correct:   `docs/ATS-EXTRACTION.md` section "Dates and right alignment"
+Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7>3.4
+Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7> "Dates and right alignment"
+Incorrect: `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
+```
+
+`<U+00A7>` stands for the section sign, which no tracked file contains (see
+"The section sign is banned outright" below).
+
+A generator would reopen the question: if Sphinx, mdBook, or Bikeshed ever
+builds `docs/`, the generator owns the number and numbering becomes defensible.
+Three things sit outside the rule: `CHANGELOG.md`, whose headings are versions
+and whose shipped entries stay as written, with only their links repointed when
+a heading moves (#259, #263); Phase numbers, which are a Project field; and a
+heading's release stamp, which belongs in the body under the heading.
+
+`tests/lint/run-markdown-anchors.sh` fails when a `](TARGET.md#anchor)` names a
+heading that no longer exists, and `tests/lint/run-prose-pointers.sh` when a
+prose pointer quotes a section name that no longer exists.
+
+### The section sign is banned outright
+
+U+00A7 SECTION SIGN appears in no tracked file, commit message, issue body, or
+pull request body: not before a number, not before a quoted heading, and not as
+a noun. `tests/lint/run-section-sign.sh`, which `make lint` runs, fails naming
+every file and line that carries it. The ban covers the character, not a
+spelling of it, because an exception list let four forms coexist until #520,
+and a contributor copying the nearest example never reads the exception.
+
+A citation of an external numbered document spells the word out, as in Common
+Changelog's `section 2.4.1`. Git history, closed issues, and merged pull request
+bodies stay as written; nothing in the repository can lint prose typed into
+GitHub, so there the rule is the only mechanism.
+
+### One ASCII spelling for a word that has one
+
+An English word with an ordinary ASCII spelling is written that way in every
+tracked file, even where a loanword accent is defensible: `resume` and
+`Resume`, never with an acute accent on either `e` (#543).
+`tests/lint/run-accented-spellings.sh`, which `make lint` runs, fails naming
+every file and line that carries an accented spelling, precomposed or
+decomposed.
+
+The ban covers the word, not the accent. An accented character that carries
+meaning is data and stays: the names under `tests/extraction/`, such as
+`Montréal`, `Zoë`, and `Dvořák`, are the subject under test, and none contains
+the letters the lint searches for, so it needs no exception list. Prose about
+the document genre is unaffected, and Git history, closed issues, and merged
+pull request bodies stay as written.
+
 ### Update the manual (`doc/careerdossier.tex`) when:
 
 - a public command is added, changed, or removed;
@@ -760,6 +928,10 @@ A pull request should include:
 - testing performed, including the expected pre-fix failure when demonstrated;
 - visual verification when layout changed;
 - decisions, risks, and follow-up work.
+
+Its title, in the form "Names" sets, describes the whole branch rather than any
+one commit. Do not close an epic from an early implementation pull request;
+close the focused sub-issue instead.
 
 Use draft pull requests when implementation is incomplete.
 

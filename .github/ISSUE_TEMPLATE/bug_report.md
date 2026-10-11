@@ -2,9 +2,11 @@
 name: Bug report
 about: Report a reproducible LaTeX, layout, or build problem
 title: "[area] "
-labels: "type:bug"
+labels: "type:fix"
 assignees: ""
 ---
+
+<!-- Title and labels: CONTRIBUTING.md ("Names"). -->
 
 ## Problem
 

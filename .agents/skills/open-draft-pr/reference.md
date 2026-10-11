@@ -19,7 +19,7 @@ restated here.
 Before setting metadata, inspect:
 
 1. the focused issue;
-2. `docs/NAMING-CONVENTION.md`;
+2. `CONTRIBUTING.md` ("Names");
 3. the issue's milestone;
 4. the issue's current Project fields;
 5. existing PR metadata when updating a PR.
@@ -98,7 +98,7 @@ Confirm:
   from the branch's real trailers;
 - no generated artifacts, secrets, private data, or unrelated changes are included;
 - API, docs, design, and accessibility impacts are documented;
-- the PR title follows `docs/NAMING-CONVENTION.md`.
+- the PR title follows `CONTRIBUTING.md` ("Names").
 
 Nothing on this list may be deferred to a follow-up commit after the push, and
 green CI discharges none of it.

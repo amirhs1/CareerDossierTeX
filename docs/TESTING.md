@@ -666,8 +666,8 @@ file's own directory, because both forms are in use.
 ### Section-sign lint
 
 `tests/lint/run-section-sign.sh` — no tracked file contains U+00A7 SECTION
-SIGN. A cross-reference names its heading instead, per
-`docs/NAMING-CONVENTION.md` section "Documentation heading convention". The ban
+SIGN. A cross-reference names its heading instead, per `CONTRIBUTING.md`
+section "Documentation heading convention". The ban
 is over the character rather than over a spelling of it, so the check needs no
 exception list — including for its own source, which builds the pattern from
 bytes rather than writing the character. Control 1 plants an occurrence in a

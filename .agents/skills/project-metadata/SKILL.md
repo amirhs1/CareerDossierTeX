@@ -9,7 +9,8 @@ Read and follow, in order:
 
 1. `AGENTS.md`
 2. `reference.md`, alongside this file
-3. `docs/NAMING-CONVENTION.md`
+3. `CONTRIBUTING.md` ("Names", "Project Status convention", and "Phase
+   numbering convention")
 4. the item's own current metadata, read live
 
 ## What this skill owns
@@ -31,7 +32,7 @@ for an issue this skill is the whole procedure.
    option lookup is by name and a transcription that has drifted resolves to no
    option id.
 2. Determine each value from `reference.md` ("Project field values"): `Status`
-   from `docs/NAMING-CONVENTION.md` "Project Status convention", `Phase` and
+   from `CONTRIBUTING.md` ("Project Status convention"), `Phase` and
    `Priority` inherited, `Size` from the "Size guide".
 3. Apply the labels `reference.md` ("Label selection") calls for — one primary
    `type:*`, every relevant `area:*` — from `gh label list --limit 100`.

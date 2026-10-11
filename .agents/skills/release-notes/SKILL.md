@@ -24,9 +24,8 @@ Read and follow, in order:
    `reference.md` ("CHANGELOG.md at release time") says.
 4. Draft the GitHub Release body using the structure and worked examples in
    `reference.md`. Keep it a selective announcement, not a restated CHANGELOG.
-   Tags are `vX.Y.Z`, and a release is titled
-   `CareerDossierTeX vX.Y.Z — Release Name`, after its milestone
-   `vX.Y.Z — Release Name`.
+   Tags, release titles, and milestones are all `vX.Y.Z`, as `CONTRIBUTING.md`
+   ("Names") sets them.
 5. Run the LaTeX-package compatibility checklist (engine support,
    `\ProvidesExpl*` version/date sync, public API changes, output-affecting
    changes, dependency changes, unvalidated-scope disclaimers).

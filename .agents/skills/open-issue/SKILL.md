@@ -27,15 +27,15 @@ procedure around them, and `project-metadata` sets the fields.
 4. The reason comes from the person who asked, or from the evidence; never
    invent it. Mark wording you drafted as a proposal, and include no secrets
    or personal data.
-5. Title: `[area] Verb object`, in the imperative; an epic is
-   `[epic] Release vX.Y.Z goal`.
+5. Title: as `CONTRIBUTING.md` ("Names") sets it; an epic is titled as an
+   issue.
 6. Milestone: every issue carries one, unless its release is genuinely
    undecided (today only #120); never invent a placeholder milestone. Give an
    issue an epic parent only when the work genuinely decomposes into several
    issues.
 7. Labels: one primary `type:*` label and every relevant `area:*` label, from
-   `gh label list --limit 100`, which defines them. The development form
-   applies no `type:*` label itself.
+   `CONTRIBUTING.md` ("Names"). The development form applies no `type:*`
+   label itself.
 8. Unless the person running you asked you to create it directly, show them
    the title and body first.
 9. Create it with the body in a file outside the repository:

@@ -261,8 +261,7 @@ improvements separately.
 - You may open issues and pull requests, write commits, and post comments. The
   person running you is responsible for what you submit.
 - Work on one focused issue per branch, branched from an up-to-date `main` and
-  named `type/short-description`: lowercase and hyphenated, with `type` one of
-  `feat`, `fix`, `docs`, `test`, `ci`, `refactor`, `release`, or `chore`. Once
+  named as `CONTRIBUTING.md` ("Names") sets it, with no issue number. Once
   review has begun, bring the branch up to date by merging `main` into it, and
   do not amend, rebase, or force-push published commits unless asked.
 - Push only the focused branch, and only when it is close-out-complete. Green
@@ -362,4 +361,4 @@ Background and detail. Nothing here adds a rule to this file.
 | Build, test harness, or CI                           | `CONTRIBUTING.md` ("Local builds"), `docs/TESTING.md`, `.github/workflows/build.yml`                                                      |
 | Agent tooling, skills, or sandbox                    | `AI-POLICY.md`, `CLAUDE.md`, `.agents/skills/`                                                                                            |
 | Release, `CHANGELOG.md`, or CTAN packaging           | `.agents/skills/release-notes/reference.md`, `docs/ROADMAP.md`, `docs/RELEASE-CHECKLIST.md`                                               |
-| Issues, names, labels, and Project fields            | `CONTRIBUTING.md` ("Issue workflow"), `docs/NAMING-CONVENTION.md`                                                                         |
+| Issues, names, labels, and Project fields            | `CONTRIBUTING.md` ("Names" and "Issue workflow")                                                                                          |

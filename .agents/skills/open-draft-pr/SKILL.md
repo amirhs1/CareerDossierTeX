@@ -10,7 +10,7 @@ Read and follow, in order:
 1. `AGENTS.md`
 2. `reference.md`, alongside this file
 3. `.agents/skills/project-metadata/`, which owns every field this skill sets
-4. `docs/NAMING-CONVENTION.md`
+4. `CONTRIBUTING.md` ("Names")
 5. the focused GitHub issue and its current Project metadata
 
 ## When this runs

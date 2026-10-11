@@ -7,10 +7,11 @@ assignees: ""
 ---
 
 <!--
-Apply one `type:*` label from `gh label list --limit 100` — `type:docs`,
-`type:test`, `type:refactor`, `type:ci`, or `type:release` — and the relevant
-`area:*` labels. This form pre-applies none, because the kind varies; the
-bug and feature forms can pre-apply one because theirs does not.
+Title and labels: CONTRIBUTING.md ("Names"). Apply one `type:*` label —
+`type:docs`, `type:test`, `type:refactor`, `type:ci`, `type:chore`, or
+`type:release` — and the relevant `area:*` labels. This form pre-applies none,
+because the kind varies; the bug and feature forms can pre-apply one because
+theirs does not.
 
 For a user-visible feature use `feature_request.md`; for a reproducible defect
 use `bug_report.md`; for work that genuinely decomposes into several issues use

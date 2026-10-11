@@ -2,9 +2,11 @@
 name: Feature
 about: Propose or implement a scoped feature
 title: "[area] "
-labels: "type:feature"
+labels: "type:feat"
 assignees: ""
 ---
+
+<!-- Title and labels: CONTRIBUTING.md ("Names"). -->
 
 ## Goal
 
