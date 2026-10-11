@@ -36,9 +36,9 @@ other contribution. The rules most often missed:
 Own what you submit. Before opening the pull request:
 
 - Read and understand the change, and be prepared to explain it and respond to
-  review feedback;
+  review feedback.
 - Meet the same `tests/` obligation as any behavior change and actually run
-  every check you claim passed;
+  every check you claim passed.
 - Say in the pull request which AI tools you used and for what.
 - Write issues, pull request descriptions, and replies in your own words. If
   an AI agent writes them for you, you answer for every word, and its text
