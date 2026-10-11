@@ -137,6 +137,24 @@ hand-written checker that motivated #559 read only the first name of each
 citation and reported the tree clean, so this fixture fails any
 reimplementation that regresses to counting pointers instead of resolutions.
 
+## Layout fixtures
+
+`layoutfixture-*.txt` pin the verdicts of `tests/lint/run-agents-layout.sh`
+(issue #584). Each one is a "Layout" section compared against the same
+`layoutfixture-manifest.txt`, whose second group opens with a prose paragraph
+and whose "Not distributed" group holds a line shaped like an entry: neither
+may be read as one. The files are `.txt`, not `.md`, so the Markdown lints do
+not read them as documents.
+
+| Fixture | Expected verdict |
+| --- | --- |
+| `layoutfixture-ok.txt` | `OK` |
+| `layoutfixture-missing.txt` | `missing from "Layout": LICENSE` |
+| `layoutfixture-extra.txt` | `not in manifest.txt: CLAUDE.md` |
+| `layoutfixture-wrong-group.txt` | `missing from "Layout": README.md, under "Distributed with the Work"` |
+| `layoutfixture-order.txt` | `same entries in another order` |
+| `layoutfixture-empty.txt` | `no entries parsed` |
+
 ## Commit-message hook fixtures
 
 `commitfixture-*.txt` pin the verdicts of `tests/lint/run-commit-msg-hook.sh`

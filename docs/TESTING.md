@@ -669,6 +669,16 @@ not just the first — one citation can carry two. Paths resolve against the
 repository root, then against the citing file's own directory, because both are
 in use.
 
+### Layout lint
+
+`tests/lint/run-agents-layout.sh` — `AGENTS.md`, "Layout" lists the paths of
+`manifest.txt`'s two groups, "The Work" and "Distributed with the Work", in the
+same groups and order (#584). Descriptions are not compared, and the
+"Repository only" group has no counterpart. An entry is recognised by its
+shape, a path followed by two or more spaces and a description, so the prose
+that opens a group is not read as one. Six fixtures pin the verdicts against
+one shared fixture manifest.
+
 ### Section-sign lint
 
 `tests/lint/run-section-sign.sh` — no tracked file contains U+00A7 SECTION

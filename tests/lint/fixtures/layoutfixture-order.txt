@@ -1,0 +1,24 @@
+# Fixture
+
+## Layout
+
+Introductory text.
+
+```text
+The Work
+manifest.txt                  defines the Work
+careerdossier-base.sty        shared profile metadata
+
+Distributed with the Work
+README.md                     overview
+LICENSE                       the licence text
+doc/careerdossier.tex         the user manual, described
+                              across two lines
+
+Repository only
+CLAUDE.md                     not in the manifest, and not compared
+```
+
+## Next section
+
+Not read.

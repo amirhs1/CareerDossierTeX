@@ -1,0 +1,29 @@
+Fixture manifest for tests/lint/run-agents-layout.sh
+====================================================
+
+Prose before the groups is not read.
+
+
+The Work
+--------
+
+manifest.txt                  this file; defines the Work
+careerdossier-base.sty        shared profile metadata
+
+
+Distributed with the Work
+-------------------------
+
+These files accompany the Work, and this paragraph is prose, which the lint
+must not read as entries.
+
+LICENSE                       the licence text
+README.md                     overview
+doc/careerdossier.tex         the user manual, described
+                              across two lines
+
+
+Not distributed
+---------------
+
+generated.pdf                 shaped like an entry, but after the two groups
