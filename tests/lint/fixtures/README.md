@@ -110,9 +110,20 @@ one any of them cites.
 | `pointerfixture-sibling.md` | `OK` |
 | `pointerfixture-fenced.md` | `OK` |
 | `pointerfixture-second-name.md` | `no heading of that name` |
+| `pointerfixture-in-form.md` | `OK` |
+| `pointerfixture-in-bad-heading.md` | `no heading of that name` |
+| `pointerfixture-old-parenthetical.md` | `write this parenthetical citation as` |
+| `pointerfixture-old-section.md` | `write this section citation as` |
+| `pointerfixture-old-bare-quoted.md` | `write this bare-quoted citation as` |
 
-Four of the seven pin an `OK`, which is unusual for a fixture set here and is
-the point: this lint's plausible failure is reporting a present pointer as
+The first seven are written in the template form (#583). `-in-form` pins the
+templates' other form, a name before `in` and a path, and a bare path without
+backticks; `-in-bad-heading` pins a missing heading in that form. The three
+`-old-` fixtures each resolve, and pin the rejection of a form the convention
+retired.
+
+Four of the first seven pin an `OK`, which is unusual for a fixture set here and
+is the point: this lint's plausible failure is reporting a present pointer as
 broken, not missing a broken one. `-wrapped` carries a pointer split across a
 newline and a section name split across one, because at 80 columns that is how
 most of them are written. `-sibling` cites a file that exists only beside it and
@@ -121,9 +132,9 @@ would fail it. `-fenced` puts an unresolvable pointer inside a fence, where it
 is illustration rather than a pointer.
 
 `-second-name.md` is the one that pins a resolution rather than a pointer: its
-single parenthetical carries two names, the first valid and the second not. The
+single citation carries two names, the first valid and the second not. The
 hand-written checker that motivated #559 read only the first name of each
-parenthetical and reported the tree clean, so this fixture fails any
+citation and reported the tree clean, so this fixture fails any
 reimplementation that regresses to counting pointers instead of resolutions.
 
 ## Commit-message hook fixtures

@@ -13,8 +13,8 @@ holds what is PR-only — the close-out gate, the PR body, and the push.
 
 For a **newly opened draft pull request**:
 
-- **Status:** the in-progress option — `CONTRIBUTING.md` ("Project Status
-  convention") for what it means, the appendix's discovery query for how
+- **Status:** the in-progress option — `CONTRIBUTING.md`, "Project Status
+  convention", for what it means, the appendix's discovery query for how
   it is spelled
 - **Phase:** inherit from the focused issue
 - **Priority:** inherit from the focused issue
@@ -26,8 +26,8 @@ For a **newly filed issue**, the same four fields are required and only their
 sources differ:
 
 - **Status:** `Ready` when the issue is defined enough to start, `Backlog` when
-  it is accepted but not scheduled — `CONTRIBUTING.md` ("Project Status
-  convention") for the vocabulary
+  it is accepted but not scheduled — `CONTRIBUTING.md`, "Project Status
+  convention", for the vocabulary
 - **Phase:** the phase paired with the issue's milestone
 - **Priority:** judged from the work, since there is nothing to inherit from
 - **Size:** estimated, not measured — see "Sizing an item that has no diff yet"
@@ -108,7 +108,7 @@ inherited and its source has none, leave it unset and report it.
 
 ## Label selection
 
-Use only the labels `CONTRIBUTING.md` ("Names") lists; they exist on the
+Use only the labels `CONTRIBUTING.md`, "Names", lists; they exist on the
 repository, and this command shows them live:
 
 ```bash
@@ -139,7 +139,7 @@ permitted to execute, which is closer to build and CI configuration.
 
 ## Status transitions
 
-`CONTRIBUTING.md` ("Project Status convention") is the canonical
+`CONTRIBUTING.md`, "Project Status convention", is the canonical
 statement of the `Status` vocabulary and of the issue and PR transitions through
 it — including which value a newly opened draft PR takes and when it changes.
 Read the value there; this skill does not restate it, and an answer derived from
@@ -178,7 +178,7 @@ Obtain explicit approval before:
 - creating or changing Project fields, allowed values, workflows, or views;
 - changing Phase or Priority contrary to the issue.
 
-Everything `AGENTS.md` ("Git") reserves to the maintainer is reserved here too.
+Everything `AGENTS.md`, "Git", reserves to the maintainer is reserved here too.
 That section states the action set; this list does not repeat it, and adds only
 the GitHub-object cases an agent meets while populating metadata.
 
@@ -214,16 +214,16 @@ Which blanks are legitimate:
 
 - **Status, Size, assignee, and labels** are determinable from the item itself,
   so none of them may be left unset. `Status` comes from
-  `CONTRIBUTING.md` ("Project Status convention"); `Size` from "Size guide"
+  `CONTRIBUTING.md`, "Project Status convention"; `Size` from "Size guide"
   above — judged on the completed diff for a pull request, and predicted
   per "Sizing an item that has no diff yet" for a freshly filed issue.
 - **Milestone, Phase, and Priority** on a *pull request* are inherited and must
   not be invented. Each may stay blank, and only when the focused issue itself
   has none — in which case name the missing *issue* field, not the PR field.
   On an *issue* there is nothing to inherit from: the milestone is required by
-  `CONTRIBUTING.md` "Every issue carries a milestone" (with the one exception
-  that section names), and `Phase` follows the milestone.
-  `CONTRIBUTING.md` ("Phase numbering convention") defines it.
+  `CONTRIBUTING.md`, "1. Every issue carries a milestone" (with the one
+  exception that section names), and `Phase` follows the milestone.
+  `CONTRIBUTING.md`, "Phase numbering convention", defines it.
 
 A deliberately unmilestoned issue is the ordinary case for work the maintainer
 has postponed, and a PR against one inherits no milestone. Do not read the rule
@@ -234,7 +234,7 @@ If Project API access is unavailable, still set every field that is reachable
 without it. Report the exact fields that could not be updated rather than
 claiming completion.
 
-The read-back above is not a report of its own. `AGENTS.md` ("Report back")
+The read-back above is not a report of its own. `AGENTS.md`, "Report back",
 defines the one report shape, and this list goes in its "2 Checks run" section,
 under the report's one verdict, which covers the work as a whole and not only
 its metadata.
@@ -265,7 +265,7 @@ branch.
 `gh api graphql` removes the id-discovery and per-field calls without removing
 anything the rules require: it batches inside one request, and it still reads
 every id and option string live in the same run, so nothing is cached into the
-tree. `CLAUDE.md` ("Sandbox and permissions") says why it is the only form that
+tree. `CLAUDE.md`, "Sandbox and permissions", says why it is the only form that
 batches here.
 
 The five steps below cost five calls, and with `gh label list` and `gh issue
@@ -495,8 +495,8 @@ The live Project is authoritative for the exact text and id of an option; this
 document and `CONTRIBUTING.md` are authoritative for *which* option to
 choose and what it means. Those are different questions, and a transcription of
 the first into prose drifts silently — which is why step 1 exists, why no id
-appears anywhere in this tree, and why the option names `CONTRIBUTING.md`
-("Project Status convention") lists are there for their meaning, never for a
+appears anywhere in this tree, and why the option names `CONTRIBUTING.md`,
+"Project Status convention", lists are there for their meaning, never for a
 lookup.
 
 The casing is the part that bites, because the lookup is by name. A
@@ -513,8 +513,8 @@ the safe direction: the silent failure became a loud one. It is still not a
 substitute for step 5, which is what catches a *valid* id written to the wrong
 row.
 
-So: take `Status` semantics from `CONTRIBUTING.md` ("Project Status
-convention") and `Phase` from its "Phase numbering convention", take `Priority`
+So: take `Status` semantics from `CONTRIBUTING.md`, "Project Status
+convention", and `Phase` from its "Phase numbering convention", take `Priority`
 and `Size` from "Project field values" above, and take every literal option
 string and id from step 1.
 

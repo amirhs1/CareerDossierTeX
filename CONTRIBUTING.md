@@ -81,7 +81,7 @@ Development requires:
   `make check` suite.
 
 The ordinary resume, letter, and no-BibLaTeX CV paths do not require BibLaTeX
-or Biber. Install LuaLaTeX: `AGENTS.md` ("Conventions a linter cannot express")
+or Biber. Install LuaLaTeX: `AGENTS.md`, "Conventions a linter cannot express",
 states the engine scope and what the unsupported engines do, and is not repeated
 here.
 
@@ -145,8 +145,8 @@ an exception applies, not a form to fill in.
 ### 3. Every pull request comes from a focused branch
 
 Branch from an up-to-date `main`, one issue per branch where practical. Direct
-commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`
-("Git") states that reservation and the rest of the maintainer-only action set,
+commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`,
+"Git", states that reservation and the rest of the maintainer-only action set,
 which this guide does not repeat.
 
 A branch has no deadline: it lives until it merges or is closed, and the
@@ -225,8 +225,8 @@ Open or select an issue before starting a meaningful change, subject to the
 exceptions in "Every pull request links an issue" above.
 
 An issue has two halves. A form in `.github/ISSUE_TEMPLATE/` fills the body;
-it cannot set the Project fields, which are required too. `AGENTS.md`
-("Settled decisions") records that division: the form supplies the body, and
+it cannot set the Project fields, which are required too. `AGENTS.md`,
+"Settled decisions", records that division: the form supplies the body, and
 the `open-issue` skill the procedure around it, fields included.
 
 A good implementation issue explains:
@@ -330,8 +330,8 @@ own order:
 | In review   | Pull request is open and awaiting checks or review |
 
 Option lookup is by name, so copy an option's exact string from the Project,
-never from this table; `.agents/skills/project-metadata/reference.md`
-("Read option strings live, never from prose") says how.
+never from this table; `.agents/skills/project-metadata/reference.md`,
+"Read option strings live, never from prose", says how.
 
 - A parent epic can be `In Progress` while its release is active; its
   sub-issues move through the workflow individually.
@@ -351,8 +351,8 @@ keep a longer form keyed to the release version. Only the numbers must agree.
 - Every shipped major or minor release has its own phase: `vX.0.0` and `v0.Y.0`
   each get one `Phase` option and one `docs/ROADMAP.md` phase heading.
 - A patch release has no phase of its own. Its issues carry the phase of the
-  minor release they correct, and it gets a row in the `docs/ROADMAP.md`
-  "Releases and phases" table but no heading.
+  minor release they correct, and it gets a row in the `docs/ROADMAP.md`,
+  "Releases and phases", table but no heading.
 - A release that never ships has no phase number, and is referred to by name:
   `v0.3.0` gave up `Phase 3` when it was dropped, and `v1.1.0` closed empty
   without one.
@@ -408,7 +408,7 @@ git push -u origin feat/resume-class
 
 A person may open a draft pull request early, when the work is incomplete but
 ready for CI or design discussion. An agent pushes only a close-out-complete
-branch, as `AGENTS.md` ("Git") says.
+branch, as `AGENTS.md`, "Git", says.
 
 Keep the branch focused, on the terms "Every pull request comes from a focused
 branch" sets out above.
@@ -501,9 +501,9 @@ the standing of `JOBS=8` — which is **unmeasured rather than barred**, so
 `make check JOBS=8` is a supported thing to run on hardware with the cores for
 it. Neither question is answered here.
 
-The driver is `tests/check-parallel.sh`. `docs/TESTING.md` "The parallel run" is
-canonical for how it works, what it asserts beyond running the same targets, the
-two tool caches it has to prepare first, its measured speedup, its ordered
+The driver is `tests/check-parallel.sh`. `docs/TESTING.md`, "The parallel run",
+is canonical for how it works, what it asserts beyond running the same targets,
+the two tool caches it has to prepare first, its measured speedup, its ordered
 replay of per-target output under `build/check-parallel/`, its disk cost, and
 what a scheduled run had to prove before it could be the gate; none of that is
 repeated here beyond the orientation figure above.
@@ -566,7 +566,7 @@ gate reports it under `SELECTED BUT NOT RUN` rather than letting "not selected"
 and "selected, checked nothing" print as the same blank space.
 
 `tests/lint/run-fixture-filter.sh` holds this contract to account and runs in
-the `lint` slot; see `docs/TESTING.md` "Option lint".
+the `lint` slot; see `docs/TESTING.md`, "Option lint".
 
 ### Running one suite's fixtures concurrently
 
@@ -595,7 +595,7 @@ make check JOBS=4 INNER_JOBS=2
 That pinning is why making the gate parallel did not quietly quadruple the
 process budget along with it.
 
-`docs/TESTING.md` "Fanning out inside a suite" is canonical for the measured
+`docs/TESTING.md`, "Fanning out inside a suite", is canonical for the measured
 speedups, the shared dispatcher, the accounting assertion that makes a
 concurrent run safe to believe, and the process budget; none of it is repeated
 here.
@@ -654,9 +654,9 @@ Do not use private commands in examples or documentation.
 
 ### Package responsibility
 
-Place code according to ownership. `docs/ARCHITECTURE.md` ("File
-responsibilities") carries the concern-to-module map and the per-file detail,
-and `AGENTS.md` ("Layout") the dependency direction and the two
+Place code according to ownership. `docs/ARCHITECTURE.md`, "File
+responsibilities", carries the concern-to-module map and the per-file detail,
+and `AGENTS.md`, "Layout", the dependency direction and the two
 standing rules about page geometry and the CV's independence from BibLaTeX.
 Neither is reproduced here.
 
@@ -684,13 +684,13 @@ Avoid:
 
 ### Optional fields
 
-`AGENTS.md` ("Conventions a linter cannot express") states how optional fields
+`AGENTS.md`, "Conventions a linter cannot express", states how optional fields
 are rendered and is not repeated here. The implementation consequence: do not
 generate every separator first and attempt to remove the empty ones later.
 
 ### Engine support
 
-`AGENTS.md` ("Conventions a linter cannot express") states the engine scope and
+`AGENTS.md`, "Conventions a linter cannot express", states the engine scope and
 is not repeated here. Two things
 specific to writing the code: `careerdossier-typography` owns the guard, and
 partial XeLaTeX or pdfLaTeX support is not to be added without defining,
@@ -718,14 +718,14 @@ build. Markdown headings carry no section number. There a number is typed by
 hand in the heading and again in every citation, and GitHub bakes it into the
 anchor, so inserting one heading silently breaks every link below it (#447).
 
-A Markdown cross-reference names the heading, joined by the literal word
-`section`, which does not vary with the heading's depth:
+A Markdown cross-reference names the heading in the form the shared agent
+templates use: the path, a comma, and the heading in double quotes. The same
+form cites a heading at any depth.
 
 ```text
-Correct:   `docs/ATS-EXTRACTION.md` section "Dates and right alignment"
+Correct:   `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
 Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7>3.4
 Incorrect: `docs/ATS-EXTRACTION.md` <U+00A7> "Dates and right alignment"
-Incorrect: `docs/ATS-EXTRACTION.md`, "Dates and right alignment"
 ```
 
 `<U+00A7>` stands for the section sign, which no tracked file contains (see
@@ -740,7 +740,8 @@ heading's release stamp, which belongs in the body under the heading.
 
 `tests/lint/run-markdown-anchors.sh` fails when a `](TARGET.md#anchor)` names a
 heading that no longer exists, and `tests/lint/run-prose-pointers.sh` when a
-prose pointer quotes a section name that no longer exists.
+citation names a file or heading that does not exist, or takes any other form
+than the one above.
 
 ### The section sign is banned outright
 
@@ -870,15 +871,15 @@ commits since the last tag. Until the next release, `[Unreleased]` keeps the
 entries it has, and that release's section replaces it; earlier sections stay
 as written.
 
-A change earns a line by being *user-visible*: `manifest.txt` calls
-`CHANGELOG.md` "user-visible changes per release", and that is the whole test —
-what changed, not who ran it. A change that alters rendered output, a public
+A change earns a line by being *user-visible*: `manifest.txt` describes
+`CHANGELOG.md` as "user-visible changes per release", and that is the whole test
+— what changed, not who ran it. A change that alters rendered output, a public
 name, or a documented behavior earns a line however internal its cause looks.
 Maintainer tooling and agent instructions do not: `.agents/`, `.claude/`, a CI
-workflow, a maintainer-only script, or a `Makefile` target a contributor is
-told to run, which is documented here instead. The boundary is not applied
-backwards: five entries in `[0.7.0]` (#188, #195, #211, #233, #236) and one in
-`[0.8.0]` (#334) that it would not have produced stay as written (#260), and
+workflow, a maintainer-only script, or a `Makefile` target a contributor is told
+to run, which is documented here instead. The boundary is not applied backwards:
+five entries in `[0.7.0]` (#188, #195, #211, #233, #236) and one in `[0.8.0]`
+(#334) that it would not have produced stay as written (#260), and
 `CHANGELOG.md` notes them under each release's own heading (#410, #413).
 
 ## Proposing public API changes
@@ -1110,7 +1111,7 @@ silently building an unpinned `HEAD` if a fetch ever resolved differently.
 4. Inspect the full suite. A bump is expected to be behavior-neutral. If a
    `.tlg` baseline or an extraction reference changes, that is a finding to
    investigate and report — never regenerate a baseline merely to turn the
-   suite green (see `docs/TESTING.md` "Baselines are load-bearing").
+   suite green (see `docs/TESTING.md`, "Baselines are load-bearing").
 
 ## Release contributions
 

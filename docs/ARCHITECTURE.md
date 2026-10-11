@@ -499,7 +499,7 @@ a late, confusing font error appears. LuaLaTeX is the supported engine.
 
 ## Public and internal surfaces
 
-`CONTRIBUTING.md` ("Coding conventions") owns the naming and interface rules;
+`CONTRIBUTING.md`, "Coding conventions", owns the naming and interface rules;
 [`API.md`](API.md#stability-policy) owns what publishing a name commits the
 project to. Neither is restated here. What belongs to this document is which
 surface owns what:

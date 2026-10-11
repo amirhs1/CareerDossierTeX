@@ -22,29 +22,29 @@ skill for the fields.
 
 ## Procedure
 
-1. Read every id and option string live, from `reference.md` ("1. Discover every
-   id in one query"). Never from prose in this file, that one, or any other:
+1. Read every id and option string live, from `reference.md`, "1. Discover every
+   id in one query". Never from prose in this file, that one, or any other:
    option lookup is by name and a transcription that has drifted resolves to no
    option id.
-2. Determine each value from `reference.md` ("Project field values"): `Status`
-   from `CONTRIBUTING.md` ("Project Status convention"), `Phase` and
+2. Determine each value from `reference.md`, "Project field values": `Status`
+   from `CONTRIBUTING.md`, "Project Status convention", `Phase` and
    `Priority` inherited, `Size` from the "Size guide".
-3. Apply the labels `reference.md` ("Label selection") calls for — one primary
-   `type:*`, every relevant `area:*` — from `CONTRIBUTING.md` ("Names").
-4. Write every field in one mutation, per `reference.md` ("4. Write every field
-   in one mutation"). A batched write fails per alias, not per call.
-5. Read every field back and **assert** it, per `reference.md`
-   ("Verification"). A blank is unfinished work, not a reporting line: fill it
+3. Apply the labels `reference.md`, "Label selection", calls for — one primary
+   `type:*`, every relevant `area:*` — from `CONTRIBUTING.md`, "Names".
+4. Write every field in one mutation, per `reference.md`, "4. Write every field
+   in one mutation". A batched write fails per alias, not per call.
+5. Read every field back and **assert** it, per `reference.md`,
+   "Verification". A blank is unfinished work, not a reporting line: fill it
    and read back again.
 
 Steps 1–5 batch their reads and writes rather than making one call per field.
-`reference.md` ("The shape of the sequence") counts the calls, and its appendix
+`reference.md`, "The shape of the sequence", counts the calls, and its appendix
 is canonical for the shape and for why a wrapper script is not an option here.
 
 ## Boundaries
 
-`AGENTS.md` ("Git") states the complete boundary on this delegation; it is not
-restated here. `reference.md` ("Routine authorization")
+`AGENTS.md`, "Git", states the complete boundary on this delegation; it is not
+restated here. `reference.md`, "Routine authorization",
 adds only the GitHub-object cases an agent meets while setting fields.
 
 When Project access is unavailable — a missing `project` token scope, or missing

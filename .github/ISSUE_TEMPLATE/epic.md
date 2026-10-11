@@ -7,10 +7,10 @@ assignees: ""
 ---
 
 <!--
-Title and labels: `CONTRIBUTING.md` ("Names"); an epic is titled as an issue.
+Title and labels: `CONTRIBUTING.md`, "Names"; an epic is titled as an issue.
 Open an epic only for work that genuinely decomposes into several issues —
 a release epic, or a cross-cutting effort spanning more than one class or
-package. `CONTRIBUTING.md` "Work item structure" is canonical for when an epic
+package. `CONTRIBUTING.md`, "Work item structure", is canonical for when an epic
 is warranted. Apply one `type:*` label and the relevant `area:*` labels from
 "Names"; there is no epic-specific label.
 -->

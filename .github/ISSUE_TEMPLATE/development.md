@@ -53,8 +53,8 @@ tracked files, so `build/` is excluded by construction.
 Where the issue concerns a statement or value that could appear in more than one
 place, make at least one criterion a command over the repository rather than a
 check of the files listed above. A criterion that reads only the named files
-cannot fail on the copy nobody thought to look for. See `CONTRIBUTING.md`
-section "Issue workflow" item 5.
+cannot fail on the copy nobody thought to look for. See `CONTRIBUTING.md`,
+"Issue workflow", item 5.
 
 ```bash
 # The command a reviewer runs to confirm no copy was missed.

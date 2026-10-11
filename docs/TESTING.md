@@ -113,11 +113,11 @@ only to confirm. Three practical consequences:
   campaign. Re-running a suite because the script changed underneath it is the
   common way a day disappears.
 - **Prefer the scoping the runners already give you** — `FIXTURE=` and `TEST=`,
-  see `CONTRIBUTING.md` "Scoping a suite while you iterate" — over a full run,
+  see `CONTRIBUTING.md`, "Scoping a suite while you iterate" — over a full run,
   right up until the run that has to be full.
 
-`CONTRIBUTING.md` "Issue workflow" carries the matching obligation on the other
-side: an issue that prescribes a mechanism records what would refute it.
+`CONTRIBUTING.md`, "Issue workflow", carries the matching obligation on the
+other side: an issue that prescribes a mechanism records what would refute it.
 
 ## Baselines and layers
 
@@ -335,8 +335,8 @@ committed to check them against.
 
 ## Running the harness
 
-`make check` is the gate and runs every suite below. `CONTRIBUTING.md` "Local
-builds" and "The gate, and the serial path" own the invocation, scoping, and
+`make check` is the gate and runs every suite below. `CONTRIBUTING.md`, "Local
+builds", and "The gate, and the serial path" own the invocation, scoping, and
 what each target's CI job is called.
 
 The entries below say only what a suite covers and where its output lands, so
@@ -453,8 +453,9 @@ exists to catch (#509).
 
 Alongside the comparison, each fixture's text is asserted **well-formed**: no
 replacement character (`U+FFFD`) and no Private Use Area code point
-(`U+E000`–`U+F8FF`), the properties `docs/ATS-EXTRACTION.md` "What ATS-friendly
-means" requires of extracted text. The scan runs over the text captured this
+(`U+E000`–`U+F8FF`), the properties
+[`docs/ATS-EXTRACTION.md`](ATS-EXTRACTION.md#what-ats-friendly-means-and-the-layout-rules-that-follow)
+requires of extracted text. The scan runs over the text captured this
 run *and* over the committed baselines, because those are different claims — a
 baseline regenerated over a defect would otherwise be blessed, and every later
 comparison would agree with it. Both baselines are scanned on every platform;
@@ -556,7 +557,7 @@ establish that both will.
 up extraction whitespace inside a visual line and reassembles exactly when it
 wraps, reading `pdftotext -bbox` coordinates via `link-token-check.awk`.
 Fixtures declare `% LINKTOKEN:` and optionally `% LINKEXPECT: split` for a
-negative control. `docs/ATS-EXTRACTION.md` "Copy-paste integrity" is canonical
+negative control. `docs/ATS-EXTRACTION.md`, "Copy-paste integrity", is canonical
 for the extractor behaviour behind it.
 
 ### Default-path metadata suite
@@ -647,27 +648,32 @@ resolves to a real heading.
 
 ### Prose section pointer lint
 
-`tests/lint/run-prose-pointers.sh` — every pointer of the form
+`tests/lint/run-prose-pointers.sh` — every citation of a heading names a file
+that exists and a heading it actually has, in one of the two forms
+`CONTRIBUTING.md`, "Documentation heading convention" sets, with or without
+backticks:
 
 ```text
-`PATH.md` ("Section Name")
+`PATH.md`, "Section Name"
+"Section Name" in `PATH.md`
 ```
 
-in the tree names a file that exists and a heading it actually has. (That
-example is fenced deliberately: the lint resolves this form wherever it appears
-outside fenced code, so an unfenced illustration of it would be checked as a
-real pointer — as this line was, on the first run.) The anchor lint
-above covers the `[text](file.md#anchor)` form; this covers the prose form the
-agent contract uses for rules, which nothing checked before #559. Every quoted
-name in a parenthetical is resolved, not just the first — one parenthetical can
-carry two. Paths resolve against the repository root, then against the citing
-file's own directory, because both forms are in use.
+(The examples are fenced deliberately: the lint checks these forms wherever
+they appear outside fenced code.) A backticked path followed by a
+parenthetical, by `section` and a quoted name, or by a bare quoted name is
+resolved too, and then fails with the form to write instead; `CHANGELOG.md`
+keeps its shipped citations and is exempt from that check (#583). The anchor
+lint above covers the `[text](file.md#anchor)` form, which is also how to cite
+a heading that itself contains double quotes. Every quoted name is resolved,
+not just the first — one citation can carry two. Paths resolve against the
+repository root, then against the citing file's own directory, because both are
+in use.
 
 ### Section-sign lint
 
 `tests/lint/run-section-sign.sh` — no tracked file contains U+00A7 SECTION
-SIGN. A cross-reference names its heading instead, per `CONTRIBUTING.md`
-section "Documentation heading convention". The ban
+SIGN. A cross-reference names its heading instead, per `CONTRIBUTING.md`,
+"Documentation heading convention". The ban
 is over the character rather than over a spelling of it, so the check needs no
 exception list — including for its own source, which builds the pattern from
 bytes rather than writing the character. Control 1 plants an occurrence in a
