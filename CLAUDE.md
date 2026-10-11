@@ -13,6 +13,9 @@ excluded. These settings bind Claude Code only.
   one `gh api graphql` document.
 - Run these with the sandbox off: `make check`, writes to `.git/config`
   (`git config`, `git push -u`), and writes under `.claude/`.
+- Sandboxed Bash and `gh` see different temporary folders: `$TMPDIR` in one is
+  not the other's. Write a file for `--body-file` to an absolute path that both
+  can read, never to `$TMPDIR`.
 - `allowWrite` covers `~/Library/texlive`, LuaLaTeX's font cache. Without it
   TeX typesets empty `nullfont` documents that pass every build and fail every
   baseline; never regenerate a baseline from such a run (#386, #392).
