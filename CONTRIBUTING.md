@@ -862,34 +862,24 @@ instead. The stability policy both serve is in
 
 ### Update `CHANGELOG.md` when:
 
-- a feature is added;
-- behavior changes;
-- a bug is fixed;
-- a breaking change is introduced.
+- a release is drafted, and at no other time.
 
-Each of those four is qualified by *user-visible*: `manifest.txt` calls
+A pull request adds no entry. The `draft-release` skill writes each release's
+section in [Common Changelog](https://common-changelog.org) form from the
+commits since the last tag. Until the next release, `[Unreleased]` keeps the
+entries it has, and that release's section replaces it; earlier sections stay
+as written.
+
+A change earns a line by being *user-visible*: `manifest.txt` calls
 `CHANGELOG.md` "user-visible changes per release", and that is the whole test —
 what changed, not who ran it. A change that alters rendered output, a public
-name, or a documented behavior earns an entry however internal its cause looks.
+name, or a documented behavior earns a line however internal its cause looks.
 Maintainer tooling and agent instructions do not: `.agents/`, `.claude/`, a CI
-workflow, a maintainer-only script. Neither does a `Makefile` target a
-contributor is told to run, which is documented here instead. The boundary is
-not applied backwards — entries already shipped stay as written, including five
-in `[0.7.0]` (#188, #195, #211, #233, #236) and one in `[0.8.0]` (#334) that it
-would not have produced (#260). `CHANGELOG.md` carries a note under each
-release's own heading saying so, listing the same entries, so a reader who
-opens the register first is not left reading them as precedent (#410, #413).
-
-`[Unreleased]` is the one section this is *not* true of. It sits inside the
-boundary's own era and is still editable, so an entry there that the boundary
-would not have produced is removed at release preparation rather than annotated
-— a note saying it predates the rule would be false. `v0.9.0` was the first
-release to sweep it, and eleven entries came out (#414); the sweep is a standing
-step in `.agents/skills/release-notes/reference.md`, "The tooling sweep".
-
-For entry format and house style, see
-`.agents/skills/update-changelog/reference.md`; for how `CHANGELOG.md` relates
-to GitHub Release notes, see `.agents/skills/release-notes/reference.md`.
+workflow, a maintainer-only script, or a `Makefile` target a contributor is
+told to run, which is documented here instead. The boundary is not applied
+backwards: five entries in `[0.7.0]` (#188, #195, #211, #233, #236) and one in
+`[0.8.0]` (#334) that it would not have produced stay as written (#260), and
+`CHANGELOG.md` notes them under each release's own heading (#410, #413).
 
 ## Proposing public API changes
 
@@ -951,7 +941,6 @@ Before marking a pull request ready:
 - confirm new behavior has a focused committed test under `tests/`;
 - test missing optional fields;
 - update documentation;
-- update the changelog when appropriate;
 - confirm CI passes;
 - resolve review conversations.
 
@@ -1136,13 +1125,12 @@ Release preparation should verify:
   caught, but nothing checks the pair against the tag you are about to cut;
 - `README.md` reflects current support;
 - the manual matches implementation;
-- `CHANGELOG.md` is updated;
-- GitHub Release notes are drafted;
+- the `draft-release` skill has drafted the `CHANGELOG.md` section and the
+  GitHub Release notes;
 - `LICENSE` and `manifest.txt` remain accurate;
 - the working tree is clean.
 
-See `.agents/skills/update-changelog/reference.md` for CHANGELOG entry format
-and house style, and `.agents/skills/release-notes/reference.md` for release
-notes and the LaTeX-package compatibility checklist.
+`.agents/skills/draft-release/SKILL.md` says how the section and the notes are
+written, and which LaTeX-package details a release states.
 
 Tagging and publishing a release should occur only after the release-preparation pull request is merged.
