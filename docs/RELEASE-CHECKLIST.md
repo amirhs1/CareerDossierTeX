@@ -142,7 +142,7 @@ GitHub release can. Verify the archive manually before upload.
 ### Licence and fonts
 
 - LPPL 1.3c or later is conventional for LaTeX code; the project uses LPPL 1.3c,
-  maintenance status `maintained`, maintainer Amir Sadeghi.
+  maintenance status `maintained`, and the maintainer `manifest.txt` names.
 - Give documentation and examples explicit licence terms.
 - Do not assume a font licence permits bundling merely because the font is free to
   use in documents. List every bundled asset and its licence, and keep third-party
@@ -260,4 +260,4 @@ GitHub release can. Verify the archive manually before upload.
 
 ---
 
-*Part of CareerDossierTeX. Licensed under LPPL 1.3c. Maintainer: Amir Sadeghi.*
+*Part of CareerDossierTeX. Licensed under LPPL 1.3c. Maintainer: as `manifest.txt` names.*

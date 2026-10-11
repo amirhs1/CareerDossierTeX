@@ -983,7 +983,7 @@ When adding or changing licensed source files:
 - identify third-party code, fonts, images, or other assets and confirm that their licenses are compatible;
 - do not copy code from another project without preserving its required notices.
 
-The public class and package files should state that the Work has LPPL maintenance status `maintained` and that the current maintainer is Amir Sadeghi.
+The public class and package files should state that the Work has LPPL maintenance status `maintained` and that the current maintainer is the maintainer `manifest.txt` names.
 
 ## Generated files
 

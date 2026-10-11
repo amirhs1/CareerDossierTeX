@@ -194,11 +194,11 @@ Save personal metadata in `examples/profiles/profile-english.tex`:
 
 ```latex
 \CDossierSetup{
-  name     = {Amir Sadeghi},
+  name     = {Ada Lovelace},
   headline = {Data Scientist},
   email    = {name@example.com},
   phone    = {+1 555 555 5555},
-  location = {Ontario, Canada},
+  location = {Toronto, Ontario, Canada},
   website  = {example.com},
   linkedin = {linkedin.com/in/example},
   github   = {github.com/example}
