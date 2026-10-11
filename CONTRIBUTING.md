@@ -51,8 +51,12 @@ Pull requests that don't follow the policy may be closed without review.
 
 - [ ] `.claude/settings.json` is committed with the attribution block.
 - [ ] `git config core.hooksPath .githooks` has been run in this clone.
-- [ ] A test commit made by each tool in use ends with `Assisted-by:` and no
-      AI `Co-authored-by:` (`git log -1 --format=%B`).
+- [ ] `.gitmessage` is committed.
+- [ ] `git config commit.template .gitmessage` has been run, for commits
+      written in an editor.
+- [ ] A test commit made by each tool in use ends with one trailer block that
+      includes `Assisted-by:` and no AI `Co-authored-by:`
+      (`git log -1 --format=%B`).
 - [ ] `.gitignore` ignores the agent files kept local: `CLAUDE.local.md`,
       `AGENTS.local.md`, `.claude/settings.local.json`, `.claude/worktrees/`,
       and `.claude/.cc-writes/`.
