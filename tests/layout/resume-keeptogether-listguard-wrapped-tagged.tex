@@ -1,5 +1,5 @@
-% resume-listguard-wrapped-tagged.tex — the tagged arm of the list-guard pair
-% (issue #562).
+% resume-keeptogether-listguard-wrapped-tagged.tex — the tagged arm of the
+% list-guard pair (issues #562, #564).
 %
 % #562 derives each edge item's line count from `\prevgraf', and the tagged path
 % does not build lists the way the untagged one does: under
@@ -9,9 +9,10 @@
 % the recorded counts would differ, the guards would differ, and the two builds
 % of one source would paginate differently.
 %
-% The assertion is the page-fill floor, as in the untagged arm: the tagged arm
-% clears it only if it took the same breakpoint. Measured identical, with both
-% arms recording 3 and 2 lines for the probe list's edge items.
+% The assertions are the untagged arm's: the tagged arm clears the page-fill
+% floor, and leaves the same wrapped remnant, only if it took the same
+% breakpoint. Measured identical, with both arms recording 3 and 2 lines for the
+% probe list's edge items.
 %
 % This is the only tagged fixture in this suite. It earns that because the
 % quantity at issue is a pagination input read from a primitive, which neither
