@@ -12,6 +12,9 @@
 #   - no *two-page* fixture splits a hyphenated word across a page break, and
 #     no letter or statement fixture strands a single line of a paragraph at a
 #     page boundary (issue #171, via page-break-check.awk);
+#   - no *keeptogether* fixture strands a heading from its material, or splits
+#     a list leaving a single typeset line of it on a page (issues #145, #564,
+#     the latter via list-remnant.awk);
 #   - no page a policy governs falls below `$page_fill_min` of its goal, read
 #     from `\tracingpages` output via page-fill.awk (issue #334). Everything
 #     above asserts only that material stays *together*, and all of it passes on
@@ -467,36 +470,35 @@ EOF
 
         keep_fail=0
 
-        # No list may be split leaving exactly one item on a page. The
-        # *-orphan* fixtures mark the list under test so its items can be
-        # counted apart from the filler bullets sharing the same page; the
-        # remaining fixtures hold a single list, so every bullet belongs to it.
-        #
-        # Issue #562 narrowed what this may be applied to. The policy forbids
-        # stranding a single *line*, not a single item, so a page carrying one
-        # wrapped item of a split list is now correct and this count would fail
-        # it. Every fixture below has single-line items at the edges of the list
-        # it marks, which is where the two readings agree, and the wrapped case
-        # is asserted by resume-listguard-wrapped.tex through the page-fill floor
-        # instead. Before marking a new fixture *keeptogether*, check that its
-        # marked list's first and last items are single lines.
+        # No list may be split leaving a single typeset line of it on a page
+        # (issues #562, #564). A page carrying one item of the split list is
+        # legal when that item wraps, so the lone item's lines are counted,
+        # from the hanging indent its continuation rows start at; see
+        # list-remnant.awk. The *-orphan* fixtures mark the list under test so
+        # its items can be counted apart from the filler bullets sharing the
+        # same page; the remaining fixtures hold a single list, so every bullet
+        # belongs to it.
         case "$base" in
           *-orphan*) item_pattern='^• Probe' ;;
           *)         item_pattern='^•' ;;
         esac
         for (( n = 1; n <= pages; n++ )); do
-          # `-eq 1` is the failing case, so every other count passes — including
-          # the 0 that an unextracted page produces. Counted with the third
-          # state so "no page text" cannot report "no orphaned bullet" (#398).
-          page_text="$(text_page "$base.pdf" "$n")"
-          items="$(text_count_matches "$page_text" "$item_pattern")"
+          # Any status but 0 means the page was not read, or the lone item's
+          # indent could not be, and either must not report "no orphaned
+          # bullet" (#398). The capture carries CDTEXT_UNAVAILABLE when
+          # pdftotext could not run, which the script answers with 2.
+          page_layout="$(text_page "$base.pdf" "$n" -bbox-layout)"
+          remnant="$(awk -v item="$item_pattern" -f "$here/list-remnant.awk" \
+                       <<< "$page_layout")"
           state=$?
-          if [ "$state" -ne 0 ]; then
+          IFS=$'\t' read -r items item_lines item_text <<< "$remnant"
+          if [ "$state" -ne 0 ] || [ -z "$items" ]; then
             echo "  UNCHECKABLE ORPHANED BULLET: page $n of $base yielded no"
-            echo "    text, so its item count was never taken."
+            echo "    readable line geometry, so its remnant was never measured."
             keep_fail=1
-          elif [ "$items" -eq 1 ]; then
-            echo "  ORPHANED BULLET: page $n carries exactly one item of the split list"
+          elif [ "$items" -eq 1 ] && [ "$item_lines" -eq 1 ]; then
+            echo "  ORPHANED BULLET: page $n carries a single-line remnant of the"
+            echo "    split list: $item_text"
             keep_fail=1
           fi
         done

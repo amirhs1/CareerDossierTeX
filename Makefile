@@ -14,6 +14,8 @@
 # careerdossier-tokens.sty against the value tables in docs/ARCHITECTURE.md
 # and the manual,
 # run-text-guards.sh drives tests/lib/text.sh over synthetic text,
+# run-list-remnant.sh drives tests/layout/list-remnant.awk over synthetic
+# page geometry,
 # run-commit-msg-hook.sh runs .githooks/commit-msg over fixture messages,
 # and check-parallel.sh --self-test exercises check-parallel's accounting
 # controls against synthetic workers.
@@ -265,7 +267,7 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, the commit-msg hook, shellcheck over the harness, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, the list-remnant line count, the commit-msg hook, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
@@ -278,6 +280,7 @@ lint: ## Static lint: option values, version declarations, fixture selection, Ma
 	tests/lint/run-manual-examples.sh
 	tests/lint/run-token-values.sh
 	tests/lint/run-text-guards.sh
+	tests/lint/run-list-remnant.sh
 	tests/lint/run-commit-msg-hook.sh
 	tests/lint/run-shellcheck.sh
 	tests/check-parallel.sh --self-test

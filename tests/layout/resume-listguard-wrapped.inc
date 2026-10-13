@@ -2,7 +2,7 @@
 %
 % Shared so that the tagged and untagged arms cannot drift: the parity they
 % assert is only meaningful while both compile the same document. See
-% resume-listguard-wrapped.tex for what the pair measures.
+% resume-keeptogether-listguard-wrapped.tex for what the pair measures.
 \CDossierSetup{
   name     = {Grace Hopper},
   headline = {Systems Engineer},

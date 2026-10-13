@@ -427,13 +427,16 @@ and `*-missing-*.tex` must fail with the expected diagnostic, and
 page-level properties: no overfull boxes, correct furniture and folios,
 `*two-page*` fixtures actually spanning two pages, no split hyphenated word
 across a break, and the page-fill floor. `tests/layout/page-break-check.awk` and
-`page-fill.awk` do the log parsing.
+`page-fill.awk` do the log parsing. `*keeptogether*` fixtures also assert that no
+heading is stranded and that no split list leaves a single typeset line on a
+page; `list-remnant.awk` counts a lone item's lines from the hanging indent its
+continuation lines start at.
 
 One fixture here declares `\DocumentMetadata{tagging=on}`, sharing its body with
-an untagged twin: `resume-listguard-wrapped` asserts that both build paths take
-the same page break, which is a pagination input neither the tagging suite
-(structure) nor the regression suite (untagged) can see. Pagination parity is the
-only reason to put a tagged fixture in this suite.
+an untagged twin: `resume-keeptogether-listguard-wrapped` asserts that both build
+paths take the same page break, which is a pagination input neither the tagging
+suite (structure) nor the regression suite (untagged) can see. Pagination parity
+is the only reason to put a tagged fixture in this suite.
 
 ### Extraction round-trip test
 
@@ -716,6 +719,13 @@ costs the archive a file and costs `l3build ctan` no error. It is its own
 `tests/lint/run-text-guards.sh` — the extracted-text guards in `tests/lib/text.sh`
 answer three states, not two, so an unperformable check reports as unperformable
 rather than as absent text.
+
+### List-remnant lint
+
+`tests/lint/run-list-remnant.sh` — drives `tests/layout/list-remnant.awk` over
+synthetic page geometry: a lone single-line item counts as one line, a wrapped
+one counts its continuation lines at an indent read from the item, and a page
+whose geometry could not be read gets no verdict.
 
 ### Commit-message hook lint
 
