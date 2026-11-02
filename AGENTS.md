@@ -337,6 +337,7 @@ gives a commit message's subject and body.
 | Skill               | Use when                                         |
 | ------------------- | ------------------------------------------------ |
 | `create-branch`     | Starting a change                                |
+| `write-test`        | Writing or changing a test under `tests/`        |
 | `write-commit`      | Every commit                                     |
 | `open-issue`        | Opening or revising an issue                     |
 | `open-pull-request` | Opening a draft pull request, or updating one    |
