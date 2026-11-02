@@ -1,5 +1,11 @@
 @AGENTS.md
 
+## Local and scoped instructions
+
+Claude Code does not read `AGENTS.local.md` on its own. On a machine that has
+one, a gitignored `CLAUDE.local.md` containing `@AGENTS.local.md` loads it at
+launch.
+
 ## Sandbox and permissions
 
 `.claude/settings.json` denies reading and editing private paths, asks before

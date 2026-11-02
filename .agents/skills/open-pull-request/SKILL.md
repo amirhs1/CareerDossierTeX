@@ -33,7 +33,8 @@ description: Open a draft GitHub pull request whose body is the full report, and
 
    Write it to a file outside the repository, by absolute path.
 5. Title and labels: follow "Names" in CONTRIBUTING.md. The type comes from
-   the branch name; the areas, from the parts the diff changes.
+   the branch name; the areas, from the parts the diff changes. If the branch
+   prefix and the intended type label disagree, stop and ask.
 6. Push the branch, open a draft, then read it back with `gh pr view`:
    `gh pr create --draft --base main --title "<title>" --label <labels> --body-file <file>`.
    Never mark it ready or merge it.
