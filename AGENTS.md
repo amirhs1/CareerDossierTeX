@@ -18,7 +18,8 @@ class, fill in one profile, and expect every document to share one look.
 
 Run the full gate before calling a change complete, and report the actual
 output, not the expected output. Do not describe a change as working because it
-reads correctly.
+reads correctly. CI, in `.github/workflows/`, runs more than the gate, in a
+pinned TeX Live container; say how far your local checks reach.
 
 - Run the `Makefile` targets, never a hand-written engine invocation: they write
   to `build/` and keep the source tree free of artifacts.
@@ -397,3 +398,7 @@ A pull request body is the full report, in the sections of
 | This file disagrees with another document                                                                                           | `AI-POLICY.md` governs AI use, a skill governs its own procedure, and this file governs the rest. Report the disagreement. |
 | Restricted material might enter your context                                                                                        | Stop before sending it, and ask.                                                                                           |
 | Context is long and quality is degrading                                                                                            | Say so and propose restarting from a written handoff.                                                                      |
+
+For the facts they hold, these canonical sources win over this file:
+`manifest.txt`, the `Makefile` (`make help` and `CHECK_TARGETS`), `build.lua`,
+`CHANGELOG.md`, `CONTRIBUTING.md`, and `AI-POLICY.md`.
