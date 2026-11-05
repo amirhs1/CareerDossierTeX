@@ -3,7 +3,7 @@
 #
 # WHAT THIS IS
 #
-# A driver, not a twelfth suite. It asks the Makefile which targets `check`
+# A driver, not one more suite. It asks the Makefile which targets `check`
 # runs, dispatches each one as its own `make <target>`, and replays their
 # captured output in the Makefile's own order. Every assertion is made by the
 # suite that already made it serially; nothing here changes how a suite decides,
@@ -35,7 +35,7 @@
 # Three reasons, in order of how hard they are to work around:
 #
 #   1. macOS ships GNU make 3.81, which has no `--output-sync`. Under `-j` the
-#      eleven suites interleave their output line by line and "which suite
+#      suites interleave their output line by line and "which suite
 #      failed" stops being answerable from the transcript.
 #   2. `make -j check` would also fan out *inside* `examples`, whose six
 #      sub-targets all latexmk into $(EXAMPLES_BUILD_DIR). That is a collision
@@ -47,7 +47,7 @@
 # This repository's characteristic failure is a check that reports green
 # without doing the work: a sandboxed TeX run typesets nothing and passes, a
 # stale artifact reads as evidence, `grep -q` loses a race to SIGPIPE. Running
-# eleven suites concurrently adds a fresh instance of that class — a worker that
+# the suites concurrently adds a fresh instance of that class — a worker that
 # dies before its suite ever ran leaves no failure behind, only an absence — so
 # three checks here are the substance rather than paperwork:
 #
@@ -59,7 +59,7 @@
 #   - FONT CACHE. LuaLaTeX needs to write luaotfload's font cache. Where it
 #     cannot, fontspec falls back to nullfont, every document typesets empty,
 #     and every suite passes having measured nothing. Serially the first suite
-#     pays the cache-warming cost once; under fan-out eleven processes race to
+#     pays the cache-warming cost once; under fan-out the workers race to
 #     build it at once, which is exactly when it goes wrong. So the cache is
 #     warmed by one small build before any worker starts, and that build is
 #     required to prove it typeset real glyphs.
@@ -673,7 +673,7 @@ self_test() {
   fi
 
   # Every dispatched name must be .PHONY, or a same-named file in the tree would
-  # make `make <target>` a no-op that exits 0 — eleven hollow passes.
+  # make `make <target>` a no-op that exits 0 — a hollow pass.
   local phony_line phony_names=() name candidate found
   phony_line="$(sed -n 's/^\.PHONY:[[:space:]]*//p' "$root/Makefile" | tr '\n' ' ')"
   for candidate in $phony_line; do phony_names+=("$candidate"); done
