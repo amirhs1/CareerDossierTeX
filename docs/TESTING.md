@@ -768,3 +768,5 @@ The page-fill floor is the one part of this that *is* asserted: `make layout`
 enforces it, a fixture below it declares `% PAGEFILLFLOOR: <pct>` at the fixture,
 and a declaration that is no longer needed fails the run. It is a ratchet
 against the accepted corpus, not a fill policy.
+
+<!-- #568 probe: throwaway docs-only edit; this branch is never merged. -->
