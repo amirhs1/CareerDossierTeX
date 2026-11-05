@@ -115,11 +115,11 @@ park it in the furthest-out open milestone.
 currently qualify; each records why its release is undecided, and an
 unmilestoned issue without that reason is an oversight.
 
-An **epic parent** is for work that genuinely decomposes into several issues — a
-release epic, or a cross-cutting effort spanning more than one class or package.
-A bug found mid-milestone, a CI repair, or a documentation sync takes a
-milestone and no parent. Do not create a placeholder epic so a lone issue has
-somewhere to sit; that reproduces the milestone with extra steps.
+Every issue in a major or minor release's milestone is a sub-issue of that
+release's epic. A bug found mid-milestone, a CI repair, or a documentation sync
+takes the release epic and no other parent. Do not create a placeholder epic so
+a lone issue has somewhere to sit. A patch release has no epic, so its issues
+have no parent.
 
 Where an epic exists, its **sub-issue graph is canonical**. A checklist in the
 epic body is a rendering of that graph, not a second register — if the two
