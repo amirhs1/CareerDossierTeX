@@ -33,8 +33,8 @@ description: Open a GitHub issue from this repository's issue forms, with its ti
 6. Labels, from "Names": the type that fits the work, with the form's type as
    the default, and the area of each part it changes.
 7. Milestone: every issue carries one, unless its release is genuinely
-   undecided; never invent a placeholder. Give an issue an epic parent only
-   when the work genuinely decomposes into several issues.
+   undecided; never invent a placeholder. Make it a sub-issue of its
+   milestone's release epic; a patch release has none.
 8. Unless the person running you asked you to create it directly, show them
    the title and body first.
 9. Write the body to a file outside the repository, by absolute path, and open
