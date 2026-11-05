@@ -25,6 +25,67 @@ permissions:
   contents: read
 
 jobs:
+  # Docs-only classifier (issue #568). On a pull request whose diff touches
+  # only the paths below, the TeX jobs are skipped; `lint` and `toolchain` run
+  # regardless, and so does every job on a push to main.
+  #
+  # Skipping is done with a job-level `if:`, not a `paths:` filter on the
+  # trigger: every job here is a required status check on the `Protect Main`
+  # ruleset, and a job whose workflow never starts never reports, so the pull
+  # request would wait on it forever. A job skipped by `if:` reports, and a
+  # skipped required check counts as passed.
+  #
+  # The guard on each TeX job is fail-safe: it runs the job when this
+  # classifier did not succeed. Without that, a failed `changes` job would skip
+  # its dependants, and the skips would satisfy the required checks untested.
+  #
+  # The list is safe only while no TeX job reads a path on it. Re-run these
+  # before widening it, and whenever a runner starts reading documentation;
+  # every hit must be a comment, a message, or `tests/lint/`, which `lint` runs:
+  #
+  #   git grep -nE '\.md' -- build.lua Makefile tests ':!tests/lint'
+  #   git grep -nE '\.claude|\.codex|githooks|gitmessage' -- build.lua Makefile tests ':!tests/lint'
+  #
+  # `doc/careerdossier.tex` is not on the list: the `manual` job builds it.
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      tex: ${{ steps.classify.outputs.tex }}
+    steps:
+      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      # Full history, so the merge base of the two commits below is present.
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+      # --no-renames lists both sides of a rename, so moving a source file into
+      # docs/ still counts as touching the source file it removes.
+      - name: Classify the pull request diff
+        id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eu
+          if [ "$EVENT_NAME" != pull_request ]; then
+            echo "Event $EVENT_NAME: every job runs."
+            echo "tex=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          docs='^(docs/|\.agents/|\.github/ISSUE_TEMPLATE/|\.claude/|\.codex/|\.githooks/|\.gitmessage$|.*\.md$)'
+          files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA")
+          echo "Files changed since the merge base:"
+          printf '%s\n' "$files" | sed 's/^/  /'
+          # An empty diff prints one empty line, which the pattern does not
+          # match, so it too runs every job.
+          if printf '%s\n' "$files" | grep -qvE "$docs"; then
+            echo "A path outside the docs-only list changed: every job runs."
+            echo "tex=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Docs-only diff: the TeX jobs are skipped."
+            echo "tex=false" >> "$GITHUB_OUTPUT"
+          fi
+
   toolchain:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
@@ -104,6 +165,9 @@ jobs:
         run: make lint
 
   regression:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -127,6 +191,9 @@ jobs:
           if-no-files-found: warn
 
   extraction:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -149,6 +216,9 @@ jobs:
           if-no-files-found: warn
 
   tagging:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -190,6 +260,9 @@ jobs:
   # lets them start in parallel with every other job; the `resume` job below is
   # once again only as slow as the example it builds.
   smoke:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -213,6 +286,9 @@ jobs:
           if-no-files-found: warn
 
   layout:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -238,6 +314,9 @@ jobs:
           if-no-files-found: warn
 
   resume:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -262,6 +341,9 @@ jobs:
   # to compile. Keep it that way, or add `manual` to CHECK_TARGETS; do not leave
   # it in neither place.
   manual:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -281,6 +363,9 @@ jobs:
           if-no-files-found: warn
 
   letter:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -310,6 +395,9 @@ jobs:
   # that tells a local Biber fault apart from a general one. Fold it back into
   # `cv` if the runner is ever worth more than that.
   bibliography:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -362,6 +450,9 @@ jobs:
   # is the only site that puts stretchable glue at a URL's breakpoints, and the
   # suite's negative control lives there.
   links:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -394,6 +485,9 @@ jobs:
   # fixtures build uncompressed and the runner reads the catalog itself — so it
   # is the cheapest job in this workflow.
   metadata:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -415,6 +509,9 @@ jobs:
   # `metadata` it needs no PDF tooling: the fixtures build uncompressed and the
   # runner reads the annotations itself.
   annotations:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -425,6 +522,9 @@ jobs:
       # No artifact upload, for the reason given under `metadata` above.
 
   cv:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -449,6 +549,9 @@ jobs:
           if-no-files-found: warn
 
   academic-letter:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
@@ -468,6 +571,9 @@ jobs:
           if-no-files-found: warn
 
   statement:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
