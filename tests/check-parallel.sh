@@ -11,21 +11,24 @@
 #
 # Since #399 this is what `make check` runs, so it is the full local run rather
 # than an opt-in alternative to it. The serial path is `make check-serial` and
-# dispatches the same eleven targets one at a time. Being the full run is why
-# the proofs below are not optional decoration: they are the reason a scheduled
-# run can be believed in place of a serial one.
+# dispatches the same targets, the Makefile's CHECK_TARGETS, one at a time.
+# Being the full run is why the proofs below are not optional decoration: they
+# are the reason a scheduled run can be believed in place of a serial one.
 #
 # WHY FOUR
 #
 # --jobs defaults to 4 because 4 is the fastest value measured green (#399):
-# serial 439 s, JOBS=2 285 s, JOBS=4 211 s, all green; JOBS=8 runs in 168-201 s
-# and failed 4 of 8 clean-tree runs. Every one of those failures was a
+# serial 439 s, JOBS=2 285 s, JOBS=4 211 s, all green. JOBS=8 ran in 168-201 s
+# but failed 4 of 8 clean-tree runs, and every one of those failures was a
 # text-extraction assertion against a document that is provably correct — a
-# guard reporting present text as missing under load, which is #398 and is not
-# about the classes at all. So the ceiling here is a known open defect rather
-# than a property of the machine, and raising the default waits on that issue.
-# A red `JOBS=4` run for that reason is a reason to reconsider this arrangement,
-# not to retry it.
+# guard reporting present text as missing under load, which was #398 and was
+# not about the classes at all.
+#
+# #398 is closed: PR #403 made the extracted-text guards answer three states.
+# The default stays 4 all the same. Why it does, and where JOBS=8 stands since,
+# belong to the Makefile header, where JOBS is defined and defaulted; this file
+# does not restate them. A red `JOBS=4` run from a guard misreading present
+# text is a reason to reconsider this arrangement, not to retry it.
 #
 # WHY NOT `make -j`
 #
