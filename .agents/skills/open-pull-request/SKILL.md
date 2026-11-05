@@ -35,17 +35,24 @@ description: Open a draft GitHub pull request whose body is the full report, and
 5. Title and labels: follow "Names" in CONTRIBUTING.md. The type comes from
    the branch name; the areas, from the parts the diff changes. If the branch
    prefix and the intended type label disagree, stop and ask.
-6. Push the branch, open a draft, then read it back with `gh pr view`:
-   `gh pr create --draft --base main --title "<title>" --label <labels> --body-file <file>`.
-   Never mark it ready or merge it.
-7. Set its fields with `project-metadata`: the assignee, the Project, the
-   focused issue's milestone, `Phase`, and `Priority`, the in-progress
-   `Status`, and `Size` scored from the diff. Its read-back adds four items for
-   a pull request: the URL and draft status; the base and head branches; the
-   focused issue the body links; and, for a pull request scored `L`, its extra
-   obligation: stay draft and recommend splitting, unless broad scope was
-   already approved.
+6. Push the branch. Read the focused issue's milestone and the Project's title
+   live, with `project-metadata`'s first step, then open a draft with them and
+   read it back with `gh pr view`:
+   `gh pr create --draft --base main --title "<title>" --label <labels> --assignee amirhs1 --milestone "<milestone>" --project "<project title>" --body-file <file>`.
+   Leave out `--milestone` when the focused issue has none. Never mark it
+   ready or merge it.
+7. Set its fields with `project-metadata`: the focused issue's `Phase` and
+   `Priority`, the in-progress `Status`, and `Size` scored from the diff; when
+   the pull request closes only the focused issue, that issue takes the same
+   `Size`. Its read-back adds four items for a pull request: the URL and draft
+   status; the base and head branches; the focused issue the body links; and,
+   for a pull request scored `L`, its extra obligation: stay draft and
+   recommend splitting, unless broad scope was already approved. It also
+   asserts the focused issue's parent and `Size`.
 8. If the branch already has a pull request, first check
    `gh pr view <n> --json state`, and stop if it has merged. Otherwise push,
    then replace its body and read it back:
-   `gh pr edit <n> --body-file <file>`.
+   `gh pr edit <n> --body-file <file>`. When the update pushed commits,
+   re-score `Size` from the whole diff with `project-metadata`, "Updating an
+   open pull request" in its `reference.md`, and assert it on the pull request
+   and the focused issue.

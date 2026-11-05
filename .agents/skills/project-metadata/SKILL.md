@@ -11,9 +11,14 @@ metadata, read live.
 ## What this skill owns
 
 The metadata half of every tracked object: `Status`, `Phase`, `Priority`,
-`Size`, the milestone, labels, the assignee, and Project membership. It applies
-to an **issue** and to a **pull request** alike — the fields are the same, the
-option ids are the same, and the read-back obligation is the same.
+`Size`, the milestone, labels, the assignee, Project membership, and an issue's
+epic parent. It applies to an **issue** and to a **pull request** alike — the
+fields are the same, the option ids are the same, and the read-back obligation
+is the same.
+
+It runs when an issue is filed, when its pull request opens, and again whenever
+an update changes that pull request's diff. The pull request is where the
+focused issue's parent is checked and its final `Size` written.
 
 It does not open anything. `open-pull-request` owns the close-out gate, the
 pull request body, and the push, and adds four items to this skill's read-back;
@@ -32,10 +37,13 @@ skill for the fields.
 3. Apply the labels `reference.md`, "Label selection", calls for — one primary
    `type:*`, every relevant `area:*` — from `CONTRIBUTING.md`, "Names".
 4. Write every field in one mutation, per `reference.md`, "4. Write every field
-   in one mutation". A batched write fails per alias, not per call.
+   in one mutation". A batched write fails per alias, not per call. An issue
+   becomes a sub-issue of its milestone's release epic when it joins the
+   Project; a pull request that closes only the focused issue gives that issue
+   its own `Size`.
 5. Read every field back and **assert** it, per `reference.md`,
-   "Verification". A blank is unfinished work, not a reporting line: fill it
-   and read back again.
+   "Verification", the parent included. A blank is unfinished work, not a
+   reporting line: fill it and read back again.
 
 Steps 1–5 batch their reads and writes rather than making one call per field.
 `reference.md`, "The shape of the sequence", counts the calls, and its appendix
