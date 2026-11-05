@@ -340,10 +340,11 @@ committed to check them against.
 
 ## Running the harness
 
-`make check` is the gate and runs every suite below. `CONTRIBUTING.md`, "Local
-builds", and "The gate, and the serial path" own the invocation, scoping, and
-what each target's CI job is called; its "CI expectations" owns when CI skips
-one.
+`make check` is the gate and runs every suite below, except on a docs-only
+change, where it runs only the lints. `CONTRIBUTING.md`, "Local builds", and
+"The gate, and the serial path" own the invocation, scoping, the docs-only rule,
+and what each target's CI job is called; its "CI expectations" owns when CI
+skips one.
 
 The entries below say only what a suite covers and where its output lands, so
 that you can find the right runner to read.
@@ -368,8 +369,11 @@ a baseline from such a run.
 `tests/check-parallel.sh` dispatches `CHECK_TARGETS` across workers, captures
 each to `build/check-parallel/NN-<target>.log`, and replays them in `Makefile`
 order. It accounts for every dispatched target, warms the font cache, and gives
-each worker its own biber cache. `--self-test` drives its five committed
-controls. The `Makefile` header owns why `JOBS` defaults to 4.
+each worker its own biber cache. On a docs-only change it narrows the dispatch
+to `DOCS_ONLY_TARGETS` and skips the two cache proofs, which none of those
+targets needs. `--self-test` drives its six committed controls; the sixth pins
+that only a docs-only verdict, with no `FULL=1`, narrows the run. The `Makefile`
+header owns why `JOBS` defaults to 4.
 
 ### Fanning out inside a suite
 
@@ -742,6 +746,17 @@ fixture messages: an AI-assisted commit with a fixed role and a commit with no
 trailers are accepted; a free-text `Assisted-by:` role and an AI
 `Co-authored-by:` line are rejected. A missing fixture, or an exit status other
 than 0 or 1, fails the lint rather than counting as a rejection.
+
+### Docs-only classifier lint
+
+`tests/lint/run-docs-only.sh` — drives `tests/lib/docs-only.sh`, the one copy of
+the docs-only path list, over the `docsonlyfixture-*` path lists and over a
+throwaway repository built under `build/`. A list that is docs-only but for one
+`.sty`, `doc/careerdossier.tex`, `Makefile`, `build.yml`, a rename into `docs/`,
+or the classifier itself is not docs-only, and nor is an empty change; a
+committed, staged, unstaged, or untracked change each counts; no `origin/main`
+and no git checkout are unclassified. An exit status other than 0, 1, or 2
+fails the lint.
 
 ### Shell-harness lint
 

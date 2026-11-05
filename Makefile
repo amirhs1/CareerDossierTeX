@@ -74,12 +74,16 @@
 # sources, so the source tree never picks up untracked build artifacts.
 #
 # Running the full suite (issues #378, #390, #399). `check` is the pre-push gate
-# and runs its twelve targets four at a time. The serial path survives under its
-# own name:
+# and runs its twelve targets four at a time. On a docs-only change it runs only
+# DOCS_ONLY_TARGETS and says so (#603). The serial path survives under its own
+# name:
 #
-#   make check                  the gate: twelve targets, four at a time
+#   make check                  the gate: twelve targets, four at a time,
+#                               or only the lints on a docs-only change
+#   make check FULL=1           every target, whatever the change touches
 #   make check JOBS=2           the same targets, two at a time
-#   make check-serial           one target after another, deterministic
+#   make check-serial           one target after another, deterministic,
+#                               never scoped
 #
 # The gate was serial until #399 on the argument that it is the CI-aligned entry
 # point. What CI is aligned to is the target set and the commands, not the
@@ -172,7 +176,7 @@ STATEMENTS := examples/statements/research-statement.tex \
 # documents under "Build".
 .DEFAULT_GOAL := examples
 
-.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements manual ctan check check-serial check-parallel check-targets test lint ctan-lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
+.PHONY: help examples resume letter academic-cv academic-bibliography academic-letter statements manual ctan check check-serial check-parallel check-targets check-docs-only-targets test lint ctan-lint regression smoke layout review-page-two review-matrix review-entrymeta-muted review-link-decoration review-linebreak review-linebreak-parallel review-pagefill review-spacing extract-test bibliography-test links metadata annotations tagging clean
 
 help: ## List the available targets
 	@printf 'CareerDossierTeX make targets:\n\n'
@@ -246,13 +250,27 @@ ctan: ## Build the CTAN release archive; runs l3build check first
 CHECK_TARGETS := lint ctan-lint regression extract-test smoke layout \
                  bibliography-test links metadata annotations tagging examples
 
-check: ## Run the full supported local suite — the gate; JOBS=N sets the workers
+# What `check` dispatches on a docs-only change (#603): the targets that read
+# the files such a change edits. tests/lib/docs-only.sh decides what docs-only
+# means, for this and for CI's `changes` job alike; `FULL=1` overrides it, and
+# a change it cannot classify runs every target.
+#
+# A target joins this list only if it compiles no LaTeX and runs no biber: a
+# scoped run skips the driver's font-cache and biber proofs, which exist for
+# those runs. Each member must also be in CHECK_TARGETS, in the same order;
+# `tests/check-parallel.sh --self-test` asserts both orders and that `lint` is
+# here.
+DOCS_ONLY_TARGETS := lint ctan-lint
+
+check: ## The gate: every suite, or only the lints on a docs-only change; FULL=1 runs all, JOBS=N sets the workers
 	tests/check-parallel.sh $(if $(JOBS),--jobs $(JOBS)) \
-	  $(if $(INNER_JOBS),--inner-jobs $(INNER_JOBS))
+	  $(if $(INNER_JOBS),--inner-jobs $(INNER_JOBS)) \
+	  $(if $(FULL),--full=$(FULL))
 
 # The serial path, kept because a deterministic run is worth having when a
 # parallel one reports something surprising: it removes scheduling as a variable
-# in one command. It is also the prerequisite list `make lint` reads the target
+# in one command. It is never scoped to a docs-only change, so it is also the
+# always-full path. It is also the prerequisite list `make lint` reads the target
 # set from, so it is load-bearing beyond being an alternative.
 check-serial: $(CHECK_TARGETS) ## check's targets one after another, deterministic
 	@printf '\nAll suites passed.\n'
@@ -263,11 +281,15 @@ check-serial: $(CHECK_TARGETS) ## check's targets one after another, determinist
 check-targets:
 	@printf '%s\n' $(CHECK_TARGETS)
 
+# Likewise, for the docs-only subset the driver narrows to.
+check-docs-only-targets:
+	@printf '%s\n' $(DOCS_ONLY_TARGETS)
+
 check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, the list-remnant line count, the commit-msg hook, shellcheck over the harness, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, accented spellings, manual names, manual examples, documented token values, text guards, the list-remnant line count, the commit-msg hook, the docs-only classifier, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
@@ -282,6 +304,7 @@ lint: ## Static lint: option values, version declarations, fixture selection, Ma
 	tests/lint/run-text-guards.sh
 	tests/lint/run-list-remnant.sh
 	tests/lint/run-commit-msg-hook.sh
+	tests/lint/run-docs-only.sh
 	tests/lint/run-shellcheck.sh
 	tests/check-parallel.sh --self-test
 
