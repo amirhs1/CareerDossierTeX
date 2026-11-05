@@ -170,7 +170,7 @@ jobs:
             package pdfmanagement-testphase
             echo
             echo "## tagpdf"
-            package tagpdf
+            package tagpdf-probe-missing
             echo
             echo "## l3build"
             l3build --version 2>&1 | sed -n '1,4p'
