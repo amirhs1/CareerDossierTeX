@@ -340,9 +340,11 @@ committed to check them against.
 
 ## Running the harness
 
-`make check` is the gate and runs every suite below, except on a docs-only
-change, where it runs only the lints. `CONTRIBUTING.md`, "Local builds", and
-"The gate, and the serial path" own the invocation, scoping, the docs-only rule,
+`make check` runs every suite below, except on a docs-only change, where it
+runs only the lints. It is optional before a push: CI's required checks are the
+gate (`CONTRIBUTING.md`, "What actually gates a merge"). `CONTRIBUTING.md`,
+"Local builds", and "The full run, and the serial path" own the invocation,
+scoping, the docs-only rule,
 and what each target's CI job is called; its "CI expectations" owns when CI
 skips one.
 

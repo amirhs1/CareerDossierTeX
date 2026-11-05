@@ -33,7 +33,8 @@ for anything not checked, and why.
 
 - [ ] Focused tests were added or updated under `tests/` with behavior changes
 - [ ] Expected pre-fix failure was confirmed, or the reason it could not be was documented
-- [ ] `make check` passed, which builds every supported example
+- [ ] `make lint` and the suite that owns the change passed; `make check` too, if it ran
+- [ ] Required CI checks passed, in run `<run ID>`
 - [ ] Relevant logs inspected
 - [ ] No unexpected overfull boxes
 - [ ] Missing optional fields render correctly
