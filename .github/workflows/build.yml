@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   # Docs-only classifier (issue #568). On a pull request whose diff touches
-  # only the paths below, the TeX jobs are skipped; `lint` and `toolchain` run
+  # only docs-only paths, the TeX jobs are skipped; `lint` and `toolchain` run
   # regardless, and so does every job on a push to main.
   #
   # Skipping is done with a job-level `if:`, not a `paths:` filter on the
@@ -39,14 +39,12 @@ jobs:
   # classifier did not succeed. Without that, a failed `changes` job would skip
   # its dependants, and the skips would satisfy the required checks untested.
   #
-  # The list is safe only while no TeX job reads a path on it. Re-run these
-  # before widening it, and whenever a runner starts reading documentation;
-  # every hit must be a comment, a message, or `tests/lint/`, which `lint` runs:
-  #
-  #   git grep -nE '\.md' -- build.lua Makefile tests ':!tests/lint'
-  #   git grep -nE '\.claude|\.codex|githooks|gitmessage' -- build.lua Makefile tests ':!tests/lint'
-  #
-  # `doc/careerdossier.tex` is not on the list: the `manual` job builds it.
+  # The path list and its test live in tests/lib/docs-only.sh (#603), which
+  # `make check` calls too, so CI and the local gate share one definition of
+  # docs-only. That script's header holds the list, the greps that keep it
+  # safe, and why `doc/careerdossier.tex` is not on it; `make lint` tests it
+  # (tests/lint/run-docs-only.sh). A pull request that edits the script is not
+  # docs-only, so it runs every job.
   changes:
     runs-on: ubuntu-24.04
     outputs:
@@ -72,18 +70,17 @@ jobs:
             echo "tex=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          docs='^(docs/|\.agents/|\.github/ISSUE_TEMPLATE/|\.claude/|\.codex/|\.githooks/|\.gitmessage$|.*\.md$)'
           files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA")
           echo "Files changed since the merge base:"
           printf '%s\n' "$files" | sed 's/^/  /'
-          # An empty diff prints one empty line, which the pattern does not
-          # match, so it too runs every job.
-          if printf '%s\n' "$files" | grep -qvE "$docs"; then
-            echo "A path outside the docs-only list changed: every job runs."
-            echo "tex=true" >> "$GITHUB_OUTPUT"
-          else
+          # Exit 0 is docs-only. Anything else -- not docs-only, an empty
+          # diff, or a classifier that could not run -- runs every job.
+          if printf '%s\n' "$files" | tests/lib/docs-only.sh --paths; then
             echo "Docs-only diff: the TeX jobs are skipped."
             echo "tex=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "A path outside the docs-only list changed: every job runs."
+            echo "tex=true" >> "$GITHUB_OUTPUT"
           fi
 
   toolchain:

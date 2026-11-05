@@ -188,3 +188,26 @@ as git would give it.
 
 `-free-role.txt` is the case that made the hook necessary: both AI-assisted
 commits on `main` before #573 gave a sentence as the `Assisted-by:` role.
+
+## Docs-only classifier fixtures
+
+`docsonlyfixture-*.txt` pin the `--paths` verdicts of `tests/lib/docs-only.sh`,
+driven by `tests/lint/run-docs-only.sh` (issue #603). Each is a path list, one
+path per line, as `git diff --no-renames --name-only` prints it. The expected
+verdicts follow the path list `CONTRIBUTING.md`, "CI expectations", documents.
+
+| Fixture | Expected verdict |
+| --- | --- |
+| `docsonlyfixture-docs.txt` | docs-only: one path under each entry of the list |
+| `docsonlyfixture-sty.txt` | full: a docs edit and a `.sty` |
+| `docsonlyfixture-manual.txt` | full: `doc/careerdossier.tex`, which the `manual` job builds |
+| `docsonlyfixture-makefile.txt` | full: `Makefile` |
+| `docsonlyfixture-workflow.txt` | full: `.github/workflows/build.yml`, beside `.github/ISSUE_TEMPLATE/` |
+| `docsonlyfixture-rename.txt` | full: a `.sty` renamed into `docs/`, listed as both sides |
+| `docsonlyfixture-classifier.txt` | full: `tests/lib/docs-only.sh` itself |
+| `docsonlyfixture-empty.txt` | full: an empty change |
+
+Each "full" list but the last keeps a docs path beside the one that disqualifies
+it, so the classifier has to single out that path rather than reject the list
+whole. The working-tree cases build their repository at run time and have no
+fixture file.

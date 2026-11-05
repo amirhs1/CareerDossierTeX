@@ -1,0 +1,2 @@
+docs/TESTING.md
+tests/lib/docs-only.sh

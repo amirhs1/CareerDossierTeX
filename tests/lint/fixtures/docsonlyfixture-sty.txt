@@ -1,0 +1,2 @@
+docs/TESTING.md
+careerdossier-theme.sty
