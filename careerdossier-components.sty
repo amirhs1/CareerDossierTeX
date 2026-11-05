@@ -17,52 +17,46 @@
 %%
 %% careerdossier-components owns the shared rendered document parts: the
 %% identity block and header stack, page furniture, section rules, the contact
-%% line, the entry-heading primitive and its metadata placement, the link layer,
-%% list page-break policy and its tagged closing edge, and separator handling.
+%% line, the entry-heading primitive and its metadata placement, list
+%% page-break policy and its tagged closing edge, and separator handling.
 %% It carries no page geometry (see careerdossier-tokens) and no resume- or
-%% letter-specific structure.
-%%
-%% That list is longer than a module description should be, and the length is
-%% the finding rather than the style. Two blocks dominated the file -- the link
-%% layer and PDF document metadata. The second now has its own package,
-%% careerdossier-metadata (#464), which this one loads; #465 asks the same
-%% question of the link layer and may well answer no, and carries the
-%% measurements. Its landing would require rewriting this comment, manifest.txt,
-%% and docs/ARCHITECTURE.md again; describing the module accurately in the
-%% meantime is worth that cost, because AGENTS.md ("Layout") sends an author
-%% here to find the module that owns a concern.
+%% letter-specific structure. Links belong to careerdossier-links (#465) and PDF
+%% document metadata to careerdossier-metadata (#464); this package loads both,
+%% so a class reaches them through the \RequirePackage list it already has.
 
 %% Responsibilities, in full: the public header-stack composition API; the
 %% identity block, token-sized and baseline-derived; the shared page-style pair,
 %% single-page suppression, running header, and folio; the medium=print|screen
-%% decision of whether furniture is emitted at all and whether a link carries a
-%% visible decoration; the link-decoration role \CDossierLinkStyle, the
-%% \CDossierPlainLinks suppression declaration, and the \href hook that reaches
-%% an author's own anchor text; the muted=italic|gray|both|plain de-emphasis
-%% role \CDossierMutedStyle and what it resolves to; the entrymeta=column|inline
-%% placement of an entry's dates and location and the
+%% option, its decision of whether furniture is emitted at all, and the hand-off
+%% of its link half to careerdossier-links; the muted=italic|gray|both|plain
+%% de-emphasis role \CDossierMutedStyle and what it resolves to; the
+%% entrymeta=column|inline placement of an entry's dates and location and the
 %% \CDossierEntryMetaSeparator the inline form joins them with; the shared
 %% CV/resume section rule with its token-owned spacing and tagged
 %% layout-artifact treatment; the shared record subsection renderer (#337) that
 %% both record classes expose as \CDossierSubsection -- its depth-3 division and
 %% heading, its two tokens, its needs-N-lines bound, and the test for whether a
 %% section has typeset anything yet, one renderer so the tokens and the tagged
-%% structure cannot drift between two spellings; the contact line;
-%% optional-field separator handling; the hyperlink wrappers including
-%% \CDossierLink and the scheme normalisation shared with the web-profile
-%% fields; the entry-heading, date, and location primitives; letterhead pieces
-%% that impose no page geometry; and the no-op \pdffakespace fallback every
-%% class relies on when untagged. PDF document metadata belongs to
-%% careerdossier-metadata.
+%% structure cannot drift between two spellings; the contact line, its field
+%% order, labels, and row packing; optional-field separator handling; the
+%% entry-heading, date, and location primitives; letterhead pieces that impose
+%% no page geometry; and the no-op \pdffakespace fallback every class relies on
+%% when untagged.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
 \ProvidesExplPackage {careerdossier-components} {2026-08-26} {0.9.0}
-  {CareerDossierTeX shared document parts and link layer}
+  {CareerDossierTeX shared document parts}
 
 \RequirePackage { careerdossier-base }
 \RequirePackage { careerdossier-tokens }
 \RequirePackage { careerdossier-typography }
 \RequirePackage { careerdossier-theme }
+
+%% The link layer (issue #465). Loaded here, before the package options are
+%% processed, because the `medium' handler below hands it the link half of that
+%% decision; loaded after theme, so its hyperref hook still runs after theme's,
+%% as it did when the layer was part of this file.
+\RequirePackage { careerdossier-links }
 
 %% ---------------------------------------------------------------------------
 %% Output medium (issue #184).
@@ -93,10 +87,10 @@
 
 %% `medium' now drives two independent decisions, so each has its own state
 %% rather than one bool read in two senses: the page furniture below, and the
-%% body-copy link decoration of issue #278. They are not each other's negation
-%% by accident -- a third medium, if one is ever added, would have to answer
-%% both questions separately.
-\bool_new:N \l__cdossier_components_screen_bool
+%% body-copy link decoration of issue #278, whose state careerdossier-links owns
+%% and this package sets through \__cdossier_links_set_screen:n. They are not
+%% each other's negation by accident -- a third medium, if one is ever added,
+%% would have to answer both questions separately.
 
 \msg_new:nnnn { careerdossier-components } { unknown-option }
   { Unknown~package~option~'#1'~for~careerdossier-components. }
@@ -230,7 +224,7 @@
       {
         \bool_set:Nn \l__cdossier_components_furniture_bool
           { \str_if_eq_p:Vn \l_keys_choice_tl { print } }
-        \bool_set:Nn \l__cdossier_components_screen_bool
+        \__cdossier_links_set_screen:n
           { \str_if_eq_p:Vn \l_keys_choice_tl { screen } }
       } ,
     medium / unknown .code:n =
@@ -336,11 +330,6 @@
 \clist_const:Nn \c__cdossier_components_contactorder_clist
   { email , phone , location , website , linkedin , github , scholar , orcid }
 
-\tl_new:N   \l__cdossier_components_disp_tl
-\tl_new:N   \l__cdossier_components_url_tl
-\tl_new:N   \l__cdossier_components_target_tl
-\tl_new:N   \l__cdossier_components_shown_tl
-\str_new:N  \l__cdossier_components_scheme_str
 \bool_new:N \l__cdossier_components_printed_bool
 \tl_new:N   \l__cdossier_components_label_tl
 \box_new:N  \l__cdossier_components_contact_box
@@ -405,501 +394,6 @@
       { \hbox:n { ~|~ } }
   }
 
-%% ---------------------------------------------------------------------------
-%% Link decoration (issue #278).
-%%
-%% careerdossier-theme sets `colorlinks=true, allcolors=cdossier-link' with
-%% `cdossier-link' at gray 0, so a link is drawn in body black with no border.
-%% Where the visible text *is* the address -- the contact line, \CDossierLink,
-%% an ORCID iD, a bibliography DOI -- that costs nothing: the text announces
-%% itself. Where an author writes their own anchor text,
-%%
-%%     documented in a \href{https://example.test/work}{public write-up}
-%%
-%% nothing at all marks `public write-up' as actionable. That is worse than the
-%% colour-only case WCAG 2.1 AA 1.4.1 is about: there is no cue of any kind.
-%%
-%% `medium' already names the reading context, so it carries the decision. On
-%% screen the anchor text is underlined; on paper it is not, which is the
-%% deliberate print treatment this toolkit shipped with. The *annotation* is
-%% emitted under both media: it costs nothing on paper and stripping it would
-%% hand dead links to anyone who opens a `medium=print' file on screen.
-%%
-%% Three findings from issue #278 shape the implementation, and each is a
-%% constraint rather than a preference.
-%%
-%%   - `colorlinks=true' is the only thing suppressing hyperref's default 1pt
-%%     annotation border. Turning it off to make room for a rule brings the
-%%     border back as `/Border [0 0 1]'. So the rule is drawn by us and
-%%     `colorlinks' is never touched.
-%%   - \__cdossier_components_link:nn below is the chokepoint for every link
-%%     this package generates, and it is the wrong hook: a user's \href in body
-%%     copy never reaches it. Patching it decorated exactly the links that
-%%     already announced themselves and left the one that did not byte-identical.
-%%   - \RenewDocumentCommand\href{omm} detonates. hyperref re-catcodes the URL
-%%     argument inside \hyper@normalise before expanding it, and an xparse
-%%     wrapper that grabs the argument first fails in the URL scanner.
-%%
-%% The last one is why the wrapper below grabs *no* arguments. It records that
-%% this link came from \href and hands the untouched token stream straight to
-%% hyperref's own scanner, which then runs exactly as it always did. The flag is
-%% read once, in \hyper@link@, which is where hyperref has the link text in hand
-%% and has finished with catcodes.
-%%
-%% The flag is global because it must survive the \begingroup that \href opens
-%% between setting and reading it. Its lifetime is that single macro hop:
-%% \hyper@link@ clears it before typesetting anything, so \hyperlink and
-%% \hyperref -- which share \hyper@link@ but are not author prose -- are never
-%% decorated by a stale value.
-%% ---------------------------------------------------------------------------
-%% lua-ul draws the rule, and the choice was settled by measurement rather than
-%% by preference. ulem was tried first and rejected.
-%%
-%% \uline reboxes its argument and rebuilds the interword spaces as its own
-%% leaders. That survives every check this project had before issue #302: the
-%% rendered page is correct, veraPDF passes, and Poppler, MuPDF, and PDFKit all
-%% read `public write-up' back intact, because they rebuild words from glyph
-%% geometry and the gap is still there. What changes is the structure tree. A
-%% consumer reading the logical text of the Link element -- which is what a
-%% screen reader announces -- gets `publicwrite-up': tagpdf marks a real space
-%% only where it finds interword glue, and ulem has replaced that glue. The same
-%% class of defect as issues #302 and #315, arriving by a third route.
-%%
-%% lua-ul underlines by attaching a node attribute and letting LuaTeX draw the
-%% rule at shipout. Nothing is reboxed, the glue is untouched, and the space
-%% survives -- tests/tagging/resume-linkdecoration pins that. It is LuaLaTeX-only,
-%% which costs this toolkit nothing: LuaLaTeX is the sole supported engine, and
-%% the classes already error on anything else. LPPL 1.3c, in TeX Live, and it
-%% pulls in luacolor (LPPL 1.3) as its one further dependency.
-%%
-%% Reboxing was also the #161 hazard -- boxed text under tagging can silently
-%% become a bare /Artifact -- so avoiding the rebox removes that risk too rather
-%% than merely testing for it. The test is kept regardless.
-\RequirePackage { lua-ul }
-
-%% Set true for exactly one link, by the \href wrapper installed below.
-\bool_new:N \g__cdossier_components_hrefdeco_bool
-
-%% Suppresses decoration for the links this toolkit renders itself, where the
-%% visible text is the address. Local, so it lasts for one group.
-\bool_new:N \l__cdossier_components_plainlinks_bool
-
-%% \CDossierPlainLinks: a declaration, scoped to the enclosing group, that turns
-%% link decoration off. Public because careerdossier-cv and careerdossier-biblatex
-%% both render address-as-text links that this package cannot reach, and because
-%% a document may legitimately want an undecorated region.
-%%
-%% Every one of those links displays the address through \nolinkurl or url.sty,
-%% so the visible text already announces itself and needs no second cue -- which
-%% is the split issue #278 settled deliberately rather than by default. On the
-%% contact line in particular a rule under the e-mail and the website, but not
-%% under the phone or the location, reads as `these two are emphasised' rather
-%% than `these are links', because every item on that line is an identifier.
-\NewDocumentCommand \CDossierPlainLinks { }
-  { \bool_set_true:N \l__cdossier_components_plainlinks_bool }
-
-%% \CDossierLinkStyle{<text>}: the semantic role. Under `medium=print', and
-%% wherever \CDossierPlainLinks is in force, it is the identity.
-%%
-%% The rule sits at lua-ul's own depth, 0.75ex below the baseline, which is
-%% font-relative and so clears descenders at every `fontsize' and under either
-%% `bodyfont'. Its thickness is this project's shared \CDossierRuleThickness
-%% instead of lua-ul's 0.1ex, so a link rule and a section rule are the same
-%% weight and both scale with the body size.
-%%
-%% lua-ul states the rule as two signed offsets from the baseline, so the top
-%% edge is the bottom edge plus the thickness.
-\cs_new_protected:Npn \__cdossier_components_underline:n #1
-  {
-    \underLine
-      [ bottom = -0.75ex , top = -0.75ex + \CDossierRuleThickness ]
-      {#1}
-  }
-
-\NewDocumentCommand \CDossierLinkStyle { m }
-  {
-    \bool_lazy_and:nnTF
-      { \l__cdossier_components_screen_bool }
-      { ! \l__cdossier_components_plainlinks_bool }
-      { \__cdossier_components_underline:n {#1} }
-      {#1}
-  }
-
-%% Install the \href hook. Guarded on \hyper@link@ so a document without
-%% hyperref, or a future hyperref that renames it, degrades to today's
-%% undecorated output instead of failing; tests/regression asserts the hook is
-%% actually in place, because a silent no-op here looks exactly like
-%% `medium=print'.
-\cs_new_protected:Npn \__cdossier_components_install_link_hook:
-  {
-    \NewCommandCopy \__cdossier_components_href_orig: \href
-    \cs_set_protected:Npn \href
-      {
-        \bool_gset_true:N \g__cdossier_components_hrefdeco_bool
-        \__cdossier_components_href_orig:
-      }
-    \cs_new_eq:Nc \__cdossier_components_hyperlink_orig:w { hyper@link@ }
-    \cs_set_protected:cpn { hyper@link@ } [##1]##2##3##4
-      {
-        \bool_if:NTF \g__cdossier_components_hrefdeco_bool
-          {
-            \bool_gset_false:N \g__cdossier_components_hrefdeco_bool
-            %% A blank argument is passed through untouched so hyperref still
-            %% issues its own "Suppressing empty link" warning, which a
-            %% \CDossierLinkStyle wrapper would make unreachable.
-            \tl_if_blank:nTF {##4}
-              { \__cdossier_components_hyperlink_orig:w [##1] {##2} {##3} {##4} }
-              {
-                \__cdossier_components_hyperlink_orig:w [##1] {##2} {##3}
-                  { \CDossierLinkStyle {##4} }
-              }
-          }
-          { \__cdossier_components_hyperlink_orig:w [##1] {##2} {##3} {##4} }
-      }
-  }
-
-\AddToHook { package/hyperref/after }
-  {
-    \cs_if_exist:cT { hyper@link@ }
-      { \__cdossier_components_install_link_hook: }
-  }
-
-%% Every link this package emits is guarded on \href, and the false branch is
-%% the right behavior: the address stays visible, selectable, and extractable.
-%% What the false branch has no way of announcing is that it was taken. The
-%% page looks finished, and the author finds out by clicking a dead address in
-%% the finished PDF. So say it once (issue #329).
-%%
-%% Once per document, not once per field: a contact line renders up to six
-%% linked fields, and the cause is a single missing package, not six mistakes.
-%% The flag is global because each contact item is rendered inside \hbox_set:Nn,
-%% which would restore a local one before the next item could read it.
-%%
-%% Reported where the degradation happens rather than at \begin{document}, so a
-%% document that emits no links at all is not warned about links. That also puts
-%% the message after \START in the regression fixtures, where a baseline can
-%% pin it.
-\msg_new:nnnn { careerdossier-components } { links-inert }
-  { Links~are~typeset~as~plain~text~because~hyperref~is~not~loaded. }
-  {
-    This~package~links~contact~fields~and~\CDossierLink\ with~\href,~which~
-    hyperref~provides.~The~addresses~remain~visible,~selectable,~and~
-    extractable,~but~nothing~in~the~PDF~is~clickable.~Load~hyperref,~or~use~
-    one~of~the~supplied~classes,~which~load~it~for~you.
-  }
-
-\bool_new:N \g__cdossier_components_inertwarned_bool
-
-%% Called from the false branch of every \href guard in the toolkit, including
-%% the manual publication target in careerdossier-cv.
-\cs_new_protected:Npn \__cdossier_components_links_inert:
-  {
-    \bool_if:NF \g__cdossier_components_inertwarned_bool
-      {
-        \bool_gset_true:N \g__cdossier_components_inertwarned_bool
-        \msg_warning:nn { careerdossier-components } { links-inert }
-      }
-  }
-
-%% Rewrite every raw `#' in a link target to \# in place (issue #353).
-%%
-%% A `#' in a profile value survives tokenization -- unlike `%', which the lexer
-%% destroys before any package code can see it -- so it reaches here intact, at
-%% catcode 6, and the displayed address already renders correctly. Only the
-%% \href target fails, and it fails from inside hyperref: \Hy@tempa is built
-%% with \edef, where a lone parameter character is "Illegal parameter number in
-%% definition of \Hy@tempa" -- a diagnostic naming neither the field, nor the
-%% value, nor the fix.
-%%
-%% THE OBVIOUS REPAIR IS THE WRONG ONE, AND FAILS SILENTLY. Handing hyperref a
-%% catcode-12 string instead (\str_set:Nn) compiles with zero errors, which is
-%% exactly why it is dangerous: hyperref reads an unescaped `#' as the fragment
-%% delimiter and drops everything after it, so `example.com/a#b' emits
-%%
-%%     /URI(https://example.com/a)
-%%
-%% -- a loud build failure traded for a link that looks right on the page and
-%% points at the wrong address, the same class of defect as issue #328. No
-%% text-layer test can catch it, because the displayed address is correct either
-%% way. Measured, not inferred: the two spellings were compared in an
-%% uncompressed build, and only \# reaches the annotation intact.
-%%
-%% So the target has to carry \#, the one spelling hyperref preserves, and the
-%% rewrite is a token substitution rather than a catcode change. l3regex is the
-%% idiom that can express it: \cP matches the parameter catcode class, which an
-%% \tl_replace_all:Nnn search argument cannot hold -- a lone parameter token
-%% breaks expl3's own argument scanning before the replacement is ever reached.
-%%
-%% A value that already writes \# is a control sequence, not a parameter
-%% character, so \cP\# does not match it and documents using the documented
-%% escape are untouched.
-%%
-%% BOTH ARGUMENTS OF A LINK NEED THIS, not just the target. \nolinkurl is also
-%% built on \hyper@normalise, and so also \edef's \Hy@tempa: measured on the
-%% reproducer, rewriting only the target took the failure from five errors to
-%% two, and the two that remained were the displayed address. The unlinked
-%% branch below needs no rewrite -- nothing there reaches hyperref, and the
-%% parameter character typesets as `#' on its own.
-\cs_new_protected:Npn \__cdossier_components_hashescape:N #1
-  { \regex_replace_all:nnN { \cP\# } { \c{\#} } #1 }
-
-%% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
-%% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
-%% \urlstyle{same} so the text stays in the body font rather than switching to
-%% monospace. Degrades to plain visible text when hyperref is absent, so the
-%% identifier is always present and extractable.
-%%
-%% The visible text here is the address, so the link is left plain under both
-%% media -- see \CDossierPlainLinks above.
-\cs_new_protected:Npn \__cdossier_components_link:nn #1#2
-  {
-    \cs_if_exist:NTF \href
-      {
-        \group_begin:
-          \CDossierPlainLinks
-          \tl_set:Nn \l__cdossier_components_target_tl {#1}
-          \tl_set:Nn \l__cdossier_components_shown_tl  {#2}
-          \__cdossier_components_hashescape:N \l__cdossier_components_target_tl
-          \__cdossier_components_hashescape:N \l__cdossier_components_shown_tl
-          \href { \l__cdossier_components_target_tl }
-            { \nolinkurl { \l__cdossier_components_shown_tl } }
-        \group_end:
-      }
-      { \__cdossier_components_links_inert: #2 }
-  }
-\cs_generate_variant:Nn \__cdossier_components_link:nn { VV }
-
-%% Body-text link (issue #308). The contact line's items are packed as atomic
-%% boxes, so its links only ever break at url.sty's own punctuation points. A
-%% link inside running prose or a bullet has no such packer behind it: it is
-%% one long token in a justified paragraph, and the three available forms all
-%% fail differently.
-%%
-%%   - plain text has no URL breakpoints at all, so TeX either overruns the
-%%     margin or *hyphenates* the address -- which sets an inserted hyphen that
-%%     copy-and-paste then carries into the pasted URL;
-%%   - \url breaks at punctuation only, so a long segment carrying none (a
-%%     repository or report identifier) is still one unbreakable token: measured
-%%     at 178.34 pt over the measure in a resume bullet at fontsize=10pt,
-%%     margin=narrow, and worse at the larger sizes;
-%%   - \emergencystretch cannot reach either case. It redistributes interword
-%%     glue on the offending line, and a line holding one over-wide token has
-%%     none to redistribute. See \CDossierEmergencyStretch (issue #272).
-%%
-%% So the break points have to be supplied. \UrlBreaks is extended, for the
-%% duration of one link, with every ASCII letter and digit, which lets the
-%% address break anywhere rather than only after punctuation. url.sty inserts a
-%% penalty and no discretionary hyphen at these points, so a wrapped address
-%% still reassembles exactly -- the copy-paste invariant of issue #294, which
-%% tests/links now pins for body text as well as the contact line.
-%%
-%% The extension is local to the group below rather than a global change to
-%% \UrlBreaks, so the contact line and the bibliography keep the punctuation-only
-%% breaks they were measured with.
-\tl_const:Nn \c__cdossier_components_anybreak_tl
-  {
-    \do \a \do \b \do \c \do \d \do \e \do \f \do \g \do \h \do \i
-    \do \j \do \k \do \l \do \m \do \n \do \o \do \p \do \q \do \r
-    \do \s \do \t \do \u \do \v \do \w \do \x \do \y \do \z
-    \do \A \do \B \do \C \do \D \do \E \do \F \do \G \do \H \do \I
-    \do \J \do \K \do \L \do \M \do \N \do \O \do \P \do \Q \do \R
-    \do \S \do \T \do \U \do \V \do \W \do \X \do \Y \do \Z
-    \do \0 \do \1 \do \2 \do \3 \do \4
-    \do \5 \do \6 \do \7 \do \8 \do \9
-  }
-
-%% Normalize a link target in place: supply https:// when the value carries no
-%% scheme of its own. Shared by the web-profile fields and by \CDossierLink so
-%% both accept the same input, `example.org/path' as readily as a full URL.
-%%
-%% Detect an existing scheme by string, not by token list: the value's colon is
-%% an ordinary character (catcode 12) while a literal colon in this package is a
-%% letter (catcode 11) under expl3, so a catcode-sensitive \tl_if_in: would never
-%% match and would double the scheme.
-%%
-%% The same catcode difference decides what the *inserted* scheme becomes, and
-%% getting it wrong is silent. hyperref splits an \href target on a catcode-12
-%% colon to find its scheme (\@hyper@readexternallink); a catcode-11 colon is
-%% invisible to that split, so hyperref takes the target for a local file,
-%% appends `.pdf', and emits a GoToR "open a remote PDF" action instead of a
-%% URI action -- with no warning, and with the page, the extracted text, and
-%% copy-paste integrity all still correct. Hence :Ne and \tl_to_str:n, which
-%% put the scheme in at catcode 12, exactly as a document that wrote the
-%% address out in full would (issue #328).
-\cs_new_protected:Npn \__cdossier_components_scheme:N #1
-  {
-    \str_set:NV \l__cdossier_components_scheme_str #1
-    \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
-      { \tl_put_left:Ne #1 { \tl_to_str:n { https:// } } }
-  }
-
-%% A URL cannot contain a literal space, so one in the argument is a mistake --
-%% and in practice always the same mistake: the address was broken across two
-%% source lines, and the line end became a space.
-%%
-%% It has to be removed rather than merely reported, because the two halves of
-%% \CDossierLink treat it differently. url.sty discards spaces, so the *displayed*
-%% address closes up and the page looks correct; \href's target is not processed
-%% by url.sty and keeps the space, so the link silently points somewhere else.
-%% Stripping the target restores the agreement the page already implies.
-%%
-%% Warn anyway. The removal is a repair, not a supported input format: the
-%% author still wants to know, and %20 is what a genuine space is written as.
-\msg_new:nnnn { careerdossier-components } { link-target-space }
-  { Removed~a~space~from~the~\CDossierLink\ target~'#1'. }
-  {
-    A~URL~cannot~contain~a~literal~space,~and~the~displayed~address~drops~it~
-    while~the~link~target~would~have~kept~it~--~so~the~text~and~the~link~would~
-    disagree.~The~usual~cause~is~a~line~break~inside~the~argument:~keep~the~
-    address~on~one~source~line.~Write~%20~if~the~space~is~real.
-  }
-
-%% \CDossierLink{<url>}: the supported way to put a link in body text. The
-%% argument is both the displayed text and, once normalized, the link target.
-%%
-%% The argument is read as ordinary text, exactly as a profile field value is,
-%% so a target containing TeX special characters needs them escaped. It is not
-%% \url's verbatim argument.
-\cs_new_protected:Npn \__cdossier_components_bodylink:n #1
-  {
-    \group_begin:
-      \tl_set:Nn \l__cdossier_components_disp_tl {#1}
-      \tl_set:Nn \l__cdossier_components_url_tl  {#1}
-      \tl_remove_all:Nn \l__cdossier_components_url_tl { ~ }
-      \tl_if_eq:NNF \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-        {
-          \msg_warning:nnV { careerdossier-components } { link-target-space }
-            \l__cdossier_components_url_tl
-        }
-      \__cdossier_components_scheme:N \l__cdossier_components_url_tl
-      \cs_if_exist:NT \UrlBreaks
-        { \tl_put_right:NV \UrlBreaks \c__cdossier_components_anybreak_tl }
-      \__cdossier_components_link:VV
-        \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-    \group_end:
-  }
-
-\NewDocumentCommand \CDossierLink { m }
-  { \__cdossier_components_bodylink:n {#1} }
-
-%% Email: a mailto: link over the visible address.
-%%
-%% \tl_to_str:n for the scheme, for the reason given at
-%% \__cdossier_components_scheme:N. This one used to escape the consequences by
-%% luck: it took the same wrong branch, but \@hyper@linkfile saw what looked
-%% like an extension in the address's domain and fell back to a URL, so no
-%% `.pdf' was appended. That is not something to rely on (issue #328).
-\cs_new_protected:Npn \__cdossier_components_mail:n #1
-  {
-    \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
-    \tl_set:Nx \l__cdossier_components_url_tl
-      { \tl_to_str:n { mailto: } \l__cdossier_components_disp_tl }
-    \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-  }
-
-%% Services whose bare identifier has a documented canonical address, and the
-%% prefix that produces it (issue #330). Authors hold a LinkedIn or GitHub
-%% handle, not a profile path, and a Scholar identifier rather than the query
-%% string around it -- so the natural value used to produce https://<handle>,
-%% a broken link with no warning and a page that looked correct.
-%%
-%% The prefix carries no scheme: it is prepended to the *displayed* text, which
-%% then becomes the target in the ordinary way, so the visible address and the
-%% link agree by construction rather than by a second rule. `website' has no
-%% canonical host by definition and is deliberately absent, which leaves its
-%% behaviour exactly as before.
-%%
-%% Each value is braced because it is keyval input and two of them contain the
-%% `=' that would otherwise be read as the item's own separator.
-\prop_const_from_keyval:Nn \c__cdossier_components_canonical_prop
-  {
-    linkedin = {linkedin.com/in/} ,
-    github   = {github.com/} ,
-    scholar  = {scholar.google.com/citations?user=} ,
-  }
-
-\tl_new:N   \l__cdossier_components_canonical_tl
-\str_new:N  \l__cdossier_components_value_str
-
-%% A value is a bare identifier when it contains neither `/' nor `.'. Those two
-%% characters are what every address form has -- with a scheme, without one, or
-%% with a `www.' host -- and what none of these three services allows in an
-%% identifier, so the test needs no list of hosts to keep current and no guess
-%% about which address form was written. Anything holding either is passed
-%% through untouched: canonicalizing `www.' or a trailing slash away would
-%% change the output of documents that already work.
-\cs_new_protected:Npn \__cdossier_components_canonical:n #1
-  {
-    \prop_get:NnNT \c__cdossier_components_canonical_prop {#1}
-      \l__cdossier_components_canonical_tl
-      {
-        \str_set:NV \l__cdossier_components_value_str
-          \l__cdossier_components_disp_tl
-        \str_if_in:NnF \l__cdossier_components_value_str { / }
-          {
-            \str_if_in:NnF \l__cdossier_components_value_str { . }
-              {
-                \tl_put_left:NV \l__cdossier_components_disp_tl
-                  \l__cdossier_components_canonical_tl
-              }
-          }
-      }
-  }
-
-%% Web profile: a link over the visible address. A bare identifier for a service
-%% with a canonical address is expanded to that address first, so the displayed
-%% text is the value as given for every other input and the canonical form for
-%% that one. The href target is then normalized to include a scheme.
-\cs_new_protected:Npn \__cdossier_components_web:n #1
-  {
-    \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue {#1} }
-    \__cdossier_components_canonical:n {#1}
-    \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-    \__cdossier_components_scheme:N \l__cdossier_components_url_tl
-    \__cdossier_components_link:VV \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-  }
-
-%% ORCID: unlike an ordinary web-profile value, a bare ORCID identifier has a
-%% documented canonical destination. Keep the identifier visible with a text
-%% label, so its meaning does not depend on a colour, icon, or link annotation.
-\cs_new_protected:Npn \__cdossier_components_orcid:
-  {
-    \tl_set:Nx \l__cdossier_components_disp_tl { \CDossierFieldValue { orcid } }
-    \tl_set_eq:NN \l__cdossier_components_url_tl \l__cdossier_components_disp_tl
-    \str_set:NV \l__cdossier_components_scheme_str \l__cdossier_components_url_tl
-    \str_if_in:NnF \l__cdossier_components_scheme_str { :// }
-      {
-        %% :Ne and \tl_to_str:n for the reason given at
-        %% \__cdossier_components_scheme:N -- a catcode-11 colon here would
-        %% make the ORCID link a GoToR action (issue #328).
-        \str_if_in:NnTF \l__cdossier_components_scheme_str { orcid.org/ }
-          { \tl_put_left:Ne \l__cdossier_components_url_tl
-              { \tl_to_str:n { https:// } } }
-          { \tl_put_left:Ne \l__cdossier_components_url_tl
-              { \tl_to_str:n { https://orcid.org/ } } }
-      }
-    %% This branch builds its own \href rather than going through
-    %% \__cdossier_components_link:nn, so it needs the raw-`#' rewrite the
-    %% chokepoint applies (issue #353). An ORCID identifier holds no `#', but
-    %% the value is author-supplied and a mistyped one would otherwise fail
-    %% with hyperref's internal diagnostic while every other field no longer
-    %% does.
-    \__cdossier_components_hashescape:N \l__cdossier_components_url_tl
-    \__cdossier_components_hashescape:N \l__cdossier_components_disp_tl
-    \cs_if_exist:NTF \href
-      {
-        \group_begin:
-          \CDossierPlainLinks
-          \href { \l__cdossier_components_url_tl }
-            { ORCID:\nobreakspace \nolinkurl { \l__cdossier_components_disp_tl } }
-        \group_end:
-      }
-      {
-        \__cdossier_components_links_inert:
-        ORCID:\nobreakspace \l__cdossier_components_disp_tl
-      }
-  }
-
 %% Render one contact field: an optional identifying label, then the value —
 %% linked for the web-facing fields, plain text for the rest.
 %%
@@ -911,12 +405,12 @@
     \__cdossier_components_label:n {#1}
     \str_case:nnF {#1}
       {
-        { email }    { \__cdossier_components_mail:n { email }    }
-        { website }  { \__cdossier_components_web:n  { website }  }
-        { linkedin } { \__cdossier_components_web:n  { linkedin } }
-        { github }   { \__cdossier_components_web:n  { github }   }
-        { scholar }  { \__cdossier_components_web:n  { scholar }  }
-        { orcid }    { \__cdossier_components_orcid:              }
+        { email }    { \__cdossier_links_mail:n { email }    }
+        { website }  { \__cdossier_links_web:n  { website }  }
+        { linkedin } { \__cdossier_links_web:n  { linkedin } }
+        { github }   { \__cdossier_links_web:n  { github }   }
+        { scholar }  { \__cdossier_links_web:n  { scholar }  }
+        { orcid }    { \__cdossier_links_orcid:              }
       }
       { \__cdossier_typography_text_content:n { \CDossierPrintField {#1} } }
   }
