@@ -226,6 +226,198 @@
   }
 
 %% ---------------------------------------------------------------------------
+%% Shared class options (issue #266).
+%%
+%% Every public class takes the same six options -- fontsize, margin, paper,
+%% bodyfont, medium, and muted -- and the two record classes, resume and CV,
+%% also take entrymeta. Each class used to declare all of them by hand, so one
+%% accepted-value list was restated in four classes and again in the package
+%% that owns the behaviour. These generators declare them once. A class calls
+%% them before its own \keys_define:nn, with its own module name and key path:
+%%
+%%   \__cdossier_base_declare_shared_options:nn
+%%     { careerdossier-resume } { cdossier / resume }
+%%   \__cdossier_base_declare_record_options:nn
+%%     { careerdossier-resume } { cdossier / resume }
+%%
+%% and l3keys adds the generated keys to the same path the class then extends
+%% with its own options and its `unknown' handler.
+%%
+%% For each option a generator emits the class's storage variable, the
+%% `unknown-<key>' message, and the three key properties. The module name is
+%% substituted into the message, so the error a user sees still names the
+%% class, word for word as before. Storage keeps the class's own private name,
+%% \l__cdossier_<class>_<key>_tl, so the rest of the class reads its values
+%% unchanged. The generator sets the default wherever every class agrees on
+%% it; fontsize and margin differ by class (the resume is 11pt and narrow), so
+%% each class sets those two itself, straight after the call.
+%%
+%% Forwarding stays in the class. Each class passes a different subset of the
+%% values to a different set of packages, with \PassOptionsToPackage before
+%% \LoadClass, and the package that owns the behaviour validates what it
+%% receives. That package-level declaration is deliberate, not a leftover: it
+%% keeps each package usable without a class. So a value list lives in two
+%% places, here and in the owning package, and tests/lint/run.sh compares the
+%% two.
+%%
+%% entrymeta has a generator of its own because only record classes have
+%% entries: it follows the same Record versus Prose line as the
+%% \CDossierRecord...Skip and \CDossierProse...Skip token families.
+%% ---------------------------------------------------------------------------
+\tl_new:N \l__cdossier_base_option_class_tl
+
+%% Internal: call the three-argument generator #1 with the module name #2, the
+%% key path #3, and the class name inside the module name -- `resume' for
+%% `careerdossier-resume' -- which names the class's storage variables.
+%% tests/lint/run.sh requires #2 to be the module the calling file's name
+%% implies, so the prefix is always there to remove.
+\cs_new_protected:Npn \__cdossier_base_with_option_class:Nnn #1#2#3
+  {
+    \tl_set:Nn \l__cdossier_base_option_class_tl {#2}
+    \tl_remove_once:Nn \l__cdossier_base_option_class_tl { careerdossier- }
+    \exp_args:NnnV #1 {#2} {#3} \l__cdossier_base_option_class_tl
+  }
+
+\cs_new_protected:Npn \__cdossier_base_declare_shared_options:nn #1#2
+  {
+    \__cdossier_base_with_option_class:Nnn
+      \__cdossier_base_declare_shared_options:nnn {#1} {#2}
+  }
+
+\cs_new_protected:Npn \__cdossier_base_declare_record_options:nn #1#2
+  {
+    \__cdossier_base_with_option_class:Nnn
+      \__cdossier_base_declare_record_options:nnn {#1} {#2}
+  }
+
+%% #1 is the module, #2 the key path, #3 the class name. Within the messages
+%% and handlers, ##1 is the rejected value, as #1 is in a hand-written one.
+%% l3keys' own choice error reports that the value is not one of a fixed set
+%% without saying what that set is, so every choice-valued option names its own
+%% accepted values. Each message is reached through the matching
+%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
+\cs_new_protected:Npn \__cdossier_base_declare_shared_options:nnn #1#2#3
+  {
+    \tl_new:c  { l__cdossier_ #3 _fontsize_tl }
+    \tl_new:c  { l__cdossier_ #3 _margin_tl }
+    \tl_new:c  { l__cdossier_ #3 _paper_tl }
+    \tl_set:cn { l__cdossier_ #3 _paper_tl } { letterpaper }
+    \tl_new:c  { l__cdossier_ #3 _bodyfont_tl }
+    \tl_set:cn { l__cdossier_ #3 _bodyfont_tl } { serif }
+    \tl_new:c  { l__cdossier_ #3 _medium_tl }
+    \tl_set:cn { l__cdossier_ #3 _medium_tl } { print }
+    \tl_new:c  { l__cdossier_ #3 _muted_tl }
+    \tl_set:cn { l__cdossier_ #3 _muted_tl } { plain }
+
+    \msg_new:nnnn {#1} { unknown-fontsize }
+      { Unknown~'fontsize'~value~'##1'~for~#1. }
+      { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
+
+    \msg_new:nnnn {#1} { unknown-margin }
+      { Unknown~'margin'~value~'##1'~for~#1. }
+      {
+        The~accepted~values~are~'normal'~(one-inch~margins)~and~
+        'narrow'~(half-inch~margins).
+      }
+
+    \msg_new:nnnn {#1} { unknown-paper }
+      { Unknown~'paper'~value~'##1'~for~#1. }
+      { The~accepted~values~are~'letter'~(US~Letter)~and~'a4'~(ISO~A4). }
+
+    \msg_new:nnnn {#1} { unknown-bodyfont }
+      { Unknown~'bodyfont'~value~'##1'~for~#1. }
+      {
+        The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
+        'sans'~(TeX~Gyre~Heros~body).
+      }
+
+    \msg_new:nnnn {#1} { unknown-medium }
+      { Unknown~'medium'~value~'##1'~for~#1. }
+      {
+        The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
+        and~'screen'~(neither).
+      }
+
+    \msg_new:nnnn {#1} { unknown-muted }
+      { Unknown~'muted'~value~'##1'~for~#1. }
+      {
+        The~accepted~values~are~'italic'~(italic,~black),~
+        'gray'~(upright,~gray~0.30),~'both'~(italic~and~gray),~and~
+        'plain'~(upright,~black:~no~de-emphasis).
+      }
+
+    \keys_define:nn {#2}
+      {
+        fontsize .choices:nn =
+          { 10pt , 11pt , 12pt }
+          { \tl_set_eq:cN { l__cdossier_ #3 _fontsize_tl } \l_keys_choice_tl } ,
+        fontsize / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-fontsize } {##1} } ,
+        fontsize .value_required:n = true ,
+        margin .choices:nn =
+          { normal , narrow }
+          { \tl_set_eq:cN { l__cdossier_ #3 _margin_tl } \l_keys_choice_tl } ,
+        margin / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-margin } {##1} } ,
+        margin .value_required:n = true ,
+        paper .choices:nn =
+          { letter , a4 }
+          {
+            \str_case:Vn \l_keys_choice_tl
+              {
+                { letter } { \tl_set:cn { l__cdossier_ #3 _paper_tl } { letterpaper } }
+                { a4 }     { \tl_set:cn { l__cdossier_ #3 _paper_tl } { a4paper } }
+              }
+          } ,
+        paper / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-paper } {##1} } ,
+        paper .value_required:n = true ,
+        bodyfont .choices:nn =
+          { serif , sans }
+          { \tl_set_eq:cN { l__cdossier_ #3 _bodyfont_tl } \l_keys_choice_tl } ,
+        bodyfont / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-bodyfont } {##1} } ,
+        bodyfont .value_required:n = true ,
+        medium .choices:nn =
+          { print , screen }
+          { \tl_set_eq:cN { l__cdossier_ #3 _medium_tl } \l_keys_choice_tl } ,
+        medium / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-medium } {##1} } ,
+        medium .value_required:n = true ,
+        muted .choices:nn =
+          { italic , gray , both , plain }
+          { \tl_set_eq:cN { l__cdossier_ #3 _muted_tl } \l_keys_choice_tl } ,
+        muted / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-muted } {##1} } ,
+        muted .value_required:n = true ,
+      }
+  }
+
+\cs_new_protected:Npn \__cdossier_base_declare_record_options:nnn #1#2#3
+  {
+    \tl_new:c  { l__cdossier_ #3 _entrymeta_tl }
+    \tl_set:cn { l__cdossier_ #3 _entrymeta_tl } { column }
+
+    \msg_new:nnnn {#1} { unknown-entrymeta }
+      { Unknown~'entrymeta'~value~'##1'~for~#1. }
+      {
+        The~accepted~values~are~'column'~(dates~and~location~flush~right)~
+        and~'inline'~(dates~and~location~on~the~same~line~as~the~title~
+        and~organization).
+      }
+
+    \keys_define:nn {#2}
+      {
+        entrymeta .choices:nn =
+          { column , inline }
+          { \tl_set_eq:cN { l__cdossier_ #3 _entrymeta_tl } \l_keys_choice_tl } ,
+        entrymeta / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-entrymeta } {##1} } ,
+        entrymeta .value_required:n = true ,
+      }
+  }
+
+%% ---------------------------------------------------------------------------
 %% Public interface.
 %% ---------------------------------------------------------------------------
 

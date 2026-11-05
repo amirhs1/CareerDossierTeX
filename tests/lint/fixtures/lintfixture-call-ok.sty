@@ -1,0 +1,16 @@
+%% lintfixture-call-ok.sty — option-lint fixture (issue #266)
+%%
+%% A complete call: its module is the one this file's name implies, and its
+%% key path is the one \ProcessKeysOptions processes. Expected verdict: OK
+%% for `size', via the fixture generator.
+%% This fixture is lint input only; it is never compiled and is not part of the
+%% Work (see tests/lint/fixtures/README.md).
+
+\__cdossier_base_declare_fixture_options:nn
+  { lintfixture-call-ok } { cdossier / fixture }
+
+\keys_define:nn { cdossier / fixture }
+  {
+    unknown .code:n = { } ,
+  }
+\ProcessKeysOptions { cdossier / fixture }
