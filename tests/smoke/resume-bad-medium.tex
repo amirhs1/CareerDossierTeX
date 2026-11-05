@@ -1,4 +1,6 @@
-% resume-bad-medium.tex — an unsupported medium value must be rejected with an
-% actionable choice error, not silently ignored (expected failure, issue #184).
+% resume-bad-medium.tex — expected failure: the resume must reject
+% medium=paper (issue #184). An unsupported medium value must stop the build
+% with an actionable choice error, not be silently ignored; the three other
+% *-bad-medium fixtures assert the same of their classes.
 \documentclass[medium=paper]{careerdossier-resume}
 \begin{document}Unsupported.\end{document}
