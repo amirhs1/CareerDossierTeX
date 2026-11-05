@@ -142,6 +142,23 @@ issue is the usual vehicle for it, not the only one.
 An issue whose body would only restate its pull request's title is a sign that
 an exception applies, not a form to fill in.
 
+A pull request must not carry `Closes #...` or `Fixes #...` for an issue whose
+acceptance criteria include an action the merge cannot perform: one that
+`AGENTS.md`, "Git", reserves to the maintainer, or any other change outside the
+pull request's diff. The link closes the issue the moment the pull request
+merges, while that action is still undone, and prose beside the link in the
+body does not stop it (#537). Two cases have happened:
+
+- the `[release]` issue, which the tag completes, and the tag is pushed only
+  after the release pull request merges;
+- an issue completed by a change to the Project, as #477 was by its `Phase`
+  option descriptions.
+
+Read the issue's acceptance criteria before writing the link. If any criterion
+begins "the maintainer has", write `Refs #...` instead, and give the pull
+request body the problem, the proposal, and the acceptance criteria, as for an
+exception. Close the issue by hand once the last such action is done.
+
 ### 3. Every pull request comes from a focused branch
 
 Branch from an up-to-date `main`, one issue per branch where practical. Direct
@@ -692,11 +709,10 @@ generate every separator first and attempt to remove the empty ones later.
 
 ### Engine support
 
-`AGENTS.md`, "Conventions a linter cannot express", states the engine scope and
-is not repeated here. Two things
-specific to writing the code: `careerdossier-typography` owns the guard, and
-partial XeLaTeX or pdfLaTeX support is not to be added without defining,
-documenting, and testing it.
+`AGENTS.md`, "Conventions a linter cannot express", states the engine scope,
+and `AGENTS.md`, "Settled decisions", rules out partial XeLaTeX or pdfLaTeX
+support; neither is repeated here. One thing specific to writing the code:
+`careerdossier-typography` owns the guard.
 
 ## Documentation requirements
 
@@ -1051,7 +1067,7 @@ that affects output.
 Branch protection on `main` is the `Protect Main` **ruleset**, not classic
 branch protection, so read it with `gh api repos/<owner>/<repo>/rulesets` rather
 than from the older branch-protection endpoint or from this paragraph. As last
-derived, it requires a pull request, allows all three merge methods, requires
+derived, it requires a pull request, allows only merge commits, requires
 **zero** approving reviews, forbids deletion and non-fast-forward pushes, and
 requires a named list of job contexts to pass against an up-to-date branch.
 Green CI is therefore the merge gate; a branch that is not close-out complete

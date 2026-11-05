@@ -1,10 +1,11 @@
 # CareerDossierTeX release checklist
 
-The per-release gate: what a release has to satisfy before it is tagged, and
-what CTAN additionally requires of the uploaded archive at `v1.0.0`. It is the
-one file that answers "is this releasable yet"; `docs/ROADMAP.md` owns which
-release a change belongs to, and `.agents/skills/draft-release/SKILL.md` owns how
-`CHANGELOG.md` sections and the GitHub Release notes are written.
+The per-release gate: what a release has to satisfy before it is tagged, the one
+step that follows the tag, and what CTAN additionally requires of the uploaded
+archive at `v1.0.0`. It is the one file that answers "is this releasable yet";
+`docs/ROADMAP.md` owns which release a change belongs to, and
+`.agents/skills/draft-release/SKILL.md` owns how `CHANGELOG.md` sections and the
+GitHub Release notes are written.
 
 The checks below reference [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) for the
 font, extraction, and tagging policy each one asserts, and
@@ -257,6 +258,12 @@ GitHub release can. Verify the archive manually before upload.
       archive has been extracted and inspected by hand — one top-level
       directory, README with licence and version, no prohibited generated
       files, and a document that builds from the extracted tree.
+
+### After the tag
+
+- [ ] The `[release]` issue is closed by hand once the tag is pushed
+      (`CONTRIBUTING.md`, "2. Every pull request links an issue, with three
+      exceptions").
 
 ---
 
