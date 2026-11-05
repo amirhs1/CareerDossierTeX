@@ -73,7 +73,7 @@ jobs:
             echo "tex=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          docs='^(docs/|\.agents/|\.github/ISSUE_TEMPLATE/|\.claude/|\.codex/|\.githooks/|\.gitmessage$|.*\.md$)'
+          docs='^(\.github/workflows/|docs/|\.agents/|\.github/ISSUE_TEMPLATE/|\.claude/|\.codex/|\.githooks/|\.gitmessage$|.*\.md$)'
           files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA")
           echo "Files changed since the merge base:"
           printf '%s\n' "$files" | sed 's/^/  /'
