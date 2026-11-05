@@ -25,15 +25,15 @@
 %% select its default title; process fontsize and margin, keeping 12pt,normal as
 %% the prose-oriented defaults; store statement-scoped title, running-title,
 %% subtitle, application-context, and application-ID metadata; validate name and
-%% email for every type, research affiliation, and artist website where the
-%% header renders; keep the full title in the page-one body and PDF metadata
-%% while a separately bounded running title identifies continuation pages, and
-%% register that short title with the shared furniture component; forward medium
-%% and muted to it; derive every header size, gap, and prose paragraph rhythm
-%% from careerdossier-tokens; restyle the two inherited unnumbered heading
-%% levels and offer them as \CDossierSection and \CDossierSubsection; keep
-%% running furniture out of tagged structure; and allow ordinary prose without
-%% imposing a type-specific narrative schema.
+%% email for every type and artist website where the header renders; keep the
+%% full title in the page-one body and PDF metadata while a separately bounded
+%% running title identifies continuation pages, and register that short title
+%% with the shared furniture component; forward medium and muted to it; derive
+%% every header size, gap, and prose paragraph rhythm from careerdossier-tokens;
+%% restyle the two inherited unnumbered heading levels and offer them as
+%% \CDossierSection and \CDossierSubsection; keep running furniture out of
+%% tagged structure; and allow ordinary prose without imposing a type-specific
+%% narrative schema.
 %%
 %% Why the headings are restyled rather than replaced (#177): \@startsection is
 %% where the kernel's tagging support hooks in, so an unnumbered heading there
@@ -47,9 +47,9 @@
 %% design.
 %%
 %% Field scoping: `affiliation' is reusable identity data and lives in the
-%% shared profile in careerdossier-base; this class decides when it is required
-%% or displayed. `application-context' and `application-id' describe one
-%% application document and stay class-scoped. The shared profile may hold
+%% shared profile in careerdossier-base; this class displays it when it is set
+%% and never requires it. `application-context' and `application-id' describe
+%% one application document and stay class-scoped. The shared profile may hold
 %% fields a statement does not render -- linkedin, github, location -- which is
 %% ordinary cross-document reuse and must never warn.
 
@@ -337,7 +337,7 @@
 
 %% The full display title, not its abbreviated page-furniture counterpart,
 %% becomes the shared PDF document type.
-\exp_args:NV \__cdossier_components_doctype:n
+\exp_args:NV \__cdossier_metadata_doctype:n
   \l__cdossier_statement_title_tl
 
 %% ---------------------------------------------------------------------------
@@ -363,7 +363,7 @@
         \tl_set_eq:NN \l__cdossier_statement_title_tl
           \l__cdossier_statement_default_title_tl
       }
-    \exp_args:NV \__cdossier_components_doctype:n
+    \exp_args:NV \__cdossier_metadata_doctype:n
       \l__cdossier_statement_title_tl
   }
 
@@ -409,8 +409,6 @@
   {
     \__cdossier_base_require_name:N \MakeCDossierStatementHeader
     \__cdossier_base_require_field:n { email }
-    \str_if_eq:VnT \l__cdossier_statement_type_tl { research }
-      { \__cdossier_base_require_field:n { affiliation } }
     \str_if_eq:VnT \l__cdossier_statement_type_tl { artist }
       { \__cdossier_base_require_field:n { website } }
   }

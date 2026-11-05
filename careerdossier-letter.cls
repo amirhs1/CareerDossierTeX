@@ -141,10 +141,10 @@
 
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a resume built off the same profile. The title
-%% itself is assembled in careerdossier-components, which owns identity.
+%% itself is assembled in careerdossier-metadata from the profile name.
 \str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
-  { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
-  { \__cdossier_components_doctype:n { Cover~Letter } }
+  { \__cdossier_metadata_doctype:n { Academic~Cover~Letter } }
+  { \__cdossier_metadata_doctype:n { Cover~Letter } }
 
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_letter_paper_tl
 

@@ -126,7 +126,7 @@
 \RequirePackage { hyperref }
 \__cdossier_tokens_apply_body_size:
 
-\__cdossier_components_doctype:n { Curriculum\c_space_tl Vitae }
+\__cdossier_metadata_doctype:n { Curriculum\c_space_tl Vitae }
 
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_cv_paper_tl
 

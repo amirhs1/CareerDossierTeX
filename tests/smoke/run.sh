@@ -238,7 +238,8 @@ cases=(
   "statement-unknown-meta-key fail|Unknown \CDossierStatementSetup key"
   "statement-missing-name fail|required profile field 'name' is not"
   "statement-missing-email fail|required profile field 'email' is not"
-  "statement-research-missing-affiliation fail|required profile field 'affiliation'"
+  "statement-research-without-affiliation pass"
+  "statement-research-blank-affiliation pass"
   "statement-artist-missing-website fail|required profile field 'website'"
 )
 
