@@ -241,35 +241,40 @@ reproduced inside the test written to catch it.
 
 So each public spacing token must be rendered by at least one committed
 fixture, and the table below records which. Extend the fixture named there when
-you retune a ratio, and add a row when you add a token.
+you retune a ratio, and add a row when you add a token. `make lint` fails when a
+token `careerdossier-tokens.sty` allocates with `\skip_new:N` has no row, or a
+row names a token the source does not allocate; it checks that the two name the
+same tokens, not that the named fixture renders the token.
 
-| Token                                 | Rendered by                                    | At the boundary                     |
-| ------------------------------------- | ---------------------------------------------- | ----------------------------------- |
-| `\CDossierSharedHeaderNameGapSkip`    | `components-headerstack`                       | header line 1 → line 2              |
-| `\CDossierSharedHeaderMetaGapSkip`    | `components-headerstack`                       | header line 2 → line 3              |
-| `\CDossierRecordHeaderBelowSkip`      | `resume-header-edges`                          | header stack → first ruled section  |
-| `\CDossierRecordSectionAboveSkip`     | `resume-entry-edges`                           | entry → next section heading        |
-| `\CDossierRecordSectionRuleGapSkip`   | `resume-entry-edges`                           | heading baseline → section rule     |
-| `\CDossierRecordSectionBelowSkip`     | `resume-entry-edges`                           | section rule → first entry          |
-| `\CDossierRecordEntryAboveSkip`       | `resume-entry-edges`                           | bodiless entry → bodiless entry     |
-| `\CDossierRecordEntryGapSkip`         | `resume-entry-edges`                           | entry heading → prose body          |
-| `\CDossierRecordListEdgeAboveSkip`    | `resume-entry-edges`                           | entry heading → bullet list         |
-| `\CDossierRecordListEdgeBelowSkip`    | `resume-entry-edges`                           | bullet list → next block            |
-| `\CDossierRecordItemSepSkip`          | `resume-entry-edges`                           | bullet → bullet                     |
-| `\CDossierRecordParSkip`              | `resume-entry-edges`                           | every paragraph boundary            |
-| `\CDossierProseHeaderBelowSkip`       | `statement-prose-edges`                        | header stack → first section        |
-| `\CDossierProseSectionAboveSkip`      | `statement-prose-edges`                        | paragraph → section heading         |
-| `\CDossierProseSectionBelowSkip`      | `statement-prose-edges`                        | section heading → paragraph         |
-| `\CDossierProseSubsectionAboveSkip`   | `statement-prose-edges`                        | paragraph → subsection heading      |
-| `\CDossierProseSubsectionBelowSkip`   | `statement-prose-edges`                        | subsection heading → paragraph      |
-| `\CDossierProseParSkip`               | `statement-prose-edges`                        | paragraph → paragraph               |
-| `\CDossierLetterHeaderBelowSkip`      | `letter-block-edges`, `components-headerstack` | header stack → date line            |
-| `\CDossierLetterParSkip`              | `letter-block-edges`                           | paragraph → paragraph               |
-| `\CDossierLetterRecipientLineGapSkip` | `letter-block-edges`                           | recipient line → recipient line     |
-| `\CDossierLetterBlockSkip`            | `letter-block-edges`                           | letterhead block → letterhead block |
-| `\CDossierLetterBodyAboveSkip`        | `letter-block-edges`                           | salutation → body                   |
-| `\CDossierLetterBodyBelowSkip`        | `letter-block-edges`                           | body → closing                      |
-| `\CDossierLetterSignatureGapSkip`     | `letter-block-edges`                           | closing → signature name            |
+| Token                                 | Rendered by                                      | At the boundary                     |
+| ------------------------------------- | ------------------------------------------------ | ----------------------------------- |
+| `\CDossierSharedHeaderNameGapSkip`    | `components-headerstack`                         | header line 1 → line 2              |
+| `\CDossierSharedHeaderMetaGapSkip`    | `components-headerstack`                         | header line 2 → line 3              |
+| `\CDossierRecordHeaderBelowSkip`      | `resume-header-edges`                            | header stack → first ruled section  |
+| `\CDossierRecordSectionAboveSkip`     | `resume-entry-edges`                             | entry → next section heading        |
+| `\CDossierRecordSectionRuleGapSkip`   | `resume-entry-edges`                             | heading baseline → section rule     |
+| `\CDossierRecordSectionBelowSkip`     | `resume-entry-edges`                             | section rule → first entry          |
+| `\CDossierRecordSubsectionAboveSkip`  | `resume-subsection-edges`, `cv-subsection-edges` | entry → subsection heading          |
+| `\CDossierRecordSubsectionBelowSkip`  | `resume-subsection-edges`, `cv-subsection-edges` | subsection heading → entry or list  |
+| `\CDossierRecordEntryAboveSkip`       | `resume-entry-edges`                             | bodiless entry → bodiless entry     |
+| `\CDossierRecordEntryGapSkip`         | `resume-entry-edges`                             | entry heading → prose body          |
+| `\CDossierRecordListEdgeAboveSkip`    | `resume-entry-edges`                             | entry heading → bullet list         |
+| `\CDossierRecordListEdgeBelowSkip`    | `resume-entry-edges`                             | bullet list → next block            |
+| `\CDossierRecordItemSepSkip`          | `resume-entry-edges`                             | bullet → bullet                     |
+| `\CDossierRecordParSkip`              | `resume-entry-edges`                             | every paragraph boundary            |
+| `\CDossierProseHeaderBelowSkip`       | `statement-prose-edges`                          | header stack → first section        |
+| `\CDossierProseSectionAboveSkip`      | `statement-prose-edges`                          | paragraph → section heading         |
+| `\CDossierProseSectionBelowSkip`      | `statement-prose-edges`                          | section heading → paragraph         |
+| `\CDossierProseSubsectionAboveSkip`   | `statement-prose-edges`                          | paragraph → subsection heading      |
+| `\CDossierProseSubsectionBelowSkip`   | `statement-prose-edges`                          | subsection heading → paragraph      |
+| `\CDossierProseParSkip`               | `statement-prose-edges`                          | paragraph → paragraph               |
+| `\CDossierLetterHeaderBelowSkip`      | `letter-block-edges`, `components-headerstack`   | header stack → date line            |
+| `\CDossierLetterParSkip`              | `letter-block-edges`                             | paragraph → paragraph               |
+| `\CDossierLetterRecipientLineGapSkip` | `letter-block-edges`                             | recipient line → recipient line     |
+| `\CDossierLetterBlockSkip`            | `letter-block-edges`                             | letterhead block → letterhead block |
+| `\CDossierLetterBodyAboveSkip`        | `letter-block-edges`                             | salutation → body                   |
+| `\CDossierLetterBodyBelowSkip`        | `letter-block-edges`                             | body → closing                      |
+| `\CDossierLetterSignatureGapSkip`     | `letter-block-edges`                             | closing → signature name            |
 
 Two kinds of fixture are _not_ in that column, and neither is a substitute.
 
@@ -705,7 +710,9 @@ the declared-exception list and its ratchet.
 
 `tests/lint/run-token-values.sh` — the calibrated values documented in
 `docs/ARCHITECTURE.md` and the manual's `fontsize` table match what the source
-declares. A stale number typesets and reads as authoritative.
+declares. A stale number typesets and reads as authoritative. It also holds the
+token table under "Spacing tokens: reporting a value is not rendering a gap" to
+the set of spacing tokens the source allocates.
 
 ### CTAN packaging lint
 

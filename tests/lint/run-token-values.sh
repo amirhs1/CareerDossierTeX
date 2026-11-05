@@ -7,6 +7,11 @@
 #   docs/ARCHITECTURE.md       38 valued rows across three tables
 #   doc/careerdossier.tex      the user-facing `fontsize' size table
 #
+# A fourth, docs/TESTING.md, states no value but lists every public spacing
+# token with the fixture that renders it, under the rule "add a row when you
+# add a token". Issue #590 found two tokens that had gone without a row since
+# they were added, because nothing read that table.
+#
 # A retune changes the first and nothing forces the other two to follow. That
 # is the failure mode #185 already cost this project once: after the v0.7.0
 # retune, ten sentences were left stale across three documents, one of them
@@ -19,7 +24,7 @@
 # `12 / 13 / 14' typesets perfectly and reads as authoritative. LaTeX never
 # sees these numbers as claims about the source; they are digits in a document.
 #
-# So this lint reads both sides as text and asserts four things:
+# So this lint reads both sides as text and asserts five things:
 #
 #   1. Every ratio the vertical-rhythm table states equals the ratio
 #      careerdossier-tokens.sty declares for that token, and the two sides name
@@ -30,6 +35,9 @@
 #   3. Every type-scale size/leading pair, and every derived-metric row, equals
 #      what the source declares.
 #   4. The manual's `fontsize' table states the sizes the source declares.
+#   5. The docs/TESTING.md token table and the source's \skip_new:N
+#      allocations name the same set of tokens. Membership only: whether the
+#      named fixture renders the token is a claim about TeX output.
 #
 # The ratio column of the *type scale* is deliberately not checked. That table
 # says so itself -- "the ratio column is design intent and does not ship" --
@@ -62,6 +70,7 @@ fixtures="$here/fixtures"
 source_file="$root/careerdossier-tokens.sty"
 architecture="$root/docs/ARCHITECTURE.md"
 manual="$root/doc/careerdossier.tex"
+testing="$root/docs/TESTING.md"
 
 # Comparisons are decimal arithmetic on values TeX resolves in scaled points
 # (1/65536 pt), and the tables round for display. Half a thousandth of a point
@@ -84,7 +93,7 @@ Running header, folio=CDossierSizeFurniture"
 # ---------------------------------------------------------------------------
 
 # Every calibrated value careerdossier-tokens.sty declares, as one flat record
-# stream. Five record kinds, each `kind key... value...':
+# stream. Seven record kinds, each `kind key... value...':
 #
 #   bodysize  <fontsize> <pt>
 #   leading   <fontsize> <pt>
@@ -92,6 +101,7 @@ Running header, folio=CDossierSizeFurniture"
 #   scale     <fontsize> <selector> <size> <leading>
 #   ratio     <token> <ratio>
 #   derived   <token> <factor> <basis>
+#   skip      <token>
 #
 # The `fontsize' blocks are the arms of \__cdossier_tokens_resolve:'s
 # \str_case:Vn, each opening with `{ 10pt }' alone on its line. The margin
@@ -153,6 +163,15 @@ source_values() {
       match(line, /CDossier[A-Za-z]+/)
       pending = substr(line, RSTART, RLENGTH); next
     }
+    # The public spacing tokens are allocated one per line, before any value
+    # is set. The allocation, not the ratio, is what makes a name public, so
+    # it is the set the rendering table in docs/TESTING.md is held to.
+    match($0, /^[[:space:]]*\\skip_new:N[[:space:]]+\\CDossier[A-Za-z]+/) {
+      line = substr($0, RSTART, RLENGTH)
+      match(line, /CDossier[A-Za-z]+$/)
+      print "skip", substr(line, RSTART, RLENGTH); pending = ""; next
+    }
+
     pending != "" && match($0, /[0-9.]+[[:space:]]*\*[[:space:]]*\\dim_to_fp:n[[:space:]]*[{][[:space:]]*\\CDossier[A-Za-z]+/) {
       line = substr($0, RSTART, RLENGTH)
       factor = line; sub(/[^0-9.].*/, "", factor)
@@ -168,14 +187,15 @@ source_values() {
 # The documentation side.
 # ---------------------------------------------------------------------------
 
-# The first Markdown table under a given `#### ' heading, header row included,
-# with the alignment row dropped. Empty output means the heading or its table
-# was not found, which every caller treats as a failure rather than as "no
-# mismatches" (docs/TESTING.md, "A guard answers three states, not two").
+# The first Markdown table under a given heading, `#### ' unless a third
+# argument names another level, header row included, with the alignment row
+# dropped. Empty output means the heading or its table was not found, which
+# every caller treats as a failure rather than as "no mismatches"
+# (docs/TESTING.md, "A guard answers three states, not two").
 markdown_table() {
-  local file="$1" heading="$2"
-  awk -v want="$heading" '
-    $0 == "#### " want { armed = 1; next }
+  local file="$1" heading="$2" level="${3:-####}"
+  awk -v want="$level $heading" '
+    $0 == want         { armed = 1; next }
     armed && /^#/      { exit }
     armed && /^\|/     { intable = 1; if ($0 ~ /^\|[ :|-]*\|[ :|-]*$/) next; print; next }
     armed && intable   { exit }
@@ -603,6 +623,82 @@ check_manual_sizes() {
   '
 }
 
+# 5. The rendering table in docs/TESTING.md: one row per public spacing token,
+# naming the fixture that renders it. The rule there -- "add a row when you add
+# a token" -- is checked as set membership only. Whether the named fixture
+# really renders the token is a claim about TeX output, which this lint does
+# not compile.
+rendered_heading="Spacing tokens: reporting a value is not rendering a gap"
+
+check_rendered() {
+  local src="$1" doc="$2" values table label
+  label="$(basename "$doc")"
+
+  load_source "$src" "$label" || return 1
+
+  table="$(markdown_table "$doc" "$rendered_heading" "###")"
+  if [ -z "$table" ]; then
+    printf '  %-30s %s\n' "$label" "NO TABLE FOUND"
+    printf '    -> %s\n' "no table under '### $rendered_heading' in $label; the heading or the table shape has changed, so no token was compared"
+    return 1
+  fi
+
+  { printf '%s\n' "$values"; echo "--TABLE--"; printf '%s\n' "$table"; } |
+  awk -v label="$label" '
+    function trim(s) { gsub(/`/, "", s); sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$/, "", s); return s }
+
+    $0 == "--TABLE--" { intable = 1; next }
+    !intable && $1 == "skip" { declared[$2] = 1; declarations++; next }
+    !intable { next }
+
+    # The header row must open with the token column, or the rows below are
+    # being read by the wrong column and every comparison is meaningless.
+    !seen_header {
+      seen_header = 1
+      split($0, field, "|")
+      header = trim(field[2])
+      next
+    }
+
+    {
+      n = split($0, field, "|")
+      token = trim(field[2]); sub(/^\\/, "", token)
+      if (token == "") next
+      rows++
+      if (!(token in declared)) {
+        printf "  %-30s %-20s %s\n", label, "UNKNOWN TOKEN", "\\" token
+        printf "    -> %s\n", "the table names a fixture for \\" token ", which careerdossier-tokens.sty does not allocate with \\skip_new:N"
+        bad = 1
+        next
+      }
+      documented[token] = 1
+    }
+
+    END {
+      if (header != "Token") {
+        printf "  %-30s %-20s %s\n", label, "NO TOKEN COLUMN", "first column is '"'"'" header "'"'"'"
+        printf "    -> %s\n", "the table no longer opens with a Token column, so no token was compared"
+        exit 1
+      }
+      if (declarations == 0) {
+        printf "  %-30s %s\n", label, "NO SPACING TOKENS"
+        printf "    -> %s\n", "the source allocates no \\CDossier token with \\skip_new:N in a shape this lint reads, so the table was compared against nothing"
+        exit 1
+      }
+      for (token in declared) {
+        if (!(token in documented)) {
+          printf "  %-30s %-20s %s\n", label, "MISSING ROW", "\\" token
+          printf "    -> %s\n", "careerdossier-tokens.sty allocates this spacing token and the table names no fixture that renders it"
+          bad = 1
+        }
+      }
+      if (bad) exit 1
+      printf "  %-30s %s\n", label, rows " rows for " declarations " spacing tokens, the same set as the source"
+      exit 0
+    }
+  '
+}
+
 # ---------------------------------------------------------------------------
 # The run.
 # ---------------------------------------------------------------------------
@@ -632,6 +728,15 @@ else
   check_manual_sizes "$source_file" "$manual" || fail=1
 fi
 
+echo
+echo "== docs/TESTING.md's rendering table against careerdossier-tokens.sty =="
+if [ ! -f "$testing" ]; then
+  printf '  %-30s %s\n' "docs/TESTING.md" "MISSING"
+  fail=1
+else
+  check_rendered "$source_file" "$testing" || fail=1
+fi
+
 # Self-check. One fixture per verdict, so a checker that stopped detecting a
 # defect -- or started rejecting a correct document -- fails here.
 echo
@@ -643,6 +748,7 @@ self_check() {
     scale)    out="$(check_type_scale   "$fixtures/$src" "$fixtures/$doc")" ;;
     derived)  out="$(check_derived      "$fixtures/$src" "$fixtures/$doc")" ;;
     manual)   out="$(check_manual_sizes "$fixtures/$src" "$fixtures/$doc")" ;;
+    rendered) out="$(check_rendered     "$fixtures/$src" "$fixtures/$doc")" ;;
   esac
   rc=$?
   if [ "$expected" = "OK" ]; then
@@ -695,6 +801,12 @@ self_check tokenfixture-manual-ok.tex      manual "OK"
 self_check tokenfixture-manual-value.tex   manual "MANUAL VALUE MISMATCH"
 self_check tokenfixture-manual-unknown.tex manual "UNKNOWN ROLE"
 self_check tokenfixture-manual-notable.tex manual "NO TABLE FOUND"
+
+self_check tokenfixture-testing-ok.md      rendered "OK"
+self_check tokenfixture-testing-dropped.md rendered "MISSING ROW"
+self_check tokenfixture-testing-extra.md   rendered "UNKNOWN TOKEN"
+self_check tokenfixture-testing-notable.md rendered "NO TABLE FOUND"
+self_check tokenfixture-testing-ok.md      rendered "NO SPACING TOKENS" tokenfixture-noskip.sty
 
 echo
 if [ "$fail" -ne 0 ]; then
