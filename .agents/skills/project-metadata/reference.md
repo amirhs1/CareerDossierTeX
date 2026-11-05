@@ -409,6 +409,7 @@ query($owner:String!,$repo:String!,$pr:Int!,$issue:Int!){
       assignees(first:5){nodes{login}}
       labels(first:20){nodes{name}}
       milestone{title}
+      closingIssuesReferences(first:10){nodes{number}}
       projectItems(first:10){nodes{project{title}
         status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
         phase:fieldValueByName(name:"Phase"){... on ProjectV2ItemFieldSingleSelectValue{name}}
@@ -427,21 +428,45 @@ query($owner:String!,$repo:String!,$pr:Int!,$issue:Int!){
 
 Reading that output is not the check. **Assert the values**, because a null
 field and a wrongly-set field read alike in prose but not in a comparison. Put
-the assertion in the same call's own `--jq`, which compares each field against
-what you meant to set and exits non-zero on any mismatch:
+the assertion in the same call's own `--jq`. It compares every value
+"Verification" lists, the pull request's four items, and the focused issue's
+Status against what you meant to set, and exits non-zero on any mismatch:
 
 ```bash
 gh api graphql … -f query='…' --jq '
-    {"status":"<intended>","phase":"<intended>",
-     "priority":"<intended>","size":"<intended>"} as $want
-    | ( .data.repository.pullRequest.projectItems.nodes
-        | map(select(.project.title | test("CareerDossierTeX")))[0]
-        // halt_error(1) ) as $i
-    | [ $want | to_entries[]
-        | {field:.key, want:.value, got:($i[.key].name // null)} ]
+    {"url":"<pr-url>","isDraft":true,"base":"main","head":"<branch>",
+     "assignees":["amirhs1"],"labels":["<label>","<label>"],
+     "milestone":"<milestone>","closes":[<issue-number>],
+     "project":"CareerDossierTeX Development",
+     "status":"<intended>","phase":"<intended>",
+     "priority":"<intended>","size":"<intended>",
+     "issueStatus":"<intended>"} as $want
+    | .data.repository as $r
+    | ( $r.pullRequest.projectItems.nodes
+        | map(select(.project.title | test("CareerDossierTeX")))[0] // {} ) as $i
+    | ( $r.issue.projectItems.nodes
+        | map(select(.project.title | test("CareerDossierTeX")))[0] // {} ) as $j
+    | ( ( $r.pullRequest
+          | {url, isDraft, base:.baseRefName, head:.headRefName,
+             assignees:([.assignees.nodes[].login] | sort),
+             labels:([.labels.nodes[].name] | sort),
+             milestone:.milestone.title,
+             closes:[.closingIssuesReferences.nodes[].number]} )
+        + {project:$i.project.title, status:$i.status.name,
+           phase:$i.phase.name, priority:$i.priority.name,
+           size:$i.size.name, issueStatus:$j.status.name} ) as $got
+    | [ $want | to_entries[] | {field:.key, want:.value, got:$got[.key]} ]
     | map(. + {ok:(.want == .got)})
     | if all(.[]; .ok) then . else halt_error(1) end'
 ```
+
+Write `$want` from what you set, never from what came back:
+
+- `assignees` and `labels` sorted, because `$got` sorts them;
+- `closes` with each issue the body closes with `Closes #n`, or `[]` for a body
+  that only refers to one;
+- `null` for an inherited field the focused issue lacks, which "Verification"
+  permits.
 
 Never pipe the call to `jq` instead. The pipe puts `gh` inside the sandbox,
 where its request is denied (`CLAUDE.md`, "Sandbox and permissions"); `jq`
@@ -451,12 +476,19 @@ bound inside the expression.
 
 Select the item by project rather than taking `nodes[0]`: a PR that ends up in
 two projects would otherwise be checked against whichever row came back first,
-which is the same class of mistake as writing a field to the wrong item.
+which is the same class of mistake as writing a field to the wrong item. An
+item missing from the Project selects `{}`, so the missing membership fails as
+the `project` row, with each of that item's fields `null`, and the table is
+still printed.
 
 `halt_error(1)` makes `gh` print the offending table and exit 1, so a mismatch
 cannot be read as a pass. Report the printed table in the report's "2 Checks
-run" section. The issue's own Status comes back in the same response and is
-confirmed the same way.
+run" section.
+
+Two items on the list stay with the reader, because they are decisions rather
+than values: why a field was left unset, which the report states; and, for a
+pull request scored `L`, the recommendation to split it. Staying draft, the
+other half of that obligation, is the `isDraft` row.
 
 ### Filing an issue instead
 
