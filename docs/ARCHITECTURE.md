@@ -354,9 +354,10 @@ than one paragraph's edges.
 `\hyphenpenalty` and `\exhyphenpenalty` are deliberately left at TeX's default
 of `50` with no token (#309), and the `tokens-*-defaults` baselines record both
 so a later change argues with a diff. The measurements that refused a higher
-value — and the evidence that forbidding hyphenation outright is decisively
-wrong — are commented beside the penalty declarations in
-`careerdossier-tokens.sty`, reproducible with `make review-linebreak` (#316).
+value — of the pair, and of each penalty alone (#542) — and the evidence that
+forbidding hyphenation outright is decisively wrong are commented beside the
+penalty declarations in `careerdossier-tokens.sty`, reproducible with
+`make review-linebreak` (#316).
 
 ### `careerdossier-base.sty`
 
