@@ -692,11 +692,10 @@ generate every separator first and attempt to remove the empty ones later.
 
 ### Engine support
 
-`AGENTS.md`, "Conventions a linter cannot express", states the engine scope and
-is not repeated here. Two things
-specific to writing the code: `careerdossier-typography` owns the guard, and
-partial XeLaTeX or pdfLaTeX support is not to be added without defining,
-documenting, and testing it.
+`AGENTS.md`, "Conventions a linter cannot express", states the engine scope,
+and `AGENTS.md`, "Settled decisions", rules out partial XeLaTeX or pdfLaTeX
+support; neither is repeated here. One thing specific to writing the code:
+`careerdossier-typography` owns the guard.
 
 ## Documentation requirements
 
