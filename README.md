@@ -311,9 +311,9 @@ Three things worth knowing before you open one:
 - The CV adds a dependency-free publication list, `CDossierPublications`, and an
   optional BibLaTeX and Biber profile in `careerdossier-biblatex`. A CV that does
   not load that package builds without either tool.
-- A statement selects one of seven types with `type=`. Omit it for a statement of
-  interest, which requires only `name` and `email`; `type=research` also requires
-  profile `affiliation`, and `type=artist` profile `website`.
+- A statement selects one of seven types with `type=`. Every type requires
+  `name` and `email`, and `type=artist` also requires profile `website`. Omit
+  `type=` for a statement of interest.
 
 `\CDossierSubsection` is available in the resume and the CV as the level between
 a section and an entry — `Publications` split into journal, conference, and
