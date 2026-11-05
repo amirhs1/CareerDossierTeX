@@ -29,7 +29,8 @@ own, and each one decides where a change belongs:
 ## Module graph and data flow
 
 All four classes load the same five shared packages, and none of the five knows
-which class loaded it:
+which class loaded it. `careerdossier-components.sty` loads two more, so a class
+reaches them without naming them:
 
 ```text
 careerdossier-{resume,letter,cv,statement}.cls
@@ -38,6 +39,8 @@ careerdossier-{resume,letter,cv,statement}.cls
         ├── careerdossier-typography.sty   engine guard, fonts, text roles
         ├── careerdossier-theme.sty        colour
         ├── careerdossier-components.sty   rendered parts
+        │       ├── careerdossier-links.sty      links and linked fields
+        │       └── careerdossier-metadata.sty   derived PDF metadata
         └── careerdossier-base.sty         profile state and validation
 
 careerdossier-biblatex.sty  ──optional──▶  biblatex / Biber
@@ -61,9 +64,10 @@ profile file ──▶ \CDossierSetup ──▶ careerdossier-base.sty
                                                 │
                                                 ▼
                                     careerdossier-components.sty
-                                        renders identity, contact line, links,
-                                        entry primitives, furniture, section
-                                        rules, list breaks, derived PDF metadata
+                                        renders identity, contact line, entry
+                                        primitives, furniture, section rules,
+                                        list breaks; links and PDF metadata
+                                        through the two packages it loads
                                                 │
                                                 ▼
 document class ── chooses paper, owns structure and the running label
@@ -417,13 +421,11 @@ The file's own header comment states the responsibilities.
 ### `careerdossier-components.sty`
 
 The reusable rendered pieces every class arranges: identity, furniture, section
-rule, contact line, entry primitives, and the link layer. The file's own header
-comment states the responsibilities in full, and comments the two mechanisms
-that reach outside this package — the `\href` hook against hyperref's
-`\hyper@link@`, and why `lua-ul` draws the link rule and `ulem` was rejected on
-measurement. Neither is restated here. It owns no PDF document metadata: it
-loads `careerdossier-metadata.sty`, below, so that every class reaches that
-package through the `\RequirePackage` list it already has.
+rule, contact line, and entry primitives. The file's own header comment states
+the responsibilities in full. It owns neither links nor PDF document metadata:
+it loads `careerdossier-links.sty` and `careerdossier-metadata.sty`, below, so
+that every class reaches both through the `\RequirePackage` list it already
+has.
 
 Three boundary questions this package answers are recorded where they were
 decided, not restated here. Each mechanism is commented at the code that
@@ -432,11 +434,29 @@ implements it in `careerdossier-components.sty`; each decision is in its issue.
 | Question | The answer, in one line | Decided in |
 |---|---|---|
 | Why one stack serves both header shapes | The identity block and the statement header are the same sequence of optional lines, so *position* decides which gap token applies rather than presence — the defect that let an absent `headline` change the gap below the name. | #204, #224, #252 |
-| Why `medium=print\|screen` resolves here | The classes validate the public value and forward it, but what it decides — whether page furniture is emitted at all — is owned here, so the policy exists once instead of once per class. | #184 |
+| Why `medium=print\|screen` resolves here | The classes validate the public value and forward it, but what it decides — whether page furniture is emitted at all — is owned here, so the policy exists once instead of once per class. Its link half is handed to `careerdossier-links.sty` through one setter. | #184, #465 |
 | Why the de-emphasis role resolves here | `muted` combines a shape from typography with a colour from theme, and the dependency direction forbids either module from reaching into the other. This one loads both. | #271, #324 |
 
 Optional fields follow the project-wide rule: collect the present fields, then
 insert separators between them, so an absent `phone` leaves no separator behind.
+
+### `careerdossier-links.sty`
+
+Every link the toolkit emits and how a link looks: the decoration role
+`\CDossierLinkStyle` and its `\CDossierPlainLinks` suppression, the `\href`
+hook that reaches an author's own anchor text, the single link chokepoint with
+its `#` rewrite, scheme normalisation, `\CDossierLink`, the one-time warning
+when `hyperref` is absent, and the profile fields that become links. It lays out
+nothing and does not load `hyperref`. The file's own header comment states the
+responsibilities and its interfaces, and comments the two mechanisms that reach
+outside it — the `\href` hook against hyperref's `\hyper@link@`, and why
+`lua-ul` draws the link rule and `ulem` was rejected on measurement. Neither is
+restated here.
+
+| Question | The answer, in one line | Decided in |
+|---|---|---|
+| Why links are not part of `careerdossier-components` | Nothing else in that package called into the link layer; its one real dependency, the link half of `medium`, now arrives through a setter, so the dependency runs one way. The analysis is on the issue. | #465 |
+| Why its warnings still say `careerdossier-components` | That is what the log has always said and what the regression baselines pin, so the move changed no output. | #465 |
 
 ### `careerdossier-metadata.sty`
 

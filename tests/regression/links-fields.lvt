@@ -1,4 +1,4 @@
-% components-links.lvt — careerdossier-components link targets.
+% links-fields.lvt — careerdossier-links targets for the linked profile fields.
 %
 % The visible contact text is checked by the extraction fixtures; pdftotext
 % cannot see a link's href target, so the target normalization is checked here
@@ -27,29 +27,29 @@
   {
     \CDossierSetup{ website = {} }
     \CDossierSetup{ website = {#1} }
-    \__cdossier_components_web:n { website }
-    \TYPE{ [\l__cdossier_components_url_tl] }
+    \__cdossier_links_web:n { website }
+    \TYPE{ [\l__cdossier_links_url_tl] }
   }
 \cs_new_protected:Npn \cdossiertestProfile #1#2
   {
     \CDossierSetup{ #1 = {} }
     \CDossierSetup{ #1 = {#2} }
-    \__cdossier_components_web:n {#1}
-    \TYPE{ [\l__cdossier_components_disp_tl] ~ -> ~ [\l__cdossier_components_url_tl] }
+    \__cdossier_links_web:n {#1}
+    \TYPE{ [\l__cdossier_links_disp_tl] ~ -> ~ [\l__cdossier_links_url_tl] }
   }
 \cs_new_protected:Npn \cdossiertestMailTarget #1
   {
     \CDossierSetup{ email = {} }
     \CDossierSetup{ email = {#1} }
-    \__cdossier_components_mail:n { email }
-    \TYPE{ [\l__cdossier_components_url_tl] }
+    \__cdossier_links_mail:n { email }
+    \TYPE{ [\l__cdossier_links_url_tl] }
   }
 \cs_new_protected:Npn \cdossiertestOrcidTarget #1
   {
     \CDossierSetup{ orcid = {} }
     \CDossierSetup{ orcid = {#1} }
-    \__cdossier_components_orcid:
-    \TYPE{ [\l__cdossier_components_url_tl] }
+    \__cdossier_links_orcid:
+    \TYPE{ [\l__cdossier_links_url_tl] }
   }
 \cs_new_protected:Npn \cdossiertestHrefBranch
   {
@@ -88,7 +88,7 @@
 %% many links degrade. So it is asserted first, on a contact line carrying five
 %% linked fields at once — and every later test in this file renders a further
 %% link with hyperref still absent, so the silence in each of their baselines is
-%% the other half of the assertion. tests/regression/components-links-hyperref
+%% the other half of the assertion. tests/regression/links-fields-hyperref
 %% holds the case where hyperref is present and nothing is said at all.
 \TEST{links-inert-warns-once-for-a-multi-field-contact-line}{
   \cdossiertestContactLine
