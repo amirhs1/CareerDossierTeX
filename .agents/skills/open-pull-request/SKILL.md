@@ -6,7 +6,11 @@ description: Open a draft GitHub pull request whose body is the full report, and
 # Open a pull request
 
 1. Check the branch, the working tree, and `HEAD`; the branch is not `main`.
-   Run the full gate in AGENTS.md, "Commands": `make check`.
+   Run the checks AGENTS.md, "Commands", sets before a push: `make lint`,
+   the suite that owns the change, and `make check` when the change touches
+   a shared package, a class, or a baseline. CI's required checks are the
+   gate: once they finish, add the run, by its ID, to the body's "Checks run"
+   with `gh pr edit`.
 2. Before the push, review the diff: `git status --short`, then the whole
    branch diff, `git diff origin/main...HEAD`, for unrelated files, generated
    artifacts, secrets, private data, and accidental deletions. A change on the

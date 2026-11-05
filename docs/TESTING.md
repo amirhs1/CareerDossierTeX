@@ -340,9 +340,11 @@ committed to check them against.
 
 ## Running the harness
 
-`make check` is the gate and runs every suite below, except on a docs-only
-change, where it runs only the lints. `CONTRIBUTING.md`, "Local builds", and
-"The gate, and the serial path" own the invocation, scoping, the docs-only rule,
+`make check` runs every suite below, except on a docs-only change, where it
+runs only the lints. It is optional before a push: CI's required checks are the
+gate (`CONTRIBUTING.md`, "What actually gates a merge"). `CONTRIBUTING.md`,
+"Local builds", and "The full run, and the serial path" own the invocation,
+scoping, the docs-only rule,
 and what each target's CI job is called; its "CI expectations" owns when CI
 skips one.
 
@@ -381,6 +383,14 @@ header owns why `JOBS` defaults to 4.
 for `JOBS=N` over their own fixtures, with the same per-fixture accounting. The
 two layers multiply, so the driver passes every target an explicit `JOBS` and
 only `INNER_JOBS=N` raises the product.
+
+CI's `smoke`, `layout`, and `tagging` jobs run this path with
+`--jobs "$(nproc)"` (#631); the local targets stay serial without `JOBS`. On
+the standard runner `nproc` printed 4. Against the serial run 42081335342, run
+42114379810 took the test steps from 172 s to 74 s (`smoke`), 122 s to 45 s
+(`layout`), and 62 s to 30 s (`tagging`), and the run's wall clock from 269 s
+to 159 s. Each job dispatched and completed as many units as its runner's
+`--list-units` prints: 130, 58, and 13.
 
 ### Log inspection
 

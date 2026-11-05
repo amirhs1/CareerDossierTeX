@@ -20,7 +20,8 @@
 --
 -- `l3build ctan' runs `check' first and skips the zip stage when it fails, so
 -- an archive only exists for a tree that passed the regression suite. It does
--- not run the shell-driven suites; `make check' is still the gate.
+-- not run the shell-driven suites; `make check' runs them, and
+-- docs/RELEASE-CHECKLIST.md requires it before a release.
 --
 -- Nothing here uploads. `AGENTS.md' ("Git") reserves release publication to the
 -- maintainer, and `uploadconfig' below deliberately omits the one mandatory
