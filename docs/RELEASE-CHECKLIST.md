@@ -65,7 +65,7 @@ lint asserts what was configured, not what was produced.
 
 `packtdszip = false`, set explicitly rather than left to l3build's identical
 default so that the decision has a value to point at. The package installs as
-eleven files into `tex/latex/careerdossier/` with no scripts, fonts, or
+twelve files into `tex/latex/careerdossier/` with no scripts, fonts, or
 generated assets to place, so CTAN's installers derive that tree from the
 archive without help. `.tds.zip` is optional and, for a package without an elaborate install,
 generally unnecessary.

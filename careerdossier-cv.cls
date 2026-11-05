@@ -552,7 +552,7 @@
 %% one is invisible to that split, so hyperref takes the target for a local
 %% file, appends `.pdf', and emits a GoToR "open a remote PDF" action rather
 %% than a URI action -- silently, and only in the annotation. See the same note
-%% at \__cdossier_components_scheme:N in careerdossier-components (issue #328).
+%% at \__cdossier_links_scheme:N in careerdossier-links (issue #328).
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
     \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
@@ -573,18 +573,18 @@
               { \tl_to_str:n { https:// } } }
       }
     %% A raw `#' in the target is rewritten to \# by the package that owns
-    %% links, for the reason given at \__cdossier_components_hashescape:N in
-    %% careerdossier-components: hyperref's own \edef fails on a parameter
+    %% links, for the reason given at \__cdossier_links_hashescape:N in
+    %% careerdossier-links: hyperref's own \edef fails on a parameter
     %% character, and the catcode-12 repair truncates the address silently
     %% (issue #353). This link builds its own \href rather than going through
-    %% \__cdossier_components_link:nn, so it applies the rewrite itself. A URL
+    %% \__cdossier_links_link:nn, so it applies the rewrite itself. A URL
     %% carrying a fragment is ordinary in a publication list.
-    \__cdossier_components_hashescape:N \l__cdossier_cv_publication_target_tl
-    \__cdossier_components_hashescape:N \l__cdossier_cv_publication_shown_tl
+    \__cdossier_links_hashescape:N \l__cdossier_cv_publication_target_tl
+    \__cdossier_links_hashescape:N \l__cdossier_cv_publication_shown_tl
     %% The visible text is the identifier itself, so this link needs no
     %% decoration under `medium=screen' -- and must not get one: ulem would
     %% rebox the \nolinkurl into a single unbreakable token. See
-    %% \CDossierPlainLinks in careerdossier-components (issue #278).
+    %% \CDossierPlainLinks in careerdossier-links (issue #278).
     \cs_if_exist:NTF \href
       {
         \group_begin:
@@ -598,7 +598,7 @@
         %% The same warning the contact line and \CDossierLink raise, from the
         %% package that owns the message: a publication identifier that is not
         %% a link has the same cause and the same remedy (issue #329).
-        \__cdossier_components_links_inert:
+        \__cdossier_links_inert:
         #1:\nobreakspace #2
       }
   }

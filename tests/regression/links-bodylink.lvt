@@ -1,4 +1,4 @@
-% components-bodylink.lvt — \CDossierLink, the body-text link (issue #308).
+% links-bodylink.lvt — \CDossierLink, the body-text link (issue #308).
 %
 % Three properties, none of which a rendered page reveals:
 %
@@ -40,7 +40,7 @@
 %% at the \TEST boundary, so every test that needs it installs it again.
 \cs_new_protected:Npn \cdossiertestTrace
   {
-    \cs_set_protected:Npn \__cdossier_components_link:nn ##1##2
+    \cs_set_protected:Npn \__cdossier_links_link:nn ##1##2
       {
         \TYPE{ [target:~##1] }
         \TYPE{ [text:~##2] }
