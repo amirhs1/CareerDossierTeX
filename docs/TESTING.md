@@ -611,6 +611,13 @@ rendered identifier precedence over `publications.bib`, plus the
 missing-`\addbibresource` diagnostic. Needs Biber; a run without it skips and
 says so.
 
+`doi-hyphen-break.tex` wraps a DOI inside the identifier and asserts that the
+joined default-mode extraction equals the database's `doi` field, which
+`doi-hyphen-break.expected.txt` holds verbatim; `--update` never rewrites it,
+because no extraction is a source for it. A wrap guard reads the `-layout` text
+first and fails the fixture by name if the DOI stops wrapping, since an
+unwrapped DOI would pass without exercising the break.
+
 It also owns the two author-highlighting fixtures over `highlight-names.bib`.
 `highlight-multiword.tex` asserts the **bold run** rather than the extracted
 text, because a name part that failed to match renders identically and differs

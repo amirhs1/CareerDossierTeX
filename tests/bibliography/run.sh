@@ -309,6 +309,101 @@ echo "    $warned"
 echo "  the unmatched declaration is reported, and named"
 
 # --------------------------------------------------------------------------
+# A DOI wrapped at one of its own hyphens extracts intact (issue #561).
+#
+# BibLaTeX lists `-' among the URL break points, so a DOI can end a line on a
+# hyphen it already contains. The hyphen is printed, but default-mode pdftotext
+# takes a line-final hyphen for a soft hyphen and drops it when it joins the
+# lines: `10.9999/example-2026-50355-2' extracted as `10.9999/example-202650355-2'.
+# The build is clean throughout, and tests/links cannot see it, because a link
+# annotation stores the whole URI wherever the visible text breaks.
+#
+# The expected value is the database's `doi' field, which
+# doi-hyphen-break.expected.txt holds verbatim. It is not an extraction, so
+# `--update' leaves it alone: no output of this run can be a source for it.
+echo "== doi-hyphen-break.tex (a DOI wrapped at its own hyphen extracts intact) =="
+dh="doi-hyphen-break"
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
+    "$dh.tex" > "$dh.stdout" 2>&1; then
+  echo "  BUILD FAILED (see $dh.log and $dh.blg)"
+  exit 1
+fi
+if grep -Eiq '(^| - )(WARN|ERROR) -' "$dh.blg"; then
+  echo "  BIBER WARNINGS/ERRORS:"
+  grep -Ei '(^| - )(WARN|ERROR) -' "$dh.blg" | sed 's/^/    /'
+  exit 1
+fi
+# Overfull as well as the font checks: suppressing a break point must not buy
+# an intact identifier with a line set into the margin.
+unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' \
+  "$dh.log" || true)"
+if [ -n "$unexpected" ]; then
+  echo "  UNEXPECTED LATEX LOG LINES:"
+  printf '%s\n' "$unexpected" | sed 's/^/    /'
+  exit 1
+fi
+
+# Wrap guard. The assertion below passes trivially for a DOI that fits on one
+# line, so first establish from the line-preserving `-layout' output that the
+# identifier really is split: the part on the `doi:' line must be a proper
+# prefix of the whole. A fixture that stops wrapping fails here, by name,
+# rather than reporting a clean extraction of a case it no longer exercises.
+#
+# Two shapes defeat a plain prefix test, and both were met in a filler sweep.
+# A DOI that fits ends its line with the entry's full stop, which is removed
+# before comparing. A `doi:' label that ends its own line leaves the head
+# empty, which is a prefix of anything while nothing wraps inside the
+# identifier, so an empty head is refused outright.
+expected_doi="$(cat "$dh.expected.txt")"
+doi_head="$(pdftotext -layout -enc UTF-8 "$dh.pdf" - \
+  | sed -n 's/.*doi: \([^[:space:]]*\).*/\1/p' | head -n 1)"
+doi_head="${doi_head%.}"
+echo "    first line of the DOI: [$doi_head]"
+case "$expected_doi" in
+  "")
+    echo "  EMPTY BASELINE: $dh.expected.txt holds no DOI."
+    exit 1
+    ;;
+esac
+if [ -z "$doi_head" ]; then
+  echo "  THE DOI DOES NOT START ON THE doi: LINE: the label ends its line and"
+  echo "  the identifier sits whole on the next, so nothing wraps inside it."
+  echo "  Retune the filler in doi-hyphen.bib; do not delete the guard."
+  exit 1
+fi
+case "$expected_doi" in
+  "$doi_head")
+    echo "  THE DOI NO LONGER WRAPS: it fits on its first line, so this fixture"
+    echo "  cannot see the defect. Retune the filler in doi-hyphen.bib until the"
+    echo "  break falls inside the identifier again; do not delete the guard."
+    exit 1
+    ;;
+  "$doi_head"?*)
+    ;;
+  *)
+    echo "  THE FIRST DOI LINE IS NOT A PREFIX OF THE DOI: [$doi_head]"
+    echo "  Either the fixture changed or the line was not found at all."
+    exit 1
+    ;;
+esac
+
+# The assertion. Join the default-mode lines, as a reader's copy or a text
+# pipeline would, and take the identifier out of the joined text. A DOI ends
+# before the unit punctuation BibLaTeX appends, so one trailing full stop is
+# removed; this DOI has none of its own.
+pdftotext -enc UTF-8 "$dh.pdf" - | tr -d '\n' \
+  | { grep -oE '10\.9999/[A-Za-z0-9.-]+' || true; } \
+  | sed 's/\.$//' > "$dh.got"
+if ! diff -u "$dh.expected.txt" "$dh.got" > "$dh.diff"; then
+  echo "  THE EXTRACTED DOI DOES NOT MATCH THE DATABASE:"
+  sed 's/^/    /' "$dh.diff"
+  echo "  A line-final hyphen the DOI already contains was dropped when"
+  echo "  pdftotext joined the lines (issue #561)."
+  exit 1
+fi
+echo "  the wrapped DOI extracts as its doi field: $expected_doi"
+
+# --------------------------------------------------------------------------
 # The shipped example rendered its entries (issue #319).
 #
 # Four tiers, cheapest first, all derived from the sources so that adding an

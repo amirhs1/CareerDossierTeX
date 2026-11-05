@@ -21,9 +21,11 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 - Fix `\CDossierHighlightAuthor` never matching a multi-word family or given name. ([#541])
 - Fix an entry of three or fewer bullets never breaking across a page. ([#562])
+- Fix a bibliography DOI or URL wrapped at one of its own hyphens losing that hyphen in extracted text. ([#561])
 
 [#541]: https://github.com/amirhs1/CareerDossierTeX/issues/541
 [#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
+[#561]: https://github.com/amirhs1/CareerDossierTeX/issues/561
 [#562]: https://github.com/amirhs1/CareerDossierTeX/issues/562
 [#593]: https://github.com/amirhs1/CareerDossierTeX/issues/593
 
