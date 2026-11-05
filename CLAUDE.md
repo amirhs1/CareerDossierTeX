@@ -8,9 +8,10 @@ excluded. These settings bind Claude Code only.
 
 - `gh` must be the whole command. Inside a loop, a subshell, `$(…)`, `xargs`,
   a pipe, or a redirect it runs sandboxed and fails with
-  `tls: failed to verify certificate: x509: OSStatus -26276` — the sandbox, not
-  the network (measured 2026-10-07). Assert with `gh`'s own `--jq`; batch with
-  one `gh api graphql` document.
+  `not in this command's allowed_domains` or, where the sandbox lets the host
+  through, `tls: failed to verify certificate: x509: OSStatus -26276` — the
+  sandbox, not the network (measured 2026-10-07 and 2026-11-05). Assert with
+  `gh`'s own `--jq`; batch with one `gh api graphql` document.
 - Run these with the sandbox off: `make check`, writes to `.git/config`
   (`git config`, `git push -u`), and writes under `.claude/`.
 - Sandboxed Bash and `gh` see different temporary folders: `$TMPDIR` in one is

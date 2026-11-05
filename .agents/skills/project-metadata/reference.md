@@ -426,28 +426,34 @@ query($owner:String!,$repo:String!,$pr:Int!,$issue:Int!){
 ```
 
 Reading that output is not the check. **Assert the values**, because a null
-field and a wrongly-set field read alike in prose but not in a comparison. Pipe
-the same call — `gh` still leads a pipeline — through a jq that compares each
-field against what you meant to set and exits non-zero on any mismatch:
+field and a wrongly-set field read alike in prose but not in a comparison. Put
+the assertion in the same call's own `--jq`, which compares each field against
+what you meant to set and exits non-zero on any mismatch:
 
 ```bash
-gh api graphql … -f query='…' \
-| jq --argjson want '{"status":"<intended>","phase":"<intended>",
-                      "priority":"<intended>","size":"<intended>"}' '
-    ( .data.repository.pullRequest.projectItems.nodes
-      | map(select(.project.title | test("CareerDossierTeX")))[0]
-      // halt_error(1) ) as $i
+gh api graphql … -f query='…' --jq '
+    {"status":"<intended>","phase":"<intended>",
+     "priority":"<intended>","size":"<intended>"} as $want
+    | ( .data.repository.pullRequest.projectItems.nodes
+        | map(select(.project.title | test("CareerDossierTeX")))[0]
+        // halt_error(1) ) as $i
     | [ $want | to_entries[]
         | {field:.key, want:.value, got:($i[.key].name // null)} ]
     | map(. + {ok:(.want == .got)})
     | if all(.[]; .ok) then . else halt_error(1) end'
 ```
 
+Never pipe the call to `jq` instead. The pipe puts `gh` inside the sandbox,
+where its request is denied (`CLAUDE.md`, "Sandbox and permissions"); `jq`
+then reads empty input, prints nothing, and exits 0, so the denial reads as a
+pass. `gh`'s `--jq` takes no `--argjson`, which is why the intended values are
+bound inside the expression.
+
 Select the item by project rather than taking `nodes[0]`: a PR that ends up in
 two projects would otherwise be checked against whichever row came back first,
 which is the same class of mistake as writing a field to the wrong item.
 
-`halt_error(1)` prints the offending table to stderr and exits 1, so a mismatch
+`halt_error(1)` makes `gh` print the offending table and exit 1, so a mismatch
 cannot be read as a pass. Report the printed table in the report's "2 Checks
 run" section. The issue's own Status comes back in the same response and is
 confirmed the same way.
@@ -467,15 +473,26 @@ gh issue create --title "[area] Verb object" --body-file <body.md> \
 ```
 
 `gh issue create` has **no `--project` flag**, which is the one asymmetry with
-`gh pr create`. Add the issue to the Project with a mutation instead, reading
-its node id in the same call — `gh` still leads, so the nested substitution is
-sandbox-safe:
+`gh pr create`. Add the issue to the Project with a mutation instead, in two
+calls with each `gh` alone: a `gh` nested in `$(…)` inside the mutation runs
+sandboxed and is denied (`CLAUDE.md`, "Sandbox and permissions"). First read
+the issue's node id:
 
 ```bash
-gh api graphql -f query='
-mutation{ addProjectV2ItemById(input:{projectId:"<project-id from step 1>",
-  contentId:"'"$(gh issue view <n> --json id --jq .id)"'"}){item{id}} }'
+gh issue view <n> --json id --jq .id
 ```
+
+Then write that id into the mutation:
+
+```bash
+gh api graphql -f p=<project-id from step 1> -f c=<node id from the call above> -f query='
+mutation($p:ID!,$c:ID!){
+  addProjectV2ItemById(input:{projectId:$p,contentId:$c}){item{id}}
+}'
+```
+
+The mutation is safe to run when the Project's auto-add workflow has already
+added the issue: it returns that item's id and adds no second item.
 
 The returned `item.id` is what step 4 writes against, so **step 3 is not needed
 on this path** — the mutation that adds the item already returns its id, while
