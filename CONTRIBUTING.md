@@ -115,11 +115,11 @@ park it in the furthest-out open milestone.
 currently qualify; each records why its release is undecided, and an
 unmilestoned issue without that reason is an oversight.
 
-An **epic parent** is for work that genuinely decomposes into several issues — a
-release epic, or a cross-cutting effort spanning more than one class or package.
-A bug found mid-milestone, a CI repair, or a documentation sync takes a
-milestone and no parent. Do not create a placeholder epic so a lone issue has
-somewhere to sit; that reproduces the milestone with extra steps.
+Every issue in a major or minor release's milestone is a sub-issue of that
+release's epic. A bug found mid-milestone, a CI repair, or a documentation sync
+takes the release epic and no other parent. Do not create a placeholder epic so
+a lone issue has somewhere to sit. A patch release has no epic, so its issues
+have no parent.
 
 Where an epic exists, its **sub-issue graph is canonical**. A checklist in the
 epic body is a rendering of that graph, not a second register — if the two
@@ -480,8 +480,10 @@ A local check and the matching CI job are equivalent, but not textually
 identical. Most jobs run the same `make` target you would; `extraction`,
 `tagging`, `smoke`, and `layout` invoke `tests/<suite>/run.sh` directly and
 `regression` runs a bare `l3build check` — in each case the same command the
-target itself wraps, with the empty selector described below. If you change a
-command in one place, change it in the other.
+target itself wraps, with the empty selector described below. `smoke`,
+`layout`, and `tagging` also pass `--jobs "$(nproc)"`, which the targets pass
+only when you set `JOBS`. If you change a command in one place, change it in
+the other.
 
 Target and job names overlap but are not in bijection, so do not derive one from
 the other. The extraction and bibliography *targets* are `extract-test` and
@@ -631,8 +633,9 @@ make layout JOBS=8 FIXTURE='resume-*'
 ```
 
 **With no `JOBS` nothing changes.** Each runs exactly the fixtures it ran
-before, in the same order, with byte-identical output — which is what CI invokes
-and why it is unaffected.
+before, in the same order, with byte-identical output. CI's `smoke`, `layout`,
+and `tagging` jobs take the concurrent path instead, one fixture per core, and
+each job log ends with the accounting line that shows every fixture ran once.
 
 `JOBS` composes with `FIXTURE`, and it composes with `make check` — but the two
 layers multiply, so `check` pins the inner one to 1 and you raise it
