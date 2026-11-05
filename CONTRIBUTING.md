@@ -929,9 +929,11 @@ A pull request should include:
 
 - a concise summary;
 - the problem, with evidence;
-- linked issues using `Closes #...` or `Fixes #...`, or, under one of the three
-  exceptions in "Work item structure", the problem, proposal, and acceptance
-  criteria stated in the body instead;
+- linked issues, using `Closes #...` or `Fixes #...` for each issue the pull
+  request completes and `Refs #...` for one whose acceptance criteria the merge
+  cannot satisfy (see "2. Every pull request links an issue, with three
+  exceptions" above), or, under one of the three exceptions there, the
+  problem, proposal, and acceptance criteria stated in the body instead;
 - a focused change list;
 - public API impact;
 - tests added or updated under `tests/`;
