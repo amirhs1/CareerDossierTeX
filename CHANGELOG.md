@@ -15,6 +15,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 ### Changed
 
 - Change the resume `/Title` and running page label to `Resume`, spelled in ASCII. ([#543])
+- Document keeping `\exhyphenpenalty` at TeX's `50`, measured apart from `\hyphenpenalty`. ([#542])
 
 ### Fixed
 
@@ -22,6 +23,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 - Fix an entry of three or fewer bullets never breaking across a page. ([#562])
 
 [#541]: https://github.com/amirhs1/CareerDossierTeX/issues/541
+[#542]: https://github.com/amirhs1/CareerDossierTeX/issues/542
 [#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
 [#562]: https://github.com/amirhs1/CareerDossierTeX/issues/562
 
