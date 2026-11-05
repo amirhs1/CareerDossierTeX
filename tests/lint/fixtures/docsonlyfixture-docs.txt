@@ -1,0 +1,9 @@
+docs/TESTING.md
+CONTRIBUTING.md
+AGENTS.md
+.agents/skills/write-test/SKILL.md
+.github/ISSUE_TEMPLATE/bug-report.yml
+.claude/settings.json
+.codex/config.toml
+.githooks/commit-msg
+.gitmessage

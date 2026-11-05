@@ -259,6 +259,13 @@ is a legitimate character in a legitimate word. Body text therefore uses a link
 form whose break points add no hyphen, so a wrapped address still rejoins
 exactly.
 
+Adding no hyphen is not the whole rule: an address must also never end a line on
+a hyphen it already contains. A plain-text extractor reads a line-final hyphen
+as a soft hyphen and removes it when it joins the lines, so the real character
+is lost and the address no longer resolves — the inserted-hyphen defect in
+reverse. A break that would fall after such a hyphen belongs before it, where
+the hyphen opens the next line and nothing mistakes it for hyphenation.
+
 The same constraint governs decoration. An underline must be drawn over an
 address rather than around it: anything that re-boxes text in order to decorate
 it rebuilds the spaces inside it, and the text layer changes while the page

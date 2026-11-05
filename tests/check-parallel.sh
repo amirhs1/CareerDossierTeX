@@ -69,10 +69,11 @@
 #     before anything is dispatched.
 #
 # `--self-test` exercises the accounting assertion, the failure path, the
-# per-worker cache isolation, and the extraction verdict, against synthetic
-# workers and synthetic logs. It compiles nothing and needs neither TeX nor
-# biber. `make lint` runs it, which is how the negative controls stay committed
-# rather than performed once by hand.
+# per-worker cache isolation, the extraction verdict, and the docs-only
+# scoping, against synthetic workers, synthetic logs, and stub classifiers. It
+# compiles nothing and needs neither TeX nor biber. `make lint` runs it, which
+# is how the negative controls stay committed rather than performed once by
+# hand.
 #
 # WHERE IT RUNS
 #
@@ -91,7 +92,8 @@
 #
 # USAGE
 #
-#   tests/check-parallel.sh [--jobs N] [--inner-jobs N] [--list] [--self-test]
+#   tests/check-parallel.sh [--jobs N] [--inner-jobs N] [--full] [--list]
+#                           [--self-test]
 #
 #   --jobs       concurrent targets; default 4, for the reason under WHY FOUR
 #                above. Capped at the number of targets.
@@ -100,9 +102,15 @@
 #                process budget is --jobs x --inner-jobs; see issue #390 and the
 #                comment on `inner_jobs' below for why this is passed explicitly
 #                to every dispatched target rather than left to MAKEFLAGS.
-#   --list       print the target list the run would dispatch, and exit.
-#   --self-test  run the accounting, failure-path, biber-isolation, and
-#                biber-extraction controls; compile nothing.
+#   --full       dispatch every target even on a docs-only change; `make check
+#                FULL=1`. Without it, a working tree whose change since the
+#                merge base with origin/main is docs-only dispatches only the
+#                Makefile's DOCS_ONLY_TARGETS; see "Docs-only scoping" below.
+#   --list       print the full target list, before any docs-only scoping,
+#                and exit.
+#   --self-test  run the accounting, failure-path, biber-isolation,
+#                biber-extraction, and docs-only scoping controls; compile
+#                nothing.
 #
 # Output lands in build/check-parallel/, which is gitignored and removed by
 # `make clean`. Each target's full stdout and stderr is kept there as
@@ -115,6 +123,8 @@ root="$(cd "$here/.." && pwd)"
 
 jobs=4
 mode=run
+# 1 when FULL=1 forces every target whatever the change touches (#603).
+full=0
 
 # Fixtures in flight *inside* each dispatched target (issue #390). One, not
 # `jobs', and the default is the whole of the process budget answer.
@@ -154,6 +164,15 @@ while [ "$#" -gt 0 ]; do
     --inner-jobs=*)
       inner_jobs="${1#--inner-jobs=}"
       shift
+      ;;
+    --full|--full=1)
+      full=1
+      shift
+      ;;
+    --full=*)
+      # FULL=0 or FULL=yes would otherwise read as a request nobody made, in
+      # one direction or the other; only the documented spelling is accepted.
+      die "FULL takes 1, got: ${1#--full=}"
       ;;
     --list)
       mode=list
@@ -230,6 +249,104 @@ read_targets() {
     return 1
   fi
   return 0
+}
+
+# --------------------------------------------------------------------------
+# Docs-only scoping (#603).
+#
+# On a working tree whose change since the merge base with origin/main is
+# docs-only, the gate dispatches only DOCS_ONLY_TARGETS, the lint targets that
+# read the files such a change edits; no TeX suite can fail on it. The path list
+# and the git commands that collect the change live in tests/lib/docs-only.sh,
+# which CI's `changes` job calls too, so the two cannot disagree about what
+# docs-only means.
+#
+# Narrowing is opt-out and fail-safe. `--full` (`make check FULL=1`) skips the
+# classification, and every classifier status but 0 — not docs-only, could not
+# classify, or a classifier that is missing — dispatches every target. A scoped
+# run says so before dispatch and in its closing line, as a FIXTURE-scoped suite
+# run does, so its transcript cannot pass for a full one.
+#
+# `check-serial` is not scoped: it stays the always-full deterministic path.
+
+classifier="$here/lib/docs-only.sh"
+docs_targets=()
+total_targets=0
+# full | docs-only | unclassified | forced
+scope=full
+
+read_docs_targets() {
+  docs_targets=()
+  if ! (cd "$root" && make --no-print-directory check-docs-only-targets) \
+       > "$scratch/docs-targets.txt" 2> "$scratch/docs-targets.err"; then
+    return 1
+  fi
+  local line
+  while IFS= read -r line; do
+    case "$line" in
+      '') continue ;;
+      *[[:space:]]*) return 1 ;;
+    esac
+    docs_targets+=("$line")
+  done < "$scratch/docs-targets.txt"
+  return 0
+}
+
+# Sets `scope`. The classifier's listing and reason land in the scratch
+# directory, where the run's report reads them.
+classify_change() {
+  local status
+  if [ "$full" -eq 1 ]; then
+    scope=forced
+    return 0
+  fi
+  (cd "$root" && "$classifier" --worktree) \
+    > "$scratch/change.txt" 2> "$scratch/change.err"
+  status="$?"
+  case "$status" in
+    0) scope=docs-only ;;
+    1) scope=full ;;
+    *) scope=unclassified ;;
+  esac
+  return 0
+}
+
+# Narrows `targets` only on a docs-only verdict.
+scope_targets() {
+  total_targets="${#targets[@]}"
+  if [ "$scope" = docs-only ]; then
+    targets=(${docs_targets[@]+"${docs_targets[@]}"})
+  fi
+}
+
+report_scope() {
+  case "$scope" in
+    forced)
+      printf 'scope: FULL=1, so every target runs whatever the change touches\n' ;;
+    full)
+      printf 'scope: the change since the merge base with origin/main is not\n'
+      printf '       docs-only, so every target runs\n'
+      sed 's/^docs-only: /       /' "$scratch/change.err" ;;
+    unclassified)
+      printf 'scope: the change could not be classified, so every target runs\n'
+      sed 's/^docs-only: /       /' "$scratch/change.err" ;;
+    docs-only)
+      printf 'scope: DOCS-ONLY change since the merge base with origin/main;\n'
+      printf '       only %s run, NOT a full run (FULL=1 runs every target)\n' \
+        "${targets[*]}"
+      printf '       changed:\n'
+      sed 's/^/         /' "$scratch/change.txt" ;;
+  esac
+}
+
+closing_line() {
+  if [ "$scope" = docs-only ]; then
+    printf '\nDocs-only targets passed: %d of %d (%s), NOT a full run;\n' \
+      "${#targets[@]}" "$total_targets" "${targets[*]-}"
+    printf '`make check FULL=1` runs every target.\n'
+  else
+    printf '\nAll suites passed.\n'
+  fi
 }
 
 # --------------------------------------------------------------------------
@@ -463,9 +580,9 @@ probe_biber_extraction() {
 # --------------------------------------------------------------------------
 # --self-test: the committed negative controls.
 #
-# Three of them, because each covers a way the machinery above could report a
-# clean run without one having happened. None compiles anything, so this runs
-# in the sub-second `lint` slot and on the TeX-free CI lint runner.
+# Each covers a way the machinery above could report a clean run without one
+# having happened. None compiles anything, so this runs in the sub-second
+# `lint` slot and on the TeX-free CI lint runner.
 
 self_test() {
   local fails=0 rc out
@@ -687,6 +804,146 @@ self_test() {
     printf '      accepted only a proven extraction\n'
   fi
 
+  printf '\n== control 6: only a docs-only change narrows the gate (#603) ==\n'
+  # The scoped path is the one way this driver can dispatch fewer targets than
+  # `make check-serial` would, on purpose. So the narrowing is pinned from both
+  # sides: what it narrows to, and that nothing but a docs-only verdict, with no
+  # override, narrows at all. A classifier that fails or cannot be found must
+  # run everything; a run that dispatched the lints after a failed
+  # classification would print a clean gate having read no TeX.
+  #
+  # Static half: the subset is read from make, as the full list is.
+  local full_list=() t d in_full pos last_pos subset_ok=1
+  full_list=(${targets[@]+"${targets[@]}"})
+  if ! read_docs_targets; then
+    printf '  FAIL: could not read the docs-only target list from make\n'
+    fails=$((fails + 1))
+    subset_ok=0
+  elif [ "${#docs_targets[@]}" -eq 0 ]; then
+    printf '  FAIL: `make check-docs-only-targets` named no targets\n'
+    fails=$((fails + 1))
+    subset_ok=0
+  else
+    # Every docs-only target is one of the gate's, in the gate's order, so the
+    # scoped replay reads in the order a full one does; and `lint` is among
+    # them, because it is the suite that reads the files a docs change edits.
+    last_pos=-1
+    for d in "${docs_targets[@]}"; do
+      in_full=0
+      pos=0
+      for t in ${full_list[@]+"${full_list[@]}"}; do
+        if [ "$t" = "$d" ]; then in_full=1; break; fi
+        pos=$((pos + 1))
+      done
+      if [ "$in_full" -eq 0 ]; then
+        printf '  FAIL: docs-only target `%s` is not in CHECK_TARGETS\n' "$d"
+        subset_ok=0
+      elif [ "$pos" -le "$last_pos" ]; then
+        printf '  FAIL: docs-only target `%s` is out of CHECK_TARGETS order\n' "$d"
+        subset_ok=0
+      fi
+      last_pos="$pos"
+    done
+    case " ${docs_targets[*]} " in
+      *' lint '*) ;;
+      *) printf '  FAIL: `lint` is not a docs-only target\n'; subset_ok=0 ;;
+    esac
+    if [ "${#docs_targets[@]}" -ge "${#full_list[@]}" ]; then
+      printf '  FAIL: the docs-only list is not smaller than CHECK_TARGETS\n'
+      subset_ok=0
+    fi
+    if [ "$subset_ok" -eq 1 ]; then
+      printf '  ok: docs-only targets (%s) are an ordered subset with lint\n' \
+        "${docs_targets[*]}"
+    else
+      fails=$((fails + 1))
+    fi
+  fi
+
+  case "$gate_recipe" in
+    *--full*)
+      printf '  ok: `check` passes FULL through to this driver\n' ;;
+    *)
+      printf '  FAIL: Makefile `check:` does not pass FULL to the driver, so the\n'
+      printf '        override cannot force a full run.\n'
+      fails=$((fails + 1))
+      ;;
+  esac
+
+  # Dynamic half: stub classifiers exiting with each status, and a missing one,
+  # each driving the same two functions the real run calls.
+  local stub saved_classifier="$classifier" status want got
+  for status in 0 1 2 7 missing; do
+    stub="$scratch/classifier-$status"
+    if [ "$status" != missing ]; then
+      printf '#!/bin/sh\nexit %s\n' "$status" > "$stub"
+      chmod +x "$stub"
+    fi
+    classifier="$stub"
+    targets=(${full_list[@]+"${full_list[@]}"})
+    full=0
+    classify_change > /dev/null 2>&1
+    scope_targets
+    if [ "$status" = 0 ]; then
+      want="${docs_targets[*]-}"
+    else
+      want="${full_list[*]-}"
+    fi
+    got="${targets[*]-}"
+    if [ "$subset_ok" -eq 1 ] && [ "$got" = "$want" ]; then
+      printf '  ok: classifier exit %s dispatches %d of %d\n' \
+        "$status" "${#targets[@]}" "${#full_list[@]}"
+    else
+      printf '  FAIL: classifier exit %s dispatched [%s]; expected [%s]\n' \
+        "$status" "$got" "$want"
+      fails=$((fails + 1))
+    fi
+  done
+
+  # The override outranks a docs-only verdict.
+  classifier="$scratch/classifier-0"
+  targets=(${full_list[@]+"${full_list[@]}"})
+  full=1
+  classify_change > /dev/null 2>&1
+  scope_targets
+  if [ "${targets[*]-}" = "${full_list[*]-}" ] && [ "$scope" = forced ]; then
+    printf '  ok: FULL=1 dispatches all %d on a docs-only change\n' \
+      "${#full_list[@]}"
+  else
+    printf '  FAIL: FULL=1 on a docs-only change dispatched [%s]\n' \
+      "${targets[*]-}"
+    fails=$((fails + 1))
+  fi
+
+  # A scoped run's closing line says so, and a full one's does not, so a
+  # scoped transcript cannot be pasted into a PR as a full run.
+  full=0
+  scope=docs-only
+  out="$(closing_line)"
+  case "$out" in
+    *'NOT a full run'*)
+      printf '  ok: a scoped run closes with NOT a full run\n' ;;
+    *)
+      printf '  FAIL: a scoped run closed with: %s\n' "$out"
+      fails=$((fails + 1)) ;;
+  esac
+  scope=full
+  out="$(closing_line)"
+  case "$out" in
+    *'All suites passed.'*)
+      case "$out" in
+        *'NOT a full run'*)
+          printf '  FAIL: a full run closed with: %s\n' "$out"
+          fails=$((fails + 1)) ;;
+        *) printf '  ok: a full run closes with All suites passed.\n' ;;
+      esac ;;
+    *)
+      printf '  FAIL: a full run closed with: %s\n' "$out"
+      fails=$((fails + 1)) ;;
+  esac
+  classifier="$saved_classifier"
+  targets=(${full_list[@]+"${full_list[@]}"})
+
   printf '\n'
   if [ "$fails" -ne 0 ]; then
     printf 'check-parallel --self-test: %d control(s) FAILED.\n' "$fails"
@@ -716,6 +973,20 @@ esac
 
 read_targets || exit 1
 
+# A docs-only target list make cannot print leaves nothing to narrow to, so the
+# run stays full rather than failing or guessing one.
+if [ "$full" -eq 0 ] \
+   && { ! read_docs_targets || [ "${#docs_targets[@]}" -eq 0 ]; }; then
+  scope=unclassified
+  printf 'docs-only: `make check-docs-only-targets` named no targets\n' \
+    > "$scratch/change.err"
+else
+  classify_change
+fi
+scope_targets
+report_scope
+printf '\n'
+
 if [ "$jobs" -gt "${#targets[@]}" ]; then
   jobs="${#targets[@]}"
 fi
@@ -725,7 +996,12 @@ if [ "$inner_jobs" -gt 1 ]; then
   printf 'fixture fan-out inside each target: %d (process budget: %d x %d = %d)\n' \
     "$inner_jobs" "$jobs" "$inner_jobs" "$((jobs * inner_jobs))"
 fi
-printf '(this is the gate; `make check-serial` runs the same targets one at a time)\n\n'
+if [ "$scope" = docs-only ]; then
+  printf '(the gate, scoped to a docs-only change; `make check FULL=1` runs all %d)\n\n' \
+    "$total_targets"
+else
+  printf '(this is the gate; `make check-serial` runs the same targets one at a time)\n\n'
+fi
 
 batch_names=(${targets[@]+"${targets[@]}"})
 batch_cmds=()
@@ -737,9 +1013,17 @@ for target in ${targets[@]+"${targets[@]}"}; do
   batch_cmds+=("make JOBS=$inner_jobs $target")
 done
 
-warm_font_cache || exit 1
+# The two tool proofs guard LuaLaTeX and biber runs. DOCS_ONLY_TARGETS compiles
+# no LaTeX and runs no biber — the Makefile comment on that variable makes it a
+# condition of joining the list — so a scoped run skips them rather than paying
+# for a build none of its targets makes.
+if [ "$scope" != docs-only ]; then
+  warm_font_cache || exit 1
+fi
 prepare_par_caches || exit 1
-probe_biber_extraction || exit 1
+if [ "$scope" != docs-only ]; then
+  probe_biber_extraction || exit 1
+fi
 printf '\n'
 
 started="$SECONDS"
@@ -759,4 +1043,4 @@ if [ "$verdict" -ne 0 ]; then
   exit 1
 fi
 
-printf '\nAll suites passed.\n'
+closing_line

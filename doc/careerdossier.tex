@@ -1606,6 +1606,13 @@ the middle of a run of letters or digits; and a line holding nothing but URL is
 set ragged-right and reported underfull, since it has no glue to justify with. A
 wrapped address still concatenates back exactly.
 
+A URL or DOI never breaks immediately after a hyphen it contains. BibLaTeX
+allows that break by default, and it costs the identifier its hyphen: a
+plain-text extractor takes a hyphen at the end of a line for a soft hyphen and
+drops it when it joins the lines, so the extracted DOI no longer resolves. The
+break moves to the letter or digit before the hyphen instead, which then begins
+the next line.
+
 \cmd{CDossierHighlightAuthor} may be repeated for spelling or initial variants.
 It bolds a BibLaTeX-parsed family/given-name pair in the bibliography and does
 not alter citations. Both keys are required; an incomplete declaration produces

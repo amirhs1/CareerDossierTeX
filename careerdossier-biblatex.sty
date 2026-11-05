@@ -154,6 +154,26 @@
 \setcounter { biburlucpenalty  } { 9000 }
 \setcounter { biburllcpenalty  } { 9000 }
 
+%% The copy-paste invariant above holds for the break points this file adds,
+%% and BibLaTeX supplies one more that breaks it: \biburlsetup puts `-' in
+%% \UrlBigBreaks, so an address may end a line on a hyphen it already contains.
+%% Nothing is inserted there and the hyphen is printed, but pdftotext's default
+%% mode takes a line-final hyphen for a soft one and drops it when it joins the
+%% lines, so `10.9999/example-2026-50355-2' extracted as
+%% `10.9999/example-202650355-2' -- a DOI that does not resolve, from a clean
+%% build (issue #561, tests/bibliography/doi-hyphen-break.tex).
+%%
+%% Removing that one break point is enough, and costs the measure nothing: the
+%% letter or digit before a hyphen still carries the 9000 break above, so the
+%% line still fills and the hyphen opens the next line instead of closing this
+%% one, where no extractor reads it as a soft hyphen. Only `-' is removed;
+%% whatever else BibLaTeX lists in \UrlBigBreaks stays. \biburlsetup runs inside
+%% the bibliography's group and each citation's, so the removal is local to the
+%% URLs BibLaTeX sets and never reaches \CDossierLink, whose url.sty defaults
+%% have no hyphen break to begin with.
+\tl_gput_right:Nn \biburlsetup
+  { \tl_remove_all:Nn \UrlBigBreaks { \do \- } }
+
 %% The trailing space is inside the measured label box and does not widen the
 %% gap; \biblabelsep above is what separates the label from the entry.
 \DeclareFieldFormat { labelnumberwidth } { \mkbibbold {#1) } }
