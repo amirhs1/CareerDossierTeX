@@ -414,7 +414,7 @@
 
 %% The full display title, not its abbreviated page-furniture counterpart,
 %% becomes the shared PDF document type.
-\exp_args:NV \__cdossier_components_doctype:n
+\exp_args:NV \__cdossier_metadata_doctype:n
   \l__cdossier_statement_title_tl
 
 %% ---------------------------------------------------------------------------
@@ -440,7 +440,7 @@
         \tl_set_eq:NN \l__cdossier_statement_title_tl
           \l__cdossier_statement_default_title_tl
       }
-    \exp_args:NV \__cdossier_components_doctype:n
+    \exp_args:NV \__cdossier_metadata_doctype:n
       \l__cdossier_statement_title_tl
   }
 
