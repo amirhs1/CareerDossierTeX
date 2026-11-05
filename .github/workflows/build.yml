@@ -13,7 +13,7 @@ name: build
 # TeX Live release a digest resolves to.
 #
 #   texlive/texlive        digest below == :latest as published 2026-07-12
-#   actions/checkout       v4.3.1
+#   actions/checkout       v7.0.1
 #   actions/upload-artifact v7.0.1
 
 on:
@@ -70,9 +70,9 @@ jobs:
     outputs:
       tex: ${{ steps.classify.outputs.tex }}
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
       # Full history, so the merge base of the two commits below is present.
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
       # --no-renames lists both sides of a rename, so moving a source file into
@@ -110,8 +110,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       # CONTRIBUTING.md "CI expectations" requires the tested toolchain to be
       # recorded beside the output it produced. This step is the one list of
       # what the record holds; CONTRIBUTING.md, "Pinned dependencies", points
@@ -202,8 +202,8 @@ jobs:
   lint:
     runs-on: ubuntu-24.04
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Record lint toolchain
         run: |
           bash --version | head -1
@@ -222,8 +222,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Module regression suite (l3build check on LuaTeX)
         run: l3build check
       # The CTAN packaging configuration, which lives in the same build.lua this
@@ -248,8 +248,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Install poppler-utils
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Extraction round-trip
@@ -273,8 +273,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       # poppler-utils matches the extraction job. mupdf-tools supplies mutool,
       # the second independent extractor: Poppler and MuPDF linearize the
       # two-column entry header differently, so agreement between them is what
@@ -324,8 +324,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       # No poppler here: tests/smoke/run.sh only compiles and greps the engine
       # rejection messages. It does need xelatex and pdflatex, which the image
       # already provides, to prove the unsupported engines fail as required.
@@ -354,8 +354,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       # tests/layout/run.sh skips its folio, contact-line, and page-break checks
       # with a notice when poppler is absent, so pdftotext and pdfinfo must be
       # installed for this job to assert anything.
@@ -386,8 +386,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Build the resume example
         run: make resume
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
@@ -413,8 +413,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Build the PDF manual
         run: make manual
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
@@ -435,8 +435,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Build the cover-letter example
         run: make letter
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
@@ -467,8 +467,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       # tests/bibliography/run.sh diffs extracted text, so pdftotext must be
       # present for the ydnt-ordering and identifier-precedence assertions to
       # run at all. It is also what reads the rendered entry labels for the
@@ -522,8 +522,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       # tests/links/run.sh decides split-versus-wrap from `pdftotext -bbox`
       # coordinates and exits early without it, so poppler is not optional here.
       - name: Install poppler-utils
@@ -557,8 +557,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Default-path PDF metadata fixtures
         run: make metadata
       # No artifact upload: this runner builds in a temporary directory and
@@ -581,8 +581,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Link-annotation action-type fixtures
         run: make annotations
       # No artifact upload, for the reason given under `metadata` above.
@@ -594,8 +594,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Install poppler-utils
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
       - name: Build the academic CV examples
@@ -621,8 +621,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Build the academic letter example
         run: make academic-letter
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
@@ -643,8 +643,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Build all six statement examples
         run: make statements
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
