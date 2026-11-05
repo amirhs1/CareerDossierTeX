@@ -682,7 +682,7 @@ from it, so that an address is corrected in one place.
 \key{github} & No & GitHub handle, profile path, or URL \\
 \key{scholar} & No & Google Scholar identifier, profile path, or URL \\
 \key{orcid} & No & ORCID identifier or profile URL \\
-\key{affiliation} & Conditional & Current institution, organization, studio, or independent-practice description \\
+\key{affiliation} & No & Current institution, organization, studio, or independent-practice description \\
 \bottomrule
 \end{longtable}
 
@@ -690,9 +690,7 @@ Whitespace-only values count as missing.
 
 \key{name} is the only key every class requires. A class may require a further
 key for a particular document, and the statement class does: \key{email} for
-every statement, \key{affiliation} for \opt{type=research}, and \key{website}
-for \opt{type=artist}. \emph{Conditional} above means exactly that --- the key is
-optional to the profile and required by some documents that use it.
+every statement and \key{website} for \opt{type=artist}.
 
 A shared profile is expected to carry fields for several document types, so a
 class that does not display a field does not warn about it.
@@ -1035,7 +1033,7 @@ optional contacts:
 \midrule
 \endhead
 \opt{interest} & None & \key{phone}, \key{website}, \key{affiliation} \\
-\opt{research} & \key{affiliation} & \key{phone}, \key{website}, \key{scholar}, \key{orcid} \\
+\opt{research} & None & \key{phone}, \key{website}, \key{scholar}, \key{orcid}, \key{affiliation} \\
 \opt{teaching} & None & \key{phone}, \key{website}, \key{affiliation} \\
 \opt{teaching-philosophy} & None & \key{phone}, \key{website}, \key{affiliation} \\
 \opt{diversity} & None & \key{phone}, \key{website}, \key{affiliation} \\
@@ -1058,7 +1056,7 @@ present items in this fixed logical order:
   \item profile \key{name};
   \item the selected statement title;
   \item optional one-line \key{subtitle};
-  \item optional or required profile \key{affiliation};
+  \item optional profile \key{affiliation};
   \item optional \key{application-context}, followed by a labelled
         \key{application-id} when both are present;
   \item required \key{email}, followed by the active type's present optional
@@ -2263,7 +2261,8 @@ This statement introduces work and interests without a type-specific contract.
 \end{document}
 \end{latexcode}
 
-Research requires \key{affiliation}:
+Research adds \key{scholar} and \key{orcid} to the contacts, and shows
+\key{affiliation} when it is set:
 
 \begin{latexcode}
 \documentclass[type=research]{careerdossier-statement}

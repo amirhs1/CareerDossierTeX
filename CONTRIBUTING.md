@@ -190,7 +190,7 @@ areas: core tokens typography theme components bibliography resume letter cv sta
 | `tokens`                              | `careerdossier-tokens.sty`: type scale, vertical rhythm, lists, page geometry                  |
 | `typography`                          | `careerdossier-typography.sty`: engine guard, fonts, semantic text roles                       |
 | `theme`                               | `careerdossier-theme.sty`: colour, rule, and link tokens                                       |
-| `components`                          | `careerdossier-components.sty`: shared document parts, links, PDF metadata                     |
+| `components`                          | `careerdossier-components.sty`, `careerdossier-links.sty`, and `careerdossier-metadata.sty`: shared document parts, links, PDF metadata |
 | `bibliography`                        | `careerdossier-biblatex.sty` and the BibLaTeX and Biber path                                   |
 | `resume`, `letter`, `cv`, `statement` | each class, its layout, and its examples                                                       |
 | `i18n`                                | document language and translated strings                                                       |

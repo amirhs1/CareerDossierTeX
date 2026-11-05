@@ -48,20 +48,21 @@
 
 \RequirePackage { l3keys2e }
 
-\tl_new:N \l__cdossier_cv_fontsize_tl
+%% Issue #266: careerdossier-base declares the six options every class shares
+%% and the entrymeta option the two record classes share, each with its
+%% storage, its accepted values, and its class-named message; see `Shared class
+%% options' there. The class adds its unknown-option message and its
+%% unknown-key handler to the same key path, and sets the two defaults that
+%% differ by class.
+%% careerdossier-components would load base later anyway; it is loaded here
+%% because the declarations must exist before \ProcessKeysOptions.
+\RequirePackage { careerdossier-base }
+\__cdossier_base_declare_shared_options:nn
+  { careerdossier-cv } { cdossier / cv }
+\__cdossier_base_declare_record_options:nn
+  { careerdossier-cv } { cdossier / cv }
 \tl_set:Nn \l__cdossier_cv_fontsize_tl { 12pt }
-\tl_new:N \l__cdossier_cv_margin_tl
 \tl_set:Nn \l__cdossier_cv_margin_tl { normal }
-\tl_new:N \l__cdossier_cv_paper_tl
-\tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper }
-\tl_new:N \l__cdossier_cv_bodyfont_tl
-\tl_set:Nn \l__cdossier_cv_bodyfont_tl { serif }
-\tl_new:N \l__cdossier_cv_medium_tl
-\tl_set:Nn \l__cdossier_cv_medium_tl { print }
-\tl_new:N \l__cdossier_cv_muted_tl
-\tl_set:Nn \l__cdossier_cv_muted_tl { plain }
-\tl_new:N \l__cdossier_cv_entrymeta_tl
-\tl_set:Nn \l__cdossier_cv_entrymeta_tl { column }
 
 \msg_new:nnnn { careerdossier-cv } { unknown-option }
   {
@@ -79,105 +80,8 @@
     'entrymeta'~(column,~inline).~Language~and~theme~cannot~be~set~here.
   }
 
-%% l3keys' own choice error reports that the value is not one of a fixed set
-%% without saying what that set is, so every choice-valued option below names
-%% its own accepted values. Each message is reached through the matching
-%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
-\msg_new:nnnn { careerdossier-cv } { unknown-fontsize }
-  { Unknown~'fontsize'~value~'#1'~for~careerdossier-cv. }
-  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
-
-\msg_new:nnnn { careerdossier-cv } { unknown-margin }
-  { Unknown~'margin'~value~'#1'~for~careerdossier-cv. }
-  {
-    The~accepted~values~are~'normal'~(one-inch~margins)~and~
-    'narrow'~(half-inch~margins).
-  }
-
-\msg_new:nnnn { careerdossier-cv } { unknown-paper }
-  { Unknown~'paper'~value~'#1'~for~careerdossier-cv. }
-  { The~accepted~values~are~'letter'~(US~Letter)~and~'a4'~(ISO~A4). }
-
-\msg_new:nnnn { careerdossier-cv } { unknown-bodyfont }
-  { Unknown~'bodyfont'~value~'#1'~for~careerdossier-cv. }
-  {
-    The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
-    'sans'~(TeX~Gyre~Heros~body).
-  }
-
-\msg_new:nnnn { careerdossier-cv } { unknown-medium }
-  { Unknown~'medium'~value~'#1'~for~careerdossier-cv. }
-  {
-    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
-    and~'screen'~(neither).
-  }
-
-\msg_new:nnnn { careerdossier-cv } { unknown-muted }
-  { Unknown~'muted'~value~'#1'~for~careerdossier-cv. }
-  {
-    The~accepted~values~are~'italic'~(italic,~black),~
-    'gray'~(upright,~gray~0.30),~'both'~(italic~and~gray),~and~
-    'plain'~(upright,~black:~no~de-emphasis).
-  }
-
-\msg_new:nnnn { careerdossier-cv } { unknown-entrymeta }
-  { Unknown~'entrymeta'~value~'#1'~for~careerdossier-cv. }
-  {
-    The~accepted~values~are~'column'~(dates~and~location~flush~right)~
-    and~'inline'~(dates~and~location~on~the~same~line~as~the~title~
-    and~organization).
-  }
-
 \keys_define:nn { cdossier / cv }
   {
-    fontsize .choices:nn =
-      { 10pt , 11pt , 12pt }
-      { \tl_set_eq:NN \l__cdossier_cv_fontsize_tl \l_keys_choice_tl } ,
-    fontsize / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-fontsize } {#1} } ,
-    fontsize .value_required:n = true ,
-    margin .choices:nn =
-      { normal , narrow }
-      { \tl_set_eq:NN \l__cdossier_cv_margin_tl \l_keys_choice_tl } ,
-    margin / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-margin } {#1} } ,
-    margin .value_required:n = true ,
-    paper .choices:nn =
-      { letter , a4 }
-      {
-        \str_case:Vn \l_keys_choice_tl
-          {
-            { letter } { \tl_set:Nn \l__cdossier_cv_paper_tl { letterpaper } }
-            { a4 }     { \tl_set:Nn \l__cdossier_cv_paper_tl { a4paper } }
-          }
-      } ,
-    paper / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-paper } {#1} } ,
-    paper .value_required:n = true ,
-    bodyfont .choices:nn =
-      { serif , sans }
-      { \tl_set_eq:NN \l__cdossier_cv_bodyfont_tl \l_keys_choice_tl } ,
-    bodyfont / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-bodyfont } {#1} } ,
-    bodyfont .value_required:n = true ,
-    medium .choices:nn =
-      { print , screen }
-      { \tl_set_eq:NN \l__cdossier_cv_medium_tl \l_keys_choice_tl } ,
-    medium / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-medium } {#1} } ,
-    medium .value_required:n = true ,
-    muted .choices:nn =
-      { italic , gray , both , plain }
-      { \tl_set_eq:NN \l__cdossier_cv_muted_tl \l_keys_choice_tl } ,
-    muted / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-muted } {#1} } ,
-    muted .value_required:n = true ,
-    entrymeta .choices:nn =
-      { column , inline }
-      { \tl_set_eq:NN \l__cdossier_cv_entrymeta_tl \l_keys_choice_tl } ,
-    entrymeta / unknown .code:n =
-      { \msg_error:nnn { careerdossier-cv } { unknown-entrymeta } {#1} } ,
-    entrymeta .value_required:n = true ,
     unknown  .code:n =
       { \msg_error:nnx { careerdossier-cv } { unknown-option } { \l_keys_key_str } } ,
   }
@@ -222,7 +126,7 @@
 \RequirePackage { hyperref }
 \__cdossier_tokens_apply_body_size:
 
-\__cdossier_components_doctype:n { Curriculum\c_space_tl Vitae }
+\__cdossier_metadata_doctype:n { Curriculum\c_space_tl Vitae }
 
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_cv_paper_tl
 
@@ -552,7 +456,7 @@
 %% one is invisible to that split, so hyperref takes the target for a local
 %% file, appends `.pdf', and emits a GoToR "open a remote PDF" action rather
 %% than a URI action -- silently, and only in the annotation. See the same note
-%% at \__cdossier_components_scheme:N in careerdossier-components (issue #328).
+%% at \__cdossier_links_scheme:N in careerdossier-links (issue #328).
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
     \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
@@ -573,18 +477,18 @@
               { \tl_to_str:n { https:// } } }
       }
     %% A raw `#' in the target is rewritten to \# by the package that owns
-    %% links, for the reason given at \__cdossier_components_hashescape:N in
-    %% careerdossier-components: hyperref's own \edef fails on a parameter
+    %% links, for the reason given at \__cdossier_links_hashescape:N in
+    %% careerdossier-links: hyperref's own \edef fails on a parameter
     %% character, and the catcode-12 repair truncates the address silently
     %% (issue #353). This link builds its own \href rather than going through
-    %% \__cdossier_components_link:nn, so it applies the rewrite itself. A URL
+    %% \__cdossier_links_link:nn, so it applies the rewrite itself. A URL
     %% carrying a fragment is ordinary in a publication list.
-    \__cdossier_components_hashescape:N \l__cdossier_cv_publication_target_tl
-    \__cdossier_components_hashescape:N \l__cdossier_cv_publication_shown_tl
+    \__cdossier_links_hashescape:N \l__cdossier_cv_publication_target_tl
+    \__cdossier_links_hashescape:N \l__cdossier_cv_publication_shown_tl
     %% The visible text is the identifier itself, so this link needs no
     %% decoration under `medium=screen' -- and must not get one: ulem would
     %% rebox the \nolinkurl into a single unbreakable token. See
-    %% \CDossierPlainLinks in careerdossier-components (issue #278).
+    %% \CDossierPlainLinks in careerdossier-links (issue #278).
     \cs_if_exist:NTF \href
       {
         \group_begin:
@@ -598,7 +502,7 @@
         %% The same warning the contact line and \CDossierLink raise, from the
         %% package that owns the message: a publication identifier that is not
         %% a link has the same cause and the same remedy (issue #329).
-        \__cdossier_components_links_inert:
+        \__cdossier_links_inert:
         #1:\nobreakspace #2
       }
   }

@@ -16,6 +16,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 
 - Change the resume `/Title` and running page label to `Resume`, spelled in ASCII. ([#543])
 - Document keeping `\exhyphenpenalty` at TeX's `50`, measured apart from `\hyphenpenalty`. ([#542])
+- Let a `type=research` statement build without profile `affiliation`, as the other types do; its header then omits that line. ([#593])
 
 ### Fixed
 
@@ -26,6 +27,7 @@ Before `v1.0.0`, breaking changes may occur, but they must be documented here an
 [#542]: https://github.com/amirhs1/CareerDossierTeX/issues/542
 [#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
 [#562]: https://github.com/amirhs1/CareerDossierTeX/issues/562
+[#593]: https://github.com/amirhs1/CareerDossierTeX/issues/593
 
 ## [0.9.0] - 2026-08-26
 

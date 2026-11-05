@@ -4,7 +4,7 @@
 # Issue #276. Every other suite that sees a /Lang sees one the kernel put there:
 # all thirteen fixtures that produce one pass \DocumentMetadata{lang=en}, and
 # \DocumentMetadata is what writes the catalog entry in that case. The package's
-# own contribution -- the derived `pdflang' in careerdossier-components -- is
+# own contribution -- the derived `pdflang' in careerdossier-metadata -- is
 # therefore invisible to the existing suites, and so is anything that breaks it.
 # This suite exists to look at the path a user actually takes when they do not
 # opt into tagging.
@@ -31,7 +31,7 @@
 # that chunk runs is simply not in the file, and nothing is logged. The four
 # classes load this package before hyperref, so their chunk happens to come
 # first; a document that loads the package directly, after hyperref, does not
-# get that for free. careerdossier-components declares a \DeclareHookRule to
+# get that for free. careerdossier-metadata declares a \DeclareHookRule to
 # state the requirement, and this is the fixture that fails without it. /Title
 # and /Author cannot fail this way -- they go to the Info dictionary at
 # \end{document} -- which is why this suite is about /Lang specifically.
@@ -381,7 +381,7 @@ echo "== a document's own '--' is upstream's to spell, and the paths differ =="
 # what stops "accepted" from decaying into "unnoticed".
 #
 # pdfsubject is the load-bearing field, not a third example. Nothing in
-# careerdossier-components reads or writes it, so it cannot be diverging
+# careerdossier-metadata reads or writes it, so it cannot be diverging
 # because of anything this package did -- and it diverges identically to the
 # two fields the package does handle. That is the evidence for docs/API.md's
 # claim that the cause is upstream, and the reason the workaround was declined.

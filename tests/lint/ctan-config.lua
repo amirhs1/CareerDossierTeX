@@ -30,10 +30,10 @@
 -- WHY IT LOADS build.lua RATHER THAN READING IT
 --
 -- Because the version is not in the text. build.lua derives it from
--- careerdossier-base.sty precisely so that no eleventh copy exists to go stale
--- (see the comment there), which means a grep can see the derivation but not
--- its result. Loading the file is how the value l3build would publish becomes
--- available to compare, and it is also, incidentally, a syntax check.
+-- careerdossier-base.sty precisely so that no thirteenth copy exists to go
+-- stale (see the comment there), which means a grep can see the derivation but
+-- not its result. Loading the file is how the value l3build would publish
+-- becomes available to compare, and it is also, incidentally, a syntax check.
 --
 -- Loading is safe: build.lua assigns configuration and reads one file. It does
 -- not run LaTeX, spawn anything, or write. The l3build variable defaults are
@@ -172,8 +172,8 @@ local function audit(cfg)
   --
   --    Read from careerdossier-statement.cls, deliberately not from the file
   --    build.lua derives from: comparing the derivation against its own source
-  --    would assert nothing. The #258 lint holds all ten declarations equal, so
-  --    any Work file is the Work's version, and this one crossing the other
+  --    would assert nothing. The #258 lint holds all twelve declarations equal,
+  --    so any Work file is the Work's version, and this one crossing the other
   --    makes a broken or bypassed derivation visible here.
   do
     local published = cfg.uploadconfig and cfg.uploadconfig.version
