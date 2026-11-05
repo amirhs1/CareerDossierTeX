@@ -87,7 +87,11 @@ changes only; a change to contributor tooling is documented in
 `CONTRIBUTING.md` instead. That boundary was settled after this release shipped
 (#260) and is not applied backwards, so one entry below that it would not have
 produced stays as written: `make review-pagefill` and its 90% page-fill floor
-under `### Added
+under `### Added` (#334). It was accurate when written and is unchanged here,
+and is not precedent for adding a similar entry today. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md#update-changelogmd-when).
+
+### Added
 
 - Add `\CDossierSubsection{<title>}`, a second heading level for the resume and CV. ([#337])
 - Add `make review-pagefill`; `make layout` now asserts a 90% page-fill floor on every page a policy governs. ([#334])
