@@ -45,18 +45,19 @@
 \RequirePackage { l3keys2e }
 \tl_new:N \l__cdossier_letter_family_tl
 \tl_set:Nn \l__cdossier_letter_family_tl { industry }
-\tl_new:N \l__cdossier_letter_paper_tl
-\tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper }
-\tl_new:N \l__cdossier_letter_fontsize_tl
+
+%% Issue #266: careerdossier-base declares the six options every class
+%% shares, each with its storage, its accepted values, and its class-named
+%% message; see `Shared class options' there. The class adds its own `family'
+%% option, its unknown-option message, and its unknown-key handler to the same
+%% key path, and sets the two defaults that differ by class.
+%% careerdossier-components would load base later anyway; it is loaded here
+%% because the declarations must exist before \ProcessKeysOptions.
+\RequirePackage { careerdossier-base }
+\__cdossier_base_declare_shared_options:nn
+  { careerdossier-letter } { cdossier / letter }
 \tl_set:Nn \l__cdossier_letter_fontsize_tl { 12pt }
-\tl_new:N \l__cdossier_letter_margin_tl
 \tl_set:Nn \l__cdossier_letter_margin_tl { normal }
-\tl_new:N \l__cdossier_letter_bodyfont_tl
-\tl_set:Nn \l__cdossier_letter_bodyfont_tl { serif }
-\tl_new:N \l__cdossier_letter_medium_tl
-\tl_set:Nn \l__cdossier_letter_medium_tl { print }
-\tl_new:N \l__cdossier_letter_muted_tl
-\tl_set:Nn \l__cdossier_letter_muted_tl { plain }
 
 \msg_new:nnnn { careerdossier-letter } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-letter. }
@@ -69,51 +70,15 @@
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
-%% without saying what that set is, so every choice-valued option below names
-%% its own accepted values. Each message is reached through the matching
-%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
+%% without saying what that set is, so the class's own choice-valued option
+%% below names its accepted values, as the shared ones do. Each message is
+%% reached through the matching `<key> / unknown' sub-key, which l3keys runs in
+%% place of its stock error.
 \msg_new:nnnn { careerdossier-letter } { unknown-family }
   { Unknown~'family'~value~'#1'~for~careerdossier-letter. }
   {
     The~accepted~values~are~'industry'~(the~default~cover~letter)~and~
     'academic'~(the~academic~cover-letter~family).
-  }
-
-\msg_new:nnnn { careerdossier-letter } { unknown-fontsize }
-  { Unknown~'fontsize'~value~'#1'~for~careerdossier-letter. }
-  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
-
-\msg_new:nnnn { careerdossier-letter } { unknown-margin }
-  { Unknown~'margin'~value~'#1'~for~careerdossier-letter. }
-  {
-    The~accepted~values~are~'normal'~(one-inch~margins)~and~
-    'narrow'~(half-inch~margins).
-  }
-
-\msg_new:nnnn { careerdossier-letter } { unknown-paper }
-  { Unknown~'paper'~value~'#1'~for~careerdossier-letter. }
-  { The~accepted~values~are~'letter'~(US~Letter)~and~'a4'~(ISO~A4). }
-
-\msg_new:nnnn { careerdossier-letter } { unknown-bodyfont }
-  { Unknown~'bodyfont'~value~'#1'~for~careerdossier-letter. }
-  {
-    The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
-    'sans'~(TeX~Gyre~Heros~body).
-  }
-
-\msg_new:nnnn { careerdossier-letter } { unknown-medium }
-  { Unknown~'medium'~value~'#1'~for~careerdossier-letter. }
-  {
-    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
-    and~'screen'~(neither).
-  }
-
-\msg_new:nnnn { careerdossier-letter } { unknown-muted }
-  { Unknown~'muted'~value~'#1'~for~careerdossier-letter. }
-  {
-    The~accepted~values~are~'italic'~(italic,~black),~
-    'gray'~(upright,~gray~0.30),~'both'~(italic~and~gray),~and~
-    'plain'~(upright,~black:~no~de-emphasis).
   }
 
 \keys_define:nn { cdossier / letter }
@@ -124,48 +89,6 @@
     family / unknown .code:n =
       { \msg_error:nnn { careerdossier-letter } { unknown-family } {#1} } ,
     family .value_required:n = true ,
-    fontsize .choices:nn =
-      { 10pt , 11pt , 12pt }
-      { \tl_set_eq:NN \l__cdossier_letter_fontsize_tl \l_keys_choice_tl } ,
-    fontsize / unknown .code:n =
-      { \msg_error:nnn { careerdossier-letter } { unknown-fontsize } {#1} } ,
-    fontsize .value_required:n = true ,
-    margin .choices:nn =
-      { normal , narrow }
-      { \tl_set_eq:NN \l__cdossier_letter_margin_tl \l_keys_choice_tl } ,
-    margin / unknown .code:n =
-      { \msg_error:nnn { careerdossier-letter } { unknown-margin } {#1} } ,
-    margin .value_required:n = true ,
-    paper .choices:nn =
-      { letter , a4 }
-      {
-        \str_case:Vn \l_keys_choice_tl
-          {
-            { letter } { \tl_set:Nn \l__cdossier_letter_paper_tl { letterpaper } }
-            { a4 }     { \tl_set:Nn \l__cdossier_letter_paper_tl { a4paper } }
-          }
-      } ,
-    paper / unknown .code:n =
-      { \msg_error:nnn { careerdossier-letter } { unknown-paper } {#1} } ,
-    paper .value_required:n = true ,
-    bodyfont .choices:nn =
-      { serif , sans }
-      { \tl_set_eq:NN \l__cdossier_letter_bodyfont_tl \l_keys_choice_tl } ,
-    bodyfont / unknown .code:n =
-      { \msg_error:nnn { careerdossier-letter } { unknown-bodyfont } {#1} } ,
-    bodyfont .value_required:n = true ,
-    medium .choices:nn =
-      { print , screen }
-      { \tl_set_eq:NN \l__cdossier_letter_medium_tl \l_keys_choice_tl } ,
-    medium / unknown .code:n =
-      { \msg_error:nnn { careerdossier-letter } { unknown-medium } {#1} } ,
-    medium .value_required:n = true ,
-    muted .choices:nn =
-      { italic , gray , both , plain }
-      { \tl_set_eq:NN \l__cdossier_letter_muted_tl \l_keys_choice_tl } ,
-    muted / unknown .code:n =
-      { \msg_error:nnn { careerdossier-letter } { unknown-muted } {#1} } ,
-    muted .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-letter } { unknown-option }
           { \l_keys_key_str } } ,
@@ -218,10 +141,10 @@
 
 %% Declare the document type so the shared PDF-metadata code can title this
 %% document distinctly from a resume built off the same profile. The title
-%% itself is assembled in careerdossier-components, which owns identity.
+%% itself is assembled in careerdossier-metadata from the profile name.
 \str_if_eq:VnTF \l__cdossier_letter_family_tl { academic }
-  { \__cdossier_components_doctype:n { Academic~Cover~Letter } }
-  { \__cdossier_components_doctype:n { Cover~Letter } }
+  { \__cdossier_metadata_doctype:n { Academic~Cover~Letter } }
+  { \__cdossier_metadata_doctype:n { Cover~Letter } }
 
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_letter_paper_tl
 

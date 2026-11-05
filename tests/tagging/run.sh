@@ -1001,7 +1001,7 @@ check_untagged() {
 # ViewerPreferences /DisplayDocTitle (issue #277).
 #
 # A viewer shows the filename in its window title, tab bar, and recent-documents
-# list unless the catalog asks it not to, so the /Title careerdossier-components
+# list unless the catalog asks it not to, so the /Title careerdossier-metadata
 # derives is present and unused without this flag -- PDF/UA-2 clause 8.11.2 and
 # WCAG 2.1 AA 2.4.2. hyperref sets it only for a document that asks, or for
 # \DocumentMetadata{...,pdfstandard=ua-2}, which meant the *-ua2.tex variants
