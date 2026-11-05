@@ -63,21 +63,21 @@ hypersetup: pdfdisplaydoctitle=true
 ============================================================
 TEST 12: pdfmeta-writes-title-author-and-lang
 ============================================================
-hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
-hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
 hypersetup: pdflang=en
 ============================================================
 ============================================================
 TEST 13: pdfmeta-keeps-user-pdflang
 ============================================================
-hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
-hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
 ============================================================
 ============================================================
 TEST 14: pdfmeta-keeps-documentmetadata-lang
 ============================================================
-hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
-hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
 ============================================================
 ============================================================
 TEST 15: kernel-info-without-accessor-reads-as-unset
@@ -107,12 +107,12 @@ Info/Author -> unset
 ============================================================
 TEST 20: pdfmeta-keeps-kernel-info-title
 ============================================================
-hypersetup: pdfauthor={\l__cdossier_components_pdfauthor_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
 hypersetup: pdflang=en
 ============================================================
 ============================================================
 TEST 21: pdfmeta-keeps-kernel-info-author
 ============================================================
-hypersetup: pdftitle={\l__cdossier_components_pdfname_tl }
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
 hypersetup: pdflang=en
 ============================================================
