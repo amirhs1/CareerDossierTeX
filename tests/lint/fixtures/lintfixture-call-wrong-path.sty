@@ -1,0 +1,16 @@
+%% lintfixture-call-wrong-path.sty — option-lint fixture (issue #266)
+%%
+%% The call declares its keys on a path this file never processes, so every
+%% generated option would be an unknown key. Expected verdict: WRONG PATH for
+%% `size'.
+%% This fixture is lint input only; it is never compiled and is not part of the
+%% Work (see tests/lint/fixtures/README.md).
+
+\__cdossier_base_declare_fixture_options:nn
+  { lintfixture-call-wrong-path } { cdossier / other }
+
+\keys_define:nn { cdossier / fixture }
+  {
+    unknown .code:n = { } ,
+  }
+\ProcessKeysOptions { cdossier / fixture }

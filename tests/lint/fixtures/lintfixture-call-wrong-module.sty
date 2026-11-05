@@ -1,0 +1,15 @@
+%% lintfixture-call-wrong-module.sty — option-lint fixture (issue #266)
+%%
+%% The call names another class's module, so every generated message would name
+%% that class. Expected verdict: WRONG MODULE for `size'.
+%% This fixture is lint input only; it is never compiled and is not part of the
+%% Work (see tests/lint/fixtures/README.md).
+
+\__cdossier_base_declare_fixture_options:nn
+  { lintfixture-call-ok } { cdossier / fixture }
+
+\keys_define:nn { cdossier / fixture }
+  {
+    unknown .code:n = { } ,
+  }
+\ProcessKeysOptions { cdossier / fixture }

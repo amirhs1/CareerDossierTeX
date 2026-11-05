@@ -1,0 +1,26 @@
+%% lintfixture-template-wrong-module.sty — option-lint fixture (issue #266)
+%%
+%% The template's message names a fixed module instead of { #1 }, so every
+%% class would get one message under another class's name. Expected verdict:
+%% WRONG MODULE for `size'.
+%% This fixture is lint input only; it is never compiled and is not part of the
+%% Work (see tests/lint/fixtures/README.md).
+
+\cs_new_protected:Npn \__cdossier_base_declare_fixture_options:nnn #1#2#3
+  {
+    \tl_new:c { l__cdossier_ #3 _size_tl }
+
+    \msg_new:nnnn { careerdossier-base } { unknown-size }
+      { Unknown~'size'~value~'##1'~for~#1. }
+      { The~accepted~values~are~'small'~and~'large'. }
+
+    \keys_define:nn {#2}
+      {
+        size .choices:nn =
+          { small , large }
+          { \tl_set_eq:cN { l__cdossier_ #3 _size_tl } \l_keys_choice_tl } ,
+        size / unknown .code:n =
+          { \msg_error:nnn {#1} { unknown-size } {##1} } ,
+        size .value_required:n = true ,
+      }
+  }
