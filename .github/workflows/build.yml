@@ -24,6 +24,23 @@ on:
 permissions:
   contents: read
 
+# Superseded pull request runs (#633). A newer commit on a pull request's
+# branch cancels the run still in progress for the older one: the required
+# checks are read from the newest commit, so the older result no longer counts.
+#
+# A push to main is never cancelled, by two guards that each suffice alone.
+# Its group is keyed on its own run ID, so no other run ever joins it: a group
+# holds one running and one pending run, and a newer pending run replaces an
+# older one even when cancel-in-progress is false. And cancel-in-progress is
+# false for every event but pull_request. The `pr-` and `run-` prefixes keep
+# the two kinds of key from ever naming the same group.
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name == 'pull_request'
+    && format('pr-{0}', github.event.pull_request.number)
+    || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # Docs-only classifier (issues #568 and #614). On a pull request whose diff
   # touches only docs-only paths, the TeX jobs are skipped: every job in the
