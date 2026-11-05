@@ -574,7 +574,15 @@ for the extractor behaviour behind it.
 `make metadata` — `tests/metadata/run.sh` checks derived PDF catalog metadata on
 the default (untagged) path and, for `/Title` and `/Author`, on both paths. The
 two paths hand the string to different writers, so a value correct on one can be
-wrong on the other with nothing logged.
+wrong on the other with nothing logged. `/Lang` needs a suite of its own because
+it is written by a different mechanism at a different time, and is the only
+field that depends on package load order.
+
+Two other suites cover the rest of the metadata. The regression pair
+`tests/regression/metadata-pdfmeta` pins how `careerdossier-metadata.sty`
+derives each value and when it leaves a document's own value alone, and reads
+no PDF; whether `/DisplayDocTitle` reaches the catalog is asserted by
+`tests/tagging/run.sh`.
 
 ### Link-annotation suite
 

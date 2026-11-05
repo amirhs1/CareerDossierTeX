@@ -3,7 +3,8 @@
 % This is the ordering the four classes never produce: they load the package
 % first, so their derived pdflang reaches hyperref's catalog write by accident
 % of load order. Here it does not, and only the \DeclareHookRule in
-% careerdossier-components keeps /Lang in the file. Remove that rule and this
+% careerdossier-metadata, which careerdossier-components loads, keeps /Lang in
+% the file. Remove that rule and this
 % fixture is the one that fails.
 \documentclass{article}
 \input{uncompressed.inc}
