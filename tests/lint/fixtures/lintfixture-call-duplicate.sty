@@ -1,0 +1,26 @@
+%% lintfixture-call-duplicate.sty — option-lint fixture (issue #266)
+%%
+%% The call declares `size' and the file declares it again by hand: the
+%% five-copy shape issue #266 removed. The hand-written copy is itself complete,
+%% so only the duplication is wrong. Expected verdict: DUPLICATE for `size'.
+%% This fixture is lint input only; it is never compiled and is not part of the
+%% Work (see tests/lint/fixtures/README.md).
+
+\msg_new:nnnn { lintfixture-call-duplicate } { unknown-size }
+  { Unknown~'size'~value~'#1'~for~lintfixture-call-duplicate. }
+  { The~accepted~values~are~'small'~and~'large'. }
+
+\__cdossier_base_declare_fixture_options:nn
+  { lintfixture-call-duplicate } { cdossier / fixture }
+
+\keys_define:nn { cdossier / fixture }
+  {
+    size .choices:nn =
+      { small , large }
+      { \tl_set_eq:NN \l__lintfixture_size_tl \l_keys_choice_tl } ,
+    size / unknown .code:n =
+      { \msg_error:nnn { lintfixture-call-duplicate } { unknown-size } {#1} } ,
+    size .value_required:n = true ,
+    unknown .code:n = { } ,
+  }
+\ProcessKeysOptions { cdossier / fixture }

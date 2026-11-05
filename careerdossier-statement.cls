@@ -25,15 +25,15 @@
 %% select its default title; process fontsize and margin, keeping 12pt,normal as
 %% the prose-oriented defaults; store statement-scoped title, running-title,
 %% subtitle, application-context, and application-ID metadata; validate name and
-%% email for every type, research affiliation, and artist website where the
-%% header renders; keep the full title in the page-one body and PDF metadata
-%% while a separately bounded running title identifies continuation pages, and
-%% register that short title with the shared furniture component; forward medium
-%% and muted to it; derive every header size, gap, and prose paragraph rhythm
-%% from careerdossier-tokens; restyle the two inherited unnumbered heading
-%% levels and offer them as \CDossierSection and \CDossierSubsection; keep
-%% running furniture out of tagged structure; and allow ordinary prose without
-%% imposing a type-specific narrative schema.
+%% email for every type and artist website where the header renders; keep the
+%% full title in the page-one body and PDF metadata while a separately bounded
+%% running title identifies continuation pages, and register that short title
+%% with the shared furniture component; forward medium and muted to it; derive
+%% every header size, gap, and prose paragraph rhythm from careerdossier-tokens;
+%% restyle the two inherited unnumbered heading levels and offer them as
+%% \CDossierSection and \CDossierSubsection; keep running furniture out of
+%% tagged structure; and allow ordinary prose without imposing a type-specific
+%% narrative schema.
 %%
 %% Why the headings are restyled rather than replaced (#177): \@startsection is
 %% where the kernel's tagging support hooks in, so an unnumbered heading there
@@ -47,9 +47,9 @@
 %% design.
 %%
 %% Field scoping: `affiliation' is reusable identity data and lives in the
-%% shared profile in careerdossier-base; this class decides when it is required
-%% or displayed. `application-context' and `application-id' describe one
-%% application document and stay class-scoped. The shared profile may hold
+%% shared profile in careerdossier-base; this class displays it when it is set
+%% and never requires it. `application-context' and `application-id' describe
+%% one application document and stay class-scoped. The shared profile may hold
 %% fields a statement does not render -- linkedin, github, location -- which is
 %% ordinary cross-document reuse and must never warn.
 
@@ -63,19 +63,20 @@
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
 \tl_new:N   \l__cdossier_statement_type_tl
-\tl_new:N   \l__cdossier_statement_paper_tl
-\tl_new:N   \l__cdossier_statement_bodyfont_tl
-\tl_new:N   \l__cdossier_statement_fontsize_tl
-\tl_new:N   \l__cdossier_statement_margin_tl
-\tl_new:N   \l__cdossier_statement_medium_tl
-\tl_new:N   \l__cdossier_statement_muted_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { interest }
-\tl_set:Nn  \l__cdossier_statement_medium_tl { print }
-\tl_set:Nn  \l__cdossier_statement_muted_tl { plain }
-\tl_set:Nn  \l__cdossier_statement_paper_tl { letterpaper }
-\tl_set:Nn  \l__cdossier_statement_bodyfont_tl { serif }
-\tl_set:Nn  \l__cdossier_statement_fontsize_tl { 12pt }
-\tl_set:Nn  \l__cdossier_statement_margin_tl { normal }
+
+%% Issue #266: careerdossier-base declares the six options every class
+%% shares, each with its storage, its accepted values, and its class-named
+%% message; see `Shared class options' there. The class adds its own `type'
+%% option, its unknown-option message, and its unknown-key handler to the same
+%% key path, and sets the two defaults that differ by class.
+%% careerdossier-components would load base later anyway; it is loaded here
+%% because the declarations must exist before \ProcessKeysOptions.
+\RequirePackage { careerdossier-base }
+\__cdossier_base_declare_shared_options:nn
+  { careerdossier-statement } { cdossier / statement }
+\tl_set:Nn \l__cdossier_statement_fontsize_tl { 12pt }
+\tl_set:Nn \l__cdossier_statement_margin_tl { normal }
 
 \msg_new:nnnn { careerdossier-statement } { unknown-option }
   { Unknown~class~option~'#1'~for~careerdossier-statement. }
@@ -91,9 +92,10 @@
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
-%% without saying what that set is, so every choice-valued option below names
-%% its own accepted values. Each message is reached through the matching
-%% `<key> / unknown' sub-key, which l3keys runs in place of its stock error.
+%% without saying what that set is, so the class's own choice-valued option
+%% below names its accepted values, as the shared ones do. Each message is
+%% reached through the matching `<key> / unknown' sub-key, which l3keys runs in
+%% place of its stock error.
 %% `type' names its values in the message body rather than the first line, so
 %% the one-line report stays short; the pairing is the same as the rest.
 \msg_new:nnnn { careerdossier-statement } { unknown-type }
@@ -101,43 +103,6 @@
   {
     The~accepted~types~are:~interest,~research,~teaching,~
     teaching-philosophy,~diversity,~artist,~purpose.
-  }
-
-\msg_new:nnnn { careerdossier-statement } { unknown-fontsize }
-  { Unknown~'fontsize'~value~'#1'~for~careerdossier-statement. }
-  { The~accepted~values~are~'10pt',~'11pt',~and~'12pt'. }
-
-\msg_new:nnnn { careerdossier-statement } { unknown-margin }
-  { Unknown~'margin'~value~'#1'~for~careerdossier-statement. }
-  {
-    The~accepted~values~are~'normal'~(one-inch~margins)~and~
-    'narrow'~(half-inch~margins).
-  }
-
-\msg_new:nnnn { careerdossier-statement } { unknown-paper }
-  { Unknown~'paper'~value~'#1'~for~careerdossier-statement. }
-  { The~accepted~values~are~'letter'~(US~Letter)~and~'a4'~(ISO~A4). }
-
-\msg_new:nnnn { careerdossier-statement } { unknown-bodyfont }
-  { Unknown~'bodyfont'~value~'#1'~for~careerdossier-statement. }
-  {
-    The~accepted~values~are~'serif'~(TeX~Gyre~Termes~body)~and~
-    'sans'~(TeX~Gyre~Heros~body).
-  }
-
-\msg_new:nnnn { careerdossier-statement } { unknown-medium }
-  { Unknown~'medium'~value~'#1'~for~careerdossier-statement. }
-  {
-    The~accepted~values~are~'print'~(running~header~and~'Page~N~of~M'~folio)~
-    and~'screen'~(neither).
-  }
-
-\msg_new:nnnn { careerdossier-statement } { unknown-muted }
-  { Unknown~'muted'~value~'#1'~for~careerdossier-statement. }
-  {
-    The~accepted~values~are~'italic'~(italic,~black),~
-    'gray'~(upright,~gray~0.30),~'both'~(italic~and~gray),~and~
-    'plain'~(upright,~black:~no~de-emphasis).
   }
 
 \keys_define:nn { cdossier / statement }
@@ -151,48 +116,6 @@
     type / unknown .code:n =
       { \msg_error:nnn { careerdossier-statement } { unknown-type } {#1} } ,
     type .value_required:n = true ,
-    fontsize .choices:nn =
-      { 10pt , 11pt , 12pt }
-      { \tl_set_eq:NN \l__cdossier_statement_fontsize_tl \l_keys_choice_tl } ,
-    fontsize / unknown .code:n =
-      { \msg_error:nnn { careerdossier-statement } { unknown-fontsize } {#1} } ,
-    fontsize .value_required:n = true ,
-    margin .choices:nn =
-      { normal , narrow }
-      { \tl_set_eq:NN \l__cdossier_statement_margin_tl \l_keys_choice_tl } ,
-    margin / unknown .code:n =
-      { \msg_error:nnn { careerdossier-statement } { unknown-margin } {#1} } ,
-    margin .value_required:n = true ,
-    paper .choices:nn =
-      { letter , a4 }
-      {
-        \str_case:Vn \l_keys_choice_tl
-          {
-            { letter } { \tl_set:Nn \l__cdossier_statement_paper_tl { letterpaper } }
-            { a4 }     { \tl_set:Nn \l__cdossier_statement_paper_tl { a4paper } }
-          }
-      } ,
-    paper / unknown .code:n =
-      { \msg_error:nnn { careerdossier-statement } { unknown-paper } {#1} } ,
-    paper .value_required:n = true ,
-    bodyfont .choices:nn =
-      { serif , sans }
-      { \tl_set_eq:NN \l__cdossier_statement_bodyfont_tl \l_keys_choice_tl } ,
-    bodyfont / unknown .code:n =
-      { \msg_error:nnn { careerdossier-statement } { unknown-bodyfont } {#1} } ,
-    bodyfont .value_required:n = true ,
-    medium .choices:nn =
-      { print , screen }
-      { \tl_set_eq:NN \l__cdossier_statement_medium_tl \l_keys_choice_tl } ,
-    medium / unknown .code:n =
-      { \msg_error:nnn { careerdossier-statement } { unknown-medium } {#1} } ,
-    medium .value_required:n = true ,
-    muted .choices:nn =
-      { italic , gray , both , plain }
-      { \tl_set_eq:NN \l__cdossier_statement_muted_tl \l_keys_choice_tl } ,
-    muted / unknown .code:n =
-      { \msg_error:nnn { careerdossier-statement } { unknown-muted } {#1} } ,
-    muted .value_required:n = true ,
     unknown .code:n =
       { \msg_error:nnx { careerdossier-statement } { unknown-option }
           { \l_keys_key_str } } ,
@@ -486,8 +409,6 @@
   {
     \__cdossier_base_require_name:N \MakeCDossierStatementHeader
     \__cdossier_base_require_field:n { email }
-    \str_if_eq:VnT \l__cdossier_statement_type_tl { research }
-      { \__cdossier_base_require_field:n { affiliation } }
     \str_if_eq:VnT \l__cdossier_statement_type_tl { artist }
       { \__cdossier_base_require_field:n { website } }
   }
