@@ -59,8 +59,9 @@ too, so naming it there would make it look documented and the
 
 `tokenfixture-*` pin the verdicts of `tests/lint/run-token-values.sh` (issue
 #487), which compares the calibrated numbers `docs/ARCHITECTURE.md` and the
-manual state against the ones `careerdossier-tokens.sty` declares. Like the
-files above they are lint input and are never compiled.
+manual state against the ones `careerdossier-tokens.sty` declares, and the
+token table in `docs/TESTING.md` against the spacing tokens it allocates (issue
+#590). Like the files above they are lint input and are never compiled.
 
 That lint's fixtures come in two halves, because it compares two files rather
 than reading one. The source half is held fixed and the document half varies:
@@ -69,6 +70,7 @@ than reading one. The source half is held fixed and the document half varies:
 | --- | --- |
 | `tokenfixture-source.sty` | the source side for every case below — one token of each declared shape |
 | `tokenfixture-nosource.sty` | a source that declares nothing the lint parses → `NO SOURCE VALUES` |
+| `tokenfixture-noskip.sty` | a source that sets ratios but allocates no token with `\skip_new:N` → `NO SPACING TOKENS` |
 
 | Fixture | Driven check | Expected verdict |
 | --- | --- | --- |
@@ -84,11 +86,15 @@ than reading one. The source half is held fixed and the document half varies:
 | `tokenfixture-manual-value.tex` | the manual's `fontsize` table | `MANUAL VALUE MISMATCH` |
 | `tokenfixture-manual-unknown.tex` | the manual's `fontsize` table | `UNKNOWN ROLE` |
 | `tokenfixture-manual-notable.tex` | the manual's `fontsize` table | `NO TABLE FOUND` |
+| `tokenfixture-testing-ok.md` | the `docs/TESTING.md` token table | `OK` |
+| `tokenfixture-testing-dropped.md` | the `docs/TESTING.md` token table | `MISSING ROW` |
+| `tokenfixture-testing-extra.md` | the `docs/TESTING.md` token table | `UNKNOWN TOKEN` |
+| `tokenfixture-testing-notable.md` | the `docs/TESTING.md` token table | `NO TABLE FOUND` |
 
-`tokenfixture-source.sty` declares its two spacing ratios under names the real
+`tokenfixture-source.sty` declares its two spacing tokens under names the real
 `careerdossier-tokens.sty` does not use, so a check that had quietly fallen
 back to reading the real source would report `UNKNOWN TOKEN` on the `OK`
-fixture rather than pass it. The two
+fixture rather than pass it. The three
 `-notable` fixtures carry near-miss headings rather than empty files, because
 that is how the failure actually arrives — a heading renamed in a
 documentation tidy-up, leaving a parser that finds nothing and a lint that

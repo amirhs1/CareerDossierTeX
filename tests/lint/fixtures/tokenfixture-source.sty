@@ -3,11 +3,14 @@
 %% Not a package: it is never loaded, and exists only so the lint's self-check
 %% has a source side it can hold fixed while the document side varies. It
 %% carries one token of each shape the real careerdossier-tokens.sty declares
-%% — a set_skip ratio, a size command, a per-fontsize dimension, and a derived
-%% metric. Its two ratios are declared under names the real source does not
-%% use, so a check that silently read the real source instead would report
-%% UNKNOWN TOKEN on the OK fixture rather than pass it.
+%% — a skip_new allocation, a set_skip ratio, a size command, a per-fontsize
+%% dimension, and a derived metric. Its two spacing tokens are declared under
+%% names the real source does not use, so a check that silently read the real
+%% source instead would report UNKNOWN TOKEN on the OK fixture rather than
+%% pass it.
 \ExplSyntaxOn
+\skip_new:N \CDossierFixtureAboveSkip
+\skip_new:N \CDossierFixtureBelowSkip
 \cs_new_protected:Npn \__cdossier_tokens_resolve:
   {
     \str_case:Vn \l__cdossier_tokens_fontsize_tl

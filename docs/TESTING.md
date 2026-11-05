@@ -241,7 +241,10 @@ reproduced inside the test written to catch it.
 
 So each public spacing token must be rendered by at least one committed
 fixture, and the table below records which. Extend the fixture named there when
-you retune a ratio, and add a row when you add a token.
+you retune a ratio, and add a row when you add a token. `make lint` fails when a
+token `careerdossier-tokens.sty` allocates with `\skip_new:N` has no row, or a
+row names a token the source does not allocate; it checks that the two name the
+same tokens, not that the named fixture renders the token.
 
 | Token                                 | Rendered by                                      | At the boundary                     |
 | ------------------------------------- | ------------------------------------------------ | ----------------------------------- |
@@ -707,7 +710,9 @@ the declared-exception list and its ratchet.
 
 `tests/lint/run-token-values.sh` — the calibrated values documented in
 `docs/ARCHITECTURE.md` and the manual's `fontsize` table match what the source
-declares. A stale number typesets and reads as authoritative.
+declares. A stale number typesets and reads as authoritative. It also holds the
+token table under "Spacing tokens: reporting a value is not rendering a gap" to
+the set of spacing tokens the source allocates.
 
 ### CTAN packaging lint
 

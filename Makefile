@@ -12,7 +12,7 @@
 # compile-nothing `--list` mode, run-manual-names.sh reads
 # doc/careerdossier.tex and README.md, run-token-values.sh reads
 # careerdossier-tokens.sty against the value tables in docs/ARCHITECTURE.md
-# and the manual,
+# and the manual and the token table in docs/TESTING.md,
 # run-text-guards.sh drives tests/lib/text.sh over synthetic text,
 # run-list-remnant.sh drives tests/layout/list-remnant.awk over synthetic
 # page geometry,
