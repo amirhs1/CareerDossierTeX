@@ -1064,10 +1064,10 @@ The build workflow should:
 - run on pull requests;
 - run on pushes to `main`, every job whatever the commit touches;
 - on a docs-only pull request, one whose diff since the merge base touches only
-  the paths `tests/lib/docs-only.sh` lists, skip every TeX job and still run
-  `lint` and `toolchain` (#568). The `changes` job in `build.yml` calls that
-  script, and so does `make check`, so CI and the local gate share one path
-  list (#603);
+  the paths `tests/lib/docs-only.sh` lists, skip every TeX job, which is every
+  job in the TeX Live container, `toolchain` among them, and still run `lint`
+  (#568, #614). The `changes` job in `build.yml` calls that script, and so
+  does `make check`, so CI and the local gate share one path list (#603);
 - run every committed automated suite under `tests/` that applies to the active
   milestone;
 - compile every supported example;
@@ -1103,7 +1103,7 @@ requires a named list of job contexts to pass against an up-to-date branch.
 Green CI is therefore the merge gate; a branch that is not close-out complete
 when it goes green is one that can be merged incomplete. A job its `if:` skips
 on a docs-only pull request reports as skipped, and a skipped required check
-counts as passed, so that pull request merges on `lint` and `toolchain` alone.
+counts as passed, so that pull request merges on `lint` alone.
 
 **How many contexts, and which, is a question for the ruleset and not for this
 paragraph.** The list is not the workflow's job count — a job may exist without

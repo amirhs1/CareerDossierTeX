@@ -25,9 +25,10 @@ permissions:
   contents: read
 
 jobs:
-  # Docs-only classifier (issue #568). On a pull request whose diff touches
-  # only docs-only paths, the TeX jobs are skipped; `lint` and `toolchain` run
-  # regardless, and so does every job on a push to main.
+  # Docs-only classifier (issues #568 and #614). On a pull request whose diff
+  # touches only docs-only paths, the TeX jobs are skipped: every job in the
+  # TeX Live container, `toolchain` among them. `lint` runs regardless, and so
+  # does every job on a push to main.
   #
   # Skipping is done with a job-level `if:`, not a `paths:` filter on the
   # trigger: every job here is a required status check on the `Protect Main`
@@ -84,6 +85,9 @@ jobs:
           fi
 
   toolchain:
+    needs: changes
+    # Fail-safe docs-only guard; see the `changes` job.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tex == 'true') }}
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
