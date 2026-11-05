@@ -243,9 +243,10 @@ its metadata.
 ## Appendix: gh command reference
 
 These commands are how an agent (or the maintainer) actually reads and writes
-the Project. Steps 1, 4, and 5 are object-neutral — an item id is an item id.
-Step 2 is written for a pull request because that is the busier path; "Filing an
-issue instead" after step 5 gives the two substitutions an issue needs.
+the Project. Step 4 is object-neutral: an item id is an item id. The other four
+steps are written for a pull request, because that is the busier path, and
+"Filing an issue instead", after step 5, gives an issue's own steps in their
+place.
 
 Repository metadata (assignee, labels, milestone) needs only the `repo` token
 scope; Project reads/writes additionally need `read:project` and `project`:
@@ -492,8 +493,37 @@ other half of that obligation, is the `isDraft` row.
 
 ### Filing an issue instead
 
-Two substitutions turn the sequence above into the issue path; steps 1, 4, and 5
-are unchanged.
+Step 4 keeps its shape with one alias fewer. Every other step changes: step 1
+reads no issue, step 2 files it, step 3 is not needed, and step 5 reads the
+issue alone.
+
+**Step 1 reads no issue.** The issue does not exist until step 2 files it, and
+step 1's query declares `$issue:Int!`, so run without one it fails:
+`Variable $issue of type Int! was provided invalid value`. Read the Project and
+the open milestones instead:
+
+```bash
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -f query='
+query($owner:String!,$repo:String!){
+  user(login:$owner){
+    projectsV2(first:20){nodes{
+      id number title
+      fields(first:50){nodes{
+        ... on ProjectV2FieldCommon{id name}
+        ... on ProjectV2SingleSelectField{id name options{id name}}
+      }}
+    }}
+  }
+  repository(owner:$owner,name:$repo){
+    milestones(states:OPEN,first:20){nodes{title}}
+  }
+}'
+```
+
+Take the project id, field ids, and option ids as step 1 does. There is no
+focused issue to inherit from, so `CONTRIBUTING.md`, "1. Every issue carries a
+milestone", decides which milestone the issue takes, and this list gives its
+exact string. "Project field values" above gives the four Project values.
 
 **Step 2 becomes `gh issue create`.** It takes the same metadata flags, so the
 issue is filed fully configured in one call:
@@ -532,6 +562,48 @@ a PR's item id has to be read back separately.
 
 **Step 4 drops the `issueStatus` alias.** There is no second object to move, so
 the mutation carries four aliases rather than five.
+
+**Step 5 reads the issue alone.** Its query declares `$pr:Int!`, which an issue
+does not have, and its assertion builds rows only a pull request has. This query
+and assertion cover the eight values "Verification" lists for an issue, with
+step 5's pattern and its rules for writing `$want`:
+
+```bash
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
+query($owner:String!,$repo:String!,$issue:Int!){
+  repository(owner:$owner,name:$repo){
+    issue(number:$issue){
+      assignees(first:5){nodes{login}}
+      labels(first:20){nodes{name}}
+      milestone{title}
+      projectItems(first:10){nodes{project{title}
+        status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        phase:fieldValueByName(name:"Phase"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        priority:fieldValueByName(name:"Priority"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+      }}
+    }
+  }
+}' --jq '
+    {"assignees":["amirhs1"],"labels":["<label>","<label>"],
+     "milestone":"<milestone>","project":"CareerDossierTeX Development",
+     "status":"<intended>","phase":"<intended>",
+     "priority":"<intended>","size":"<intended>"} as $want
+    | .data.repository.issue as $x
+    | ( $x.projectItems.nodes
+        | map(select(.project.title | test("CareerDossierTeX")))[0] // {} ) as $i
+    | {assignees:([$x.assignees.nodes[].login] | sort),
+       labels:([$x.labels.nodes[].name] | sort),
+       milestone:$x.milestone.title,
+       project:$i.project.title, status:$i.status.name,
+       phase:$i.phase.name, priority:$i.priority.name,
+       size:$i.size.name} as $got
+    | [ $want | to_entries[] | {field:.key, want:.value, got:$got[.key]} ]
+    | map(. + {ok:(.want == .got)})
+    | if all(.[]; .ok) then . else halt_error(1) end'
+```
+
+Why a field was left unset stays with the reader, as on the pull request path.
 
 When several issues are filed together, add them one call at a time rather than
 batching the `addProjectV2ItemById` aliases: the order of sequential calls is
