@@ -261,8 +261,15 @@ jobs:
       #
       # The PDFKit gate likewise cannot run on Linux; it is covered locally on
       # macOS and by the committed *.pdfkit.txt baselines.
+      #
+      # This job, `smoke`, and `layout` run their fixtures concurrently, one per
+      # core (issue #631); the runner's accounting line in the log is what shows
+      # every fixture ran exactly once. `make tagging` stays serial locally.
       - name: Tagged-PDF structure, extraction, and geometry fixtures
-        run: tests/tagging/run.sh
+        run: |
+          jobs="$(nproc)"
+          echo "fixture jobs: $jobs (nproc)"
+          tests/tagging/run.sh --jobs "$jobs"
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload tagging reports
         if: always()
@@ -289,8 +296,12 @@ jobs:
       # No poppler here: tests/smoke/run.sh only compiles and greps the engine
       # rejection messages. It does need xelatex and pdflatex, which the image
       # already provides, to prove the unsupported engines fail as required.
+      # Fixtures run one per core, as in `tagging` above.
       - name: Smoke tests (supported builds and required failures)
-        run: tests/smoke/run.sh
+        run: |
+          jobs="$(nproc)"
+          echo "fixture jobs: $jobs (nproc)"
+          tests/smoke/run.sh --jobs "$jobs"
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload smoke PDFs and logs
         if: always()
@@ -317,8 +328,12 @@ jobs:
       # installed for this job to assert anything.
       - name: Install poppler-utils
         run: apt-get update && apt-get install -y --no-install-recommends poppler-utils
+      # Fixtures run one per core, as in `tagging` above.
       - name: Layout-stress tests
-        run: tests/layout/run.sh
+        run: |
+          jobs="$(nproc)"
+          echo "fixture jobs: $jobs (nproc)"
+          tests/layout/run.sh --jobs "$jobs"
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
       - name: Upload layout PDFs and logs
         if: always()

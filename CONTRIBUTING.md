@@ -455,8 +455,9 @@ lint, the module regression suite, extraction, smoke, layout, the focused
 BibLaTeX/Biber fixture, the link copy-paste, default-path metadata, and
 link-annotation suites, and the tagged-structure fixtures — plus all supported
 example builds. `make check` runs them all, except on a docs-only change, where
-it runs only the lints and says so; "The gate, and the serial path" below has
-the rule and the `FULL=1` override:
+it runs only the lints and says so; "The full run, and the serial path" below
+has the rule and the `FULL=1` override. It is optional: the required checks CI
+runs are the gate ("What actually gates a merge"):
 
 ```bash
 make check
@@ -479,8 +480,10 @@ A local check and the matching CI job are equivalent, but not textually
 identical. Most jobs run the same `make` target you would; `extraction`,
 `tagging`, `smoke`, and `layout` invoke `tests/<suite>/run.sh` directly and
 `regression` runs a bare `l3build check` — in each case the same command the
-target itself wraps, with the empty selector described below. If you change a
-command in one place, change it in the other.
+target itself wraps, with the empty selector described below. `smoke`,
+`layout`, and `tagging` also pass `--jobs "$(nproc)"`, which the targets pass
+only when you set `JOBS`. If you change a command in one place, change it in
+the other.
 
 Target and job names overlap but are not in bijection, so do not derive one from
 the other. The extraction and bibliography *targets* are `extract-test` and
@@ -497,15 +500,18 @@ per-pull-request one, which is why `ctan-lint` checks the configuration on every
 run while the target itself is called for by
 [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md#building-the-archive).
 
-### The gate, and the serial path
+### The full run, and the serial path
 
 `make check` runs its twelve targets four at a time — about four minutes on the
 maintainer's machine where `check-serial` takes seven, as orientation rather
-than a figure to plan around. It is the pre-push gate. Set the worker count with
+than a figure to plan around. It is optional before a push: the required checks
+CI runs are the gate ("What actually gates a merge" below), and `AGENTS.md`,
+"Commands", says when the full local run is worth it. It also tests the TeX Live
+on your machine, where CI tests one pinned image. Set the worker count with
 `JOBS`, or take the deterministic path instead:
 
 ```bash
-make check                     # the gate: twelve targets, four at a time
+make check                     # the full run: twelve targets, four at a time
 make check JOBS=2              # fewer workers
 make check-serial              # one target after another
 ```
@@ -543,7 +549,7 @@ The driver is `tests/check-parallel.sh`. `docs/TESTING.md`, "The parallel run",
 is canonical for how it works, what it asserts beyond running the same targets,
 the two tool caches it has to prepare first, its measured speedup, its ordered
 replay of per-target output under `build/check-parallel/`, its disk cost, and
-what a scheduled run had to prove before it could be the gate; none of that is
+what a scheduled run had to prove before `make check` could use it; none of that is
 repeated here beyond the orientation figure above.
 
 ### Scoping a suite while you iterate
@@ -579,7 +585,7 @@ Three properties make this safe to trust:
 - **With no selector, nothing changed.** `make check` and every CI job that
   runs invoke the suites unscoped and run exactly what they ran before. A
   docs-only change is the exception at the level of whole suites: `make check`
-  then runs only the lints, under "The gate, and the serial path" above, and a
+  then runs only the lints, under "The full run, and the serial path" above, and a
   docs-only pull request skips CI's TeX jobs, under "CI expectations".
 - **A selector that matches nothing fails the run.** Every assertion these
   suites make is made per fixture, so a run that selected no fixture passes all
@@ -589,13 +595,14 @@ Three properties make this safe to trust:
   `NOT a full run`, so a filtered transcript cannot be pasted into a PR as
   evidence of a full one.
 
-Scoping is a development-loop convenience and nothing more. `make check` before
-you push is still the gate, and a scoped run is not a test result for the PR
-body. While iterating, run `make lint` and the one suite that owns the changed
-behaviour (`TEST=` or `FIXTURE=`); run `make check` once per branch, before the
-push, and again after any later change to a `.sty`, `.cls`, test, or example.
-On a docs-only branch that `make check` is the scoped gate under "The gate, and
-the serial path" above, the local mirror of CI's docs-only run.
+Scoping is a development-loop convenience and nothing more. CI's required
+checks, which run every suite unscoped, are the gate, and a scoped run is never
+evidence of a full one in the PR body. Before a push, run `make lint` and the
+one suite that owns the changed behaviour (`TEST=` or `FIXTURE=`); run
+`make check` as well when the change touches a shared package, a class, or a
+baseline, or when you want the full run before CI. On a docs-only branch
+`make check` runs only the lints, under "The full run, and the serial path"
+above, the local mirror of CI's docs-only run.
 
 `make tagging` is the one whose selectable unit is not the `.tex` file but the
 fixture **group**: `resume`, `cv-subsection`, `biblatex-ua2`. A group is a base
@@ -626,10 +633,11 @@ make layout JOBS=8 FIXTURE='resume-*'
 ```
 
 **With no `JOBS` nothing changes.** Each runs exactly the fixtures it ran
-before, in the same order, with byte-identical output — which is what CI invokes
-and why it is unaffected.
+before, in the same order, with byte-identical output. CI's `smoke`, `layout`,
+and `tagging` jobs take the concurrent path instead, one fixture per core, and
+each job log ends with the accounting line that shows every fixture ran once.
 
-`JOBS` composes with `FIXTURE`, and it composes with the gate — but the two
+`JOBS` composes with `FIXTURE`, and it composes with `make check` — but the two
 layers multiply, so `check` pins the inner one to 1 and you raise it
 deliberately:
 
@@ -637,7 +645,7 @@ deliberately:
 make check JOBS=4 INNER_JOBS=2
 ```
 
-That pinning is why making the gate parallel did not quietly quadruple the
+That pinning is why making `make check` parallel did not quietly quadruple the
 process budget along with it.
 
 `docs/TESTING.md`, "Fanning out inside a suite", is canonical for the measured
@@ -670,8 +678,9 @@ canonical for all of it and is not summarized here. Read the section that covers
 what you are changing; it is reference material, not a document to read through.
 
 "Local builds" above is the other half: how to invoke a suite, how to scope one
-while you iterate, and how a target relates to its CI job. `make check` before
-you push is the gate.
+while you iterate, and how a target relates to its CI job. CI's required checks
+are the gate ("What actually gates a merge"), and `make check` is the optional
+full local run.
 
 ## Coding conventions
 
@@ -1070,7 +1079,7 @@ The build workflow should:
   the paths `tests/lib/docs-only.sh` lists, skip every TeX job, which is every
   job in the TeX Live container, `toolchain` among them, and still run `lint`
   (#568, #614). The `changes` job in `build.yml` calls that script, and so
-  does `make check`, so CI and the local gate share one path list (#603);
+  does `make check`, so CI and the local run share one path list (#603);
 - run every committed automated suite under `tests/` that applies to the active
   milestone;
 - compile every supported example;

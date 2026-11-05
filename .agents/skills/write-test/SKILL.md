@@ -72,9 +72,10 @@ description: Write or change a test under tests/: an l3build regression test, a 
     `--update`; each extractor keeps its own, and PDFKit's regenerate only on
     macOS. Report every gate the runner's summary says it skipped, such as
     veraPDF for `-ua2`: `docs/TESTING.md`, "Tagged-PDF suite".
-12. Run the focused target, then the affected suites, then `make check` in
-    the background with the sandbox off, and report what each printed under
-    `.github/pull_request_template.md`, "Checks run".
+12. Run the focused target, then the affected suites, and `make check` in
+    the background with the sandbox off when the change touches a shared
+    package, a class, or a baseline (AGENTS.md, "Commands"). Report what
+    each printed under `.github/pull_request_template.md`, "Checks run".
 
 ## Example
 
