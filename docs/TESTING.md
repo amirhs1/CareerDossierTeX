@@ -44,7 +44,7 @@ under `tests/`:
 | Path | Holds |
 | --- | --- |
 | `tests/lint/` | source-level invariants no compiled fixture can assert; eleven scripts and their self-test `fixtures/` |
-| `tests/regression/` | `l3build` `.lvt` sources and `.tlg` baselines, one pair per module concern |
+| `tests/regression/` | `l3build` `.lvt` sources and `.tlg` baselines, one pair per module concern; `support/` holds shared bodies, which `l3build` copies into the test directory before each run |
 | `tests/smoke/` | supported builds (`*-valid`), required failures (`*-bad-*`, `*-missing-*`), and the manual's templates |
 | `tests/extraction/` | text-layer round trips: fixtures plus `*.expected.txt` (Poppler) and `*.pdfkit.txt` (PDFKit) baselines |
 | `tests/layout/` | multi-page and long-value stress sources, the two `.awk` log parsers, and every visual-review renderer |
@@ -578,7 +578,15 @@ for the extractor behaviour behind it.
 `make metadata` — `tests/metadata/run.sh` checks derived PDF catalog metadata on
 the default (untagged) path and, for `/Title` and `/Author`, on both paths. The
 two paths hand the string to different writers, so a value correct on one can be
-wrong on the other with nothing logged.
+wrong on the other with nothing logged. `/Lang` needs a suite of its own because
+it is written by a different mechanism at a different time, and is the only
+field that depends on package load order.
+
+Two other suites cover the rest of the metadata. The regression pair
+`tests/regression/metadata-pdfmeta` pins how `careerdossier-metadata.sty`
+derives each value and when it leaves a document's own value alone, and reads
+no PDF; whether `/DisplayDocTitle` reaches the catalog is asserted by
+`tests/tagging/run.sh`.
 
 ### Link-annotation suite
 
@@ -638,6 +646,16 @@ sub-key in the same `\keys_define:nn` block and file. LaTeX enforces neither, so
 omitting the sub-key degrades the error silently. `.choices:nn` is the only
 supported way to declare such an option, because a hand-rolled `\str_case:nnF`
 list is invisible to this lint.
+
+The shared class options are declared by generators in
+`careerdossier-base.sty` (#266). The lint checks each generator body as a
+template whose module is `{ #1 }`, and counts each call in a class as that
+class declaring every key of the generator. A call must name the module the
+file's name implies and the key path the file's `\ProcessKeysOptions`
+processes, name a generator that exists, and not sit beside a hand-written copy
+of a key it declares. Last, for each generated key, the lint compares the
+generator's accepted values with those of the package that owns the behaviour,
+in order; `paper` has no owning package.
 
 ### Version-declaration lint
 

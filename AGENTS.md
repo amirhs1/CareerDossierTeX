@@ -46,7 +46,8 @@ careerdossier-base.sty        shared profile metadata, keys, and validation
 careerdossier-tokens.sty      calibrated type, rhythm, list, and geometry tokens
 careerdossier-typography.sty  LuaLaTeX engine guard, fonts, semantic text roles
 careerdossier-theme.sty       monochrome semantic colour, rule, and link tokens
-careerdossier-components.sty  shared document parts, link layer, PDF metadata
+careerdossier-components.sty  shared document parts and the link layer
+careerdossier-metadata.sty    derived PDF document metadata
 careerdossier-resume.cls      English industry resume class
 careerdossier-letter.cls      English industry cover-letter class
 careerdossier-cv.cls          English academic CV class

@@ -1,8 +1,10 @@
 # Option-lint fixtures
 
 These files pin the verdicts of `tests/lint/run.sh` (issue #233). One holds a
-complete choice-valued option; the other four each omit or misdirect exactly one
-half of the pairing the lint exists to enforce.
+complete choice-valued option; four each omit or misdirect exactly one half of
+the pairing the lint exists to enforce. The rest pin the checks issue #266 added
+for the shared-option generators: a generator template, calls to it, and
+owning packages to compare it with.
 
 They are lint input, not LaTeX: they are never compiled, are not part of the
 Work, and are named `lintfixture-*` rather than `careerdossier-*` so that
@@ -15,9 +17,19 @@ Work, and are named `lintfixture-*` rather than `careerdossier-*` so that
 | `lintfixture-no-message.sty` | `MISSING MESSAGE` |
 | `lintfixture-wrong-module.sty` | `WRONG MODULE` |
 | `lintfixture-wrong-target.sty` | `WRONG TARGET` |
+| `lintfixture-generator.sty` | `OK`; the generator the fixtures below call and compare against |
+| `lintfixture-template-wrong-module.sty` | `WRONG MODULE` |
+| `lintfixture-call-ok.sty` | `OK` |
+| `lintfixture-call-wrong-module.sty` | `WRONG MODULE` |
+| `lintfixture-call-wrong-path.sty` | `WRONG PATH` |
+| `lintfixture-call-unknown.sty` | `UNKNOWN GENERATOR` |
+| `lintfixture-call-duplicate.sty` | `DUPLICATE` |
+| `lintfixture-parity-ok.sty` | `PARITY OK` |
+| `lintfixture-parity-drift.sty` | `VALUE LISTS DIFFER` |
 
-Each fixture keeps a second, complete option alongside the defective one, so the
-lint has to single out the right key rather than condemn the whole file.
+Each of the four defective option fixtures keeps a second, complete option
+alongside the defective one, so the lint has to single out the right key rather
+than condemn the whole file.
 
 The `version/` subdirectory holds a separate set, for
 `tests/lint/run-version-declarations.sh` (issue #258); see its own `README.md`.

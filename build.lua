@@ -56,8 +56,8 @@ checkruns = 1
 -- The release the archive publishes, read out of the Work rather than restated
 -- here.
 --
--- `uploadconfig.version' is a version string, and ten `\ProvidesExpl*' lines
--- already carry one. Writing an eleventh copy by hand would reintroduce exactly
+-- `uploadconfig.version' is a version string, and eleven `\ProvidesExpl*' lines
+-- already carry one. Writing a twelfth copy by hand would reintroduce exactly
 -- the drift tests/lint/run-version-declarations.sh (#258) exists to catch, one
 -- file outside the set that lint reads: `manifest.txt' defines the Work, and
 -- build.lua is not part of it, so a stale literal here would ship a wrong
@@ -65,8 +65,8 @@ checkruns = 1
 -- instead of detecting it.
 --
 -- careerdossier-base.sty is the file every other one loads, and the #258 lint
--- holds all ten declarations equal, so any of them would do. Parse failure is
--- an error, not a silent "": l3build loads this file for `check' too, so a
+-- holds all eleven declarations equal, so any of them would do. Parse failure
+-- is an error, not a silent "": l3build loads this file for `check' too, so a
 -- broken derivation fails `make regression' rather than waiting for a release.
 local function work_release()
   local path = sourcefiledir .. "/careerdossier-base.sty"

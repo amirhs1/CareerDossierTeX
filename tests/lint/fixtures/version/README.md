@@ -29,6 +29,6 @@ what isolates that verdict from the two above it (issue #405).
 Every tree carries three sources rather than two, and the defective one is
 always the third. Two agreeing files and one outlier is what makes the lint
 choose a reference pair by frequency rather than by position: with two files a
-mismatch is a tie, and either could be reported as the wrong one. Ten files
-disagreeing one-to-nine is the shape a missed release bump actually takes, and
+mismatch is a tie, and either could be reported as the wrong one. Eleven files
+disagreeing one-to-ten is the shape a missed release bump actually takes, and
 the outlier is the file that has to be named.

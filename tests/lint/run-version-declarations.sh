@@ -8,7 +8,7 @@
 #   \ProvidesExplPackage {careerdossier-base} {2026-08-12} {0.8.0}
 #   \ProvidesExplClass   {careerdossier-cv}   {2026-08-12} {0.8.0}
 #
-# Ten such declarations exist, they are bumped by hand, and until this script
+# Eleven such declarations exist, they are bumped by hand, and until this script
 # nothing compared them. A release that missed one file would pass every suite
 # and ship: LaTeX writes both values into the `.log' without complaint, and no
 # committed baseline records either one --
@@ -48,7 +48,7 @@
 # `CHANGELOG.md' or `docs/MIGRATION.md'. Both legitimately disagree on `main'
 # between releases -- the declarations lead or trail the tag, and the headings
 # move at a different moment in the release sequence -- so either check would
-# fail on a correct tree. Consistency between the ten is the property that is
+# fail on a correct tree. Consistency between the eleven is the property that is
 # true at every commit, and it is the only one asserted here.
 #
 # HOW IT AVOIDS PASSING BY FINDING NOTHING

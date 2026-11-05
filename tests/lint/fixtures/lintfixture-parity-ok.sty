@@ -1,0 +1,13 @@
+%% lintfixture-parity-ok.sty — option-lint fixture (issue #266)
+%%
+%% An owning package whose `size' accepts what the fixture generator's does.
+%% Expected verdict: PARITY OK.
+%% This fixture is lint input only; it is never compiled and is not part of the
+%% Work (see tests/lint/fixtures/README.md).
+
+\keys_define:nn { cdossier / fixtureowner }
+  {
+    size .choices:nn =
+      { small , large }
+      { \tl_set_eq:NN \l__lintfixture_size_tl \l_keys_choice_tl } ,
+  }

@@ -82,6 +82,12 @@ The class is not where geometry lives. It hands each option to its owner with
 `\PassOptionsToPackage` before `\LoadClass`, so a value is validated once
 rather than separately in four classes.
 
+Nor does a class write out the options it shares with the others. Every class
+takes `fontsize`, `margin`, `paper`, `bodyfont`, `medium`, and `muted`, and the
+resume and CV also take `entrymeta`; `careerdossier-base.sty` declares them,
+and each class calls its generators with its own module name and key path
+(#266). See `careerdossier-base.sty` below.
+
 ## File responsibilities
 
 ### `careerdossier-tokens.sty`
@@ -354,6 +360,25 @@ Shared profile state and validation: the project's data model, not its page. The
 file's own header comment states the responsibilities and what it must not
 define.
 
+It is also where shared class options are declared (#266). One internal
+generator, `\__cdossier_base_declare_shared_options:nn`, declares the six
+options every class takes; a second, `\__cdossier_base_declare_record_options:nn`,
+declares `entrymeta` for the two record classes only, on the same Record versus
+Prose line as the `\CDossierRecord…Skip` and `\CDossierProse…Skip` token
+families. Each class loads `careerdossier-base.sty` before it processes its
+options and calls them with its own module name and key path, so the error text
+still names the class. For each option a generator emits the class's storage
+variable, its `unknown-<key>` message, and its key properties, and sets the
+default wherever every class agrees on it. The class keeps everything that
+differs: its `fontsize` and `margin` defaults, its own options (`family`,
+`type`, `numbering`), its `unknown-option` message, and the forwarding.
+
+The owning packages keep their own declarations, so each package still
+validates what it receives and works without a class. A value list therefore
+lives in two places, the generator and the owning package, and the option lint
+compares them (`docs/TESTING.md`, "Option lint"). `paper` has no owning
+package: the generator is its only declaration.
+
 ### English strings and the absence of a language module
 
 CareerDossierTeX is English-only and has no language-abstraction module and no
@@ -392,16 +417,15 @@ The file's own header comment states the responsibilities.
 ### `careerdossier-components.sty`
 
 The reusable rendered pieces every class arranges: identity, furniture, section
-rule, contact line, entry primitives, the link layer, and the derived PDF
-metadata. The file's own header comment states the responsibilities in full, and
-comments the two mechanisms that reach outside this package — the `\href` hook
-against hyperref's `\hyper@link@`, and why `lua-ul` draws the link rule and
-`ulem` was rejected on measurement. Neither is restated here.
+rule, contact line, entry primitives, and the link layer. The file's own header
+comment states the responsibilities in full, and comments the two mechanisms
+that reach outside this package — the `\href` hook against hyperref's
+`\hyper@link@`, and why `lua-ul` draws the link rule and `ulem` was rejected on
+measurement. Neither is restated here. It owns no PDF document metadata: it
+loads `careerdossier-metadata.sty`, below, so that every class reaches that
+package through the `\RequirePackage` list it already has.
 
-Four boundary questions this package answers are architectural rather than
-internal, and stay below.
-
-Four boundary questions this package answers are recorded where they were
+Three boundary questions this package answers are recorded where they were
 decided, not restated here. Each mechanism is commented at the code that
 implements it in `careerdossier-components.sty`; each decision is in its issue.
 
@@ -410,10 +434,24 @@ implements it in `careerdossier-components.sty`; each decision is in its issue.
 | Why one stack serves both header shapes | The identity block and the statement header are the same sequence of optional lines, so *position* decides which gap token applies rather than presence — the defect that let an absent `headline` change the gap below the name. | #204, #224, #252 |
 | Why `medium=print\|screen` resolves here | The classes validate the public value and forward it, but what it decides — whether page furniture is emitted at all — is owned here, so the policy exists once instead of once per class. | #184 |
 | Why the de-emphasis role resolves here | `muted` combines a shape from typography with a colour from theme, and the dependency direction forbids either module from reaching into the other. This one loads both. | #271, #324 |
-| Why PDF document metadata lives here | `/Title`, `/Author`, and `/Lang` derive from profile data this module already owns; the class contributes only the document type. Timing, precedence, and ordering against `hyperref` are commented at the implementation. | #276 |
 
 Optional fields follow the project-wide rule: collect the present fields, then
 insert separators between them, so an absent `phone` leaves no separator behind.
+
+### `careerdossier-metadata.sty`
+
+The document's derived PDF metadata: `/Title` and `/Author` from the profile's
+`name` and the document type a class declares, `/Lang`, and the
+`/DisplayDocTitle` viewer preference. It renders nothing, carries no dimension,
+and does not load `hyperref`. Its one inbound interface is the private
+`doctype` declaration each class makes once. The file's own header comment
+states the responsibilities; timing, precedence on both build paths, and the
+ordering against `hyperref` are commented at the implementation.
+
+| Question | The answer, in one line | Decided in |
+|---|---|---|
+| Why PDF document metadata is derived in a shared package | `/Title`, `/Author`, and `/Lang` derive from profile data, so one implementation serves every class; the class contributes only the document type. | #276 |
+| Why it is not part of `careerdossier-components` | It shares no code with the rendered parts, and has its own suite, `make metadata`; `careerdossier-components` loads it, so no class loads it by name. | #464 |
 
 ### `careerdossier-resume.cls`
 
