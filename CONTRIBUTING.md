@@ -1072,6 +1072,9 @@ The build workflow should:
 
 - run on pull requests;
 - run on pushes to `main`, every job whatever the commit touches;
+- cancel a pull request's run still in progress when a newer commit on the same
+  pull request starts one, and never cancel a run on a push to `main` (#633).
+  The `concurrency:` comment in `build.yml` says how each half is guaranteed;
 - on a docs-only pull request, one whose diff since the merge base touches only
   the paths `tests/lib/docs-only.sh` lists, skip every TeX job, which is every
   job in the TeX Live container, `toolchain` among them, and still run `lint`
