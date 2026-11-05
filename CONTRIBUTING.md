@@ -1051,7 +1051,7 @@ that affects output.
 Branch protection on `main` is the `Protect Main` **ruleset**, not classic
 branch protection, so read it with `gh api repos/<owner>/<repo>/rulesets` rather
 than from the older branch-protection endpoint or from this paragraph. As last
-derived, it requires a pull request, allows all three merge methods, requires
+derived, it requires a pull request, allows only merge commits, requires
 **zero** approving reviews, forbids deletion and non-fast-forward pushes, and
 requires a named list of job contexts to pass against an up-to-date branch.
 Green CI is therefore the merge gate; a branch that is not close-out complete
