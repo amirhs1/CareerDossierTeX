@@ -13,53 +13,26 @@ entry is required and the shape it takes; the stability policy it serves is in
 
 ## Status
 
-`v0.9.0` is the current published release. **It changes how letters and
-statements render in one place:** the gap below the header stack no longer adds
-`\parskip` on top of the token that names it, so the header-to-body gap tightens
-by one `\parskip` — 3.625 pt at `fontsize=12pt` — once per document. No source
-edit is required; the recipe below restores the previous gap. No public name is
-added, renamed, or removed. `CDossierPublications` gains an optional `numbering`
-key whose default is the shipped behaviour, so no existing document moves.
-Resume and CV are unaffected. See [`[0.9.0]`](#090---2026-08-26) below.
+`v0.9.0` is the current published release. Each line says whether a release
+needs a source edit and whether documents reflow; its section has the detail
+and the recipes. A document coming from `v0.5.x` or earlier needs every section
+from `v0.6.0` up.
 
-`v0.8.0` was the previous release. **It changes how every existing
-document renders in one place:** an entry's dates and location, and a statement's
-application-context line, were italic and are now upright black body text. No
-source edit is required for that; `muted=italic` restores the previous
-appearance in any of the four classes. Two public names change and need a source
-edit only in a document that used them by name — `\CDossierSizeTitle` is renamed
-to `\CDossierSizeDocumentTitle`, and `\CDossierPrimaryColor` is removed in favour
-of the identical `\CDossierTextColor`. One further change is invisible in
-ordinary use: `CDossierEntry` now reads its body as an argument, so
-catcode-sensitive content such as `\verb` no longer works directly inside an
-entry. See [`[0.8.0]`](#080---2026-08-12) below.
-
-`v0.7.0` renames public design tokens, adds new ones beside them, **retires
-three**, and retunes the calibrated vertical-rhythm ratios. Renamed tokens need a
-source edit only if a document reads or sets them by name, and all three retired
-tokens rendered nothing at the `v0.6.0` defaults — but three mechanism changes
-do move the page: letter and statement headers tighten, the gap above a bullet
-list inside an entry tightens,
-and a document with no `headline` gains a little space below the name. **The
-retune then reflows every document.** It also makes three undocumented
-class-to-package primitives private, which changes no output and affects no
-supported document. See [`[0.7.0]`](#070---2026-08-04) below. This release was
-numbered `v0.6.1` until 2026-08-01.
-
-`v0.6.0` **removes the `density` option and changes every class's layout
-defaults** — see [Upgrading to `v0.6.0`](#upgrading-to-v060) below. A document
-coming from `v0.5.x` or earlier needs that section as well as the `v0.7.0` and
-`v0.8.0` ones.
-
-`v0.4.0` **changes the supported engine from XeLaTeX to LuaLaTeX** — see
-[Upgrading to `v0.4.0`](#upgrading-to-v040-xelatex--lualatex) below.
-
-No released public command, key, class option, or default has been renamed or
-removed in `v0.5.0`. Its statement class, A4 paper, sans body font, affiliation
-key, and contact labels are additive and opt-in; existing documents need no
-source edit. The `v0.4.0` break is in the toolchain, not the document API. Two
-documents do render differently — the academic CV's folio and the academic
-letter's page furniture — and neither requires a source edit; see step 5.
+- [`v0.9.0`](#090---2026-08-26): no source edit. Letters and statements reflow
+  slightly: the header-to-body gap tightens by one `\parskip`.
+- [`v0.8.0`](#080---2026-08-12): a source edit only where a document names
+  `\CDossierSizeTitle` or `\CDossierPrimaryColor`, or puts `\verb` inside an
+  entry. Every document renders differently: entry metadata is no longer
+  italic.
+- [`v0.7.0`](#070---2026-08-04): a source edit only where a document names a
+  renamed, split, retired, or now-private token. Every document reflows. This
+  release was numbered `v0.6.1` until 2026-08-01.
+- [`v0.6.0`](#upgrading-to-v060): a source edit where a document passes
+  `density`. Every document reflows.
+- `v0.5.0`: no source edit and no reflow; everything it added is opt-in.
+- [`v0.4.0`](#upgrading-to-v040-xelatex--lualatex): the engine changes from
+  XeLaTeX to LuaLaTeX, so the build command changes. The academic CV's and
+  letter's page furniture render differently, with no source edit.
 
 ## Upgrading to `v0.6.0`
 
@@ -76,13 +49,9 @@ size or margin has changed. A document that took two pages may now take three,
 or one. No source edit is required unless you pass `density`, but do not ship
 an upgraded document without looking at it.
 
-The measure changes too. The resume defaults to `11pt` at `margin=narrow`, and
-the CV, letter, and statement classes to `12pt` at `margin=normal`; the measured
-characters per line for every combination are tabulated in
-[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
-
-The resume's default is the longest measure in the project, kept deliberately
-for one-page capacity; see the manual for when to override it.
+The measured characters per line for every combination are tabulated in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty), and the manual
+says when to override the resume's deliberately long one.
 
 On US Letter paper, `margin=narrow` increases the physical text block from the
 v0.5.0 resume's 72.27 in² to 75.00 in² (about 3.8%) and provides about 28.2%
@@ -197,11 +166,8 @@ There is no compatibility mode and no option to bypass the guard. Stay on
 
 Classes, class options, profile keys, public commands, environments, paper size,
 and theme are unchanged. An existing document that does not contain
-XeTeX-specific preamble code needs no edit beyond the build command.
-
-Two exceptions to "page design is unchanged": the academic CV's folio and the
-academic letter's running header and footer both changed, so those two documents
-render slightly differently. Neither needs a source edit. See step 5.
+XeTeX-specific preamble code needs no edit beyond the build command. The one
+exception to "page design is unchanged" is step 5.
 
 ### 1. Change the build command
 
@@ -224,9 +190,8 @@ Update editor and CI configuration too. In TeXShop, TeXworks, VS Code
 stale `latexmkrc`, `.vscode/settings.json`, or CI workflow still passing
 `-xelatex` is the most common cause of the engine error after upgrading.
 
-Reason: LuaHBTeX writes real interword spaces into the PDF text layer and
-supports the LaTeX kernel tagging pipeline. XeTeX supports neither, which capped
-both extraction reliability (see `v0.2.1` and issue #72) and tagged output.
+Why the engine changed: [#75](https://github.com/amirhs1/CareerDossierTeX/issues/75) and
+[#76](https://github.com/amirhs1/CareerDossierTeX/issues/76).
 
 ### 2. Remove XeTeX-only preamble code
 
@@ -249,10 +214,6 @@ After:
 Guards of the form `\ifXeTeX … \fi` should be deleted or inverted to
 `\ifLuaTeX`. `iftex` still provides both.
 
-Reason: the primitive is engine-specific. Under XeTeX it also wrapped every word
-in its own `/ActualText` span, which made PDFKit-based readers merge adjacent
-words — the bug fixed in `v0.2.1`.
-
 ### 3. Check fonts if you overrode them
 
 CareerDossierTeX resolves TeX Gyre Termes and TeX Gyre Heros **by file name**
@@ -274,8 +235,7 @@ upgrading rather than assuming identical pagination.
 
 `v0.4.0` changes the running headers and folios of two documents so that a CV
 and an academic cover letter sent together look like one set. **No source edit
-is required** — this is rendered output only, and no class, option, key, or
-command changed.
+is required**; only rendered output changes.
 
 Affects `careerdossier-cv` and `careerdossier-letter` with `family=academic`.
 The industry letter and the resume are **unaffected**: the industry letter keeps
@@ -288,12 +248,8 @@ its `v0.1` empty page style, and the resume still prints no folio.
 | Academic letter running header | *none* | `Name — Cover Letter` from page 2 |
 | Academic letter folio | `Name` at left, `Page 2 of 2` at right | centered `Page 2 of 2` |
 
-Reasons, in short: a bare `Page 2` cannot tell a reader holding a loose sheet
-whether the document ended, and the two classes previously disagreed on every
-aspect of their page furniture. The letter adopted the CV's pattern rather than
-the reverse, because a running header naming the person and document type on
-continuation pages is the stronger convention for both academic CVs and formal
-multi-page correspondence.
+The reasons are in [#91](https://github.com/amirhs1/CareerDossierTeX/issues/91) and
+[#98](https://github.com/amirhs1/CareerDossierTeX/issues/98).
 
 The academic letter's name has moved, not disappeared: it is in the running
 header from page two, and the letterhead and signature block already carried it
@@ -341,23 +297,16 @@ no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
 ### The resume `/Title` and running page label are spelled `Resume`
 
-`careerdossier-resume` registered the document type and the running page label
-with an acute accent on both vowels, so a document built from it carried a PDF
-`/Title` of `Resume – <name>` spelled that way, and repeated the same spelling in
-the running header of every page after the first. The class file, the shipped
-example, the `make` target, and the CI job all spelled the word in ASCII, and
-nothing stated which was right. Both strings are now `Resume`.
+`careerdossier-resume` spelled the document type in its PDF `/Title` and in the
+running page label with an acute accent on both vowels. Both strings are now
+`Resume`, in ASCII
+([#543](https://github.com/amirhs1/CareerDossierTeX/issues/543)).
 
-**No source edit is required, and nothing reflows.** The replacement is one
-character shorter in each of two places; the running label sits in page
-furniture that is set ragged against a fixed width, and no example and no
+**No source edit is required, and nothing reflows.** No example and no
 class × margin × size combination changes its page count. Only the resume class
-is affected — the letter, CV, and statement document types never carried an
-accent.
+is affected.
 
-Two places outside the document may notice. Tooling that matches the PDF `/Title`
-by string — an applicant-tracking pipeline, a document-management rule, a script
-that names files from metadata — should be updated to expect `Resume`. And a
+Tooling that matches the PDF `/Title` by string should now expect `Resume`. A
 `/Title` set explicitly by the document still wins, so a document that needs the
 previous spelling can ask for it:
 
@@ -374,29 +323,20 @@ published as a key.
 
 ### The gap below the header stack no longer adds `\parskip`
 
-`v0.7.0` zeroed `\parskip` for the header block's own scope, so the gaps
-*between* header lines render their token in all four classes — see
+In `careerdossier-letter` and `careerdossier-statement`, the first body
+paragraph added the document-wide `\parskip` on top of the token below the
+header stack. That boundary now subtracts `\parskip` as the boundaries between
+header lines already did — see
 [Header spacing no longer floored by `\parskip`](#header-spacing-no-longer-floored-by-parskip)
-below. The boundary *below* the stack was left out of that fix: it is emitted
-after the block's scope ends, where `careerdossier-letter` and
-`careerdossier-statement` have restored their document-wide `\parskip`, and the
-first body paragraph then contributed that `\parskip` on top of the token.
-`\CDossierProseHeaderBelowSkip` and `\CDossierLetterHeaderBelowSkip` therefore
-named a gap narrower than the one a reader measured — by 3.00 pt at `10pt`,
-3.40 pt at `11pt`, and 3.625 pt at `12pt`, or 27% of the token's value.
-
-That boundary now routes through the same `token − \parskip` emission the
-between-line boundaries already used, so all three header tokens name the
-rendered gap in all four classes. No public command, class option, key, or token
-value changes.
+below — so `\CDossierProseHeaderBelowSkip` and `\CDossierLetterHeaderBelowSkip`
+name the rendered gap. No public command, class option, key, or token value
+changes ([#419](https://github.com/amirhs1/CareerDossierTeX/issues/419)).
 
 **Letters and statements reflow.** The header-to-body gap tightens by exactly
-one `\parskip` — 3.625 pt at `fontsize=12pt` — once per document. Measured on
-the shipped examples and on the size/margin matrix, no example and no
-class × margin × size combination changes its page count, but a letter or
-statement fits marginally more body text on page one. Resume and CV are
-unaffected, because `\CDossierRecordParSkip` is `0.00` and the subtraction was
-already a no-op there.
+one `\parskip` — 3.00 pt at `10pt`, 3.40 pt at `11pt`, 3.625 pt at `12pt` — once
+per document. No example and no class × margin × size combination changes its
+page count. Resume and CV are unaffected, because `\CDossierRecordParSkip` is
+`0.00`.
 
 To keep the previous letter or statement header-to-body gap, add the paragraph
 gap back after `\documentclass`:
@@ -408,9 +348,8 @@ gap back after `\documentclass`:
 ```
 
 Use `\CDossierProseHeaderBelowSkip` with `\CDossierProseParSkip` in
-`careerdossier-statement`. Unlike the `v0.7.0` note above, the token may be read
-here rather than written out, because no retune accompanies this change. Do not
-apply it in the resume or CV, whose gap never moved.
+`careerdossier-statement`. Do not apply it in the resume or CV, whose gap never
+moved.
 
 ## [0.8.0] - 2026-08-12
 
@@ -421,12 +360,10 @@ names.
 ### `CDossierEntry` reads its body as an argument
 
 No source edit is required unless an entry body contains catcode-sensitive
-content. Nothing renders differently, and no vertical token changed.
-
-`CDossierEntry` now takes its body as a `+b` argument in both the resume and the
-CV class. The consequence is the usual one for an environment that grabs its
-body: characters are tokenized when the body is read, so anything that depends
-on rescanning them no longer works directly inside an entry.
+content, such as `\verb` or a `listings` environment. Nothing renders
+differently. `CDossierEntry` now reads its body as a `+b` argument in the resume
+and the CV, so anything that rescans its characters no longer works directly
+inside an entry ([#332](https://github.com/amirhs1/CareerDossierTeX/issues/332)).
 
 Before, this typeset:
 
@@ -441,21 +378,16 @@ After, define the fragment outside the entry and use it inside:
       Maintains \makecheck{} across the suite.
     \end{CDossierEntry}
 
-This affects `\verb`, `listings` environments, and anything else built on
-rescanning. Ordinary prose, `\texttt`, `\CDossierLink`, and `CDossierItemize`
-are unaffected; no example or template in this repository used a form that
-breaks.
-
-Reading the body is what lets the environment test whether it is empty — an
-entry with no body was emitting a keep-with-next penalty with nothing to bind
-to, which made every following inter-entry boundary illegal to break at
-([#332](https://github.com/amirhs1/CareerDossierTeX/issues/332)).
+Ordinary prose, `\texttt`, `\CDossierLink`, and `CDossierItemize` are
+unaffected.
 
 ### `\CDossierSizeTitle` renamed to `\CDossierSizeDocumentTitle`
 
 A source edit is required only in a document that reads or sets this token by
-name. Nothing renders differently: the rename moves no value, and no other token
-changes.
+name. The rename moves no value — see the type scale in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty) — and
+`\CDossierEntryTitleStyle` and every other size or style token keep their names
+([#269](https://github.com/amirhs1/CareerDossierTeX/issues/269)).
 
 Before:
 
@@ -465,23 +397,12 @@ After:
 
     \CDossierSizeDocumentTitle
 
-`\CDossierEntryTitleStyle` is **not** renamed, and neither is any other size or
-style token; `\CDossierSizeSection` was not a candidate either, being a distinct
-1.12 step
-([#269](https://github.com/amirhs1/CareerDossierTeX/issues/269)). The renamed
-token keeps its 1.50 ratio and its 15 / 17, 16 / 18, and 18 / 20 pt values at
-`fontsize=10pt`, `11pt`, and `12pt` — see the type scale in
-[`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-tokenssty).
-
-Reason: `Title` meant two unrelated things in one vocabulary. This token is a
-step of the type scale sizing a statement's document title;
-`\CDossierEntryTitleStyle` is a semantic role for the heading of one job,
-degree, or project. They sit at different levels and are never composed.
-
 ### `\CDossierPrimaryColor` removed
 
 No source edit is required unless a document called `\CDossierPrimaryColor`
 directly — no CareerDossierTeX component, class, or example ever did.
+`\CDossierTextColor` replaces it with no visual change: both were `gray 0`
+([#270](https://github.com/amirhs1/CareerDossierTeX/issues/270)).
 
 Before:
 
@@ -491,19 +412,13 @@ After:
 
     {\CDossierTextColor ...}
 
-`\CDossierTextColor` is a drop-in replacement with no visual change: the
-underlying `cdossier-primary` was `gray 0`, the same value as `cdossier-text`,
-differing only in name
-([#270](https://github.com/amirhs1/CareerDossierTeX/issues/270)).
-
 ### Entry metadata is no longer italic by default
 
 **This changes rendered output in every existing document.** An entry's dates
 and location in the resume and CV, and the statement's application-context
 line, were italic; they are now upright black body text. No source edit is
-required, no command, option, or key is renamed, and the text layer and reading
-order are unchanged — but a document that wants the previous appearance must now
-ask for it:
+required, and the text layer and reading order are unchanged, but a document
+that wants the previous appearance must now ask for it:
 
 Before:
 
@@ -514,28 +429,16 @@ After:
     \documentclass[muted=italic]{careerdossier-resume}
 
 The same one-word addition restores it in `careerdossier-cv`,
-`careerdossier-letter`, and `careerdossier-statement`, which all default to
-`muted=plain` as well.
-
-Reason: `muted=plain` applies no de-emphasis at all, and is the only one of the
-four values that cannot fail a contrast floor — italic at small sizes is harder
-to read for low-vision and dyslexic readers, and a gray level is what disappears
-on a fax or a 1-bit print. What it drops is a redundant signal: the dates are
-still identified by position and content, and under `entrymeta=inline` by the
-separator. See the manual's `muted` section.
+`careerdossier-letter`, and `careerdossier-statement`. Why `plain` is the
+default is in the manual's `muted` section and
+[#324](https://github.com/amirhs1/CareerDossierTeX/issues/324).
 
 ### `\CDossierMutedStyle` is published by `careerdossier-components`
 
-No source edit is required in any document that uses a CareerDossierTeX class.
-
-Before, the role was defined by `careerdossier-typography` and was fixed at
-`\rmfamily \itshape`. It is now defined by `careerdossier-components` and
-resolved by the `muted=italic|gray|both|plain` class option, whose default is
-`plain` — see the entry above for the rendered change that follows from it.
-
-Every document class loads `careerdossier-components`, so `\CDossierMutedStyle`
-is available in all of them as it always was. The one case that changes is a
-document that loads the typography package on its own:
+No source edit is required in any document that uses a CareerDossierTeX class:
+every class loads `careerdossier-components`, which now defines the role that
+`careerdossier-typography` used to fix at `\rmfamily \itshape`. Only a document
+that loads the typography package on its own changes:
 
 Before:
 
@@ -547,30 +450,25 @@ After:
     \usepackage{careerdossier-components}   % loads careerdossier-typography
     ... \CDossierMutedStyle ...
 
-Reason: `muted=gray` and `muted=both` resolve the role to a colour, and
-`careerdossier-typography` owns no colour — only `careerdossier-components` may
-combine a typography shape role with a theme colour token. See
+Why the role moved is in
 [`ARCHITECTURE.md`](ARCHITECTURE.md#careerdossier-componentssty).
 
 ## [0.7.0] - 2026-08-04
 
 Each entry states what changed and what to type; the calibration reasoning is in
 [`CHANGELOG.md`](../CHANGELOG.md#070---2026-08-04) and the issue each entry
-names. Where an entry renames or splits a token, the new names carry the old
-one's value, so nothing reflows and only source that names the token needs the
-edit.
+names.
 
 ### The vertical-rhythm ratios are retuned
 
-**Every document reflows.** No name changes and no source edit is required —
-only the calibrated values move, seventeen of the twenty-five. The type scale,
-the margin presets, and the page geometry do not move, and no supported class ×
-`fontsize` × `margin` combination changes its page count. A document that
-already overrode one of these tokens keeps its own value.
+**Every document reflows.** No source edit is required: seventeen of the
+twenty-five calibrated ratios move, and no supported class × `fontsize` ×
+`margin` combination changes its page count. A document that already overrode
+one of these tokens keeps its own value.
 
 To restore the `v0.6.0` spacing, set the changed tokens back after
-`\documentclass`. The names below are the `v0.7.0` ones; the rename table gives
-what each was called in `v0.6.0`.
+`\documentclass`; the rename table below maps these `v0.7.0` names to their
+`v0.6.0` ones.
 
 | Token | `v0.6.0` | `v0.7.0` |
 |---|---:|---:|
@@ -592,20 +490,13 @@ what each was called in `v0.6.0`.
 | `\CDossierLetterBodyBelowSkip` | 0.50, borrowed from `\CDossierLetterBlockSkip` | 0.625 |
 | `\CDossierLetterSignatureGapSkip` | 2.25 | 2.00 |
 
-The remaining eight keep their `v0.6.0` ratio. A ratio is a multiple of the body
-baseline — 12.0 pt at `10pt`, 13.6 pt at `11pt`, 14.5 pt at `12pt` — and the
-resolved values are tabulated in
-[`ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm).
-
-Restoring the whole set is rarely what you want: several of these tokens could
-not previously render the relation they named, so a full restore reinstates
-those defects too.
+The resolved values are in
+[`ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm). A full restore also
+restores defects that several of these tokens had.
 
 ### Three vertical-spacing tokens retired, two added
 
-Every vertical boundary is now owned by exactly one token. Removed — **none of
-them rendered anything at the released defaults**, each having lost its boundary
-to a larger token or claimed one that does not exist
+Removed — **none of them rendered anything at the released defaults**
 ([#206](https://github.com/amirhs1/CareerDossierTeX/issues/206)):
 
 | Removed | Use instead |
@@ -614,8 +505,8 @@ to a larger token or claimed one that does not exist
 | `\CDossierLetterheadBelowSkip` | `\CDossierLetterHeaderBelowSkip` |
 | `\CDossierHeaderAboveSkip`, renamed `\CDossierSharedHeaderAboveSkip` earlier in this release | nothing — the boundary does not exist |
 
-A document that sets any of these names now gets an undefined-control-sequence
-error: delete the setting, or move it to the replacement named above.
+Setting one of these names is now an undefined-control-sequence error: delete
+the setting, or move it to its replacement.
 
 Added:
 
@@ -624,26 +515,20 @@ Added:
 | `\CDossierLetterRecipientLineGapSkip` | between two lines of the letter's recipient block | `0.00`, reproducing the plain `\baselineskip` of the bare `\\` it replaces |
 | `\CDossierLetterBodyBelowSkip` | letter body → closing | `0.625` |
 
-The letter body's closing edge previously borrowed `\CDossierLetterBlockSkip`,
-which names the boundaries *between letterhead blocks*; a document that set that
-token to change the space above its closing must now set
-`\CDossierLetterBodyBelowSkip` instead.
-
-Why one token per boundary is necessary is derived under
-[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
+A document that set `\CDossierLetterBlockSkip` to change the space above its
+closing must now set `\CDossierLetterBodyBelowSkip` instead.
 
 ### Header spacing no longer floored by `\parskip`
 
 No source edit is required. The header block now zeroes `\parskip` for its own
-scope, so the letter's and statement's document-wide paragraph gap no longer
-lands in every header boundary on top of the header token.
+scope, so the paragraph gap no longer lands in every header boundary.
 
 **Letters and statements reflow.** Each header boundary tightens by 0.50 of a
 line — 7.25 pt at `fontsize=12pt`. No example changes page count. Resume and CV
-are unaffected: `\CDossierRecordParSkip` is already `0.00`.
+are unaffected.
 
-To keep the previous letter or statement header spacing, add back what the old
-`\parskip` floor contributed — 0.50 of a line — after `\documentclass`:
+To keep the previous spacing, add the 0.50 of a line back after
+`\documentclass`:
 
 ```latex
 \makeatletter\ExplSyntaxOn
@@ -658,62 +543,53 @@ halves. Do not apply it in the resume or CV.
 
 ### `\CDossierRecordEntryGapSkip` became a floor rather than added space
 
-No source edit is required. The entry heading → body gap is now contributed with
-`\addvspace`, so the gap above a bullet list was `\CDossierRecordEntryGapSkip`
-**plus** `\CDossierRecordListEdgeAboveSkip` and is now the larger of the two.
+No source edit is required. The gap above a bullet list inside an entry was
+`\CDossierRecordEntryGapSkip` **plus** `\CDossierRecordListEdgeAboveSkip`, and
+is now the larger of the two
+([#204](https://github.com/amirhs1/CareerDossierTeX/issues/204)).
 
 **Resumes and CVs reflow slightly.** That gap tightens by
 `\CDossierRecordEntryGapSkip` — 0.85 pt at `fontsize=11pt`, 0.91 pt at `12pt`.
-An entry whose body is ordinary prose is unchanged, and no example changes page
-count. Why a `\vspace` made the two add is under
-[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
+An entry whose body is prose is unchanged; no example changes page count.
 
 ### The gap below the name no longer depends on `headline`
 
-No source edit is required. Position now decides which token guards a boundary,
-not presence: the gap below the name is always
+No source edit is required. The gap below the name is always
 `\CDossierSharedHeaderNameGapSkip`.
 
-**A resume, CV, or letter with no `headline` reflows.** That boundary previously
-fell through to `\CDossierSharedHeaderMetaGapSkip` (0.1875), so it gains
-`0.0625` of a line — 0.85 pt at `fontsize=11pt`. Setting `headline` is
-unaffected.
+**A resume, CV, or letter with no `headline` reflows.** That gap gains `0.0625`
+of a line — 0.85 pt at `fontsize=11pt`. Setting `headline` is unaffected.
 
 ### Vertical-spacing design tokens renamed onto one convention
 
 Every public vertical-spacing token now has the shape
-`\CDossier<Family><Scope><Position>Skip`, whose families and members are
-tabulated under "Design tokens" in the PDF manual,
-[`../doc/careerdossier.tex`](../doc/careerdossier.tex). Seventeen of the
-twenty-two tokens released in `v0.6.0` are renamed; **no value changes**.
-
-Before → after:
+`\CDossier<Family><Scope><Position>Skip`, tabulated under "Design tokens" in the
+PDF manual. Seventeen of the twenty-two `v0.6.0` tokens are renamed; **no value
+changes**.
 
 | `v0.6.0` | `v0.7.0` |
 |---|---|
-| `\CDossierHeaderAboveSkip` | `\CDossierSharedHeaderAboveSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
+| `\CDossierHeaderAboveSkip` | `\CDossierSharedHeaderAboveSkip`, then **retired**; see above |
 | `\CDossierHeaderNameGapSkip` | `\CDossierSharedHeaderNameGapSkip` |
 | `\CDossierHeaderMetaGapSkip` | `\CDossierSharedHeaderMetaGapSkip` |
-| `\CDossierHeaderBelowSkip` | `\CDossierRecordHeaderBelowSkip`, `\CDossierProseHeaderBelowSkip`, **and** `\CDossierLetterHeaderBelowSkip` (split — see below) |
+| `\CDossierHeaderBelowSkip` | split three ways; see below |
 | `\CDossierSectionAboveSkip` | `\CDossierRecordSectionAboveSkip` |
 | `\CDossierSectionRuleSkip` | `\CDossierRecordSectionRuleGapSkip` |
 | `\CDossierSectionBelowSkip` | `\CDossierRecordSectionBelowSkip` |
 | `\CDossierEntryAboveSkip` | `\CDossierRecordEntryAboveSkip` |
 | `\CDossierEntryGapSkip` | `\CDossierRecordEntryGapSkip` |
-| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
-| `\CDossierListEdgeSkip` | `\CDossierRecordListEdgeAboveSkip` **and** `\CDossierRecordListEdgeBelowSkip` (split — see below) |
+| `\CDossierEntryBelowSkip` | `\CDossierRecordEntryBelowSkip`, then **retired**; see above |
+| `\CDossierListEdgeSkip` | split in two; see below |
 | `\CDossierItemSepSkip` | `\CDossierRecordItemSepSkip` |
 | `\CDossierParSkip` | `\CDossierRecordParSkip` |
-| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip` — then **retired** in the same release; see “Three vertical-spacing tokens retired, two added” above |
+| `\CDossierAfterHeaderBlockSkip` | `\CDossierLetterheadBelowSkip`, then **retired**; see above |
 | `\CDossierBlockSkip` | `\CDossierLetterBlockSkip` |
 | `\CDossierAfterSalutationSkip` | `\CDossierLetterBodyAboveSkip` |
 | `\CDossierSignatureSkip` | `\CDossierLetterSignatureGapSkip` |
 
-Unchanged: `\CDossierProseSectionAboveSkip`, `\CDossierProseSectionBelowSkip`,
-`\CDossierProseSubsectionAboveSkip`, and `\CDossierProseSubsectionBelowSkip`.
-`\CDossierProseParSkip` keeps its name but no longer sets `\parskip` in
-`careerdossier-letter`, and `\CDossierLetterBlockSkip` keeps its name but no
-longer serves the letter body's closing edge — see the splits below.
+The four prose section and subsection tokens keep their names. So do
+`\CDossierProseParSkip`, which no longer sets the letter's `\parskip`, and
+`\CDossierLetterBlockSkip`, which no longer serves the letter body's closing.
 
 ### `\CDossierListEdgeSkip` split into two tokens
 
@@ -727,8 +603,7 @@ After:
 \CDossierRecordListEdgeBelowSkip   % the gap below a list
 
 Read `\CDossierRecordListEdgeAboveSkip` wherever the old name appeared, and set
-both when overriding the list edge as a whole. One token could not give the two
-ends different values, because LaTeX spends a single `topsep` at both.
+both when overriding the list edge as a whole.
 
 ### `\CDossierProseParSkip` split for `careerdossier-letter`
 
@@ -745,8 +620,6 @@ After:
 **If you override `\CDossierProseParSkip`,** keep every statement heading
 below-token strictly greater than the value you set: a statement heading whose
 after-skip reaches zero silently becomes a run-in heading rather than erroring.
-That floor is what the letter needed its own token to escape, and is derived
-under [“Vertical rhythm” in `ARCHITECTURE.md`](ARCHITECTURE.md#vertical-rhythm).
 
 ### `\CDossierHeaderBelowSkip` split into one token per family
 
@@ -762,13 +635,7 @@ After:
 \CDossierLetterHeaderBelowSkip   % careerdossier-letter
 
 Replace `\CDossierHeaderBelowSkip` with the token for the class being styled,
-and set all three when styling every class from one shared preamble; their
-retuned ratios are in the table above. Earlier in this same
-release the token was renamed `\CDossierSharedHeaderBelowSkip`, which is
-superseded here and was never released, so `v0.6.0` source migrates straight to
-the three tokens above. Why the gap *below* the header is per-family while the
-gaps inside it are shared is under
-[“Boundary ownership” in `ARCHITECTURE.md`](ARCHITECTURE.md#boundary-ownership).
+and set all three when styling every class from one shared preamble.
 
 ### `careerdossier-tokens` no longer reads global `\documentclass` options
 
@@ -786,17 +653,15 @@ After:
 \usepackage[fontsize=10pt]{careerdossier-tokens}
 ```
 
-No CareerDossierTeX class or example is affected, because all four forward
-`fontsize` and `margin` explicitly. This applies only to a document that loads
-`careerdossier-tokens` directly under some other class *and* passes `fontsize=`
-or `margin=` to that class; `\usepackage` and `\PassOptionsToPackage` work as
-before. Why reading the global list reported a rejected value twice is in
-[`CHANGELOG.md`](../CHANGELOG.md#070---2026-08-04), #232.
+This affects only a document that loads `careerdossier-tokens` directly under
+some other class *and* passes `fontsize=` or `margin=` to that class; no
+CareerDossierTeX class or example does
+([#232](https://github.com/amirhs1/CareerDossierTeX/issues/232)).
 
 ### Three class-to-package primitives made private
 
-Three names carried a public prefix without being part of the author-facing
-interface. They now carry the private form reserved for internal names:
+Three public-prefixed names that were never part of the author-facing
+interface are now private:
 
 | Before | After |
 |---|---|
@@ -804,36 +669,16 @@ interface. They now carry the private form reserved for internal names:
 | `\CDossierApplyGeometry:n` | `\__cdossier_tokens_apply_geometry:n` |
 | `\MakeCDossierPageFurniture` | `\__cdossier_components_apply_page_furniture:` |
 
-**No document reflows and no supported document needs an edit.** None of the
-three was documented in the interface reference, and no example, fixture, or
-class option calls them by the old name. Source that called an old name now gets
-an undefined-control-sequence error.
-
-Calling the new names is possible but unsupported, and the spelling is stricter:
-an expl3 private name tokenises as one control sequence only inside
-`\ExplSyntaxOn`. In a plain preamble it silently splits into `\_` plus ordinary
-text and never runs — no error, just a document missing its page furniture.
-
-Why each old name promised a command that does not exist is in
-[`CHANGELOG.md`](../CHANGELOG.md#070---2026-08-04);
-[#242](https://github.com/amirhs1/CareerDossierTeX/issues/242) carries the
-classification of the whole public-prefixed name surface, whose other fifteen
-names were confirmed public and keep their names.
+**No document reflows and no supported document needs an edit.** Source that
+called an old name now gets an undefined-control-sequence error. Calling the
+new names is unsupported: outside `\ExplSyntaxOn` a private name splits into
+`\_` plus ordinary text and never runs, with no error
+([#242](https://github.com/amirhs1/CareerDossierTeX/issues/242)).
 
 ## [0.6.0] - 2026-07-30
 
 ### `density=compact|standard` removed from `careerdossier-resume` and `careerdossier-cv`
 
-Before:
-
-\documentclass[fontsize=11pt,density=compact]{careerdossier-resume}
-
-After:
-
-\documentclass[fontsize=11pt,margin=narrow]{careerdossier-resume}
-
-Reason: vertical rhythm is now derived entirely from `fontsize`; a separate
-density axis would have permitted combinations such as 12pt-compact that
-work against the calibrated proportional design. See
-[Upgrading to `v0.6.0`](#upgrading-to-v060) above for the full set of layout
-changes in this release.
+Remove the option and choose the size and margin directly: the before-and-after
+for both classes, and the release's other layout changes, are in
+[Upgrading to `v0.6.0`](#upgrading-to-v060) above.
