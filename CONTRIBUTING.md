@@ -433,10 +433,11 @@ Build every supported example:
 make
 ```
 
-Run every suite CI runs — the static lint, the module regression suite,
-extraction, smoke, layout, the focused BibLaTeX/Biber fixture, the link
-copy-paste, default-path metadata, and link-annotation suites, and the
-tagged-structure fixtures — plus all supported example builds:
+Run every suite CI runs on a pull request that is not docs-only — the static
+lint, the module regression suite, extraction, smoke, layout, the focused
+BibLaTeX/Biber fixture, the link copy-paste, default-path metadata, and
+link-annotation suites, and the tagged-structure fixtures — plus all supported
+example builds. `make check` runs them all whatever the diff touches:
 
 ```bash
 make check
@@ -538,8 +539,9 @@ tests/layout/run.sh --list two-page
 
 Three properties make this safe to trust:
 
-- **With no selector, nothing changed.** `make check` and every CI job invoke
-  the suites unscoped and run exactly what they ran before.
+- **With no selector, nothing changed.** `make check` and every CI job that
+  runs invoke the suites unscoped and run exactly what they ran before; a
+  docs-only pull request skips the TeX jobs, under "CI expectations".
 - **A selector that matches nothing fails the run.** Every assertion these
   suites make is made per fixture, so a run that selected no fixture passes all
   of them — "0 fixtures, all passed" and "the suite is clean" print the same
@@ -1016,7 +1018,10 @@ Project policy:
 The build workflow should:
 
 - run on pull requests;
-- run on pushes to `main`;
+- run on pushes to `main`, every job whatever the commit touches;
+- on a docs-only pull request, one whose diff since the merge base touches only
+  the paths the `changes` job in `build.yml` lists, skip every TeX job and still
+  run `lint` and `toolchain` (#568);
 - run every committed automated suite under `tests/` that applies to the active
   milestone;
 - compile every supported example;
@@ -1050,7 +1055,9 @@ derived, it requires a pull request, allows all three merge methods, requires
 **zero** approving reviews, forbids deletion and non-fast-forward pushes, and
 requires a named list of job contexts to pass against an up-to-date branch.
 Green CI is therefore the merge gate; a branch that is not close-out complete
-when it goes green is one that can be merged incomplete.
+when it goes green is one that can be merged incomplete. A job its `if:` skips
+on a docs-only pull request reports as skipped, and a skipped required check
+counts as passed, so that pull request merges on `lint` and `toolchain` alone.
 
 **How many contexts, and which, is a question for the ruleset and not for this
 paragraph.** The list is not the workflow's job count — a job may exist without

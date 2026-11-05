@@ -337,7 +337,8 @@ committed to check them against.
 
 `make check` is the gate and runs every suite below. `CONTRIBUTING.md`, "Local
 builds", and "The gate, and the serial path" own the invocation, scoping, and
-what each target's CI job is called.
+what each target's CI job is called; its "CI expectations" owns when CI skips
+one.
 
 The entries below say only what a suite covers and where its output lands, so
 that you can find the right runner to read.

@@ -19,7 +19,9 @@ class, fill in one profile, and expect every document to share one look.
 Run the full gate before calling a change complete, and report the actual
 output, not the expected output. Do not describe a change as working because it
 reads correctly. CI, in `.github/workflows/`, runs more than the gate, in a
-pinned TeX Live container; say how far your local checks reach.
+pinned TeX Live container, except that a docs-only pull request skips its TeX
+jobs (`CONTRIBUTING.md`, "CI expectations"); say how far your local checks
+reach.
 
 - Run the `Makefile` targets, never a hand-written engine invocation: they write
   to `build/` and keep the source tree free of artifacts.
