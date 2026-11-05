@@ -82,6 +82,12 @@ The class is not where geometry lives. It hands each option to its owner with
 `\PassOptionsToPackage` before `\LoadClass`, so a value is validated once
 rather than separately in four classes.
 
+Nor does a class write out the options it shares with the others. Every class
+takes `fontsize`, `margin`, `paper`, `bodyfont`, `medium`, and `muted`, and the
+resume and CV also take `entrymeta`; `careerdossier-base.sty` declares them,
+and each class calls its generators with its own module name and key path
+(#266). See `careerdossier-base.sty` below.
+
 ## File responsibilities
 
 ### `careerdossier-tokens.sty`
@@ -353,6 +359,25 @@ wrong — are commented beside the penalty declarations in
 Shared profile state and validation: the project's data model, not its page. The
 file's own header comment states the responsibilities and what it must not
 define.
+
+It is also where shared class options are declared (#266). One internal
+generator, `\__cdossier_base_declare_shared_options:nn`, declares the six
+options every class takes; a second, `\__cdossier_base_declare_record_options:nn`,
+declares `entrymeta` for the two record classes only, on the same Record versus
+Prose line as the `\CDossierRecord…Skip` and `\CDossierProse…Skip` token
+families. Each class loads `careerdossier-base.sty` before it processes its
+options and calls them with its own module name and key path, so the error text
+still names the class. For each option a generator emits the class's storage
+variable, its `unknown-<key>` message, and its key properties, and sets the
+default wherever every class agrees on it. The class keeps everything that
+differs: its `fontsize` and `margin` defaults, its own options (`family`,
+`type`, `numbering`), its `unknown-option` message, and the forwarding.
+
+The owning packages keep their own declarations, so each package still
+validates what it receives and works without a class. A value list therefore
+lives in two places, the generator and the owning package, and the option lint
+compares them (`docs/TESTING.md`, "Option lint"). `paper` has no owning
+package: the generator is its only declaration.
 
 ### English strings and the absence of a language module
 

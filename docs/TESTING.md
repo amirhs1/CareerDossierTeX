@@ -635,6 +635,16 @@ omitting the sub-key degrades the error silently. `.choices:nn` is the only
 supported way to declare such an option, because a hand-rolled `\str_case:nnF`
 list is invisible to this lint.
 
+The shared class options are declared by generators in
+`careerdossier-base.sty` (#266). The lint checks each generator body as a
+template whose module is `{ #1 }`, and counts each call in a class as that
+class declaring every key of the generator. A call must name the module the
+file's name implies and the key path the file's `\ProcessKeysOptions`
+processes, name a generator that exists, and not sit beside a hand-written copy
+of a key it declares. Last, for each generated key, the lint compares the
+generator's accepted values with those of the package that owns the behaviour,
+in order; `paper` has no owning package.
+
 ### Version-declaration lint
 
 `tests/lint/run-version-declarations.sh` — every file of the Work declares
