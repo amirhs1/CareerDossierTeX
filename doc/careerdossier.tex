@@ -1913,11 +1913,13 @@ further structural page-break policy.
 
 \cmd{hyphenpenalty} and \cmd{exhyphenpenalty} keep \TeX's defaults of
 \texttt{50} in all four families. No token sets them, and that is a decision
-rather than an omission: raising the penalty was measured and rejected. Across
-the shipped examples, \texttt{500} removes 18 hyphens and creates 10 lines
-looser than badness 99 --- roughly a one-for-one trade, paid to fix a problem
-the record classes do not have. Forbidding hyphenation entirely produces
-overfull boxes.
+rather than an omission: raising them was measured and rejected. Across
+the shipped examples, a \cmd{hyphenpenalty} of \texttt{500} removes 18 hyphens
+and creates 10 lines looser than badness 99 --- roughly a one-for-one trade,
+paid to fix a problem the record classes do not have. Measured alone,
+\cmd{exhyphenpenalty}, which prices only the hyphens you type, changes no
+shipped example at any value up to \texttt{1000}. Forbidding hyphenation
+entirely produces overfull boxes.
 
 A document that wants different behaviour can set either parameter in its
 preamble; both are ordinary \TeX{} parameters and nothing in the toolkit

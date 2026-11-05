@@ -192,13 +192,14 @@
 %%
 %% The case for raising it was that a resume bullet is scanned rather than read,
 %% so a hyphen at a short line's end costs more there than in prose. Measured
-%% across the committed examples, three findings refused it. The hyphenation is
+%% across the committed examples with both penalties set to one value in each
+%% cell (`--param hyphenation'), three findings refused it. The hyphenation is
 %% not where the case was: 48 of 56 hyphens are in the statements, which are
 %% continuous prose, against one each in the resume and CV. The trade is one for
 %% one: 50 -> 500 removes 18 hyphens and creates 10 lines looser than badness 99,
 %% at unchanged worst badness. And there is nothing to tune in the safe band --
 %% 500 and 1000 give identical output in the examples and across a 216-cell
-%% sweep. Forbidding hyphenation outright (10000) is decisively wrong: 68
+%% sweep. Forbidding hyphenation outright (both at 10000) is decisively wrong: 68
 %% overfull boxes across the sweep, 72 loose lines, worst badness 2452, because
 %% removing break points is what sends a paragraph to the third line-breaking
 %% pass and then past the margin. No committed example changes page count at any
@@ -206,6 +207,24 @@
 %%
 %% Reproduce with `make review-linebreak' (#316):
 %%   make review-linebreak SWEEP_ARGS="--param hyphenation \
+%%     --values '50 200 500 1000 10000'"
+%%
+%% Issue #542 swept each penalty alone, and the findings above belong to
+%% \hyphenpenalty, which prices the breaks TeX finds itself. Alone, it gives
+%% the paired sweep's output in every example at every value from 50 to 1000,
+%% so the 50 -> 500 trade is its own. \exhyphenpenalty prices only the hyphens
+%% an author typed, and also stays at 50, on evidence about it alone: from 50
+%% to 1000 it changes no committed example, so there is nothing to tune. At
+%% 10000 it removes 2 of the examples' 61 line-end hyphens, and in exchange
+%% adds 5 loose lines, in the resume and the research statement, and raises
+%% the worst badness from 688 to 931; across the fixture sweep it takes the
+%% overfull boxes from 5 to 22. No committed example changes page count under
+%% either penalty at any value tested.
+%%
+%% Reproduce each penalty alone with:
+%%   make review-linebreak SWEEP_ARGS="--param exhyphenpenalty \
+%%     --values '50 200 500 1000 10000'"
+%%   make review-linebreak SWEEP_ARGS="--param hyphenpenalty \
 %%     --values '50 200 500 1000 10000'"
 %%
 %% Typographic page-break penalties (issue #171). These control hyphenation
