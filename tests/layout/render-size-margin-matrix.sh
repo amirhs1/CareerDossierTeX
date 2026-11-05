@@ -4,7 +4,7 @@
 #
 # Each PDF is named <type>-<margin>-<fontsize>.pdf, and the margin is the outer
 # loop, so both the build order and a directory listing group every size of one
-# margin preset together — the order a reviewer compares them in (issue #195).
+# margin preset together — the order a reviewer compares them in.
 #
 # Each document class is represented by its existing canonical two-page
 # fixture — resume, CV, industry letter, research statement — so the matrix

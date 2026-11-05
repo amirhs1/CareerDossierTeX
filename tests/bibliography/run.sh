@@ -54,7 +54,7 @@ if grep -Eiq '(^| - )(WARN|ERROR) -' "$base.blg"; then
   grep -Ei '(^| - )(WARN|ERROR) -' "$base.blg" | sed 's/^/    /'
   # If Biber rejected the `date` of every entry that has one, the fault is its
   # date parser, not this fixture's data: the years vanish and the ydnt sort
-  # order silently comes out wrong (issue #211). Counting `date` fields rather
+  # order silently comes out wrong. Counting `date` fields rather
   # than entries keeps this correct if a `year`-only entry is added later. Biber
   # is a PAR-packed binary that unpacks its Perl runtime -- including the
   # DateTime modules only the `date` path uses -- into a per-user cache under
