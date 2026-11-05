@@ -44,6 +44,15 @@ These entries keep the numbers they were written with.
 > public interface: it removes duplication and fixes defects so that the freeze
 > applies to a deduplicated surface. The Project gained `Phase 10 — Stable API`
 > and `Phase 9` was retitled `Phase 9 — Consolidation and Correctness`.
+>
+> **Split on 2026-11-05.** A new `v0.11.0 — Interface Changes` took the
+> breaking and additive interface changes out of `v1.0.0`, so they ship and are
+> used before the freeze makes them permanent: #288, #327, and #420 moved from
+> `v1.0.0`, and #569 joined them, under new epic #597 and release #598. The
+> freeze point did not move: it is still `v1.0.0`, which now documents and
+> freezes the result. The Project gained `Phase 10 — Interface Changes`, and
+> `Phase 10 — Stable API` became `Phase 11 — Stable API`. See
+> [issue #599](https://github.com/amirhs1/CareerDossierTeX/issues/599).
 
 ## Releases and phases
 
@@ -67,7 +76,8 @@ must agree.
 | `v0.8.0` | Semantic structure, tagged-output metadata, and the public typography and colour roles | Released | 7 | `Phase 7 — Semantic Structure and Tagged Output` |
 | `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Released | 8 | `Phase 8 — Documentation, Examples, and Release Readiness` |
 | `v0.10.0` | Duplication removed, defects fixed, and each rule given one home | Planned | 9 | `Phase 9 — Consolidation and Correctness` |
-| `v1.0.0` | Stable, documented public API — the freeze | Planned | 10 | `Phase 10 — Stable API` |
+| `v0.11.0` | The last breaking and additive interface changes before the freeze | Planned | 10 | `Phase 10 — Interface Changes` |
+| `v1.0.0` | Stable, documented public API — the freeze | Planned | 11 | `Phase 11 — Stable API` |
 | `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** | — | _(none — never had an option)_ |
 
 A patch release shares the phase of the minor release it corrects, a release
@@ -395,14 +405,36 @@ Remove duplication, fix defects, and give each rule one home, so that the
 - measured correctness and optimization work on the ten Work files.
 
 **This release adds no public interface.** Public commands, keys, and options
-may still change here; work that defines, documents, or freezes them belongs to
-`v1.0.0`.
+may still change here; work that changes them on purpose belongs to `v0.11.0`,
+and work that documents or freezes them belongs to `v1.0.0`.
 
 Tracked under
 [milestone `v0.10.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
 and [epic #285](https://github.com/amirhs1/CareerDossierTeX/issues/285).
 
-## Phase 10: `v1.0.0 — Stable Public API`
+## Phase 10: `v0.11.0 — Interface Changes`
+
+### Goal
+
+Ship the last breaking and additive changes to the public interface in a
+release of their own, so they are used before `v1.0.0` freezes them.
+
+### Definition of `0.11.0`
+
+- the `medium` default decided (#327);
+- record and prose section headings rendered alike (#420);
+- a public key for declaring the document language (#288);
+- a per-entry `entrymeta` key on `CDossierEntry` (#569);
+- every breaking change recorded with its migration in `MIGRATION.md`.
+
+**This release changes the public interface on purpose.** Work that only
+documents or freezes the interface stays in `v1.0.0`.
+
+Tracked under
+[milestone `v0.11.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/15)
+and [epic #597](https://github.com/amirhs1/CareerDossierTeX/issues/597).
+
+## Phase 11: `v1.0.0 — Stable Public API`
 
 ### Goal
 
