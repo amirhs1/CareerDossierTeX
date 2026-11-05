@@ -8,8 +8,9 @@ name: build
 # from; update the comment whenever the pin moves.
 #
 # To bump the TeX Live image, see CONTRIBUTING.md ("Bumping the pinned TeX Live
-# image"). The `toolchain` job records the exact versions a run used; read its
-# artifact to learn which TeX Live release a digest resolves to.
+# image"). The `toolchain` job records the exact versions a run used, and its
+# "Record toolchain versions" step lists them; read its artifact to learn which
+# TeX Live release a digest resolves to.
 #
 #   texlive/texlive        digest below == :latest as published 2026-07-12
 #   actions/checkout       v4.3.1
@@ -112,45 +113,76 @@ jobs:
       # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       # CONTRIBUTING.md "CI expectations" requires the tested toolchain to be
-      # recorded beside the output it produced.
+      # recorded beside the output it produced. This step is the one list of
+      # what the record holds; CONTRIBUTING.md, "Pinned dependencies", points
+      # here rather than repeating it.
+      #
+      # Every item is required (#628). The image is pinned, so a missing item
+      # means the image changed, which is what the record exists to show: a
+      # recorded command that fails or finds nothing fails the step, and no
+      # item falls back to a NOT-FOUND line. `shell: bash` gives the step
+      # `-eo pipefail`. Under the container's default, `sh -e` with no
+      # pipefail, a failing command ended the group early, the step took
+      # `tee`'s status, and a truncated record passed.
+      #
+      # Two forms keep a failure visible under errexit. A lookup is assigned
+      # to a variable before it is printed, because `echo "$(cmd)"` takes
+      # echo's status, not cmd's. Output is cut with `sed -n`, which reads to
+      # the end, not with `head`, whose early exit can kill the writer with
+      # SIGPIPE, which pipefail would report as a failure.
       - name: Record toolchain versions
+        shell: bash
         run: |
+          # A package's file and the version it declares. fontspec puts
+          # {date}{version} on the line after \ProvidesExplPackage, so -A1.
+          package() {
+            local file
+            file=$(kpsewhich "$1.sty")
+            echo "$file"
+            grep -A1 -m1 'ProvidesExplPackage' "$file"
+          }
           {
             echo "# CareerDossierTeX toolchain record"
             echo "date-utc: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             echo "commit:   ${GITHUB_SHA}"
             echo
             echo "## TeX Live"
-            tlmgr --version 2>&1 || echo "tlmgr: unavailable"
+            tlmgr --version 2>&1
             echo
             echo "## LuaHBTeX / LuaLaTeX format"
-            lualatex --version 2>&1 | head -3
-            echo "format: $(kpsewhich --engine=luahbtex --format=fmt lualatex.fmt || echo NOT-FOUND)"
+            lualatex --version 2>&1 | sed -n '1,3p'
+            fmt=$(kpsewhich --engine=luahbtex --format=fmt lualatex.fmt)
+            echo "format: $fmt"
+            # The format date is the kernel's `LaTeX2e <date>` banner, which
+            # only a run prints; its texput.log goes to a scratch directory.
+            scratch=$(mktemp -d)
+            banner=$(cd "$scratch" && lualatex --interaction=nonstopmode '\stop' 2>&1)
+            grep 'LaTeX2e <' <<<"$banner"
             echo
             echo "## fontspec"
-            kpsewhich fontspec.sty
-            # fontspec declares {date}{version} on the line after
-            # \ProvidesExplPackage, so -A1 is required to capture the version.
-            grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich fontspec.sty)" || true
+            package fontspec
+            echo
+            echo "## luaotfload"
+            otfversion=$(luaotfload-tool --version)
+            grep -E '^(luaotfload-tool version|Luaotfload|Revision):' <<<"$otfversion"
             echo
             echo "## PDF management"
-            kpsewhich pdfmanagement-testphase.sty || echo "pdfmanagement-testphase: NOT-FOUND"
-            grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich pdfmanagement-testphase.sty)" || true
+            package pdfmanagement-testphase
             echo
-            echo "## tagpdf (used once tagged fixtures are added)"
-            kpsewhich tagpdf.sty || echo "tagpdf: NOT-FOUND"
-            grep -A1 -m1 'ProvidesExplPackage' "$(kpsewhich tagpdf.sty)" || true
+            echo "## tagpdf"
+            package tagpdf
             echo
             echo "## l3build"
-            l3build --version 2>&1 | head -4 || echo "l3build: unavailable"
+            l3build --version 2>&1 | sed -n '1,4p'
             echo
             echo "## BibLaTeX / Biber"
-            kpsewhich biblatex.sty || echo "biblatex: NOT-FOUND"
-            biber --version 2>&1 | head -2 || echo "biber: unavailable"
+            kpsewhich biblatex.sty
+            biber --version 2>&1 | sed -n '1,2p'
             echo
             echo "## default fonts"
             for f in texgyretermes-regular.otf texgyreheros-regular.otf; do
-              echo "$f -> $(kpsewhich "$f" || echo NOT-FOUND)"
+              font=$(kpsewhich "$f")
+              echo "$f -> $font"
             done
           } | tee toolchain.txt
       # actions/upload-artifact v7.0.1: https://github.com/actions/upload-artifact/releases/tag/v7.0.1
