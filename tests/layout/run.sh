@@ -48,7 +48,7 @@
 # Run from anywhere; the repository root is placed on TEXINPUTS.
 #
 # Usage:
-#   ./run.sh                    every fixture — the full suite, and what CI runs
+#   ./run.sh                    every fixture — the full suite (CI adds --jobs N)
 #   ./run.sh <pattern>          only the fixtures matching <pattern>
 #   ./run.sh --list [<pattern>] print the selection and compile nothing
 #
