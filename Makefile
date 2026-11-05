@@ -73,12 +73,13 @@
 # gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
 # sources, so the source tree never picks up untracked build artifacts.
 #
-# Running the full suite (issues #378, #390, #399). `check` is the pre-push gate
+# Running the full suite (issues #378, #390, #399). `check` is the optional full
+# local run, since CI's required checks are the gate (AGENTS.md, "Commands"),
 # and runs its twelve targets four at a time. On a docs-only change it runs only
 # DOCS_ONLY_TARGETS and says so (#603). The serial path survives under its own
 # name:
 #
-#   make check                  the gate: twelve targets, four at a time,
+#   make check                  every suite: twelve targets, four at a time,
 #                               or only the lints on a docs-only change
 #   make check FULL=1           every target, whatever the change touches
 #   make check JOBS=2           the same targets, two at a time

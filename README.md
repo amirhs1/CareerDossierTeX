@@ -430,10 +430,11 @@ suites plus every supported example build — with:
 make check
 ```
 
-`make check` runs those targets four at a time and is the pre-push gate;
-`make check-serial` runs the same ones singly when a deterministic pass is worth
-more than the wall clock, and [`CONTRIBUTING.md`](CONTRIBUTING.md) "The gate, and
-the serial path" says when each is worth reaching for.
+`make check` runs those targets four at a time and is optional before a push:
+the required checks CI runs on a pull request are the gate. `make check-serial`
+runs the same targets singly when a deterministic pass is worth more than the
+wall clock, and [`CONTRIBUTING.md`](CONTRIBUTING.md) "The full run, and the
+serial path" says when each is worth reaching for.
 
 `make help` lists every individual target, `make clean` removes the generated
 files afterwards, and the `Makefile`'s `CHECK_TARGETS` variable is the

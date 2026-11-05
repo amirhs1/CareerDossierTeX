@@ -9,11 +9,11 @@
 # suite that already made it serially; nothing here changes how a suite decides,
 # only how many of them are in flight at once.
 #
-# Since #399 this is what `make check` runs, so it is the pre-push gate rather
+# Since #399 this is what `make check` runs, so it is the full local run rather
 # than an opt-in alternative to it. The serial path is `make check-serial` and
-# dispatches the same eleven targets one at a time. Being the gate is why the
-# proofs below are not optional decoration: they are the reason a scheduled run
-# is allowed to be the thing a push happens behind.
+# dispatches the same eleven targets one at a time. Being the full run is why
+# the proofs below are not optional decoration: they are the reason a scheduled
+# run can be believed in place of a serial one.
 #
 # WHY FOUR
 #
@@ -997,10 +997,10 @@ if [ "$inner_jobs" -gt 1 ]; then
     "$inner_jobs" "$jobs" "$inner_jobs" "$((jobs * inner_jobs))"
 fi
 if [ "$scope" = docs-only ]; then
-  printf '(the gate, scoped to a docs-only change; `make check FULL=1` runs all %d)\n\n' \
+  printf '(scoped to a docs-only change; `make check FULL=1` runs all %d)\n\n' \
     "$total_targets"
 else
-  printf '(this is the gate; `make check-serial` runs the same targets one at a time)\n\n'
+  printf '(the full run; `make check-serial` runs the same targets one at a time)\n\n'
 fi
 
 batch_names=(${targets[@]+"${targets[@]}"})

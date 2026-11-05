@@ -28,7 +28,7 @@ anything deliberately excluded.
 ## Definition of done
 
 - every sub-issue closed;
-- `make check` green at the closing commit;
+- the required CI checks green at the closing commit;
 - documentation and `CHANGELOG.md` updated as the work required.
 
 ## Release
