@@ -1,86 +1,13 @@
-% tokens-statement-defaults.lvt — statement class layout-input defaults.
+% tokens-statement-defaults.lvt — statement class layout-input defaults; see support/tokens-defaults.inc.
 \input{regression-test}
 \documentclass{careerdossier-statement}
 \ExplSyntaxOn
-\NewDocumentCommand \cdossiertestDefaults { }
+\NewDocumentCommand \cdossiertestClassDefaults { }
   {
-    \TYPE{fontsize = \l__cdossier_tokens_fontsize_tl}
-    \TYPE{margin = \l__cdossier_tokens_margin_tl}
-    \TYPE{body-size = \dim_use:N \CDossierBodySize}
-    \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
     \TYPE{prose-par-skip = \skip_use:N \CDossierProseParSkip}
     \skip_if_eq:nnTF { \parskip } { \CDossierProseParSkip }
       { \TYPE{paragraph-rhythm = shared} }
       { \TYPE{paragraph-rhythm = local} }
-    %% Issue #272: \emergencystretch is one shared policy expressed as one
-    %% token. Pinning the resolved value *and* its identity with the token
-    %% catches both halves of the defect this replaced: a class writing its own
-    %% literal again, and a class silently setting nothing at all.
-    \TYPE{emergency-stretch = \dim_use:N \emergencystretch}
-    \dim_compare:nNnTF { \emergencystretch } = { \CDossierEmergencyStretch }
-      { \TYPE{line-break-flexibility = shared} }
-      { \TYPE{line-break-flexibility = local} }
-    %% Issue #309: hyphenation is a decided policy, and the decision was to
-    %% keep TeX's defaults (50/50) in all four families. Only a recorded
-    %% baseline can express that: in the source, a parameter nobody thought
-    %% about and a parameter deliberately left alone look identical, which is
-    %% how this went unowned long enough to need an issue. Pinning both values
-    %% turns the decision into something a later change has to argue with --
-    %% including a change that sets them indirectly, by loading a language
-    %% package rather than by writing the parameter.
-    \TYPE{hyphen-penalty = \int_use:N \tex_hyphenpenalty:D}
-    \TYPE{ex-hyphen-penalty = \int_use:N \tex_exhyphenpenalty:D}
   }
 \ExplSyntaxOff
-\makeatletter
-%% Issue #335: the bottom-fill state this class actually ends up in. Nothing in
-%% the toolkit sets it -- \raggedbottom is inherited from `article.cls', which
-%% issues it only in the \if@twoside false branch and switches to \flushbottom
-%% for \if@twocolumn. The club/widow penalties in careerdossier-tokens.sty are
-%% calibrated on that state (see the comment at \CDossierClubPenalty), so a
-%% class that later took `twoside' or `twocolumn' would change how every short
-%% page renders with nothing pointing back at the decision it invalidated.
-%%
-%% The two reference meanings are captured from the kernel commands themselves
-%% rather than written out, so the probe states which command is in force and
-%% does not fail on a kernel that respells either definition. Everything is
-%% local to the group, so asserting the state does not set it.
-\newcommand\cdossiertestBottomFill{%
-  \begingroup
-    \let\cdossiertest@actual\@textbottom
-    \raggedbottom \let\cdossiertest@ragged\@textbottom
-    \flushbottom \let\cdossiertest@flush\@textbottom
-    \ifx\cdossiertest@actual\cdossiertest@ragged
-      \TYPE{bottom-fill=raggedbottom}%
-    \else
-      \ifx\cdossiertest@actual\cdossiertest@flush
-        \TYPE{bottom-fill=flushbottom}%
-      \else
-        \TYPE{bottom-fill=other}%
-      \fi
-    \fi
-  \endgroup
-}
-%% Issue #351: the club/widow decision rests on two more inherited quantities,
-%% and the toolkit sets neither of them either. A rigid \topskip is what leaves
-%% the page builder with no stretch to judge a short page on, and \@secpenalty
-%% is the -300 bonus before every section that becomes live, and moves breaks
-%% *earlier*, the moment it gains some. careerdossier-tokens.sty states the
-%% decision at \CDossierClubPenalty; recording both values here is what
-%% stops a later package that supplies either from reopening #342 in silence.
-\newcommand\cdossiertestBuilderTolerance{%
-  \TYPE{top-skip=\the\topskip}%
-  \ifdim\gluestretch\topskip=\z@
-    \TYPE{page-builder-tolerance=none}%
-  \else
-    \TYPE{page-builder-tolerance=present}%
-  \fi
-  \TYPE{section-penalty=\the\@secpenalty}%
-}
-\makeatother
-\begin{document}
-\START
-\cdossiertestDefaults
-\cdossiertestBottomFill
-\cdossiertestBuilderTolerance
-\END
+\input{tokens-defaults.inc}

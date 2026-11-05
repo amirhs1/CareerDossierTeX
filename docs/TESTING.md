@@ -44,7 +44,7 @@ under `tests/`:
 | Path | Holds |
 | --- | --- |
 | `tests/lint/` | source-level invariants no compiled fixture can assert; eleven scripts and their self-test `fixtures/` |
-| `tests/regression/` | `l3build` `.lvt` sources and `.tlg` baselines, one pair per module concern |
+| `tests/regression/` | `l3build` `.lvt` sources and `.tlg` baselines, one pair per module concern; `support/` holds shared bodies, which `l3build` copies into the test directory before each run |
 | `tests/smoke/` | supported builds (`*-valid`), required failures (`*-bad-*`, `*-missing-*`), and the manual's templates |
 | `tests/extraction/` | text-layer round trips: fixtures plus `*.expected.txt` (Poppler) and `*.pdfkit.txt` (PDFKit) baselines |
 | `tests/layout/` | multi-page and long-value stress sources, the two `.awk` log parsers, and every visual-review renderer |
