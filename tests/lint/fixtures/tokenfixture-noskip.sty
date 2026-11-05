@@ -1,0 +1,17 @@
+%% tokenfixture-noskip.sty — a source that sets ratios but allocates no token
+%%
+%% Drives the third state of the docs/TESTING.md rendering check. The file
+%% sets two spacing ratios, so the lint has source values to read, but
+%% allocates neither token with \skip_new:N, which is the shape that check
+%% reads. A correct table compared against it must report "could not check"
+%% rather than "no mismatches": with no allocations on the source side, a
+%% table with no rows would match it exactly.
+\ExplSyntaxOn
+\skip_new:c { CDossierFixtureAboveSkip }
+\skip_new:c { CDossierFixtureBelowSkip }
+\cs_new_protected:Npn \__cdossier_tokens_resolve:
+  {
+    \__cdossier_tokens_set_skip:Nn \CDossierFixtureAboveSkip { 0.75 }
+    \__cdossier_tokens_set_skip:Nn \CDossierFixtureBelowSkip { 0.375 }
+  }
+\ExplSyntaxOff
