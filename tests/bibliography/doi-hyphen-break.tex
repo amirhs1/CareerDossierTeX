@@ -1,0 +1,20 @@
+% doi-hyphen-break.tex — issue #561: a DOI whose line break falls at one of its
+% own hyphens extracts, with pdftotext, character for character as the `doi'
+% field of doi-hyphen.bib. False if the test fails: the printed hyphen sits at a
+% line end, Poppler takes it for a soft hyphen and drops it when it joins the
+% two lines, and the extracted identifier does not resolve.
+%
+% The expected value is the database field itself, not a recorded extraction:
+% doi-hyphen-break.expected.txt holds that field verbatim. The class options are
+% the ones the issue reproduced at; the filler in doi-hyphen.bib is tuned to
+% them, and run.sh fails the fixture if the DOI stops wrapping.
+\documentclass[fontsize=11pt, margin=narrow, medium=screen]{careerdossier-resume}
+\usepackage{careerdossier-biblatex}
+\addbibresource{doi-hyphen.bib}
+\CDossierSetup{name = {Example Name}}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\nocite{*}
+\printbibliography[heading=none]
+\end{document}

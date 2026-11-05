@@ -1,10 +1,11 @@
-% components-linkdecoration.lvt — the `medium=screen' link decoration (#278).
+% links-decoration.lvt — the `medium=screen' link decoration (#278).
 %
-% careerdossier-components owns `medium', owns the rendered link parts, and
-% therefore owns the decision to decorate an author's \href anchor text. This
-% file asserts the resolved state and the emitted decoration at the component;
-% the rendered pages, the text layer, and the structure tree are covered by the
-% layout, extraction, and tagging suites.
+% careerdossier-components owns `medium' and hands its link half to
+% careerdossier-links, which owns the rendered link parts and therefore the
+% decision to decorate an author's \href anchor text. This file asserts the
+% resolved state and the emitted decoration at the component; the rendered
+% pages, the text layer, and the structure tree are covered by the layout,
+% extraction, and tagging suites.
 %
 % `screen' is the value under test, so it is the one the package is loaded with;
 % `print' is the default and is reached below by setting the key directly.
@@ -22,17 +23,17 @@
 %% rather than a reference PDF quietly losing its underlines.
 \cs_new_protected:Npn \cdossiertestReportHook
   {
-    \cs_if_exist:NTF \__cdossier_components_href_orig:
+    \cs_if_exist:NTF \__cdossier_links_href_orig:
       { \TYPE{href-hook=installed} }
       { \TYPE{href-hook=missing} }
-    \cs_if_exist:NTF \__cdossier_components_hyperlink_orig:w
+    \cs_if_exist:NTF \__cdossier_links_hyperlink_orig:w
       { \TYPE{link-hook=installed} }
       { \TYPE{link-hook=missing} }
   }
 
 \cs_new_protected:Npn \cdossiertestReportMedium
   {
-    \bool_if:NTF \l__cdossier_components_screen_bool
+    \bool_if:NTF \l__cdossier_links_screen_bool
       { \TYPE{medium=screen} }
       { \TYPE{medium=print} }
   }

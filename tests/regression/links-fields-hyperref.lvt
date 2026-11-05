@@ -1,6 +1,6 @@
-% components-links-hyperref.lvt — silence when hyperref is present (#329).
+% links-fields-hyperref.lvt — silence when hyperref is present (#329).
 %
-% The other half of tests/regression/components-links, which asserts that the
+% The other half of tests/regression/links-fields, which asserts that the
 % `links-inert' warning fires exactly once when hyperref is absent. The warning
 % must not fire at all when it is present, and that cannot be checked in the
 % same file: hyperref is a preamble decision, and the flag guarding the message

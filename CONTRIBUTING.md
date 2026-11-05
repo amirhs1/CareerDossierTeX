@@ -190,7 +190,7 @@ areas: core tokens typography theme components bibliography resume letter cv sta
 | `tokens`                              | `careerdossier-tokens.sty`: type scale, vertical rhythm, lists, page geometry                  |
 | `typography`                          | `careerdossier-typography.sty`: engine guard, fonts, semantic text roles                       |
 | `theme`                               | `careerdossier-theme.sty`: colour, rule, and link tokens                                       |
-| `components`                          | `careerdossier-components.sty` and `careerdossier-metadata.sty`: shared document parts, links, PDF metadata |
+| `components`                          | `careerdossier-components.sty`, `careerdossier-links.sty`, and `careerdossier-metadata.sty`: shared document parts, links, PDF metadata |
 | `bibliography`                        | `careerdossier-biblatex.sty` and the BibLaTeX and Biber path                                   |
 | `resume`, `letter`, `cv`, `statement` | each class, its layout, and its examples                                                       |
 | `i18n`                                | document language and translated strings                                                       |
@@ -454,7 +454,9 @@ Run every suite CI runs on a pull request that is not docs-only — the static
 lint, the module regression suite, extraction, smoke, layout, the focused
 BibLaTeX/Biber fixture, the link copy-paste, default-path metadata, and
 link-annotation suites, and the tagged-structure fixtures — plus all supported
-example builds. `make check` runs them all whatever the diff touches:
+example builds. `make check` runs them all, except on a docs-only change, where
+it runs only the lints and says so; "The gate, and the serial path" below has
+the rule and the `FULL=1` override:
 
 ```bash
 make check
@@ -513,6 +515,24 @@ worth reaching for when a parallel run reports something surprising: it removes
 scheduling as a variable in one command. `check-parallel` survives as an alias
 of `check`.
 
+On a docs-only change, `make check` dispatches only the `Makefile`'s
+`DOCS_ONLY_TARGETS`, the lint targets, because no TeX suite can fail on such a
+change (#603). The change is the working tree against its merge base with
+`origin/main`: what is committed since, staged, unstaged, and untracked.
+Docs-only means the same here as in CI: `tests/lib/docs-only.sh` holds the one
+path list, and the `changes` job in `build.yml` calls it too ("CI expectations"
+below). A scoped run names the changed paths before dispatch and closes with
+`NOT a full run`, so its transcript cannot pass for a full one.
+
+```bash
+make check FULL=1              # every target, whatever the change touches
+```
+
+Every other change runs every target, and so does a change that cannot be
+classified: no `origin/main`, not a git checkout, or a git error. A stale local
+`origin/main` can only widen the diff, so it can only cause a full run.
+`check-serial` is never scoped.
+
 Four is the default because it is the fastest value measured green. The
 `Makefile` header, where `JOBS` is defined and defaulted, owns that answer and
 the standing of `JOBS=8` — which is **unmeasured rather than barred**, so
@@ -557,8 +577,10 @@ tests/layout/run.sh --list two-page
 Three properties make this safe to trust:
 
 - **With no selector, nothing changed.** `make check` and every CI job that
-  runs invoke the suites unscoped and run exactly what they ran before; a
-  docs-only pull request skips the TeX jobs, under "CI expectations".
+  runs invoke the suites unscoped and run exactly what they ran before. A
+  docs-only change is the exception at the level of whole suites: `make check`
+  then runs only the lints, under "The gate, and the serial path" above, and a
+  docs-only pull request skips CI's TeX jobs, under "CI expectations".
 - **A selector that matches nothing fails the run.** Every assertion these
   suites make is made per fixture, so a run that selected no fixture passes all
   of them — "0 fixtures, all passed" and "the suite is clean" print the same
@@ -569,7 +591,11 @@ Three properties make this safe to trust:
 
 Scoping is a development-loop convenience and nothing more. `make check` before
 you push is still the gate, and a scoped run is not a test result for the PR
-body.
+body. While iterating, run `make lint` and the one suite that owns the changed
+behaviour (`TEST=` or `FIXTURE=`); run `make check` once per branch, before the
+push, and again after any later change to a `.sty`, `.cls`, test, or example.
+On a docs-only branch that `make check` is the scoped gate under "The gate, and
+the serial path" above, the local mirror of CI's docs-only run.
 
 `make tagging` is the one whose selectable unit is not the `.tex` file but the
 fixture **group**: `resume`, `cv-subsection`, `biblatex-ua2`. A group is a base
@@ -1038,9 +1064,10 @@ The build workflow should:
 - run on pull requests;
 - run on pushes to `main`, every job whatever the commit touches;
 - on a docs-only pull request, one whose diff since the merge base touches only
-  the paths the `changes` job in `build.yml` lists, skip every TeX job, which is
-  every job in the TeX Live container, `toolchain` among them, and still run
-  `lint` (#568, #614);
+  the paths `tests/lib/docs-only.sh` lists, skip every TeX job, which is every
+  job in the TeX Live container, `toolchain` among them, and still run `lint`
+  (#568, #614). The `changes` job in `build.yml` calls that script, and so
+  does `make check`, so CI and the local gate share one path list (#603);
 - run every committed automated suite under `tests/` that applies to the active
   milestone;
 - compile every supported example;
