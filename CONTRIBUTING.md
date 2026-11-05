@@ -256,28 +256,14 @@ A good implementation issue explains:
    first file someone noticed the statement in is fixed in that file alone;
 5. observable acceptance criteria; where the issue concerns a statement or value
    that could appear in more than one place, at least one of them is a command
-   over the repository rather than a check of the files named in item 4. A
-   criterion that reads only the named files cannot fail on the copy nobody
-   thought to look for — #275 wrote its criterion as a command instead, and the
-   command found four hits where the issue had named two.
-
-   Scope that command by **excluding directories, never by filtering in on
-   extension**. `--include='*.md'` matches no file that has no extension, so it
-   is blind to `Makefile` and `LICENSE` — and to whatever extensionless file is
-   added next — and it filters build artifacts in rather than out. `git grep`
-   needs neither flag: it searches tracked files, so `build/` is excluded by
-   construction. #491's criterion was a command over the repository and still
-   certified an incomplete fix — it named two copies of a stale value, and the
-   third was in `Makefile`:
-
-   ```bash
-   # On ce42158^, the tree #491 was filed against:
-   git grep -n -e '[0-9]\+-page' ce42158^                    # finds all 3
-   git grep -n -e '[0-9]\+-page' ce42158^ -- '*.md' '*.lua'  # finds 2 of 3
-   ```
-
-   A criterion narrower than the defect is worse than none: it certifies the
-   fix that left a copy behind, at review time, when the diff shown is correct;
+   over the repository rather than a check of the files named in item 4, scoped
+   by **excluding directories, never by filtering in on extension**.
+   `--include='*.md'` matches no file that has no extension, so it is blind to
+   `Makefile` and `LICENSE`, and to whatever extensionless file is added next;
+   `git grep` needs neither flag, since it searches only tracked files and so
+   never `build/`. A criterion narrower than the defect is worse than none: it
+   certifies the fix that left a copy behind. #275 and #491 are the cases that
+   established this rule;
 6. the test files under `tests/` that will prove those criteria;
 7. where the issue prescribes a *mechanism* rather than an outcome, the smallest
    command that would show that mechanism does not work, and the result of
