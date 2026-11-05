@@ -23,7 +23,7 @@
 # repository root is put on TEXINPUTS so the root classes and packages resolve.
 #
 # Usage:
-#   ./run.sh                    every fixture — the full suite, and what CI runs
+#   ./run.sh                    every fixture — the full suite (CI adds --jobs N)
 #   ./run.sh <pattern>          only the fixtures matching <pattern>
 #   ./run.sh --list [<pattern>] print the selection and compile nothing
 #
@@ -61,8 +61,10 @@ fail=0
 # `make smoke JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
 # runner takes the serial path below and is the suite it has always been: the
 # same fixtures, in the same order, with byte-identical output. That is the
-# invocation CI makes and the one `make check` makes, and a gate whose result
-# depends on scheduling is not a gate.
+# invocation `make check` makes, and a gate whose result depends on scheduling
+# is not a gate. CI's job passes `--jobs "$(nproc)"` instead (issue #631),
+# relying on the accounting assertion below to fail, by name, any fixture that
+# left no verdict.
 fixture_filter=""
 list_only=0
 list_units_only=0

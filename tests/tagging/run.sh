@@ -42,7 +42,7 @@
 # Regenerate extraction baselines intentionally with:  ./run.sh --update
 #
 # Usage:
-#   ./run.sh                    every fixture group — the full suite, and what CI runs
+#   ./run.sh                    every fixture group — the full suite (CI adds --jobs N)
 #   ./run.sh <pattern>          only the fixture groups matching <pattern>
 #   ./run.sh --list [<pattern>] print the selection and compile nothing
 #   ./run.sh --update [<pat>]   regenerate the selected baselines

@@ -479,8 +479,10 @@ A local check and the matching CI job are equivalent, but not textually
 identical. Most jobs run the same `make` target you would; `extraction`,
 `tagging`, `smoke`, and `layout` invoke `tests/<suite>/run.sh` directly and
 `regression` runs a bare `l3build check` — in each case the same command the
-target itself wraps, with the empty selector described below. If you change a
-command in one place, change it in the other.
+target itself wraps, with the empty selector described below. `smoke`,
+`layout`, and `tagging` also pass `--jobs "$(nproc)"`, which the targets pass
+only when you set `JOBS`. If you change a command in one place, change it in
+the other.
 
 Target and job names overlap but are not in bijection, so do not derive one from
 the other. The extraction and bibliography *targets* are `extract-test` and
@@ -626,8 +628,9 @@ make layout JOBS=8 FIXTURE='resume-*'
 ```
 
 **With no `JOBS` nothing changes.** Each runs exactly the fixtures it ran
-before, in the same order, with byte-identical output — which is what CI invokes
-and why it is unaffected.
+before, in the same order, with byte-identical output. CI's `smoke`, `layout`,
+and `tagging` jobs take the concurrent path instead, one fixture per core, and
+each job log ends with the accounting line that shows every fixture ran once.
 
 `JOBS` composes with `FIXTURE`, and it composes with the gate — but the two
 layers multiply, so `check` pins the inner one to 1 and you raise it

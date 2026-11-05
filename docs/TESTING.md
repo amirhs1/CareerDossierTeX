@@ -382,6 +382,14 @@ for `JOBS=N` over their own fixtures, with the same per-fixture accounting. The
 two layers multiply, so the driver passes every target an explicit `JOBS` and
 only `INNER_JOBS=N` raises the product.
 
+CI's `smoke`, `layout`, and `tagging` jobs run this path with
+`--jobs "$(nproc)"` (#631); the local targets stay serial without `JOBS`. On
+the standard runner `nproc` printed 4. Against the serial run 42081335342, run
+42114379810 took the test steps from 172 s to 74 s (`smoke`), 122 s to 45 s
+(`layout`), and 62 s to 30 s (`tagging`), and the run's wall clock from 269 s
+to 159 s. Each job dispatched and completed as many units as its runner's
+`--list-units` prints: 130, 58, and 13.
+
 ### Log inspection
 
 After compiling, inspect logs for:
