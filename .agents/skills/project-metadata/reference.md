@@ -21,6 +21,8 @@ For a **newly opened draft pull request**:
 - **Size:** score the actual completed diff against the "Size guide" below
 - **Start date:** leave unset for routine items
 - **Target date:** leave unset for routine items
+- **The focused issue's Size:** the pull request's own, when the pull request
+  closes that issue and no other, except the cases "Size guide" names
 
 For a **newly filed issue**, the same four fields are required and only their
 sources differ:
@@ -32,6 +34,11 @@ sources differ:
 - **Priority:** judged from the work, since there is nothing to inherit from
 - **Size:** estimated, not measured — see "Sizing an item that has no diff yet"
   below
+
+An issue also takes a **parent**: its milestone's release epic, the issue in
+that milestone whose title begins `[epic]`. `CONTRIBUTING.md`, "1. Every issue
+carries a milestone", states the rule. A patch release has no epic, and an epic
+is not its own sub-issue, so neither takes a parent.
 
 
 ### Size guide
@@ -82,7 +89,11 @@ Three cases the table does not cover:
   previous release's pair instead.
 
 **An issue takes the size of the PR that closed it**, except the three cases
-above.
+above. The pull request path writes it: step 4 of the appendix gives the
+focused issue the pull request's `Size` when the pull request opens, and again
+on each update that changes the diff. It writes nothing when the pull request
+closes more than that one issue, or only refers to it with `Refs #n`, which
+closes nothing.
 
 ### Sizing an item that has no diff yet
 
@@ -196,13 +207,16 @@ what you intended to set — and confirm each of:
 - Phase;
 - Priority;
 - Size;
+- on an issue, its parent;
 - fields intentionally left unset and why.
 
 A pull request additionally confirms four items, which
 `.agents/skills/open-pull-request/SKILL.md` lists too: its URL and draft status;
 its base and head branches; the focused issue its body links; and, when it
 scores `L`, its extra obligation — stay draft and recommend splitting, unless
-broad scope was already approved.
+broad scope was already approved. It also confirms two values on the focused
+issue besides its `Status`: its parent, and its `Size`, which equals the pull
+request's when "Size guide" says the issue takes it.
 
 A blank field in that read-back is unfinished work, not a reporting line. Fill
 it and read back again. The appendix has the queries, and reads the list back in
@@ -224,6 +238,10 @@ Which blanks are legitimate:
   `CONTRIBUTING.md`, "1. Every issue carries a milestone" (with the one
   exception that section names), and `Phase` follows the milestone.
   `CONTRIBUTING.md`, "Phase numbering convention", defines it.
+- **The parent** may be blank only on an issue in a patch release, an epic, or
+  an issue with no milestone. Anywhere else a missing parent is unfinished
+  work: attach it with the mutation in "Filing an issue instead", and read back
+  again.
 
 A deliberately unmilestoned issue is the ordinary case for work the maintainer
 has postponed, and a PR against one inherits no milestone. Do not read the rule
@@ -295,8 +313,10 @@ query($owner:String!,$repo:String!,$issue:Int!){
   }
   repository(owner:$owner,name:$repo){
     issue(number:$issue){
-      id
-      milestone{title}
+      id title
+      parent{number}
+      milestone{title
+        issues(first:100,orderBy:{field:CREATED_AT,direction:ASC}){nodes{number title}}}
       projectItems(first:10){nodes{
         id
         project{id title}
@@ -314,7 +334,11 @@ query($owner:String!,$repo:String!,$issue:Int!){
 From the `CareerDossierTeX Development` node take the project id and title, the
 `Status`, `Phase`, `Priority`, and `Size` field ids, and the option id of each
 value you intend to set. From the issue's own item take the milestone, Phase,
-and Priority to inherit.
+and Priority to inherit. From its milestone's issues take the release epic, the
+first whose title begins `[epic]`, for step 5 to assert as the issue's parent;
+a patch milestone lists none. The issue's own title says whether it is an epic
+or a release-preparation issue (`[epic]`, `[release]`), which step 4's
+`issueSize` alias skips.
 
 ### 2. Open the PR fully configured (repo scope)
 
@@ -355,9 +379,9 @@ that does not exist.
 ### 4. Write every field in one mutation
 
 One aliased `updateProjectV2ItemFieldValue` per value: the PR's Status, Phase,
-Priority, and Size, and the focused issue's move to the in-progress option. Each
-alias selects back the value it just wrote, so the response is evidence rather
-than an exit status:
+Priority, and Size, the focused issue's move to the in-progress option, and the
+focused issue's Size. Each alias selects back the value it just wrote, so the
+response is evidence rather than an exit status:
 
 ```bash
 gh api graphql \
@@ -384,17 +408,26 @@ mutation($p:ID!,$pi:ID!,$ii:ID!,$fSt:ID!,$fPh:ID!,$fPr:ID!,$fSz:ID!,
   issueStatus: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$ii,
     fieldId:$fSt,value:{singleSelectOptionId:$oIs}}){projectV2Item{
       fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+  issueSize: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$ii,
+    fieldId:$fSz,value:{singleSelectOptionId:$oSz}}){projectV2Item{
+      fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
 }'
 ```
+
+The `issueSize` alias writes the pull request's own option to the focused
+issue, so it needs no variable of its own. Drop it, and leave the issue's
+`Size` as it is, when "Size guide" says the issue does not take the pull
+request's size: the body closes more than one issue, or none (`Refs #n`), or
+the focused issue is an epic or a release-preparation issue.
 
 Text, date, and number fields take `text:`, `date:`, or `number:` in `value:`
 instead of `singleSelectOptionId:`.
 
 **A batched write fails per alias, not per call.** When one alias is rejected,
 its entry in `data` is `null`, `errors[].path` names it, and `gh` exits
-non-zero — while the other four have already applied. So a zero exit is not
-five successes, and neither is a response that merely contains data. Read the
-five returned names.
+non-zero — while the others have already applied. So a zero exit is not six
+successes, and neither is a response that merely contains data. Read every
+returned name.
 
 ### 5. Read the verification list back in one query
 
@@ -419,8 +452,10 @@ query($owner:String!,$repo:String!,$pr:Int!,$issue:Int!){
       }}
     }
     issue(number:$issue){
+      parent{number}
       projectItems(first:10){nodes{project{title}
         status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+        size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}
       }}
     }
   }
@@ -431,7 +466,8 @@ Reading that output is not the check. **Assert the values**, because a null
 field and a wrongly-set field read alike in prose but not in a comparison. Put
 the assertion in the same call's own `--jq`. It compares every value
 "Verification" lists, the pull request's four items, and the focused issue's
-Status against what you meant to set, and exits non-zero on any mismatch:
+Status, Size, and parent against what you meant to set, and exits non-zero on
+any mismatch:
 
 ```bash
 gh api graphql … -f query='…' --jq '
@@ -441,7 +477,8 @@ gh api graphql … -f query='…' --jq '
      "project":"CareerDossierTeX Development",
      "status":"<intended>","phase":"<intended>",
      "priority":"<intended>","size":"<intended>",
-     "issueStatus":"<intended>"} as $want
+     "issueStatus":"<intended>","issueSize":"<intended>",
+     "issueParent":<epic-number>} as $want
     | .data.repository as $r
     | ( $r.pullRequest.projectItems.nodes
         | map(select(.project.title | test("CareerDossierTeX")))[0] // {} ) as $i
@@ -455,7 +492,8 @@ gh api graphql … -f query='…' --jq '
              closes:[.closingIssuesReferences.nodes[].number]} )
         + {project:$i.project.title, status:$i.status.name,
            phase:$i.phase.name, priority:$i.priority.name,
-           size:$i.size.name, issueStatus:$j.status.name} ) as $got
+           size:$i.size.name, issueStatus:$j.status.name,
+           issueSize:$j.size.name, issueParent:$r.issue.parent.number} ) as $got
     | [ $want | to_entries[] | {field:.key, want:.value, got:$got[.key]} ]
     | map(. + {ok:(.want == .got)})
     | if all(.[]; .ok) then . else halt_error(1) end'
@@ -467,7 +505,13 @@ Write `$want` from what you set, never from what came back:
 - `closes` with each issue the body closes with `Closes #n`, or `[]` for a body
   that only refers to one;
 - `null` for an inherited field the focused issue lacks, which "Verification"
-  permits.
+  permits;
+- `issueSize` as step 4 wrote it, or, where step 4 dropped that alias, the
+  issue's `Size` from step 1;
+- `issueParent` as the release epic step 1 found, or `null` where
+  "Verification" allows no parent. A mismatch here is a missing sub-issue
+  link, not a field step 4 sets: attach it as "Filing an issue instead" does,
+  then read back again.
 
 Never pipe the call to `jq` instead. The pipe puts `gh` inside the sandbox,
 where its request is denied (`CLAUDE.md`, "Sandbox and permissions"); `jq`
@@ -537,36 +581,62 @@ gh issue create --title "[area] Verb object" --body-file <body.md> \
 `gh issue create` has **no `--project` flag**, which is the one asymmetry with
 `gh pr create`. Add the issue to the Project with a mutation instead, in two
 calls with each `gh` alone: a `gh` nested in `$(…)` inside the mutation runs
-sandboxed and is denied (`CLAUDE.md`, "Sandbox and permissions"). First read
-the issue's node id:
+sandboxed and is denied (`CLAUDE.md`, "Sandbox and permissions"). The same
+mutation makes the issue a sub-issue of its release epic, so the first call
+reads both node ids: the issue's own, and the epic's, found in the issue's
+milestone as the first issue whose title begins `[epic]`:
 
 ```bash
-gh issue view <n> --json id --jq .id
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<n> -f query='
+query($owner:String!,$repo:String!,$issue:Int!){
+  repository(owner:$owner,name:$repo){
+    issue(number:$issue){
+      id number
+      milestone{title
+        issues(first:100,orderBy:{field:CREATED_AT,direction:ASC}){nodes{id number title}}}
+    }
+  }
+}' --jq '.data.repository.issue
+    | {id, milestone:.milestone.title,
+       epic:([.milestone.issues.nodes[]? | select(.title | startswith("[epic]"))][0] // null)}'
 ```
 
-Then write that id into the mutation:
+Then write both ids into the mutation:
 
 ```bash
-gh api graphql -f p=<project-id from step 1> -f c=<node id from the call above> -f query='
-mutation($p:ID!,$c:ID!){
-  addProjectV2ItemById(input:{projectId:$p,contentId:$c}){item{id}}
+gh api graphql -f p=<project-id from step 1> -f c=<issue id from the call above> \
+  -f e=<epic id from the call above> -f query='
+mutation($p:ID!,$c:ID!,$e:ID!){
+  add: addProjectV2ItemById(input:{projectId:$p,contentId:$c}){item{id}}
+  sub: addSubIssue(input:{issueId:$e,subIssueId:$c}){subIssue{number parent{number}}}
 }'
 ```
 
+Drop the `sub` alias and the `$e` variable when `epic` is `null` (a patch
+release, or an issue with no milestone) or names the issue itself (filing the
+release epic). `sub` selects back the parent it wrote, which is the evidence;
+step 5 asserts it again.
+
 The mutation is safe to run when the Project's auto-add workflow has already
-added the issue: it returns that item's id and adds no second item.
+added the issue: `add` returns that item's id and adds no second item. `sub`
+is not idempotent. On an issue that already has a parent, the epic included,
+`sub` is `null` with a `VALIDATION` error, `Issue may not contain duplicate
+sub-issues and Sub issue may only have one parent`, and `gh` exits 1 even
+though `add` applied (measured 2026-11-05 on #632). Take the item id from
+`add`, and let step 5 show which parent the issue has.
 
 The returned `item.id` is what step 4 writes against, so **step 3 is not needed
 on this path** — the mutation that adds the item already returns its id, while
 a PR's item id has to be read back separately.
 
-**Step 4 drops the `issueStatus` alias.** There is no second object to move, so
-the mutation carries four aliases rather than five.
+**Step 4 drops the `issueStatus` and `issueSize` aliases.** There is no second
+object to write, so the mutation carries four aliases rather than six.
 
 **Step 5 reads the issue alone.** Its query declares `$pr:Int!`, which an issue
 does not have, and its assertion builds rows only a pull request has. This query
-and assertion cover the eight values "Verification" lists for an issue, with
-step 5's pattern and its rules for writing `$want`:
+and assertion cover the nine values "Verification" lists for an issue, with
+step 5's pattern and its rules for writing `$want`; `parent` is the epic's
+number from the id read above, or `null` where it found none:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
@@ -576,6 +646,7 @@ query($owner:String!,$repo:String!,$issue:Int!){
       assignees(first:5){nodes{login}}
       labels(first:20){nodes{name}}
       milestone{title}
+      parent{number}
       projectItems(first:10){nodes{project{title}
         status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
         phase:fieldValueByName(name:"Phase"){... on ProjectV2ItemFieldSingleSelectValue{name}}
@@ -586,7 +657,8 @@ query($owner:String!,$repo:String!,$issue:Int!){
   }
 }' --jq '
     {"assignees":["amirhs1"],"labels":["<label>","<label>"],
-     "milestone":"<milestone>","project":"CareerDossierTeX Development",
+     "milestone":"<milestone>","parent":<epic-number>,
+     "project":"CareerDossierTeX Development",
      "status":"<intended>","phase":"<intended>",
      "priority":"<intended>","size":"<intended>"} as $want
     | .data.repository.issue as $x
@@ -594,7 +666,7 @@ query($owner:String!,$repo:String!,$issue:Int!){
         | map(select(.project.title | test("CareerDossierTeX")))[0] // {} ) as $i
     | {assignees:([$x.assignees.nodes[].login] | sort),
        labels:([$x.labels.nodes[].name] | sort),
-       milestone:$x.milestone.title,
+       milestone:$x.milestone.title, parent:$x.parent.number,
        project:$i.project.title, status:$i.status.name,
        phase:$i.phase.name, priority:$i.priority.name,
        size:$i.size.name} as $got
@@ -609,6 +681,26 @@ When several issues are filed together, add them one call at a time rather than
 batching the `addProjectV2ItemById` aliases: the order of sequential calls is
 the order they appear in the Project and in an epic's sub-issue graph, and that
 order is maintainer-curated.
+
+### Updating an open pull request
+
+`.agents/skills/open-pull-request/SKILL.md`, step 8, updates a pull request
+that is already open. When the update pushes commits, the diff `Size` was
+scored from has changed, so score it again; an update to the body alone
+changes no field and skips this.
+
+Score the whole branch diff, not the new commits, from the pull request's own
+counts against "Size guide":
+
+```bash
+gh pr view <pr-number> --json changedFiles,additions,deletions
+```
+
+Then run steps 1, 3, 4, and 5 above as for a new pull request. Step 4 carries
+only the `size` and `issueSize` aliases, with `issueSize` dropped in the same
+cases, and declares only the variables they use (`$p`, `$pi`, `$ii`, `$fSz`,
+`$oSz`): GraphQL rejects a declared variable that nothing uses. Step 5 runs in full, so the fields the update did not touch are asserted
+unchanged.
 
 ### Read option strings live, never from prose
 
@@ -678,3 +770,61 @@ number reported there. `stateReason` marks the `not_planned` carve-out on
 `Issue` nodes, and `closingIssuesReferences` is how an issue's own
 `size.name` is checked against the multi-issue-PR carve-out rather than
 assumed to equal its closing PR's score.
+
+### Auditing a milestone before a release
+
+One read-only query checks a whole milestone for the two values this skill
+writes outside a field mutation: an issue's parent, and the `Size` an issue
+takes from the pull request that closed it. Run it before a release, and after
+any hand correction of either. It prints one line per finding and exits 1, or
+prints nothing and exits 0. Put the milestone's exact title in both places
+(`-f m=` and `$m`). The `query:` argument is a partial match (`v0.1` returns
+`v0.1.0`, `v0.1.1`, `v0.10.0`, and `v0.11.0`; measured 2026-11-05), so the
+`--jq` keeps only the milestone whose title equals `$m`.
+
+```bash
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -f m=<milestone> -f query='
+query($owner:String!,$repo:String!,$m:String!){
+  repository(owner:$owner,name:$repo){
+    milestones(query:$m,first:5,states:[OPEN,CLOSED]){nodes{title
+      issues(first:100){pageInfo{hasNextPage} nodes{
+        number title stateReason parent{number}
+        projectItems(first:10){nodes{project{title}
+          size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
+        closedByPullRequestsReferences(first:5){nodes{number state
+          closingIssuesReferences(first:10){totalCount}
+          projectItems(first:10){nodes{project{title}
+            size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}}}
+      }}
+    }}
+  }
+}' --jq '
+    def size: [.projectItems.nodes[] | select(.project.title | test("CareerDossierTeX")) | .size.name][0];
+    "<milestone>" as $m
+    | [ .data.repository.milestones.nodes[] | select(.title == $m) ] as $ms
+    | if ($ms | length) != 1 then "milestone \($m) not found" | halt_error(1) else $ms[0] end
+    | if .issues.pageInfo.hasNextPage then "more than 100 issues: page" | halt_error(1) else . end
+    | .issues.nodes as $is
+    | ([$is[] | select(.title | startswith("[epic]")) | .number][0]) as $e
+    | [ ( $is[] | select(.number != $e and .parent.number != $e)
+          | "#\(.number) parent \(.parent.number // "none"), want \($e // "none")" ),
+        ( $is[]
+          | select((.title | test("^\\[(epic|release)\\]")) | not)
+          | select(.stateReason != "NOT_PLANNED")
+          | . as $x
+          | [.closedByPullRequestsReferences.nodes[] | select(.state == "MERGED")] as $prs
+          | select($prs | length == 1)
+          | $prs[0] | select(.closingIssuesReferences.totalCount == 1)
+          | select(size != ($x | size))
+          | "#\($x.number) Size \($x | size // "none"), closing PR #\(.number) \(size // "none")" ) ]
+    | if length == 0 then empty else join("\n") + "\n" | halt_error(1) end'
+```
+
+The parent half follows `CONTRIBUTING.md`, "1. Every issue carries a
+milestone": the release epic is the milestone's first issue titled `[epic]`,
+and in a patch milestone, which has none, any parent is a finding. It checks
+the direct parent only, so a topic epic's children would be listed. The `Size`
+half skips the three cases "Size guide" names (`[epic]` and `[release]`
+titles, `not_planned`, a pull request closing more than one issue), and an
+issue with no merged closing pull request or with more than one, since neither
+has one diff to take a size from.
