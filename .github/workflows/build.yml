@@ -48,10 +48,11 @@ jobs:
   # does every job on a push to main.
   #
   # Skipping is done with a job-level `if:`, not a `paths:` filter on the
-  # trigger: every job here is a required status check on the `Protect Main`
-  # ruleset, and a job whose workflow never starts never reports, so the pull
-  # request would wait on it forever. A job skipped by `if:` reports, and a
-  # skipped required check counts as passed.
+  # trigger: a job whose workflow never starts never reports, so a pull request
+  # would wait forever on each required status check the `Protect Main` ruleset
+  # names. A job skipped by `if:` reports, and a skipped required check counts
+  # as passed. `changes` is not a required check; the ruleset, not this file,
+  # holds the list (CONTRIBUTING.md, "What actually gates a merge").
   #
   # The guard on each TeX job is fail-safe: it runs the job when this
   # classifier did not succeed. Without that, a failed `changes` job would skip
