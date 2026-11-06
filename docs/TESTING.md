@@ -738,6 +738,19 @@ bytes rather than writing the character. Control 1 plants an occurrence in a
 scratch file and asserts the same search still finds it, so a clean run is
 distinguishable from a search that stopped working.
 
+### Testphase key lint
+
+`tests/lint/run-testphase-keys.sh` — no Work file but
+`careerdossier-components.sty` names one of the six vertical-space keys
+`latex-lab-testphase-block.sty` declares for its block templates, in code or in
+a comment (#478). `docs/ARCHITECTURE.md`, "Testphase interfaces stay behind one
+wrapper", gives the rule and why the stable tagpdf API is exempt. The Work
+files are read from `manifest.txt`. Four controls run the same search: over the
+owner with its exemption lifted, which must hit, and over three fixtures
+(`tests/lint/fixtures/testphasefixture-*.cls`): a key in code and a key in a
+comment, which must hit, and a class calling only the tagpdf API, which must
+not.
+
 ### Manual-name lint
 
 `tests/lint/run-manual-names.sh` — every public name the Work declares is
