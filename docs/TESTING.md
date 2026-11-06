@@ -821,6 +821,14 @@ Each renderer under `tests/layout/` — `render-page-two.sh`,
 to look at and how to read its output. `tests/spacing/` holds the spacing
 report's probe and drivers.
 
+The line-breaking sweep refuses a row it cannot trust instead of measuring it.
+A build that exited non-zero, wrote no PDF or log, or, for a BibLaTeX document,
+built no bibliography reads `BUILD-FAILED`. The value's summary line counts
+such rows, and `sweep-record.txt` names them. Each sweep gives biber a cache of
+its own, so concurrent sweeps cannot corrupt each other's Biber runs, and
+`sweep-linebreak-parallel.sh` reports `done` only for a value with no refused
+row. The two scripts' headers hold the rules (#627).
+
 The page-fill floor is the one part of this that *is* asserted: `make layout`
 enforces it, a fixture below it declares `% PAGEFILLFLOOR: <pct>` at the fixture,
 and a declaration that is no longer needed fails the run. It is a ratchet

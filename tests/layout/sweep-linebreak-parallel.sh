@@ -36,7 +36,13 @@
 #
 # It needs whatever sweep-linebreak.sh needs: lualatex and pdftotext for either
 # corpus, pdfinfo for page counts, and latexmk plus biber for the bibliography
-# example in the `examples` corpus.
+# example in the `examples` corpus. Each sub-sweep gives biber its own cache
+# (sweep-linebreak.sh, header), so values running at once never corrupt each
+# other's Biber runs.
+#
+# A value is reported `done` only when none of its rows was refused. One with
+# any BUILD-FAILED row is reported FAILED with the refused documents named, and
+# the merged sweep-record.txt lists every refused row (#627).
 #
 # IT WILL NOT WORK CORRECTLY UNDER A RESTRICTED SANDBOX. LuaLaTeX needs to write
 # luaotfload's font cache; where it cannot, fontspec silently falls back to
@@ -95,7 +101,7 @@ while [ "$#" -gt 0 ]; do
     --values)     values="${2:?--values needs a value}"; shift 2 ;;
     --corpus)     corpus="${2:?--corpus needs a value}"; shift 2 ;;
     --merge-only) merge_only="${2:?--merge-only needs a directory}"; shift 2 ;;
-    -h|--help)    sed -n '2,80p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help)    awk 'NR > 1 && /^#/ {sub(/^# ?/, ""); print; next} NR > 1 {exit}' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -137,6 +143,17 @@ merge_scratch() { # scratch-dir
     echo "A fixture-corpus document is named <fixture>--<size>pt-<margin>, which"
     echo "is what makes a specific overflowing cell identifiable rather than"
     echo "merely countable."
+    echo
+    echo "Refused rows (BUILD-FAILED: not measured, and not in any total):"
+    # Each per-value record lists its own refused rows, or `none`; keep the
+    # rows, and say `none` once only when no value refused any.
+    for d in "$scratch"/*/; do
+      [ -d "$d" ] || continue
+      sed -n '/^Refused rows/,/^$/p' "${d}sweep-record.txt" 2>/dev/null \
+        | sed '1d;/^$/d;/^  none$/d'
+    done > "$scratch/.refused"
+    if [ -s "$scratch/.refused" ]; then cat "$scratch/.refused"; else echo "  none"; fi
+    rm -f "$scratch/.refused"
     echo
     echo "Value -> artifact filename:"
     for d in "$scratch"/*/; do
@@ -199,11 +216,13 @@ for v in "${value_list[@]}"; do
     #
     #   1. the sweep exited non-zero
     #   2. it exited 0 but wrote no .tsv
-    #   3. it wrote a .tsv in which EVERY row is BUILD-FAILED. A value TeX
-    #      rejects (a malformed dimension, say) does not stop the sweep: every
-    #      document fails to build, the rows are all BUILD-FAILED, and the
-    #      arm's totals come out as clean zeroes. That reads as a perfect
-    #      result unless it is checked for here.
+    #   3. it wrote a .tsv with ANY row BUILD-FAILED, which sweep-linebreak.sh
+    #      writes for a document it refused to measure. Every row failed is
+    #      the case a value TeX rejects (a malformed dimension, say) produces,
+    #      and the arm's totals then come out as clean zeroes. Some rows failed
+    #      is the case #627 found: one document's Biber run failed and the
+    #      value still printed `done`. Either reads as a result it is not
+    #      unless it is checked for here, so `done` means no row was refused.
     if ! "$sweep" "${passthrough[@]}" --values "$v" --output "$dir" \
            > "$dir/log.txt" 2>&1; then
       echo "  [$i/${#value_list[@]}] FAILED: $v (sweep exited non-zero) -- see $dir/log.txt"
@@ -211,12 +230,19 @@ for v in "${value_list[@]}"; do
     elif ! ls "$dir"/*.tsv >/dev/null 2>&1; then
       echo "  [$i/${#value_list[@]}] FAILED: $v (no results written) -- see $dir/log.txt"
       tail -3 "$dir/log.txt" 2>/dev/null | sed 's/^/        /'
-    elif awk -F'\t' '{tot++; if ($2 == "BUILD-FAILED") bad++}
-                     END {exit (tot > 0 && bad == tot) ? 0 : 1}' "$dir"/*.tsv; then
-      echo "  [$i/${#value_list[@]}] FAILED: $v (every document failed to build --"
-      echo "        is the value valid for --param $param?) -- see $dir/*.tsv"
     else
-      echo "  [$i/${#value_list[@]}] done: $v"
+      tot="$(awk 'END {print NR}' "$dir"/*.tsv)"
+      bad="$(awk -F'\t' '$2 == "BUILD-FAILED" {n++} END {print n + 0}' "$dir"/*.tsv)"
+      refused="$(awk -F'\t' '$2 == "BUILD-FAILED" {printf "%s%s", sep, $1; sep = " "}' "$dir"/*.tsv)"
+      if [ "$bad" -gt 0 ] && [ "$bad" -eq "$tot" ]; then
+        echo "  [$i/${#value_list[@]}] FAILED: $v (every document failed to build --"
+        echo "        is the value valid for --param $param?) -- see $dir/*.tsv"
+      elif [ "$bad" -gt 0 ]; then
+        echo "  [$i/${#value_list[@]}] FAILED: $v ($bad of $tot documents refused: $refused)"
+        echo "        reasons in $dir/log.txt"
+      else
+        echo "  [$i/${#value_list[@]}] done: $v"
+      fi
     fi
   ) &
 
