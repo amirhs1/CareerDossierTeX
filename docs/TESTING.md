@@ -689,6 +689,20 @@ its `--list` exactly and that the `Makefile` can reach the `--jobs` path. A
 runner whose fan-out dispatched a subset would report a clean run of something
 other than the suite.
 
+### Fixture-header lint
+
+`tests/lint/run-fixture-headers.sh` — every fixture's first line names the file
+(#534). A fixture is a tracked `.tex`, `.inc`, or `.lvt` file under `tests/`,
+outside `tests/lib/` and `tests/lint/fixtures/`. One rule covers all three
+extensions, because a comment writes nothing to the log, so a self-naming first
+line cannot move a `.tlg`. The lint checks that a header names its file, not
+whether its reason is any good. `tests/lint/fixture-headers-backlog.txt`
+declares the fixtures that did not name themselves when it landed, each with a
+reason. The lint keeps that list shrinking: an undeclared unnamed fixture, an
+entry with no reason, a stale entry, an entry whose fixture now names itself,
+and more entries than its `FROZEN AT` line each fail. One committed control
+per verdict runs the same check over `tests/lint/fixtures/header*`.
+
 ### Markdown anchor lint
 
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree

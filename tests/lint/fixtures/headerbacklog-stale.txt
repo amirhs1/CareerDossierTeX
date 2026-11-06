@@ -1,0 +1,4 @@
+# A run-fixture-headers.sh control backlog (#534). Lint input.
+# FROZEN AT 2 entries
+tests/lint/fixtures/headerfixture-unnamed.tex  its first line does not name the file (control)
+tests/lint/fixtures/headerfixture-gone.tex  its first line does not name the file (control)

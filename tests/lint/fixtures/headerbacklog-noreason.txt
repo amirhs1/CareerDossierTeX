@@ -1,0 +1,3 @@
+# A run-fixture-headers.sh control backlog (#534). Lint input.
+# FROZEN AT 1 entries
+tests/lint/fixtures/headerfixture-unnamed.tex
