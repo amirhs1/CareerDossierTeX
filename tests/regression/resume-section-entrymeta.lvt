@@ -1,0 +1,94 @@
+% resume-section-entrymeta.lvt — #569: the `entrymeta' key on the resume's
+% \CDossierSection changes the layout of that one section's entries only.
+%
+% The claim that is false if this test fails: in an `entrymeta=inline'
+% document, a section that sets `entrymeta=column' draws its entries in the
+% column form, and the sections before and after it, which set nothing, keep
+% the document's inline form. Three sections in a row -- inherit, override,
+% inherit -- so a value that outlives its section changes the third section's
+% join, not just the second's. cv-section-entrymeta.lvt covers the reverse
+% direction (a column document with an inline section) for the CV.
+%
+% What is traced is the join itself, the one thing `entrymeta' changes (see
+% \__cdossier_components_entryjoin: in careerdossier-components.sty): the
+% column form joins a heading line's cells with \pdffakespace and \hfill, the
+% inline form with the visible separator, emitted as a layout artifact. The
+% expected joins come from that documented behaviour and from #569's approved
+% acceptance criteria, not from a saved run. components-entrymeta.lvt owns the
+% join's shapes for each value; this file owns only which value each section
+% resolves to, and that the three key errors #569 names are raised: an unknown
+% value (the components package's message, with its accepted-values help), a
+% bare key, and a misspelt key (the class's unknown-section-key message).
+%
+% The heading is stubbed to a trace line and the material is set in a box, as
+% resume-section-structure.lvt does, so no page is shipped; the join is decided
+% when each entry heading is built, which is inside the box.
+\input{regression-test}
+\documentclass[entrymeta=inline]{careerdossier-resume}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\cs_set_protected:Npn \__cdossier_typography_division_begin:n #1 { }
+\cs_set_protected:Npn \__cdossier_typography_heading:nnn #1#2#3
+  { \TYPE{ section:~#2 } }
+%% The section rule is drawn through the same layout-artifact hook the trace
+%% below redirects to \TYPE, so it is stubbed out: this file asserts the
+%% entries' joins, not the rule.
+\cs_set_protected:Npn \__cdossier_components_section_rule: { }
+\box_new:N \l_cdossiertest_box
+\cs_new_protected:Npn \cdossiertestTraceJoin
+  {
+    \RenewDocumentCommand \CDossierEntryTitleStyle { } { \TYPE{ >entry } }
+    \RenewDocumentCommand \pdffakespace { } { \TYPE{ >fakespace } }
+    \cs_set_protected:Npn \__cdossier_typography_layout_artifact:n ##1
+      { \TYPE{ >separator(##1) } }
+  }
+\NewDocumentCommand \cdossiertestQuiet { +m }
+  { \vbox_set:Nn \l_cdossiertest_box { \cdossiertestTraceJoin #1 } }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{inline-document-column-section-reverts-at-the-next-section}{
+  \cdossiertestQuiet{
+    \CDossierSection{Experience}
+    \begin{CDossierEntry}[title = {Alpha}, organization = {Alpha Lab},
+        location = {Berlin, DE}, dates = {2016--2018}]
+    \end{CDossierEntry}
+    \CDossierSection[entrymeta = column]{Education}
+    \begin{CDossierEntry}[title = {Beta}, organization = {Beta University},
+        location = {Paris, FR}, dates = {2012--2016}]
+    \end{CDossierEntry}
+    \CDossierSection{Service}
+    \begin{CDossierEntry}[title = {Gamma}, organization = {Gamma Society},
+        location = {Rome, IT}, dates = {2018--2024}]
+    \end{CDossierEntry}
+  }
+}
+
+\TEST{unknown-section-entrymeta-value-is-rejected}{
+  \cdossiertestQuiet{
+    \CDossierSection[entrymeta = block]{Experience}
+    \begin{CDossierEntry}[title = {Delta}, dates = {2016--2018}]
+    \end{CDossierEntry}
+  }
+}
+
+\TEST{section-entrymeta-requires-a-value}{
+  \cdossiertestQuiet{
+    \CDossierSection[entrymeta]{Experience}
+  }
+}
+
+\TEST{unknown-section-key-is-rejected}{
+  \cdossiertestQuiet{
+    \CDossierSection[entrymeat = inline]{Experience}
+  }
+}
+
+\END
+\end{document}

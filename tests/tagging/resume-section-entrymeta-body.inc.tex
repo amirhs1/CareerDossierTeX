@@ -1,0 +1,76 @@
+% resume-section-entrymeta-body.inc.tex — shared body for the per-section
+% `entrymeta' tagging fixtures (#569).
+%
+% Deliberately one page, outside the five-document loop in run.sh, for the
+% reason resume-entrymeta-inline-body.inc.tex gives: what is under test is the
+% entry heading, and continuation furniture would only add noise.
+%
+% A `column' document (the default) whose Education section sets
+% `entrymeta=inline' on \CDossierSection and whose Experience section, last on
+% the page, is left at `column'. The join between an entry's cells differs
+% between the two layouts -- \pdffakespace for `column', a marked-content
+% artifact for `inline' -- so this is the one document in the suite where both
+% joins meet in one structure tree. The claim `entrymeta' rests on is that it
+% moves ink, not structure: the decoded structure text of an Education heading
+% and of an Experience heading must take the same shape, `Title Dates', with a
+% real U+0020 between the cells and no `|' in either.
+%
+% The `column' section is last on purpose. That is the order the manual
+% recommends for extraction (#569): the last column entry on a page extracts
+% its dates after everything below it under Poppler, and here that is only its
+% own bullets.
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name={Tagged Section Resume},
+  headline={Accessibility Engineer},
+  email={section@example.test},
+  phone={+1 555 0105},
+  website={example.test/section}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection[entrymeta=inline]{Education}
+\begin{CDossierEntry}[
+  title={PhD, Physics},
+  organization={Example University},
+  location={Toronto},
+  dates={2012--2016}
+]
+\begin{CDossierItemize}
+  \item Thesis on accessible document rendering.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={MSc, Physics},
+  organization={Example Institute},
+  location={Ottawa},
+  dates={2010--2012}
+]
+\begin{CDossierItemize}
+  \item Dissertation on text extraction order.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title={Engineer},
+  organization={Example Labs},
+  location={Toronto},
+  dates={2024--2026}
+]
+\begin{CDossierItemize}
+  \item First column achievement in source order.
+  \item Second column achievement with a meaningful
+        \href{https://example.test/work}{work link}.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Associate Engineer},
+  organization={Example Services},
+  location={Ottawa},
+  dates={2022--2024}
+]
+\begin{CDossierItemize}
+  \item Later column achievement that follows the first entry on the same page.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

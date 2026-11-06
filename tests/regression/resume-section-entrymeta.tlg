@@ -1,0 +1,51 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: inline-document-column-section-reverts-at-the-next-section
+============================================================
+section: Experience
+>entry
+>separator(| )
+>separator(| )
+section: Education
+>entry
+>fakespace
+>fakespace
+section: Service
+>entry
+>separator(| )
+>separator(| )
+============================================================
+============================================================
+TEST 2: unknown-section-entrymeta-value-is-rejected
+============================================================
+! Package careerdossier-components Error: Unknown 'entrymeta' value 'block'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'column' (dates and location flush right) and 'inline' (dates and location on the same line as the title and organization).
+section: Experience
+>entry
+>separator(| )
+============================================================
+============================================================
+TEST 3: section-entrymeta-requires-a-value
+============================================================
+! LaTeX Error: The key 'cdossier/section/entrymeta' requires a value.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The key 'cdossier/section/entrymeta' must have a value.
+No value was present: the key will be ignored.
+section: Experience
+============================================================
+============================================================
+TEST 4: unknown-section-key-is-rejected
+============================================================
+! Package careerdossier-resume Error: Unknown CDossierSection key 'entrymeat'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The supported key is: entrymeta.
+section: Experience
+============================================================

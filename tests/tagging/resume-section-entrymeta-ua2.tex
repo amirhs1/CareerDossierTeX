@@ -1,0 +1,11 @@
+% resume-section-entrymeta-ua2.tex — PDF/UA-2 validation variant.
+%
+% Same body as the tagged fixture; only the declared standard differs, so a
+% veraPDF result here describes the tagged output the other fixtures assert on.
+% A document that mixes the two `entrymeta' joins by section (#569) carries
+% both the `column' fake space and the `inline' marked-content artifact in one
+% structure tree, so the mix is validated rather than assumed.
+\DocumentMetadata{lang=en,tagging=on,pdfstandard=ua-2}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{resume-section-entrymeta-body.inc.tex}

@@ -1,0 +1,86 @@
+% resume-section-column-first.tex — extraction fixture for a resume whose
+% sections differ in `entrymeta', with the `column' section first on the page.
+%
+% Purpose (#569)
+%   The same two sections as resume-section-inline-first.tex in the other
+%   order: a `column' Experience section first, then an Education section that
+%   sets `entrymeta=inline' on \CDossierSection. This fixture pins the one
+%   behaviour the manual documents for mixed documents rather than a clean
+%   reading order, so that a change in it is noticed.
+%
+%   Measured 2026-11-06 (recorded in #569): under Poppler's default mode the
+%   last `column' entry on a page extracts its dates and location after
+%   everything below it on that page. In an all-column document that is only
+%   its own bullets. Here the inline Education section follows, so the last
+%   Experience entry's dates and location are expected after the whole of
+%   Education, at the end of the page's text. The first Experience entry's
+%   dates and location extract in place, as a block after its heading, as in
+%   resume-entry-dates-order.expected.txt. PDFKit reads the page in source
+%   order, so its baseline shows no displacement.
+%
+%   The expected text was written before this fixture was first run, from the
+%   two reviewed baselines and the measurement above, not saved from it. If
+%   this fixture one day extracts in source order, Poppler has changed, and the
+%   manual's sentence about section order should be revisited, not the
+%   fixture silently regenerated.
+%
+%   The list edge stays at its committed 0.25 floor. No value of it reaches
+%   this displacement (#219), which is why the manual gives the section-order
+%   rule instead.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-section-column-first.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Accessibility Engineer},
+  email    = {ada@example.com},
+  phone    = {+1 416 555 0142},
+  website  = {example.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Engineer},
+  organization = {Example Labs},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First achievement in source order.
+    \item Second achievement with a measurable reporting outcome.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Engineer},
+  organization = {Example Services},
+  location     = {Ottawa, ON},
+  dates        = {2022--2024}
+]
+  \begin{CDossierItemize}
+    \item Later achievement that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\CDossierSection[entrymeta = inline]{Education}
+\begin{CDossierEntry}[
+  title        = {PhD, Physics},
+  organization = {Example University},
+  location     = {Toronto, ON},
+  dates        = {2012--2016}
+]
+  \begin{CDossierItemize}
+    \item Thesis on accessible document rendering.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {MSc, Physics},
+  organization = {Example Institute},
+  location     = {Ottawa, ON},
+  dates        = {2010--2012}
+]
+  \begin{CDossierItemize}
+    \item Dissertation on text extraction order.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

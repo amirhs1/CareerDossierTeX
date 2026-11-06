@@ -1,0 +1,51 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: column-document-inline-section-reverts-at-the-next-section
+============================================================
+section: Research Experience
+>entry
+>fakespace
+>fakespace
+section: Education
+>entry
+>separator(| )
+>separator(| )
+section: Service
+>entry
+>fakespace
+>fakespace
+============================================================
+============================================================
+TEST 2: unknown-section-entrymeta-value-is-rejected
+============================================================
+! Package careerdossier-components Error: Unknown 'entrymeta' value 'block'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are 'column' (dates and location flush right) and 'inline' (dates and location on the same line as the title and organization).
+section: Research Experience
+>entry
+>fakespace
+============================================================
+============================================================
+TEST 3: section-entrymeta-requires-a-value
+============================================================
+! LaTeX Error: The key 'cdossier/cv/section/entrymeta' requires a value.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The key 'cdossier/cv/section/entrymeta' must have a value.
+No value was present: the key will be ignored.
+section: Research Experience
+============================================================
+============================================================
+TEST 4: unknown-section-key-is-rejected
+============================================================
+! Package careerdossier-cv Error: Unknown CDossierSection key 'entrymeat'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The supported key is: entrymeta.
+section: Research Experience
+============================================================

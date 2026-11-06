@@ -140,6 +140,7 @@ groups=(
   "${profiles[@]}"
   resume-contact-labels
   resume-entrymeta-inline
+  resume-section-entrymeta
   resume-linkdecoration
   resume-default-medium
   letter-recipient-address
@@ -1312,6 +1313,34 @@ fi
 return "$fail"
 }
 
+# Entry metadata set per section (#569). Outside the five-document loop for
+# the same reason as the fixture above: one page, no continuation furniture.
+# The body's Education section is `inline' and its Experience section is
+# `column', so both joins meet in one structure tree, and the triples below
+# cover a heading from each: the separated form is the same string for both
+# layouts, which is the claim `entrymeta' rests on -- it moves ink, not
+# structure -- and the glued and barred forms are the two ways a join could
+# reach the tree wrongly.
+tagging_resume_section_entrymeta() {
+local fail=0
+echo "== resume-section-entrymeta =="
+if compile_fixture resume-section-entrymeta.tex resume-section-entrymeta; then
+  check_structure_text resume-section-entrymeta
+  check_structure_text_inline_joins resume-section-entrymeta \
+    'PhD, Physics 2012–2016::PhD, Physics2012–2016::PhD, Physics | 2012–2016' \
+    'Example University Toronto::Example UniversityToronto::Example University | Toronto' \
+    'Engineer 2024–2026::Engineer2024–2026::Engineer | 2024–2026' \
+    'Example Labs Toronto::Example LabsToronto::Example Labs | Toronto'
+  check_extraction resume-section-entrymeta
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture resume-section-entrymeta-ua2.tex resume-section-entrymeta-ua2 \
+      && validate_ua2 resume-section-entrymeta
+  fi
+fi
+return "$fail"
+}
+
 # Link decoration under `medium=screen' (#278). Outside the five-document
 # loop for the same reason as the two fixtures above: one page, no continuation
 # furniture. What only this suite can see is whether ulem's rebox pushed the
@@ -1467,6 +1496,7 @@ unit_for_group() {
                                 printf 'tagging_profile %s' "$1" ;;
     resume-contact-labels)      printf 'tagging_resume_contact_labels' ;;
     resume-entrymeta-inline)    printf 'tagging_resume_entrymeta_inline' ;;
+    resume-section-entrymeta)   printf 'tagging_resume_section_entrymeta' ;;
     resume-linkdecoration)      printf 'tagging_resume_linkdecoration' ;;
     resume-default-medium)      printf 'tagging_resume_default_medium' ;;
     letter-recipient-address)   printf 'tagging_letter_recipient_address' ;;

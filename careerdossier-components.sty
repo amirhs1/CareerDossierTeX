@@ -30,8 +30,10 @@
 %% option, its decision of whether furniture is emitted at all, and the hand-off
 %% of its link half to careerdossier-links; the muted=italic|gray|both|plain
 %% de-emphasis role \CDossierMutedStyle and what it resolves to; the
-%% entrymeta=column|inline placement of an entry's dates and location and the
-%% \CDossierEntryMetaSeparator the inline form joins them with; the shared
+%% entrymeta=column|inline placement of an entry's dates and location, the
+%% per-section setter and reset the record classes' \CDossierSection key
+%% calls, and the \CDossierEntryMetaSeparator the inline form joins them with;
+%% the shared
 %% CV/resume section rule with its token-owned spacing and tagged
 %% layout-artifact treatment; the shared record subsection renderer (#337) that
 %% both record classes expose as \CDossierSubsection -- its depth-3 division and
@@ -244,6 +246,35 @@
           { \l_keys_key_str } } ,
   }
 
+%% The per-section form of `entrymeta' (#569). The resume and the CV give
+%% \CDossierSection an `entrymeta' key, so one section's entries can take the
+%% other layout, and every entry in a section takes the same one: mixing the
+%% two within a section is not a layout this toolkit offers (maintainer
+%% decision, 2026-11-06). The class does not restate the accepted values: the
+%% key hands its value to the setter below, which runs the declaration above,
+%% the one the package option uses, so the values and the error for any other
+%% value are stated once.
+%%
+%% Two calls, because a section is a command and not a group. The boolean is
+%% read only when an entry heading is built, inside
+%% \__cdossier_components_entryhead:nnnn, so a value set between two sections
+%% holds for the entries that follow until it is set again. Every
+%% \CDossierSection therefore first resets the value to the document's, taken
+%% once after the package options are read (below), and then applies its own
+%% key if it has one: a section with no key reverts, and nothing a section
+%% sets outlives it. The class key must require a value: an empty one reaches
+%% the `unknown' branch of the declaration and is rejected.
+\bool_new:N \l__cdossier_components_entrymeta_document_bool
+
+\cs_new_protected:Npn \__cdossier_components_set_entrymeta:n #1
+  { \keys_set:nn { cdossier / components } { entrymeta = {#1} } }
+
+\cs_new_protected:Npn \__cdossier_components_entrymeta_reset:
+  {
+    \bool_set_eq:NN \l__cdossier_components_entrymeta_inline_bool
+      \l__cdossier_components_entrymeta_document_bool
+  }
+
 %% The role is redefined rather than branched at each use, so a de-emphasised
 %% run costs the same as before the option existed and there is exactly one
 %% definition to read. \CDossierBodyStyle carries the family and resets the
@@ -322,6 +353,13 @@
   }
 
 \ProcessKeysPackageOptions { cdossier / components }
+
+%% The document's `entrymeta' value, which every \CDossierSection restores
+%% before applying its own key (#569). Taken here, once the options have set
+%% the working boolean, so the record is the class option's value and nothing
+%% a section sets later can move it.
+\bool_set_eq:NN \l__cdossier_components_entrymeta_document_bool
+  \l__cdossier_components_entrymeta_inline_bool
 
 %% ---------------------------------------------------------------------------
 %% Contact line.

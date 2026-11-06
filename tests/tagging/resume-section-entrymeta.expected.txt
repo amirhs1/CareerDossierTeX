@@ -1,0 +1,28 @@
+Tagged Section Resume
+Accessibility Engineer
+
+section@example.test | +1 555 0105 | example.test/section
+
+Education
+PhD, Physics | 2012–2016
+Example University | Toronto
+• Thesis on accessible document rendering.
+MSc, Physics | 2010–2012
+Example Institute | Ottawa
+• Dissertation on text extraction order.
+
+Experience
+Engineer
+Example Labs
+
+2024–2026
+Toronto
+
+• First column achievement in source order.
+• Second column achievement with a meaningful work link.
+Associate Engineer
+Example Services
+• Later column achievement that follows the first entry on the same page.
+
+2022–2024
+Ottawa
