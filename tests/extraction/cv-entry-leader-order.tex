@@ -1,0 +1,59 @@
+% cv-entry-leader-order.tex — extraction fixture for `entrymeta=leader'.
+%
+% Purpose (#678)
+%   The CV half of resume-entry-leader-order.tex, which carries the
+%   explanation. This is cv-entry-inline-order.tex with `entrymeta=leader' in
+%   place of `inline', at the same 0.125 list edge: the option is declared on
+%   both record classes, and the CV reaches the same component through its own
+%   \CDossierEntry with its own surrounding spacing.
+%
+%   The assertion is that both entries' dates and location extract on their
+%   own heading lines, after the leader, the last entry's included.
+%
+%   The 0.125 override is the assertion. Do not raise it to make a failure go
+%   away.
+%
+%   The committed baseline (cv-entry-leader-order.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode cv-entry-leader-order.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[entrymeta=leader]{careerdossier-cv}
+
+\ExplSyntaxOn
+\skip_set:Nn \CDossierRecordListEdgeAboveSkip
+  { \fp_to_dim:n { 0.125 * \dim_to_fp:n { \CDossierBodyLeading } } }
+\ExplSyntaxOff
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Research Engineer},
+  email    = {ada@example.edu},
+  phone    = {+1 416 555 0142},
+  website  = {example.edu/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Research Experience}
+\begin{CDossierEntry}[
+  title        = {Postdoctoral Researcher},
+  organization = {Example University},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First research contribution in source order.
+    \item Second research contribution with a reproducible analysis pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Graduate Researcher},
+  organization = {Example Institute},
+  location     = {Ottawa, ON},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Later contribution that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
