@@ -32,6 +32,11 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+# Every output, the PDFs and logs and the .stdout and .diff scratch, goes to
+# build/smoke/, never beside the fixtures (#586). The working directory stays
+# here, so a fixture's relative \input still resolves against this directory.
+out="$root/build/smoke"
+mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
@@ -308,8 +313,8 @@ fi
 smoke_engine_contract() {
   local unit_fail=0 engine job rc engine_log
   echo "== $engine_fixture.tex (engine contract) =="
-  if ! lualatex -halt-on-error -interaction=nonstopmode "$engine_fixture.tex" \
-      > "$engine_fixture-lualatex.stdout" 2>&1; then
+  if ! lualatex -halt-on-error -interaction=nonstopmode -output-directory="$out" \
+      "$engine_fixture.tex" > "$out/$engine_fixture-lualatex.stdout" 2>&1; then
     echo "  LuaLaTeX EXPECTED PASS but compile failed"
     unit_fail=1
   else
@@ -318,7 +323,7 @@ smoke_engine_contract() {
   for engine in xelatex pdflatex; do
     job="$engine_fixture-$engine"
     "$engine" -halt-on-error -interaction=nonstopmode -jobname="$job" \
-      "$engine_fixture.tex" > "$job.stdout" 2>&1
+      -output-directory="$out" "$engine_fixture.tex" > "$out/$job.stdout" 2>&1
     rc=$?
     if [ "$rc" -eq 0 ]; then
       echo "  $engine EXPECTED FAILURE but compile succeeded"
@@ -329,8 +334,8 @@ smoke_engine_contract() {
       # signals `tr`, and `pipefail` reports "needle absent" for a log that
       # contains it — here, "failed for the wrong reason" about a correct
       # failure.
-      if [ -f "$job.log" ]; then
-        engine_log="$(tr '\n' ' ' < "$job.log" | tr -s ' ')"
+      if [ -f "$out/$job.log" ]; then
+        engine_log="$(tr '\n' ' ' < "$out/$job.log" | tr -s ' ')"
       else
         engine_log="$CDTEXT_UNAVAILABLE"
       fi
@@ -388,17 +393,17 @@ smoke_doc_drift() {
                           }
     inblock               { buf = buf $0 "\n" }
     END                   { if (found != 1) exit 1; printf "%s", out }
-  ' "$doc_source" > "$here/doc-example.stdout"
+  ' "$doc_source" > "$out/doc-example.stdout"
   if [ $? -ne 0 ]; then
     echo "  FAILED to locate exactly one worked example in doc/careerdossier.tex"
     unit_fail=1
   else
-    awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$here/doc-fixture.stdout"
-    if diff -u "$here/doc-example.stdout" "$here/doc-fixture.stdout" > "$here/doc-example.diff"; then
+    awk '/^\\documentclass/ { p = 1 } p' "$doc_fixture" > "$out/doc-fixture.stdout"
+    if diff -u "$out/doc-example.stdout" "$out/doc-fixture.stdout" > "$out/doc-example.diff"; then
       echo "  documented example and fixture are identical"
     else
       echo "  DRIFTED — the fixture no longer compiles what the manual publishes:"
-      sed 's/^/    /' "$here/doc-example.diff"
+      sed 's/^/    /' "$out/doc-example.diff"
       unit_fail=1
     fi
   fi
@@ -430,27 +435,29 @@ smoke_case() {
   # spelled out in both branches rather than held in an array, because an empty
   # array expansion is an unbound-variable error under `set -u' in bash 3.2.
   if [ "$expect" = "fail-once" ]; then
-    lualatex -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1
+    lualatex -interaction=nonstopmode -output-directory="$out" "$tex" > "$out/$base.stdout" 2>&1
   else
-    lualatex -halt-on-error -interaction=nonstopmode "$tex" > "$base.stdout" 2>&1
+    lualatex -halt-on-error -interaction=nonstopmode -output-directory="$out" "$tex" \
+      > "$out/$base.stdout" 2>&1
   fi
   rc=$?
 
   case "$expect" in
     pass)
       if [ "$rc" -ne 0 ]; then
-        echo "  EXPECTED PASS but compile failed (see $base.log)"; return 1
+        echo "  EXPECTED PASS but compile failed (see $out/$base.log)"; return 1
       fi
       # Academic-letter footers include the total page count, which is resolved
       # by the label written on the first LuaLaTeX pass.
       if [[ "$base" = letter-academic-* || "$base" = statement-* ]]; then
-        lualatex -halt-on-error -interaction=nonstopmode "$tex" >> "$base.stdout" 2>&1
+        lualatex -halt-on-error -interaction=nonstopmode -output-directory="$out" "$tex" \
+          >> "$out/$base.stdout" 2>&1
         rc=$?
         if [ "$rc" -ne 0 ]; then
-          echo "  EXPECTED PASS but footer rerun failed (see $base.log)"; return 1
+          echo "  EXPECTED PASS but footer rerun failed (see $out/$base.log)"; return 1
         fi
       fi
-      unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' "$base.log" \
+      unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' "$out/$base.log" \
                     | grep -viE "$allow" || true)"
       if [ -n "$unexpected" ]; then
         echo "  UNEXPECTED LOG LINES:"; printf '%s\n' "$unexpected" | sed 's/^/    /'
@@ -467,7 +474,7 @@ smoke_case() {
       # marker lands mid-sentence and would break any needle spanning the wrap,
       # so it is removed before matching. Dropping it costs nothing: the module
       # is still named in the "! Package <module> Error:" opening.
-      flat="$(tr '\n' ' ' < "$base.log" | tr -s ' ' \
+      flat="$(tr '\n' ' ' < "$out/$base.log" | tr -s ' ' \
         | sed 's/(careerdossier-[a-z]*)[[:space:]]*/ /g' | tr -s ' ')"
       needle_state=0
       if [ -n "$needle" ]; then
