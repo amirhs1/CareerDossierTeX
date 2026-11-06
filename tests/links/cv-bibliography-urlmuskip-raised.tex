@@ -11,28 +11,14 @@
 % that. Without it the suite could pass because it looks in the wrong place, or
 % because the checker cannot see the defect at all.
 %
-% Why a rigid 4mu rather than BibLaTeX's own 0mu plus 3mu, which is what this
-% fixture used until #312: a *stretch* only reaches the extractor's threshold
-% when the line it lands on happens to need enough stretch, and the realized
-% per-breakpoint gap then sits within a point or two of 0.1 em. That is not an
-% assertion, it is a coin toss. Measured from a clean tree, the 0mu plus 3mu
-% form split on CI (texlive/texlive, Debian) and did NOT split locally (TeX
-% Live 2026, macOS), so `make links' was red on a clean checkout of main while
-% CI was green — and docs/TESTING.md then told the contributor who hit it that
-% the check had gone blind. Lengthening the URL does not fix this: swept across
-% all six fontsize x margin combinations, 0mu plus 3mu on the 262-character URL
-% split at two of them and stayed intact at four.
-%
-% 4mu is 2/9 em, more than twice the threshold, and it is rigid: the gap is
-% decided by this file, not by how much stretch a particular line happened to
-% need on a particular toolchain. It splits at every fontsize x margin
-% combination. What it gives up is that it no longer reproduces the *mechanism*
-% of #199 (justification spending its stretch inside the URL); what it keeps is
-% the thing a negative control is for — a PDF whose URL really is set as
-% several words on one baseline, so a checker that has stopped being able to
-% see that cannot pass. The mechanism no longer needs a fixture: after #312 the
-% package's glue is rigid, and TeX cannot stretch what has no stretch
-% component, so there is nothing left for a measurement to confirm.
+% The glue is a rigid 4mu, 2/9 em and more than twice the threshold. Do not
+% replace it with BibLaTeX's own 0mu plus 3mu, which this fixture used until
+% #312: a *stretch* only reaches the extractor's threshold when the line it
+% lands on happens to need enough stretch, and the realized per-breakpoint gap
+% then sits within a point or two of 0.1 em. That is not an assertion, it is a
+% coin toss. Rigid, the gap is decided by this file, not by the toolchain. The
+% measurements behind this, and what the control gives up for it, are in #312
+% and in its pull request, #313.
 %
 % LINKEXPECT: split
 % LINKTOKEN: https://records.example.invalid/collections/analytical-engine/notes/1843/appendix-g.html
