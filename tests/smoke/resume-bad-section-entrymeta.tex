@@ -1,0 +1,16 @@
+% resume-bad-section-entrymeta.tex — smoke fixture: an unsupported value of the
+% `entrymeta' key on \CDossierSection must stop the build, not be ignored
+% (#569). careerdossier-components owns the option, so the error is that
+% package's own `unknown-entrymeta' message, with the same accepted values and
+% help text as the class option's; it does not name the class, because no
+% package knows which class loaded it. `block' is the third layout #569 leaves
+% out, so it is the value a reader is most likely to try.
+\documentclass{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection[entrymeta = block]{Experience}
+\begin{CDossierEntry}[title = {Research Fellow}, organization = {Example Lab},
+  dates = {2018--2020}]
+\end{CDossierEntry}
+\end{document}

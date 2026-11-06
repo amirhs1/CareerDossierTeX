@@ -523,6 +523,7 @@ All four values are visual only: no extractor sees a difference, and the reading
 order is identical under each. Colour is never the only carrier of meaning.
 
 \subsubsection{\texttt{entrymeta}}
+\label{sec:entrymeta}
 
 Accepted by the resume and CV; the letter and statement classes do not accept it
 because neither has entry headings.
@@ -551,6 +552,37 @@ semantic roles, and the page-break penalty that holds the two heading lines
 together, and a missing \key{organization}, \key{location}, or \key{dates}
 leaves no stray separator under \opt{inline} just as it leaves no empty column
 under \opt{column}.
+
+\paragraph{Per section.} The resume and CV also take the key on
+\cmd{CDossierSection}, so one section can use the other layout:
+
+\begin{latexcode}
+\documentclass{careerdossier-cv}                 % column, the default
+...
+\CDossierSection[entrymeta=inline]{Education}    % this section only
+...
+\CDossierSection{Experience}                     % back to column
+\end{latexcode}
+
+The value holds for every entry in that section and reverts to the class
+option's value at the next \cmd{CDossierSection}, whether or not that one
+carries the key; the subsections and entries inside the section inherit it.
+Every entry in a section shares one layout: there is no per-entry form, because
+mixing the two within one section is not a layout this toolkit offers. The
+accepted values, and the error for any other value, are the class option's; a
+bare \opt{entrymeta} and any other key in the bracket are errors too.
+
+Mixing layouts by section has one consequence for extraction. Poppler's
+\texttt{pdftotext}, the reference extractor of the test suite
+(\file{docs/TESTING.md}), reads the last \opt{column} entry on each page with
+its dates and location after everything below it on that page. In an
+all-\opt{column} document that is only the entry's own bullets; when an
+\opt{inline} section follows on the same page, it is that whole section too.
+MuPDF, Apple PDFKit, and \texttt{pdftotext -raw} read the same page in source
+order. Where extraction order matters, put the \opt{column} section last on
+its page, or use one layout throughout. No spacing value reaches this: it is
+the geometry behind the \texttt{0.25} bound below, acting on the page's last
+column rather than on a list edge.
 
 \paragraph{What the option is for.} \cmd{CDossierRecordListEdgeAboveSkip}
 carries a lower bound of \texttt{0.25} that is an extraction constraint rather
@@ -1230,11 +1262,17 @@ header renders three lines with no gap left behind.
 
 \begin{latexcode}
 \CDossierSection{Experience}
+\CDossierSection[entrymeta=inline]{Education}
 \end{latexcode}
 
 Creates a resume or CV section heading followed by a full-width decorative rule.
 Class-controlled spacing places the rule closer to its heading than to the
 content below.
+
+The optional argument takes one key, \opt{entrymeta}, which sets the
+entry-metadata layout for this section alone and reverts at the next
+\cmd{CDossierSection}; section~\ref{sec:entrymeta} describes it, including
+what it means for text extraction. Any other key is an error.
 
 The rule sits \cmd{CDossierRecordSectionRuleGapSkip} below the heading's
 \emph{baseline}, not below the bottom of its line box, so its height does not
@@ -1249,8 +1287,8 @@ bullet list, or an ordinary paragraph therefore yields one predictable gap
 rather than three different ones.
 
 The argument is user-visible text; the command does not translate it. The
-statement class defines \cmd{CDossierSection} too, without a rule and on the
-prose heading rhythm.
+statement class defines \cmd{CDossierSection} too, without a rule, on the
+prose heading rhythm, and with no optional argument, since it has no entries.
 
 \subsection{\cmd{CDossierSubsection}}
 

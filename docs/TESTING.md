@@ -495,8 +495,10 @@ correctly.
 
 It is not a gold standard. Measured on 2026-11-06, on a resume page whose
 `entrymeta=column` section is followed by an `entrymeta=inline` section (set
-through the private components key in a group, since no public per-section
-setter exists yet), Poppler's default mode moved the last column entry's dates
+through the private components key in a group; `\CDossierSection`'s
+`entrymeta` key, #569, is the public form of the same setting, and
+`tests/extraction/resume-section-column-first.tex` now pins the
+measurement), Poppler's default mode moved the last column entry's dates
 and location to the end of the page's text, after the whole inline section.
 `pdftotext -raw`, which emits content-stream order, MuPDF's
 `mutool draw -F txt`, and Apple PDFKit all read that page in source order. The

@@ -164,17 +164,38 @@
 %% list placed under an ordinary \CDossierSection -- so this one division is
 %% what encloses it too. The division opens after the `\addvspace' and before
 %% the heading; see the note on the primitive in careerdossier-typography.sty.
-\NewDocumentCommand \CDossierSection { m }
+%%
+%% The optional argument takes `entrymeta = column|inline' for this section
+%% alone (#569), as in careerdossier-resume.cls: every entry in a section
+%% shares one layout, the next \CDossierSection reverts to the document value,
+%% and careerdossier-components, which owns the option, validates the value
+%% and performs the reset. Any other key is rejected here.
+\msg_new:nnnn { careerdossier-cv } { unknown-section-key }
+  { Unknown~CDossierSection~key~'#1'. }
+  { The~supported~key~is:~entrymeta. }
+
+\keys_define:nn { cdossier / cv / section }
+  {
+    entrymeta .code:n = { \__cdossier_components_set_entrymeta:n {#1} } ,
+    entrymeta .value_required:n = true ,
+    unknown   .code:n =
+      { \msg_error:nnx { careerdossier-cv } { unknown-section-key }
+          { \l_keys_key_str } } ,
+  }
+
+\NewDocumentCommand \CDossierSection { O{} m }
   {
     \par
+    \__cdossier_components_entrymeta_reset:
+    \keys_set:nn { cdossier / cv / section } {#1}
     %% The section keep, applied before the heading contributes
     %% anything, so the bound is on what the heading commits rather than a
     %% prohibition on breaking after it (#333).
     \__cdossier_components_section_need:
     \addvspace { \CDossierRecordSectionAboveSkip }
     \__cdossier_typography_division_begin:n { 2 }
-    \__cdossier_typography_heading:nnn { 2 } { #1 }
-      { { \CDossierSectionStyle \CDossierSizeSection #1 \par } }
+    \__cdossier_typography_heading:nnn { 2 } { #2 }
+      { { \CDossierSectionStyle \CDossierSizeSection #2 \par } }
     \__cdossier_components_section_rule:
   }
 

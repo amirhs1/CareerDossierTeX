@@ -1,0 +1,35 @@
+1	0	section	Tagged Section Resume
+1	1	text	Accessibility Engineer
+1	2	Link	section@example.test
+1	3	text	+1 555 0105
+1	4	Link	example.test/section
+1	5	subsection	Education
+1	6	text	
+1	7	text	
+1	8	text	PhD, Physics 
+1	9	text	2012–2016
+1	10	text	Example University 
+1	11	text	Toronto
+1	12	itemlabel	•
+1	13	text	Thesis on accessible document rendering.
+1	14	text	MSc, Physics 
+1	15	text	2010–2012
+1	16	text	Example Institute 
+1	17	text	Ottawa
+1	18	itemlabel	•
+1	19	text	Dissertation on text extraction order.
+1	20	subsection	Experience
+1	21	text	
+1	22	text	
+1	23	text	Engineer 2024–2026
+1	24	text	Example Labs Toronto
+1	25	itemlabel	•
+1	26	text	First column achievement in source order.
+1	27	itemlabel	•
+1	28	text	Second column achievement with a meaningful 
+1	29	Link	work link
+1	30	text	.
+1	31	text	Associate Engineer 2022–2024
+1	32	text	Example Services Ottawa
+1	33	itemlabel	•
+1	34	text	Later column achievement that follows the first entry on the same page.

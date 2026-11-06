@@ -92,6 +92,13 @@ resume and CV also take `entrymeta`; `careerdossier-base.sty` declares them,
 and each class calls its generators with its own module name and key path
 (#266). See `careerdossier-base.sty` below.
 
+The one option a class also accepts inside the document is `entrymeta`, as a
+key in `\CDossierSection`'s optional argument on the resume and CV (#569). The
+class owns the key and its `unknown-section-key` error, and hands the value to
+`careerdossier-components.sty`, which validates it against the same
+declaration its package option uses and restores the document's value at every
+section, so a value never outlives the section that set it.
+
 ## File responsibilities
 
 ### `careerdossier-tokens.sty`

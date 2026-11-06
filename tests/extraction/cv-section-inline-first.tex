@@ -1,0 +1,83 @@
+% cv-section-inline-first.tex — extraction fixture for a CV whose sections
+% differ in `entrymeta', with the `column' section last on the page.
+%
+% Purpose (#569)
+%   The CV half of resume-section-inline-first.tex: a `column' document (the
+%   default) whose Education section sets `entrymeta=inline' on
+%   \CDossierSection, followed by a Research Experience section left at
+%   `column'. The claim: each section extracts as its layout does on its own,
+%   in source order. The Education entries read as
+%   cv-entry-inline-order.expected.txt reads inline entries, their dates and
+%   location on the heading lines joined by `|'; the Research Experience
+%   entries read as cv-entry-dates-order.expected.txt reads column entries, the
+%   first entry's dates and location a block after its heading, the last
+%   entry's after its own bullets. The expected text is those two reviewed
+%   baselines put together, written before this fixture was first run, not
+%   saved from it.
+%
+%   This is the clean order: with the `column' section last on the page, the
+%   last column entry's dates are displaced only past its own bullets, which
+%   the all-column baseline already shows (#569, measured 2026-11-06). The
+%   resume carries the fixture for the other order.
+%
+%   The list edge stays at its committed 0.25 floor.
+%
+%   The committed baselines are the assertion; regenerate them only for an
+%   intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode cv-section-inline-first.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass{careerdossier-cv}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Research Engineer},
+  email    = {ada@example.edu},
+  phone    = {+1 416 555 0142},
+  website  = {example.edu/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection[entrymeta = inline]{Education}
+\begin{CDossierEntry}[
+  title        = {PhD, Physics},
+  organization = {Example University},
+  location     = {Toronto, ON},
+  dates        = {2016--2020}
+]
+  \begin{CDossierItemize}
+    \item Thesis on accessible document rendering.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {MSc, Physics},
+  organization = {Example Institute},
+  location     = {Ottawa, ON},
+  dates        = {2014--2016}
+]
+  \begin{CDossierItemize}
+    \item Dissertation on text extraction order.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\CDossierSection{Research Experience}
+\begin{CDossierEntry}[
+  title        = {Postdoctoral Researcher},
+  organization = {Example University},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First research contribution in source order.
+    \item Second research contribution with a reproducible analysis pipeline.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Graduate Researcher},
+  organization = {Example Institute},
+  location     = {Ottawa, ON},
+  dates        = {2020--2024}
+]
+  \begin{CDossierItemize}
+    \item Later contribution that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}
