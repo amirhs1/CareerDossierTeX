@@ -1625,14 +1625,23 @@ uses monochrome link styling and does not redefine unrelated document lists or
 headings globally.
 
 The gap between bibliography entries follows the same calibrated list token as
-every other list in the CV, so a \textsf{biblatex} list and a manual publication
-list share one rhythm at every \opt{fontsize}. The horizontal gap between an
-entry number and its entry follows the shared list label token for the same
-reason. BibLaTeX's own default places that gap at roughly one em, which is the
-width at which a plain-text extractor stops treating the numbers as labels and
-starts treating them as a separate left-hand column, emitting them as a block
-ahead of the entry text; the shared token is half the body size and clears that
-threshold at every supported \opt{fontsize}.
+every other list in the CV, \cmd{CDossierRecordItemSepSkip}, so a
+\textsf{biblatex} list and a manual publication list share one rhythm at every
+\opt{fontsize}. The horizontal gap between an entry number and its entry follows
+the shared list label token, \cmd{CDossierListLabelSep}, for the same reason.
+BibLaTeX's own default places that gap at roughly one em, which is the width at
+which a plain-text extractor stops treating the numbers as labels and starts
+treating them as a separate left-hand column, emitting them as a block ahead of
+the entry text; the shared token is half the body size and clears that threshold
+at every supported \opt{fontsize}.
+
+Both tokens are read each time \cmd{printbibliography} runs, as
+\env{CDossierItemize} reads them each time a list begins, so a document that
+sets either one moves its bibliography with its lists wherever the assignment
+sits before the bibliography. \cmd{bibbysection}, \cmd{bibbysegment}, and
+\cmd{bibbycategory} print without \cmd{printbibliography}, and use the values
+read when the package loaded or by the last \cmd{printbibliography} before
+them.
 
 URLs printed in a bibliography carry no stretch at their break points, so a
 justified line ending in a URL spreads its word spaces rather than the URL

@@ -1,0 +1,57 @@
+% list-tokens-late-override.tex — #243: the bibliography reads the shared list
+% tokens when it is printed, as CDossierItemize does, so an override made after
+% \usepackage{careerdossier-biblatex} moves the bibliography with the lists.
+% Before #243 the package copied \CDossierListLabelSep into \biblabelsep and
+% \CDossierRecordItemSepSkip into \bibitemsep once, at load, and a later
+% override moved every CDossierItemize and left the bibliography behind.
+%
+% Property test, no reference value: inside the printed bibliography, the
+% list's \labelsep and \itemsep equal the tokens' current values. The override
+% values are arbitrary; they only have to differ from the defaults. A
+% bibliography that never printed would pass the comparison vacuously, so the
+% fixture also fails if \AtBeginBibliography never ran once a .bbl exists.
+%
+% The fixture fails the build itself, so the runner only checks the exit status.
+\documentclass[fontsize=12pt, margin=normal]{careerdossier-cv}
+\usepackage{careerdossier-biblatex}
+\addbibresource{publications.bib}
+\CDossierSetup{name = {Ada Lovelace}}
+\setlength{\CDossierListLabelSep}{17pt}
+\setlength{\CDossierRecordItemSepSkip}{9pt}
+\ExplSyntaxOn
+\bool_new:N \g__cdossier_test_bibliography_seen_bool
+\msg_new:nnn { cdossier-test } { stale-labelsep }
+  {
+    the~bibliography~list~set~labelsep~to~\dim_use:N \labelsep ,~but~
+    CDossierListLabelSep~is~\dim_use:N \CDossierListLabelSep .
+  }
+\msg_new:nnn { cdossier-test } { stale-itemsep }
+  {
+    the~bibliography~list~set~itemsep~to~\skip_use:N \itemsep ,~but~
+    CDossierRecordItemSepSkip~is~\skip_use:N \CDossierRecordItemSepSkip .
+  }
+\msg_new:nnn { cdossier-test } { no-bibliography }
+  { no~bibliography~was~printed,~so~nothing~was~compared. }
+\AtBeginBibliography
+  {
+    \bool_gset_true:N \g__cdossier_test_bibliography_seen_bool
+    \dim_compare:nNnF { \labelsep } = { \CDossierListLabelSep }
+      { \msg_error:nn { cdossier-test } { stale-labelsep } }
+    \skip_if_eq:nnF { \itemsep } { \CDossierRecordItemSepSkip }
+      { \msg_error:nn { cdossier-test } { stale-itemsep } }
+  }
+%% latexmk's first pass has no .bbl yet and prints no bibliography by design,
+%% so the guard is armed only once Biber has written one.
+\AtEndDocument
+  {
+    \file_if_exist:nT { \c_sys_jobname_str .bbl }
+      {
+        \bool_if:NF \g__cdossier_test_bibliography_seen_bool
+          { \msg_error:nn { cdossier-test } { no-bibliography } }
+      }
+  }
+\ExplSyntaxOff
+\begin{document}
+\nocite{*}
+\printbibliography[title={Publications}]
+\end{document}
