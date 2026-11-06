@@ -261,9 +261,9 @@ jobs:
         with:
           name: extraction-artifacts
           path: |
-            tests/extraction/*.pdf
-            tests/extraction/*.log
-            tests/extraction/*.diff
+            build/extraction/*.pdf
+            build/extraction/*.log
+            build/extraction/*.diff
           if-no-files-found: warn
 
   tagging:
@@ -342,9 +342,9 @@ jobs:
         with:
           name: smoke-artifacts
           path: |
-            tests/smoke/*.pdf
-            tests/smoke/*.log
-            tests/smoke/*.stdout
+            build/smoke/*.pdf
+            build/smoke/*.log
+            build/smoke/*.stdout
           if-no-files-found: warn
 
   layout:
@@ -374,9 +374,9 @@ jobs:
         with:
           name: layout-artifacts
           path: |
-            tests/layout/*.pdf
-            tests/layout/*.log
-            tests/layout/*.stdout
+            build/layout/*.pdf
+            build/layout/*.log
+            build/layout/*.stdout
           if-no-files-found: warn
 
   resume:
@@ -497,12 +497,12 @@ jobs:
         with:
           name: bibliography-artifacts
           path: |
-            tests/bibliography/*.pdf
-            tests/bibliography/*.log
-            tests/bibliography/*.blg
-            tests/bibliography/*.diff
-            tests/bibliography/*.stdout
-            tests/bibliography/*.guard
+            build/bibliography/*.pdf
+            build/bibliography/*.log
+            build/bibliography/*.blg
+            build/bibliography/*.diff
+            build/bibliography/*.stdout
+            build/bibliography/*.guard
             build/bibliography-example/cv-bibliography.pdf
             build/bibliography-example/cv-bibliography.log
             build/bibliography-example/cv-bibliography.blg
@@ -537,10 +537,10 @@ jobs:
         with:
           name: links-artifacts
           path: |
-            tests/links/*.pdf
-            tests/links/*.log
-            tests/links/*.blg
-            tests/links/*.tokens
+            build/links/*.pdf
+            build/links/*.log
+            build/links/*.blg
+            build/links/*.tokens
           if-no-files-found: warn
 
   # Default-path PDF metadata (issue #276). Deliberately its own job rather than

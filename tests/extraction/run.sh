@@ -44,6 +44,13 @@ cd "$here" || exit 1
 root="$(cd "$here/../.." && pwd)"
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
+# Every output, the PDFs and logs and the .stdout, .got, and .diff scratch, goes
+# to build/extraction/, never beside the fixtures (#586). The committed
+# baselines (*.expected.txt, *.pdfkit.txt) stay here, and --update writes them
+# here; so does the working directory, so \input{$tex} still resolves.
+out="$root/build/extraction"
+mkdir -p "$out" || exit 1
+
 # Extracted-text guards that answer "could not check" apart from "absent"
 # (issue #398).
 # shellcheck source=tests/lib/text.sh
@@ -224,14 +231,14 @@ for tex in "${fixtures[@]}"; do
 
   lua_input="\\pdfvariable compresslevel=0 \\pdfvariable objcompresslevel=0 \\input{$tex}"
   lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
-    "$lua_input" > "$base.stdout" 2>&1 || {
-    echo "  COMPILE FAILED (see $base.log)"; fail=1; continue; }
+    -output-directory="$out" "$lua_input" > "$out/$base.stdout" 2>&1 || {
+    echo "  COMPILE FAILED (see $out/$base.log)"; fail=1; continue; }
   # Resolve end-of-document labels such as the academic-letter total-page footer.
   lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
-    "$lua_input" >> "$base.stdout" 2>&1 || {
-    echo "  RERUN FAILED (see $base.log)"; fail=1; continue; }
+    -output-directory="$out" "$lua_input" >> "$out/$base.stdout" 2>&1 || {
+    echo "  RERUN FAILED (see $out/$base.log)"; fail=1; continue; }
 
-  got="$(pdftotext -enc UTF-8 "$base.pdf" - | normalize)"
+  got="$(pdftotext -enc UTF-8 "$out/$base.pdf" - | normalize)"
 
   # Before any baseline is consulted, and before `--update` can write one.
   # A regeneration that would bless malformed text says so on the run that
@@ -239,7 +246,7 @@ for tex in "${fixtures[@]}"; do
   check_wellformed "poppler, this run" "$got" || fail=1
 
   if [ "$base" = "resume-contact-wrap" ]; then
-    contact_text="$(text_extract "$base.pdf" -layout | normalize)"
+    contact_text="$(text_extract "$out/$base.pdf" -layout | normalize)"
     text_matches "$contact_text" '^[[:space:]]*\||\|[[:space:]]*$'; state=$?
     if [ "$state" -eq 0 ]; then
       echo "  ORPHAN CONTACT SEPARATOR in extracted visual line"; fail=1
@@ -277,8 +284,8 @@ EOF
   case "$base" in
     statement-diversity-title)
       expected_pdf_title="Statement of Contributions to Equity, Diversity, Inclusion, and Accessibility – Ada Lovelace"
-      pdf_title="$(pdfinfo "$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
-      pdf_author="$(pdfinfo "$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
+      pdf_title="$(pdfinfo "$out/$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
+      pdf_author="$(pdfinfo "$out/$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
       if [ "$pdf_title" != "$expected_pdf_title" ]; then
         echo "  WRONG PDF TITLE: $pdf_title"; fail=1
       else
@@ -292,8 +299,8 @@ EOF
       ;;
     statement-interest)
       expected_pdf_title="Statement of Interest – Ada Lovelace"
-      pdf_title="$(pdfinfo "$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
-      pdf_author="$(pdfinfo "$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
+      pdf_title="$(pdfinfo "$out/$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
+      pdf_author="$(pdfinfo "$out/$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
       if [ "$pdf_title" != "$expected_pdf_title" ]; then
         echo "  WRONG PDF TITLE: $pdf_title"; fail=1
       else
@@ -306,8 +313,8 @@ EOF
       fi
       ;;
     statement-*)
-      pdf_title="$(pdfinfo "$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
-      pdf_author="$(pdfinfo "$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
+      pdf_title="$(pdfinfo "$out/$base.pdf" | sed -n 's/^Title:[[:space:]]*//p')"
+      pdf_author="$(pdfinfo "$out/$base.pdf" | sed -n 's/^Author:[[:space:]]*//p')"
       if [ "$pdf_title" != "Teaching Statement – Ada Lovelace" ]; then
         echo "  WRONG PDF TITLE: $pdf_title"; fail=1
       else
@@ -324,7 +331,7 @@ EOF
   if [ "$update" -eq 1 ]; then
     printf '%s\n' "$got" > "$exp"; echo "  baseline updated: $exp"
     if [ "$pdfkit" -eq 1 ]; then
-      osascript -l JavaScript "$here/pdfkit-extract.js" "$here/$base.pdf" \
+      osascript -l JavaScript "$here/pdfkit-extract.js" "$out/$base.pdf" \
         | normalize > "$kexp"
       echo "  baseline updated: $kexp"
     fi
@@ -340,8 +347,8 @@ EOF
     check_wellformed "baseline $kexp" "$(cat "$kexp")" || fail=1
   fi
 
-  if ! compare_to_baseline "$exp" "$got" "$base"; then
-    echo "  EXTRACTION MISMATCH:"; sed 's/^/    /' "$base.diff"; fail=1
+  if ! compare_to_baseline "$exp" "$got" "$out/$base"; then
+    echo "  EXTRACTION MISMATCH:"; sed 's/^/    /' "$out/$base.diff"; fail=1
   else
     echo "  extraction OK (poppler)"
   fi
@@ -351,8 +358,8 @@ EOF
   # package must not emit them at all.
   # -a: the PDF is uncompressed but still binary-ish, and grep without it
   # collapses every hit into a single "Binary file matches" line.
-  if grep -qa '/ActualText' "$base.pdf"; then
-    n="$(grep -oa '/ActualText' "$base.pdf" | wc -l | tr -d ' ')"
+  if grep -qa '/ActualText' "$out/$base.pdf"; then
+    n="$(grep -oa '/ActualText' "$out/$base.pdf" | wc -l | tr -d ' ')"
     echo "  /ActualText PRESENT ($n spans) — see issue #72."
     echo "    PDFKit-class consumers (Preview, Spotlight, Safari, copy/paste)"
     echo "    will merge adjacent words. Do not re-enable"
@@ -366,11 +373,11 @@ EOF
     if [ ! -f "$kexp" ]; then
       echo "  MISSING baseline $kexp (run with --update on macOS to create)"; fail=1
     else
-      kgot="$(osascript -l JavaScript "$here/pdfkit-extract.js" "$here/$base.pdf" \
+      kgot="$(osascript -l JavaScript "$here/pdfkit-extract.js" "$out/$base.pdf" \
               | normalize)"
       check_wellformed "pdfkit, this run" "$kgot" || fail=1
-      if ! compare_to_baseline "$kexp" "$kgot" "$base.pdfkit"; then
-        echo "  PDFKIT EXTRACTION MISMATCH:"; sed 's/^/    /' "$base.pdfkit.diff"
+      if ! compare_to_baseline "$kexp" "$kgot" "$out/$base.pdfkit"; then
+        echo "  PDFKIT EXTRACTION MISMATCH:"; sed 's/^/    /' "$out/$base.pdfkit.diff"
         fail=1
       else
         echo "  extraction OK (pdfkit)"
@@ -379,7 +386,7 @@ EOF
   fi
 
   # Warning triage: any Warning/Missing/substitution not on the allowlist fails.
-  unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting' "$base.log" \
+  unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting' "$out/$base.log" \
                 | grep -viE "$allow" || true)"
   if [ -n "$unexpected" ]; then
     echo "  UNEXPECTED LOG LINES:"; printf '%s\n' "$unexpected" | sed 's/^/    /'
@@ -447,12 +454,12 @@ for extractor in expected pdfkit; do
     fi
     continue
   fi
-  if diff -u "$a" "$b" > "$here/medium-pair.$extractor.diff"; then
+  if diff -u "$a" "$b" > "$out/medium-pair.$extractor.diff"; then
     echo "  print and screen extract identically ($extractor)"
-    rm -f "$here/medium-pair.$extractor.diff"
+    rm -f "$out/medium-pair.$extractor.diff"
   else
     echo "  MEDIUM PAIR MISMATCH ($extractor): the screen decoration reached the text layer"
-    sed 's/^/    /' "$here/medium-pair.$extractor.diff"
+    sed 's/^/    /' "$out/medium-pair.$extractor.diff"
     fail=1
   fi
 done
