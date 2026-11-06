@@ -8,7 +8,7 @@ name: verapdf-scheduled
 # release it came from; update the comment whenever the pin moves.
 #
 #   texlive/texlive        digest below == :latest as published 2026-07-12 (matches build.yml)
-#   actions/checkout       v4.3.1
+#   actions/checkout       v7.0.1
 #   actions/upload-artifact v7.0.1
 #   veraPDF-apps            tag v1.30.2, commit 7d9b5c3f709846ab83f86ca1a538b24eac2d3f72 (2026-05-31)
 #     verified 2026-07-20 against Homebrew's formula pin for the same version;
@@ -34,8 +34,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: texlive/texlive@sha256:d39efa547acfa518072600315280f92357ca8e0b9e295e09b6ccd5f5d82a1373
     steps:
-      # actions/checkout v4.3.1: https://github.com/actions/checkout/releases/tag/v4.3.1
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      # actions/checkout v7.0.1: https://github.com/actions/checkout/releases/tag/v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Install build and extraction tooling
         run: |

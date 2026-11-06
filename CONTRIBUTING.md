@@ -1071,10 +1071,9 @@ The build workflow should:
 - compile every supported example;
 - fail when compilation fails;
 - upload PDFs and logs as artifacts;
-- record the tested toolchain beside the output it produced — TeX Live and
-  LuaHBTeX versions, the LaTeX format date, and the `fontspec`, `luaotfload`,
-  `tagpdf`, and `pdfmanagement-testphase` versions — so a result can be
-  attributed to the build that produced it;
+- record the tested toolchain beside the output it produced, and fail when the
+  record is incomplete, so a result can be attributed to the build that
+  produced it ("Pinned dependencies" says where the list lives);
 - keep its commands locally reproducible where practical;
 - pin every container and third-party action to an immutable reference.
 
@@ -1134,11 +1133,11 @@ from. A mutable tag such as `:latest` or `@v4` lets an upstream retag silently
 change what runs, which would surface as an unexplained failure or an output
 shift that looks like our bug.
 
-The `toolchain` job records the TeX Live release, LuaHBTeX and the `lualatex`
-format, `fontspec`, `pdfmanagement-testphase`, `tagpdf`, `l3build`,
-BibLaTeX/Biber, and default-font paths that a run actually used, and uploads them
-as the `toolchain-record` artifact. Read that artifact to learn
-which release a digest resolves to.
+The `toolchain` job records the toolchain a run actually used and uploads it as
+the `toolchain-record` artifact. Its "Record toolchain versions" step, in
+`.github/workflows/build.yml`, is the one list of what the record holds. Every
+item on it is required: a recorded command that fails or finds nothing fails
+the job. Read that artifact to learn which release a digest resolves to.
 
 `verapdf-scheduled.yml` additionally pins veraPDF itself to a commit SHA
 rather than a container digest or action tag, because `veraPDF/veraPDF-apps`
