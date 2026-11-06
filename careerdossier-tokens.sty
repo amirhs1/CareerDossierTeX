@@ -306,7 +306,8 @@
 %% header line, which is always the first material on page 1 and therefore
 %% always discarded; `\CDossierSharedHeaderParSkip' was subtracted from every
 %% header gap and then re-contributed by the following header line, so it
-%% cancelled itself for every value. Both are retired; see docs/MIGRATION.md.
+%% cancelled itself for every value. Both are retired (#220); the second was
+%% never in a release, so no migration note names it.
 %% The header group still needs its own paragraph gap -- see
 %% `careerdossier-components.sty' -- but it is now a fixed zero rather than a
 %% public knob.
