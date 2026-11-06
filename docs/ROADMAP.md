@@ -53,6 +53,13 @@ These entries keep the numbers they were written with.
 > freezes the result. The Project gained `Phase 10 — Interface Changes`, and
 > `Phase 10 — Stable API` became `Phase 11 — Stable API`. See
 > [issue #599](https://github.com/amirhs1/CareerDossierTeX/issues/599).
+>
+> **Moved on 2026-11-06.** At the maintainer's decision, every open
+> interface-change issue sits in `v0.11.0`. So
+> [#243](https://github.com/amirhs1/CareerDossierTeX/issues/243) moved there
+> from `v1.0.0`, its documentation included, because it can make
+> `\CDossierApplyPageBreakPenalties` private. #669 and #670 change
+> documentation only and moved to `v1.0.0`.
 
 ## Releases and phases
 
@@ -425,6 +432,10 @@ release of their own, so they are used before `v1.0.0` freezes them.
 - record and prose section headings rendered alike (#420);
 - a public key for declaring the document language (#288);
 - a per-entry `entrymeta` key on `CDossierEntry` (#569);
+- `\CDossierApplyPageBreakPenalties` documented with a signature or made
+  private, `\CDossierListLabelSep`'s split read time fixed or documented, and
+  the other public-prefixed names that survive the `v0.10.0` classification
+  documented (#243);
 - every breaking change recorded with its migration in `MIGRATION.md`.
 
 **This release changes the public interface on purpose.** Work that only
