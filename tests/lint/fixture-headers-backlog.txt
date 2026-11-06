@@ -1,0 +1,129 @@
+# fixture-headers-backlog.txt — the self-naming fixture-header ratchet (#534)
+#
+# Every fixture's first line should name the file:
+# `tests/lint/run-fixture-headers.sh' enforces it. This file declares the
+# fixtures that did not, measured on `main' at 5aca83f on 2026-11-06: 106 of
+# the 358 tracked .tex, .inc, and .lvt files under tests/, outside tests/lib/
+# and tests/lint/fixtures/.
+#
+# THIS LIST MAY ONLY SHRINK, and the lint makes it so: a fixture neither
+# naming itself nor listed fails; an entry whose fixture now names itself
+# fails until it is removed; an entry for a file that is no longer a fixture
+# fails; and more entries than the frozen size below fails. When the last
+# entry goes, delete this file and the lint's backlog branch; it says so.
+#
+# Format: the repository-relative path, whitespace, then the reason. THE
+# REASON IS MANDATORY; an entry without one fails the lint, as in
+# tests/lint/manual-undocumented.txt. Each reason here was read from the
+# file's own first line when the list was frozen: either it has no header
+# comment at all, or its header does not name the file. Blank lines and `#'
+# comments are ignored.
+#
+# FROZEN AT 106 entries, the measured size above.
+
+tests/annotations/uncompressed.inc                                     its header comment does not name the file
+tests/extraction/letter-academic-optional.tex                          its header comment does not name the file
+tests/extraction/resume-link-decoration.inc                            its header comment does not name the file
+tests/extraction/statement-diversity-title.tex                         its header comment does not name the file
+tests/extraction/statement-interest.tex                                its header comment does not name the file
+tests/extraction/statement-optional.tex                                its header comment does not name the file
+tests/layout/cv-a4-sans-body-two-page.tex                              its header comment does not name the file
+tests/layout/cv-a4-two-page.tex                                        its header comment does not name the file
+tests/layout/header-token-sizes.inc                                    its header comment does not name the file
+tests/layout/header-tokens-10pt.tex                                    its header comment does not name the file
+tests/layout/header-tokens-11pt.tex                                    its header comment does not name the file
+tests/layout/header-tokens-12pt.tex                                    its header comment does not name the file
+tests/layout/letter-a4-sans-body-two-page.tex                          its header comment does not name the file
+tests/layout/letter-a4-two-page.tex                                    its header comment does not name the file
+tests/layout/letter-academic-a4-sans-body-two-page.tex                 its header comment does not name the file
+tests/layout/letter-academic-a4-two-page.tex                           its header comment does not name the file
+tests/layout/letter-academic-long.tex                                  its header comment does not name the file
+tests/layout/resume-a4-sans-body-two-page.tex                          its header comment does not name the file
+tests/layout/resume-a4-two-page.tex                                    its header comment does not name the file
+tests/layout/resume-body-link-10pt-narrow.tex                          no header comment: the file opens with TeX, not a header
+tests/layout/resume-body-link-10pt-normal.tex                          no header comment: the file opens with TeX, not a header
+tests/layout/resume-body-link-11pt-narrow.tex                          no header comment: the file opens with TeX, not a header
+tests/layout/resume-body-link-11pt-normal.tex                          no header comment: the file opens with TeX, not a header
+tests/layout/resume-body-link-12pt-narrow.tex                          no header comment: the file opens with TeX, not a header
+tests/layout/resume-body-link-12pt-normal.tex                          no header comment: the file opens with TeX, not a header
+tests/layout/resume-body-link.inc                                      its header comment does not name the file
+tests/layout/resume-contact-wrap-10pt-narrow.tex                       no header comment: the file opens with TeX, not a header
+tests/layout/resume-contact-wrap-10pt-normal.tex                       no header comment: the file opens with TeX, not a header
+tests/layout/resume-contact-wrap-11pt-narrow.tex                       no header comment: the file opens with TeX, not a header
+tests/layout/resume-contact-wrap-11pt-normal.tex                       no header comment: the file opens with TeX, not a header
+tests/layout/resume-contact-wrap-12pt-narrow.tex                       no header comment: the file opens with TeX, not a header
+tests/layout/resume-contact-wrap-12pt-normal.tex                       no header comment: the file opens with TeX, not a header
+tests/layout/resume-contact-wrap.inc                                   its header comment does not name the file
+tests/layout/statement-a4-sans-body-two-page.tex                       its header comment does not name the file
+tests/layout/statement-a4-two-page.tex                                 its header comment does not name the file
+tests/metadata/components-after-hyperref.tex                           its header comment does not name the file
+tests/metadata/cv-default.tex                                          its header comment does not name the file
+tests/metadata/letter-default.tex                                      its header comment does not name the file
+tests/metadata/letter-ligature-default.tex                             its header comment does not name the file
+tests/metadata/letter-ligature-tagged.tex                              its header comment does not name the file
+tests/metadata/letter-override-default.tex                             its header comment does not name the file
+tests/metadata/letter-override-tagged.tex                              its header comment does not name the file
+tests/metadata/letter-passthrough-default.tex                          its header comment does not name the file
+tests/metadata/letter-passthrough-tagged.tex                           its header comment does not name the file
+tests/metadata/letter-title-default.tex                                its header comment does not name the file
+tests/metadata/letter-title-tagged.tex                                 its header comment does not name the file
+tests/metadata/resume-default.tex                                      its header comment does not name the file
+tests/metadata/resume-documentmetadata-lang.tex                        its header comment does not name the file
+tests/metadata/resume-user-lang.tex                                    its header comment does not name the file
+tests/metadata/statement-default.tex                                   its header comment does not name the file
+tests/metadata/uncompressed.inc                                        its header comment does not name the file
+tests/regression/support/tokens-defaults.inc                           its header comment does not name the file
+tests/smoke/itemize-trailing-glue.inc                                  its header comment does not name the file
+tests/smoke/letter-academic-10pt.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/letter-academic-11pt.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/letter-academic-12pt.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/letter-bad-fontsize.tex                                    no header comment: the file opens with TeX, not a header
+tests/smoke/letter-bad-margin.tex                                      no header comment: the file opens with TeX, not a header
+tests/smoke/letter-industry-10pt.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/letter-industry-11pt.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/letter-industry-12pt.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/letter-no-recipient-subject.tex                            its header comment does not name the file
+tests/smoke/letter-size-body.inc                                       no header comment: the file opens with TeX, not a header
+tests/smoke/list-edge-gap.inc                                          its header comment does not name the file
+tests/smoke/resume-contact-too-wide.tex                                its header comment does not name the file
+tests/smoke/section-rule-baseline.inc                                  its header comment does not name the file
+tests/smoke/section-rule-gap.inc                                       its header comment does not name the file
+tests/smoke/section-rule-spacing.inc                                   its header comment does not name the file
+tests/smoke/statement-artist-missing-website.tex                       no header comment: the file opens with TeX, not a header
+tests/smoke/statement-artist-valid.tex                                 no header comment: the file opens with TeX, not a header
+tests/smoke/statement-bad-fontsize.tex                                 no header comment: the file opens with TeX, not a header
+tests/smoke/statement-bad-margin.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/statement-bad-type.tex                                     no header comment: the file opens with TeX, not a header
+tests/smoke/statement-diversity-valid.tex                              no header comment: the file opens with TeX, not a header
+tests/smoke/statement-empty-type.tex                                   no header comment: the file opens with TeX, not a header
+tests/smoke/statement-header-tokens.inc                                its header comment does not name the file
+tests/smoke/statement-missing-email.tex                                no header comment: the file opens with TeX, not a header
+tests/smoke/statement-missing-name.tex                                 no header comment: the file opens with TeX, not a header
+tests/smoke/statement-name-10pt.tex                                    no header comment: the file opens with TeX, not a header
+tests/smoke/statement-name-11pt.tex                                    no header comment: the file opens with TeX, not a header
+tests/smoke/statement-name-12pt.tex                                    no header comment: the file opens with TeX, not a header
+tests/smoke/statement-name-size.inc                                    its header comment does not name the file
+tests/smoke/statement-purpose-valid.tex                                no header comment: the file opens with TeX, not a header
+tests/smoke/statement-research-valid.tex                               no header comment: the file opens with TeX, not a header
+tests/smoke/statement-teaching-philosophy-valid.tex                    no header comment: the file opens with TeX, not a header
+tests/smoke/statement-teaching-valid.tex                               no header comment: the file opens with TeX, not a header
+tests/smoke/statement-unknown-meta-key.tex                             no header comment: the file opens with TeX, not a header
+tests/smoke/statement-unknown-option.tex                               no header comment: the file opens with TeX, not a header
+tests/tagging/academic-letter-body.inc.tex                             no header comment: the file opens with TeX, not a header
+tests/tagging/academic-letter-untagged.tex                             no header comment: the file opens with TeX, not a header
+tests/tagging/academic-letter.tex                                      no header comment: the file opens with TeX, not a header
+tests/tagging/cv-body.inc.tex                                          no header comment: the file opens with TeX, not a header
+tests/tagging/cv-untagged.tex                                          no header comment: the file opens with TeX, not a header
+tests/tagging/cv.tex                                                   no header comment: the file opens with TeX, not a header
+tests/tagging/letter-body.inc.tex                                      no header comment: the file opens with TeX, not a header
+tests/tagging/letter-recipient-address-body.inc.tex                    no header comment: the file opens with TeX, not a header
+tests/tagging/letter-untagged.tex                                      no header comment: the file opens with TeX, not a header
+tests/tagging/letter.tex                                               no header comment: the file opens with TeX, not a header
+tests/tagging/resume-body.inc.tex                                      no header comment: the file opens with TeX, not a header
+tests/tagging/resume-entrymeta-inline.tex                              no header comment: the file opens with TeX, not a header
+tests/tagging/resume-linkdecoration-body.inc.tex                       no header comment: the file opens with TeX, not a header
+tests/tagging/resume-untagged.tex                                      no header comment: the file opens with TeX, not a header
+tests/tagging/resume.tex                                               no header comment: the file opens with TeX, not a header
+tests/tagging/statement-body.inc.tex                                   no header comment: the file opens with TeX, not a header
+tests/tagging/statement-untagged.tex                                   no header comment: the file opens with TeX, not a header
+tests/tagging/statement.tex                                            no header comment: the file opens with TeX, not a header

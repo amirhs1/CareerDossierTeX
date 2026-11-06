@@ -290,10 +290,11 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, testphase keys outside their owner, accented spellings, manual names, manual examples, documented token values, text guards, the list-remnant line count, the commit-msg hook, the docs-only classifier, shellcheck over the harness, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, fixture headers that name their file, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, testphase keys outside their owner, accented spellings, manual names, manual examples, documented token values, text guards, the list-remnant line count, the commit-msg hook, the docs-only classifier, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
+	tests/lint/run-fixture-headers.sh
 	tests/lint/run-markdown-anchors.sh
 	tests/lint/run-prose-pointers.sh
 	tests/lint/run-agents-layout.sh

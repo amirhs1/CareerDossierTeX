@@ -229,3 +229,19 @@ Like the files above they are lint input and are never compiled.
 | `testphasefixture-code.cls` | a key set in code → reported |
 | `testphasefixture-comment.cls` | a key named only in a comment → reported, because comments count |
 | `testphasefixture-clean.cls` | only the stable tagpdf API → not reported |
+
+## Fixture-header fixtures
+
+These pin the verdicts of `tests/lint/run-fixture-headers.sh` (issue #534).
+Like the files above they are lint input and are never compiled, and they sit
+outside the lint's own scope.
+
+| Fixture | Backlog | Verdict |
+| --- | --- | --- |
+| `headerfixture-named.tex` | `headerbacklog-empty.txt` | `OK` |
+| `headerfixture-unnamed.tex` | `headerbacklog-empty.txt` | `UNNAMED FIXTURE` |
+| `headerfixture-unnamed.tex` | `headerbacklog-ok.txt` | `OK`: declared, with a reason |
+| `headerfixture-unnamed.tex` | `headerbacklog-noreason.txt` | `NO REASON` |
+| `headerfixture-unnamed.tex` | `headerbacklog-stale.txt` | `STALE ENTRY`: it also lists a file that does not exist |
+| `headerfixture-named.tex` | `headerbacklog-fixed.txt` | `FIXED, DROP THE ENTRY` |
+| `headerfixture-unnamed.tex`, `headerfixture-unnamed-2.tex` | `headerbacklog-over.txt` | `OVER THE FROZEN SIZE`: two entries, frozen at one |
