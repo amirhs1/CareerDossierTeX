@@ -26,7 +26,7 @@
 %% not load hyperref: the classes own that, and every link degrades to its
 %% visible address without it.
 %%
-%% Until issue #465 this was the largest block of careerdossier-components. It
+%% Until #465 this was the largest block of careerdossier-components. It
 %% moved because nothing else in that package called into it; the dependency
 %% analysis is recorded on #465.
 %%
@@ -57,7 +57,7 @@
 \tl_new:N   \l__cdossier_links_shown_tl
 \str_new:N  \l__cdossier_links_scheme_str
 
-%% The link half of `medium' (issue #278). careerdossier-components owns the
+%% The link half of `medium' (#278). careerdossier-components owns the
 %% `medium' option and validates it once; it hands this package the one
 %% decision that concerns links -- whether body-copy anchor text is underlined
 %% -- through the setter, so the dependency runs one way. Loaded on its own,
@@ -67,7 +67,7 @@
   { \bool_set:Nn \l__cdossier_links_screen_bool {#1} }
 
 %% ---------------------------------------------------------------------------
-%% Link decoration (issue #278).
+%% Link decoration (#278).
 %%
 %% careerdossier-theme sets `colorlinks=true, allcolors=cdossier-link' with
 %% `cdossier-link' at gray 0, so a link is drawn in body black with no border.
@@ -86,7 +86,7 @@
 %% emitted under both media: it costs nothing on paper and stripping it would
 %% hand dead links to anyone who opens a `medium=print' file on screen.
 %%
-%% Three findings from issue #278 shape the implementation, and each is a
+%% Three findings from #278 shape the implementation, and each is a
 %% constraint rather than a preference.
 %%
 %%   - `colorlinks=true' is the only thing suppressing hyperref's default 1pt
@@ -117,14 +117,14 @@
 %% by preference. ulem was tried first and rejected.
 %%
 %% \uline reboxes its argument and rebuilds the interword spaces as its own
-%% leaders. That survives every check this project had before issue #302: the
+%% leaders. That survives every check this project had before #302: the
 %% rendered page is correct, veraPDF passes, and Poppler, MuPDF, and PDFKit all
 %% read `public write-up' back intact, because they rebuild words from glyph
 %% geometry and the gap is still there. What changes is the structure tree. A
 %% consumer reading the logical text of the Link element -- which is what a
 %% screen reader announces -- gets `publicwrite-up': tagpdf marks a real space
 %% only where it finds interword glue, and ulem has replaced that glue. The same
-%% class of defect as issues #302 and #315, arriving by a third route.
+%% class of defect as #302 and #315, arriving by a third route.
 %%
 %% lua-ul underlines by attaching a node attribute and letting LuaTeX draw the
 %% rule at shipout. Nothing is reboxed, the glue is untouched, and the space
@@ -152,7 +152,7 @@
 %%
 %% Every one of those links displays the address through \nolinkurl or url.sty,
 %% so the visible text already announces itself and needs no second cue -- which
-%% is the split issue #278 settled deliberately rather than by default. On the
+%% is the split #278 settled deliberately rather than by default. On the
 %% contact line in particular a rule under the e-mail and the website, but not
 %% under the phone or the location, reads as `these two are emphasised' rather
 %% than `these are links', because every item on that line is an identifier.
@@ -229,7 +229,7 @@
 %% the right behavior: the address stays visible, selectable, and extractable.
 %% What the false branch has no way of announcing is that it was taken. The
 %% page looks finished, and the author finds out by clicking a dead address in
-%% the finished PDF. So say it once (issue #329).
+%% the finished PDF. So say it once (#329).
 %%
 %% Once per document, not once per field: a contact line renders up to six
 %% linked fields, and the cause is a single missing package, not six mistakes.
@@ -262,7 +262,7 @@
       }
   }
 
-%% Rewrite every raw `#' in a link target to \# in place (issue #353).
+%% Rewrite every raw `#' in a link target to \# in place (#353).
 %%
 %% A `#' in a profile value survives tokenization -- unlike `%', which the lexer
 %% destroys before any package code can see it -- so it reaches here intact, at
@@ -280,7 +280,7 @@
 %%     /URI(https://example.com/a)
 %%
 %% -- a loud build failure traded for a link that looks right on the page and
-%% points at the wrong address, the same class of defect as issue #328. No
+%% points at the wrong address, the same class of defect as #328. No
 %% text-layer test can catch it, because the displayed address is correct either
 %% way. Measured, not inferred: the two spellings were compared in an
 %% uncompressed build, and only \# reaches the annotation intact.
@@ -330,7 +330,7 @@
   }
 \cs_generate_variant:Nn \__cdossier_links_link:nn { VV }
 
-%% Body-text link (issue #308). The contact line's items are packed as atomic
+%% Body-text link (#308). The contact line's items are packed as atomic
 %% boxes, so its links only ever break at url.sty's own punctuation points. A
 %% link inside running prose or a bullet has no such packer behind it: it is
 %% one long token in a justified paragraph, and the three available forms all
@@ -345,13 +345,13 @@
 %%     margin=narrow, and worse at the larger sizes;
 %%   - \emergencystretch cannot reach either case. It redistributes interword
 %%     glue on the offending line, and a line holding one over-wide token has
-%%     none to redistribute. See \CDossierEmergencyStretch (issue #272).
+%%     none to redistribute. See \CDossierEmergencyStretch (#272).
 %%
 %% So the break points have to be supplied. \UrlBreaks is extended, for the
 %% duration of one link, with every ASCII letter and digit, which lets the
 %% address break anywhere rather than only after punctuation. url.sty inserts a
 %% penalty and no discretionary hyphen at these points, so a wrapped address
-%% still reassembles exactly -- the copy-paste invariant of issue #294, which
+%% still reassembles exactly -- the copy-paste invariant of #294, which
 %% tests/links now pins for body text as well as the contact line.
 %%
 %% The extension is local to the group below rather than a global change to
@@ -386,7 +386,7 @@
 %% URI action -- with no warning, and with the page, the extracted text, and
 %% copy-paste integrity all still correct. Hence :Ne and \tl_to_str:n, which
 %% put the scheme in at catcode 12, exactly as a document that wrote the
-%% address out in full would (issue #328).
+%% address out in full would (#328).
 \cs_new_protected:Npn \__cdossier_links_scheme:N #1
   {
     \str_set:NV \l__cdossier_links_scheme_str #1
@@ -449,7 +449,7 @@
 %% \__cdossier_links_scheme:N. This one used to escape the consequences by
 %% luck: it took the same wrong branch, but \@hyper@linkfile saw what looked
 %% like an extension in the address's domain and fell back to a URL, so no
-%% `.pdf' was appended. That is not something to rely on (issue #328).
+%% `.pdf' was appended. That is not something to rely on (#328).
 \cs_new_protected:Npn \__cdossier_links_mail:n #1
   {
     \tl_set:Nx \l__cdossier_links_disp_tl { \CDossierFieldValue {#1} }
@@ -459,7 +459,7 @@
   }
 
 %% Services whose bare identifier has a documented canonical address, and the
-%% prefix that produces it (issue #330). Authors hold a LinkedIn or GitHub
+%% prefix that produces it (#330). Authors hold a LinkedIn or GitHub
 %% handle, not a profile path, and a Scholar identifier rather than the query
 %% string around it -- so the natural value used to produce https://<handle>,
 %% a broken link with no warning and a page that looked correct.
@@ -532,7 +532,7 @@
       {
         %% :Ne and \tl_to_str:n for the reason given at
         %% \__cdossier_links_scheme:N -- a catcode-11 colon here would
-        %% make the ORCID link a GoToR action (issue #328).
+        %% make the ORCID link a GoToR action (#328).
         \str_if_in:NnTF \l__cdossier_links_scheme_str { orcid.org/ }
           { \tl_put_left:Ne \l__cdossier_links_url_tl
               { \tl_to_str:n { https:// } } }
@@ -541,7 +541,7 @@
       }
     %% This branch builds its own \href rather than going through
     %% \__cdossier_links_link:nn, so it needs the raw-`#' rewrite the
-    %% chokepoint applies (issue #353). An ORCID identifier holds no `#', but
+    %% chokepoint applies (#353). An ORCID identifier holds no `#', but
     %% the value is author-supplied and a mistyped one would otherwise fail
     %% with hyperref's internal diagnostic while every other field no longer
     %% does.

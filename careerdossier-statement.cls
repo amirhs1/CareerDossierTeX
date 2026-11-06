@@ -65,9 +65,9 @@
 \tl_new:N   \l__cdossier_statement_type_tl
 \tl_set:Nn  \l__cdossier_statement_type_tl { interest }
 
-%% Issue #266: careerdossier-base declares the six options every class
+%% careerdossier-base declares the six options every class
 %% shares, each with its storage, its accepted values, and its class-named
-%% message; see `Shared class options' there. The class adds its own `type'
+%% message; see `Shared class options' there (#266). The class adds its own `type'
 %% option, its unknown-option message, and its unknown-key handler to the same
 %% key path, and sets the two defaults that differ by class.
 %% careerdossier-components would load base later anyway; it is loaded here
@@ -133,9 +133,9 @@
       }
       { careerdossier-tokens }
   }
-%% Issues #184 and #271: the class validates the public values;
+%% The class validates the public values;
 %% careerdossier-components owns the page furniture and the de-emphasis role,
-%% and therefore owns both resulting decisions.
+%% and therefore owns both resulting decisions (#184, #271).
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
@@ -161,22 +161,22 @@
 \exp_args:NV \__cdossier_tokens_apply_geometry:n \l__cdossier_statement_paper_tl
 \setlength { \parindent }        { 0pt }
 \setlength { \parskip }          { \CDossierProseParSkip }
-%% Issue #272: the shared line-breaking flexibility every family applies. The
+%% The shared line-breaking flexibility every family applies (#272). The
 %% policy and its reasoning live with the token in careerdossier-tokens.
 \setlength { \emergencystretch } { \CDossierEmergencyStretch }
 
-%% Typographic page-break penalties (issue #171): see careerdossier-tokens for
+%% Typographic page-break penalties (#171): see careerdossier-tokens for
 %% the shared values and the reasoning for using one strength across families.
 \CDossierApplyPageBreakPenalties
 
-%% Issue #223: the shared header stack ends at a boundary against this class's
+%% The shared header stack ends at a boundary against this class's
 %% prose section heading, whose gap is calibrated against the paragraph gap
-%% rather than against the record classes' ruled furniture. Naming its own token
+%% rather than against the record classes' ruled furniture (#223). Naming its own token
 %% keeps a retune of that heading scale inside this class.
 \__cdossier_components_headerbelow:N \CDossierProseHeaderBelowSkip
 
 %% ---------------------------------------------------------------------------
-%% Section headings (issue #177).
+%% Section headings (#177).
 %%
 %% A statement is continuous prose, so its headings are not the resume's ruled
 %% section furniture: no decorative rule, and a smaller, quieter break in the
@@ -215,9 +215,9 @@
 %% The tokens are set well clear of that, and the fixture asserts the bound
 %% rather than clamping it here, so an unusable retune fails loudly.
 %% ---------------------------------------------------------------------------
-%% Issue #267: the kernel's tagging support reads `\@startsection''s numeric
+%% The kernel's tagging support reads `\@startsection''s numeric
 %% level argument, not its name, to pick the heading's structure depth --
-%% level 1 resolves to `/H1', level 2 to `/H2', and so on. The document
+%% level 1 resolves to `/H1', level 2 to `/H2', and so on (#267). The document
 %% identity (the name) now owns depth 1, so `\section' and `\subsection' move
 %% to depths 2 and 3, keeping the heading hierarchy unskipped underneath it.
 %% Both stay starred-only, so neither ever touches `secnumdepth' or a counter;
@@ -248,7 +248,7 @@
 %% implementation: a statement numbers nothing, and one renderer means the
 %% tokens and the tagged structure cannot drift between the two spellings.
 %%
-%% Issue #337: the parity this claims is now real on both halves. Until then the
+%% The parity this claims is now real on both halves (#337). Until then the
 %% record classes offered `\CDossierSection' and nothing between it and an entry,
 %% so only the section half of the sentence above was true. They now render a
 %% second level under the same name, from one shared renderer, for the same
@@ -425,15 +425,15 @@
       { Application~ID:~\tl_use:N \l__cdossier_statement_application_id_tl }
   }
 
-%% Issue #204: the header lines and the gaps between them are emitted by the
+%% The header lines and the gaps between them are emitted by the
 %% shared header stack in careerdossier-components, which this class used to
 %% duplicate from five separate sites -- each gap attached as a leading skip on
-%% the optional block below it. The class now states only which lines are
+%% the optional block below it (#204). The class now states only which lines are
 %% present, in reading order; the component owns the gap between two of them,
 %% the paragraph gap inside the header group, and the boundary below the stack.
 %%
-%% Issue #224: it states them through the public \CDossierHeaderBegin /
-%% \CDossierHeaderLine / \CDossierHeaderEnd triple. It used to drive the
+%% It states them through the public \CDossierHeaderBegin /
+%% \CDossierHeaderLine / \CDossierHeaderEnd triple (#224). It used to drive the
 %% component's private primitives, which no class may do. The statement cannot
 %% reuse \MakeCDossierHeader instead, because its title, subtitle, and context
 %% lines interleave with the identity lines rather than following them.
@@ -442,13 +442,13 @@
     \__cdossier_statement_validate:
     \par
     \CDossierHeaderBegin
-    %% Issue #267: the name is the document identity and outranks the
+    %% The name is the document identity and outranks the
     %% statement's own title, so it is depth 1 of the shared heading
-    %% primitive and the title moves to depth 2.
+    %% primitive and the title moves to depth 2 (#267).
     \CDossierHeaderLine
       {
-        %% Issue #305: as in \MakeCDossierHeader, the unformatted text is
-        %% passed alongside the rendered line so the heading records a `/T'.
+        %% As in \MakeCDossierHeader, the unformatted text is
+        %% passed alongside the rendered line so the heading records a `/T' (#305).
         %% \CDossierFieldValue, not \CDossierPrintField -- see the note there
         %% for why a protected command in this argument records the wrong
         %% title rather than no title.

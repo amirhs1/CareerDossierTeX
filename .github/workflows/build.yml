@@ -43,7 +43,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # Docs-only classifier (issues #568 and #614). On a pull request whose diff
+  # Docs-only classifier (#568 and #614). On a pull request whose diff
   # touches only docs-only paths, the TeX jobs are skipped: every job in the
   # TeX Live container, `toolchain` among them. `lint` runs regardless, and so
   # does every job on a push to main.
@@ -288,7 +288,7 @@ jobs:
       # (maven + a JDK) adds several minutes that this per-PR job should not
       # pay on every push; the weekly `verapdf-scheduled` workflow
       # (.github/workflows/verapdf-scheduled.yml) builds it from a pinned
-      # commit and runs this same gate instead (issue #94). The runner skips
+      # commit and runs this same gate instead (#94). The runner skips
       # the gate here with a notice and names it in its closing summary, so a
       # CI pass in this job is not mistaken for a validated one.
       #
@@ -296,7 +296,7 @@ jobs:
       # macOS and by the committed *.pdfkit.txt baselines.
       #
       # This job, `smoke`, and `layout` run their fixtures concurrently, one per
-      # core (issue #631); the runner's accounting line in the log is what shows
+      # core (#631); the runner's accounting line in the log is what shows
       # every fixture ran exactly once. `make tagging` stays serial locally.
       - name: Tagged-PDF structure, extraction, and geometry fixtures
         run: |
@@ -472,10 +472,10 @@ jobs:
       # tests/bibliography/run.sh diffs extracted text, so pdftotext must be
       # present for the ydnt-ordering and identifier-precedence assertions to
       # run at all. It is also what reads the rendered entry labels for the
-      # shipped-example guard (issue #319).
+      # shipped-example guard (#319).
       # mupdf-tools supplies mutool, which is the only tool here that reports
       # which font a run of text is set in. The multi-word author-highlighting
-      # assertion (issue #541) needs that and nothing else does: the defect it
+      # assertion (#541) needs that and nothing else does: the defect it
       # guards changes the weight of a name and not one character of the
       # extracted text, so poppler cannot see it. The runner skips that one
       # assertion when mutool is absent, and installing it here is what keeps CI
@@ -509,7 +509,7 @@ jobs:
             build/bibliography-example/cv-bibliography.bbl
           if-no-files-found: warn
 
-  # Copy-paste integrity of URLs and e-mail addresses (issue #294). Its own job
+  # Copy-paste integrity of URLs and e-mail addresses (#294). Its own job
   # for the same reason `bibliography` is: the property is invisible in the
   # rendered page and in ordinary extracted text, so a named check is what makes
   # the coverage findable. It needs Biber as well as poppler — the bibliography
@@ -543,7 +543,7 @@ jobs:
             build/links/*.tokens
           if-no-files-found: warn
 
-  # Default-path PDF metadata (issue #276). Deliberately its own job rather than
+  # Default-path PDF metadata (#276). Deliberately its own job rather than
   # part of `tagging`, which is the suite it exists to complement: every tagging
   # fixture opts into \DocumentMetadata, and that is precisely what masks the
   # package's own /Lang. Naming the job keeps the distinction visible from the
@@ -566,7 +566,7 @@ jobs:
       # fixture that fails, so the job log already carries what a reviewer
       # needs. An upload step here would only ever report no files found.
 
-  # Link-annotation action types (issue #328). Its own job for the same reason
+  # Link-annotation action types (#328). Its own job for the same reason
   # `metadata` is: every other link-facing suite reads the text layer, and the
   # defect this one exists to catch — a scheme-less profile link emitted as a
   # GoToR remote-PDF action — leaves the page, the extracted text, and the

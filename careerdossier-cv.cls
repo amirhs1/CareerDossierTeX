@@ -48,10 +48,10 @@
 
 \RequirePackage { l3keys2e }
 
-%% Issue #266: careerdossier-base declares the six options every class shares
+%% careerdossier-base declares the six options every class shares
 %% and the entrymeta option the two record classes share, each with its
 %% storage, its accepted values, and its class-named message; see `Shared class
-%% options' there. The class adds its unknown-option message and its
+%% options' there (#266). The class adds its unknown-option message and its
 %% unknown-key handler to the same key path, and sets the two defaults that
 %% differ by class.
 %% careerdossier-components would load base later anyway; it is loaded here
@@ -98,10 +98,10 @@
       }
       { careerdossier-tokens }
   }
-%% Issues #184, #271, and #230: the class validates the public values;
+%% The class validates the public values;
 %% careerdossier-components owns the page furniture, the de-emphasis role, and
 %% the entry-heading primitive, and therefore owns all three resulting
-%% decisions.
+%% decisions (#184, #271, #230).
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
@@ -133,7 +133,7 @@
 \setlength { \parindent } { 0pt }
 \setlength { \parskip }   { \CDossierRecordParSkip }
 
-%% Issue #272: the shared line-breaking flexibility every family applies. This
+%% The shared line-breaking flexibility every family applies (#272). This
 %% was previously spent only at `a4paper', on the reasoning that A4's narrower
 %% text block needs more paragraph flexibility for prose-heavy CV entries --
 %% true, but not a reason to withhold it from letter paper, which is only less
@@ -145,31 +145,31 @@
 \__cdossier_components_apply_page_furniture:
 \CDossierApplyPageBreakPenalties
 
-%% Issue #223: the shared header stack ends at a boundary against whatever the
+%% The shared header stack ends at a boundary against whatever the
 %% class puts next -- here a ruled \CDossierSection -- so the class names the
 %% token that owns it rather than sharing one gap with the letter and the
-%% statement, whose next block is not a ruled section at all.
+%% statement, whose next block is not a ruled section at all (#223).
 \__cdossier_components_headerbelow:N \CDossierRecordHeaderBelowSkip
 
-%% The keep-together penalty (issue #145) after the heading and rule keeps the
+%% The keep-together penalty (#145) after the heading and rule keeps the
 %% title with the content that follows it, so a section heading is never
 %% stranded alone at the foot of a page.
-%% Issue #267: depth 2, not 1 -- the document identity (the name, in
+%% Depth 2, not 1 -- the document identity (the name, in
 %% \MakeCDossierHeader) is the document's one depth-1 heading, so every
-%% resume/CV section heading sits one level under it.
+%% resume/CV section heading sits one level under it (#267).
 %%
-%% Issue #268: the heading also opens the division that encloses it and the
+%% The heading also opens the division that encloses it and the
 %% entries it introduces, and passes its plain title so the heading element
-%% records it. A CV's publication list has no sectioning of its own -- it is a
+%% records it (#268). A CV's publication list has no sectioning of its own -- it is a
 %% list placed under an ordinary \CDossierSection -- so this one division is
 %% what encloses it too. The division opens after the `\addvspace' and before
 %% the heading; see the note on the primitive in careerdossier-typography.sty.
 \NewDocumentCommand \CDossierSection { m }
   {
     \par
-    %% Issue #333: the section keep, applied before the heading contributes
+    %% The section keep, applied before the heading contributes
     %% anything, so the bound is on what the heading commits rather than a
-    %% prohibition on breaking after it.
+    %% prohibition on breaking after it (#333).
     \__cdossier_components_section_need:
     \addvspace { \CDossierRecordSectionAboveSkip }
     \__cdossier_typography_division_begin:n { 2 }
@@ -179,7 +179,7 @@
   }
 
 %% \CDossierSubsection {title} -- the level between a section and an entry
-%% (issue #337). A CV is where the need is sharpest: Publications split into
+%% (#337). A CV is where the need is sharpest: Publications split into
 %% journal, conference, and preprint, Experience into industry and academic.
 %% Both of those groupings are served by one pair of tokens, because the
 %% subsection's below-skip wins the `\addvspace' maximum against an entry run and
@@ -229,11 +229,11 @@
       \l__cdossier_cv_entry_org_tl
       \l__cdossier_cv_entry_loc_tl
       \l__cdossier_cv_entry_dates_tl
-    %% Issue #145: keep the entry heading with the first line of its body, so
-    %% the heading cannot be stranded alone at the foot of a page.
+    %% Keep the entry heading with the first line of its body, so
+    %% the heading cannot be stranded alone at the foot of a page (#145).
     %%
-    %% Issue #332: guarded on a non-empty body, for the reasons set out at the
-    %% matching guard in careerdossier-resume.cls. In short: emitted with no body
+    %% Guarded on a non-empty body, for the reasons set out at the
+    %% matching guard in careerdossier-resume.cls (#332). In short: emitted with no body
     %% to bind to, the penalty is left immediately before the gap glue, which
     %% makes that boundary unbreakable, and the next entry's `\addvspace'
     %% collapses rather than intervening -- so a run of body-less entries welds
@@ -241,7 +241,7 @@
     %% be made, at the cost of catcode-sensitive content in an entry body.
     \tl_if_blank:nF {#2}
       { \penalty \CDossierHeadingKeepPenalty }
-    %% Issue #204: `\addvspace', not `\vspace'. As a `\vspace' this was extra
+    %% `\addvspace', not `\vspace' (#204). As a `\vspace' this was extra
     %% space that added to whatever the entry body opened with, so a bullet list
     %% sat further from the entry heading that owns it than from the next entry.
     %% As an `\addvspace' the token is the *floor* for the heading -> body
@@ -250,34 +250,34 @@
     #2
   }
   {
-    %% Issue #204: the entry's closing boundary is owned by whatever opens next
-    %% -- \CDossierRecordEntryAboveSkip or \CDossierRecordSectionAboveSkip. The
+    %% The entry's closing boundary is owned by whatever opens next
+    %% -- \CDossierRecordEntryAboveSkip or \CDossierRecordSectionAboveSkip (#204). The
     %% retired \CDossierRecordEntryBelowSkip lost both of those maxima.
     \par
   }
 
-%% Issue #145: `beginpenalty' keeps the first bullet with whatever precedes the
-%% list -- here the entry heading. The inter-item boundaries are governed by
+%% `beginpenalty' keeps the first bullet with whatever precedes the
+%% list -- here the entry heading (#145). The inter-item boundaries are governed by
 %% the shared position-aware policy in careerdossier-components, which forbids
 %% the boundaries that would strand a single bullet and merely discourages the
 %% rest, so a list longer than a page still breaks.
 %%
-%% Issue #176: `partopsep' is zeroed so the list-edge tokens alone own the
-%% distance between the list and the content around it, as documented. LaTeX
+%% `partopsep' is zeroed so the list-edge tokens alone own the
+%% distance between the list and the content around it, as documented (#176). LaTeX
 %% adds `\partopsep' on top of `topsep' whenever a list opens a new paragraph,
 %% and the `article' default is 3 pt plus stretch: a quantity no token owns and
 %% that does not rescale with `fontsize'. Left in place it would make the list
 %% edge both wider than the token says and proportionally wider at 10pt than
 %% at 12pt. The token's own ratio absorbs the 3 pt instead.
 %%
-%% Issue #191: `topsep' is LaTeX's only list-edge key and applies at both ends,
+%% `topsep' is LaTeX's only list-edge key and applies at both ends,
 %% so `\CDossierRecordListEdgeAboveSkip' passes through it and the shared
 %% component call below substitutes `\CDossierRecordListEdgeBelowSkip' for the
-%% closing edge.
+%% closing edge (#191).
 %%
-%% Issue #193: that substitution works on the untagged path only, because a
+%% That substitution works on the untagged path only, because a
 %% tagged list is built by LaTeX Lab's block templates and never reads the
-%% register it assigns. The tagged branch names the same token through
+%% register it assigns (#193). The tagged branch names the same token through
 %% `cdossier-closing-edge' instead -- the shared key careerdossier-components
 %% declares for exactly this -- so both paths place the same gap below a list.
 \dim_new:N \l__cdossier_cv_label_width_dim
@@ -380,7 +380,7 @@
     'continue'~(this~list~carries~on~from~the~last~one).
   }
 
-%% Numbering across grouped lists (issue #355).
+%% Numbering across grouped lists (#355).
 %%
 %% `restart' is the default and is the behaviour the class shipped with: each
 %% CDossierPublications is a self-contained list and its first item is `1)'.
@@ -456,7 +456,7 @@
 %% one is invisible to that split, so hyperref takes the target for a local
 %% file, appends `.pdf', and emits a GoToR "open a remote PDF" action rather
 %% than a URI action -- silently, and only in the annotation. See the same note
-%% at \__cdossier_links_scheme:N in careerdossier-links (issue #328).
+%% at \__cdossier_links_scheme:N in careerdossier-links (#328).
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
     \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
@@ -480,7 +480,7 @@
     %% links, for the reason given at \__cdossier_links_hashescape:N in
     %% careerdossier-links: hyperref's own \edef fails on a parameter
     %% character, and the catcode-12 repair truncates the address silently
-    %% (issue #353). This link builds its own \href rather than going through
+    %% (#353). This link builds its own \href rather than going through
     %% \__cdossier_links_link:nn, so it applies the rewrite itself. A URL
     %% carrying a fragment is ordinary in a publication list.
     \__cdossier_links_hashescape:N \l__cdossier_cv_publication_target_tl
@@ -488,7 +488,7 @@
     %% The visible text is the identifier itself, so this link needs no
     %% decoration under `medium=screen' -- and must not get one: ulem would
     %% rebox the \nolinkurl into a single unbreakable token. See
-    %% \CDossierPlainLinks in careerdossier-links (issue #278).
+    %% \CDossierPlainLinks in careerdossier-links (#278).
     \cs_if_exist:NTF \href
       {
         \group_begin:
@@ -501,7 +501,7 @@
       {
         %% The same warning the contact line and \CDossierLink raise, from the
         %% package that owns the message: a publication identifier that is not
-        %% a link has the same cause and the same remedy (issue #329).
+        %% a link has the same cause and the same remedy (#329).
         \__cdossier_links_inert:
         #1:\nobreakspace #2
       }
@@ -549,7 +549,7 @@
 %% and cannot accept enumitem's `*' calculation, and it places the closing edge
 %% from `cdossier-closing-edge' rather than from `\@topsepadd'. CDossierItemize
 %% gained the first branch with the calibrated token system and this list did
-%% not, so until now it had no tagged path at all (issues #218 and #193).
+%% not, so until now it had no tagged path at all (#218 and #193).
 %%
 %% enumitem's `*' resolves the label box from the *first* item's label and keeps
 %% that width however long the list runs, so `\textbf{1)}' is the box the

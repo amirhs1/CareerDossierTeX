@@ -26,7 +26,7 @@
 %% The one inbound interface is \__cdossier_metadata_doctype:n, which each class
 %% calls once to name the kind of document it produces. careerdossier-components
 %% loads this package, so a class reaches it without loading it by name. Until
-%% issue #464 this block lived in careerdossier-components; it moved because it
+%% #464 this block lived in careerdossier-components; it moved because it
 %% shares no code with that module and has its own suite, `make metadata'.
 
 \NeedsTeXFormat{LaTeX2e}[2022-06-01]
@@ -110,7 +110,7 @@
 %% Build "Doctype - Name" with an en dash, or just "Name" when the class
 %% declared no doctype.
 %%
-%% The separator is written as the character it is, not as `--' (issue #428).
+%% The separator is written as the character it is, not as `--' (#428).
 %% Spelling it `--' produced two different titles from one source, because the
 %% two build paths hand the string to different writers. On the default path
 %% hyperref's \pdfstringdef performs the usual TeX ligature substitution on its
@@ -137,7 +137,7 @@
     \__cdossier_metadata_pdfligatures:N \l__cdossier_metadata_pdfname_tl
   }
 
-%% Spell TeX's input ligatures the same way on both build paths (issue #439).
+%% Spell TeX's input ligatures the same way on both build paths (#439).
 %%
 %% The comment above fixed the separator this package writes, and could, by
 %% naming the character instead of spelling it `--'. That does not reach a `--'
@@ -156,7 +156,7 @@
 %% second thing to keep correct for no difference in output.
 %%
 %% The table is measured, not assumed, against \pdfstringdef under LuaHBTeX
-%% 1.24.0 / TeX Live 2026, and it is shorter than issue #439 supposed:
+%% 1.24.0 / TeX Live 2026, and it is shorter than #439 supposed:
 %%
 %%   --  -> U+2013     ---  -> U+2014     !`  -> U+00A1     ?`  -> U+00BF
 %%
@@ -175,7 +175,7 @@
 %% both from `name'. It cannot cover a value the document sets itself, which
 %% since #440 this package deliberately passes through untouched, nor
 %% pdfsubject or pdfkeywords, which it never sees. Those follow hyperref's and
-%% the kernel's own behaviour and still differ between the paths. Issue #442
+%% the kernel's own behaviour and still differ between the paths. #442
 %% settled that as accepted rather than worked around: a workaround would
 %% rewrite values this package passes through on purpose, and would still reach
 %% only the two fields above. pdfsubject is the evidence it is not this
@@ -222,7 +222,7 @@
   }
 
 %% Has the document already supplied this Info dictionary entry through the
-%% kernel's PDF management? (issue #440)
+%% kernel's PDF management? (#440)
 %%
 %% The /Lang trap above, again, for /Title and /Author. There are two ways into
 %% each of those too, and \__cdossier_metadata_hyp_if_unset:n sees only one.
@@ -280,7 +280,7 @@
           {
             %% /Author is the second route out of `name' and does not go
             %% through the title builder, so it needs the ligature pass in its
-            %% own right (issue #439). Handing \hypersetup the raw field here
+            %% own right (#439). Handing \hypersetup the raw field here
             %% passes the /Title check and fails the /Author one.
             \__cdossier_metadata_hyp_if_unset:nT { @pdfauthor }
               {
@@ -309,7 +309,7 @@
 \AddToHook { begindocument }
   { \cs_if_exist:NT \hypersetup { \__cdossier_metadata_pdfmeta: } }
 
-%% Ask the viewer to show the derived /Title (issue #277).
+%% Ask the viewer to show the derived /Title (#277).
 %%
 %% A /Title in the file is not what a viewer puts in its window title, tab bar,
 %% or recent-documents list; it uses the filename unless the catalog's
@@ -350,7 +350,7 @@
 \AddToHook { package/hyperref/after }
   { \__cdossier_metadata_pdfdisplaydoctitle: }
 
-%% Ordering against hyperref's own begindocument code (issue #276).
+%% Ordering against hyperref's own begindocument code (#276).
 %%
 %% /Lang is not written at \end{document} with the rest of the metadata. Without
 %% \DocumentMetadata the kernel's PDF management is inactive, so hyperref writes
