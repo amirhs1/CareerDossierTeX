@@ -355,8 +355,9 @@
 %% tests/links now pins for body text as well as the contact line.
 %%
 %% The extension is local to the group below rather than a global change to
-%% \UrlBreaks, so the contact line and the bibliography keep the punctuation-only
-%% breaks they were measured with.
+%% \UrlBreaks, so the contact line keeps the punctuation-only breaks it was
+%% measured with. The bibliography's own break points, which BibLaTeX adds
+%% through \UrlSpecials (#312), are untouched.
 \tl_const:Nn \c__cdossier_links_anybreak_tl
   {
     \do \a \do \b \do \c \do \d \do \e \do \f \do \g \do \h \do \i
