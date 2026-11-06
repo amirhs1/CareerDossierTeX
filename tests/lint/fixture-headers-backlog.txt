@@ -13,11 +13,10 @@
 # entry goes, delete this file and the lint's backlog branch; it says so.
 #
 # Format: the repository-relative path, whitespace, then the reason. THE
-# REASON IS MANDATORY; an entry without one fails the lint, as in
-# tests/lint/manual-undocumented.txt. Each reason here was read from the
-# file's own first line when the list was frozen: either it has no header
-# comment at all, or its header does not name the file. Blank lines and `#'
-# comments are ignored.
+# REASON IS MANDATORY; an entry without one fails the lint. Each reason here
+# was read from the file's own first line when the list was frozen: either it
+# has no header comment at all, or its header does not name the file. Blank
+# lines and `#' comments are ignored.
 #
 # FROZEN AT 106 entries, the measured size above.
 

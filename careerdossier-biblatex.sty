@@ -96,6 +96,30 @@
 \cs_if_exist:NT \CDossierListLabelSep
   { \setlength { \biblabelsep } { \CDossierListLabelSep } }
 
+%% Read both list tokens again each time a bibliography is printed (#243).
+%% CDossierItemize reads them when a list begins, so while the two copies above
+%% were the only ones, a document that overrode either token after loading this
+%% package moved its lists and left its bibliography at the load-time value.
+%% The copies above stay, so \bibitemsep and \biblabelsep hold the shared values
+%% from load onwards for any code that reads them before a bibliography.
+%%
+%% \AtBeginBibliography cannot carry this: BibLaTeX runs that hook after the
+%% bibliography environment's begin code, and the begin code is where the list
+%% reads \biblabelsep and \bibitemsep. The kernel's generic command hook runs
+%% before \printbibliography does anything. \bibbysection, \bibbysegment, and
+%% \bibbycategory print without \printbibliography, so they use the values read
+%% at load or by the last \printbibliography before them; nothing in the Work
+%% uses them, and the manual says so.
+\cs_new_protected:Npn \__cdossier_biblatex_read_list_tokens:
+  {
+    \cs_if_exist:NT \CDossierRecordItemSepSkip
+      { \setlength { \bibitemsep } { \CDossierRecordItemSepSkip } }
+    \cs_if_exist:NT \CDossierListLabelSep
+      { \setlength { \biblabelsep } { \CDossierListLabelSep } }
+  }
+\AddToHook { cmd / printbibliography / before }
+  { \__cdossier_biblatex_read_list_tokens: }
+
 %% Remove the stretch BibLaTeX puts at each URL breakpoint. \biburlbigskip is
 %% 0mu plus 3mu by default -- one sixth of an em per breakpoint -- and
 %% \biburlsetup copies it into \Urlmuskip, so a justified line ending in a URL

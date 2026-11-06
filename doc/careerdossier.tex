@@ -366,22 +366,58 @@ theme is monochrome.
 
 \opt{fontsize} selects one whole-point type scale for the whole document. It is
 the only input to type size; there is no per-element size option. The sizes it
-resolves to, in points:
+resolves to, in points, and the command that selects each step:
 
-\begin{longtable}{@{}lrrr@{}}
+{\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}llrrr@{}}
 \toprule
-\textbf{Element} & \opt{10pt} & \opt{11pt} & \opt{12pt} \\
+\textbf{Element} & \textbf{Command} & \opt{10pt} & \opt{11pt} & \opt{12pt} \\
 \midrule
 \endhead
-Name & 19 & 21 & 23 \\
-Statement title & 15 & 16 & 18 \\
-Headline, subtitle & 12 & 13 & 14 \\
-Section heading & 11 & 12 & 13 \\
-Entry title, body text, bullets, dates & 10 & 11 & 12 \\
-Contact line & 9 & 10 & 11 \\
-Running header, folio & 8 & 9 & 10 \\
+Name & \cmd{CDossierSizeName} & 19 & 21 & 23 \\
+Statement title & \cmd{CDossierSizeDocumentTitle} & 15 & 16 & 18 \\
+Headline, subtitle & \cmd{CDossierSizeHeadline} & 12 & 13 & 14 \\
+Section heading & \cmd{CDossierSizeSection} & 11 & 12 & 13 \\
+Entry title, body text, bullets, dates & \cmd{CDossierSizeBody} & 10 & 11 & 12 \\
+Contact line & \cmd{CDossierSizeSmall} & 9 & 10 & 11 \\
+Running header, folio & \cmd{CDossierSizeFurniture} & 8 & 9 & 10 \\
 \bottomrule
-\end{longtable}
+\end{longtable}}
+
+A size command is a switch, used like \cmd{small}: it sets the type size and
+the calibrated leading of its step, and nothing else --- no family, weight, or
+colour. Use one to set your own material at a step of the scale, as the header
+stack does (\S\ref{sec:header-stack}). The commands select a step; they are not
+a way to retune one, because \opt{fontsize} is the only input to type size. The
+leading of each step is in \file{docs/ARCHITECTURE.md} in the repository, with
+the other calibrated values, and the values are not stable API before
+\texttt{v1.0.0}.
+
+The size commands and the typography roles (\S\ref{sec:roles}) are independent
+axes. A role sets family and weight only, a size command sets size and leading
+only, and any role composes with any size. A word two names share, such as
+\emph{Title} in \cmd{CDossierSizeDocumentTitle} and
+\cmd{CDossierEntryTitleStyle}, implies no pairing. The classes rely on that:
+
+{\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}lll@{}}
+\toprule
+\textbf{Element} & \textbf{Role} & \textbf{Size} \\
+\midrule
+\endhead
+Section heading & \cmd{CDossierSectionStyle} & \cmd{CDossierSizeSection} \\
+Subsection heading & \cmd{CDossierSectionStyle} & \cmd{CDossierSizeBody} \\
+Statement title & \cmd{CDossierSectionStyle} & \cmd{CDossierSizeDocumentTitle} \\
+Contact line & \cmd{CDossierBodyStyle} & \cmd{CDossierSizeSmall} \\
+Statement context line & \cmd{CDossierMutedStyle} & \cmd{CDossierSizeSmall} \\
+Entry title & \cmd{CDossierEntryTitleStyle} & none (body size) \\
+\bottomrule
+\end{longtable}}
+
+The body step is also available as two dimensions, \cmd{CDossierBodySize} and
+\cmd{CDossierBodyLeading}. The body leading is the unit of the vertical rhythm:
+every spacing token is a fixed multiple of it. Read them; do not set them
+(\S\ref{sec:dimensions}).
 
 Structural vertical spacing scales with the same option, as a fixed fraction of
 the body baseline. \S\ref{sec:tokens} lists the tokens that name each gap.
@@ -391,7 +427,8 @@ replacement.
 
 \subsubsection{\texttt{margin}}
 
-\opt{normal} means one-inch margins and \opt{narrow} half-inch margins.
+\opt{normal} means one-inch margins and \opt{narrow} half-inch margins. The
+resolved value is \cmd{CDossierPageMargin} (\S\ref{sec:dimensions}).
 \opt{margin} and \opt{fontsize} together decide line length. Measured in TeX
 Gyre Termes on US Letter, full lines of running prose hold roughly:
 
@@ -1232,6 +1269,7 @@ which govern the first and last line \emph{of one paragraph} and cannot express
 it.
 
 \subsection{The header stack}
+\label{sec:header-stack}
 
 \begin{latexcode}
 \CDossierHeaderBegin
@@ -1684,14 +1722,23 @@ uses monochrome link styling and does not redefine unrelated document lists or
 headings globally.
 
 The gap between bibliography entries follows the same calibrated list token as
-every other list in the CV, so a \textsf{biblatex} list and a manual publication
-list share one rhythm at every \opt{fontsize}. The horizontal gap between an
-entry number and its entry follows the shared list label token for the same
-reason. BibLaTeX's own default places that gap at roughly one em, which is the
-width at which a plain-text extractor stops treating the numbers as labels and
-starts treating them as a separate left-hand column, emitting them as a block
-ahead of the entry text; the shared token is half the body size and clears that
-threshold at every supported \opt{fontsize}.
+every other list in the CV, \cmd{CDossierRecordItemSepSkip}, so a
+\textsf{biblatex} list and a manual publication list share one rhythm at every
+\opt{fontsize}. The horizontal gap between an entry number and its entry follows
+the shared list label token, \cmd{CDossierListLabelSep}, for the same reason.
+BibLaTeX's own default places that gap at roughly one em, which is the width at
+which a plain-text extractor stops treating the numbers as labels and starts
+treating them as a separate left-hand column, emitting them as a block ahead of
+the entry text; the shared token is half the body size and clears that threshold
+at every supported \opt{fontsize}.
+
+Both tokens are read each time \cmd{printbibliography} runs, as
+\env{CDossierItemize} reads them each time a list begins, so a document that
+sets either one moves its bibliography with its lists wherever the assignment
+sits before the bibliography. \cmd{bibbysection}, \cmd{bibbysegment}, and
+\cmd{bibbycategory} print without \cmd{printbibliography}, and use the values
+read when the package loaded or by the last \cmd{printbibliography} before
+them.
 
 URLs printed in a bibliography carry no stretch at their break points, so a
 justified line ending in a URL spreads its word spaces rather than the URL
@@ -1947,8 +1994,8 @@ All four classes use the same page-furniture policy. Under
 Under \opt{medium=screen}, the default, neither is emitted, on any page and at
 any page count.
 
-Furniture uses the sans-serif furniture step of the calibrated type scale and
-the monochrome text token. It stays print-safe and is marked as a layout
+Furniture uses the sans-serif furniture step of the calibrated type scale,
+\cmd{CDossierSizeFurniture}, and the monochrome text token. It stays print-safe and is marked as a layout
 artifact when tagged output is active. Which furniture is emitted is the only
 user-configurable part of the policy; its typography, wording, and placement are
 not.
@@ -1994,6 +2041,39 @@ leaves grows with its bullets rather than with what is missing.
 The policy uses page-break penalties, not boxing, so material that genuinely
 does not fit still breaks: an entry or bullet list longer than a page paginates
 normally rather than overflowing.
+
+\subsection{Keep-together penalties}
+\label{sec:keep-penalties}
+
+The resume and CV state the entry and list rules with two named penalties. Each
+is read when the boundary it guards is set, so a document that sets one changes
+every boundary set after the assignment.
+
+\begin{longtable}{@{}lrL{0.44\textwidth}@{}}
+\toprule
+\textbf{Token} & \textbf{Default} & \textbf{Where it applies} \\
+\midrule
+\endhead
+\cmd{CDossierHeadingKeepPenalty} & \texttt{10000} & between the two lines of
+  an entry heading; between an entry heading and the first line of its body;
+  before a list's first item; after a list's first item when that item is one
+  line, and before its last item when that item is one line \\
+\cmd{CDossierListOrphanPenalty} & \texttt{9997} & every other boundary
+  between two list items \\
+\bottomrule
+\end{longtable}
+
+\texttt{10000} forbids the break, and a value below it does not.
+\cmd{CDossierListOrphanPenalty} is deliberately below it, so a list longer than
+a page can still break somewhere in its middle.
+
+\cmd{CDossierHeadingKeepPenalty} has a second job: when a section or subsection
+heading lacks the room its bound below requires, the class breaks the page with
+the negative of this value, which at \texttt{10000} forces the break. Lowering
+the token below \texttt{10000} therefore weakens both the keeps in the table and
+that forced break.
+
+Both are integers, and are set the way the two bounds below are.
 
 \subsection{\cmd{CDossierSectionNeedLines}}
 
@@ -2056,6 +2136,24 @@ The cost of that rule was measured and accepted: each fixture that gains page
 fill by permitting these breaks gains a club or widow line with it, one for one.
 There is no value, and no per-family split, that buys the space without the
 defect, so the toolkit keeps the space.
+
+\cmd{CDossierApplyPageBreakPenalties} takes no argument. It copies the three
+tokens into \cmd{brokenpenalty}, \cmd{clubpenalty}, and \cmd{widowpenalty}, and
+each class calls it once while it loads. That call is the only time the tokens
+are read, so a document that sets one after \cmd{documentclass} calls the
+command again, in the preamble:
+
+\begin{latexcode}
+\ExplSyntaxOn
+\int_set:Nn \CDossierWidowPenalty { 0 }
+\ExplSyntaxOff
+\CDossierApplyPageBreakPenalties
+\end{latexcode}
+
+The preamble matters for \cmd{clubpenalty}: \LaTeX{} records its value at
+\cmd{begin}\texttt{\{document\}}, and its list items, its sectioning, and the paragraph
+that follows a list all restore that recorded value, so a call in the document
+body does not last.
 
 The letter and statement classes otherwise remain continuous prose with no
 further structural page-break policy.
@@ -2149,6 +2247,69 @@ them in mind is the usual reason an override appears to do nothing.
 The calibrated \emph{values} are not stable API before \texttt{v1.0.0}; the
 token names and the boundaries they own are.
 
+\subsection{Dimensions}
+\label{sec:dimensions}
+
+Six resolved dimensions sit beside the spacing tokens. A class option fixes
+each one, directly or through the body size, and they differ in when they are
+read, which decides whether setting one does anything. Their values at each
+\opt{fontsize} are in \file{docs/ARCHITECTURE.md} in the repository;
+\cmd{CDossierEmergencyStretch}, a seventh, is under ``Line breaking'' below.
+
+\begin{longtable}{@{}lL{0.34\textwidth}L{0.21\textwidth}@{}}
+\toprule
+\textbf{Token} & \textbf{What it is} & \textbf{Set after the class} \\
+\midrule
+\endhead
+\cmd{CDossierBodySize} & the body type size \opt{fontsize} selects & read it;
+  do not set it \\
+\cmd{CDossierBodyLeading} & the body leading, the unit of the vertical rhythm &
+  read it; do not set it \\
+\cmd{CDossierPageMargin} & the margin \opt{margin} selects & no effect \\
+\cmd{CDossierFurnitureLeading} & the leading of \cmd{CDossierSizeFurniture},
+  which places the running header and folio in the margins & no effect \\
+\cmd{CDossierRuleThickness} & the weight of the rule under a resume or CV
+  section heading, and of a link's underline under \opt{medium=screen} &
+  applies to every later rule \\
+\cmd{CDossierListLabelSep} & the gap between a label and its item, in
+  \env{CDossierItemize} and in a BibLaTeX bibliography & applies to every later
+  list and bibliography \\
+\bottomrule
+\end{longtable}
+
+\cmd{CDossierBodySize} and \cmd{CDossierBodyLeading} are set by \opt{fontsize}.
+The class reads them while it loads, to derive every spacing token,
+\cmd{CDossierRuleThickness}, \cmd{CDossierListLabelSep}, and
+\cmd{CDossierEmergencyStretch}, and some code reads them again later: the
+section and subsection bounds (\S\ref{sec:pagination}) measure in body leading
+each time a heading is placed, and at \opt{11pt} the body font reads both each
+time it is selected. An assignment after \cmd{documentclass} therefore reaches
+some readers and not others, which ones depends on \opt{fontsize}, and the
+derived tokens keep their values whatever you set. To change the scale, change
+\opt{fontsize}. Reading them is supported: an override of a spacing token may be
+written as a multiple of \cmd{CDossierBodyLeading}, as the list-edge example
+under \opt{entrymeta} is.
+
+\cmd{CDossierPageMargin} and \cmd{CDossierFurnitureLeading} are read once, when
+the class sets the page geometry, so setting either afterwards changes nothing.
+To change the margins, use \opt{margin}, or call \cmd{geometry} as the
+\opt{margin} section describes.
+
+\cmd{CDossierRuleThickness} and \cmd{CDossierListLabelSep} are read where they
+are used: the rule thickness each time a rule is drawn, and the label
+separation each time a \env{CDossierItemize} begins or \cmd{printbibliography}
+runs (\S\ref{sec:biblatex}). Setting either one changes everything set after
+the assignment:
+
+\begin{latexcode}
+\ExplSyntaxOn
+\dim_set:Nn \CDossierListLabelSep { 4pt }
+\ExplSyntaxOff
+\end{latexcode}
+
+Raising \cmd{CDossierListLabelSep} to about one em brings back the extraction
+problem \S\ref{sec:biblatex} describes for a bibliography's entry numbers.
+
 \subsection{Line breaking}
 
 \cmd{CDossierEmergencyStretch} is the extra flexibility \TeX{} may distribute
@@ -2170,6 +2331,7 @@ paragraph that already sets within \cmd{tolerance}, because
 a paragraph never reaches.
 
 \subsection{Typography roles}
+\label{sec:roles}
 
 Each role names one place in a document, and describes meaning rather than a
 particular font family, weight, or size:
