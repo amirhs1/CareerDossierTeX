@@ -22,11 +22,12 @@ TEST 4: running-label-remains-live-until-shipout
 label=Updated
 ============================================================
 ============================================================
-TEST 5: default-medium-is-print-and-selects-the-furniture-styles
+TEST 5: default-medium-is-screen-and-selects-the-empty-styles
 ============================================================
-medium=print
-head=furniture
-foot=furniture
+medium=screen
+links=screen
+head=empty
+foot=empty
 ============================================================
 ============================================================
 TEST 6: page-furniture-primitive-name-surface

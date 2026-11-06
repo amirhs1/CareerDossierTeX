@@ -41,9 +41,9 @@ CareerDossierTeX separates personal information from document content and presen
 
 | Capability | Current support | Notes |
 |---|---|---|
-| Industry resume | Supported | Multi-page output gains a continuation header and folios; one-page output stays clean |
+| Industry resume | Supported | Under `medium=print`, multi-page output gains a continuation header and folios; one-page output stays clean |
 | Industry cover letter | Supported | `family=industry` remains the default; shared multi-page furniture applies |
-| Academic CV | Supported | Multi-page layout with running headers and folios; one-page folios are suppressed |
+| Academic CV | Supported | Multi-page layout; under `medium=print` it carries running headers and folios, and one-page folios are suppressed |
 | Academic cover letter | Supported | Select with `family=academic`; shares the cross-class page furniture |
 | Statement documents | Supported | Default interest type plus six specialized types; calibrated header/prose rhythm and shared multi-page furniture apply |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
@@ -54,7 +54,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |
 | Paper size | US Letter and A4 | `paper=letter` remains the default; `paper=a4` is opt-in |
 | Body font | Serif and sans | `bodyfont=serif` remains the default; `bodyfont=sans` is opt-in |
-| Output medium | Print and screen | `medium=print` remains the default; `medium=screen` drops the running header and folio |
+| Output medium | Screen and print | `medium=screen` is the default and drops the running header and folio; `medium=print` keeps them |
 | Entry-metadata de-emphasis | None, italic, gray, or both | `muted=plain` is the default and applies no de-emphasis; `muted=italic`, `muted=gray`, and `muted=both` opt into the styling |
 | Theme | Monochrome | Color themes, named font combinations, and icons are unsupported |
 | Continuous integration | Supported | Accumulated suites plus every shipped example |
@@ -214,7 +214,7 @@ Optional fields may be omitted. Contact separators should adjust automatically w
   margin=narrow,
   paper=letter,
   bodyfont=serif,
-  medium=print,
+  medium=screen,
   muted=plain
 ]{careerdossier-resume}
 
@@ -257,10 +257,12 @@ which runs long in full-width prose — see the manual for the measured figures
 and when to override it.
 
 `medium` names the output context and decides whether page furniture is
-emitted. `print` is the default and keeps the running header and `Page N of M`
-folio; `screen` drops both, because a PDF viewer already shows page position.
-It changes nothing else — the text block does not move, so switching `medium`
-cannot reflow a document.
+emitted. `screen` is the default and drops the running header and `Page N of M`
+folio, because a PDF viewer already shows page position; it also underlines the
+anchor text of a link you write with `\href`. `print` keeps the header and the
+folio and leaves that text undecorated; pass `medium=print` for a document that
+will be printed. Neither moves the text block, so switching `medium` cannot
+reflow a document.
 
 `muted` decides how de-emphasized runs are rendered: an entry's dates and
 location, and the statement's application-context line. `italic` is the default
@@ -275,10 +277,11 @@ the only carrier of meaning, and no extractor sees any difference.
 Advanced users can call `\geometry{...}` after `\documentclass` for a custom
 layout, but should not load the already-loaded `geometry` package again.
 
-Build every document **twice**. Single-page folio suppression and the
-`Page N of M` total both read the previous run's auxiliary file, so a first
-build from a clean tree still shows a folio on a one-page document. `latexmk`
-and the `make` targets below already rerun; a bare `lualatex` call does not.
+Build every document **twice**. Under `medium=print`, single-page folio
+suppression and the `Page N of M` total both read the previous run's auxiliary
+file, so a first build from a clean tree still shows a folio on a one-page
+document. `latexmk` and the `make` targets below already rerun; a bare
+`lualatex` call does not.
 
 See the complete example in:
 

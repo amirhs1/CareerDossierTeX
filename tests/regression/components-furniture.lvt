@@ -4,9 +4,10 @@
 % suites. This regression isolates the component-owned decisions: the
 % auxiliary-file page total controls single-page suppression, both shared page
 % styles exist, a class may register a live short-label token list, and the
-% default output medium resolves to `print' and selects the furniture styles.
-% The `screen' half of that last decision lives in components-medium.lvt,
-% because a package can only be loaded with one set of options per document.
+% default output medium resolves to `screen' (#327), in both of the halves it
+% decides, and selects the empty page styles. An explicit `medium=screen' and
+% the return to `print' live in components-medium.lvt, because a package can
+% only be loaded with one set of options per document.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-components}
@@ -51,6 +52,16 @@
     \bool_if:NTF \l__cdossier_components_furniture_bool
       { \TYPE{medium=print} }
       { \TYPE{medium=screen} }
+  }
+
+%% The link half of the same decision (#278), which careerdossier-links holds.
+%% Loaded through this package with no option, it must agree with the
+%% furniture half: one default medium, whichever package a reader asks.
+\cs_new_protected:Npn \cdossiertestReportLinkMedium
+  {
+    \bool_if:NTF \l__cdossier_links_screen_bool
+      { \TYPE{links=screen} }
+      { \TYPE{links=print} }
   }
 
 \cs_new_protected:Npn \cdossiertestReportSelectedStyle
@@ -109,8 +120,9 @@
   \cdossiertestReportRunningLabel
 }
 
-\TEST{default-medium-is-print-and-selects-the-furniture-styles}{
+\TEST{default-medium-is-screen-and-selects-the-empty-styles}{
   \cdossiertestReportMedium
+  \cdossiertestReportLinkMedium
   \cdossiertestReportSelectedStyle
 }
 

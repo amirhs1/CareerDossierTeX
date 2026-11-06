@@ -1,0 +1,25 @@
+% letter-medium-print.tex — smoke fixture: the letter must accept medium=print
+% and build cleanly (#327). `screen' is the default, so `print' is reached
+% only by asking for it, as this fixture does; that it restores the folio and
+% running header is asserted on rendered pages by
+% tests/layout/letter-two-page.
+\documentclass[fontsize=10pt, margin=narrow, medium=print]{careerdossier-letter}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\CDossierLetterSetup{
+  date           = {14 July 2026},
+  recipient-name = {Hiring Committee},
+  subject        = {Application for the Senior Data Scientist position},
+  salutation     = {Dear Members of the Hiring Committee,},
+  closing        = {Sincerely,},
+}
+\begin{document}
+\MakeCDossierLetterhead
+
+I am writing to apply for the Senior Data Scientist position.
+
+\MakeCDossierClosing
+\end{document}

@@ -61,8 +61,10 @@
 %% `medium' option and validates it once; it hands this package the one
 %% decision that concerns links -- whether body-copy anchor text is underlined
 %% -- through the setter, so the dependency runs one way. Loaded on its own,
-%% this package behaves as `medium=print' does: no decoration.
+%% this package behaves as the default `medium=screen' does (#327): anchor text
+%% is underlined.
 \bool_new:N \l__cdossier_links_screen_bool
+\bool_set_true:N \l__cdossier_links_screen_bool
 \cs_new_protected:Npn \__cdossier_links_set_screen:n #1
   { \bool_set:Nn \l__cdossier_links_screen_bool {#1} }
 

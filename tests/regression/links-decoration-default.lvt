@@ -1,0 +1,71 @@
+% links-decoration-default.lvt — the default medium through a class (#327).
+%
+% A class that is given no `medium' option resolves it to `screen', and that
+% one value reaches both packages it decides for: careerdossier-components
+% emits no page furniture, and careerdossier-links underlines the anchor text
+% of an author-written \href (#278). If this file fails, a document written
+% with no `medium' option gets print output, or half of it.
+%
+% components-furniture.lvt asserts the package defaults, with no class loaded.
+% This file asserts the class path, where the shared declaration in
+% careerdossier-base.sty sets the value a class forwards; the resume is the
+% vehicle, and the layout suite's *-default-two-page fixtures render the same
+% default through all four classes. The expected values are the documented
+% behaviour of `screen', which links-decoration.lvt and components-medium.lvt
+% already pin for the explicit option.
+\input{regression-test}
+\documentclass{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+\usepackage{hyperref}
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestReportMedium
+  {
+    \TYPE{class-medium=\l__cdossier_resume_medium_tl}
+    \bool_if:NTF \l__cdossier_components_furniture_bool
+      { \TYPE{furniture=print} }
+      { \TYPE{furniture=screen} }
+    \bool_if:NTF \l__cdossier_links_screen_bool
+      { \TYPE{links=screen} }
+      { \TYPE{links=print} }
+  }
+
+%% The probe of links-decoration.lvt, which says why it observes the call to
+%% \underLine rather than measuring the result, here driven by a real \href:
+%% the default has to reach an author's own link, not only the style command.
+%% The flag is global because \href opens a group and \hbox_set:Nn another.
+\bool_new:N \g__cdossiertest_underlined_bool
+\tl_new:N \g__cdossiertest_text_tl
+
+\RenewDocumentCommand \underLine { o +m }
+  {
+    \bool_gset_true:N \g__cdossiertest_underlined_bool
+    \tl_gset:Nn \g__cdossiertest_text_tl {#2}
+    #2
+  }
+
+\cs_new_protected:Npn \cdossiertestReportHref
+  {
+    \bool_gset_false:N \g__cdossiertest_underlined_bool
+    \tl_gclear:N \g__cdossiertest_text_tl
+    \hbox_set:Nn \l_tmpa_box
+      { \href { https://example.test/work } { anchor~text } }
+    \bool_if:NTF \g__cdossiertest_underlined_bool
+      { \TYPE{href=underline~over~'\g__cdossiertest_text_tl'} }
+      { \TYPE{href=none} }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{class-default-medium-is-screen-in-both-halves}{
+  \cdossiertestReportMedium
+}
+
+\TEST{class-default-underlines-href-anchor-text}{
+  \cdossiertestReportHref
+}
+
+\END
+\end{document}

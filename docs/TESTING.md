@@ -452,6 +452,14 @@ heading is stranded and that no split list leaves a single typeset line on a
 page; `list-remnant.awk` counts a lone item's lines from the hanging indent its
 continuation lines start at.
 
+The furniture is checked against the medium a fixture's class options name, in
+its `\documentclass[...]` or, for a wrapper, a `\PassOptionsToClass` before the
+`\input` of the fixture it wraps; with none it is `screen`, the default (#327).
+A file name says nothing about it. Every fixture that asserts the folio and
+running header pins `medium=print`, and each `*-default-two-page` fixture is
+the body its `*-screen-two-page` wrapper reuses, so the default and the explicit
+`screen` are both checked for every class.
+
 One fixture here declares `\DocumentMetadata{tagging=on}`, sharing its body with
 an untagged twin: `resume-keeptogether-listguard-wrapped` asserts that both build
 paths take the same page break, which is a pagination input neither the tagging
@@ -465,6 +473,14 @@ compares Poppler output against its `*.expected.txt` baseline, asserts no
 `/ActualText`, and on macOS compares Apple PDFKit output against `*.pdfkit.txt`
 via `pdfkit-extract.js`. The two extractors keep separate baselines because they
 impose different line structure. `./run.sh --update` regenerates, deliberately.
+
+A fixture whose baseline records page furniture pins `medium=print`, since the
+default, `screen`, emits none (#327). `resume-entry-dates-default-medium` shares
+its body with `resume-entry-dates-page-furniture` and passes no option. Its
+PDFKit baseline is that fixture's with the furniture lines removed. Its Poppler
+baseline also moves each page's dates column after its bullets: without the
+folio, each page's one entry is the last block on its page, and the last entry
+on a page trails its own column (#219).
 
 The comparison performs no Unicode normalisation, and must not start. Accented
 source written in decomposed form — a base letter plus a combining mark —
@@ -611,6 +627,12 @@ so no other suite covers it.
 and as a `-ua2` variant, compares structure against `*.structure.txt` and
 extracted text against `*.mupdf.txt`, runs a three-extractor matrix, and
 validates UA-2 with veraPDF. `structure-text.pl` does the structure dump.
+The five profile fixtures pin `medium=print`, because their continuation
+furniture is what they assert; `resume-default-medium` builds the resume body
+under the default `screen` (#327) and asserts that neither page carries a folio
+or running header, that page two holds no text artifact, and that its structure
+is the resume's. Its Poppler text reorders each page's last entry, for the
+reason the extraction suite's `resume-entry-dates-default-medium` gives.
 Reports land in `tests/tagging/reports/`, never committed. The per-PR CI job
 skips the veraPDF gate; a weekly `verapdf-scheduled` workflow runs it.
 

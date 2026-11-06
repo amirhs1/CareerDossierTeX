@@ -297,6 +297,34 @@ requires no migration. To try it, add `\DocumentMetadata` before
 Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
+## [Unreleased]
+
+### `medium` defaults to `screen`
+
+**This changes rendered output in every document that passes no `medium`
+option.** It now renders as `medium=screen`: no page carries the `Page N of M`
+folio or the running header, and the anchor text of a link written with `\href`
+is underlined ([#327](https://github.com/amirhs1/CareerDossierTeX/issues/327)).
+No source edit is required, and nothing reflows, because `medium` never moves
+the text block. A document meant to be printed restores the previous output
+with one option:
+
+Before:
+
+    \documentclass{careerdossier-resume}
+
+After:
+
+    \documentclass[medium=print]{careerdossier-resume}
+
+The same one-word addition restores it in `careerdossier-cv`,
+`careerdossier-letter`, and `careerdossier-statement`, and a document that loads
+`careerdossier-components` without a class passes the same option to the
+package.
+
+Reason: documents are sent as PDFs now, so reading on screen is the common case
+and is what an author gets without asking.
+
 ## [0.10.0] - 2026-11-06
 
 ### The resume `/Title` and running page label are spelled `Resume`

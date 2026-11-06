@@ -1,0 +1,25 @@
+% resume-default-medium.tex — the tagged resume under the default medium (#327).
+%
+% The body of resume.tex, whose wrappers pin `medium=print'; this one passes no
+% `medium' option, so the class default, `screen', applies. The document is
+% still two pages long, but neither page carries a folio and page two carries
+% no running header, so page two holds no text artifact at all. The body's
+% \href is underlined under `screen' (#278), and its anchor text must stay in
+% the structure tree.
+%
+% The MuPDF and PDFKit baselines are resume.tex's with the three furniture
+% lines removed. They were derived that way rather than written by --update, so
+% `diff' against resume's shows the furniture and nothing else. The structure
+% tree never held the furniture, so resume-default-medium.structure.txt is
+% resume.structure.txt unchanged.
+%
+% The Poppler baseline differs in order as well. With the folio gone, each
+% page's last entry is the last block Poppler sorts on its page, and the last
+% entry on a page always trails its own dates and location column
+% (tests/extraction/resume-entry-dates-order.tex, #219). So it records each
+% page's dates after its bullets: expected output under that rule, written by
+% --update and inspected against it (#327), not a defect.
+\DocumentMetadata{lang=en,tagging=on}
+\pdfvariable compresslevel=0
+\pdfvariable objcompresslevel=0
+\input{resume-body.inc.tex}

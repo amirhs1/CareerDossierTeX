@@ -181,6 +181,49 @@ fail=0
 # reports without asserting, which is how a candidate value is explored.
 page_fill_min="${CDOSSIER_PAGE_FILL_MIN-90}"
 
+# The medium a fixture renders under (#327), read from the class options it
+# passes rather than inferred from its file name. A name could only ever say
+# `screen' or nothing, so once nothing meant the default and the default moved,
+# every fixture that passes no option would have been checked against the
+# wrong medium.
+#
+# A fixture states its options in \documentclass[...] or, as a wrapper does, in
+# \PassOptionsToClass{...} before the \input{*.tex} of the fixture it wraps, so
+# the search follows that chain to the file holding \documentclass. With no
+# `medium' anywhere on it the class default applies, `screen', as README.md and
+# the manual document it. That value is written here, not read from
+# careerdossier-base.sty: a harness that took the default from the code under
+# test would agree with it whatever it said.
+#
+# Prints `print' or `screen'. Returns 1, printing nothing, for a chain that
+# names both, names any other value, or ends before a \documentclass: the
+# caller reports that rather than guessing.
+layout_fixture_medium() { # <fixture.tex>
+  local file="$1" found="" value hops=0
+  while :; do
+    [ -f "$file" ] || return 1
+    hops=$(( hops + 1 ))
+    [ "$hops" -le 8 ] || return 1
+    while IFS= read -r value; do
+      case "$found" in
+        ''|"$value") found="$value" ;;
+        *) return 1 ;;
+      esac
+    done < <(
+      sed -n -E 's/^[[:space:]]*\\(documentclass\[|PassOptionsToClass\{)([^]}]*).*/\2/p' "$file" \
+        | tr ',' '\n' \
+        | sed -n -E 's/^[[:space:]]*medium[[:space:]]*=[[:space:]]*([^[:space:]]*)[[:space:]]*$/\1/p'
+    )
+    grep -q '^[[:space:]]*\\documentclass' "$file" && break
+    file="$(sed -n -E 's/^[[:space:]]*\\input\{([^}]*\.tex)\}.*/\1/p' "$file" | head -n 1)"
+    [ -n "$file" ] || return 1
+  done
+  case "${found:-screen}" in
+    print|screen) printf '%s\n' "${found:-screen}" ;;
+    *) return 1 ;;
+  esac
+}
+
 # One fixture, start to finish (#390).
 #
 # `local fail` shadows the global deliberately. Every assertion below already
@@ -198,7 +241,7 @@ layout_fixture() {
   # Guard state, kept local for the same reason `fail` is: a fan-out worker is
   # a subshell, but the serial path runs every fixture in one shell and a stale
   # value carried between them would be read as a verdict.
-  local state=0 paper_re paper_label paper_wrong paper_info keep_unchecked=0
+  local state=0 paper_re paper_label paper_wrong paper_info keep_unchecked=0 medium=""
   echo "== $tex =="
 
   # `\tracingpages=1` goes on the command line rather than into a rebuild of
@@ -316,17 +359,22 @@ layout_fixture() {
     esac
   fi
 
-  # Under the default `medium=print`, shared page furniture is suppressed
-  # entirely for a one-page document, and a multi-page document carries
-  # `Page N of M` throughout and an identity-derived running header from page
-  # two onwards. Under `medium=screen` (#184, fixtures named
-  # `*-screen-*`) neither is emitted on any page. Check extracted text rather
-  # than exact coordinates so the test guards behavior without freezing layout.
+  # Under `medium=print`, shared page furniture is suppressed entirely for a
+  # one-page document, and a multi-page document carries `Page N of M`
+  # throughout and an identity-derived running header from page two onwards.
+  # Under `medium=screen` (#184), the default since #327, neither is emitted on
+  # any page. The medium is the one the fixture's class options name, read by
+  # layout_fixture_medium above. Check extracted text rather than exact
+  # coordinates so the test guards behavior without freezing layout.
   if command -v pdftotext >/dev/null 2>&1; then
-    case "$base" in
-      *-screen-*) medium_screen=1 ;;
-      *)          medium_screen=0 ;;
-    esac
+    medium_screen=0
+    if ! medium="$(layout_fixture_medium "$tex")"; then
+      echo "  UNREADABLE MEDIUM: $tex names no single print or screen medium in"
+      echo "    its class options, so its furniture was checked as print."
+      fail=1
+    elif [ "$medium" = screen ]; then
+      medium_screen=1
+    fi
 
     furniture_label=""
     case "$base" in
