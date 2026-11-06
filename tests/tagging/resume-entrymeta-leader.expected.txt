@@ -12,9 +12,10 @@ Dateless Engineer
 Example Services . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Ottawa
 • An entry with no dates joins only its second heading line.
 Volunteer Reviewer
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Remote
+
 • A location with no organization opens its line with no leader.
 Workshop Facilitator
 Example Trust
 • An organization with no location ends its line with no leader.
-
-Remote

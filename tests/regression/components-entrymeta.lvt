@@ -36,9 +36,15 @@
 %      to split the heading at. The leader is a layout artifact, its marks take
 %      the body role, and \pdffakespace still supplies the word boundary,
 %      because the leader's `\hfill' has no natural width either. On the
-%      second line it follows the optional-field rule: with no organization a
-%      lone location sits flush right after a plain `\hfill', as under
-%      `column', with no leader opening the line. The default space on each
+%      second line it follows the optional-field rule: with no organization no
+%      leader opens the line. A lone location instead takes a leader that
+%      starts where the title ends, measured from the title (#682), so Poppler
+%      reads it in place, which a lone location after a plain `\hfill' is not;
+%      the title and the location are each set once more for that
+%      measurement, so the trace shows their roles twice. The measured start
+%      is capped so the location still fits on the line under a title wider
+%      than the line, which no overfull box in the trace asserts: a property
+%      test, since no reference rendering exists. The default space on each
 %      side of a mark is 0.25 of the body size (maintainer decision on #678,
 %      2026-11-06), 3pt at the package's 12pt default: a reproducible
 %      computation, not output this test wrote.
@@ -214,9 +220,11 @@
   \cdossiertestEntryHead{Research Engineer}{}{}{}
 }
 
-% No organization: the location sits flush right after a plain `\hfill', which
-% emits no marker, and no leader opens the line.
-\TEST{leader-location-without-organization-emits-no-leader}{
+% No organization (#682): no leader opens the second line. The title and the
+% location are set again to measure where the leader starts, which is the
+% second `>entrytitle' and `>muted'; then the leader, with no fake space,
+% since nothing precedes it on the line, and the location after it.
+\TEST{leader-location-without-organization-fills-from-the-title-end}{
   \cdossiertestSetOption{entrymeta=leader}
   \cdossiertestTraceLeader
   \cdossiertestEntryHead{Research Engineer}{}{Berlin, DE}{2020--2024}
@@ -230,6 +238,17 @@
 
 \TEST{leader-mark-spacing-defaults-to-a-quarter-of-the-body-size}{
   \TYPE{body size = \the\CDossierBodySize, leader sep = \the\CDossierEntryMetaLeaderSep}
+}
+
+% A title wider than the line (#682): the measured start is capped at the line
+% width less the location's, so the second line is not overfull. Real roles,
+% no tracing: an `Overfull \hbox' in this test's log is the failure.
+\TEST{leader-lone-location-fits-under-a-title-wider-than-the-line}{
+  \cdossiertestSetOption{entrymeta=leader}
+  \cdossiertestEntryHead
+    {Principal Research Engineer for Distributed Systems, Data Platforms,
+     Reliability Tooling, and Observability Infrastructure}
+    {}{Berlin, DE}{}
 }
 
 \END
