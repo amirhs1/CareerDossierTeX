@@ -171,14 +171,14 @@
 \NewDocumentCommand \CDossierSubjectStyle    { } { \rmfamily \bfseries }
 \NewDocumentCommand \CDossierBodyStyle       { } { \rmfamily \normalfont }
 
-%% Issue #299: \CDossierSubjectStyle and \CDossierEntryTitleStyle resolve to the
-%% same shape, and that is deliberate rather than duplication. A letter's subject
+%% \CDossierSubjectStyle and \CDossierEntryTitleStyle resolve to the
+%% same shape, and that is deliberate rather than duplication (#299). A letter's subject
 %% line and a resume entry's heading are two independent semantic decisions that
 %% currently agree; either may change without the other, and a future retune of
 %% entry headings must not silently restyle every letter. Do not factor one into
 %% the other, and do not define either in terms of the other.
 
-%% \CDossierMutedStyle is deliberately absent here (issue #271). De-emphasis is
+%% \CDossierMutedStyle is deliberately absent here (#271). De-emphasis is
 %% configurable through `muted=italic|gray|both|plain', so the role may resolve
 %% to a colour -- and this package owns no colour. It is defined once, complete,
 %% by careerdossier-components, which is the module allowed to combine a shape
@@ -232,9 +232,9 @@
 %% becomes a heading structure directly, rather than a heading nested inside a
 %% paragraph.  All commands used here are public kernel/tagpdf interfaces.
 %%
-%% Issue #267: the heading level is now a caller-supplied depth rather than a
+%% The heading level is now a caller-supplied depth rather than a
 %% hard-coded 1, because two things in a document can want a heading role and
-%% they must not collide. `sec/<n>/title' is the kernel's own generic
+%% they must not collide (#267). `sec/<n>/title' is the kernel's own generic
 %% structure name for a level-<n> sectioning title; its default role mapping
 %% resolves depth 1 to `/H1', depth 2 to `/H2', and so on. Depth 1 is reserved
 %% for the document identity (the name), so every other heading -- a resume or
@@ -242,8 +242,8 @@
 %% deeper, keeping the identity the document's one and only `/H1' and the
 %% heading hierarchy unskipped beneath it.
 %%
-%% Issue #268: the primitive also accepts the heading's plain title text, so a
-%% caller that has it can record it as the heading element's `/T'. That is what
+%% The primitive also accepts the heading's plain title text, so a
+%% caller that has it can record it as the heading element's `/T' (#268). That is what
 %% the kernel's own sectioning does -- `title-o' on the `sec/<n>/title'
 %% element -- and it is what lets a consumer show the heading in a document
 %% outline without re-reading the page. The text is purified first, because a
@@ -251,7 +251,7 @@
 %% and size commands into the PDF. An empty title omits the key entirely, so a
 %% title that purifies away leaves no `/T' rather than an empty PDF string.
 %%
-%% Issue #268 kept a two-argument wrapper that passed no title, so that the
+%% #268 kept a two-argument wrapper that passed no title, so that the
 %% call sites it did not touch needed no edit. #305 gave the remaining three --
 %% the document identity and the statement's title line -- their titles too,
 %% which left the wrapper with no callers, so it is gone. Every heading in
@@ -294,7 +294,7 @@
 
 %% ---------------------------------------------------------------------------
 %% \__cdossier_typography_division_begin:n {depth} -- start the `Sect' division
-%% that a heading at that depth introduces (issue #268).
+%% that a heading at that depth introduces (#268).
 %%
 %% A heading element on its own says only "these words are a heading". It does
 %% not say where the section it names begins or ends, so assistive technology

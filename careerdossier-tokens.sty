@@ -95,13 +95,13 @@
 \dim_new:N \CDossierFurnitureLeading
 \dim_new:N \CDossierRuleThickness
 \dim_new:N \CDossierListLabelSep
-%% Issue #272: the line-breaking flexibility every family may spend on a
-%% paragraph TeX cannot otherwise set within \tolerance. This module owns it
+%% The line-breaking flexibility every family may spend on a
+%% paragraph TeX cannot otherwise set within \tolerance (#272). This module owns it
 %% because line-breaking policy is a shared typographic decision, not a
 %% per-class one; the classes apply the token and none of them names a value.
 \dim_new:N \CDossierEmergencyStretch
 
-%% Keep-together penalties (issue #145). Entry-structured documents (resume,
+%% Keep-together penalties (#145). Entry-structured documents (resume,
 %% CV) state their page-break policy as named, tokenised penalties rather than
 %% bare \nobreak calls, so the policy is visible and independently tunable.
 %% Continuous-prose documents (letter, statement) are unaffected and keep
@@ -112,8 +112,8 @@
 %% lines, the entry heading and the first line of its body, and the two list
 %% boundaries that would leave a single typeset line stranded.
 %%
-%% Issue #562: "a bounded amount of material" used to be claimed here, and it was
-%% true of each of those boundaries alone and false of them together. A list's
+%% "a bounded amount of material" used to be claimed here, and it was
+%% true of each of those boundaries alone and false of them together (#562). A list's
 %% interior boundaries are those before items 2..n, so at n = 3 the two list
 %% guards were every one of them and at n = 2 they were the same one; with the
 %% heading keeps above them the entry became a single atom whose height grows
@@ -124,7 +124,7 @@
 %% each is bounded by a line; what is not bounded is the material between two
 %% guards, which is why the condition and not the value is what changed.
 %%
-%% Issue #333: the section heading is deliberately *not* in that list any more.
+%% The section heading is deliberately *not* in that list any more (#333).
 %% Read literally, a penalty after the section rule does not say "keep the
 %% heading with its first few lines" -- it says "keep the heading with
 %% everything up to the next legal breakpoint", which is unbounded and makes the
@@ -151,13 +151,13 @@
 \int_set:Nn \CDossierListOrphanPenalty { 9997 }
 
 %% CDossierSectionNeedLines is the section heading's keep, expressed as a bound
-%% instead of a prohibition (issue #333). A section heading is placed only when
+%% instead of a prohibition (#333). A section heading is placed only when
 %% at least this many lines of body leading remain on the page; otherwise the
 %% page breaks *before* the heading and the heading opens the next one.
 %%
 %% Four lines is what the heading actually needs to introduce anything: the
 %% heading and its rule, the two lines of the first entry heading, and that
-%% entry's first line of body. Fewer strands the heading in the sense issue #145
+%% entry's first line of body. Fewer strands the heading in the sense #145
 %% forbids; more would start pushing headings to the next page for no gain,
 %% since a section is free to break immediately after its first entry.
 %%
@@ -170,21 +170,21 @@
 \int_set:Nn \CDossierSectionNeedLines { 4 }
 
 %% CDossierSubsectionNeedLines is the same bound for the record classes' second
-%% heading level (issue #337), and it is smaller because a subsection commits
+%% heading level (#337), and it is smaller because a subsection commits
 %% less: its own heading line and the two lines of the first entry heading it
 %% introduces. There is no rule between them, and the entry heading carries its
-%% own keep down to its first body line (issue #145), so the subsection does not
+%% own keep down to its first body line (#145), so the subsection does not
 %% have to require that line a second time.
 %%
 %% A subsection that opens its section directly is exempt from this check
 %% altogether -- see \__cdossier_components_subsection:n. The section's own
 %% four-line bound already placed that material, so re-testing here could only
 %% break the page between a section heading and the subsection immediately under
-%% it, which is the stranding issue #145 forbids.
+%% it, which is the stranding #145 forbids.
 \int_new:N \CDossierSubsectionNeedLines
 \int_set:Nn \CDossierSubsectionNeedLines { 3 }
 
-%% Hyphenation is deliberately NOT tokenised (issue #309). \hyphenpenalty and
+%% Hyphenation is deliberately NOT tokenised (#309). \hyphenpenalty and
 %% \exhyphenpenalty stay at TeX's default of 50 in all four families, and the
 %% `tokens-*-defaults' baselines record both values, so a later change --
 %% including one made indirectly by loading a language package -- argues with a
@@ -209,7 +209,7 @@
 %%   make review-linebreak SWEEP_ARGS="--param hyphenation \
 %%     --values '50 200 500 1000 10000'"
 %%
-%% Issue #542 swept each penalty alone, and the findings above belong to
+%% #542 swept each penalty alone, and the findings above belong to
 %% \hyphenpenalty, which prices the breaks TeX finds itself. Alone, it gives
 %% the paired sweep's output in every example at every value from 50 to 1000,
 %% so the 50 -> 500 trade is its own. \exhyphenpenalty prices only the hyphens
@@ -227,7 +227,7 @@
 %%   make review-linebreak SWEEP_ARGS="--param hyphenpenalty \
 %%     --values '50 200 500 1000 10000'"
 %%
-%% Typographic page-break penalties (issue #171). These control hyphenation
+%% Typographic page-break penalties (#171). These control hyphenation
 %% and paragraph-remnant breaks at page boundaries, complementing the
 %% structural keep-together penalties above.
 %%
@@ -246,7 +246,7 @@
 %% breaks remain available, so a page can still break inside an over-long
 %% paragraph rather than overflow.
 %%
-%% Issue #335: that \raggedbottom is inherited, not set here. It comes from
+%% That \raggedbottom is inherited, not set here (#335). It comes from
 %% `article.cls', which issues it in the \if@twoside false branch and switches
 %% to \flushbottom for \if@twocolumn; the four classes get it only because each
 %% loads `article' one-side and one-column. Under \flushbottom the justification
@@ -258,7 +258,7 @@
 %% `twoside' or `twocolumn' fails a baseline rather than changing the page
 %% silently.
 %%
-%% Issue #351 asked for the rule that would dominate both outcomes -- fill the
+%% #351 asked for the rule that would dominate both outcomes -- fill the
 %% page unless doing so strands a line. It was specified, built, measured, and
 %% declined. What it needs is not a token: LaTeX's \raggedbottom leaves \topskip
 %% rigid and puts its fil in \@textbottom, which the output routine inserts at
@@ -273,7 +273,7 @@
 %% fill it recovers is still bought one-for-one with a stranded line, and the
 %% same tolerance makes LaTeX's -300 \@secpenalty live, which moves breaks
 %% *earlier* and costs two shipped examples 11.8 points of page-one fill.
-%% Issues #342 and #351 hold the measurements; docs/ARCHITECTURE.md
+%% #342 and #351 hold the measurements; docs/ARCHITECTURE.md
 %% ("Page-break penalties") states the rule and the deterrent for each route.
 \int_new:N \CDossierBrokenPenalty
 \int_set:Nn \CDossierBrokenPenalty { 10000 }
@@ -282,12 +282,12 @@
 \int_new:N \CDossierWidowPenalty
 \int_set:Nn \CDossierWidowPenalty { 10000 }
 
-%% Issue #204: every vertical boundary is owned by exactly one token, and every
+%% Every vertical boundary is owned by exactly one token, and every
 %% token declared here reaches the page at some boundary in the class that uses
-%% it. Two rules make that possible and both are load-bearing.
+%% it (#204). Two rules make that possible and both are load-bearing.
 %%
 %% Block boundaries compose with `\addvspace', which takes the *maximum* of the
-%% adjacent claims and never their sum (issue #168). Where two tokens met at one
+%% adjacent claims and never their sum (#168). Where two tokens met at one
 %% boundary the smaller was therefore unreachable: changing it moved nothing and
 %% produced no diagnostic. `\CDossierRecordEntryBelowSkip' and
 %% `\CDossierLetterheadBelowSkip' were exactly that and are retired; see
@@ -301,8 +301,8 @@
 %% that pattern for its headings and the shared header stack uses it for every
 %% header line.
 %%
-%% Issue #220: a token that cannot change output at any value is not a tunable,
-%% whatever its value. `\CDossierSharedHeaderAboveSkip' was glue above the first
+%% A token that cannot change output at any value is not a tunable,
+%% whatever its value (#220). `\CDossierSharedHeaderAboveSkip' was glue above the first
 %% header line, which is always the first material on page 1 and therefore
 %% always discarded; `\CDossierSharedHeaderParSkip' was subtracted from every
 %% header gap and then re-contributed by the following header line, so it
@@ -312,10 +312,10 @@
 %% `careerdossier-components.sty' -- but it is now a fixed zero rather than a
 %% public knob.
 %%
-%% Issue #223: the two gaps *inside* the header stack are genuinely shared --
+%% The two gaps *inside* the header stack are genuinely shared --
 %% every class stacks the same lines in the same order, and the stack zeroes
 %% `\parskip' for its own group, so the same ratio renders the same gap
-%% everywhere. The gap *below* the stack is not shared in the same sense: it is
+%% everywhere (#223). The gap *below* the stack is not shared in the same sense: it is
 %% a boundary against whatever the class puts next, and that neighbour differs
 %% per family (a ruled section in the record classes, a prose section in the
 %% statement, the date line in the letter). One token therefore had to clear
@@ -453,7 +453,7 @@
         \fp_to_dim:n
           { 0.5 * \dim_to_fp:n { \CDossierBodySize } }
       }
-    %% Issue #272: one \emergencystretch policy for all four families. Three
+    %% One \emergencystretch policy for all four families (#272). Three
     %% classes each wrote `2em' -- the letter and the statement unconditionally,
     %% the CV only at `a4paper' -- and the resume wrote nothing, so four classes
     %% held three policies and none of them could say why they differed.
@@ -469,7 +469,7 @@
     %% depends on a font whose quad happens to equal its design size, nor on
     %% which font is current at the point the length is set.
     %%
-    %% Issue #310 asked whether the token should instead scale with the measure,
+    %% #310 asked whether the token should instead scale with the measure,
     %% since a pool is spent on a line and a line has a length. It was measured
     %% and it should not, because the quantity it has to cover tracks neither.
     %% Holding one fixture, its text, and its body size fixed and varying only
@@ -510,15 +510,15 @@
 
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderNameGapSkip { 0.25 }
     \__cdossier_tokens_set_skip:Nn \CDossierSharedHeaderMetaGapSkip { 0.1875 }
-    %% Issue #223: one gap below the header stack per document family, each
+    %% One gap below the header stack per document family, each
     %% answering only for the boundary it actually meets -- the record classes'
     %% ruled section heading, the statement's prose section heading, and the
-    %% letter's date line (\CDossierLetterBlockSkip, 0.50). The retired
+    %% letter's date line (\CDossierLetterBlockSkip, 0.50) (#223). The retired
     %% \CDossierSharedHeaderBelowSkip had to clear whichever of those was
     %% largest in *any* class, so raising a section gap in one family spent
     %% vertical space in the other two, and the letter carried a floor set by a
     %% boundary it does not have. The split shipped mechanism-only, with all
-    %% three at the single value the shared token carried; issue #206 then
+    %% three at the single value the shared token carried; #206 then
     %% retuned them together. They remain equal because each still clears its
     %% own neighbour with room to spare, not because one value is imposed on
     %% all three -- the point of #223 is that they may now diverge freely.
@@ -526,28 +526,28 @@
     \__cdossier_tokens_set_skip:Nn \CDossierProseHeaderBelowSkip { 0.9375 }
     \__cdossier_tokens_set_skip:Nn \CDossierLetterHeaderBelowSkip { 0.9375 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionAboveSkip { 0.875 }
-    %% Issue #169: measured from the section heading's baseline, not from the
-    %% bottom of its line box. The value has a hard lower bound -- the heading's
+    %% Measured from the section heading's baseline, not from the
+    %% bottom of its line box (#169). The value has a hard lower bound -- the heading's
     %% depth, about 0.20 line at every supported size -- because a smaller
     %% offset would draw the rule through descender ink. 0.3125 leaves 1.63 pt
     %% of clearance at 11 pt and sits between the two distances it replaces
     %% (2.28 pt under a heading without descenders, 4.80 pt under one with).
     %%
-    %% Issue #206: this comment used to claim 0.3125 was the smallest sixteenth
-    %% that clears the descender. It is not -- 0.25 also passes
+    %% This comment used to claim 0.3125 was the smallest sixteenth
+    %% that clears the descender (#206). It is not -- 0.25 also passes
     %% `tests/smoke/section-rule-baseline.inc' at all three body sizes. The
     %% value is kept for the clearance it leaves, not because a smaller grid
     %% step is unavailable.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionRuleGapSkip { 0.3125 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.4375 }
-    %% Issue #337: the record classes' second heading level. The pair is not the
+    %% The record classes' second heading level (#337). The pair is not the
     %% prose subsection pair under another name, and only the above-ratio could
     %% have been ported.
     %%
     %% The below-ratio is pinned from both sides. Record boundaries compose with
     %% `\addvspace', which takes the maximum, so a below-token that only ties the
     %% opening claim of what follows never reaches the page: it would be the dead
-    %% token issue #204 retired \CDossierRecordEntryBelowSkip for. It must
+    %% token #204 retired \CDossierRecordEntryBelowSkip for. It must
     %% therefore exceed both claims a record subsection can meet below it --
     %% \CDossierRecordEntryAboveSkip (an entry run) and
     %% \CDossierRecordListEdgeAboveSkip (the CV's CDossierPublications list) --
@@ -581,9 +581,9 @@
     %% careerdossier-components.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSubsectionAboveSkip { 0.75 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSubsectionBelowSkip { 0.375 }
-    %% Issue #177: the heading rhythm of a continuous-prose document -- today
+    %% The heading rhythm of a continuous-prose document -- today
     %% the statement class, the only one with headings and prose paragraph
-    %% spacing at once. It cannot reuse the four tokens above, which are
+    %% spacing at once (#177). It cannot reuse the four tokens above, which are
     %% calibrated for a ruled heading in a document whose paragraphs are
     %% separated by nothing (\CDossierRecordParSkip is 0). A prose statement
     %% separates its paragraphs by \CDossierProseParSkip (0.25), so a heading
@@ -596,7 +596,7 @@
     %% that shape one step down (0.625 / 0.3125): still clear of the paragraph
     %% gap, but unambiguously tighter than the section it sits inside.
     %%
-    %% Issue #206 retuned all four. The pair relation is a floor -- above is at
+    %% #206 retuned all four. The pair relation is a floor -- above is at
     %% least twice below -- rather than an equality, because the ratio of the
     %% tokens is not the ratio a reader perceives: the token owns only the
     %% explicit glue, and TeX adds interline glue on top that no token can
@@ -606,7 +606,7 @@
     %%
     %% Two measures of that white exist and they do not agree on the ratio, so
     %% a figure is meaningless unless it names one. Measured on the built
-    %% statement at 12 pt (issue #417):
+    %% statement at 12 pt (#417):
     %%
     %%                          pdftotext -bbox     ink to ink
     %%   above a section              9.65 pt         15.39 pt
@@ -637,20 +637,20 @@
     \__cdossier_tokens_set_skip:Nn \CDossierProseSectionBelowSkip { 0.375 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionAboveSkip { 0.625 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseSubsectionBelowSkip { 0.3125 }
-    %% Issue #204: \CDossierRecordEntryAboveSkip is the sole inter-entry token.
+    %% \CDossierRecordEntryAboveSkip is the sole inter-entry token (#204).
     %% The retired \CDossierRecordEntryBelowSkip claimed the same boundary from
     %% the other side and lost every max it entered -- to this token between two
     %% entries, and to \CDossierRecordSectionAboveSkip at a section end.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryAboveSkip { 0.3125 }
-    %% Issue #204: the floor for the entry heading -> body boundary, emitted with
-    %% `\addvspace' rather than `\vspace'. As a `\vspace' it was extra space that
+    %% The floor for the entry heading -> body boundary, emitted with
+    %% `\addvspace' rather than `\vspace' (#204). As a `\vspace' it was extra space that
     %% *added* to whatever the body opened with, so a bullet list sat at
     %% EntryGap + ListEdgeAbove above its own entry and at max(...) below it --
     %% further from the entry that owns it than from the next one. Both ends of a
     %% list are now maxes, so the "a list belongs to the entry above it" relation
     %% is expressible by the ratios alone.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordEntryGapSkip { 0.0625 }
-    %% Issue #176: these tokens own the complete list edge. Until #176 the
+    %% These tokens own the complete list edge (#176). Until #176 the
     %% lists also inherited LaTeX's `\partopsep' -- 3 pt plus stretch that no
     %% token owned and that did not rescale -- so the rendered edge was 4.5 pt at
     %% 10pt, 4.7 pt at 11pt, and 4.81 pt at 12pt: an effective ratio drifting
@@ -658,13 +658,13 @@
     %% set `partopsep = 0pt' and this ratio absorbs the 3 pt, so the same edge
     %% is reproduced and rescales properly.
     %%
-    %% Issue #191: the edge above a list and the edge below it are separate
+    %% The edge above a list and the edge below it are separate
     %% tokens, because LaTeX's `\list' offers only one `topsep' for both and so
-    %% could not express a different value at the two ends. The split shipped
+    %% could not express a different value at the two ends (#191). The split shipped
     %% as a mechanism change alone, both ratios at the single value #176
     %% calibrated.
     %%
-    %% Issue #206 gave them the asymmetry the split exists for: a bullet list
+    %% #206 gave them the asymmetry the split exists for: a bullet list
     %% belongs to the entry above it, so it sits closer to that entry than to
     %% the next one. Measured on the resume at 11 pt, 2.30 pt above the list
     %% against 4.99 pt below -- 2.17:1.
@@ -682,30 +682,30 @@
     \__cdossier_tokens_set_skip:Nn \CDossierRecordItemSepSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierRecordParSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierProseParSkip { 0.25 }
-    %% Issue #222: \CDossierProseParSkip set \parskip for both the letter and
+    %% \CDossierProseParSkip set \parskip for both the letter and
     %% the statement, but the statement's heading below-tokens must stay
     %% strictly greater than it (see the comment above), while the letter has
     %% no heading scale to bound it and would prefer a more generous gap
-    %% between its unindented block paragraphs. Splitting the token per family
+    %% between its unindented block paragraphs (#222). Splitting the token per family
     %% lets either retune independently; both shipped at the same value, so the
-    %% split itself was mechanism-only. Issue #206 then tightened both together
+    %% split itself was mechanism-only. #206 then tightened both together
     %% -- still equal, but now by measurement rather than by the split's
     %% starting condition, and either may move alone from here. The set line
     %% above is the value; docs/ARCHITECTURE.md ("Vertical rhythm") tabulates
     %% the pair.
     \__cdossier_tokens_set_skip:Nn \CDossierLetterParSkip { 0.25 }
-    %% Issue #204: the recipient block prints one field per line and separated
+    %% The recipient block prints one field per line and separated
     %% them with a bare `\\', so the only vertical distance in the letter that no
-    %% token expressed was the one inside its most structured block. 0.00
+    %% token expressed was the one inside its most structured block (#204). 0.00
     %% reproduces the plain `\baselineskip' the bare `\\' gave.
     \__cdossier_tokens_set_skip:Nn \CDossierLetterRecipientLineGapSkip { 0.00 }
     \__cdossier_tokens_set_skip:Nn \CDossierLetterBlockSkip { 0.50 }
-    %% Issue #204: the letter body's two edges are a pair, and naming only the
+    %% The letter body's two edges are a pair, and naming only the
     %% opening one left the closing one borrowing \CDossierLetterBlockSkip -- a
-    %% token for the boundaries *between* letterhead blocks, not for the body.
+    %% token for the boundaries *between* letterhead blocks, not for the body (#204).
     %% The pair shipped at that borrowed value, which made it invisible: the
     %% salutation -> body gap was identical to the gap between two body
-    %% paragraphs. Issue #206 lifted it clear of both, so the body now reads as
+    %% paragraphs. #206 lifted it clear of both, so the body now reads as
     %% a framed block. The two must stay equal -- the frame is symmetric
     %% because the body is bounded by peers, not opened by a heading.
     \__cdossier_tokens_set_skip:Nn \CDossierLetterBodyAboveSkip { 0.625 }
@@ -727,7 +727,7 @@
 %% the selected class option, then pin the font itself to the resolved whole
 %% point size and calibrated leading. No catcode changes occur at call time.
 %%
-%% Issue #242: this is class-to-package plumbing, not an author command. It
+%% This is class-to-package plumbing, not an author command (#242). It
 %% transports a resolved load-time option -- \l__cdossier_tokens_fontsize_tl,
 %% which is package-private -- into \normalsize, so a document body cannot
 %% call it usefully and re-calling it changes nothing. It was named
@@ -749,14 +749,14 @@
 %% The paper name remains a class concern. The shared primitive is the only
 %% place that translates the public normal/narrow preset into geometry options.
 %%
-%% Issue #242: the name was \CDossierApplyGeometry:n, the one name in the
+%% The name was \CDossierApplyGeometry:n, the one name in the
 %% codebase that mixed the public CDossier prefix with an expl3 argument
-%% signature. It is plumbing either way -- its argument is the paper name only
+%% signature (#242). It is plumbing either way -- its argument is the paper name only
 %% the calling class knows, and geometry is applied once at load -- so it takes
 %% the private form the signature already implied. See docs/MIGRATION.md.
 %%
-%% Issue #183: the running header and the folio are placed by this module too,
-%% because their position is a function of the resolved margin. Until #183 the
+%% The running header and the folio are placed by this module too,
+%% because their position is a function of the resolved margin (#183). Until #183 the
 %% three furniture dimensions kept `geometry''s untouched defaults --
 %% \headheight 12pt, \headsep 25pt, \footskip 30pt -- identical at every
 %% fontsize x margin combination. At margin=narrow (0.5in = 36pt) that put the
@@ -801,7 +801,7 @@
 %% is too small and the ink can overrun the box it is nominally inside. The
 %% furniture leading is that height by construction; `geometry''s fixed 12pt is
 %% short of the 12pt line at fontsize=12pt once the line's depth is counted.
-%% Furniture placement (issue #183). The running header and the folio are the
+%% Furniture placement (#183). The running header and the folio are the
 %% only components positioned by page geometry rather than by the vertical
 %% rhythm, so their placement is derived here from the resolved margin M and the
 %% furniture line height H (\CDossierFurnitureLeading):

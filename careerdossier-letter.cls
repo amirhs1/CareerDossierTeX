@@ -46,9 +46,9 @@
 \tl_new:N \l__cdossier_letter_family_tl
 \tl_set:Nn \l__cdossier_letter_family_tl { industry }
 
-%% Issue #266: careerdossier-base declares the six options every class
+%% careerdossier-base declares the six options every class
 %% shares, each with its storage, its accepted values, and its class-named
-%% message; see `Shared class options' there. The class adds its own `family'
+%% message; see `Shared class options' there (#266). The class adds its own `family'
 %% option, its unknown-option message, and its unknown-key handler to the same
 %% key path, and sets the two defaults that differ by class.
 %% careerdossier-components would load base later anyway; it is loaded here
@@ -106,9 +106,9 @@
       }
       { careerdossier-tokens }
   }
-%% Issues #184 and #271: the class validates the public values;
+%% The class validates the public values;
 %% careerdossier-components owns the page furniture and the de-emphasis role,
-%% and therefore owns both resulting decisions.
+%% and therefore owns both resulting decisions (#184, #271).
 \use:x
   {
     \exp_not:N \PassOptionsToPackage
@@ -153,19 +153,19 @@
 
 %% Block format: no paragraph indentation, paragraphs separated by the shared
 %% prose token. \emergencystretch keeps justified prose from producing overfull
-%% boxes when a paragraph has few break points; issue #272 made it the shared
+%% boxes when a paragraph has few break points; #272 made it the shared
 %% token every family applies, so the reasoning now lives with the value in
 %% careerdossier-tokens.
 \setlength { \parindent }       { 0pt }
 \setlength { \parskip }         { \CDossierLetterParSkip }
 \setlength { \emergencystretch }{ \CDossierEmergencyStretch }
 
-%% Typographic page-break penalties (issue #171): see careerdossier-tokens for
+%% Typographic page-break penalties (#171): see careerdossier-tokens for
 %% the shared values and the reasoning for using one strength across families.
 \CDossierApplyPageBreakPenalties
 
-%% Issue #223: nothing that follows a letter header is a section -- the next
-%% block is the date line, at \CDossierLetterBlockSkip. The letter therefore
+%% Nothing that follows a letter header is a section -- the next
+%% block is the date line, at \CDossierLetterBlockSkip (#223). The letter therefore
 %% names its own gap below the header stack instead of carrying a floor set by
 %% a section boundary the class does not have.
 \__cdossier_components_headerbelow:N \CDossierLetterHeaderBelowSkip
@@ -236,15 +236,15 @@
 %% present lines. A missing field therefore leaves no blank line, and when every
 %% field is absent the caller omits the block entirely (see the letterhead).
 %%
-%% Issue #204: the break carries \CDossierLetterRecipientLineGapSkip. Until then
+%% The break carries \CDossierLetterRecipientLineGapSkip (#204). Until then
 %% it was a bare `\\', which is plain `\baselineskip' -- the only vertical
 %% distance in the letter that the token system did not express. The token
 %% defaults to 0.00, which is that same plain `\baselineskip'.
 %%
-%% Issue #302: the whole block is one paragraph, so a bare `\\' leaves the
+%% The whole block is one paragraph, so a bare `\\' leaves the
 %% consecutive lines with no character between them at all and a consumer that
 %% reads the structure element's logical text gets `Casey ReaderExample
-%% Company'. `\pdffakespace' emits a real, zero-width U+0020 (see
+%% Company' (#302). `\pdffakespace' emits a real, zero-width U+0020 (see
 %% careerdossier-components.sty for the mechanism and the untagged fallback).
 %%
 %% The separator hangs off `\\' itself, for the length of this block only,
@@ -311,17 +311,17 @@
 %% and the vertical space that follows it are emitted together, so an absent
 %% recipient or subject leaves no gap. \MakeCDossierHeader validates `name'.
 %%
-%% Issue #204: the header -> date boundary is owned by the header stack's own
-%% below-token, which \MakeCDossierHeader has already contributed -- for this
-%% class \CDossierLetterHeaderBelowSkip (issue #223). The retired
+%% The header -> date boundary is owned by the header stack's own
+%% below-token, which \MakeCDossierHeader has already contributed (#204) -- for
+%% this class \CDossierLetterHeaderBelowSkip (#223). The retired
 %% \CDossierLetterheadBelowSkip claimed the same boundary immediately
 %% afterwards with a smaller value, and `\addvspace' takes the maximum, so it
 %% never reached the page. The measurement, both ratios included, is in #204's
 %% table of unreachable tokens; docs/MIGRATION.md ("Three vertical-spacing
 %% tokens retired, two added") records only the retirement.
 %%
-%% Issue #299: the subject line uses \CDossierSubjectStyle, the role that
-%% describes it. It previously borrowed \CDossierEntryTitleStyle, which names a
+%% The subject line uses \CDossierSubjectStyle, the role that
+%% describes it (#299). It previously borrowed \CDossierEntryTitleStyle, which names a
 %% resume or CV entry heading -- a shape that happens to match, attached to a
 %% name that does not describe this line. Nothing on the page moved.
 %% ---------------------------------------------------------------------------
@@ -353,12 +353,12 @@
 %% \MakeCDossierClosing -- the letter close: the configured closing, signature
 %% space, and the profile name. Validates `name' because it prints it.
 %%
-%% Issue #204: the body's closing edge is \CDossierLetterBodyBelowSkip, the pair
-%% of \CDossierLetterBodyAboveSkip that opens it. It previously borrowed
+%% The body's closing edge is \CDossierLetterBodyBelowSkip, the pair
+%% of \CDossierLetterBodyAboveSkip that opens it (#204). It previously borrowed
 %% \CDossierLetterBlockSkip, which names the boundary *between letterhead
 %% blocks*; the two are separate boundaries and the default value is unchanged.
 %%
-%% Issue #421: the \nobreak before the signature gap. The closing text and the
+%% The \nobreak before the signature gap (#421). The closing text and the
 %% name are two separate one-line paragraphs, so \clubpenalty and \widowpenalty
 %% never see the boundary between them -- those parameters govern the first and
 %% last line *of one paragraph*, and here each paragraph is a single line that

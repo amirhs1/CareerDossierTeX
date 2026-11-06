@@ -82,7 +82,7 @@
 %% the gap at roughly one em -- and one em is exactly where pdftotext's default
 %% (non-layout) mode stops reading the numbers as labels and starts reading
 %% them as a separate left-hand column, emitting them as a block ahead of the
-%% entry text (issue #199). Measured on tests/bibliography/cv-bibliography.tex
+%% entry text (#199). Measured on tests/bibliography/cv-bibliography.tex
 %% with Poppler 26.07.0, the fixture splits at a 11.955pt gap and pairs at
 %% 11.905pt; the entries are correctly placed and `pdftotext -layout' reports
 %% them in source order either way, so this is the extractor's column
@@ -106,13 +106,13 @@
 %% contact line measures each item in its own box, and body text goes through
 %% \CDossierLink, whose break points carry a penalty and no glue.
 %%
-%% Capping the stretch was the earlier fix (0mu plus 1mu, issue #199), and it
+%% Capping the stretch was the earlier fix (0mu plus 1mu, #199), and it
 %% was a mitigation rather than a guarantee for a reason that turned out to be
 %% reachable with an ordinary address: TeX exceeds a stated stretch to set an
 %% otherwise underfull line, so a long enough URL split anyway. A 262-character
 %% query-string URL in an @online entry, at the CV's own fontsize=12pt,
 %% margin=normal, extracted as `silencing + diasporic + futurism' with the cap
-%% in place (issue #312). Rigid glue is the guarantee the cap was not: TeX
+%% in place (#312). Rigid glue is the guarantee the cap was not: TeX
 %% cannot stretch what has no stretch component, at any measure or length.
 \muskip_set:Nn \biburlbigskip { 0mu }
 
@@ -120,14 +120,14 @@
 %% breaks a URL only at punctuation, so a query string's long `+'-joined runs
 %% leave breakpoints ~10 characters apart; with no stretch to absorb the
 %% remainder, TeX set the line 5.09pt and 4.79pt into the margin instead. The
-%% missing ingredient is breakpoint density, exactly as in issue #308, where
+%% missing ingredient is breakpoint density, exactly as in #308, where
 %% \CDossierLink extends \UrlBreaks with the letters and digits so a body-text
 %% address can break anywhere. BibLaTeX exposes the same capability for its own
 %% URLs through three penalties, all 0 (disabled) by default. Raising them lets
 %% a URL break inside a run of letters or digits when punctuation will not do,
 %% which is what removes the overfull lines. As with \UrlBreaks, these break
 %% points insert a penalty and no discretionary hyphen, so a wrapped address
-%% still concatenates back exactly -- the copy-paste invariant of issue #294.
+%% still concatenates back exactly -- the copy-paste invariant of #294.
 %%
 %% 9000 ranks an intra-run break below url.sty's punctuation break points,
 %% which cost \UrlBreakPenalty (100), so where both would fit the line TeX
@@ -161,7 +161,7 @@
 %% mode takes a line-final hyphen for a soft one and drops it when it joins the
 %% lines, so `10.9999/example-2026-50355-2' extracted as
 %% `10.9999/example-202650355-2' -- a DOI that does not resolve, from a clean
-%% build (issue #561, tests/bibliography/doi-hyphen-break.tex).
+%% build (#561, tests/bibliography/doi-hyphen-break.tex).
 %%
 %% Removing that one break point is enough, and costs the measure nothing: the
 %% letter or digit before a hyphen still carries the 9000 break above, so the
@@ -193,7 +193,7 @@
 
 %% Every link a bibliography entry emits displays its own address -- a DOI, an
 %% e-print identifier, a URL -- so none of them is the undecorated-anchor-text
-%% problem that issue #278 addresses, and the body-copy underline must not reach
+%% problem that #278 addresses, and the body-copy underline must not reach
 %% them. It would also undo the work directly above: ulem breaks an underlined
 %% run at its spaces only, so an underlined address would become one
 %% unbreakable box and the intra-URL break points calibrated here would never
@@ -220,7 +220,7 @@
 %% The pairs are matched after normalisation, not as raw strings: Biber writes
 %% the words of a multi-word name part separated by a delimiter macro rather
 %% than by a space, so a declaration written the way the name reads could never
-%% match one (issue #541). Two further variables record what the matching found,
+%% match one (#541). Two further variables record what the matching found,
 %% so that a declaration matching nothing is reported instead of being silent.
 %% ---------------------------------------------------------------------------
 \seq_new:N  \g__cdossier_biblatex_highlight_authors_seq
@@ -299,7 +299,7 @@
 %% delimiter macro, so `given = {Maria Elena}' reaches \namepartgiven as
 %% `Maria\bibnamedelima Elena'. Comparing that against an ordinary space can
 %% never succeed, and nothing says so -- the document compiles, the entry
-%% renders, and the name is simply not bold (issue #541).
+%% renders, and the name is simply not bold (#541).
 %%
 %% Both sides are normalised rather than only the parsed one. That is what keeps
 %% a document carrying the old workaround -- a literal \bibnamedelima written

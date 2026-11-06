@@ -43,7 +43,7 @@
 # is what keeps it free of the poppler dependency the rest of the layout work
 # carries.
 #
-# Scoping a suite while developing (issues #359 and #367). `regression`,
+# Scoping a suite while developing (#359 and #367). `regression`,
 # `smoke`, `layout`, `extract-test`, and `tagging` each accept an optional
 # selector, and with no selector run exactly what they ran before — which is
 # what `check` and CI invoke, so neither is affected:
@@ -73,7 +73,7 @@
 # gitignored $(BUILD_DIR)/examples/ rather than beside the tracked example
 # sources, so the source tree never picks up untracked build artifacts.
 #
-# Running the full suite (issues #378, #390, #399). `check` is the optional full
+# Running the full suite (#378, #390, #399). `check` is the optional full
 # local run, since CI's required checks are the gate (AGENTS.md, "Commands"),
 # and runs its twelve targets four at a time. On a docs-only change it runs only
 # DOCS_ONLY_TARGETS and says so (#603). The serial path survives under its own
@@ -131,7 +131,7 @@
 # 3.81, which is what macOS ships, has no `--output-sync`, so under `-j` the
 # twelve suites interleave and "which suite failed" stops being answerable.
 #
-# Fanning out inside a suite (issue #390). `smoke`, `layout`, and `tagging`
+# Fanning out inside a suite (#390). `smoke`, `layout`, and `tagging`
 # additionally take JOBS=N, which runs that many of their own fixtures at once:
 #
 #   make smoke JOBS=4           four fixtures in flight
