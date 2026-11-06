@@ -13,11 +13,16 @@ entry is required and the shape it takes; the stability policy it serves is in
 
 ## Status
 
-`v0.10.0` is the current published release. Each line says whether a release
+`v0.11.0` is the current published release. Each line says whether a release
 needs a source edit and whether documents reflow; its section has the detail
 and the recipes. A document coming from `v0.5.x` or earlier needs every section
 from `v0.6.0` up.
 
+- [`v0.11.0`](#0110---2026-11-06): no source edit. A document that passes no
+  `medium` option loses its running header and `Page N of M` folio and
+  underlines `\href` text; `medium=print` restores it. Every resume and CV
+  leaves more white below each section rule, so one that fills its last page
+  may gain one; a single `\setlength` restores the old gap.
 - [`v0.10.0`](#0100---2026-11-06): no source edit. A resume's PDF `/Title` and
   running page label read `Resume`. An entry of three or fewer bullets can now
   break across a page, so a document in which such an entry moved whole to the
@@ -297,7 +302,7 @@ requires no migration. To try it, add `\DocumentMetadata` before
 Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
-## [Unreleased]
+## [0.11.0] - 2026-11-06
 
 ### `medium` defaults to `screen`
 

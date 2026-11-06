@@ -6,6 +6,26 @@ The project follows [Semantic Versioning](https://semver.org/). From `0.10.0`, e
 
 Before `v1.0.0`, breaking changes may occur, but they must be documented here and in `docs/MIGRATION.md`.
 
+## [0.11.0](https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.11.0) - 2026-11-06
+
+_If you are upgrading: please see [docs/MIGRATION.md](docs/MIGRATION.md)._
+
+### Changed
+
+- **Breaking:** Default `medium` to `screen`: a document that passes no `medium` option has no running header or `Page N of M` folio, and underlines the anchor text of an author-written `\href`; `medium=print` restores the previous output ([`1a6c21b`](https://github.com/amirhs1/CareerDossierTeX/commit/1a6c21b), [#673](https://github.com/amirhs1/CareerDossierTeX/pull/673))
+- **Breaking:** Leave as much white below a resume or CV section rule as below a statement section heading: `\CDossierRecordSectionBelowSkip` moves from `0.4375` to `0.6875` of the body baseline, so a document that fills its last page may gain one ([`c8bf600`](https://github.com/amirhs1/CareerDossierTeX/commit/c8bf600), [#674](https://github.com/amirhs1/CareerDossierTeX/pull/674))
+- Document in the manual the seven `\CDossierSize…` commands, the six resolved dimensions and whether setting each one has an effect, all five page-break penalties with their values, and the signature of `\CDossierApplyPageBreakPenalties`, and state that the `Style` and `Size` axes are independent ([`1b9ce60`](https://github.com/amirhs1/CareerDossierTeX/commit/1b9ce60), [#680](https://github.com/amirhs1/CareerDossierTeX/pull/680))
+
+### Added
+
+- Add a `language` key to `\CDossierSetup` that declares the document language as a BCP 47 tag and writes it to the PDF's `/Lang` on the default build path; `\hypersetup{pdflang=...}` still takes precedence, and a malformed tag is an error ([`2536420`](https://github.com/amirhs1/CareerDossierTeX/commit/2536420), [#672](https://github.com/amirhs1/CareerDossierTeX/pull/672))
+- Add an `entrymeta` key to `\CDossierSection` in the resume and CV classes, so one section can use `column` or `inline` while the rest of the document keeps the class option ([`70c97df`](https://github.com/amirhs1/CareerDossierTeX/commit/70c97df), [#679](https://github.com/amirhs1/CareerDossierTeX/pull/679))
+- Add `entrymeta=leader`, which keeps an entry's dates and location flush right and fills the gap before them with a dotted leader, so Poppler's `pdftotext` reads them with their entry, including the last entry on a page; `\CDossierEntryMetaLeader` and `\CDossierEntryMetaLeaderSep` set the mark and its spacing ([`897012f`](https://github.com/amirhs1/CareerDossierTeX/commit/897012f), [#681](https://github.com/amirhs1/CareerDossierTeX/pull/681); [`07503ad`](https://github.com/amirhs1/CareerDossierTeX/commit/07503ad), [#683](https://github.com/amirhs1/CareerDossierTeX/pull/683))
+
+### Fixed
+
+- Fix a bibliography ignoring a change to `\CDossierListLabelSep` or `\CDossierRecordItemSepSkip` made after `careerdossier-biblatex` loads ([`fcbd68a`](https://github.com/amirhs1/CareerDossierTeX/commit/fcbd68a), [#680](https://github.com/amirhs1/CareerDossierTeX/pull/680))
+
 ## [0.10.0](https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.10.0) - 2026-11-06
 
 _If you are upgrading: please see [docs/MIGRATION.md](docs/MIGRATION.md)._

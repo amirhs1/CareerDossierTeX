@@ -8,26 +8,25 @@ and the options at a glance. The PDF manual — `make manual`, or the
 reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing the
 code.
 
-> **Status:** `v0.10.0 — Consolidation and Correctness` is the current
-> published release. It removes duplication, fixes defects, and gives each rule
-> one home, so that the `v1.0.0` freeze applies to a deduplicated surface. The
-> shared class options are declared once instead of once per class, and the link
-> layer and the PDF metadata move into packages of their own,
-> `careerdossier-links.sty` and `careerdossier-metadata.sty`, which
-> `careerdossier-components.sty` loads.
+> **Status:** `v0.11.0 — Interface Changes` is the current published release.
+> It ships the last breaking and additive interface changes before `v1.0.0`
+> freezes the interface, so that they are used in a release first.
 >
-> It also fixes three defects: `\CDossierHighlightAuthor` now matches a
-> multi-word family or given name; an entry of three or fewer bullets can break
-> across a page; and a bibliography DOI or URL keeps its own hyphen when it wraps
-> at one. `\CDossierHighlightAuthor` now warns when a declaration matches no
-> name, and a research statement builds without an `affiliation`, as the other
-> statement types do.
+> **Two defaults change, and each is restored with one line.** A document that
+> passes no `medium` option now renders as `medium=screen`: no running header or
+> `Page N of M` folio, and author-written `\href` text underlined. A resume or CV
+> leaves more white below each section rule, as much as a statement leaves below
+> a section heading, so a document that fills its last page may gain one.
 >
-> **No public command, environment, class option, or key is added, renamed, or
-> removed.** A resume's PDF `/Title` and running page label now read `Resume`,
-> and a document in which an entry of three or fewer bullets moved whole to the
-> next page paginates differently. See [`docs/MIGRATION.md`](docs/MIGRATION.md)
-> for the upgrade path.
+> **Added:** a `language` key for `\CDossierSetup`, which declares the document
+> language for the PDF's `/Lang`; an `entrymeta` key on `\CDossierSection` in
+> the resume and CV, so one section can use another layout; and a third
+> `entrymeta` value, `leader`, which fills the gap before an entry's dates with a
+> dotted leader, set by `\CDossierEntryMetaLeader` and
+> `\CDossierEntryMetaLeaderSep`. A bibliography now follows a later change to
+> `\CDossierListLabelSep` or `\CDossierRecordItemSepSkip`, and the manual
+> documents the public names that survived the `v0.10.0` classification. See
+> [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -474,7 +473,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.10.0 — Consolidation and Correctness
+v0.11.0 — Interface Changes
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -482,10 +481,8 @@ Source archives and selected example PDFs are available through GitHub Releases.
 ## Roadmap
 
 Everything in the support matrix above is in the current release, named under
-[Releases](#releases). Two releases remain planned: `v0.10.0` removes
-duplication and fixes defects without changing the public interface, and
-`v1.0.0` declares that interface stable and fully documented. Nothing is
-scheduled after that.
+[Releases](#releases). One release remains planned: `v1.0.0` declares the
+public interface stable and fully documented. Nothing is scheduled after that.
 
 [`docs/ROADMAP.md`](docs/ROADMAP.md#releases-and-phases) owns the release table —
 every version, its goal, its status, and its phase, including the two milestones
