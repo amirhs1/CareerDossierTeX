@@ -1,4 +1,4 @@
-# manual-undocumented.txt — the documented-public-name ratchet (issue #468)
+# manual-undocumented.txt — the documented-public-name ratchet (#468)
 #
 # Every public name the Work defines should have an entry in the PDF manual.
 # `tests/lint/run-manual-names.sh' check (4) enforces that. This file is the

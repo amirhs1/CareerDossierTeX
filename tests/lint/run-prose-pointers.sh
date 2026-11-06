@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-prose-pointers.sh — every prose section pointer resolves (issue #559)
+# run-prose-pointers.sh — every prose section pointer resolves (#559)
 #
 # This instruction set navigates by two different cross-reference forms, and
 # only one of them was checked. `tests/lint/run-markdown-anchors.sh` resolves
@@ -24,7 +24,7 @@
 #
 # For every citation of a heading in a tracked Markdown file, outside fenced
 # code, in the form `CONTRIBUTING.md`, "Documentation heading convention" sets
-# (issue #583) — the shared templates' two forms, with or without backticks:
+# (#583) — the shared templates' two forms, with or without backticks:
 #
 #   `PATH.md`, "Section Name"          (several names joined by "and" or commas)
 #   "Section Name" in `PATH.md`
@@ -113,7 +113,7 @@ root="$(cd "$here/../.." && pwd)"
 fixtures="$here/fixtures"
 fail=0
 
-# Output guards that answer "could not check" apart from "absent" (issue #398).
+# Output guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
@@ -393,7 +393,7 @@ self_check() {
     fail=1
     return
   fi
-  # Issue #398: read three states, not two. A check that could not run is not a
+  # Read three states, not two (#398). A check that could not run is not a
   # report about the lint's message.
   text_contains "$out" "$expected"
   case "$?" in

@@ -1,9 +1,9 @@
-% tokens-furniture-geometry.lvt — page-furniture placement (issue #183).
+% tokens-furniture-geometry.lvt — page-furniture placement (#183).
 %
 % Pins the three furniture dimensions \__cdossier_tokens_apply_geometry:n
 % derives from the resolved margin at every fontsize x margin x paper
 % combination, and asserts that deriving them leaves the text block exactly
-% where v0.6.0 put it. Issue #242 renamed that command from the public
+% where v0.6.0 put it. #242 renamed that command from the public
 % \CDossierApplyGeometry:n; the name surface itself is asserted below.
 %
 % Every probe runs in the preamble: geometry's \geometry is a preamble-only
@@ -114,7 +114,7 @@
       }
   }
 
-%% Issue #242 classified the geometry primitive as class-to-package plumbing
+%% #242 classified the geometry primitive as class-to-package plumbing
 %% and renamed it. Asserting only that the private name works would leave the
 %% public one free to reappear, so both halves are pinned: the old name must be
 %% undefined, not merely unused.

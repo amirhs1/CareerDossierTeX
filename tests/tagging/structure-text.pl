@@ -2,9 +2,9 @@
 # structure-text.pl -- decode the literal text of each marked-content run in a
 # tagged PDF, so a check can assert on what a structure-aware consumer reads.
 #
-# Issue #302. Every other extraction check in this repository asks an extractor
+# Every other extraction check in this repository asks an extractor
 # (Poppler, MuPDF, PDFKit) what the page says, and every one of them rebuilds
-# words and lines from glyph *geometry*. That is precisely the wrong instrument
+# words and lines from glyph *geometry* (#302). That is precisely the wrong instrument
 # for a defect in the *logical* text of a structure element: an entry heading
 # whose title and dates are glued together with no separating character still
 # extracts as two lines, because Poppler sees the horizontal gap and splits on

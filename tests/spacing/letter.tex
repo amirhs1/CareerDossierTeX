@@ -25,9 +25,9 @@
 \begin{document}
 
 % -- header stack into the body copy that follows it -----------------------
-% Issue #419: the letterhead as a whole is a page-level composition, but the
+% The letterhead as a whole is a page-level composition, but the
 % shared header stack inside it is not, and its below-stack boundary is the one
-% this class's non-zero `\parskip' widened past its token. See record.tex.
+% this class's non-zero `\parskip' widened past its token (#419). See record.tex.
 \setbox\ProbeHeaderBox=\vbox{%
   \CDossierHeaderBegin
   \CDossierHeaderLine{Ada Lovelace}

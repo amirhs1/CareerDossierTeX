@@ -1,4 +1,4 @@
-% Shared assertions for issue #139's identity-block layout fixtures.
+% Shared assertions for #139's identity-block layout fixtures.
 %
 % Each wrapper selects one supported body size and decides whether `headline`
 % is present. The test records which calibrated size commands the rendered

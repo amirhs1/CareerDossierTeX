@@ -1,5 +1,5 @@
-% components-listguard-lines.lvt — issue #562: the list-orphan guard measures
-% lines, not items.
+% components-listguard-lines.lvt — the list-orphan guard measures
+% lines, not items (#562).
 %
 % The layout fixtures assert the *consequence* — a page that fills — and cannot
 % see the decision. This file asserts the decision itself, boundary by boundary,

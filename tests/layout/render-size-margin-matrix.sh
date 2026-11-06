@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # render-size-margin-matrix.sh — build the {normal,narrow} x {10pt,11pt,12pt}
-# reference matrix across all four document classes (issue #147).
+# reference matrix across all four document classes (#147).
 #
 # Each PDF is named <type>-<margin>-<fontsize>.pdf, and the margin is the outer
 # loop, so both the build order and a directory listing group every size of one
@@ -16,7 +16,7 @@
 #
 # Every combination must actually compile; a genuine compile failure aborts
 # the run. Overfull boxes, missing glyphs, font substitutions, and unresolved
-# references are instead collected as warnings: issue #147's "no overfull
+# references are instead collected as warnings: #147's "no overfull
 # boxes ... in any log" is a criterion the human reviewer checks against the
 # 24 built PDFs, not a gate that should stop the other combinations from being
 # produced. Final rhythm and proportion correctness (heading-to-rule vs.

@@ -14,7 +14,7 @@
 \documentclass{article}
 \usepackage[medium=screen]{careerdossier-components}
 
-%% The furniture primitive is an expl3 private name (issue #242), so the call
+%% The furniture primitive is an expl3 private name (#242), so the call
 %% has to sit inside \ExplSyntaxOn: outside it the `_' is a subscript and the
 %% name silently splits into \_ plus text, leaving the page styles unset.
 \ExplSyntaxOn

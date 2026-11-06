@@ -1,4 +1,4 @@
-% cv-publication-numbering.lvt — issue #355 grouped publication-list numbering.
+% cv-publication-numbering.lvt — #355 grouped publication-list numbering.
 %
 % Each CDossierPublications opens its own enumerate, so two lists in one section
 % both label their first item `1)'. That was invisible while a second list meant
@@ -22,7 +22,7 @@
 % The counter is carried in a global int and seeded onto `enumi' after
 % \begin{enumerate} rather than through enumitem's `start'/`resume' keys,
 % because the tagged branch runs LaTeX Lab's key emulation rather than enumitem
-% and cannot be assumed to implement either (issues #218 and #193). Seeding the
+% and cannot be assumed to implement either (#218 and #193). Seeding the
 % LaTeX counter works the same on both branches, and test 4 is what holds that
 % claim to account on the untagged one.
 \input{regression-test}

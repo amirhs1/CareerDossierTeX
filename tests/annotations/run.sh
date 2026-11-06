@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run.sh — the action type of every link annotation the toolkit emits
-# (issue #328).
+# (#328).
 #
 # The other link-facing suites all read the *text* layer: `links' decides
 # copy-paste integrity from word bounding boxes, `extraction' and `tagging'

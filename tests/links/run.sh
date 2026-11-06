@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run.sh — CareerDossierTeX copy-paste integrity runner (issue #294)
+# run.sh — CareerDossierTeX copy-paste integrity runner (#294)
 #
 # A URL or an e-mail address must not pick up extraction whitespace inside a
 # visual line, and when it legitimately wraps, concatenating its ordered line
@@ -24,7 +24,7 @@
 # gap with a rigid muskip rather than by provoking justification into producing
 # one, because the latter lands within a point or two of the threshold and fell
 # on opposite sides of it on the two supported toolchains; see the fixture's own
-# header for the measurements (issue #312).
+# header for the measurements (#312).
 #
 # The decision is made from `pdftotext -bbox` coordinates by link-token-check.awk,
 # which is where the wrap-versus-split distinction lives; see its header for why
@@ -85,7 +85,7 @@ for tex in *.tex; do
       # two fixtures are the only ones latexmk builds, and without it a run in
       # a directory holding an earlier PDF judges that PDF: the suite would
       # report on the previous state of the package rather than the current one
-      # (issue #312).
+      # (#312).
       if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
            -outdir="$out" "$tex" > "$out/$base.stdout" 2>&1; then
         echo "  BUILD FAILED (see $out/$base.log and $out/$base.blg)"; fail=1; continue

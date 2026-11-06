@@ -1,4 +1,4 @@
-% cv-subsection-edges.lvt — issue #337 record subsection boundaries, CV class.
+% cv-subsection-edges.lvt — #337 record subsection boundaries, CV class.
 %
 % \CDossierSubsection is rendered by one shared component, so the four contracts
 % listed in resume-subsection-edges.lvt are stated there and not repeated. This

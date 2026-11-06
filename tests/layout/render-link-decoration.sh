@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # render-link-decoration.sh — build the print/screen link-decoration reference
-# pair for visual review (issue #278).
+# pair for visual review (#278).
 #
 # `medium=screen' draws a rule under author-written \href anchor text and
 # `medium=print' draws nothing. Everything a machine can decide about that is
@@ -19,7 +19,7 @@
 #   2. The rule itself — weight against the section rule above it, clearance
 #      under descenders (`p', `g', `y'), and behaviour where an anchor wraps
 #      across a line break.
-#   3. The contact line, which issue #278 settled deliberately: it is NOT
+#   3. The contact line, which #278 settled deliberately: it is NOT
 #      decorated, under either medium. Its items are addresses that announce
 #      themselves, and a rule under the e-mail and website but not under the
 #      phone or the location reads as `these two are emphasised' rather than

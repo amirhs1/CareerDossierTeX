@@ -1,8 +1,8 @@
-% resume-subsection-need.tex — issue #337: a subsection heading arriving with
-% too little room to introduce anything.
+% resume-subsection-need.tex — a subsection heading arriving with
+% too little room to introduce anything (#337).
 %
 % \CDossierSubsectionNeedLines is the second heading level's half of the bound
-% issue #333 introduced, and like that bound it does something at exactly one
+% #333 introduced, and like that bound it does something at exactly one
 % moment: when a subsection heading reaches the page with fewer than that many
 % lines left. resume-section-need.tex reaches that moment for a section; nothing
 % reached it for a subsection, and the two are separate code paths with separate
@@ -15,7 +15,7 @@
 %
 % The entry count is not arbitrary. At this count and
 % \CDossierSubsectionNeedLines = 0, "Academic" is the last line on page one — a
-% stranded heading, the thing issue #145 forbids and this bound exists to
+% stranded heading, the thing #145 forbids and this bound exists to
 % prevent. At the committed value of 3 it moves to page two with its entry.
 % The runner's "no page ends with a section heading" check reads
 % \CDossierSubsection titles too, so that two-sided behaviour is what makes this

@@ -1,8 +1,8 @@
 % Shared regression: the section-rule tokens own the rule-to-content gap.
 %
-% Issue #168. `\CDossierRecordSectionBelowSkip' must own the complete distance
+% `\CDossierRecordSectionBelowSkip' must own the complete distance
 % from the decorative section rule to the first line of section content, for
-% every kind of content that can follow a section heading.
+% every kind of content that can follow a section heading (#168).
 %
 % LaTeX vertical spacing composes by collapsing, not by adding: adjacent
 % `\addvspace' skips yield their maximum. The gap after a section rule is

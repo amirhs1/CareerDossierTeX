@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-manual-names.sh — the PDF manual's names and version (issue #263)
+# run-manual-names.sh — the PDF manual's names and version (#263)
 #
 # The manual (doc/careerdossier.tex) became the authored reference for the
 # public interface when docs/API.md was reduced to a pointer. Two of that
@@ -58,7 +58,7 @@ set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 
-# Output guards that answer "could not check" apart from "absent" (issue #398).
+# Output guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
@@ -146,7 +146,7 @@ manual_names() {
 # work_names() deliberately counts a name mentioned in a comment, because for
 # check (2) that is still a claim worth validating. Here the same inclusion
 # would be a false positive with teeth. Three names appear in this tree *only*
-# inside comments recording that issue #242 made them private --
+# inside comments recording that #242 made them private --
 # \CDossierApplyBodySize, \CDossierApplyGeometry, and
 # \MakeCDossierPageFurniture. They are private now. Asking the manual to
 # document them would pressure an author into documenting a private name, which
@@ -361,7 +361,7 @@ check_declared_release() {
 # The mirror of check (2), and the direction that was missing: (2) stops the
 # manual naming something that does not exist, (4) stops the Work exposing
 # something the manual never mentions. A new public command could ship
-# undocumented and every suite passed (issue #468).
+# undocumented and every suite passed (#468).
 #
 # It ships as a ratchet rather than a policy. 52 of the 84 names the Work
 # defines were undocumented when this was written, and a lint that fails on all
@@ -488,7 +488,7 @@ check_declared_release "$readme" readme || fail=1
 echo
 echo "== fixtures (the lint's own failure modes) =="
 
-# The positive control's release is the Work's, read at test time (issue #523).
+# The positive control's release is the Work's, read at test time (#523).
 # A fixture that wrote it down went red at every release bump, and the repair
 # was to copy the Work's new value into it: a control repaired by copying its
 # subject would certify a wrong release as readily as a right one. So
@@ -532,7 +532,7 @@ self_check() {
     fail=1
     return
   fi
-  # Issue #398: three states. A check that could not run is not a report about
+  # Three states (#398). A check that could not run is not a report about
   # the lint's message.
   case "$out" in
     '')

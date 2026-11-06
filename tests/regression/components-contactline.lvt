@@ -11,7 +11,7 @@
 % -> <field>, and \__cdossier_components_labeltext:n -> [Label:]. The render
 % stub mirrors the real \__cdossier_components_render:n by keeping its opening
 % \__cdossier_components_label:n call, so the label gating and field-selection
-% logic (issue #95) runs unchanged. Field markers appear when each atomic box is
+% logic (#95) runs unchanged. Field markers appear when each atomic box is
 % prepared; separator markers appear when the prepared box is packed with the
 % preceding row. Their log order therefore reflects the packing algorithm, not
 % the shipped visual order (which the layout tests inspect).
@@ -87,7 +87,7 @@
   \cdossiertestFilteredContactLine
 }
 
-% --- Contact-field labels (issue #95) ---------------------------------------
+% --- Contact-field labels (#95) ---------------------------------------
 
 % The feature is opt-in: with no contact-labels key, no label marker appears.
 % This test runs before any test enables the key, so it pins the true default.

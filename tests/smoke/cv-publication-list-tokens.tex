@@ -27,9 +27,9 @@
         \msg_error:nnn { cdossier-test }
           { wrong-publication-list-token } { itemsep }
       }
-    %% Issue #176: `\CDossierRecordListEdgeAboveSkip' owns the whole opening
+    %% `\CDossierRecordListEdgeAboveSkip' owns the whole opening
     %% list edge, so LaTeX's unscaled `\partopsep' must not add to it when the
-    %% list opens a new paragraph. The closing edge is measured in
+    %% list opens a new paragraph (#176). The closing edge is measured in
     %% cv-publication-list-edge-gap.tex (#191).
     \skip_if_eq:nnF { \partopsep } { 0pt }
       { \msg_error:nn { cdossier-test } { unowned-publication-list-edge } }

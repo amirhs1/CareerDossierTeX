@@ -1,4 +1,4 @@
-# page-break-check.awk — detect typographic page-break defects (issue #171)
+# page-break-check.awk — detect typographic page-break defects (#171)
 # from `pdftotext -bbox` output for a whole PDF.
 #
 # Reports two kinds of finding:
@@ -53,7 +53,7 @@
 
 # How much larger than the leading a gap must be to count as a paragraph
 # boundary. This is the whole sensitivity of the CLUB/WIDOW check, and it was
-# wrong until issue #348: at 1.35 no ordinary paragraph boundary in this corpus
+# wrong until #348: at 1.35 no ordinary paragraph boundary in this corpus
 # was ever recognized, so the check reported "no widow or club line" on every
 # prose fixture by never looking.
 #

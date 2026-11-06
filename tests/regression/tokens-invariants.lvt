@@ -1,4 +1,4 @@
-% tokens-invariants.lvt — issue #204 vertical-boundary token invariants.
+% tokens-invariants.lvt — #204 vertical-boundary token invariants.
 %
 % Every vertical boundary is owned by exactly one token, and `\addvspace' takes
 % the maximum of the adjacent claims. Which token therefore reaches the page at
@@ -8,8 +8,8 @@
 % The saved baseline is the assertion. Each relation reports `holds' or
 % `violated', so a ratio change that silently makes a token unreachable — or
 % that repairs one — shows up as a reviewable diff rather than as a token no
-% document responds to. Issue #204 fixed the mechanism that made several of
-% these expressible at all; issue #206 assigns the ratios that satisfy them.
+% document responds to. #204 fixed the mechanism that made several of
+% these expressible at all; #206 assigns the ratios that satisfy them.
 %
 % Several relations are therefore recorded as `violated' at the committed
 % defaults. That is deliberate and is the point of committing this test before
@@ -18,7 +18,7 @@
 % one at a time instead of arriving as one opaque block of new numbers.
 %
 % One relation is not a design ordering at all. The extraction floor on
-% `\CDossierRecordListEdgeAboveSkip' (issue #219) records a bound imposed from
+% `\CDossierRecordListEdgeAboveSkip' (#219) records a bound imposed from
 % outside the type scale: below it, the entry heading's right-hand column stops
 % extracting with its entry. It is stated here because it constrains the same
 % retune the orderings above constrain, and because nothing in the component it
@@ -61,10 +61,10 @@
     \keys_set:nn { cdossier / tokens } { fontsize = #1 }
     \__cdossier_tokens_resolve:
     \TYPE { fontsize = #1 }
-    %% Issue #223: the gap below the header stack is one token per family, and
+    %% The gap below the header stack is one token per family, and
     %% each is stated against the block its own class actually puts next -- a
     %% ruled section in the record classes, a prose section in the statement,
-    %% and the date line (\CDossierLetterBlockSkip) in the letter. Before the
+    %% and the date line (\CDossierLetterBlockSkip) in the letter (#223). Before the
     %% split one token answered for all three, so it was floored by whichever
     %% neighbour was largest in any class and a heading retune in one family
     %% moved output in the other two.
@@ -106,11 +106,11 @@
             { \CDossierRecordSectionAboveSkip + 2sp }
             < { \CDossierRecordSectionBelowSkip * 2 }
       }
-    %% Issue #337. The record subsection pair is the reason its above-ratio is
+    %% The record subsection pair is the reason its above-ratio is
     %% 0.75 and not the prose pair's 0.625: the below-ratio is pinned at 0.375 by
     %% the two reachability relations further down, and 0.625 against 0.375 is
     %% 1.67:1, which would have made this the first heading pair to report
-    %% `violated'.
+    %% `violated' (#337).
     \cdossiertest_invariant:nn
       { RecordSubsectionAboveSkip >= 2 ~ x ~ RecordSubsectionBelowSkip }
       {
@@ -147,8 +147,8 @@
           { \CDossierProseSubsectionBelowSkip }
           < { \CDossierProseSectionBelowSkip }
       }
-    %% Issue #337: a record subsection is a child of its section on both edges,
-    %% exactly as the prose pair is of the prose section above.
+    %% A record subsection is a child of its section on both edges,
+    %% exactly as the prose pair is of the prose section above (#337).
     \cdossiertest_invariant:nn
       { RecordSubsectionAboveSkip < RecordSectionAboveSkip }
       {
@@ -163,12 +163,12 @@
           { \CDossierRecordSubsectionBelowSkip }
           < { \CDossierRecordSectionBelowSkip }
       }
-    %% Issue #337: the two reachability relations, and the reason the record
-    %% below-ratio could not be ported from the prose pair. A subsection
+    %% The two reachability relations, and the reason the record
+    %% below-ratio could not be ported from the prose pair (#337). A subsection
     %% introduces either a run of entries or -- in the CV -- a CDossierPublications
     %% list, and `\addvspace' takes the maximum, so a below-token that merely tied
     %% either opening claim would never reach the page at any value: changing it
-    %% would move nothing and emit no diagnostic, which is what issue #204
+    %% would move nothing and emit no diagnostic, which is what #204
     %% retired \CDossierRecordEntryBelowSkip for. \CDossierProseSubsectionBelowSkip
     %% is 0.3125 and so is \CDossierRecordEntryAboveSkip, so porting it would have
     %% produced exactly that dead token.
@@ -201,7 +201,7 @@
     %% the gap below a list, which is what keeps entry separation uniform
     %% between a section whose entries carry bullet lists and one whose entries
     %% do not -- see `RecordListEdgeBelowSkip'. This is the same argument that
-    %% retired rule 5's "match the two section pairs" in issue #206: a ruled
+    %% retired rule 5's "match the two section pairs" in #206: a ruled
     %% heading and a bare one spend their gaps differently.
     \cdossiertest_invariant:nn
       { RecordEntryAboveSkip <= RecordSectionBelowSkip }
@@ -233,8 +233,8 @@
         \dim_compare_p:nNn
           { \CDossierRecordListEdgeAboveSkip } < { \CDossierRecordEntryAboveSkip }
       }
-    %% Issue #219: an extraction floor, not a design preference, and the only
-    %% relation here that is not about how the page reads.
+    %% An extraction floor, not a design preference, and the only
+    %% relation here that is not about how the page reads (#219).
     %%
     %% The entry heading sets its dates/location in a right-hand column. Poppler
     %% builds its reading order from glyph positions alone -- the PDF tag tree

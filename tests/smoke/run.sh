@@ -10,7 +10,7 @@
 #   fail-once
 #         — as `fail', plus a second substring that must appear exactly once.
 #           A rejected class option is owned by one module, so it must be
-#           reported by one module (issue #232). Proving that needs the whole
+#           reported by one module (#232). Proving that needs the whole
 #           document processed, so these fixtures run without -halt-on-error:
 #           under it TeX stops at the first report and a second one further
 #           down the preamble would never reach the log.
@@ -40,13 +40,13 @@ mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
-# Log guards that answer "could not check" apart from "absent" (issue #398).
+# Log guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
 fail=0
 
-# Fixture selection (issue #359).
+# Fixture selection (#359).
 #
 # With no pattern every fixture runs and nothing about this suite has changed;
 # that is the invocation CI makes and the one `make check' makes. A pattern
@@ -62,12 +62,12 @@ fail=0
 # passes all of them, and that is indistinguishable from a suite that checked
 # something.
 #
-# Fixture-level concurrency (issue #390) is opt-in through `--jobs N`, which
+# Fixture-level concurrency (#390) is opt-in through `--jobs N`, which
 # `make smoke JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
 # runner takes the serial path below and is the suite it has always been: the
 # same fixtures, in the same order, with byte-identical output. That is the
 # invocation `make check` makes, and a gate whose result depends on scheduling
-# is not a gate. CI's job passes `--jobs "$(nproc)"` instead (issue #631),
+# is not a gate. CI's job passes `--jobs "$(nproc)"` instead (#631),
 # relying on the accounting assertion below to fail, by name, any fixture that
 # left no verdict.
 fixture_filter=""
@@ -294,7 +294,7 @@ fi
 
 # Every block below is a *unit*: a function that prints everything the serial
 # runner printed for it, including its trailing blank line, and reports its
-# verdict through its return status alone (issue #390).
+# verdict through its return status alone (#390).
 #
 # That shape is what makes the two paths one path. The serial driver calls these
 # in order; the parallel driver dispatches them and replays their captured
@@ -329,7 +329,7 @@ smoke_engine_contract() {
       echo "  $engine EXPECTED FAILURE but compile succeeded"
       unit_fail=1
     else
-      # Flattened into a variable before it is matched (issue #398): with the
+      # Flattened into a variable before it is matched (#398): with the
       # match as the last stage of the pipeline, its early exit under `-q`
       # signals `tr`, and `pipefail` reports "needle absent" for a log that
       # contains it — here, "failed for the wrong reason" about a correct
@@ -358,9 +358,9 @@ smoke_engine_contract() {
   return "$unit_fail"
 }
 
-# Issue #252: the header-stack fixture below compiles the worked example
+# The header-stack fixture below compiles the worked example
 # published in the manual, so it is only worth compiling while the two are the
-# same text. Nothing else notices when a documented example is edited and its
+# same text (#252). Nothing else notices when a documented example is edited and its
 # fixture is not -- the fixture keeps building, and the promise it was added to
 # keep quietly stops being kept. Compare them before compiling anything.
 #
@@ -375,7 +375,7 @@ smoke_engine_contract() {
 # no-block case below is a failure rather than a skip: a manual this cannot find
 # an example in is indistinguishable from a manual that no longer publishes one.
 #
-# It is gated on its own fixture being selected (issue #359): the claim it makes
+# It is gated on its own fixture being selected (#359): the claim it makes
 # is about that fixture, and a run that does not compile it has no business
 # reporting on it.
 smoke_doc_drift() {
@@ -516,7 +516,7 @@ unit_cmds=()
 [ "$engine_selected" -eq 1 ] \
   && { unit_names+=("$engine_fixture"); unit_cmds+=("smoke_engine_contract"); }
 
-# Issue #252's drift check is its own unit rather than part of the fixture's
+# #252's drift check is its own unit rather than part of the fixture's
 # own: it printed before every compile when this ran serially, and keeping that
 # position is what makes the two paths' output identical.
 if fixture_matches components-header-stack-doc; then

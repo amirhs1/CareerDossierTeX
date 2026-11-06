@@ -1,4 +1,4 @@
-% resume-section-keep.lvt — issues #333 and #340, the section heading's keep.
+% resume-section-keep.lvt — #333 and #340, the section heading's keep.
 %
 % Two contracts, neither visible in any gap measurement.
 %
@@ -96,7 +96,7 @@
   \cdossiertestNodes{section-with-entry}
 }
 
-% Issue #340: three consecutive empty sections. Every inter-section boundary must
+% Three consecutive empty sections (#340). Every inter-section boundary must
 % remain a legal breakpoint; with the penalty emitted after each rule the count
 % was 0, because each leaked penalty sat immediately before the glue that would
 % otherwise have carried the break.
@@ -106,8 +106,8 @@
   \cdossiertestBreaks{three-empty-sections}
 }
 
-% Issue #333: the boundaries *inside* a section are legal again, which is what
-% lets a page fill to the last entry that fits instead of dumping the section.
+% The boundaries *inside* a section are legal again, which is what
+% lets a page fill to the last entry that fits instead of dumping the section (#333).
 \TEST{section-interior-breakpoints}{
   \setbox9=\vbox{\CDossierSection{Education}%
     \begin{CDossierEntry}[title = {Ph.D.}]\end{CDossierEntry}%

@@ -1,8 +1,8 @@
 % Shared regression: a full-measure bullet must not emit a blank line.
 %
-% Issue #170. Readable source puts `\end{CDossierItemize}' on its own line, so
+% Readable source puts `\end{CDossierItemize}' on its own line, so
 % the newline after the final item's text is a space token at the end of that
-% item's paragraph. When the item's last line already fills the measure, TeX
+% item's paragraph (#170). When the item's last line already fills the measure, TeX
 % carries the space onto a line of its own: a box with no glyphs, zero height,
 % and zero depth, preceded by a full `\baselineskip'. Nothing is visible, but the
 % following `\addvspace' cannot see past it, so the next structural gap grows by

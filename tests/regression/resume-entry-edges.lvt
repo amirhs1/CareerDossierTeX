@@ -1,4 +1,4 @@
-% resume-entry-edges.lvt — issue #204 entry and list boundary composition.
+% resume-entry-edges.lvt — #204 entry and list boundary composition.
 %
 % Two contracts, both invisible in the token values alone.
 %
@@ -22,7 +22,7 @@
 %    max(\CDossierRecordSectionBelowSkip, \CDossierRecordEntryAboveSkip) and
 %    the section gap governs it. TEST 1 alone therefore reports the token's
 %    value without ever rendering it, which is exactly the unreachable-token
-%    condition issue #204 exists to prevent. TEST 3 supplies the missing shape
+%    condition #204 exists to prevent. TEST 3 supplies the missing shape
 %    -- two bodiless entries, as the resume's Education and Certificates
 %    sections are written -- so a change to the ratio moves a recorded number.
 %
@@ -51,7 +51,7 @@
 \NewDocumentCommand \cdossiertestMark { m } { \cdossiertest_mark:n {#1} }
 \NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
 
-%% Issue #332: the keep penalty itself, asserted rather than observed.
+%% The keep penalty itself, asserted rather than observed (#332).
 %%
 %% \pagetotal cannot see a penalty -- it contributes 0pt -- so every assertion
 %% above this point holds equally whether the penalty is emitted, misplaced, or
@@ -91,7 +91,7 @@
   }}%
 }
 
-%% Issue #332: the consequence, counted. The signature above says where the
+%% The consequence, counted (#332). The signature above says where the
 %% penalty sits; this says what that does to the page builder, which is the
 %% property the issue is actually about.
 %%
@@ -167,10 +167,10 @@
   \cdossiertestMark{after-second-bare-entry}
 }
 
-% Issue #255: \CDossierRecordItemSepSkip is the gap *between* two bullets, so a
+% \CDossierRecordItemSepSkip is the gap *between* two bullets, so a
 % one-item list cannot render it — and TEST 1's list has one item, which is the
 % same gap between reporting a token and rendering it that point 3 above
-% describes. A two-item list is the missing shape, and it is the only one: the
+% describes (#255). A two-item list is the missing shape, and it is the only one: the
 % token reaches the page nowhere else in the record classes, and the only other
 % place it is read at all is `\bibitemsep' in careerdossier-biblatex.
 %
@@ -189,15 +189,15 @@
   \end{CDossierEntry}
 }
 
-% Issue #332: an entry with a body emits the keep penalty that binds its heading
+% An entry with a body emits the keep penalty that binds its heading
 % to that body's first line; an entry without one emits nothing, so the boundary
-% after it stays a legal breakpoint. Probed at the two points where the answer
+% after it stays a legal breakpoint (#332). Probed at the two points where the answer
 % differs -- at the start of the body, and after a bodiless entry has closed.
 %
 % The bodied probe reads 10000 and the bare probe reads 0. Deleting the penalty
 % outright turns the first into 0, which is what makes an entry heading
 % separable from a prose body; emitting it unconditionally turns the second into
-% 10000, which is issue #332 itself. Neither failure is visible in \pagetotal.
+% 10000, which is #332 itself. Neither failure is visible in \pagetotal.
 \TEST{entry-keep-penalty}{
   \setbox9=\vbox{\begin{CDossierEntry}[title = {Bodied Entry}]Prose body, no
     list.\end{CDossierEntry}}
@@ -206,8 +206,8 @@
   \cdossiertestNodes{bare}
 }
 
-% Issue #332: a run of bodiless entries, as an Education or Certificates section
-% is written. Every inter-entry boundary must remain a legal breakpoint. With the
+% A run of bodiless entries, as an Education or Certificates section
+% is written (#332). Every inter-entry boundary must remain a legal breakpoint. With the
 % penalty emitted unconditionally the count collapses, because each leaked
 % penalty sits immediately before the glue that would otherwise carry the break
 % and the next entry's \addvspace collapses into that same glue rather than

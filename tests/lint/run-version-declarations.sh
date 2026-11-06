@@ -67,7 +67,7 @@
 # Portability, for the same reason tests/lint/run.sh carries the note: this is
 # text processing, and local `grep'/`awk' are ugrep and one-true-awk while CI's
 # are GNU grep and gawk or mawk. A brace is written `[{]', and nothing is piped
-# into `grep -q' or `grep -c' (issue #398's ratchet); membership tests are shell
+# into `grep -q' or `grep -c' (#398's ratchet); membership tests are shell
 # `case' matches, which fork nothing and cannot report a hit as a miss.
 set -uo pipefail
 
@@ -305,7 +305,7 @@ self_check() {
     fail=1
     return
   fi
-  # Issue #398: three states. A check that could not run is not a report about
+  # Three states (#398). A check that could not run is not a report about
   # the lint's message.
   case "$out" in
     '')

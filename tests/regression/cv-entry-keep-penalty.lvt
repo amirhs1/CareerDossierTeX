@@ -1,4 +1,4 @@
-% cv-entry-keep-penalty.lvt — issue #332, the CV half.
+% cv-entry-keep-penalty.lvt — #332, the CV half.
 %
 % careerdossier-cv declares its own CDossierEntry rather than sharing the
 % resume's, so the guard that decides whether the keep penalty is emitted exists
@@ -15,9 +15,9 @@
 % so no page-total measurement distinguishes those cases.
 %
 %
-% Issue #562: the two `whatsit' nodes at the list's closing edge are the
+% The two `whatsit' nodes at the list's closing edge are the
 % auxiliary-file writes that carry the list's item count and its edge line
-% counts. They moved into the vertical list when the policy began ending the
+% counts (#562). They moved into the vertical list when the policy began ending the
 % final item's paragraph itself in order to read `\prevgraf'; before that the
 % writes were contributed while the last item's paragraph was still open, so they
 % sat in a horizontal list this dump cannot see. Every skip and penalty around

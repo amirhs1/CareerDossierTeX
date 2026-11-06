@@ -1,4 +1,4 @@
-% links-bodylink.lvt — \CDossierLink, the body-text link (issue #308).
+% links-bodylink.lvt — \CDossierLink, the body-text link (#308).
 %
 % Three properties, none of which a rendered page reveals:
 %
@@ -10,7 +10,7 @@
 %     are gone afterwards, so the contact line and the bibliography keep the
 %     punctuation-only \UrlBreaks they were measured with;
 %   - without hyperref the command still emits the visible address, and says
-%     so once (issue #329) — the only test here that reaches the real link
+%     so once (#329) — the only test here that reaches the real link
 %     wrapper rather than the tracing stub, so the only one that warns.
 %
 % url.sty is loaded on its own here: it owns \UrlBreaks, and loading hyperref

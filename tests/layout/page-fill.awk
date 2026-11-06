@@ -1,5 +1,5 @@
 # page-fill.awk — report how full each page is, and what forced its break
-# (issue #334), from a LuaLaTeX `.log` produced with `\tracingpages=1`.
+# (#334), from a LuaLaTeX `.log` produced with `\tracingpages=1`.
 #
 # The keep-together assertions in run.sh check only that material stays
 # *together*. Every one of them passes on a page that is half empty, and until

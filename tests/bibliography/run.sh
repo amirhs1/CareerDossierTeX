@@ -8,7 +8,7 @@
 # example is unchanged".
 #
 # The final section is the complement of that rule rather than an exception to
-# it (issue #319). It builds the shipped example and asserts only that it
+# it (#319). It builds the shipped example and asserts only that it
 # rendered as many entries as its database declares. It pins no string, no
 # order, no field, no key, and no year, so adding a fourth entry keeps it green
 # and the example stays free to change; it cannot become a content baseline
@@ -44,7 +44,7 @@ update=0
 # up-to-date PDF as done, so a run in a directory holding an earlier build
 # judges that PDF and reports on the previous state of the package rather than
 # the current one — including its Biber warnings, which is how a stale build
-# survived a package change during issue #312.
+# survived a package change during #312.
 echo "== $base.tex (latexmk + Biber) =="
 if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error -outdir="$out" \
      "$base.tex" > "$out/$base.stdout" 2>&1; then
@@ -101,7 +101,7 @@ got="$(pdftotext -enc UTF-8 "$out/$base.pdf" - | sed '/^\f/d' \
                for (i = 1; i <= last; i++) print line[i] }')"
 
 # The observed text goes to a scratch file so `diff` reads two ordinary paths.
-# This was `diff -u "$expected" <(printf '%s\n' "$got")` until issue #392, which
+# This was `diff -u "$expected" <(printf '%s\n' "$got")` until #392, which
 # fails under a restricted sandbox with `diff: /dev/fd/63: Operation not
 # permitted` — a denial on diff's own input, which this runner then reported as
 # BIBLIOGRAPHY EXTRACTION MISMATCH above an empty diff. That reads as a fixture
@@ -127,7 +127,7 @@ fi
 echo "  Biber completed without warnings/errors"
 
 # Assert label/entry association from the geometry rather than from pdftotext's
-# line grouping (issue #199). The baseline above pins the default extractor's
+# line grouping (#199). The baseline above pins the default extractor's
 # *output*, which is what a naive consumer sees, but that output depends on
 # Poppler's column heuristic and so can shift with the extractor version. Each
 # entry number shares a baseline with the first word of its entry in the page
@@ -213,7 +213,7 @@ biblatex_warning_text() { # <log-file>
 }
 
 # --------------------------------------------------------------------------
-# Multi-word name parts in \CDossierHighlightAuthor (issue #541).
+# Multi-word name parts in \CDossierHighlightAuthor (#541).
 #
 # Biber does not separate the words of a multi-word name part with a space: it
 # writes a delimiter macro, so `given = {Maria Elena}' reaches the comparison as
@@ -280,7 +280,7 @@ else
 fi
 
 # --------------------------------------------------------------------------
-# An unmatched declaration is diagnosable (issue #541).
+# An unmatched declaration is diagnosable (#541).
 #
 # The silence was half the defect: with no warning, the only way to discover
 # that a declaration had not taken effect was to read the .bbl by hand. This
@@ -316,7 +316,7 @@ echo "    $warned"
 echo "  the unmatched declaration is reported, and named"
 
 # --------------------------------------------------------------------------
-# A DOI wrapped at one of its own hyphens extracts intact (issue #561).
+# A DOI wrapped at one of its own hyphens extracts intact (#561).
 #
 # BibLaTeX lists `-' among the URL break points, so a DOI can end a line on a
 # hyphen it already contains. The hyphen is printed, but default-mode pdftotext
@@ -411,12 +411,12 @@ fi
 echo "  the wrapped DOI extracts as its doi field: $expected_doi"
 
 # --------------------------------------------------------------------------
-# The shipped example rendered its entries (issue #319).
+# The shipped example rendered its entries (#319).
 #
 # Four tiers, cheapest first, all derived from the sources so that adding an
 # entry to a database never requires editing this check. The first three prove
 # Biber succeeded; only the fourth proves LaTeX put the entries on the page,
-# which is the distinction issue #161 taught this repository to make.
+# which is the distinction #161 taught this repository to make.
 #
 # Returns 0 when the build rendered every entry its database declares, and 1
 # with a diagnosis otherwise. The negative control below calls this same
@@ -493,7 +493,7 @@ check_bibliography_render() { # <build-base-without-extension> <bib-path>
 echo "== examples/academic/cv-bibliography.tex (the shipped example renders its entries) =="
 # This guard builds the same source the `academic-bibliography' Makefile target
 # builds, and both are reached by `make check'. It writes into its own output
-# directory rather than the target's build/examples/ (issue #378). Serially the
+# directory rather than the target's build/examples/ (#378). Serially the
 # two only ever overwrote each other's artifacts, which -g already made
 # harmless; concurrently they would race on the same .aux, .bcf, .bbl, and .pdf,
 # and the loser of that race is a corrupt intermediate read as a lost
@@ -524,7 +524,7 @@ fi
 echo "  the shipped example renders every entry its database declares"
 
 # --------------------------------------------------------------------------
-# Negative control (issue #319). The guard above is only worth having if it
+# Negative control (#319). The guard above is only worth having if it
 # fires, and the failure it guards is silent by construction, so the control
 # has to be committed rather than performed once by hand.
 echo "== missing-bibresource.tex (negative control: the guard must fire) =="
