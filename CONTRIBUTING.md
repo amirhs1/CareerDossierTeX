@@ -917,9 +917,9 @@ name, or a documented behavior earns a line however internal its cause looks.
 Maintainer tooling and agent instructions do not: `.agents/`, `.claude/`, a CI
 workflow, a maintainer-only script, or a `Makefile` target a contributor is told
 to run, which is documented here instead. The boundary is not applied backwards:
-five entries in `[0.7.0]` (#188, #195, #211, #233, #236) and one in `[0.8.0]`
-(#334) that it would not have produced stay as written (#260), and
-`CHANGELOG.md` notes them under each release's own heading (#410, #413).
+shipped entries it would not have produced stay as written (#260), and a scope
+note under each affected release's own heading in `CHANGELOG.md` names them
+(#410, #413).
 
 ## Proposing public API changes
 

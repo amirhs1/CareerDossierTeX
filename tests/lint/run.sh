@@ -50,7 +50,7 @@
 #
 # Every public choice-valued option is in scope. careerdossier-statement's
 # `type' was the one exception when this lint landed, because it was hand-rolled
-# with \str_case:nnF rather than .choices:nn; #236 made it an ordinary choice
+# with \str_case:nnF rather than .choices:nn; it is an ordinary choice
 # list, so a choice option declared any other way is now a thing to convert
 # rather than a shape the lint has to learn.
 #

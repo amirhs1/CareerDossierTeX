@@ -5,7 +5,7 @@
 % named its seven accepted values since v0.5.0 -- it was the precedent this
 % issue generalised -- but it stated them from a hand-rolled \str_case:nnF
 % whose fallback no check could see, so only the smoke suite pinned its
-% message. It is an ordinary choice list as of #236 and is asserted here with
+% message. It is now an ordinary choice list and is asserted here with
 % the other five.
 \input{regression-test}
 \documentclass{careerdossier-statement}

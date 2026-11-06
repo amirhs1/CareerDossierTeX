@@ -455,7 +455,7 @@ jobs:
   # separate runner buys real wall clock -- the fixture itself takes ~15s, so
   # this job spends far longer initializing its container than testing. What it
   # buys is a named check: buried inside `cv`, the coverage was invisible, and
-  # issue #211 was investigated at length on the premise that CI never
+  # a Biber failure was investigated at length on the premise that CI never
   # exercised this path, when `cv` had in fact run it since #69. A named job
   # answers that from the checks list alone, and it is the second toolchain
   # that tells a local Biber fault apart from a general one. Fold it back into
