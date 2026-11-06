@@ -484,6 +484,41 @@ compares Poppler output against its `*.expected.txt` baseline, asserts no
 via `pdfkit-extract.js`. The two extractors keep separate baselines because they
 impose different line structure. `./run.sh --update` regenerates, deliberately.
 
+Poppler goes first because it is the extractor most text pipelines are built
+on, and the one every platform, including Linux CI, can run. Its default mode
+splits a visual line at a wide horizontal gap, groups the fragments into blocks
+by vertical proximity, and orders the blocks with a topological sort — the
+family of layout heuristics that resume parsers and text pipelines built on
+Poppler, pdfminer, or Tika and PDFBox share. Satisfying it is a proxy for the
+parsers an author cannot see, not a statement that it reads the page
+correctly.
+
+It is not a gold standard. Measured on 2026-11-06, on a resume page whose
+`entrymeta=column` section is followed by an `entrymeta=inline` section (set
+through the private components key in a group, since no public per-section
+setter exists yet), Poppler's default mode moved the last column entry's dates
+and location to the end of the page's text, after the whole inline section.
+`pdftotext -raw`, which emits content-stream order, MuPDF's
+`mutool draw -F txt`, and Apple PDFKit all read that page in source order. The
+toolkit emits every heading's cells in logical order and tags them, which is
+why the readers that trust the written order get it right and the one that
+rebuilds the page from geometry can get it wrong. The same geometry imposes
+the `0.25` floor on the list opening edge (#219): `docs/ATS-EXTRACTION.md`,
+"Dates and right alignment" explains the mechanism and `docs/ARCHITECTURE.md`,
+"File responsibilities" records the floor, so this file does not restate
+either.
+
+| Extractor                    | Where it runs                                                             | What it stands for                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Poppler `pdftotext`, default | `tests/extraction/run.sh` check 1, every platform; `tests/tagging/run.sh` | the layout-analysis family most parsers share; a proxy, not a judge                |
+| Apple PDFKit                 | `tests/extraction/run.sh` check 3, macOS only; `tests/tagging/run.sh`     | the real consumer path behind Preview, Quick Look, Spotlight, and macOS copy-paste |
+| MuPDF `mutool draw -F txt`   | `tests/tagging/run.sh` only, in CI                                        | an independent opinion on reading order, on the tagged path                        |
+| `pdftotext -raw`             | no suite; a probe                                                         | content-stream order: what the source wrote, with no layout analysis               |
+
+MuPDF already runs in CI through the tagging suite, so adding it here would be
+a test-only change if ever wanted. No further extractor enters the tree as a
+dependency without the maintainer's approval (`AGENTS.md`, "Ask first").
+
 A fixture whose baseline records page furniture pins `medium=print`, since the
 default, `screen`, emits none (#327). `resume-entry-dates-default-medium` shares
 its body with `resume-entry-dates-page-furniture` and passes no option. Its
