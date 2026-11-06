@@ -1,2 +1,0 @@
-# Gamma is undocumented and declared, with a reason. This is the passing shape.
-CDossierFixtureGamma   deliberately undocumented in this fixture, with a stated reason

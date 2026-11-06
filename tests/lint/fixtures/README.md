@@ -63,10 +63,12 @@ rather than one, so its fixtures come in a set:
 | Fixture | Role |
 | --- | --- |
 | `manual-defined-names.txt` | stands in for the Work's defined names, so a fixture manual need not document all 84 real ones |
-| `backlog-ok.txt` | the undocumented name is declared, with a reason → `OK` |
-| `backlog-empty.txt` | it is not declared at all → `UNDOCUMENTED NAME` |
-| `backlog-noreason.txt` | declared with no reason → `NO REASON` |
-| `backlog-stale.txt` | declares a name the fixture Work does not define → `STALE ENTRY` |
+| `manualfixture-alldocumented.tex` | documents all three fixture names → `OK` |
+| `manualfixture-documented.tex` | documents two of the three → `UNDOCUMENTED NAME` |
+
+Until #243 the check also read a backlog of names accepted as undocumented, and
+four `backlog-*.txt` fixtures drove its verdicts; the backlog emptied and both
+went with it.
 
 `manualfixture-documented.tex` deliberately does not name the undocumented
 command even in a TeX comment: the lint's manual-side collector reads comments

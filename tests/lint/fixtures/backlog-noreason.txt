@@ -1,3 +1,0 @@
-# Gamma is declared with no reason, which must fail: an exemption costs an
-# argument, not a keyword (run-text-guards.sh control 8).
-CDossierFixtureGamma
