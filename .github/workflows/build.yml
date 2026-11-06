@@ -402,7 +402,7 @@ jobs:
           if-no-files-found: warn
 
   # The PDF manual CTAN requires. It is not in `make check`'s target set --
-  # that list is the eleven test suites, and this is a documentation artifact --
+  # that list is the test suites, and this is a documentation artifact --
   # so this job is the only automated thing that would notice the manual failing
   # to compile. Keep it that way, or add `manual` to CHECK_TARGETS; do not leave
   # it in neither place.
