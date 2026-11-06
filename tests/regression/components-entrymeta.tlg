@@ -112,7 +112,7 @@ TEST 13: leader-title-alone-emits-no-leader
 >entrytitle
 ============================================================
 ============================================================
-TEST 14: leader-location-without-organization-emits-no-leader
+TEST 14: leader-location-without-organization-fills-from-the-title-end
 ============================================================
 >entrytitle
 >fakespace
@@ -121,6 +121,12 @@ TEST 14: leader-location-without-organization-emits-no-leader
 >leadermark
 >artifact-end
 >muted
+>entrytitle
+>muted
+>artifact-begin
+>body
+>leadermark
+>artifact-end
 >muted
 ============================================================
 ============================================================
@@ -139,4 +145,8 @@ TEST 15: leader-organization-without-location-emits-no-leader
 TEST 16: leader-mark-spacing-defaults-to-a-quarter-of-the-body-size
 ============================================================
 body size = 12.0pt, leader sep = 3.0pt
+============================================================
+============================================================
+TEST 17: leader-lone-location-fits-under-a-title-wider-than-the-line
+============================================================
 ============================================================

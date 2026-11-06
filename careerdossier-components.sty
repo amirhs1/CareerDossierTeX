@@ -413,6 +413,45 @@
       }
   }
 
+%% The leader of a lone location: a location with no organization before it
+%% (#682). No leader may open its line, the optional-field rule, so it starts
+%% where the title above ends instead: the line opens with blank space as
+%% wide as the title, then the leader, then the location. A plain \hfill there,
+%% as under `column', is the empty gap Poppler splits on, and it read the
+%% location after the last bullet on the page; with the leader all three
+%% extractors in the suite read it in place.
+%%
+%% The title and the location are set in boxes only to be measured, with
+%% tagging suspended as the kernel's \settowidth does, so the measurement adds
+%% nothing to the structure tree. The start is capped at the line width less
+%% the location's, so a title wider than the line, which wraps, still leaves
+%% the location room at the right margin; the leader then has no room left,
+%% and the location sits flush right after blank space.
+%%
+%% #1 title, #2 location.
+\box_new:N \l__cdossier_components_entrymeasure_box
+\dim_new:N \l__cdossier_components_entryindent_dim
+
+\cs_new_protected:Npn \__cdossier_components_entryleader_lone:nn #1#2
+  {
+    \hbox_set:Nn \l__cdossier_components_entrymeasure_box
+      { \tag_suspend:n { entryleader } \CDossierEntryTitleStyle #1 }
+    \dim_set:Nn \l__cdossier_components_entryindent_dim
+      { \box_wd:N \l__cdossier_components_entrymeasure_box }
+    \hbox_set:Nn \l__cdossier_components_entrymeasure_box
+      { \tag_suspend:n { entryleader } \CDossierMutedStyle #2 }
+    \dim_set:Nn \l__cdossier_components_entryindent_dim
+      {
+        \dim_max:nn { 0pt }
+          {
+            \dim_min:nn { \l__cdossier_components_entryindent_dim }
+              { \linewidth - \box_wd:N \l__cdossier_components_entrymeasure_box }
+          }
+      }
+    \skip_horizontal:N \l__cdossier_components_entryindent_dim
+    \__cdossier_components_entryleader:
+  }
+
 \ProcessKeysPackageOptions { cdossier / components }
 
 %% The document's `entrymeta' value, which every \CDossierSection restores
@@ -1316,10 +1355,10 @@
             %% margin, so it stays unconditional.
             %%
             %% `leader' takes `column's shape with the leader in the \hfill's
-            %% place: a lone location still sits at the right margin, after a
-            %% plain \hfill, and only a location that follows an organization
-            %% has a gap to fill. A leader opening the line would be the
-            %% stray separator again (#678).
+            %% place. A leader opening the line would be the stray separator
+            %% again (#678), so a lone location's leader starts where the
+            %% title ends (#682), with no fake space, since nothing precedes
+            %% it on the line.
             \str_case:Vn \l__cdossier_components_entrymeta_tl
               {
                 { column }
@@ -1329,7 +1368,7 @@
                 { leader }
                   {
                     \tl_if_blank:nTF {#2}
-                      { \hfill }
+                      { \__cdossier_components_entryleader_lone:nn {#1} {#3} }
                       { \pdffakespace \__cdossier_components_entryleader: }
                   }
               }
