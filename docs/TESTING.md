@@ -871,7 +871,7 @@ None carries a baseline or belongs to `make check`.
 | `make review-link-decoration` | the print/screen link-decoration pair | `build/link-decoration-review/` |
 | `make review-linebreak` | a line-breaking parameter swept over both corpora | `build/linebreak-sweep/` |
 | `make review-pagefill` | page fill and the atom forcing each break | `build/pagefill-review/` |
-| `make review-spacing` | structural and visible gap at every boundary | `build/spacing-review/` |
+| `make review-spacing` | structural and visible gap at every boundary | `build/spacing/` |
 
 Each renderer under `tests/layout/` — `render-page-two.sh`,
 `render-size-margin-matrix.sh`, `render-entrymeta-muted-matrix.sh`,
