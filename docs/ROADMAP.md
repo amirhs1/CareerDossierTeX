@@ -60,6 +60,12 @@ These entries keep the numbers they were written with.
 > from `v1.0.0`, its documentation included, because it can make
 > `\CDossierApplyPageBreakPenalties` private. #669 and #670 change
 > documentation only and moved to `v1.0.0`.
+>
+> **Added on 2026-11-06.**
+> [#675](https://github.com/amirhs1/CareerDossierTeX/issues/675) corrects
+> `make review-spacing`'s output folder in `docs/TESTING.md`. It was found while
+> closing out #420, and the maintainer kept it in `v0.11.0`, the one
+> documentation-only issue in that release.
 
 ## Releases and phases
 
@@ -436,10 +442,12 @@ release of their own, so they are used before `v1.0.0` freezes them.
   private, `\CDossierListLabelSep`'s split read time fixed or documented, and
   the other public-prefixed names that survive the `v0.10.0` classification
   documented (#243);
+- `make review-spacing`'s output folder corrected in `docs/TESTING.md` (#675);
 - every breaking change recorded with its migration in `MIGRATION.md`.
 
 **This release changes the public interface on purpose.** Work that only
-documents or freezes the interface stays in `v1.0.0`.
+documents or freezes the interface stays in `v1.0.0`. #675 is the one
+exception, at the maintainer's decision.
 
 Tracked under
 [milestone `v0.11.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/15)
