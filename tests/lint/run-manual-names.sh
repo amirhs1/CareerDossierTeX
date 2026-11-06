@@ -43,9 +43,10 @@
 # in the manual, and a name removed from the source while the manual keeps it.
 #
 # The lint parses text; it runs no LaTeX and needs no TeX installation.
-# Requirements: bash and awk. Run from anywhere. It ends by running itself
-# against tests/lint/fixtures/manual-*.tex, one per verdict, so a lint that had
-# stopped detecting anything fails here rather than passing everything.
+# Requirements: bash, awk, sed, and mktemp. Run from anywhere. It ends by
+# running itself against tests/lint/fixtures/manual-*.tex, one per verdict, so
+# a lint that had stopped detecting anything fails here rather than passing
+# everything.
 #
 # Portability, as in the sibling lints: local `grep' is ugrep and CI's is GNU
 # grep, local `awk' is one-true-awk and CI's is gawk or mawk. A brace is written
@@ -486,12 +487,33 @@ check_declared_release "$readme" readme || fail=1
 # defect — or started rejecting a correct manual — fails here.
 echo
 echo "== fixtures (the lint's own failure modes) =="
+
+# The positive control's release is the Work's, read at test time (issue #523).
+# A fixture that wrote it down went red at every release bump, and the repair
+# was to copy the Work's new value into it: a control repaired by copying its
+# subject would certify a wrong release as readily as a right one. So
+# manualfixture-ok.tex carries @WORK-VERSION@ and @WORK-DATE@, and the release
+# check reads a copy with work_release's values put in their place. Both values
+# still go through check_declared_release's own parse and comparison. Every
+# release fixture takes this path; one without placeholders, such as
+# manualfixture-version.tex, is copied unchanged. The copy keeps the fixture's
+# name, so the report names the fixture.
+release_scratch="$(mktemp -d "${TMPDIR:-/tmp}/manual-names.XXXXXX")" || exit 1
+trap 'rm -rf "$release_scratch"' EXIT
+with_work_release() {
+  local src="$1" dest version="" date=""
+  dest="$release_scratch/$(basename "$src")"
+  read -r version date <<< "$(work_release)"
+  sed -e "s/@WORK-VERSION@/$version/g" -e "s/@WORK-DATE@/$date/g" "$src" > "$dest"
+  printf '%s' "$dest"
+}
+
 self_check() {
   local fixture="$1" fn="$2" expected="$3" out rc
   case "$fn" in
     private) out="$(check_private_names "$fixtures/$fixture")" ;;
     public)  out="$(check_public_names  "$fixtures/$fixture")" ;;
-    release) out="$(check_declared_release "$fixtures/$fixture" manual)" ;;
+    release) out="$(check_declared_release "$(with_work_release "$fixtures/$fixture")" manual)" ;;
     documented) out="$(check_documented_names "$fixtures/$fixture" "$fixtures/$4" "$fixtures/manual-defined-names.txt")" ;;
   esac
   rc=$?
