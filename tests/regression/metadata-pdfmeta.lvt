@@ -1,6 +1,6 @@
 % metadata-pdfmeta.lvt — careerdossier-metadata PDF metadata construction.
 %
-% Five things are checked here, none of which any other suite can see.
+% Six things are checked here, none of which any other suite can see.
 %
 % 1. The "has the document already set this?" test. The module derives
 %    pdftitle/pdfauthor/pdflang from the profile, but must never overwrite a
@@ -46,6 +46,13 @@
 %    values. That the request is on the hyperref load hook, and that a
 %    document's own `false' therefore wins, is a property of a built PDF and is
 %    asserted in tests/tagging/run.sh.
+%
+% 6. The profile's `language' key (#288) at each of the three precedence
+%    levels: a document's own pdflang, then the declared language, then `en'.
+%    That the declared value reaches the catalog of a built PDF, in every
+%    class, is tests/metadata/run.sh's assertion; this file pins which
+%    \hypersetup call the module makes, and the warning it gives instead when
+%    \DocumentMetadata already owns /Lang with a different tag.
 %
 \input{regression-test}
 \documentclass{article}
@@ -288,6 +295,60 @@
 \TEST{pdfmeta-keeps-documentmetadata-lang}{
   \cdossiertestRecordHypersetup
   \cdossiertestSetKernelLang{de}
+  \cdossiertestPdfmeta
+}
+
+% ---------------------------------------------------------------------------
+% The profile's `language' key (#288), at each level of the precedence:
+% a document's own \hypersetup{pdflang}, then the declared language, then `en'.
+% \DocumentMetadata is the document's own declaration too, and on its path the
+% kernel owns /Lang, so a declared language that disagrees with it is reported
+% rather than written.
+%
+% \CDossierSetup is global, so the declared language outlives each \TEST; the
+% last test in this block clears it again, and is itself the assertion that a
+% blank value falls back to `en'.
+% ---------------------------------------------------------------------------
+
+% The middle level: declared, and nothing above it. The value reaches pdflang
+% as written -- `fr-CA' is a tag the package would never derive, so the line
+% below cannot come from the default.
+\TEST{pdfmeta-writes-declared-language}{
+  \CDossierSetup{ language = {fr-CA} }
+  \cdossiertestRecordHypersetup
+  \cdossiertestPdfmeta
+}
+
+% The top level: a document's own pdflang beats the declared language. No
+% pdflang line below.
+\TEST{pdfmeta-keeps-user-pdflang-over-declared-language}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetUserLang{en-GB}
+  \cdossiertestPdfmeta
+}
+
+% \DocumentMetadata's language wins as well, and since it disagrees with the
+% declared one, the module says so once, naming the fix. No pdflang line below.
+\TEST{pdfmeta-warns-when-documentmetadata-lang-disagrees}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetKernelLang{de}
+  \cdossiertestPdfmeta
+}
+
+% Language tags are case-insensitive (RFC 5646, section 2.1.1), so a kernel
+% language that is the same tag in another case agrees: no pdflang line and no
+% warning below.
+\TEST{pdfmeta-is-silent-when-documentmetadata-lang-agrees}{
+  \cdossiertestRecordHypersetup
+  \cdossiertestSetKernelLang{FR-ca}
+  \cdossiertestPdfmeta
+}
+
+% The bottom level: a blank value clears the declaration, and pdflang falls
+% back to `en'.
+\TEST{pdfmeta-blank-language-falls-back-to-en}{
+  \CDossierSetup{ language = {} }
+  \cdossiertestRecordHypersetup
   \cdossiertestPdfmeta
 }
 

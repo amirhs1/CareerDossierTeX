@@ -48,7 +48,7 @@ CareerDossierTeX separates personal information from document content and presen
 | Statement documents | Supported | Default interest type plus six specialized types; calibrated header/prose rhythm and shared multi-page furniture apply |
 | Manual publication lists | Supported | No BibLaTeX or Biber required |
 | External bibliography | Optional | Fixed BibLaTeX/Biber profile |
-| Shared profile metadata | Supported | Includes optional Scholar, ORCID, and affiliation fields |
+| Shared profile metadata | Supported | Includes optional Scholar, ORCID, affiliation, and document-language fields |
 | Language | English | Farsi, bilingual, and RTL support is dropped |
 | Engine | LuaLaTeX | XeLaTeX and pdfLaTeX are unsupported and error early |
 | Tagged PDF | Opt-in preview | Off by default; see [Tagged PDF](#tagged-pdf-opt-in-preview) |

@@ -37,12 +37,13 @@
 %% ---------------------------------------------------------------------------
 %% Known profile fields. `orcid` joined the shared profile in v0.2.0;
 %% `affiliation` joined in v0.5.0 so statements and other academic documents can
-%% consume the same reusable identity data.
+%% consume the same reusable identity data. `language` joined in v0.11.0 (#288):
+%% it is never typeset, and careerdossier-metadata reads it for the PDF's /Lang.
 %% ---------------------------------------------------------------------------
 \clist_const:Nn \c__cdossier_base_fields_clist
   {
     name , headline , email , phone , location , website , linkedin , github ,
-    scholar , orcid , affiliation
+    scholar , orcid , affiliation , language
   }
 
 %% ---------------------------------------------------------------------------
@@ -105,6 +106,16 @@
     The~value~is~used~as~given,~so~check~it~before~publishing.
   }
 
+%% An error, not a warning like `orcid-shape': see the language check below.
+\msg_new:nnnn { careerdossier-base } { language-shape }
+  { The~'language'~value~'#1'~is~not~a~language~tag. }
+  {
+    The~accepted~values~are~BCP~47~language~tags:~a~two-~or~three-letter~
+    language~code,~optionally~followed~by~hyphen-separated~subtags~of~one~
+    to~eight~letters~or~digits,~for~example~en,~en-GB,~fr-CA,~or~es-419.~
+    The~value~was~not~recorded.
+  }
+
 %% ---------------------------------------------------------------------------
 %% Internal: store a field, trimming surrounding spaces and treating a
 %% whitespace-only value as missing.
@@ -164,6 +175,50 @@
   }
 \cs_generate_variant:Nn \__cdossier_base_orcid_check:n { V }
 
+%% ---------------------------------------------------------------------------
+%% Language tag check (#288).
+%%
+%% `language` declares the document's natural language for the PDF's /Lang,
+%% which a screen reader uses to choose its voice. The accepted shape is the
+%% well-formedness of a BCP 47 tag, the form PDF /Lang takes: a two- or
+%% three-letter language code, then any number of hyphen-separated subtags of
+%% one to eight letters or digits. That admits en, en-GB, es-419, zh-Hant-TW,
+%% and de-CH-1996. It does not consult the IANA subtag registry, which would be
+%% a data file to ship and keep current; a well-formed tag naming no language is
+%% the author's to get right, as with any other profile value.
+%%
+%% It errors, unlike the ORCID check above, and a rejected value is not
+%% recorded. A wrong /Lang cannot be seen on the page and misleads the reader
+%% it exists for, and every character the pattern refuses is one that could
+%% end or corrupt the catalog's /Lang string. The check runs here, once, when
+%% the value is recorded; careerdossier-metadata reads only checked values and
+%% never checks again, so a bad tag is reported exactly once.
+%%
+%% A blank value is not checked: it clears the field, as for every profile key,
+%% and /Lang falls back to `en'.
+%% ---------------------------------------------------------------------------
+\regex_const:Nn \c__cdossier_base_language_regex
+  { \A[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*\Z }
+\str_new:N \l__cdossier_base_language_str
+
+\cs_new_protected:Npn \__cdossier_base_store_language:n #1
+  {
+    %% Trimmed first, as the store would, so ` en-GB ' is the tag it looks
+    %% like; compared as a string, as for the ORCID check.
+    \str_set:Ne \l__cdossier_base_language_str { \tl_trim_spaces:n {#1} }
+    \str_if_empty:NTF \l__cdossier_base_language_str
+      { \__cdossier_base_store:nn { language } {#1} }
+      {
+        \regex_match:NVTF \c__cdossier_base_language_regex
+          \l__cdossier_base_language_str
+          { \__cdossier_base_store:nn { language } {#1} }
+          {
+            \msg_error:nnV { careerdossier-base } { language-shape }
+              \l__cdossier_base_language_str
+          }
+      }
+  }
+
 %% Internal: error out on an unrecognized field name.
 \cs_new_protected:Npn \__cdossier_base_check_known:n #1
   {
@@ -216,6 +271,7 @@
     orcid    .code:n = { \__cdossier_base_store:nn { orcid }    {#1} } ,
     affiliation .code:n =
       { \__cdossier_base_store:nn { affiliation } {#1} } ,
+    language .code:n = { \__cdossier_base_store_language:n {#1} } ,
     %% Not a profile field: a rendering preference consumed by the components
     %% module. `contact-labels` alone means true; the value is validated by
     %% l3keys' boolean handling.

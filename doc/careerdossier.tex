@@ -683,6 +683,7 @@ from it, so that an address is corrected in one place.
 \key{scholar} & No & Google Scholar identifier, profile path, or URL \\
 \key{orcid} & No & ORCID identifier or profile URL \\
 \key{affiliation} & No & Current institution, organization, studio, or independent-practice description \\
+\key{language} & No & Language the document is written in, as a language tag such as \texttt{en-GB} or \texttt{fr-CA}, for the PDF's \texttt{/Lang}; \texttt{en} when absent (section~\ref{sec:language}) \\
 \bottomrule
 \end{longtable}
 
@@ -1655,7 +1656,7 @@ needs to be called; the derived values are applied automatically at
 \endhead
 \texttt{/Title} & \key{name} & \texttt{Resume – <name>}, \texttt{Cover Letter – <name>}, \texttt{Curriculum Vitae – <name>}, \texttt{Academic Cover Letter – <name>}, or the statement's title \\
 \texttt{/Author} & \key{name} & \texttt{<name>} \\
-\texttt{/Lang} & fixed & \texttt{en} \\
+\texttt{/Lang} & \key{language} & the declared language tag, or \texttt{en} when none is declared \\
 \bottomrule
 \end{longtable}
 
@@ -1705,6 +1706,56 @@ unused --- the case PDF/UA-2 clause 8.11.2 and WCAG 2.1 AA 2.4.2 (Page Titled)
 are about. It is requested on both build paths and changes nothing about
 rendering, extracted text, or the structure tree.
 
+\subsection{Declaring the document language}
+\label{sec:language}
+
+\texttt{/Lang} tells a screen reader which language the document is in, so it
+reads the text with the right voice. It is \texttt{en} unless you say otherwise.
+A document written in another language, or in a regional English, declares it
+with the \key{language} profile key:
+
+\begin{latexcode}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  language = {en-GB}
+}
+\end{latexcode}
+
+The value is a language tag in the form BCP~47 gives it: a two- or three-letter
+language code, optionally followed by hyphen-separated subtags of one to eight
+letters or digits --- \texttt{en}, \texttt{en-GB}, \texttt{fr-CA},
+\texttt{es-419}, or \texttt{zh-Hant-TW}. Anything else, such as
+\texttt{English} or \texttt{en\_GB}, is an error that names the accepted form,
+and the value is not recorded. The tag's shape is checked, not whether it names
+a registered language. A blank value clears the declaration, and
+\texttt{/Lang} returns to \texttt{en}. The key applies to every class.
+
+Three things can set \texttt{/Lang}, and the first one present wins:
+
+\begin{enumerate}
+  \item your own declaration, either the \texttt{pdflang} key of
+    \cmd{hypersetup} or the \key{lang} key of \cmd{DocumentMetadata}
+    (see below);
+  \item the \key{language} profile key;
+  \item \texttt{en}.
+\end{enumerate}
+
+Under \cmd{DocumentMetadata} the \LaTeX{} kernel always writes \texttt{/Lang}
+itself, so on that path the \key{language} key cannot reach it. When the two
+disagree, the class warns once and names the fix --- give the same tag to
+\cmd{DocumentMetadata}:
+
+\begin{latexcode}
+\DocumentMetadata{ lang = fr-CA, tagging = on }
+\end{latexcode}
+
+Tags are compared without regard to case, so \texttt{fr-CA} and
+\texttt{fr-ca} agree.
+
+Declaring a language translates nothing. The class's own strings, such as the
+letter's default salutation and closing, stay English; you supply your own with
+\cmd{CDossierLetterSetup}, as for any other default.
+
 \subsection{Overriding the derived metadata}
 
 Set any field yourself with \cmd{hypersetup} and it is used unchanged:
@@ -1735,13 +1786,14 @@ The language has a second route, and it wins too:
 \end{latexcode}
 
 \cmd{DocumentMetadata} records the language for the \LaTeX{} kernel, which
-writes \texttt{/Lang} itself, and the derived \texttt{en} stands aside. It always
+writes \texttt{/Lang} itself, and the derived value stands aside. It always
 settles on a language --- it defaults to \texttt{en} when you give no
 \key{lang} key --- so on that path the kernel owns \texttt{/Lang} outright.
 
 Declaring a language does not make the document that language.
-CareerDossierTeX is English-only; \key{lang} sets the declaration a screen
-reader reads, not hyphenation, fonts, or any fixed string.
+CareerDossierTeX is English-only; \key{lang}, \texttt{pdflang}, and the
+\key{language} profile key set the declaration a screen reader reads, not
+hyphenation, fonts, or any fixed string.
 
 \texttt{pdfdisplaydoctitle} is the one setting that works by ordering rather
 than by detection, because \textsf{hyperref} gives a boolean no state that
