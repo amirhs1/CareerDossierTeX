@@ -2,34 +2,34 @@
 
 All notable changes to CareerDossierTeX will be documented in this file.
 
-The project follows [Semantic Versioning](https://semver.org/). The structure of this file is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+The project follows [Semantic Versioning](https://semver.org/). From `0.10.0`, each release's section follows [Common Changelog](https://common-changelog.org/); the sections before it stay as they shipped.
 
 Before `v1.0.0`, breaking changes may occur, but they must be documented here and in `docs/MIGRATION.md`.
 
-## [Unreleased]
+## [0.10.0](https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.10.0) - 2026-11-06
 
-### Added
-
-- Warn when a `\CDossierHighlightAuthor` declaration matches no name in the bibliography. ([#541])
+_If you are upgrading: please see [docs/MIGRATION.md](docs/MIGRATION.md)._
 
 ### Changed
 
-- Change the resume `/Title` and running page label to `Resume`, spelled in ASCII. ([#543])
-- Document keeping `\exhyphenpenalty` at TeX's `50`, measured apart from `\hyphenpenalty`. ([#542])
-- Let a `type=research` statement build without profile `affiliation`, as the other types do; its header then omits that line. ([#593])
+- Spell the resume class's PDF `/Title` and running page label `Resume`, in ASCII ([`3917352`](https://github.com/amirhs1/CareerDossierTeX/commit/3917352), [#544](https://github.com/amirhs1/CareerDossierTeX/pull/544))
+- Let a `type=research` statement build without a profile `affiliation`, as the other types do; its header then omits that line ([`511ec25`](https://github.com/amirhs1/CareerDossierTeX/commit/511ec25), [#616](https://github.com/amirhs1/CareerDossierTeX/pull/616))
+- Move the link layer into `careerdossier-links.sty` and the PDF metadata into `careerdossier-metadata.sty`; `careerdossier-components.sty` loads both, so no document changes, but a manual installation must copy the two new files ([`f2c5e42`](https://github.com/amirhs1/CareerDossierTeX/commit/f2c5e42), [#624](https://github.com/amirhs1/CareerDossierTeX/pull/624); [`41b8392`](https://github.com/amirhs1/CareerDossierTeX/commit/41b8392), [#617](https://github.com/amirhs1/CareerDossierTeX/pull/617))
+- Move the stable-interface promise from `v0.10.0` to `v1.0.0` in the documentation ([`b6c9421`](https://github.com/amirhs1/CareerDossierTeX/commit/b6c9421), [#550](https://github.com/amirhs1/CareerDossierTeX/pull/550))
+- Document keeping `\exhyphenpenalty` at TeX's `50`, measured apart from `\hyphenpenalty` ([`66edec8`](https://github.com/amirhs1/CareerDossierTeX/commit/66edec8), [#625](https://github.com/amirhs1/CareerDossierTeX/pull/625))
+- Trim `docs/MIGRATION.md` to one statement per change, keeping every upgrade recipe ([`195c947`](https://github.com/amirhs1/CareerDossierTeX/commit/195c947), [#652](https://github.com/amirhs1/CareerDossierTeX/pull/652))
+- Use the examples' sample name in the help text of the `\CDossierHighlightAuthor` missing-key error ([`ed0a2dd`](https://github.com/amirhs1/CareerDossierTeX/commit/ed0a2dd), [#582](https://github.com/amirhs1/CareerDossierTeX/pull/582))
+
+### Added
+
+- Warn when a `\CDossierHighlightAuthor` declaration matches no name in the bibliography ([`aee5c56`](https://github.com/amirhs1/CareerDossierTeX/commit/aee5c56), [#551](https://github.com/amirhs1/CareerDossierTeX/pull/551))
 
 ### Fixed
 
-- Fix `\CDossierHighlightAuthor` never matching a multi-word family or given name. ([#541])
-- Fix an entry of three or fewer bullets never breaking across a page. ([#562])
-- Fix a bibliography DOI or URL wrapped at one of its own hyphens losing that hyphen in extracted text. ([#561])
-
-[#541]: https://github.com/amirhs1/CareerDossierTeX/issues/541
-[#542]: https://github.com/amirhs1/CareerDossierTeX/issues/542
-[#543]: https://github.com/amirhs1/CareerDossierTeX/issues/543
-[#561]: https://github.com/amirhs1/CareerDossierTeX/issues/561
-[#562]: https://github.com/amirhs1/CareerDossierTeX/issues/562
-[#593]: https://github.com/amirhs1/CareerDossierTeX/issues/593
+- Fix `\CDossierHighlightAuthor` never matching a multi-word family or given name ([`aee5c56`](https://github.com/amirhs1/CareerDossierTeX/commit/aee5c56), [#551](https://github.com/amirhs1/CareerDossierTeX/pull/551))
+- Fix an entry of three or fewer bullets never breaking across a page ([`59de845`](https://github.com/amirhs1/CareerDossierTeX/commit/59de845), [#563](https://github.com/amirhs1/CareerDossierTeX/pull/563))
+- Fix a bibliography DOI or URL wrapped at one of its own hyphens losing that hyphen in extracted text ([`cde42ad`](https://github.com/amirhs1/CareerDossierTeX/commit/cde42ad), [#620](https://github.com/amirhs1/CareerDossierTeX/pull/620))
+- Fix the manual's claim that bibliography URLs break only after punctuation ([`b9273a3`](https://github.com/amirhs1/CareerDossierTeX/commit/b9273a3), [#662](https://github.com/amirhs1/CareerDossierTeX/pull/662))
 
 ## [0.9.0] - 2026-08-26
 
@@ -459,7 +459,6 @@ there is nothing to cite; see `.agents/skills/release-notes/reference.md`.
 [#25]: https://github.com/amirhs1/CareerDossierTeX/issues/25
 [#38]: https://github.com/amirhs1/CareerDossierTeX/pull/38
 
-[Unreleased]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.9.0...HEAD
 [0.9.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/amirhs1/CareerDossierTeX/compare/v0.6.0...v0.7.0

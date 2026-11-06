@@ -8,29 +8,26 @@ and the options at a glance. The PDF manual — `make manual`, or the
 reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing the
 code.
 
-> **Status:** `v0.9.0 — Documentation, Examples, and Release Readiness` is the
-> current published release. The toolkit worked, but it was hard to learn: no
-> reference described its public interface, nothing said how to install it, and
-> the documentation set had grown to restate itself. This release adds
-> [`doc/careerdossier.tex`](doc/careerdossier.tex), a PDF manual documenting
-> every public class, option, key, command, environment, and design token with
-> its accepted values and default; an `## Installation` section covering the
-> three routes onto a path where the classes resolve; and a configured CTAN
-> release archive. The documentation set is reduced to one home per rule, and
-> the examples are revised — a two-page bibliography CV, and tagging and contact
-> labels demonstrated in shipped documents.
+> **Status:** `v0.10.0 — Consolidation and Correctness` is the current
+> published release. It removes duplication, fixes defects, and gives each rule
+> one home, so that the `v1.0.0` freeze applies to a deduplicated surface. The
+> shared class options are declared once instead of once per class, and the link
+> layer and the PDF metadata move into packages of their own,
+> `careerdossier-links.sty` and `careerdossier-metadata.sty`, which
+> `careerdossier-components.sty` loads.
 >
-> It also settles the last public-interface work before the `v1.0.0` freeze:
-> `CDossierPublications` gains `numbering=restart|continue`, a raw `#` in a
-> profile value no longer truncates the link it appears in, and a document's PDF
-> metadata is now identical on the tagged and untagged build paths.
+> It also fixes three defects: `\CDossierHighlightAuthor` now matches a
+> multi-word family or given name; an entry of three or fewer bullets can break
+> across a page; and a bibliography DOI or URL keeps its own hyphen when it wraps
+> at one. `\CDossierHighlightAuthor` now warns when a declaration matches no
+> name, and a research statement builds without an `affiliation`, as the other
+> statement types do.
 >
 > **No public command, environment, class option, or key is added, renamed, or
-> removed.** One change moves the page: the gap below the header stack in a
-> cover letter or statement no longer adds `\parskip` on top of the token that
-> names it, tightening the header-to-body gap by one `\parskip` once per
-> document. Resume and CV are unaffected. See
-> [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
+> removed.** A resume's PDF `/Title` and running page label now read `Resume`,
+> and a document in which an entry of three or fewer bullets moved whole to the
+> next page paginates differently. See [`docs/MIGRATION.md`](docs/MIGRATION.md)
+> for the upgrade path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -474,7 +471,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.9.0 — Documentation, Examples, and Release Readiness
+v0.10.0 — Consolidation and Correctness
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
