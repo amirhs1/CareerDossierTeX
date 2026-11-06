@@ -904,7 +904,7 @@ None carries a baseline or belongs to `make check`.
 | --- | --- | --- |
 | `make review-page-two` | page two of five families, long-name variants, and every statement type | `build/page-two-review/` |
 | `make review-matrix` | `{normal,narrow}` × `{10,11,12pt}` across four classes, 24 PDFs | `build/size-margin-matrix/` |
-| `make review-entrymeta-muted` | `{column,inline}` × `{italic,gray,both,plain}`, 16 PDFs | `build/entrymeta-muted-matrix/` |
+| `make review-entrymeta-muted` | `{column,inline,leader}` × `{italic,gray,both,plain}`, 24 PDFs | `build/entrymeta-muted-matrix/` |
 | `make review-link-decoration` | the print/screen link-decoration pair | `build/link-decoration-review/` |
 | `make review-linebreak` | a line-breaking parameter swept over both corpora | `build/linebreak-sweep/` |
 | `make review-pagefill` | page fill and the atom forcing each break | `build/pagefill-review/` |

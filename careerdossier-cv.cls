@@ -77,7 +77,7 @@
     'bodyfont'~(serif,~sans),~
     'medium'~(print,~screen),~
     'muted'~(italic,~gray,~both,~plain),~and~
-    'entrymeta'~(column,~inline).~Language~and~theme~cannot~be~set~here.
+    'entrymeta'~(column,~inline,~leader).~Language~and~theme~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / cv }
@@ -165,8 +165,8 @@
 %% what encloses it too. The division opens after the `\addvspace' and before
 %% the heading; see the note on the primitive in careerdossier-typography.sty.
 %%
-%% The optional argument takes `entrymeta = column|inline' for this section
-%% alone (#569), as in careerdossier-resume.cls: every entry in a section
+%% The optional argument takes `entrymeta = column|inline|leader' for this
+%% section alone (#569), as in careerdossier-resume.cls: every entry in a section
 %% shares one layout, the next \CDossierSection reverts to the document value,
 %% and careerdossier-components, which owns the option, validates the value
 %% and performs the reset. Any other key is rejected here.

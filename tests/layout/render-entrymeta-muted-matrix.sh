@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# render-entrymeta-muted-matrix.sh — build the {column,inline} x
+# render-entrymeta-muted-matrix.sh — build the {column,inline,leader} x
 # {italic,gray,both,plain} reference matrix for the resume and CV
-# (#230, #271, #324).
+# (#230, #271, #324, #678).
 #
 # `entrymeta' and `muted' are the two options that both land on the same piece
 # of the page: the entry heading's dates and location. `entrymeta' decides where
@@ -12,13 +12,16 @@
 # separator instead of at the far margin — the separator itself is deliberately
 # never italic (see \CDossierEntryMetaSeparator), and this matrix is where a
 # reviewer confirms that reads correctly rather than merely holds in a .tlg.
+# `entrymeta=leader' (#678) adds a row of dots between the title and the
+# metadata, also never italic (see \CDossierEntryMetaLeader); its row is where
+# a reviewer judges the dots against each `muted' value.
 #
 # `muted=plain' (#324) is the one column where the metadata carries no
 # de-emphasis at all, so it is where a reviewer judges whether position and
 # content still separate the cells from the title — under `inline', where they
 # share the line, that judgement rests on the separator alone. It is also the
 # class default, so `*-column-plain' is the appearance a document that sets
-# neither option gets, and it carries the most review weight of the sixteen.
+# neither option gets, and it carries the most review weight of the twenty-four.
 #
 # Every other option is left at its class default. This is deliberate and is
 # what separates this matrix from `review-matrix' (#147), which sweeps
@@ -81,7 +84,7 @@ export TEXINPUTS="$here:$root:${TEXINPUTS:-}"
 # group all four `muted' values of one placement together — the order a reviewer
 # compares them in, because the placement is the larger visual decision and the
 # de-emphasis is the variation within it.
-placements=(column inline)
+placements=(column inline leader)
 emphases=(italic gray both plain)
 diagnostic_jobs=()
 
@@ -290,16 +293,16 @@ echo "Building CV entrymeta/muted matrix (cv-two-page.tex)"
 render_class_matrix careerdossier-cv cv-two-page.tex cv
 
 count="$(find "$output" -maxdepth 1 -type f -name '*.pdf' | wc -l | tr -d ' ')"
-if [ "$count" -ne 16 ]; then
-  echo "FAILED: expected 16 PDFs, found $count"
+if [ "$count" -ne 24 ]; then
+  echo "FAILED: expected 24 PDFs, found $count"
   exit 1
 fi
 
 {
-  echo "# CareerDossierTeX entrymeta/muted reference-matrix record (issues #230, #271, #324)"
+  echo "# CareerDossierTeX entrymeta/muted reference-matrix record (issues #230, #271, #324, #678)"
   echo "generated-utc: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "commit: $(git -C "$root" rev-parse HEAD 2>/dev/null || echo unavailable)"
-  echo "combinations: 2 placements x 4 de-emphasis values x 2 record classes = 16"
+  echo "combinations: 3 placements x 4 de-emphasis values x 2 record classes = 24"
   echo "file naming: <type>-<entrymeta>-<muted>.pdf"
   echo "record classes (fontsize/margin/paper/bodyfont are every other option;"
   echo "resolved values below are read from the build, not asserted; <unset> means"
@@ -317,10 +320,12 @@ fi
   echo
   echo "What to compare:"
   echo "  down a column  - the four muted values at one placement"
-  echo "  across a row   - column vs inline at one muted value"
+  echo "  across a row   - column vs inline vs leader at one muted value"
   echo "  hardest case   - *-inline-italic and *-inline-both: the only place a"
   echo "                   de-emphasised run sits directly beside the separator,"
   echo "                   which must stay upright while the cell after it slants"
+  echo "  leader row     - *-leader-*: the dots between title and metadata, which"
+  echo "                   stay upright and in the body role under every muted value"
   echo "  plain column   - *-*-plain carries no de-emphasis at all and is the"
   echo "                   class default, so *-column-plain is what a document"
   echo "                   that sets neither option renders; judge whether"

@@ -30,6 +30,18 @@
 %      `muted=plain' (the default) and under `muted=gray', and wrong under the
 %      two values that are the reason the rule exists.
 %   4. the option's error paths — an unrecognised value and a missing one.
+%   5. the `leader' join (#678). Under `leader' the cells stay at opposite
+%      margins, as under `column', and the space between them is filled with
+%      a row of \CDossierEntryMetaLeader marks, so Poppler finds no empty gap
+%      to split the heading at. The leader is a layout artifact, its marks take
+%      the body role, and \pdffakespace still supplies the word boundary,
+%      because the leader's `\hfill' has no natural width either. On the
+%      second line it follows the optional-field rule: with no organization a
+%      lone location sits flush right after a plain `\hfill', as under
+%      `column', with no leader opening the line. The default space on each
+%      side of a mark is 0.25 of the body size (maintainer decision on #678,
+%      2026-11-06), 3pt at the package's 12pt default: a reproducible
+%      computation, not output this test wrote.
 %
 % What is *not* asserted here: that `column' renders identically to the tree
 % before this option existed. That is the extraction and layout suites' job, and
@@ -81,6 +93,20 @@
         \TYPE{ >separator(##1) ~ shape = \use:c { f@shape } ,
                ~ series = \use:c { f@series } }
       }
+  }
+
+%% The leader tracer. The artifact helper reports its boundaries and runs its
+%% argument, rather than typing it, because under `leader' that argument is
+%% the leader itself -- glue and a box, which \TYPE cannot print. The mark is
+%% replaced by a marker, so the baseline shows the role and the mark inside
+%% the artifact, and each mark is typed once: the leader box is built once and
+%% repeated by the engine.
+\cs_new_protected:Npn \cdossiertestTraceLeader
+  {
+    \cdossiertestTraceJoin
+    \cs_set_protected:Npn \__cdossier_typography_layout_artifact:n ##1
+      { \TYPE{ >artifact-begin } ##1 \TYPE{ >artifact-end } }
+    \RenewDocumentCommand \CDossierEntryMetaLeader { } { \TYPE{ >leadermark } }
   }
 
 \cs_new_protected:Npn \cdossiertestEntryHead #1#2#3#4
@@ -170,6 +196,40 @@
 
 \TEST{entrymeta-requires-a-value}{
   \cdossiertestSetOption{entrymeta}
+}
+
+% ---------------------------------------------------------------------------
+% 5. the `leader' join (#678)
+% ---------------------------------------------------------------------------
+
+\TEST{leader-joins-both-lines-with-the-fake-space-and-a-leader}{
+  \cdossiertestSetOption{entrymeta=leader}
+  \cdossiertestTraceLeader
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{Berlin, DE}{2020--2024}
+}
+
+\TEST{leader-title-alone-emits-no-leader}{
+  \cdossiertestSetOption{entrymeta=leader}
+  \cdossiertestTraceLeader
+  \cdossiertestEntryHead{Research Engineer}{}{}{}
+}
+
+% No organization: the location sits flush right after a plain `\hfill', which
+% emits no marker, and no leader opens the line.
+\TEST{leader-location-without-organization-emits-no-leader}{
+  \cdossiertestSetOption{entrymeta=leader}
+  \cdossiertestTraceLeader
+  \cdossiertestEntryHead{Research Engineer}{}{Berlin, DE}{2020--2024}
+}
+
+\TEST{leader-organization-without-location-emits-no-leader}{
+  \cdossiertestSetOption{entrymeta=leader}
+  \cdossiertestTraceLeader
+  \cdossiertestEntryHead{Research Engineer}{Example Lab}{}{2020--2024}
+}
+
+\TEST{leader-mark-spacing-defaults-to-a-quarter-of-the-body-size}{
+  \TYPE{body size = \the\CDossierBodySize, leader sep = \the\CDossierEntryMetaLeaderSep}
 }
 
 \END

@@ -71,7 +71,7 @@
     'bodyfont'~(serif,~sans),~
     'medium'~(print,~screen),~
     'muted'~(italic,~gray,~both,~plain),~and~
-    'entrymeta'~(column,~inline).~Language~and~theme~cannot~be~set~here.
+    'entrymeta'~(column,~inline,~leader).~Language~and~theme~cannot~be~set~here.
   }
 
 \keys_define:nn { cdossier / resume }
@@ -173,8 +173,8 @@
 %% follows is drawn inside the division but stays a layout artifact, so it adds
 %% nothing to the structure tree.
 %%
-%% The optional argument takes `entrymeta = column|inline' for this section
-%% alone (#569): every entry in a section shares one layout, and the next
+%% The optional argument takes `entrymeta = column|inline|leader' for this
+%% section alone (#569): every entry in a section shares one layout, and the next
 %% \CDossierSection reverts to the document value whether or not it carries
 %% the key. careerdossier-components owns the option, so the key hands its
 %% value to that package's setter, which validates it against the declaration

@@ -23,7 +23,7 @@ TEST 2: unknown-section-entrymeta-value-is-rejected
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The accepted values are 'column' (dates and location flush right) and 'inline' (dates and location on the same line as the title and organization).
+The accepted values are 'column' (dates and location flush right), 'inline' (dates and location on the same line as the title and organization), and 'leader' (dates and location flush right after a dotted leader).
 section: Experience
 >entry
 >separator(| )
