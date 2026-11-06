@@ -1,1 +1,0 @@
-# No entries: Gamma is then undocumented and undeclared, which must fail.

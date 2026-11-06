@@ -202,6 +202,19 @@ if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
 fi
 echo "  biblabelsep tracks CDossierListLabelSep"
 
+# The two fixtures above compare at \begin{document}. This one overrides both
+# tokens after the package has loaded and compares inside the printed
+# bibliography, where CDossierItemize reads them too (#243). It runs Biber, and
+# fails its own build if the bibliography never printed.
+echo "== list-tokens-late-override.tex (bibliography reads the list tokens when printed) =="
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
+    -outdir="$out" "list-tokens-late-override.tex" > "$out/list-tokens-late-override.stdout" 2>&1; then
+  echo "  the bibliography did not follow a late list-token override"
+  echo "  (see $out/list-tokens-late-override.log)"
+  exit 1
+fi
+echo "  the bibliography reads CDossierListLabelSep and CDossierRecordItemSepSkip when printed"
+
 # LaTeX wraps a package warning over several lines and prefixes every
 # continuation with the package name, so no multi-word phrase in a message
 # survives a grep for it. Undo the wrapping before matching on the text; the

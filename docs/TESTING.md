@@ -838,8 +838,8 @@ not.
 
 `tests/lint/run-manual-names.sh` — every public name the Work declares is
 documented in the manual, and every name the manual documents exists. Private
-`\__cdossier_` names must not appear. `tests/lint/manual-undocumented.txt` is
-the declared-exception list and its ratchet.
+`\__cdossier_` names must not appear. It allows no exception: the declared
+backlog of undocumented names it began with emptied in #243, and was deleted.
 
 ### Token-value lint
 
