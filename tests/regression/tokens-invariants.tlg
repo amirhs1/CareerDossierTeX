@@ -7,7 +7,9 @@ fontsize=10pt
 RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
 ProseHeaderBelowSkip>ProseSectionAboveSkip => holds
 LetterHeaderBelowSkip>LetterBlockSkip => holds
-RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => holds
+2 x RecordSectionRuleGapSkip<RecordSectionBelowSkip => holds
+RecordListEdgeAboveSkip<RecordSectionBelowSkip => holds
+RecordListEdgeBelowSkip<RecordSectionBelowSkip => holds
 RecordSubsectionAboveSkip>=2 x RecordSubsectionBelowSkip => holds
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => holds
@@ -31,7 +33,9 @@ fontsize=11pt
 RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
 ProseHeaderBelowSkip>ProseSectionAboveSkip => holds
 LetterHeaderBelowSkip>LetterBlockSkip => holds
-RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => holds
+2 x RecordSectionRuleGapSkip<RecordSectionBelowSkip => holds
+RecordListEdgeAboveSkip<RecordSectionBelowSkip => holds
+RecordListEdgeBelowSkip<RecordSectionBelowSkip => holds
 RecordSubsectionAboveSkip>=2 x RecordSubsectionBelowSkip => holds
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => holds
@@ -55,7 +59,9 @@ fontsize=12pt
 RecordHeaderBelowSkip>RecordSectionAboveSkip => holds
 ProseHeaderBelowSkip>ProseSectionAboveSkip => holds
 LetterHeaderBelowSkip>LetterBlockSkip => holds
-RecordSectionAboveSkip>=2 x RecordSectionBelowSkip => holds
+2 x RecordSectionRuleGapSkip<RecordSectionBelowSkip => holds
+RecordListEdgeAboveSkip<RecordSectionBelowSkip => holds
+RecordListEdgeBelowSkip<RecordSectionBelowSkip => holds
 RecordSubsectionAboveSkip>=2 x RecordSubsectionBelowSkip => holds
 ProseSectionAboveSkip>=2 x ProseSectionBelowSkip => holds
 ProseSubsectionAboveSkip>=2 x ProseSubsectionBelowSkip => holds

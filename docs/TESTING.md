@@ -325,6 +325,16 @@ make review-spacing        # or: tests/spacing/report.sh; tests/spacing/report-p
 Both gaps, every boundary, four classes, 10/11/12 pt. It is a report, not a
 gate: no assertion, no baseline, and it is not part of `make check`.
 
+It also prints the comparison between record and prose section headings
+(#420), and writes it to `build/spacing/section-alike.tsv`. Both fixtures
+measure the same two heading texts, `Experience` (a descender) and
+`Research Vision` (none), because the prose white below a heading depends on its
+glyphs and the record rule-to-body white does not. Each row says `within` when
+the record white lies inside the prose band and within one grid step of its
+midpoint, the tolerance `docs/ARCHITECTURE.md`, "Record and prose section
+headings render alike", states. Otherwise it says `OUTSIDE`. The run does not
+fail on `OUTSIDE`.
+
 **Two measures of "white" exist, and they disagree on ratios.**
 `pdftotext -bbox` reports each word as the font's full **em-box**, not glyph
 ink — at 12 pt body that box is 15.97 pt tall against 14.5 pt of leading, so

@@ -25,9 +25,9 @@
 % affects can express it. Unlike the rest, it must hold at every value #206 may
 % choose; it is not a target to be repaired later.
 %
-% The three heading pairs are recorded as `above >= 2 x below', not as an
-% equality, because the ratio of the *tokens* is not the ratio a reader
-% perceives. A token owns only the explicit glue; TeX adds interline glue that
+% The three heading pairs without a rule (the record subsection and the two
+% prose pairs) are recorded as `above >= 2 x below', not as an equality,
+% because the ratio of the *tokens* is not the ratio a reader perceives. A token owns only the explicit glue; TeX adds interline glue that
 % no token can reach, and a heading box -- tall and shallow -- starves it above
 % the heading and returns it below.
 %
@@ -45,6 +45,18 @@
 % the floor the hierarchy depends on and leaves the surplus to the calibration;
 % it is not a promise of two-to-one separation on the page. `make review-spacing'
 % reports both measures at every boundary.
+%
+% The ruled record section pair is not held to that floor (#420). Its gap below
+% runs from the rule to the body, and a rule takes no interline glue, so that gap
+% is its token alone. The other three pairs each receive glue below. A floor
+% stated across both kinds compares quantities that are not comparable: at the
+% former 0.4375 the record pair met the 2:1 floor and still left 28-46% less
+% white below its rule than a prose section leaves below its heading. The record section is calibrated against the prose
+% heading-to-body white instead, which `make review-spacing' measures (see
+% docs/ARCHITECTURE.md, "Vertical rhythm"). What this test pins for it are the
+% orderings that keep the rule part of its heading and keep a list from reading
+% as a section: the relations the record section's below-token must satisfy,
+% below.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-tokens}
@@ -86,10 +98,41 @@
         \dim_compare_p:nNn
           { \CDossierLetterHeaderBelowSkip } > { \CDossierLetterBlockSkip }
       }
-    %% Each heading pair binds the heading to the text it introduces: the gap
-    %% opening the block is at least twice the gap closing the heading. A pair
-    %% that fell below this floor would read as a heading suspended between two
-    %% blocks rather than as one that belongs to what follows.
+    %% The ruled record section is ordered against its own rule and its
+    %% neighbours, not against the 2:1 floor below (#420; see the header).
+    %%
+    %% The rule belongs to the heading above it only while the heading-to-rule
+    %% gap stays unambiguously smaller than the rule-to-content gap: at 1:2 the
+    %% rule starts to read as a divider floating between two blocks
+    %% (docs/ARCHITECTURE.md, "Vertical rhythm"). Strict, with no rounding
+    %% tolerance: 1:2 is the failure, not the boundary case.
+    \cdossiertest_invariant:nn
+      { 2 ~ x ~ RecordSectionRuleGapSkip < RecordSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordSectionRuleGapSkip * 2 }
+          < { \CDossierRecordSectionBelowSkip }
+      }
+    %% Both list edges stay below the gap under a section heading, or entering a
+    %% list would look like entering a section (docs/ARCHITECTURE.md, "Vertical
+    %% rhythm"; #191, #206).
+    \cdossiertest_invariant:nn
+      { RecordListEdgeAboveSkip < RecordSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordListEdgeAboveSkip } < { \CDossierRecordSectionBelowSkip }
+      }
+    \cdossiertest_invariant:nn
+      { RecordListEdgeBelowSkip < RecordSectionBelowSkip }
+      {
+        \dim_compare_p:nNn
+          { \CDossierRecordListEdgeBelowSkip } < { \CDossierRecordSectionBelowSkip }
+      }
+    %% Each heading pair without a rule binds the heading to the text it
+    %% introduces: the gap opening the block is at least twice the gap closing
+    %% the heading. A pair that fell below this floor would read as a heading
+    %% suspended between two blocks rather than as one that belongs to what
+    %% follows.
     %%
     %% The 2 sp tolerance is not slack in the design rule; it removes a rounding
     %% artefact. Each token is rounded to a whole scaled point independently, so
@@ -99,13 +142,6 @@
     %% one scaled point. Without the tolerance an exactly-2:1 pair reports
     %% `holds' at 10pt and 12pt and `violated' at 11pt, which is a false
     %% failure and would push a retune away from exact 2:1 for no design reason.
-    \cdossiertest_invariant:nn
-      { RecordSectionAboveSkip >= 2 ~ x ~ RecordSectionBelowSkip }
-      {
-        ! \dim_compare_p:nNn
-            { \CDossierRecordSectionAboveSkip + 2sp }
-            < { \CDossierRecordSectionBelowSkip * 2 }
-      }
     %% The record subsection pair is the reason its above-ratio is
     %% 0.75 and not the prose pair's 0.625: the below-ratio is pinned at 0.375 by
     %% the two reachability relations further down, and 0.625 against 0.375 is

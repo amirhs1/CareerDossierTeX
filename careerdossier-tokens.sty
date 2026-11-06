@@ -539,7 +539,24 @@
     %% value is kept for the clearance it leaves, not because a smaller grid
     %% step is unavailable.
     \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionRuleGapSkip { 0.3125 }
-    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.4375 }
+    %% Calibrated so a record section heading renders like a prose one (#420).
+    %% The rule is part of the heading, so the heading ends at the rule, and
+    %% the gap matched against the prose heading-to-body white is
+    %% rule-to-body. That white is this token alone: the rule takes no
+    %% interline glue, so nothing is added to it. The prose white below a
+    %% heading does include interline glue, which depends on the heading's
+    %% descenders, so it spans a band rather than a single value, and no single
+    %% token can match both ends of it. This one sits inside the band at
+    %% every size, within one grid step of its midpoint. The measured band
+    %% and tolerance are in docs/ARCHITECTURE.md ("Vertical rhythm").
+    %%
+    %% Raising it from 0.4375 kept the order docs/ARCHITECTURE.md requires:
+    %% the rule gap stays under half of this token, and both list edges and
+    %% \CDossierRecordSubsectionBelowSkip stay under it. The section pair no
+    %% longer meets the `above >= 2 x below' floor the other heading pairs
+    %% meet, and it is not meant to. That floor compares two gaps that both
+    %% receive interline glue, and the gap below this heading receives none.
+    \__cdossier_tokens_set_skip:Nn \CDossierRecordSectionBelowSkip { 0.6875 }
     %% The record classes' second heading level (#337). The pair is not the
     %% prose subsection pair under another name, and only the above-ratio could
     %% have been ported.
@@ -562,18 +579,18 @@
     %% publication list alike, so the gap below a subsection is the same gap in
     %% both -- the two neighbours differ, but neither of them owns the boundary.
     %%
-    %% The above-ratio is 0.75, not the prose pair's 0.625. Every heading pair in
-    %% the toolkit satisfies `above >= 2 x below', which
-    %% `tests/regression/tokens-invariants.lvt' asserts at 10/11/12pt; with the
-    %% below-ratio pinned at 0.375, 0.625 would render 1.67:1 and be the first
-    %% pair to violate it. 0.75 meets the floor exactly, the same way
-    %% \CDossierRecordSectionAboveSkip is exactly twice its own below-token, and
-    %% stays under 0.875 so the subsection is still a child of its section on
-    %% both edges.
+    %% The above-ratio is 0.75, not the prose pair's 0.625. Every heading pair
+    %% whose below-gap takes interline glue satisfies `above >= 2 x below',
+    %% which `tests/regression/tokens-invariants.lvt' asserts at 10/11/12pt;
+    %% with the below-ratio pinned at 0.375, 0.625 would render 1.67:1 and be
+    %% the first such pair to violate it. 0.75 meets the floor exactly and
+    %% stays under 0.875, so the subsection is still a child of its section on
+    %% both edges. The ruled section pair is outside that floor (#420); see
+    %% \CDossierRecordSectionBelowSkip above.
     %%
     %% The above-token is *not* what a section opening directly with a subsection
     %% renders. There \__cdossier_components_subsection:n suppresses it and
-    %% \CDossierRecordSectionBelowSkip (0.4375) owns the boundary alone, so that
+    %% \CDossierRecordSectionBelowSkip owns the boundary alone, so that
     %% gap is the same whether the section opens with a subsection or with an
     %% entry. This is the record equivalent of `\@startsection''s `\if@nobreak'
     %% guard, which gives the statement class the same result -- see the note on

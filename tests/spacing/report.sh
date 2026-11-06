@@ -80,6 +80,47 @@ for size in 10pt 11pt 12pt; do
   run_one careerdossier-letter    letter.tex ""              "$size"
 done
 
+# Record against prose section headings (#420). The rule is part of a record
+# section heading, so its rule-to-body white is compared with the white a prose
+# section leaves between its heading and the text below. The prose white
+# includes interline glue and so depends on the heading's descenders, which is
+# why it is a band: its two ends are the same two heading texts both fixtures
+# measure. The approved tolerance is that the record white lies inside the band
+# and within one grid step (1/16 of the body baseline) of its midpoint, with
+# the white above identical. This only reports; it does not fail the run.
+alike="$out/section-alike.tsv"
+awk -F'\t' -v OFS='\t' '
+  FNR == NR {
+    if ($3 == "baselineskip") base[$2] = $4
+    next
+  }
+  $3 == "section" && $5 == "rule -> body" { rule[$1, $2] = $9 }
+  $3 == "section-no-descender" && $5 == "rule -> body" { rule2[$1, $2] = $9 }
+  $3 == "section" && $5 == "body -> section heading" { above[$1, $2] = $9 }
+  $1 == "careerdossier-statement" && $3 == "section" && $5 == "section heading -> prose" { pn[$2] = $9 }
+  $1 == "careerdossier-statement" && $3 == "section-descender" && $5 == "section heading -> prose" { pd[$2] = $9 }
+  $1 == "careerdossier-statement" && $3 == "section" && $5 == "prose -> section heading" { pa[$2] = $9 }
+  END {
+    print "class", "size", "above", "prose-above", "rule-to-body", "prose-descender", "prose-plain", "midpoint", "difference", "step", "verdict"
+    n = split("careerdossier-resume careerdossier-cv", classes, " ")
+    split("10pt 11pt 12pt", sizes, " ")
+    for (i = 1; i <= n; i++) for (j = 1; j <= 3; j++) {
+      c = classes[i]; s = sizes[j]
+      lo = pd[s]; hi = pn[s]; mid = (lo + hi) / 2; step = base[s] / 16
+      w = rule[c, s]; diff = w - mid
+      ok = (w >= lo && w <= hi && (diff < 0 ? -diff : diff) <= step \
+            && rule2[c, s] == w && above[c, s] == pa[s])
+      printf "%s\t%s\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%+.3f\t%.3f\t%s\n", \
+        c, s, above[c, s], pa[s], w, lo, hi, mid, diff, step, ok ? "within" : "OUTSIDE"
+    }
+  }
+' "$tok" "$tsv" >"$alike"
+
+echo
+echo "Record against prose section headings (#420):"
+column -t -s "$(printf '\t')" "$alike"
+
 echo
 echo "Boundaries: $tsv"
 echo "Tokens:     $tok"
+echo "Alike:      $alike"

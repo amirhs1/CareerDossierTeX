@@ -3,18 +3,18 @@ Don't change this file in any respect.
 ============================================================
 TEST 1: entry-and-list-boundaries
 ============================================================
-after-section-heading page-total = 21.64pt
-after-entry-heading page-total = 32.36801pt
-after-list page-total = 55.45pt
-after-entry page-total = 55.45pt
-after-second-entry-heading page-total = 69.76802pt
-after-second-entry page-total = 81.10202pt
+after-section-heading page-total = 25.04001pt
+after-entry-heading page-total = 35.76802pt
+after-list page-total = 58.85pt
+after-entry page-total = 58.85pt
+after-second-entry-heading page-total = 73.16803pt
+after-second-entry page-total = 84.50203pt
 ============================================================
 ============================================================
 TEST 2: entry-and-list-tokens
 ============================================================
 section-above = 11.90001pt
-section-below = 5.95pt
+section-below = 9.35pt
 entry-above = 4.25pt
 entry-gap = 0.85pt
 list-edge-above = 3.4pt
@@ -23,15 +23,15 @@ list-edge-below = 6.8pt
 ============================================================
 TEST 3: bare-entry-boundaries
 ============================================================
-after-education-heading page-total = 117.64203pt
-after-first-bare-entry page-total = 128.35904pt
-after-second-bare-entry page-total = 146.22005pt
+after-education-heading page-total = 124.44205pt
+after-first-bare-entry page-total = 135.15906pt
+after-second-bare-entry page-total = 153.02007pt
 ============================================================
 ============================================================
 TEST 4: list-item-separation
 ============================================================
-after-skills-entry-heading page-total = 190.31706pt
-after-two-item-list page-total = 224.75507pt
+after-skills-entry-heading page-total = 200.51709pt
+after-two-item-list page-total = 234.9551pt
 ============================================================
 ============================================================
 TEST 5: entry-keep-penalty
