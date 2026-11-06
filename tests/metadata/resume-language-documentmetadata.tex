@@ -1,0 +1,18 @@
+% resume-language-documentmetadata.tex -- the profile's `language' key (#288)
+% under \DocumentMetadata, which always settles on a language and owns /Lang on
+% its path. The kernel's tag stays in the catalog, and because the declared one
+% disagrees with it, careerdossier-metadata warns once and names the fix.
+%
+% `de' and `fr-CA' are both tags the package would never derive, so the
+% catalog's value says which declaration won and cannot be the default.
+\DocumentMetadata{lang=de}
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name={Metadata Fixture}, email={metadata@example.test}, language={fr-CA}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+A paragraph, so the document has a body.
+\end{document}

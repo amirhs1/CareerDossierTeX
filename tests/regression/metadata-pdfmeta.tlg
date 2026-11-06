@@ -80,38 +80,73 @@ hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
 hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
 ============================================================
 ============================================================
-TEST 15: kernel-info-without-accessor-reads-as-unset
+TEST 15: pdfmeta-writes-declared-language
+============================================================
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
+hypersetup: pdflang={fr-CA}
+============================================================
+============================================================
+TEST 16: pdfmeta-keeps-user-pdflang-over-declared-language
+============================================================
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
+============================================================
+============================================================
+TEST 17: pdfmeta-warns-when-documentmetadata-lang-disagrees
+============================================================
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
+Package careerdossier-metadata Warning: The profile language 'fr-CA' is not used: \DocumentMetadata declares 'de', and on that path the kernel writes /Lang.
+(careerdossier-metadata)                To declare 'fr-CA' there, write
+(careerdossier-metadata)                \DocumentMetadata{lang=fr-CA}
+============================================================
+============================================================
+TEST 18: pdfmeta-is-silent-when-documentmetadata-lang-agrees
+============================================================
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
+============================================================
+============================================================
+TEST 19: pdfmeta-blank-language-falls-back-to-en
+============================================================
+hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
+hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
+hypersetup: pdflang=en
+============================================================
+============================================================
+TEST 20: kernel-info-without-accessor-reads-as-unset
 ============================================================
 Info/Title -> unset
 ============================================================
 ============================================================
-TEST 16: kernel-info-no-value-reads-as-unset
+TEST 21: kernel-info-no-value-reads-as-unset
 ============================================================
 Info/Title -> unset
 ============================================================
 ============================================================
-TEST 17: kernel-info-empty-value-reads-as-unset
+TEST 22: kernel-info-empty-value-reads-as-unset
 ============================================================
 Info/Title -> unset
 ============================================================
 ============================================================
-TEST 18: kernel-info-value-reads-as-user-supplied
+TEST 23: kernel-info-value-reads-as-user-supplied
 ============================================================
 Info/Title -> user-supplied
 ============================================================
 ============================================================
-TEST 19: kernel-info-is-read-per-key
+TEST 24: kernel-info-is-read-per-key
 ============================================================
 Info/Author -> unset
 ============================================================
 ============================================================
-TEST 20: pdfmeta-keeps-kernel-info-title
+TEST 25: pdfmeta-keeps-kernel-info-title
 ============================================================
 hypersetup: pdfauthor={\l__cdossier_metadata_pdfauthor_tl }
 hypersetup: pdflang=en
 ============================================================
 ============================================================
-TEST 21: pdfmeta-keeps-kernel-info-author
+TEST 26: pdfmeta-keeps-kernel-info-author
 ============================================================
 hypersetup: pdftitle={\l__cdossier_metadata_pdfname_tl }
 hypersetup: pdflang=en

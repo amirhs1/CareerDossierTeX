@@ -91,3 +91,129 @@ Package careerdossier-base Warning: The 'orcid' value 'scholar.google.com/citati
 (careerdossier-base)                The value is used as given, so check it before publishing.
 [scholar.google.com/citations?user=example]
 ============================================================
+============================================================
+TEST 16: language-primary-subtag-is-accepted
+============================================================
+[en]
+============================================================
+============================================================
+TEST 17: language-region-subtag-is-accepted
+============================================================
+[fr-CA]
+============================================================
+============================================================
+TEST 18: language-numeric-region-is-accepted
+============================================================
+[es-419]
+============================================================
+============================================================
+TEST 19: language-script-and-region-are-accepted
+============================================================
+[zh-Hant-TW]
+============================================================
+============================================================
+TEST 20: language-variant-subtag-is-accepted
+============================================================
+[de-CH-1996]
+============================================================
+============================================================
+TEST 21: language-three-letter-code-is-accepted
+============================================================
+[haw]
+============================================================
+============================================================
+TEST 22: language-is-a-trimmed-shared-profile-field
+============================================================
+[en-GB]
+language-present
+============================================================
+============================================================
+TEST 23: language-name-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'English' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 24: language-underscore-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'en_GB' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 25: language-inner-space-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'en GB' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 26: language-trailing-hyphen-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'fr-' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 27: language-empty-subtag-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'en--GB' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 28: language-one-letter-code-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'e' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 29: language-over-long-subtag-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'en-abcdefghi' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 30: language-pdf-string-delimiter-is-rejected-once
+============================================================
+! Package careerdossier-base Error: The 'language' value 'en)' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[]
+============================================================
+============================================================
+TEST 31: language-rejected-value-keeps-the-previous-one
+============================================================
+! Package careerdossier-base Error: The 'language' value 'French' is not a language tag.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
+[fr-CA]
+============================================================

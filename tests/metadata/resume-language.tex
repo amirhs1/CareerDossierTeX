@@ -1,0 +1,14 @@
+% resume-language.tex -- the resume class declares its language with the
+% profile's `language' key (#288), on the default path: no \DocumentMetadata,
+% no \hypersetup. `fr-CA' is a tag the package would never derive, so a
+% /Lang(fr-CA) in the catalog can only have come from the key.
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name={Metadata Fixture}, email={metadata@example.test}, language={fr-CA}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+A paragraph, so the document has a body.
+\end{document}

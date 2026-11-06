@@ -1,0 +1,15 @@
+% resume-language-user-lang.tex -- the top of the /Lang precedence (#288): a
+% document's own \hypersetup{pdflang=...} beats the profile's `language' key,
+% which beats the derived `en'. Both are set here, with different tags, so the
+% one in the catalog says which level won.
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\hypersetup{ pdflang = {en-GB} }
+\CDossierSetup{
+  name={Metadata Fixture}, email={metadata@example.test}, language={fr-CA}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+A paragraph, so the document has a body.
+\end{document}

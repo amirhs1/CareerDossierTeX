@@ -294,16 +294,76 @@
           }
       }
       { }
-    %% CareerDossierTeX is English-only by settled decision (see
-    %% docs/ARCHITECTURE.md, "English strings and the absence of a language
-    %% module"); there is no language key to route this through. Either way of
-    %% declaring one wins over the derived value: the document's own
-    %% \hypersetup, and \DocumentMetadata.
-    \__cdossier_metadata_kernel_lang_if_set:F
+    %% /Lang, in three levels (#288): the document's own declaration, then
+    %% the profile's `language', then `en'. The document can declare it two
+    %% ways, its own \hypersetup and \DocumentMetadata, and both win.
+    %% Declaring a language translates nothing: CareerDossierTeX is
+    %% English-only by settled decision (see docs/ARCHITECTURE.md, "English
+    %% strings and the absence of a language module"), and the key only lets a
+    %% document say truthfully which language its own text is in.
+    \__cdossier_metadata_kernel_lang_if_set:TF
+      { \__cdossier_metadata_language_check_kernel: }
       {
         \__cdossier_metadata_hyp_if_unset:nT { @pdflang }
-          { \hypersetup { pdflang = en } }
+          {
+            \CDossierIfFieldTF { language }
+              {
+                %% Expanded here, so \hypersetup receives the tag itself.
+                %% base has checked it, so it is letters, digits, and hyphens.
+                \tl_set:Ne \l__cdossier_metadata_pdflang_tl
+                  { \CDossierFieldValue { language } }
+                \exp_args:Ne \hypersetup
+                  { pdflang = { \exp_not:V \l__cdossier_metadata_pdflang_tl } }
+              }
+              { \hypersetup { pdflang = en } }
+          }
       }
+  }
+
+%% Under \DocumentMetadata the kernel owns /Lang (#288).
+%%
+%% \DocumentMetadata always settles on a language, `en' when it is given no
+%% lang key, and the kernel writes /Lang from it -- and tags the structure tree
+%% with it -- itself. The profile's `language' therefore cannot reach /Lang on
+%% that path, and is not written over it: a catalog that disagreed with the
+%% structure tree would be worse than either. What the module can do is say so.
+%% A document that declared `fr-CA' and opted into tagging without a lang key
+%% would otherwise ship /Lang(en) with nothing in the log.
+%%
+%% Language tags are case-insensitive (RFC 5646, section 2.1.1), so the two are
+%% compared case-folded: `fr-CA' and `fr-ca' are one tag, and agree in silence.
+%% Without a declared language there is nothing to compare, and nothing is
+%% said.
+\tl_new:N  \l__cdossier_metadata_pdflang_tl
+\str_new:N \l__cdossier_metadata_lang_declared_str
+\str_new:N \l__cdossier_metadata_lang_kernel_str
+
+\msg_new:nnn { careerdossier-metadata } { language-not-used }
+  {
+    The~profile~language~'#1'~is~not~used:~\c_backslash_str DocumentMetadata~
+    declares~'#2',~and~on~that~path~the~kernel~writes~/Lang. \\
+    To~declare~'#1'~there,~write \\
+    \c_backslash_str DocumentMetadata \c_left_brace_str lang=#1 \c_right_brace_str
+  }
+
+\cs_new_protected:Npn \__cdossier_metadata_language_check_kernel:
+  {
+    \CDossierIfFieldTF { language }
+      {
+        \str_set:Ne \l__cdossier_metadata_lang_declared_str
+          { \CDossierFieldValue { language } }
+        \str_set:Ne \l__cdossier_metadata_lang_kernel_str
+          { \GetDocumentProperties { document / lang } }
+        \str_if_eq:eeF
+          { \str_casefold:V \l__cdossier_metadata_lang_declared_str }
+          { \str_casefold:V \l__cdossier_metadata_lang_kernel_str }
+          {
+            \msg_warning:nnVV { careerdossier-metadata } { language-not-used }
+              \l__cdossier_metadata_lang_declared_str
+              \l__cdossier_metadata_lang_kernel_str
+          }
+      }
+      { }
   }
 
 \AddToHook { begindocument }

@@ -13,6 +13,9 @@
 % cases raises no overwrite warnings. The saved baseline is the assertion that
 % the silent cases are silent, so a missing warning line there is a failure and
 % not an omission.
+%
+% The last block covers the `language' key (#288) the same way, with one
+% difference its header states: a rejected tag is an error and is not stored.
 \input{regression-test}
 \documentclass{article}
 \usepackage{careerdossier-base}
@@ -23,6 +26,12 @@
     \CDossierSetup{ orcid = {} }
     \CDossierSetup{ orcid = {#1} }
     \TYPE{ [\CDossierFieldValue{orcid}] }
+  }
+\cs_new_protected:Npn \cdossiertestLanguage #1
+  {
+    \CDossierSetup{ language = {} }
+    \CDossierSetup{ language = {#1} }
+    \TYPE{ [\CDossierFieldValue{language}] }
   }
 \ExplSyntaxOff
 
@@ -96,6 +105,88 @@
 
 \TEST{orcid-value-from-another-key-warns-once}{
   \cdossiertestOrcid{scholar.google.com/citations?user=example}
+}
+
+% The `language' key (#288). The accepted shape is the rule the maintainer
+% approved on 2026-11-06: a two- or three-letter language code, then any number
+% of hyphen-separated subtags of one to eight letters or digits -- the
+% well-formedness of a BCP 47 tag, without the IANA registry. Each accepted
+% tag below is one RFC 5646 uses or permits (region, numeric region, script,
+% variant), and passes in silence.
+%
+% A rejected value is an error, unlike `orcid', and is never recorded: each
+% rejected case reports one error and then prints an empty value. The baseline
+% is the assertion that the error appears once, not twice (#232), and that it
+% names the accepted values (#212).
+\TEST{language-primary-subtag-is-accepted}{
+  \cdossiertestLanguage{en}
+}
+
+\TEST{language-region-subtag-is-accepted}{
+  \cdossiertestLanguage{fr-CA}
+}
+
+\TEST{language-numeric-region-is-accepted}{
+  \cdossiertestLanguage{es-419}
+}
+
+\TEST{language-script-and-region-are-accepted}{
+  \cdossiertestLanguage{zh-Hant-TW}
+}
+
+\TEST{language-variant-subtag-is-accepted}{
+  \cdossiertestLanguage{de-CH-1996}
+}
+
+\TEST{language-three-letter-code-is-accepted}{
+  \cdossiertestLanguage{haw}
+}
+
+\TEST{language-is-a-trimmed-shared-profile-field}{
+  \cdossiertestLanguage{ en-GB }
+  \CDossierIfFieldTF{language}{\TYPE{language-present}}{\TYPE{language-absent}}
+}
+
+\TEST{language-name-is-rejected-once}{
+  \cdossiertestLanguage{English}
+}
+
+\TEST{language-underscore-is-rejected-once}{
+  \cdossiertestLanguage{en_GB}
+}
+
+\TEST{language-inner-space-is-rejected-once}{
+  \cdossiertestLanguage{en GB}
+}
+
+\TEST{language-trailing-hyphen-is-rejected-once}{
+  \cdossiertestLanguage{fr-}
+}
+
+\TEST{language-empty-subtag-is-rejected-once}{
+  \cdossiertestLanguage{en--GB}
+}
+
+\TEST{language-one-letter-code-is-rejected-once}{
+  \cdossiertestLanguage{e}
+}
+
+\TEST{language-over-long-subtag-is-rejected-once}{
+  \cdossiertestLanguage{en-abcdefghi}
+}
+
+% A character that would end the catalog's /Lang string early.
+\TEST{language-pdf-string-delimiter-is-rejected-once}{
+  \cdossiertestLanguage{en)}
+}
+
+% A rejected value leaves the field as it was: no overwrite warning, and the
+% earlier tag survives.
+\TEST{language-rejected-value-keeps-the-previous-one}{
+  \CDossierSetup{ language = {} }
+  \CDossierSetup{ language = {fr-CA} }
+  \CDossierSetup{ language = {French} }
+  \TYPE{[\CDossierFieldValue{language}]}
 }
 
 \END

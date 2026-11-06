@@ -16,6 +16,9 @@
 #     including the en-GB form docs/API.md advertises;
 #   * so does a \DocumentMetadata{lang=...}, which is the other route in and the
 #     one the module cannot see through hyperref;
+#   * the profile's `language' key reaches /Lang in every class, a document's
+#     own pdflang still beats it, and under \DocumentMetadata the kernel's tag
+#     stays and a disagreeing key is reported once (#288);
 #   * /Lang survives careerdossier-components being loaded AFTER hyperref;
 #   * the derived /Title is the same string on the default and tagged paths.
 #
@@ -25,9 +28,9 @@
 # path alone. #428, where the tagged path shipped `Cover Letter -- Name'
 # against the default path's `Cover Letter – Name' from identical source.
 #
-# The third is the one with teeth. Without \DocumentMetadata the kernel's PDF
-# management is inactive, so hyperref writes the catalog from its own
-# `begindocument' chunk (/Lang(\@pdflang) in hluatex.def). A pdflang set after
+# The load-order check is the one with teeth. Without \DocumentMetadata the
+# kernel's PDF management is inactive, so hyperref writes the catalog from its
+# own `begindocument' chunk (/Lang(\@pdflang) in hluatex.def). A pdflang set after
 # that chunk runs is simply not in the file, and nothing is logged. The four
 # classes load this package before hyperref, so their chunk happens to come
 # first; a document that loads the package directly, after hyperref, does not
@@ -126,6 +129,49 @@ fi
 # value happening to match.
 if compile_fixture resume-documentmetadata-lang.tex resume-documentmetadata-lang; then
   check_lang resume-documentmetadata-lang de
+fi
+echo
+
+# Count careerdossier-metadata's warnings in a fixture's log, and require the
+# count given. l3msg wraps a long message, so the count keys on the first line,
+# which never wraps; the fix the warning names is on a line of its own for the
+# same reason, and is checked separately where a warning is expected.
+check_metadata_warnings() {
+  local job="$1" expected="$2" log="$work/$1.log" count
+  if [ ! -s "$log" ]; then
+    record_failure "$job: no log, so its warning count proves nothing"
+    return
+  fi
+  count="$(grep -c 'Package careerdossier-metadata Warning:' "$log")"
+  if [ "$count" != "$expected" ]; then
+    record_failure "$job logs $count careerdossier-metadata warning(s), expected $expected"
+  fi
+}
+
+echo "== the profile's language key reaches /Lang in every class =="
+# #288. Every fixture here omits \DocumentMetadata on purpose: under it the
+# kernel writes /Lang itself, which would mask the key exactly as every tagged
+# fixture once masked the derived `en' (#276). `fr-CA' is a tag the package
+# would never derive, so a pass cannot come from the default.
+for base in resume letter cv statement; do
+  if compile_fixture "$base-language.tex" "$base-language"; then
+    check_lang "$base-language" fr-CA
+    check_metadata_warnings "$base-language" 0
+  fi
+done
+# The top level of the precedence: a document's own pdflang beats the key.
+if compile_fixture resume-language-user-lang.tex resume-language-user-lang; then
+  check_lang resume-language-user-lang en-GB
+  check_metadata_warnings resume-language-user-lang 0
+fi
+# Under \DocumentMetadata the kernel's tag stays, and the disagreement is
+# reported once, with the fix it names.
+if compile_fixture resume-language-documentmetadata.tex resume-language-documentmetadata; then
+  check_lang resume-language-documentmetadata de
+  check_metadata_warnings resume-language-documentmetadata 1
+  if ! grep -qF '\DocumentMetadata{lang=fr-CA}' "$work/resume-language-documentmetadata.log"; then
+    record_failure "resume-language-documentmetadata: the warning does not name \\DocumentMetadata{lang=fr-CA}"
+  fi
 fi
 echo
 

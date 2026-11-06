@@ -433,6 +433,14 @@ If multilingual support is ever revived, the label table belongs in a new shared
 module rather than in either class, so the classes are not duplicated per
 language.
 
+Declaring a language is not translating one, and the profile's `language` key
+(#288) does only the first. It records which language the author's own text is
+in, so that the PDF's `/Lang` is true and a screen reader picks the right
+voice. It changes no emitted string, loads no `babel` or `polyglossia`, and
+sets no hyphenation; a document in French still supplies its own salutation and
+closing, as above. So the key does not contradict this section: the toolkit's
+strings stay English, and only the declaration follows the document.
+
 ### `careerdossier-typography.sty`
 
 The engine guard, font loading, and the six semantic text roles — meaning, never
@@ -487,8 +495,8 @@ restated here.
 ### `careerdossier-metadata.sty`
 
 The document's derived PDF metadata: `/Title` and `/Author` from the profile's
-`name` and the document type a class declares, `/Lang`, and the
-`/DisplayDocTitle` viewer preference. It renders nothing, carries no dimension,
+`name` and the document type a class declares, `/Lang` from the profile's
+`language` or `en`, and the `/DisplayDocTitle` viewer preference. It renders nothing, carries no dimension,
 and does not load `hyperref`. Its one inbound interface is the private
 `doctype` declaration each class makes once. The file's own header comment
 states the responsibilities; timing, precedence on both build paths, and the
@@ -498,6 +506,7 @@ ordering against `hyperref` are commented at the implementation.
 |---|---|---|
 | Why PDF document metadata is derived in a shared package | `/Title`, `/Author`, and `/Lang` derive from profile data, so one implementation serves every class; the class contributes only the document type. | #276 |
 | Why it is not part of `careerdossier-components` | It shares no code with the rendered parts, and has its own suite, `make metadata`; `careerdossier-components` loads it, so no class loads it by name. | #464 |
+| Why the language is a profile key, not a class option | Language is profile data, not a layout decision, so `careerdossier-base.sty` owns and checks it beside the other profile keys and this package only reads it; a class option would repeat one declaration in four classes. | #288 |
 
 ### `careerdossier-resume.cls`
 
