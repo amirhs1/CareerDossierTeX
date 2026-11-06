@@ -1,0 +1,71 @@
+% resume-entry-leader-order.tex — extraction fixture for `entrymeta=leader'.
+%
+% Purpose (#678)
+%   resume-entry-inline-order.tex with `entrymeta=leader' in place of
+%   `inline': same profile, same two entries, same bullet lists, and
+%   `\CDossierRecordListEdgeAboveSkip' at 0.125, half its committed floor.
+%
+%   `leader' keeps the column and fills its gap with a dotted leader, so the
+%   heading row carries no empty stretch for Poppler to split at (#219; see
+%   resume-entry-inline-order.tex for the mechanism). The assertion is that
+%   every entry's dates and location extract on its own heading lines, after
+%   the leader, in source order -- the *last* entry's included, which no value
+%   of the list edge fixes under `column'. Measured on #678 before the value
+%   existed: with the leader, both entries in place at 0.125; with `column' at
+%   the same edge, both entries' dates and location after their bullets.
+%
+%   The dots are part of the extracted text, by design: Poppler reads the
+%   leader as periods separated by spaces, and the baseline records exactly
+%   what it reads, count included, since the count follows from the line
+%   width and the mark spacing. A changed count is a changed leader.
+%
+%   The 0.125 override is the assertion, as in the inline fixture. Do not raise
+%   it to make a failure go away.
+%
+%   The committed baseline (resume-entry-leader-order.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-entry-leader-order.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass[entrymeta=leader]{careerdossier-resume}
+
+% Half the committed floor. Written as the ratio the token is calibrated in
+% rather than as a raw dimension, so it stays half the floor at every body size
+% instead of silently becoming some other fraction at 11pt and 12pt.
+\ExplSyntaxOn
+\skip_set:Nn \CDossierRecordListEdgeAboveSkip
+  { \fp_to_dim:n { 0.125 * \dim_to_fp:n { \CDossierBodyLeading } } }
+\ExplSyntaxOff
+
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Accessibility Engineer},
+  email    = {ada@example.com},
+  phone    = {+1 416 555 0142},
+  website  = {example.com/ada},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title        = {Senior Engineer},
+  organization = {Example Labs},
+  location     = {Toronto, ON},
+  dates        = {2024--Present}
+]
+  \begin{CDossierItemize}
+    \item First achievement in source order.
+    \item Second achievement with a measurable reporting outcome.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title        = {Engineer},
+  organization = {Example Services},
+  location     = {Ottawa, ON},
+  dates        = {2022--2024}
+]
+  \begin{CDossierItemize}
+    \item Later achievement that follows the first entry on the same page.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

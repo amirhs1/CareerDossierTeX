@@ -30,9 +30,11 @@
 %% option, its decision of whether furniture is emitted at all, and the hand-off
 %% of its link half to careerdossier-links; the muted=italic|gray|both|plain
 %% de-emphasis role \CDossierMutedStyle and what it resolves to; the
-%% entrymeta=column|inline placement of an entry's dates and location, the
-%% per-section setter and reset the record classes' \CDossierSection key
-%% calls, and the \CDossierEntryMetaSeparator the inline form joins them with;
+%% entrymeta=column|inline|leader placement of an entry's dates and location,
+%% the per-section setter and reset the record classes' \CDossierSection key
+%% calls, the \CDossierEntryMetaSeparator the inline form joins them with, and
+%% the \CDossierEntryMetaLeader mark and \CDossierEntryMetaLeaderSep spacing
+%% of the leader form's fill;
 %% the shared
 %% CV/resume section rule with its token-owned spacing and tagged
 %% layout-artifact treatment; the shared record subsection renderer (#337) that
@@ -102,7 +104,7 @@
   {
     Supported~options~are~'medium'~(print,~screen),~
     'muted'~(italic,~gray,~both,~plain),~and~
-    'entrymeta'~(column,~inline).
+    'entrymeta'~(column,~inline,~leader).
   }
 
 %% l3keys' own choice error reports that the value is not one of a fixed set
@@ -165,6 +167,7 @@
 %%
 %%   entrymeta = column  dates/location flush right, in their own column  (default)
 %%   entrymeta = inline  dates/location follow title/organization on the line
+%%   entrymeta = leader  dates/location flush right, after a dotted leader (#678)
 %%
 %% This option exists to buy back one number, and it is worth stating which.
 %% `\CDossierRecordListEdgeAboveSkip' carries a measured floor of 0.25 that is
@@ -198,29 +201,42 @@
 %% the committed default of the token is unchanged and `tokens-invariants' still
 %% guards it. A document that wants a tighter list edge sets both, per document.
 %%
+%% `leader' (#678) keeps the column and fills its gap. #219 found that a
+%% TOC-style leader reaches the fault, because the gap is no longer empty, and
+%% kept `column' as the default because the dots are visible ink across the
+%% heading. #678 offers that as the third choice: flush-right dates and a clean
+%% reading order, at the cost of the dots in the heading and in the extracted
+%% text. Like `inline', it makes the floor inapplicable rather than lifting it.
+%% Measured on #678 at half the floor: with 0.25 of the body size on each side
+%% of a mark, Poppler reads every entry's dates and location on its own
+%% heading line, including the last entry's, which no value of the floor fixes
+%% under `column'. The spacing has a working range (see the leader below).
+%%
 %% The separator is a public token rather than a literal so it can be restyled,
 %% and it is emitted only between two cells that are both present -- an entry
 %% with no organization must not open its second line with one, which is the
 %% optional-field rule of AGENTS.md on the horizontal axis.
 %% ---------------------------------------------------------------------------
-\bool_new:N \l__cdossier_components_entrymeta_inline_bool
+%% The working value, `column', `inline', or `leader', read only when an entry
+%% heading is built. A token list rather than a boolean, since #678 made the
+%% choice three-way; the joins branch on it with \str_case:Vn.
+\tl_new:N \l__cdossier_components_entrymeta_tl
+\tl_set:Nn \l__cdossier_components_entrymeta_tl { column }
 
 \msg_new:nnnn { careerdossier-components } { unknown-entrymeta }
   { Unknown~'entrymeta'~value~'#1'. }
   {
-    The~accepted~values~are~'column'~(dates~and~location~flush~right)~
-    and~'inline'~(dates~and~location~on~the~same~line~as~the~title~
-    and~organization).
+    The~accepted~values~are~'column'~(dates~and~location~flush~right),~
+    'inline'~(dates~and~location~on~the~same~line~as~the~title~
+    and~organization),~and~'leader'~(dates~and~location~flush~right~
+    after~a~dotted~leader).
   }
 
 \keys_define:nn { cdossier / components }
   {
     entrymeta .choices:nn =
-      { column , inline }
-      {
-        \bool_set:Nn \l__cdossier_components_entrymeta_inline_bool
-          { \str_if_eq_p:Vn \l_keys_choice_tl { inline } }
-      } ,
+      { column , inline , leader }
+      { \tl_set_eq:NN \l__cdossier_components_entrymeta_tl \l_keys_choice_tl } ,
     entrymeta / unknown .code:n =
       { \msg_error:nnn { careerdossier-components } { unknown-entrymeta } {#1} } ,
     entrymeta .value_required:n = true ,
@@ -255,7 +271,7 @@
 %% the one the package option uses, so the values and the error for any other
 %% value are stated once.
 %%
-%% Two calls, because a section is a command and not a group. The boolean is
+%% Two calls, because a section is a command and not a group. The value is
 %% read only when an entry heading is built, inside
 %% \__cdossier_components_entryhead:nnnn, so a value set between two sections
 %% holds for the entries that follow until it is set again. Every
@@ -264,15 +280,15 @@
 %% key if it has one: a section with no key reverts, and nothing a section
 %% sets outlives it. The class key must require a value: an empty one reaches
 %% the `unknown' branch of the declaration and is rejected.
-\bool_new:N \l__cdossier_components_entrymeta_document_bool
+\tl_new:N \l__cdossier_components_entrymeta_document_tl
 
 \cs_new_protected:Npn \__cdossier_components_set_entrymeta:n #1
   { \keys_set:nn { cdossier / components } { entrymeta = {#1} } }
 
 \cs_new_protected:Npn \__cdossier_components_entrymeta_reset:
   {
-    \bool_set_eq:NN \l__cdossier_components_entrymeta_inline_bool
-      \l__cdossier_components_entrymeta_document_bool
+    \tl_set_eq:NN \l__cdossier_components_entrymeta_tl
+      \l__cdossier_components_entrymeta_document_tl
   }
 
 %% The role is redefined rather than branched at each use, so a de-emphasised
@@ -352,14 +368,59 @@
     }
   }
 
+%% The `entrymeta=leader' fill (#678): one \CDossierEntryMetaLeader mark with
+%% \CDossierEntryMetaLeaderSep of space on each side, repeated across the gap
+%% between a heading line's two cells. Both are public so the leader can be
+%% restyled; the mark defaults to a period, as a table of contents has it.
+%%
+%% The spacing is a measured choice, not a free one. Its default, 0.25 of the
+%% body size, is 0.25em of the body face: LaTeX's own table-of-contents dot
+%% spacing (\@dotsep, 4.5mu). On #678 Poppler kept every heading line whole
+%% from 0.1em to 0.4em on each side. At 0.45em and above it split the line
+%% again between the title and the first mark, because the marks are aligned
+%% to the page and so leave up to one mark's pitch empty after the title; and
+%% at 0.05em and below the marks begin to run into the words on either side
+%% in extracted text.
+%% The manual states the range; the length is not validated.
+%%
+%% The marks take the body role, in the box, for the separator's reason: they
+%% are not metadata, and the cell that follows on the second line may be
+%% italic. The whole fill is a layout artifact, as the separator is, so
+%% assistive technology is not made to announce a row of periods and the
+%% structure text is the one `column' produces; the word boundary that text
+%% needs comes from the \pdffakespace each join puts before the fill, because
+%% the leader's \hfill has no natural width either.
+%%
+%% The length is set here, when careerdossier-tokens has already resolved the
+%% body size, so a class's `fontsize' reaches it; a document may \setlength it.
+\NewDocumentCommand \CDossierEntryMetaLeader { } { . }
+
+\dim_new:N \CDossierEntryMetaLeaderSep
+\dim_set:Nn \CDossierEntryMetaLeaderSep { 0.25 \CDossierBodySize }
+
+\cs_new_protected:Npn \__cdossier_components_entryleader:
+  {
+    \__cdossier_typography_layout_artifact:n
+      {
+        \leaders \hbox:n
+          {
+            \CDossierBodyStyle
+            \skip_horizontal:N \CDossierEntryMetaLeaderSep
+            \CDossierEntryMetaLeader
+            \skip_horizontal:N \CDossierEntryMetaLeaderSep
+          }
+        \hfill
+      }
+  }
+
 \ProcessKeysPackageOptions { cdossier / components }
 
 %% The document's `entrymeta' value, which every \CDossierSection restores
 %% before applying its own key (#569). Taken here, once the options have set
-%% the working boolean, so the record is the class option's value and nothing
+%% the working value, so the record is the class option's value and nothing
 %% a section sets later can move it.
-\bool_set_eq:NN \l__cdossier_components_entrymeta_document_bool
-  \l__cdossier_components_entrymeta_inline_bool
+\tl_set_eq:NN \l__cdossier_components_entrymeta_document_tl
+  \l__cdossier_components_entrymeta_tl
 
 %% ---------------------------------------------------------------------------
 %% Contact line.
@@ -1143,18 +1204,23 @@
 %% `column' the cells are pushed to opposite margins by `\hfill', which emits no
 %% character at all, so \pdffakespace supplies the word boundary the structure
 %% text would otherwise lack (#302). Under `inline' they are adjacent and
-%% the visible separator supplies it as ordinary glue (#230).
+%% the visible separator supplies it as ordinary glue (#230). Under `leader'
+%% the cells are at the margins as under `column', and the leader fills the
+%% gap between them; its \hfill has no width, so it takes the fake space too.
 %%
 %% Named rather than written out because the join is the *whole* of what
-%% `entrymeta' changes: neither value may differ in cell order, in the semantic
+%% `entrymeta' changes: no value may differ in cell order, in the semantic
 %% roles the cells take, in the page-break penalty between the two lines, or in
 %% the conditions under which a cell or a line is emitted at all. The second
 %% heading line guards the join itself and so does not call this -- see there.
 \cs_new_protected:Npn \__cdossier_components_entryjoin:
   {
-    \bool_if:NTF \l__cdossier_components_entrymeta_inline_bool
-      { \CDossierEntryMetaSeparator }
-      { \pdffakespace \hfill }
+    \str_case:Vn \l__cdossier_components_entrymeta_tl
+      {
+        { column } { \pdffakespace \hfill }
+        { inline } { \CDossierEntryMetaSeparator }
+        { leader } { \pdffakespace \__cdossier_components_entryleader: }
+      }
   }
 
 %% ---------------------------------------------------------------------------
@@ -1238,7 +1304,7 @@
           {
             %% The join is guarded here rather than taken from
             %% \__cdossier_components_entryjoin:, because this is the one place
-            %% where the two values need differently shaped guards.
+            %% where the values need differently shaped guards.
             %%
             %% An organization-less entry must not open its line with a
             %% separator -- rule 5's stray "|", on the horizontal axis -- so the
@@ -1248,9 +1314,25 @@
             %% column form wants it whether or not an organization precedes it.
             %% Hoisting it into the guard would move that location to the left
             %% margin, so it stays unconditional.
-            \bool_if:NTF \l__cdossier_components_entrymeta_inline_bool
-              { \tl_if_blank:nF {#2} { \CDossierEntryMetaSeparator } }
-              { \tl_if_blank:nF {#2} { \pdffakespace } \hfill }
+            %%
+            %% `leader' takes `column's shape with the leader in the \hfill's
+            %% place: a lone location still sits at the right margin, after a
+            %% plain \hfill, and only a location that follows an organization
+            %% has a gap to fill. A leader opening the line would be the
+            %% stray separator again (#678).
+            \str_case:Vn \l__cdossier_components_entrymeta_tl
+              {
+                { column }
+                  { \tl_if_blank:nF {#2} { \pdffakespace } \hfill }
+                { inline }
+                  { \tl_if_blank:nF {#2} { \CDossierEntryMetaSeparator } }
+                { leader }
+                  {
+                    \tl_if_blank:nTF {#2}
+                      { \hfill }
+                      { \pdffakespace \__cdossier_components_entryleader: }
+                  }
+              }
             { \CDossierMutedStyle #3 }
           }
         \par

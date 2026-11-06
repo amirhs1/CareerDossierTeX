@@ -76,7 +76,7 @@ TEST 10: unknown-entrymeta-value-is-rejected
 For immediate help type H <return>.
  ...                                              
 l. ...}
-The accepted values are 'column' (dates and location flush right) and 'inline' (dates and location on the same line as the title and organization).
+The accepted values are 'column' (dates and location flush right), 'inline' (dates and location on the same line as the title and organization), and 'leader' (dates and location flush right after a dotted leader).
 ============================================================
 ============================================================
 TEST 11: entrymeta-requires-a-value
@@ -87,4 +87,56 @@ For immediate help type H <return>.
 l. ...}
 The key 'cdossier/components/entrymeta' must have a value.
 No value was present: the key will be ignored.
+============================================================
+============================================================
+TEST 12: leader-joins-both-lines-with-the-fake-space-and-a-leader
+============================================================
+>entrytitle
+>fakespace
+>artifact-begin
+>body
+>leadermark
+>artifact-end
+>muted
+>body
+>fakespace
+>artifact-begin
+>body
+>leadermark
+>artifact-end
+>muted
+============================================================
+============================================================
+TEST 13: leader-title-alone-emits-no-leader
+============================================================
+>entrytitle
+============================================================
+============================================================
+TEST 14: leader-location-without-organization-emits-no-leader
+============================================================
+>entrytitle
+>fakespace
+>artifact-begin
+>body
+>leadermark
+>artifact-end
+>muted
+>muted
+============================================================
+============================================================
+TEST 15: leader-organization-without-location-emits-no-leader
+============================================================
+>entrytitle
+>fakespace
+>artifact-begin
+>body
+>leadermark
+>artifact-end
+>muted
+>body
+============================================================
+============================================================
+TEST 16: leader-mark-spacing-defaults-to-a-quarter-of-the-body-size
+============================================================
+body size = 12.0pt, leader sep = 3.0pt
 ============================================================

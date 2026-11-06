@@ -97,8 +97,9 @@ very dark, maintain strong contrast, and test grayscale output.
 ### Dates and right alignment
 
 An entry's dates and location can sit in a right-hand column, set against the
-margin opposite the title, or inline on the entry's own line after it. The
-column is the default: it is the conventional form for a career document and
+margin opposite the title; inline on the entry's own line after it; or in the
+column with a dotted leader filling the space before them. The column is the
+default: it is the conventional form for a career document and
 the fastest for a human to scan.
 
 That choice is not free, because a right-hand column is a second column, and an
@@ -112,9 +113,11 @@ the tagging, and consumers differ on whether they show it.
 Two rules follow. A right-aligned column is only ever as safe as the vertical
 space beneath the heading that carries it, so that space is a deliberate design
 value and not whatever the vertical rhythm happens to leave. And the risk
-belongs to the page rather than to the entry, so no refinement of the entry
-itself removes it: the only way out is to have no column at all, which is what
-the inline form is for.
+belongs to the page rather than to the entry, so no invisible refinement of the
+entry removes it. There are two ways out: have no column at all, which is what
+the inline form is for, or fill the column's gap with visible ink, which is
+what the leader form is for. The leader's dots then appear in the extracted
+text too.
 
 ### Page geometry and furniture
 

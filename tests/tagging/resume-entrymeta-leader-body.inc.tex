@@ -1,0 +1,58 @@
+% resume-entrymeta-leader-body.inc.tex — shared body for the `entrymeta=leader'
+% tagging fixtures (#678).
+%
+% Deliberately one page, for the reason resume-entrymeta-inline-body.inc.tex
+% gives. The entries are the same four shapes: all four fields, so both
+% heading lines take a leader; no dates; a location with no organization, which
+% sits flush right with no leader; and an organization with no location. A
+% leader that reached the *structure tree* in any of them is visible in the
+% structure baseline, and a leader opening a line in the Poppler baseline.
+\documentclass[entrymeta=leader]{careerdossier-resume}
+\CDossierSetup{
+  name={Tagged Leader Resume},
+  headline={Accessibility Engineer},
+  email={leader@example.test},
+  phone={+1 555 0104},
+  website={example.test/leader}
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[
+  title={Engineer},
+  organization={Example Labs},
+  location={Toronto},
+  dates={2024--2026}
+]
+\begin{CDossierItemize}
+  \item First leader achievement in source order.
+  \item Second leader achievement with a meaningful
+        \href{https://example.test/work}{work link}.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Dateless Engineer},
+  organization={Example Services},
+  location={Ottawa}
+]
+\begin{CDossierItemize}
+  \item An entry with no dates joins only its second heading line.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Volunteer Reviewer},
+  location={Remote}
+]
+\begin{CDossierItemize}
+  \item A location with no organization opens its line with no leader.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\begin{CDossierEntry}[
+  title={Workshop Facilitator},
+  organization={Example Trust}
+]
+\begin{CDossierItemize}
+  \item An organization with no location ends its line with no leader.
+\end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

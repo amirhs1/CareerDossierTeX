@@ -321,7 +321,7 @@ Margins & \opt{margin=normal} (1\,in) or \opt{margin=narrow} (0.5\,in) \\
 Body font & Serif (default) and opt-in sans \\
 Output medium & \opt{medium=screen} (default) or \opt{medium=print} \\
 Entry-metadata de-emphasis & \opt{muted=plain} (default), \opt{italic}, \opt{gray}, \opt{both} \\
-Entry-metadata placement & \opt{entrymeta=column} (default) or \opt{inline}; resume and CV \\
+Entry-metadata placement & \opt{entrymeta=column} (default), \opt{inline}, or \opt{leader}; resume and CV \\
 Theme & Monochrome \\
 Tagged structure & Opt-in, off by default \\
 Resume class & \file{careerdossier-resume} \\
@@ -352,7 +352,7 @@ order to act on the error. An option is rejected rather than silently ignored.
 \opt{bodyfont} & \opt{serif}, \opt{sans} & all four & \opt{serif} \\
 \opt{medium} & \opt{print}, \opt{screen} & all four & \opt{screen} \\
 \opt{muted} & \opt{plain}, \opt{italic}, \opt{gray}, \opt{both} & all four & \opt{plain} \\
-\opt{entrymeta} & \opt{column}, \opt{inline} & resume, CV & \opt{column} \\
+\opt{entrymeta} & \opt{column}, \opt{inline}, \opt{leader} & resume, CV & \opt{column} \\
 \opt{family} & \opt{industry}, \opt{academic} & letter & \opt{industry} \\
 \opt{type} & seven values, \S\ref{sec:statement} & statement & \opt{interest} \\
 \bottomrule
@@ -584,14 +584,26 @@ Example Labs | Toronto, ON
   * First achievement in source order.
 \end{plaincode}
 
-Nothing else changes under either value: the cells keep their order, their
+Under \opt{leader} they are flush right, as under \opt{column}, and a dotted
+leader fills the space before them, made of \cmd{CDossierEntryMetaLeader}
+marks spaced by \cmd{CDossierEntryMetaLeaderSep}:
+
+\begin{plaincode}
+Senior Engineer . . . . . . . . . . . . . . . . . . . .  2024-Present
+Example Labs . . . . . . . . . . . . . . . . . . . . . .  Toronto, ON
+  * First achievement in source order.
+\end{plaincode}
+
+Nothing else changes under any value: the cells keep their order, their
 semantic roles, and the page-break penalty that holds the two heading lines
 together, and a missing \key{organization}, \key{location}, or \key{dates}
-leaves no stray separator under \opt{inline} just as it leaves no empty column
-under \opt{column}.
+leaves no stray separator under \opt{inline} and no stray leader under
+\opt{leader}, just as it leaves no empty column under \opt{column}. Under
+\opt{leader}, a location with no organization sits flush right with nothing
+before it, as under \opt{column}: a leader would open the line.
 
 \paragraph{Per section.} The resume and CV also take the key on
-\cmd{CDossierSection}, so one section can use the other layout:
+\cmd{CDossierSection}, so one section can use another layout:
 
 \begin{latexcode}
 \documentclass{careerdossier-cv}                 % column, the default
@@ -605,7 +617,7 @@ The value holds for every entry in that section and reverts to the class
 option's value at the next \cmd{CDossierSection}, whether or not that one
 carries the key; the subsections and entries inside the section inherit it.
 Every entry in a section shares one layout: there is no per-entry form, because
-mixing the two within one section is not a layout this toolkit offers. The
+mixing layouts within one section is not a layout this toolkit offers. The
 accepted values, and the error for any other value, are the class option's; a
 bare \opt{entrymeta} and any other key in the bracket are errors too.
 
@@ -614,7 +626,8 @@ Mixing layouts by section has one consequence for extraction. Poppler's
 (\file{docs/TESTING.md}), reads the last \opt{column} entry on each page with
 its dates and location after everything below it on that page. In an
 all-\opt{column} document that is only the entry's own bullets; when an
-\opt{inline} section follows on the same page, it is that whole section too.
+\opt{inline} or \opt{leader} section follows on the same page, it is that whole
+section too.
 MuPDF, Apple PDFKit, and \texttt{pdftotext -raw} read the same page in source
 order. Where extraction order matters, put the \opt{column} section last on
 its page, or use one layout throughout. No spacing value reaches this: it is
@@ -627,9 +640,11 @@ than a design preference (\S\ref{sec:itemize}). The bound exists because the
 flush-right column makes each heading row a two-column region for a geometric
 extractor, and only enough vertical separation below the heading keeps the dates
 from being read after the bullets. \opt{inline} has no column, so no such region
-arises and the bound does not apply to a document that selects it. This is the
-only supported way to set a list edge below \texttt{0.25} without breaking
-reading order:
+arises and the bound does not apply to a document that selects it. \opt{leader}
+keeps the column but fills its gap, so there is no empty stretch for an
+extractor to split the heading at, and the bound does not apply either. These
+are the two supported ways to set a list edge below \texttt{0.25} without
+breaking reading order:
 
 \begin{latexcode}
 \documentclass[entrymeta=inline]{careerdossier-resume}
@@ -639,19 +654,36 @@ reading order:
 \ExplSyntaxOff
 \end{latexcode}
 
-Under \opt{column} that override still breaks reading order, and nothing detects
-it for you.
+The same override works with \opt{entrymeta=leader}. Under \opt{column} it still
+breaks reading order, and nothing detects it for you.
 
 \opt{inline} is not the default because it is a visible design change --- it
 discards the column the resume's layout is built around --- and because making it
 the default would reflow every existing document to buy a constraint only some
-documents care about. Design, a clean text layer, and a sub-\texttt{0.25} list
-edge are mutually exclusive; any two are available.
+documents care about. Without a leader, the flush-right design, a clean text
+layer, and a sub-\texttt{0.25} list edge are mutually exclusive; any two are
+available.
 
-Both values are equivalent on the tagged path: the separator is emitted as a
-layout artifact, exactly as the contact line's \texttt{|} is, so a consumer
-reading the structure tree receives the same logical text under either value and
-assistive technology is not made to announce a vertical bar.
+\opt{leader} offers all three, at a cost that is part of the design: a row of
+dots across each heading line, and the same dots in the extracted text, where
+Poppler and Apple PDFKit read them as periods separated by spaces:
+
+\begin{plaincode}
+Senior Engineer . . . . . . . . . . . . . . . . . . 2024-Present
+\end{plaincode}
+
+They are copied and pasted with the heading, too. In exchange, every entry's
+dates and location extract on its own heading lines, including the last entry
+on a page, which no list-edge value achieves under \opt{column}. One shape is
+outside that: a location with no organization has no leader before it, so it
+extracts as it does under \opt{column}. \opt{leader} is not the default because
+the dots are a visible design change.
+
+All three values are equivalent on the tagged path: the separator and the
+leader are emitted as layout artifacts, exactly as the contact line's
+\texttt{|} is, so a consumer reading the structure tree receives the same
+logical text under every value and assistive technology is not made to announce
+a vertical bar or a row of periods.
 
 \paragraph{\cmd{CDossierEntryMetaSeparator}} is the mark \opt{entrymeta=inline}
 places between two cells, with its surrounding space. The default is
@@ -676,6 +708,32 @@ Keep the mark out of the muted role as well: the cell following it is set in
 \cmd{CDossierMutedStyle}, and an italic separator reads as a glyph belonging to
 the metadata rather than as a boundary between fields. The default wraps the
 mark in \cmd{CDossierBodyStyle}, which resets shape as well as family.
+
+\paragraph{\cmd{CDossierEntryMetaLeader}} is the mark \opt{entrymeta=leader}
+repeats across the gap between two cells, and \cmd{CDossierEntryMetaLeaderSep}
+is the space on each side of each mark. The mark defaults to a period; the length
+defaults to a quarter of the body size, \texttt{0.25em} of the body face, which
+is the dot spacing of a standard \LaTeX{} table of contents. The mark is
+redefined with \cmd{RenewDocumentCommand}, and the length is set in the
+preamble:
+
+\begin{latexcode}
+\setlength \CDossierEntryMetaLeaderSep { 0.3em }
+\end{latexcode}
+
+The fill is a layout artifact, its marks are set in \cmd{CDossierBodyStyle}
+whatever \opt{muted} does to the cell beside them, and the marks are aligned
+down the page, as in a table of contents. The length has a working range,
+measured with the default mark on the resume at its default size, and it is
+not checked for you. From
+\texttt{0.1em} to \texttt{0.4em} Poppler reads each heading line whole. From
+about \texttt{0.45em} up, the space left after the title becomes a gap Poppler
+splits at, and the last entry's dates move after its bullets again. At
+\texttt{0.05em} and below, the marks begin to run into the words on either
+side in the extracted text. A replacement mark changes the measurement, and can undo the point of
+the value: a math centred dot, \verb|$\cdot$|, at \texttt{0.3em} lets the last
+entry's dates move after its bullets again. Check a replacement's extracted
+text with the test suite's extractors before relying on it.
 
 \subsubsection{\texttt{family} (letter)}
 
@@ -1419,7 +1477,8 @@ the entry's vertical band stays distinct from the list beneath it. Below
 \texttt{0.25} the two merge and the dates extract after the bullets --- on the
 resume and the CV alike, at every supported body size, and on tagged and
 untagged output equally. Overriding this token below \texttt{0.25} therefore
-breaks reading order; \opt{entrymeta=inline} is the supported way to go lower.
+breaks reading order; \opt{entrymeta=inline} and \opt{entrymeta=leader} are the
+supported ways to go lower.
 
 When the list crosses a page boundary it is never split so that a single item
 stands alone on either side; a list longer than a page still breaks normally.

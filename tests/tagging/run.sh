@@ -140,6 +140,7 @@ groups=(
   "${profiles[@]}"
   resume-contact-labels
   resume-entrymeta-inline
+  resume-entrymeta-leader
   resume-section-entrymeta
   resume-linkdecoration
   resume-default-medium
@@ -970,7 +971,7 @@ check_structure_text_inline_joins() {
     barred="${rest#*::}"
     if grep -Fq "$barred" "$joined"; then
       record_failure \
-        "$base joined structure text contains '$barred': the inline separator is reaching the structure tree as content instead of as a layout artifact"
+        "$base joined structure text contains '$barred': the join's mark (the inline separator or the leader) is reaching the structure tree as content instead of as a layout artifact"
     elif grep -Fq "$glued" "$joined"; then
       record_failure \
         "$base joined structure text contains '$glued': the two cells are glued together with no separator"
@@ -1313,6 +1314,35 @@ fi
 return "$fail"
 }
 
+# Entry metadata joined by a dotted leader (#678). Outside the five-document
+# loop for the same reason as the fixture above. The leader is a layout
+# artifact, so the structure text must be exactly the `column' and `inline'
+# forms' text: the `barred' form of each triple is the leader reaching the
+# structure tree, which would make assistive technology announce a row of
+# periods. The fill carries no /ActualText either: the word boundary comes
+# from \pdffakespace, as under `column', and nothing replaces the marks' text.
+tagging_resume_entrymeta_leader() {
+local fail=0
+echo "== resume-entrymeta-leader =="
+if compile_fixture resume-entrymeta-leader.tex resume-entrymeta-leader; then
+  check_structure_text resume-entrymeta-leader
+  check_structure_text_inline_joins resume-entrymeta-leader \
+    'Engineer 2024–2026::Engineer2024–2026::Engineer .' \
+    'Example Labs Toronto::Example LabsToronto::Example Labs .' \
+    'Example Services Ottawa::Example ServicesOttawa::Example Services .'
+  if grep -qa ActualText "$work/resume-entrymeta-leader.pdf"; then
+    record_failure "resume-entrymeta-leader contains /ActualText; the leader must reach consumers as an artifact, not as replacement text"
+  fi
+  check_extraction resume-entrymeta-leader
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture resume-entrymeta-leader-ua2.tex resume-entrymeta-leader-ua2 \
+      && validate_ua2 resume-entrymeta-leader
+  fi
+fi
+return "$fail"
+}
+
 # Entry metadata set per section (#569). Outside the five-document loop for
 # the same reason as the fixture above: one page, no continuation furniture.
 # The body's Education section is `inline' and its Experience section is
@@ -1496,6 +1526,7 @@ unit_for_group() {
                                 printf 'tagging_profile %s' "$1" ;;
     resume-contact-labels)      printf 'tagging_resume_contact_labels' ;;
     resume-entrymeta-inline)    printf 'tagging_resume_entrymeta_inline' ;;
+    resume-entrymeta-leader)    printf 'tagging_resume_entrymeta_leader' ;;
     resume-section-entrymeta)   printf 'tagging_resume_section_entrymeta' ;;
     resume-linkdecoration)      printf 'tagging_resume_linkdecoration' ;;
     resume-default-medium)      printf 'tagging_resume_default_medium' ;;
