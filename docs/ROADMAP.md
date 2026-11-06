@@ -66,6 +66,14 @@ These entries keep the numbers they were written with.
 > `make review-spacing`'s output folder in `docs/TESTING.md`. It was found while
 > closing out #420, and the maintainer kept it in `v0.11.0`, the one
 > documentation-only issue in that release.
+>
+> **Revised and added on 2026-11-06.** At the maintainer's decision,
+> [#569](https://github.com/amirhs1/CareerDossierTeX/issues/569) became a
+> per-section `entrymeta` key on `CDossierSection` instead of a per-entry key
+> on `CDossierEntry`. [#678](https://github.com/amirhs1/CareerDossierTeX/issues/678)
+> joined `v0.11.0` with a third `entrymeta` value, `leader`, and its follow-up
+> [#682](https://github.com/amirhs1/CareerDossierTeX/issues/682) settled where
+> a lone location's leader starts.
 
 ## Releases and phases
 
@@ -437,7 +445,10 @@ release of their own, so they are used before `v1.0.0` freezes them.
 - the `medium` default decided (#327);
 - record and prose section headings rendered alike (#420);
 - a public key for declaring the document language (#288);
-- a per-entry `entrymeta` key on `CDossierEntry` (#569);
+- a per-section `entrymeta` key on `CDossierSection` (#569);
+- a third `entrymeta` value, `leader`, that fills the gap before an entry's
+  dates and location with a dotted leader (#678), including where a lone
+  location's leader starts (#682);
 - `\CDossierApplyPageBreakPenalties` documented with a signature or made
   private, `\CDossierListLabelSep`'s split read time fixed or documented, and
   the other public-prefixed names that survive the `v0.10.0` classification
