@@ -226,7 +226,32 @@ which Poppler's reading order imposes rather than this design (#219, #230).
 The tagged path reaches the same closing edge by a different route (#193):
 LaTeX Lab's block templates leave `\@topsepadd` at 0 pt, so
 `careerdossier-components.sty` declares one `cdossier-closing-edge` key that
-sets LaTeX Lab's own two closing keys instead.
+sets LaTeX Lab's own two closing keys instead. "Testphase interfaces stay
+behind one wrapper", below, states the rule that keeps those keys there.
+
+#### Testphase interfaces stay behind one wrapper
+
+An unstable LaTeX Lab *testphase* interface is reached only through a
+CDossier-owned wrapper in `careerdossier-components.sty` (#478). The closing
+edge above is the worked case. LaTeX Lab's block-template keys `end-vspace` and
+`end-extra-vspace` appear there and nowhere else, behind the one
+`cdossier-closing-edge` key the classes use. If a later LaTeX Lab renames or
+withdraws them, that key becomes a no-op that still consumes its value: a tagged
+build warns once and keeps LaTeX Lab's own closing spacing instead of stopping
+at an unknown-key error. One file changes when the interface does, not every
+class.
+
+The rule names a tier, not every tagging call. The tagpdf expl3 API
+(`\tag_if_active:TF`, `\tag_struct_begin:n`, `\tag_mc_begin:n`, and the rest of
+`\tag_…`) is documented and stable, so it is called directly and not wrapped.
+Today `careerdossier-typography.sty`, `careerdossier-cv.cls`, and
+`careerdossier-resume.cls` call it. Putting an indirection in front of a stable
+interface would cost a layer and buy nothing.
+
+`tests/lint/run-testphase-keys.sh` enforces the first half: no Work file but
+`careerdossier-components.sty` names a LaTeX Lab block-template vertical-space
+key, in code or in a comment. `docs/TESTING.md`, "Testphase key lint", lists
+the keys and the controls.
 
 #### Boundary ownership
 

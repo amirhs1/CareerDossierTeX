@@ -217,3 +217,15 @@ Each "full" list but the last keeps a docs path beside the one that disqualifies
 it, so the classifier has to single out that path rather than reject the list
 whole. The working-tree cases build their repository at run time and have no
 fixture file.
+
+## Testphase-key fixtures
+
+These pin the verdicts of `tests/lint/run-testphase-keys.sh` (issue #478), which
+reports a LaTeX Lab testphase key named outside `careerdossier-components.sty`.
+Like the files above they are lint input and are never compiled.
+
+| Fixture | Verdict |
+| --- | --- |
+| `testphasefixture-code.cls` | a key set in code → reported |
+| `testphasefixture-comment.cls` | a key named only in a comment → reported, because comments count |
+| `testphasefixture-clean.cls` | only the stable tagpdf API → not reported |
