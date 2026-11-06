@@ -316,9 +316,9 @@
 %% class \CDossierLetterHeaderBelowSkip (issue #223). The retired
 %% \CDossierLetterheadBelowSkip claimed the same boundary immediately
 %% afterwards with a smaller value, and `\addvspace' takes the maximum, so it
-%% never reached the page. The two ratios it lost by are in docs/MIGRATION.md
-%% ("Three vertical-spacing tokens retired, two added"), where the release that
-%% retired it records them.
+%% never reached the page. The measurement, both ratios included, is in #204's
+%% table of unreachable tokens; docs/MIGRATION.md ("Three vertical-spacing
+%% tokens retired, two added") records only the retirement.
 %%
 %% Issue #299: the subject line uses \CDossierSubjectStyle, the role that
 %% describes it. It previously borrowed \CDossierEntryTitleStyle, which names a
