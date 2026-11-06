@@ -183,7 +183,7 @@ retaining a small, inspectable spacing vocabulary.
 | `\CDossierLetterHeaderBelowSkip` | 0.9375 | 11.25 pt | 12.75 pt | 13.59375 pt |
 | `\CDossierRecordSectionAboveSkip` | 0.875 | 10.5 pt | 11.9 pt | 12.6875 pt |
 | `\CDossierRecordSectionRuleGapSkip` | 0.3125 | 3.75 pt | 4.25 pt | 4.53125 pt |
-| `\CDossierRecordSectionBelowSkip` | 0.4375 | 5.25 pt | 5.95 pt | 6.34375 pt |
+| `\CDossierRecordSectionBelowSkip` | 0.6875 | 8.25 pt | 9.35 pt | 9.96875 pt |
 | `\CDossierRecordSubsectionAboveSkip` | 0.75 | 9.0 pt | 10.2 pt | 10.875 pt |
 | `\CDossierRecordSubsectionBelowSkip` | 0.375 | 4.5 pt | 5.1 pt | 5.4375 pt |
 | `\CDossierProseSectionAboveSkip` | 0.875 | 10.5 pt | 11.9 pt | 12.6875 pt |
@@ -209,11 +209,16 @@ declaration because each relates one token to another:
 
 - The heading-to-rule gap must stay unambiguously smaller than the
   rule-to-content gap — `\CDossierRecordSectionRuleGapSkip` against
-  `\CDossierRecordSectionBelowSkip`, currently about 1:4. At 1:2 the rule starts
+  `\CDossierRecordSectionBelowSkip`, currently 1:2.2. At 1:2 the rule starts
   to read as a divider floating between two blocks rather than as part of the
   heading above it. A retune may move both numbers, but not their order.
 - Both list-edge ratios stay below `\CDossierRecordSectionBelowSkip` (#191,
   #206), or entering a list would look like entering a section.
+
+`tests/regression/tokens-invariants.lvt` asserts both relations at 10, 11, and
+12 pt. From `v0.7.0` until #420, `\CDossierRecordListEdgeBelowSkip` (0.50)
+exceeded `\CDossierRecordSectionBelowSkip` (0.4375), and nothing asserted the
+second relation.
 
 Every other constraint on these values is commented at the declaration it
 governs in `careerdossier-tokens.sty`, which is also where the measurement
@@ -228,6 +233,51 @@ LaTeX Lab's block templates leave `\@topsepadd` at 0 pt, so
 `careerdossier-components.sty` declares one `cdossier-closing-edge` key that
 sets LaTeX Lab's own two closing keys instead. "Testphase interfaces stay
 behind one wrapper", below, states the rule that keeps those keys there.
+
+##### Record and prose section headings render alike
+
+The rule under a record section heading is part of the heading (#420; the
+maintainer decided on 2026-08-15 that the two kinds of section heading render
+alike, and on 2026-11-06 which reading of "alike" applies). A record heading
+therefore ends at its rule, and the gap compared with a prose section is the
+white from the rule to the body against the white from a prose heading to the
+text below it. The white above is the same for both, because both are
+body-to-heading with the same token and heading size.
+
+The two below-gaps are built differently, so they are compared as a band
+rather than as two numbers. A rule takes no interline glue, so the record white
+is `\CDossierRecordSectionBelowSkip` alone, whatever the heading's glyphs. The
+prose white includes interline glue, `baselineskip - depth(heading) -
+height(next)`, so a heading with descenders gets less of it. Measured with
+`make review-spacing` on the same two heading texts in both fixtures, in
+points, ink to ink:
+
+| | 10 pt | 11 pt | 12 pt |
+|---|---:|---:|---:|
+| White above, both kinds | 13.12 | 14.56 | 15.39 |
+| Prose below, heading with a descender (`Experience`) | 7.27 | 8.57 | 8.91 |
+| Prose below, heading without (`Research Vision`) | 9.57 | 11.08 | 11.62 |
+| Record rule to body | 8.25 | 9.35 | 9.97 |
+| Record minus the band's midpoint | -0.17 | -0.47 | -0.30 |
+
+The tolerance is that the record white lies inside the prose band and within
+one grid step (1/16 of the body baseline: 0.75 / 0.85 / 0.91 pt) of its
+midpoint, at every size. The report prints this comparison as
+`build/spacing/section-alike.tsv`. Two grid values meet it: 0.6875 and 0.75.
+0.6875 is closer at 10 and 12 pt, 0.75 at 11 pt (0.38 against 0.47 pt), and
+0.6875 has the smaller total error and spends less space. 0.625 misses by more
+than a step at 11 and 12 pt.
+
+Two other readings were measured and set aside. Matching the heading-to-rule
+clearance would need a rule gap of 0.8125, which puts the rule closer to the
+body than to its heading and breaks the first relation above. Treating the rule
+as an object inside the gap compares the span from heading to body across the
+rule. That span was already within 0.27–0.55 pt of prose, but it reads as
+alike only if the rule belongs to neither block, and the rule sits 1.4–4.4 pt
+under its heading.
+
+The record section pair is consequently not held to the `above >= 2 x below`
+floor that the other heading pairs meet; `tokens-invariants.lvt` explains why.
 
 #### Testphase interfaces stay behind one wrapper
 

@@ -11,6 +11,7 @@
 
 \newbox\ProbeHeaderBox
 \newbox\ProbeSectionBox
+\newbox\ProbeSectionDescenderBox
 \newbox\ProbeStarBox
 \newbox\ProbeSubsectionBox
 \newbox\ProbeParaBox
@@ -32,6 +33,16 @@
 \setbox\ProbeSectionBox=\vbox{%
   \noindent Preceding prose line.\par
   \CDossierSection{Research Vision}
+  \noindent Following prose line.\par
+}
+
+% -- the same, under a heading with a descender ----------------------------
+% The heading text the record fixture measures, so the two kinds of heading are
+% compared on the same glyphs (#420; see record.tex). Here the white below
+% includes interline glue, so a descender reduces it.
+\setbox\ProbeSectionDescenderBox=\vbox{%
+  \noindent Preceding prose line.\par
+  \CDossierSection{Experience}
   \noindent Following prose line.\par
 }
 
@@ -74,6 +85,8 @@
     "header name -> header meta", "header stack -> prose"})
   cdossier_probe.report(\number\ProbeSectionBox, "section", {
     "prose -> section heading", "section heading -> prose"})
+  cdossier_probe.report(\number\ProbeSectionDescenderBox, "section-descender", {
+    "prose -> section heading", "section heading -> prose"})
   cdossier_probe.report(\number\ProbeStarBox, "section-star", {
     "prose -> section* heading", "section* heading -> prose"})
   cdossier_probe.report(\number\ProbeSubsectionBox, "subsection", {
@@ -83,6 +96,7 @@
 
 \box\ProbeHeaderBox
 \box\ProbeSectionBox
+\box\ProbeSectionDescenderBox
 \box\ProbeStarBox
 \box\ProbeSubsectionBox
 \box\ProbeParaBox

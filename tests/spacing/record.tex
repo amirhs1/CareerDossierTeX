@@ -18,6 +18,7 @@
 
 \newbox\ProbeHeaderBox
 \newbox\ProbeSectionBox
+\newbox\ProbeSectionNoDescenderBox
 \newbox\ProbeEntryRunBox
 \newbox\ProbeEntryListBox
 \newbox\ProbeSubsectionBox
@@ -43,6 +44,18 @@
 \setbox\ProbeSectionBox=\vbox{%
   \noindent Preceding body copy line.\par
   \CDossierSection{Experience}
+  \noindent Following body copy line.\par
+}
+
+% -- the same, under a heading with no descenders --------------------------
+% The white below a prose heading includes interline glue, which shrinks under a
+% heading with descenders, so record and prose are compared on the same two
+% heading texts: `Experience' (a descender) here and above, `Research Vision'
+% (none) here and in prose.tex (#420). The rule-to-body gap does not depend on
+% the heading's glyphs; the heading-to-rule clearance does.
+\setbox\ProbeSectionNoDescenderBox=\vbox{%
+  \noindent Preceding body copy line.\par
+  \CDossierSection{Research Vision}
   \noindent Following body copy line.\par
 }
 
@@ -119,6 +132,8 @@
     "header name -> header meta", "header stack -> body"})
   cdossier_probe.report(\number\ProbeSectionBox, "section", {
     "body -> section heading", "section heading -> rule", "rule -> body"})
+  cdossier_probe.report(\number\ProbeSectionNoDescenderBox, "section-no-descender", {
+    "body -> section heading", "section heading -> rule", "rule -> body"})
   % An entry head sets two line boxes -- the title/dates row and the
   % organization/location row -- so each entry contributes an interior boundary
   % that no token owns. Measured, not assumed: it is why these label lists are
@@ -144,6 +159,7 @@
 
 \box\ProbeHeaderBox
 \box\ProbeSectionBox
+\box\ProbeSectionNoDescenderBox
 \box\ProbeEntryRunBox
 \box\ProbeEntryListBox
 \box\ProbeSubsectionBox

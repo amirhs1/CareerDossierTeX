@@ -325,6 +325,28 @@ package.
 Reason: documents are sent as PDFs now, so reading on screen is the common case
 and is what an author gets without asking.
 
+### More white below a resume or CV section rule
+
+**This changes rendered output in every resume and CV.** The gap from a section
+heading's rule to the first content below it, `\CDossierRecordSectionBelowSkip`,
+moves from 0.4375 to 0.6875 of the body baseline: 5.25 → 8.25 pt at `10pt`,
+5.95 → 9.35 pt at `11pt`, and 6.34 → 9.97 pt at `12pt`
+([#420](https://github.com/amirhs1/CareerDossierTeX/issues/420)). A section
+that opens directly with a subsection takes the same new gap. No source edit is
+required. Each section heading takes 3.0–3.6 pt more, so a document that already
+fills its last page may gain one: of the 24 size and margin reference
+documents, the `10pt` CV with normal margins goes from one page to two. The
+letter and statement classes do not change.
+
+To restore the previous gap, set the token after `\documentclass`:
+
+    \documentclass{careerdossier-resume}
+    \setlength{\CDossierRecordSectionBelowSkip}{0.4375\CDossierBodyLeading}
+
+Reason: a resume or CV section heading left noticeably less white below its
+rule than a statement section heading leaves below itself. The maintainer
+decided on 2026-08-15 that the two should render alike.
+
 ## [0.10.0] - 2026-11-06
 
 ### The resume `/Title` and running page label are spelled `Resume`
