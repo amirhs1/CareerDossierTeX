@@ -8,7 +8,8 @@
 % extraction, and tagging suites.
 %
 % `screen' is the value under test, so it is the one the package is loaded with;
-% `print' is the default and is reached below by setting the key directly.
+% `print' is reached below by setting the key directly. The default, `screen'
+% since #327, is asserted through a class in links-decoration-default.lvt.
 \input{regression-test}
 \documentclass{article}
 \usepackage[medium=screen]{careerdossier-components}

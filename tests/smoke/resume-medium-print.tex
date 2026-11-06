@@ -1,0 +1,20 @@
+% resume-medium-print.tex — smoke fixture: the resume must accept medium=print
+% and build cleanly (#327). `screen' is the default, so `print' is reached
+% only by asking for it, as this fixture does; that it restores the folio and
+% running header is asserted on rendered pages by
+% tests/layout/resume-two-page.
+\documentclass[fontsize=10pt, margin=normal, medium=print]{careerdossier-resume}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  headline = {Data Scientist},
+  email    = {ada@example.com},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Experience}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Example Corp}]
+  \begin{CDossierItemize}
+    \item Built a reproducible analytical workflow.
+  \end{CDossierItemize}
+\end{CDossierEntry}
+\end{document}

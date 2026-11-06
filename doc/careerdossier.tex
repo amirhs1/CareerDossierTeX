@@ -319,7 +319,7 @@ Paper & US Letter (default) and opt-in A4 \\
 Body size & \opt{fontsize=10pt|11pt|12pt}, per-class default \\
 Margins & \opt{margin=normal} (1\,in) or \opt{margin=narrow} (0.5\,in) \\
 Body font & Serif (default) and opt-in sans \\
-Output medium & \opt{medium=print} (default) or \opt{medium=screen} \\
+Output medium & \opt{medium=screen} (default) or \opt{medium=print} \\
 Entry-metadata de-emphasis & \opt{muted=plain} (default), \opt{italic}, \opt{gray}, \opt{both} \\
 Entry-metadata placement & \opt{entrymeta=column} (default) or \opt{inline}; resume and CV \\
 Theme & Monochrome \\
@@ -350,7 +350,7 @@ order to act on the error. An option is rejected rather than silently ignored.
 \opt{margin} & \opt{normal}, \opt{narrow} & all four & \opt{narrow} resume; \opt{normal} others \\
 \opt{paper} & \opt{letter}, \opt{a4} & all four & \opt{letter} \\
 \opt{bodyfont} & \opt{serif}, \opt{sans} & all four & \opt{serif} \\
-\opt{medium} & \opt{print}, \opt{screen} & all four & \opt{print} \\
+\opt{medium} & \opt{print}, \opt{screen} & all four & \opt{screen} \\
 \opt{muted} & \opt{plain}, \opt{italic}, \opt{gray}, \opt{both} & all four & \opt{plain} \\
 \opt{entrymeta} & \opt{column}, \opt{inline} & resume, CV & \opt{column} \\
 \opt{family} & \opt{industry}, \opt{academic} & letter & \opt{industry} \\
@@ -448,9 +448,9 @@ viewer already shows page position, so a folio is redundant chrome; on paper a
 loose page has no such affordance, and the folio is what keeps a multi-page
 dossier in order after it is put down.
 
-\opt{print}, the default, emits the page furniture described in
-\S\ref{sec:furniture}. \opt{screen} emits no running header and no folio on any
-page.
+\opt{screen}, the default, emits no running header and no folio on any page.
+\opt{print} emits the page furniture described in \S\ref{sec:furniture}; pass
+it for a document that will be printed.
 
 \opt{medium} also decides whether a link carries a visible decoration:
 
@@ -629,7 +629,7 @@ report an unsupported value the same way a class does:
 \endhead
 \file{careerdossier-tokens} & \opt{fontsize}, \opt{margin} & \opt{12pt}, \opt{normal} \\
 \file{careerdossier-typography} & \opt{bodyfont} & \opt{serif} \\
-\file{careerdossier-components} & \opt{medium}, \opt{muted}, \opt{entrymeta} & \opt{print}, \opt{plain}, \opt{column} \\
+\file{careerdossier-components} & \opt{medium}, \opt{muted}, \opt{entrymeta} & \opt{screen}, \opt{plain}, \opt{column} \\
 \bottomrule
 \end{longtable}
 
@@ -1832,7 +1832,7 @@ character you want, and both paths agree on every field at once.
 \section{Page furniture}
 \label{sec:furniture}
 
-All four classes use the same page-furniture policy. Under the default
+All four classes use the same page-furniture policy. Under
 \opt{medium=print}:
 
 \begin{itemize}
@@ -1847,7 +1847,8 @@ All four classes use the same page-furniture policy. Under the default
         configurable short running title.
 \end{itemize}
 
-Under \opt{medium=screen} neither is emitted, on any page and at any page count.
+Under \opt{medium=screen}, the default, neither is emitted, on any page and at
+any page count.
 
 Furniture uses the sans-serif furniture step of the calibrated type scale and
 the monochrome text token. It stays print-safe and is marked as a layout

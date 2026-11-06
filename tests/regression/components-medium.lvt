@@ -5,8 +5,9 @@
 % value and forward it here, so the resolved state and the page styles
 % \__cdossier_components_apply_page_furniture: then selects are asserted once,
 % at the component.
-% `print' is the default and is asserted in components-furniture.lvt; a package
-% takes one set of options per document, so the two values need two files.
+% `screen' is also the default (#327), and the default is asserted in
+% components-furniture.lvt; a package takes one set of options per document, so
+% the explicit value and the default need two files.
 %
 % Rendered output under `screen' is covered by the layout suite, and the
 % per-class option surface by the smoke suite.

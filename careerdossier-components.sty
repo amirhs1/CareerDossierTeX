@@ -82,8 +82,11 @@
 %% ---------------------------------------------------------------------------
 \RequirePackage { l3keys2e }
 
+%% `screen' is the default (#327), here as in the classes' shared declaration
+%% in careerdossier-base, so the package loaded on its own agrees with every
+%% class: no furniture unless `medium=print' asks for it.
 \bool_new:N \l__cdossier_components_furniture_bool
-\bool_set_true:N \l__cdossier_components_furniture_bool
+\bool_set_false:N \l__cdossier_components_furniture_bool
 
 %% `medium' now drives two independent decisions, so each has its own state
 %% rather than one bool read in two senses: the page furniture below, and the
@@ -732,16 +735,16 @@
 %% ---------------------------------------------------------------------------
 %% Page furniture.
 %%
-%% All document classes share one page-style pair. Under the default
-%% `medium=print' a multi-page document gets a centered "Page N of M" folio
-%% throughout and a centered identity label from page two. A one-page document
-%% gets no furniture. The total comes from the LaTeX kernel's last absolute
+%% All document classes share one page-style pair. Under `medium=print' a
+%% multi-page document gets a centered "Page N of M" folio throughout and a
+%% centered identity label from page two. A one-page document gets no
+%% furniture. The total comes from the LaTeX kernel's last absolute
 %% page, recorded in the auxiliary file, so the single-page decision settles on
 %% the second pass. On the first clean pass the kernel supplies \maxdimen as the
 %% unknown total and the folio is provisionally shown.
 %%
-%% Under `medium=screen' no furniture is emitted on any page and the page-style
-%% pair is never selected.
+%% Under `medium=screen', the default, no furniture is emitted on any page and
+%% the page-style pair is never selected.
 %%
 %% Page-style material is artifact-marked by the kernel's tagged-PDF shipout
 %% path. Do not wrap it in document structure here.

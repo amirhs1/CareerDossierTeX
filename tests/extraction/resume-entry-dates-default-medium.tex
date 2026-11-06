@@ -1,0 +1,25 @@
+% resume-entry-dates-default-medium.tex — extraction fixture for the default
+% medium (#327).
+%
+% Purpose
+%   The body of resume-entry-dates-page-furniture.tex, through a class that is
+%   given no `medium' option. The default is `screen', so neither page carries
+%   the `Page N of M' folio, and page 2 carries no running header.
+%
+%   Assertion, PDFKit: the baseline is the print fixture's with the three
+%   furniture lines (`Page 1 of 2', `Ada Lovelace – Resume', `Page 2 of 2')
+%   removed. It was derived that way, not written by --update, so `diff'
+%   between the two fixtures' PDFKit baselines shows the furniture and nothing
+%   else.
+%
+%   Assertion, Poppler: the same holds for the text, but not for its order. With
+%   the folio gone, each page's one entry is the last block Poppler sorts on
+%   that page, and the last entry on a page always trails its own dates and
+%   location column (resume-entry-dates-order.tex, #219;
+%   docs/ATS-EXTRACTION.md, "Dates and right alignment"). Under `print' the
+%   folio is that last block, which is what keeps page 1's column between the
+%   heading and the bullets. So this baseline records both columns after their
+%   bullets: expected output under that rule, written by --update and inspected
+%   against it (#327), not a defect.
+\documentclass{careerdossier-resume}
+\input{resume-entry-dates-page-furniture.inc}

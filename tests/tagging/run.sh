@@ -141,6 +141,7 @@ groups=(
   resume-contact-labels
   resume-entrymeta-inline
   resume-linkdecoration
+  resume-default-medium
   letter-recipient-address
   cv-subsection
   cv-publication-numbering
@@ -675,16 +676,41 @@ check_two_page_furniture() {
     "$base page one unexpectedly carries its running header"
 }
 
-check_page_two_artifact_stream() {
+# The `screen' counterpart of the checks above (#327): a two-page document
+# with no folio on either page and no running header on page two. Asserting an
+# absence, so the page count is required first and every text guard treats a
+# page it could not read as a failure, not as a clean page.
+check_two_page_no_furniture() { # <base> <running-header line>
+  local base="$1" header="$2"
+  local pdf="$work/$base.pdf"
+  local pages page_one page_two
+
+  pages="$(pdfinfo "$pdf" | awk '/^Pages:/ { print $2 }')"
+  if [ "$pages" -ne 2 ]; then
+    record_failure \
+      "$base must have exactly two pages for its no-furniture coverage (got $pages)"
+    return
+  fi
+
+  page_one="$(text_page "$pdf" 1)"
+  page_two="$(text_page "$pdf" 2)"
+  forbid_match "$page_one" 'Page [0-9]+ of [0-9]+' "$base page one carries a folio"
+  forbid_match "$page_two" 'Page [0-9]+ of [0-9]+' "$base page two carries a folio"
+  forbid_text "$page_two" "$header" "$base page two carries a running header"
+}
+
+check_page_two_artifact_stream() { # <base> [<expected text artifacts>]
   local base="$1"
+  local expected="${2:-2}"
   local text_artifacts
 
   [ "$have_mutool" -eq 1 ] || return
 
   # A tagged page contains empty artifact wrappers even when its page style has
   # no visible furniture. Count only Artifact BMC blocks that contain a text
-  # object before their closing EMC. Every page-two fixture must have exactly
-  # two such blocks: one running header and one folio.
+  # object before their closing EMC. Under `medium=print' a page two must have
+  # exactly two such blocks, one running header and one folio, which is the
+  # default count; under `screen' it must have none (#327).
   text_artifacts="$(
     mutool show "$work/$base.pdf" pages/2/Contents \
       | awk '
@@ -695,9 +721,15 @@ check_page_two_artifact_stream() {
         '
   )"
 
-  [ "$text_artifacts" -eq 2 ] \
-    || record_failure \
-      "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
+  if [ "$expected" -eq 2 ]; then
+    [ "$text_artifacts" -eq 2 ] \
+      || record_failure \
+        "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
+  else
+    [ "$text_artifacts" -eq "$expected" ] \
+      || record_failure \
+        "$base page two must have $expected text artifact(s) (found $text_artifacts)"
+  fi
 }
 
 # Tagged + labelled contact line (#125).
@@ -1300,6 +1332,26 @@ fi
 return "$fail"
 }
 
+# The default medium (#327). Outside the five-document loop because it asserts
+# the opposite of that loop's continuation furniture: resume's body with no
+# `medium' option renders as `screen', two pages with no folio and no running
+# header, and no text artifact on page two. Its structure text is resume's,
+# and its MuPDF and PDFKit text is resume's minus the furniture lines; its
+# Poppler text also reorders each page's last entry, for the reason the
+# fixture gives.
+tagging_resume_default_medium() {
+local fail=0
+echo "== resume-default-medium =="
+if compile_fixture resume-default-medium.tex resume-default-medium; then
+  check_two_page_no_furniture resume-default-medium \
+    'Tagged Industry Resume – Resume'
+  check_page_two_artifact_stream resume-default-medium 0
+  check_extraction resume-default-medium
+  check_structure_text resume-default-medium
+fi
+return "$fail"
+}
+
 # The full recipient block (#302). Outside the loop because it is a
 # one-page fixture with no continuation furniture, and because the only thing it
 # is here to pin is the recipient block -- including the `\\' the user writes
@@ -1416,6 +1468,7 @@ unit_for_group() {
     resume-contact-labels)      printf 'tagging_resume_contact_labels' ;;
     resume-entrymeta-inline)    printf 'tagging_resume_entrymeta_inline' ;;
     resume-linkdecoration)      printf 'tagging_resume_linkdecoration' ;;
+    resume-default-medium)      printf 'tagging_resume_default_medium' ;;
     letter-recipient-address)   printf 'tagging_letter_recipient_address' ;;
     cv-subsection)              printf 'tagging_cv_subsection' ;;
     cv-publication-numbering)   printf 'tagging_cv_publication_numbering' ;;
