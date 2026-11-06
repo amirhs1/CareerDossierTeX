@@ -45,6 +45,27 @@
 #   pages     total pages -- a document that grows a page has been made worse
 #             in a way no other column shows
 #
+# A row that cannot be trusted is refused, never measured (#627). It reads
+# `BUILD-FAILED` in place of the six numbers, and the reason goes to stderr,
+# when any of these holds:
+#
+#   - the build exited non-zero. lualatex in nonstopmode still writes a PDF
+#     after a TeX error, and latexmk leaves the first pass's PDF behind when
+#     Biber fails, so "a PDF exists" is not "the build worked";
+#   - the .pdf or the .log is missing;
+#   - the document uses BibLaTeX (it wrote a .bcf) and its bibliography did not
+#     build: the .bbl is missing or empty, the .blg is missing, or the .blg
+#     records a Biber `ERROR`. Measured otherwise, cv-bibliography comes back
+#     as one page with no hyphens, which reads as a clean result.
+#
+# Each document's artifacts are removed before its build, so a build that writes
+# nothing is refused rather than measured from the previous value's output. The
+# summary line counts a value's refused rows, and sweep-record.txt names them.
+# Each run also gives biber a PAR_TMPDIR of its own, under its work folder:
+# biber rewrites its unpacked binary in that cache on every invocation, so two
+# concurrent sweeps sharing one corrupt each other's Biber runs
+# (tests/check-parallel.sh, "Biber cache isolation", #392).
+#
 # usage:
 #   sweep-linebreak.sh [--param NAME] [--values "V1 V2 ..."] [--corpus WHICH]
 #
@@ -87,6 +108,11 @@ output="$root/build/linebreak-sweep"
 work="$(mktemp -d "${TMPDIR:-/tmp}/careerdossier-linebreak-sweep.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 
+# One biber cache per run, so concurrent sweeps never share one; see the header.
+# It lives under $work, so the trap above removes it with everything else.
+export PAR_TMPDIR="$work/par"
+mkdir -p "$PAR_TMPDIR"
+
 # The rewritten sources live in $work, so both the repository root (for the
 # packages and classes) and tests/layout (for the .inc files the fixture
 # families share) have to be reachable by search path rather than by working
@@ -108,7 +134,7 @@ while [ "$#" -gt 0 ]; do
     # feature an ordinary invocation needs. A caller using it is responsible
     # for merging the results back together.
     --output)  output="${2:?--output needs a directory}"; shift 2 ;;
-    -h|--help) sed -n '2,81p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) awk 'NR > 1 && /^#/ {sub(/^# ?/, ""); print; next} NR > 1 {exit}' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -184,12 +210,13 @@ discover_fixtures() {
 }
 
 sweep_fixtures() { # value -> writes rows to stdout
-  local v="$1" setting base job margin size
+  local v="$1" setting base job margin size rc
   setting="$(setting_for "$v")"
   for margin in normal narrow; do
     for size in 10 11 12; do
       while IFS= read -r base; do
         job="${base}--${size}pt-${margin}"
+        clear_job "$job"
         SIZE="$size" MARGIN="$margin" SETTING="$setting" awk '
           /^\\documentclass/ && !done {
             line = $0; opts = ""
@@ -224,11 +251,12 @@ sweep_fixtures() { # value -> writes rows to stdout
 
         (cd "$here" && lualatex -output-directory="$work" -jobname="$job" \
            -interaction=nonstopmode "$work/$job.tex") >/dev/null 2>&1
+        rc=$?
         # $job, not $base: a fixture appears once per size/margin combination,
         # and only $job (e.g. `resume-two-page--11pt-narrow`) names which one a
         # given row is. A claim about *which* cell overflows -- as #310's does
         # -- cannot be checked from a TSV where six rows share one label.
-        emit_row "$job" "$work/$job"
+        emit_row "$job" "$work/$job" "$rc"
       done < <(discover_fixtures)
     done
   done
@@ -248,10 +276,11 @@ discover_examples() {
 }
 
 sweep_examples() { # value
-  local v="$1" setting f job
+  local v="$1" setting f job rc
   setting="$(setting_for "$v")"
   while IFS= read -r f; do
     job="$(basename "$f" .tex)"
+    clear_job "$job"
     SETTING="$setting" awk '
       /^\\documentclass/ && !done {
         print
@@ -273,20 +302,50 @@ sweep_examples() { # value
       (cd "$root" && latexmk -lualatex -interaction=nonstopmode \
          -halt-on-error -output-directory="$work" -jobname="$job" "$work/$job.tex") \
         >/dev/null 2>&1
+      rc=$?
     else
       (cd "$root" && lualatex -output-directory="$work" -jobname="$job" \
          -interaction=nonstopmode "$work/$job.tex" && \
        lualatex -output-directory="$work" -jobname="$job" \
          -interaction=nonstopmode "$work/$job.tex") >/dev/null 2>&1
+      rc=$?
     fi
-    emit_row "$job" "$work/$job"
+    emit_row "$job" "$work/$job" "$rc"
   done < <(discover_examples)
 }
 
-emit_row() { # label jobpath
-  local label="$1" jp="$2" over hy loose pages worst third
-  if [ ! -f "$jp.pdf" ] || [ ! -f "$jp.log" ]; then
-    printf '%s\tBUILD-FAILED\t-\t-\t-\t-\t-\n' "$label"; return
+# Every value reuses one job name per document in one $work, so without this a
+# build that writes nothing would leave the previous value's .pdf and .log to be
+# measured. `$job.*` and not `$job*`: `cv.*` must not match `cv-bibliography.pdf`.
+clear_job() { # job
+  rm -f "$work/$1".*
+}
+
+# The refusal rules are the header's; this is the one place that applies them.
+build_failure() { # jobpath exit-status -> prints a reason, or nothing
+  local jp="$1" rc="$2"
+  if [ "$rc" -ne 0 ]; then
+    printf 'the build exited %s' "$rc"
+  elif [ ! -f "$jp.pdf" ] || [ ! -f "$jp.log" ]; then
+    printf 'the build wrote no .pdf or no .log'
+  elif [ -f "$jp.bcf" ]; then
+    if [ ! -s "$jp.bbl" ]; then
+      printf 'the bibliography did not build: no .bbl, or an empty one'
+    elif [ ! -f "$jp.blg" ]; then
+      printf 'the bibliography did not build: no .blg'
+    elif grep -q 'ERROR - ' "$jp.blg"; then
+      printf 'the bibliography did not build: the .blg records a Biber ERROR'
+    fi
+  fi
+}
+
+emit_row() { # label jobpath exit-status
+  local label="$1" jp="$2" rc="$3" reason over hy loose pages worst third
+  reason="$(build_failure "$jp" "$rc")"
+  if [ -n "$reason" ]; then
+    printf '%s\tBUILD-FAILED\t-\t-\t-\t-\t-\n' "$label"
+    printf '  BUILD-FAILED %s: %s\n' "$label" "$reason" >&2
+    return
   fi
   over="$(grep -cE 'Overfull \\hbox' "$jp.log" || true)"
   loose="$(grep -cE 'Underfull \\hbox \(badness' "$jp.log" || true)"
@@ -346,6 +405,8 @@ for which in fixtures examples; do
     else                             sweep_examples "$v" > "$f"; fi
     summarize "$v" "$f"
     printf '%s\t%s\n' "$v" "$(basename "$f")" >> "$output/.value-map.$which.tsv"
+    refused="$(awk -F'\t' '$2 == "BUILD-FAILED" {printf "%s%s", sep, $1; sep = " "}' "$f")"
+    [ -n "$refused" ] && printf '%s\t%s\t%s\n' "$which" "$v" "$refused" >> "$output/.refused.tsv"
   done
   echo
 done
@@ -368,6 +429,13 @@ done
   echo "Read the two corpora separately. Stress-fixture hyphen counts are not"
   echo "representative of real documents; decide policy on the examples."
   echo
+  echo "Refused rows (BUILD-FAILED: not measured, and not in any total):"
+  if [ -s "$output/.refused.tsv" ]; then
+    sed 's/^/  /' "$output/.refused.tsv"
+  else
+    echo "  none"
+  fi
+  echo
   echo "Value -> artifact filename (a value is sanitised for the filesystem;"
   echo "this is the only record of which file holds which value):"
   for which in fixtures examples; do
@@ -376,6 +444,11 @@ done
     sed 's/^/    /' "$output/.value-map.$which.tsv"
   done
 } > "$output/sweep-record.txt"
-rm -f "$output"/.value-map.*.tsv
+
+if [ -s "$output/.refused.tsv" ]; then
+  echo "NOT A CLEAN TABLE: some rows were refused (BUILD-FAILED); the reasons are"
+  echo "above and the documents are listed in sweep-record.txt."
+fi
+rm -f "$output"/.value-map.*.tsv "$output/.refused.tsv"
 
 echo "Artifacts: $output"
