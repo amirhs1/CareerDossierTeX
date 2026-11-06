@@ -51,6 +51,12 @@ are lint input and are never compiled.
 | `manualfixture-version.tex` | declared release | `VERSION MISMATCH` |
 | `manualfixture-documented.tex` | documented names | varies with the backlog below |
 
+`manualfixture-ok.tex` declares no release of its own. Its version and date are
+the placeholders `@WORK-VERSION@` and `@WORK-DATE@`, which the self-check
+replaces with the Work's declaration before the release check reads it (issue
+#523), so a release bump needs no edit here. `manualfixture-version.tex` keeps
+its fixed `0.7.0` on purpose: it must disagree with the Work.
+
 Check (4) — every public name the Work defines is documented — needs two inputs
 rather than one, so its fixtures come in a set:
 

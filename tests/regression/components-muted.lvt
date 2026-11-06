@@ -137,8 +137,9 @@
   \cdossiertestSetOption{muted}
 }
 
-% Last: the tracing renewals are deliberately permanent, so nothing after this
-% would still be reporting the real roles.
+% The tracing renewals last only until the end of the \TEST that makes them:
+% l3build runs each \TEST body inside a group, so a later test that needs them
+% applies them again.
 \TEST{entry-dates-and-location-render-through-the-role}{
   \cdossiertestTraceEntryHead
 }

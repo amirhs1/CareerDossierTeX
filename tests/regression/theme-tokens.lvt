@@ -22,8 +22,9 @@
 %     marker and their consumer -- the running head, the folio, and the
 %     section rule -- is built into a discarded box. The marker firing proves
 %     the consumer calls the token; the box is never shipped, so this has no
-%     effect on the real page. The renewals are permanent for the rest of the
-%     run, as in components-muted.lvt, so they are last.
+%     effect on the real page. The renewals last only until the end of the
+%     `\TEST' that makes them, because l3build runs each `\TEST' body inside
+%     a group.
 %   - `\CDossierLinkColor' is never called as a command by its consumer: the
 %     `package/hyperref/after' hook hands `hypersetup' the raw color name,
 %     because `allcolors' takes a color name, not a switch. What "used" means
@@ -96,8 +97,8 @@
   \cdossiertestLinkColorHook
 }
 
-% Last: the tracing renewals are deliberately permanent, so nothing after this
-% would still be reporting the real tokens.
+% The tracing renewals last only until the end of the \TEST that makes them, so
+% each of the two tests below applies its own.
 \TEST{running-head-and-folio-render-through-text-color}{
   \cdossiertestTraceTextColor
 }
