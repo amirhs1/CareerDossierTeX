@@ -26,6 +26,12 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+# Every output of the fixture builds goes to build/bibliography/, never beside
+# the fixtures (#586). The committed baselines (*.expected.txt) and the
+# databases stay here, and so does the working directory, so a fixture's
+# directory-local \addbibresource still resolves against it.
+out="$root/build/bibliography"
+mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
@@ -40,18 +46,19 @@ update=0
 # the current one — including its Biber warnings, which is how a stale build
 # survived a package change during issue #312.
 echo "== $base.tex (latexmk + Biber) =="
-if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error "$base.tex" > "$base.stdout" 2>&1; then
-  echo "  BUILD FAILED (see $base.log and $base.blg)"
+if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error -outdir="$out" \
+     "$base.tex" > "$out/$base.stdout" 2>&1; then
+  echo "  BUILD FAILED (see $out/$base.log and $out/$base.blg)"
   exit 1
 fi
 
-if [ ! -f "$base.blg" ]; then
-  echo "  MISSING Biber log $base.blg"
+if [ ! -f "$out/$base.blg" ]; then
+  echo "  MISSING Biber log $out/$base.blg"
   exit 1
 fi
-if grep -Eiq '(^| - )(WARN|ERROR) -' "$base.blg"; then
+if grep -Eiq '(^| - )(WARN|ERROR) -' "$out/$base.blg"; then
   echo "  BIBER WARNINGS/ERRORS:"
-  grep -Ei '(^| - )(WARN|ERROR) -' "$base.blg" | sed 's/^/    /'
+  grep -Ei '(^| - )(WARN|ERROR) -' "$out/$base.blg" | sed 's/^/    /'
   # If Biber rejected the `date` of every entry that has one, the fault is its
   # date parser, not this fixture's data: the years vanish and the ydnt sort
   # order silently comes out wrong. Counting `date` fields rather
@@ -62,7 +69,7 @@ if grep -Eiq '(^| - )(WARN|ERROR) -' "$base.blg"; then
   # while the legacy `year` field, which needs no DateTime, keeps working. Name
   # that here so the next reader does not re-derive it; the gate still fails.
   dated="$(grep -Ec '^[[:space:]]*date[[:space:]]*=' publications.bib || true)"
-  rejected="$(grep -Eic "Invalid format .* of date field" "$base.blg" || true)"
+  rejected="$(grep -Eic "Invalid format .* of date field" "$out/$base.blg" || true)"
   if [ "$rejected" -gt 0 ] && [ "$rejected" -eq "$dated" ]; then
     echo
     echo "  DIAGNOSIS: Biber rejected the 'date' field of all $dated entries."
@@ -80,14 +87,14 @@ if grep -Eiq '(^| - )(WARN|ERROR) -' "$base.blg"; then
   exit 1
 fi
 unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' \
-  "$base.log" || true)"
+  "$out/$base.log" || true)"
 if [ -n "$unexpected" ]; then
   echo "  UNEXPECTED LATEX LOG LINES:"
   printf '%s\n' "$unexpected" | sed 's/^/    /'
   exit 1
 fi
 
-got="$(pdftotext -enc UTF-8 "$base.pdf" - | sed '/^\f/d' \
+got="$(pdftotext -enc UTF-8 "$out/$base.pdf" - | sed '/^\f/d' \
   | awk '{ line[NR] = $0 }
          END { last = NR
                while (last > 0 && line[last] ~ /^[[:space:]]*$/) last--
@@ -101,7 +108,7 @@ got="$(pdftotext -enc UTF-8 "$base.pdf" - | sed '/^\f/d' \
 # or sorting defect, which is the most expensive way to be told the sandbox
 # denied a pipe. tests/check-parallel.sh avoids process substitution for the
 # same reason and is the in-repo precedent.
-printf '%s\n' "$got" > "$base.got"
+printf '%s\n' "$got" > "$out/$base.got"
 
 if [ "$update" -eq 1 ]; then
   printf '%s\n' "$got" > "$expected"
@@ -109,9 +116,9 @@ if [ "$update" -eq 1 ]; then
 elif [ ! -f "$expected" ]; then
   echo "  MISSING baseline $expected (run with --update to create)"
   exit 1
-elif ! diff -u "$expected" "$base.got" > "$base.diff"; then
+elif ! diff -u "$expected" "$out/$base.got" > "$out/$base.diff"; then
   echo "  BIBLIOGRAPHY EXTRACTION MISMATCH:"
-  sed 's/^/    /' "$base.diff"
+  sed 's/^/    /' "$out/$base.diff"
   exit 1
 else
   echo "  ordering and identifier precedence OK"
@@ -127,7 +134,7 @@ echo "  Biber completed without warnings/errors"
 # content, and that is a property of the PDF itself: check it directly, so a
 # future Poppler change is distinguishable from a real regression here.
 echo "== $base.pdf (each entry number shares its entry's baseline) =="
-pairing="$(pdftotext -bbox "$base.pdf" - \
+pairing="$(pdftotext -bbox "$out/$base.pdf" - \
   | awk -F'"' '
       BEGIN { tol = 2 }
       # <word xMin=".." yMin=".." xMax=".." yMax="..">text</word>
@@ -176,9 +183,9 @@ fi
 # package error on a mismatch, so a clean build is the assertion.
 echo "== bibitemsep-token.tex (bibitemsep tracks CDossierRecordItemSepSkip) =="
 if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
-    "bibitemsep-token.tex" > "bibitemsep-token.stdout" 2>&1; then
+    -outdir="$out" "bibitemsep-token.tex" > "$out/bibitemsep-token.stdout" 2>&1; then
   echo "  \\bibitemsep does not track \\CDossierRecordItemSepSkip"
-  echo "  (see bibitemsep-token.log)"
+  echo "  (see $out/bibitemsep-token.log)"
   exit 1
 fi
 echo "  bibitemsep tracks CDossierRecordItemSepSkip"
@@ -188,9 +195,9 @@ echo "  bibitemsep tracks CDossierRecordItemSepSkip"
 # pdftotext's default mode splits the numbers into their own column (#199).
 echo "== biblabelsep-token.tex (biblabelsep tracks CDossierListLabelSep) =="
 if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
-    "biblabelsep-token.tex" > "biblabelsep-token.stdout" 2>&1; then
+    -outdir="$out" "biblabelsep-token.tex" > "$out/biblabelsep-token.stdout" 2>&1; then
   echo "  \\biblabelsep does not track \\CDossierListLabelSep"
-  echo "  (see biblabelsep-token.log)"
+  echo "  (see $out/biblabelsep-token.log)"
   exit 1
 fi
 echo "  biblabelsep tracks CDossierListLabelSep"
@@ -221,16 +228,16 @@ biblatex_warning_text() { # <log-file>
 # real Biber run, and the weight actually in the PDF.
 echo "== highlight-multiword.tex (a multi-word name part is bolded) =="
 if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
-    "highlight-multiword.tex" > "highlight-multiword.stdout" 2>&1; then
-  echo "  BUILD FAILED (see highlight-multiword.log)"
+    -outdir="$out" "highlight-multiword.tex" > "$out/highlight-multiword.stdout" 2>&1; then
+  echo "  BUILD FAILED (see $out/highlight-multiword.log)"
   exit 1
 fi
 # A declaration that matched is silent, and one that matched nothing warns. This
 # fixture declares a name the database contains, so a warning here is the
 # matcher regressing rather than the fixture being wrong.
-if grep -q 'careerdossier-biblatex Warning' "highlight-multiword.log"; then
+if grep -q 'careerdossier-biblatex Warning' "$out/highlight-multiword.log"; then
   echo "  THE DECLARATION MATCHED NOTHING:"
-  echo "    $(biblatex_warning_text "highlight-multiword.log")"
+  echo "    $(biblatex_warning_text "$out/highlight-multiword.log")"
   exit 1
 fi
 # The weight is only readable from the content stream's font switches, which
@@ -239,7 +246,7 @@ fi
 # run without it, and the workflow installs mupdf-tools in this job so CI always
 # performs it.
 if command -v mutool >/dev/null 2>&1; then
-  bold="$(mutool draw -F stext -o - "highlight-multiword.pdf" 2>/dev/null | awk '
+  bold="$(mutool draw -F stext -o - "$out/highlight-multiword.pdf" 2>/dev/null | awk '
     /<font /{ f = $0; sub(/.*name="/, "", f); sub(/".*/, "", f) }
     /<char /{ if (f ~ /Bold/) { c = $0; sub(/.*c="/, "", c); sub(/".*/, "", c)
                                printf "%s", c } }
@@ -281,11 +288,11 @@ fi
 # which Biber strips, so it cannot match -- and the warning is the assertion.
 echo "== highlight-unmatched.tex (an unmatched declaration is reported) =="
 if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
-    "highlight-unmatched.tex" > "highlight-unmatched.stdout" 2>&1; then
-  echo "  BUILD FAILED (see highlight-unmatched.log)"
+    -outdir="$out" "highlight-unmatched.tex" > "$out/highlight-unmatched.stdout" 2>&1; then
+  echo "  BUILD FAILED (see $out/highlight-unmatched.log)"
   exit 1
 fi
-warned="$(biblatex_warning_text "highlight-unmatched.log")"
+warned="$(biblatex_warning_text "$out/highlight-unmatched.log")"
 case "$warned" in
   *"matched no name in the bibliography"*) ;;
   *)
@@ -324,19 +331,19 @@ echo "  the unmatched declaration is reported, and named"
 echo "== doi-hyphen-break.tex (a DOI wrapped at its own hyphen extracts intact) =="
 dh="doi-hyphen-break"
 if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
-    "$dh.tex" > "$dh.stdout" 2>&1; then
-  echo "  BUILD FAILED (see $dh.log and $dh.blg)"
+    -outdir="$out" "$dh.tex" > "$out/$dh.stdout" 2>&1; then
+  echo "  BUILD FAILED (see $out/$dh.log and $out/$dh.blg)"
   exit 1
 fi
-if grep -Eiq '(^| - )(WARN|ERROR) -' "$dh.blg"; then
+if grep -Eiq '(^| - )(WARN|ERROR) -' "$out/$dh.blg"; then
   echo "  BIBER WARNINGS/ERRORS:"
-  grep -Ei '(^| - )(WARN|ERROR) -' "$dh.blg" | sed 's/^/    /'
+  grep -Ei '(^| - )(WARN|ERROR) -' "$out/$dh.blg" | sed 's/^/    /'
   exit 1
 fi
 # Overfull as well as the font checks: suppressing a break point must not buy
 # an intact identifier with a line set into the margin.
 unexpected="$(grep -iE 'Warning:|Missing character|Font shape.*undefined|substituting|Overfull' \
-  "$dh.log" || true)"
+  "$out/$dh.log" || true)"
 if [ -n "$unexpected" ]; then
   echo "  UNEXPECTED LATEX LOG LINES:"
   printf '%s\n' "$unexpected" | sed 's/^/    /'
@@ -355,7 +362,7 @@ fi
 # empty, which is a prefix of anything while nothing wraps inside the
 # identifier, so an empty head is refused outright.
 expected_doi="$(cat "$dh.expected.txt")"
-doi_head="$(pdftotext -layout -enc UTF-8 "$dh.pdf" - \
+doi_head="$(pdftotext -layout -enc UTF-8 "$out/$dh.pdf" - \
   | sed -n 's/.*doi: \([^[:space:]]*\).*/\1/p' | head -n 1)"
 doi_head="${doi_head%.}"
 echo "    first line of the DOI: [$doi_head]"
@@ -391,12 +398,12 @@ esac
 # pipeline would, and take the identifier out of the joined text. A DOI ends
 # before the unit punctuation BibLaTeX appends, so one trailing full stop is
 # removed; this DOI has none of its own.
-pdftotext -enc UTF-8 "$dh.pdf" - | tr -d '\n' \
+pdftotext -enc UTF-8 "$out/$dh.pdf" - | tr -d '\n' \
   | { grep -oE '10\.9999/[A-Za-z0-9.-]+' || true; } \
-  | sed 's/\.$//' > "$dh.got"
-if ! diff -u "$dh.expected.txt" "$dh.got" > "$dh.diff"; then
+  | sed 's/\.$//' > "$out/$dh.got"
+if ! diff -u "$dh.expected.txt" "$out/$dh.got" > "$out/$dh.diff"; then
   echo "  THE EXTRACTED DOI DOES NOT MATCH THE DATABASE:"
-  sed 's/^/    /' "$dh.diff"
+  sed 's/^/    /' "$out/$dh.diff"
   echo "  A line-final hyphen the DOI already contains was dropped when"
   echo "  pdftotext joined the lines (issue #561)."
   exit 1
@@ -503,7 +510,7 @@ mkdir -p "$example_outdir"
 if ! (cd "$root" && latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
       -output-directory=build/bibliography-example \
       examples/academic/cv-bibliography.tex) \
-     > "$here/example-cv-bibliography.stdout" 2>&1; then
+     > "$out/example-cv-bibliography.stdout" 2>&1; then
   echo "  EXAMPLE BUILD FAILED (see build/bibliography-example/cv-bibliography.log)"
   exit 1
 fi
@@ -524,7 +531,7 @@ echo "== missing-bibresource.tex (negative control: the guard must fire) =="
 control="missing-bibresource"
 control_exit=0
 latexmk -g -lualatex -interaction=nonstopmode \
-  "$control.tex" > "$control.stdout" 2>&1 || control_exit=$?
+  -outdir="$out" "$control.tex" > "$out/$control.stdout" 2>&1 || control_exit=$?
 if [ "$control_exit" -eq 0 ]; then
   echo "  latexmk exited 0 on an unresolvable database, as it does today"
 else
@@ -545,13 +552,13 @@ fi
 # reached from here. An empty-but-present database was tried as a way to reach
 # them and is not silent at all: latexmk exits 12 and no PDF is produced, so it
 # is not the failure this guard exists for.
-if check_bibliography_render "$here/$control" "$here/publications.bib" \
-   > "$control.guard" 2>&1; then
+if check_bibliography_render "$out/$control" "$here/publications.bib" \
+   > "$out/$control.guard" 2>&1; then
   echo "  NEGATIVE CONTROL DID NOT FIRE: the guard passed a document whose"
   echo "    bibliography cannot have rendered, so it can no longer see the"
   echo "    defect it exists for. Do not relax it."
-  sed 's/^/    /' "$control.guard"
+  sed 's/^/    /' "$out/$control.guard"
   exit 1
 fi
 echo "  negative control fired: the guard rejects an unresolvable database"
-sed 's/^/    /' "$control.guard"
+sed 's/^/    /' "$out/$control.guard"

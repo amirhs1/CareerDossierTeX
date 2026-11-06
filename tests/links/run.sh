@@ -39,11 +39,16 @@
 # that exercise the only site with stretchable URL glue. When Biber is missing
 # those two are skipped with a notice and the runner says so in its summary — a
 # pass without them is not a pass of the negative control.
-# Run from anywhere; the repository root is placed on TEXINPUTS.
+# Run from anywhere; the repository root is placed on TEXINPUTS. Every output,
+# the PDFs and logs and the .stdout and .tokens scratch, goes to build/links/,
+# never beside the fixtures (#586); the working directory stays here, so a
+# fixture's relative \input still resolves against this directory.
 set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+out="$root/build/links"
+mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 fail=0
@@ -81,21 +86,21 @@ for tex in *.tex; do
       # a directory holding an earlier PDF judges that PDF: the suite would
       # report on the previous state of the package rather than the current one
       # (issue #312).
-      if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error "$tex" \
-           > "$base.stdout" 2>&1; then
-        echo "  BUILD FAILED (see $base.log and $base.blg)"; fail=1; continue
+      if ! latexmk -g -lualatex -interaction=nonstopmode -halt-on-error \
+           -outdir="$out" "$tex" > "$out/$base.stdout" 2>&1; then
+        echo "  BUILD FAILED (see $out/$base.log and $out/$base.blg)"; fail=1; continue
       fi
       ;;
     *)
       # Two passes: the letter families resolve their total-page footer from
       # the .aux, and a first-pass PDF can carry a stale line breaking.
-      if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" \
-           > "$base.stdout" 2>&1; then
-        echo "  COMPILE FAILED (see $base.log)"; fail=1; continue
+      if ! lualatex -halt-on-error -interaction=nonstopmode \
+           -output-directory="$out" "$tex" > "$out/$base.stdout" 2>&1; then
+        echo "  COMPILE FAILED (see $out/$base.log)"; fail=1; continue
       fi
-      if ! lualatex -halt-on-error -interaction=nonstopmode "$tex" \
-           >> "$base.stdout" 2>&1; then
-        echo "  RERUN FAILED (see $base.log)"; fail=1; continue
+      if ! lualatex -halt-on-error -interaction=nonstopmode \
+           -output-directory="$out" "$tex" >> "$out/$base.stdout" 2>&1; then
+        echo "  RERUN FAILED (see $out/$base.log)"; fail=1; continue
       fi
       ;;
   esac
@@ -107,10 +112,10 @@ for tex in *.tex; do
   expect="$(sed -n 's/^% LINKEXPECT:[[:space:]]*//p' "$tex" | head -1)"
   expect="${expect:-intact}"
   if [ "$expect" = "intact" ]; then
-    overfull="$(grep -cE 'Overfull \\hbox' "$base.log" || true)"
+    overfull="$(grep -cE 'Overfull \\hbox' "$out/$base.log" || true)"
     if [ "$overfull" -ne 0 ]; then
       echo "  OVERFULL BOXES: $overfull"
-      grep -E 'Overfull \\hbox' "$base.log" | sed 's/^/    /' | head -5
+      grep -E 'Overfull \\hbox' "$out/$base.log" | sed 's/^/    /' | head -5
       fail=1
     fi
   fi
@@ -118,13 +123,13 @@ for tex in *.tex; do
   # The declared tokens travel to the checker in a file rather than on the
   # command line, so a token containing a shell metacharacter, a quote, or an
   # `=' cannot be mangled on the way.
-  sed -n 's/^% LINKTOKEN:[[:space:]]*//p' "$tex" > "$base.tokens"
-  if [ ! -s "$base.tokens" ]; then
+  sed -n 's/^% LINKTOKEN:[[:space:]]*//p' "$tex" > "$out/$base.tokens"
+  if [ ! -s "$out/$base.tokens" ]; then
     echo "  NO % LINKTOKEN: DIRECTIVES — the fixture asserts nothing"; fail=1; continue
   fi
 
-  findings="$(pdftotext -bbox "$base.pdf" - \
-    | awk -v tokfile="$base.tokens" -f "$here/link-token-check.awk")"
+  findings="$(pdftotext -bbox "$out/$base.pdf" - \
+    | awk -v tokfile="$out/$base.tokens" -f "$here/link-token-check.awk")"
   printf '%s\n' "$findings" | sed 's/^/    /'
 
   # Here-strings, not `printf | grep -q`: under `pipefail` an early-exiting

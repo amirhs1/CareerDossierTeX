@@ -57,6 +57,12 @@ set -uo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
+# Every output, the PDFs and logs and the .stdout capture, goes to
+# build/layout/, never beside the fixtures (#586). The working directory stays
+# here, so \input{$tex} and the .inc bodies' relative \input still resolve
+# against this directory.
+out="$root/build/layout"
+mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 
 # Extracted-text guards that answer "could not check" apart from "absent"
@@ -204,19 +210,19 @@ layout_fixture() {
   # scan before `\input`, which is an expandable macro in LaTeX and would
   # otherwise be expanded while TeX looked for another digit.
   if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
-       "\\tracingpages=1 \\input{$tex}" > "$base.stdout" 2>&1; then
-    echo "  COMPILE FAILED (see $base.log)"; return 1
+       -output-directory="$out" "\\tracingpages=1 \\input{$tex}" > "$out/$base.stdout" 2>&1; then
+    echo "  COMPILE FAILED (see $out/$base.log)"; return 1
   fi
   if ! lualatex -halt-on-error -interaction=nonstopmode -jobname="$base" \
-       "\\tracingpages=1 \\input{$tex}" >> "$base.stdout" 2>&1; then
-    echo "  RERUN FAILED (see $base.log)"; return 1
+       -output-directory="$out" "\\tracingpages=1 \\input{$tex}" >> "$out/$base.stdout" 2>&1; then
+    echo "  RERUN FAILED (see $out/$base.log)"; return 1
   fi
 
   # No overfull boxes.
-  overfull="$(grep -cE 'Overfull \\hbox' "$base.log" || true)"
+  overfull="$(grep -cE 'Overfull \\hbox' "$out/$base.log" || true)"
   if [ "$overfull" -ne 0 ]; then
     echo "  OVERFULL BOXES: $overfull"
-    grep -E 'Overfull \\hbox' "$base.log" | sed 's/^/    /' | head -5; fail=1
+    grep -E 'Overfull \\hbox' "$out/$base.log" | sed 's/^/    /' | head -5; fail=1
   else
     echo "  no overfull boxes"
   fi
@@ -266,7 +272,7 @@ layout_fixture() {
   fi
 
   # Page count from the "Output written ... (N page[s])" line.
-  pages="$(grep -oE 'Output written on .*\(([0-9]+) page' "$base.log" \
+  pages="$(grep -oE 'Output written on .*\(([0-9]+) page' "$out/$base.log" \
            | grep -oE '\(([0-9]+) page' | grep -oE '[0-9]+' | tail -1)"
   pages="${pages:-0}"
   echo "  pages: $pages"
@@ -292,7 +298,7 @@ layout_fixture() {
   if ! command -v pdfinfo >/dev/null 2>&1; then
     echo "  pdfinfo absent: cannot verify $paper_label media box"; fail=1
   else
-    paper_info="$(pdfinfo -f 1 -l 1 "$base.pdf" 2>/dev/null)" \
+    paper_info="$(pdfinfo -f 1 -l 1 "$out/$base.pdf" 2>/dev/null)" \
       || paper_info="$CDTEXT_UNAVAILABLE"
     text_matches "$paper_info" "$paper_re"
     case "$?" in
@@ -304,7 +310,7 @@ layout_fixture() {
         ;;
       *)
         echo "  UNCHECKABLE MEDIA BOX: pdfinfo produced nothing readable for"
-        echo "    $base.pdf, so the $paper_label assertion was never made."
+        echo "    $out/$base.pdf, so the $paper_label assertion was never made."
         fail=1
         ;;
     esac
@@ -341,7 +347,7 @@ layout_fixture() {
       page_one_label_count=1
     fi
     for (( n = 1; n <= pages; n++ )); do
-      page_text="$(text_page "$base.pdf" "$n")"
+      page_text="$(text_page "$out/$base.pdf" "$n")"
 
       # Folio. Absent on every page under `screen`; under `print` absent from a
       # one-page document and present on every page otherwise. The `screen`
@@ -426,7 +432,7 @@ layout_fixture() {
 
     case "$base" in
       resume-contact-wrap-*)
-        contact_text="$(text_extract "$base.pdf" -layout)"
+        contact_text="$(text_extract "$out/$base.pdf" -layout)"
         text_matches "$contact_text" '^[[:space:]]*\||\|[[:space:]]*$'; state=$?
         if [ "$state" -eq 0 ]; then
           echo "  ORPHAN CONTACT SEPARATOR"; fail=1
@@ -487,7 +493,7 @@ EOF
           # indent could not be, and either must not report "no orphaned
           # bullet" (#398). The capture carries CDTEXT_UNAVAILABLE when
           # pdftotext could not run, which the script answers with 2.
-          page_layout="$(text_page "$base.pdf" "$n" -bbox-layout)"
+          page_layout="$(text_page "$out/$base.pdf" "$n" -bbox-layout)"
           remnant="$(awk -v item="$item_pattern" -f "$here/list-remnant.awk" \
                        <<< "$page_layout")"
           state=$?
@@ -517,7 +523,7 @@ EOF
           b="$(printf '%s' "$b" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
           page_a=0; page_b=0; keep_unchecked=0
           for (( n = 1; n <= pages; n++ )); do
-            page_text="$(text_page "$base.pdf" "$n")"
+            page_text="$(text_page "$out/$base.pdf" "$n")"
             text_contains "$page_text" "$a"; state=$?
             [ "$state" -eq 0 ] && page_a="$n"
             [ "$state" -gt 1 ] && keep_unchecked=1
@@ -571,7 +577,7 @@ EOF
     if [ -n "$sections" ] && [ "$pages" -gt 1 ]; then
       strand_fail=0
       for (( n = 1; n < pages; n++ )); do
-        last_line="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$base.pdf" - \
+        last_line="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$out/$base.pdf" - \
                      | sed '/^\f/d' | grep -v '^[[:space:]]*$' \
                      | grep -Ev 'Page [0-9]+ of [0-9]+' | tail -1)"
         while IFS= read -r sec; do
@@ -611,7 +617,7 @@ EOF
   #     Five committed fixtures do that, and their page-one fill runs from 26%
   #     to 54% purely because their source says so. A threshold that counted
   #     them would fail five fixtures for behaving exactly as written.
-  fill_records="$(awk -f "$here/page-fill.awk" "$base.log")"
+  fill_records="$(awk -f "$here/page-fill.awk" "$out/$base.log")"
   # guard-ok: compared against $pages, derived independently from the log, so a
   # parse that finds nothing reports 0 against a non-zero page count and fails.
   fill_pages="$(printf '%s\n' "$fill_records" | grep -c '.' || true)"
@@ -720,7 +726,7 @@ EOF
         esac
 
         typo_fail=0
-        findings="$(pdftotext -bbox "$base.pdf" - \
+        findings="$(pdftotext -bbox "$out/$base.pdf" - \
           | awk -v furniture="$furniture_label" -v prose="$prose" \
               -f "$here/page-break-check.awk")"
         if [ -n "$findings" ]; then
