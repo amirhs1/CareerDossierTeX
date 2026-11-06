@@ -236,6 +236,22 @@ for a feature request; the development and epic templates set none.
 
 Each of these cites this section.
 
+### Citing an issue in a comment
+
+A comment cites an issue or pull request in one form, `(#N)`, after the words
+it supports: `the gap below the stack is one token per family (#223).` Several
+numbers share one pair of brackets, `(#294, #308)`. Where the number is the
+subject or object of the sentence it stands bare, as in `#204 fixed the
+mechanism` or `the half #428 left out of scope`.
+
+Write neither `issue #N` nor `(see issue #N)`, and do not open a comment with an
+`Issue #N:` label. One form carries no claim about whether a reader should open
+the issue. A comment that needs the reader to open it says why in its own words.
+
+Two kinds of text are outside this rule. A Markdown file may cite through a
+link, `[issue #96](…)`. Text a script prints at run time keeps its wording,
+because that wording is its output.
+
 ## Issue workflow
 
 Open or select an issue before starting a meaningful change, subject to the

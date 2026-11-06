@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # render-entrymeta-muted-matrix.sh — build the {column,inline} x
 # {italic,gray,both,plain} reference matrix for the resume and CV
-# (issues #230, #271, #324).
+# (#230, #271, #324).
 #
 # `entrymeta' and `muted' are the two options that both land on the same piece
 # of the page: the entry heading's dates and location. `entrymeta' decides where
@@ -13,7 +13,7 @@
 # never italic (see \CDossierEntryMetaSeparator), and this matrix is where a
 # reviewer confirms that reads correctly rather than merely holds in a .tlg.
 #
-# `muted=plain' (issue #324) is the one column where the metadata carries no
+# `muted=plain' (#324) is the one column where the metadata carries no
 # de-emphasis at all, so it is where a reviewer judges whether position and
 # content still separate the cells from the title — under `inline', where they
 # share the line, that judgement rests on the separator alone. It is also the
@@ -21,7 +21,7 @@
 # neither option gets, and it carries the most review weight of the sixteen.
 #
 # Every other option is left at its class default. This is deliberate and is
-# what separates this matrix from `review-matrix' (issue #147), which sweeps
+# what separates this matrix from `review-matrix' (#147), which sweeps
 # fontsize and margin with the semantic options fixed. Sweeping all four at once
 # would be 72 PDFs and would not isolate anything; here fontsize, margin, paper,
 # and bodyfont are whatever the class chooses, so every visible difference
@@ -32,7 +32,7 @@
 # the CV's class default (12pt) differs from what its own two-page fixture
 # declares (11pt), so the record names the *resolved* fontsize/margin/paper/
 # bodyfont per class rather than asserting the category, and flags any place a
-# resolved value differs from what the source fixture declares (issue #336).
+# resolved value differs from what the source fixture declares (#336).
 # The resolved values are read back from the build itself (a `\typeout' probe
 # reads the public \CDossierBodySize/\CDossierPageMargin tokens and the core
 # \paperwidth/\rmdefault primitives) rather than transcribed as script

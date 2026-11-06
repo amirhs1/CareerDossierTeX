@@ -4,7 +4,7 @@
 % pure black, and muted is the single de-emphasis grey. The muted value (0.30)
 % is chosen to keep at least 4.5:1 contrast on white, so a change to it is a
 % deliberate, reviewable event, not an accident. It also checks that the public
-% semantic color tokens exist, and -- issue #270 -- that each one is actually
+% semantic color tokens exist, and -- #270 -- that each one is actually
 % *used* by a consumer, not only declared.
 %
 % `\CDossierPrimaryColor' is not tested here: it was retired in #270 for

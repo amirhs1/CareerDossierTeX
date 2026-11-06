@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run-list-remnant.sh — the committed negative controls for
-# tests/layout/list-remnant.awk (issue #564).
+# tests/layout/list-remnant.awk (#564).
 #
 # The layout suite's ORPHANED BULLET assertion is stated in lines: a page may
 # not carry a single-line remnant of a split list, and a page carrying one

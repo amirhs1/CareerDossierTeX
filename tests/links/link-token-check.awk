@@ -1,5 +1,5 @@
 # link-token-check.awk — copy-paste integrity of URLs and e-mail addresses
-# (issue #294) decided from `pdftotext -bbox` output for a whole PDF.
+# (#294) decided from `pdftotext -bbox` output for a whole PDF.
 #
 # The invariant, stated checkably: a URL or an e-mail address must not be
 # divided into several words on one visual line, and when it legitimately

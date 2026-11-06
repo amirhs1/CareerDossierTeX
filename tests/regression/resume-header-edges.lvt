@@ -1,4 +1,4 @@
-% resume-header-edges.lvt — issue #255 the record family's rendered header gap.
+% resume-header-edges.lvt — #255 the record family's rendered header gap.
 %
 % \CDossierRecordHeaderBelowSkip was the one spacing token no fixture touched
 % beyond its value. `tokens-scale' echoes it, `tokens-invariants' compares it to

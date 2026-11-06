@@ -11,12 +11,12 @@
 #   - a fixture named *two-page* actually spans at least two pages;
 #   - no *two-page* fixture splits a hyphenated word across a page break, and
 #     no letter or statement fixture strands a single line of a paragraph at a
-#     page boundary (issue #171, via page-break-check.awk);
+#     page boundary (#171, via page-break-check.awk);
 #   - no *keeptogether* fixture strands a heading from its material, or splits
-#     a list leaving a single typeset line of it on a page (issues #145, #564,
+#     a list leaving a single typeset line of it on a page (#145, #564,
 #     the latter via list-remnant.awk);
 #   - no page a policy governs falls below `$page_fill_min` of its goal, read
-#     from `\tracingpages` output via page-fill.awk (issue #334). Everything
+#     from `\tracingpages` output via page-fill.awk (#334). Everything
 #     above asserts only that material stays *together*, and all of it passes on
 #     a half-empty page. `make review-pagefill` is the same measurement as a
 #     full report.
@@ -37,7 +37,7 @@
 # zeroed. The runner rebuilds it with the token at 0pt and requires the
 # overfull box to appear: for such a fixture, "no overfull boxes" above is the
 # assertion, and this is the proof that the assertion is still testing the
-# token rather than passing for some unrelated reason (issue #310).
+# token rather than passing for some unrelated reason (#310).
 #
 # Final visual correctness (spacing, balance, typographic detail) remains a
 # human review of the rendered PDF; this runner guards the properties a machine
@@ -66,12 +66,12 @@ mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 
 # Extracted-text guards that answer "could not check" apart from "absent"
-# (issue #398). Sourced unconditionally: every furniture, contact, and
+# (#398). Sourced unconditionally: every furniture, contact, and
 # keep-together assertion below goes through it, fanned out or not.
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
-# Fixture selection (issue #359).
+# Fixture selection (#359).
 #
 # With no pattern every fixture runs and nothing about this suite has changed;
 # that is the invocation CI makes and the one `make check` makes. A pattern
@@ -87,7 +87,7 @@ cd "$here" || exit 1
 # fixtures passes all of them, and "0 fixtures, all passed" is indistinguishable
 # from a suite that actually checked something.
 #
-# Fixture-level concurrency (issue #390) is opt-in through `--jobs N`, which
+# Fixture-level concurrency (#390) is opt-in through `--jobs N`, which
 # `make layout JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
 # runner takes the serial path below and is the suite it has always been: the
 # same fixtures, in the same order, with byte-identical output.
@@ -181,7 +181,7 @@ fail=0
 # reports without asserting, which is how a candidate value is explored.
 page_fill_min="${CDOSSIER_PAGE_FILL_MIN-90}"
 
-# One fixture, start to finish (issue #390).
+# One fixture, start to finish (#390).
 #
 # `local fail` shadows the global deliberately. Every assertion below already
 # said `fail=1`, and rewriting eighteen of them to accumulate into a new name
@@ -228,7 +228,7 @@ layout_fixture() {
   fi
 
   # Negative control for the two fixtures that exist to keep
-  # \CDossierEmergencyStretch honest (issues #272, #310). Rebuilt with the
+  # \CDossierEmergencyStretch honest (#272, #310). Rebuilt with the
   # token zeroed, each must go overfull; a fixture whose text drifted far
   # enough to set clean either way would otherwise keep passing the check
   # above while asserting nothing. The declared deficit is reported next to
@@ -280,7 +280,7 @@ layout_fixture() {
   # Every *-a4-* wrapper must produce an actual ISO A4 media box. This catches
   # a class accepting the public option but silently retaining Letter paper.
   #
-  # pdfinfo's output is captured before it is matched (issue #398). Piped
+  # pdfinfo's output is captured before it is matched (#398). Piped
   # straight into `grep -Eq`, grep's early exit hands pdfinfo a SIGPIPE and
   # `pipefail` turns a match into a non-zero pipeline — reported here as the
   # wrong paper size, about a document with the right one.
@@ -319,7 +319,7 @@ layout_fixture() {
   # Under the default `medium=print`, shared page furniture is suppressed
   # entirely for a one-page document, and a multi-page document carries
   # `Page N of M` throughout and an identity-derived running header from page
-  # two onwards. Under `medium=screen` (issue #184, fixtures named
+  # two onwards. Under `medium=screen` (#184, fixtures named
   # `*-screen-*`) neither is emitted on any page. Check extracted text rather
   # than exact coordinates so the test guards behavior without freezing layout.
   if command -v pdftotext >/dev/null 2>&1; then
@@ -355,7 +355,7 @@ layout_fixture() {
       # `Page N of M` on each of its pages.
       #
       # Each of the three branches below reads the predicate's status three
-      # ways (issue #398). The `screen` branches are why: there a check that
+      # ways (#398). The `screen` branches are why: there a check that
       # could not run used to be indistinguishable from a clean page, so the
       # fixture passed having asserted nothing. `state 0/1` is the verdict;
       # anything else is the absence of one, and fails on its own terms.
@@ -407,7 +407,7 @@ layout_fixture() {
         # Counted with the third state, because 0 is this check's *passing*
         # value: `grep -Fc` over text that was never extracted also answers 0,
         # so the old spelling reported a clean page one for a page it had not
-        # read (issue #398).
+        # read (#398).
         label_count="$(text_count_lines "$page_text" "$furniture_label")"
         state=$?
         if [ "$state" -ne 0 ]; then
@@ -465,7 +465,7 @@ EOF
         ;;
     esac
 
-    # Keep-together page-break policy (issue #145). These fixtures place
+    # Keep-together page-break policy (#145). These fixtures place
     # headings and bullet lists across a page boundary on purpose.
     case "$base" in
       *keeptogether*)
@@ -477,7 +477,7 @@ EOF
         keep_fail=0
 
         # No list may be split leaving a single typeset line of it on a page
-        # (issues #562, #564). A page carrying one item of the split list is
+        # (#562, #564). A page carrying one item of the split list is
         # legal when that item wraps, so the lone item's lines are counted,
         # from the hanging indent its continuation rows start at; see
         # list-remnant.awk. The *-orphan* fixtures mark the list under test so
@@ -535,7 +535,7 @@ EOF
             # Distinguished from NOT FOUND deliberately: a page whose text
             # could not be extracted cannot support either verdict, and
             # reporting it as "not found" is a claim about a document that was
-            # never read (issue #398).
+            # never read (#398).
             echo "  UNCHECKABLE KEEPTOGETHER: a page of $base yielded no text,"
             echo "    so '$a' / '$b' were never located."
             keep_fail=1
@@ -555,7 +555,7 @@ EOF
         ;;
     esac
 
-    # Issue #333: no page may end with a section heading. The penalty that used
+    # No page may end with a section heading (#333). The penalty that used
     # to forbid the break after the section rule is gone, replaced by a bound
     # applied before the heading, so this is the failure mode that bound exists
     # to prevent and it needs asserting rather than eyeballing.
@@ -567,7 +567,7 @@ EOF
     # pairs a fixture happens to declare, and a heading stranded at the foot of a
     # page is a property of every page boundary in every fixture.
     #
-    # Issue #337: \CDossierSubsection is collected by the same pattern. It is the
+    # \CDossierSubsection is collected by the same pattern (#337). It is the
     # same failure — a heading alone at the foot of a page, introducing nothing —
     # and \CDossierSubsectionNeedLines is the bound that prevents it, so it needs
     # the same assertion rather than a second one. The `sub' alternative is
@@ -600,7 +600,7 @@ EOF
     echo "  (pdftotext absent: skipped folio check)"
   fi
 
-  # Page fill — the other half of the page-break policy (issue #334).
+  # Page fill — the other half of the page-break policy (#334).
   #
   # Everything above asserts that material stays *together*. Not one of those
   # assertions can fail on a page that is half empty, and for documents whose
@@ -706,7 +706,7 @@ EOF
         echo "  spans multiple pages as intended"
       fi
 
-      # Typographic page-break quality (issue #171): no hyphenated word split
+      # Typographic page-break quality (#171): no hyphenated word split
       # across a page break, and no single line of a paragraph stranded at a
       # page boundary. Both are decided from per-word coordinates rather than
       # extracted text — see page-break-check.awk for why text-based tests
@@ -756,7 +756,7 @@ EOF
           fail=1
         fi
 
-        # Negative control for the club/widow check itself (issue #348).
+        # Negative control for the club/widow check itself (#348).
         #
         # A clean result above is evidence only if the check can report a dirty
         # one, and for most of this suite's life it could not: its paragraph

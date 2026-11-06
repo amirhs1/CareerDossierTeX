@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# report-pagefill.sh — measure how full each page is (issue #334).
+# report-pagefill.sh — measure how full each page is (#334).
 #
 # The keep-together policy has always had two halves and only one of them was
 # measured. `tests/layout/run.sh` asserts that material stays *together*: no

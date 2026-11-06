@@ -9,7 +9,7 @@
 %
 % Policy under test (mirror of careerdossier-typography.sty):
 %   - LuaLaTeX engine (fixture errors out under other engines)
-%   - no per-word /ActualText generation (see issue #72: those spans carry no
+%   - no per-word /ActualText generation (#72: those spans carry no
 %     interword space, so PDFKit-class consumers merge adjacent
 %     words; the "interword spacing" block below is the explicit regression)
 %   - common / contextual / discretionary / historic ligatures OFF
@@ -66,7 +66,7 @@ email@example.org +1 416 555 0199
 
 \textit{January 2023 -- Present}
 
-% Interword spacing (issue #72). Every line below merged under
+% Interword spacing (#72). Every line below merged under
 % per-word /ActualText was enabled when read through Apple PDFKit. Keep them:
 % the assertion that per-word /ActualText spans have not returned.
 %

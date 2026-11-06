@@ -102,7 +102,7 @@
 #                above. Capped at the number of targets.
 #   --inner-jobs fixtures in flight inside each target; default 1, meaning each
 #                runner takes its serial path. The two layers multiply, so the
-#                process budget is --jobs x --inner-jobs; see issue #390 and the
+#                process budget is --jobs x --inner-jobs; see #390 and the
 #                comment on `inner_jobs' below for why this is passed explicitly
 #                to every dispatched target rather than left to MAKEFLAGS.
 #   --full       dispatch every target even on a docs-only change; `make check
@@ -129,7 +129,7 @@ mode=run
 # 1 when FULL=1 forces every target whatever the change touches (#603).
 full=0
 
-# Fixtures in flight *inside* each dispatched target (issue #390). One, not
+# Fixtures in flight *inside* each dispatched target (#390). One, not
 # `jobs', and the default is the whole of the process budget answer.
 #
 # The two layers compose multiplicatively, and left alone they would compose
@@ -359,7 +359,7 @@ closing_line() {
 # assertion all live in tests/lib/fanout.sh, because the three suite runners
 # that fan out over their own fixtures need exactly the same four things, and a
 # second copy of them is the drift this whole arrangement exists to prevent
-# (issue #390). What stays here is what is specific to dispatching *targets*:
+# (#390). What stays here is what is specific to dispatching *targets*:
 # the batch_names/batch_cmds spelling --self-test drives, the per-worker biber
 # cache lifecycle, and the summary table.
 #
@@ -455,7 +455,7 @@ collect_batch() {
 
 # The build itself, its nullfont check, and its two failure messages live in
 # tests/lib/fanout.sh, because the suite runners that fan out over their own
-# fixtures need the same proof before they do it (issue #390) and two copies of
+# fixtures need the same proof before they do it (#390) and two copies of
 # a check against a silent failure is how one of them stops being made.
 warm_font_cache() { fanout_warm_fonts "$scratch"; }
 
@@ -487,7 +487,7 @@ warm_font_cache() { fanout_warm_fonts "$scratch"; }
 # six concurrent invocations, isolated, zero failures. The directories are
 # created before dispatch rather than by the workers, so a filesystem that
 # cannot hold them stops the run with one message instead of three targets
-# failing on a lipo error. Issue #392.
+# failing on a lipo error (#392).
 
 par_root="$scratch/par"
 

@@ -5,7 +5,7 @@
 % warns and overwrites, present/absent is reported correctly, and the raw value
 % accessor expands to the stored value (or nothing when absent).
 %
-% The final block covers the `orcid' shape check (issue #331): each accepted
+% The final block covers the `orcid' shape check (#331): each accepted
 % form passes in silence, and each rejected one warns exactly once and is stored
 % anyway. The helper is defined under \ExplSyntaxOn because catcodes cannot be
 % switched inside a \TEST body, and it clears the field to empty (which removes

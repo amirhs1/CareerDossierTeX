@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-token-values.sh — the documented calibrated values (issue #487)
+# run-token-values.sh — the documented calibrated values (#487)
 #
 # Three surfaces state the same calibrated numbers, and only the first ships:
 #
@@ -9,7 +9,7 @@
 #
 # A fourth, docs/TESTING.md, states no value but lists every public spacing
 # token with the fixture that renders it, under the rule "add a row when you
-# add a token". Issue #590 found two tokens that had gone without a row since
+# add a token". #590 found two tokens that had gone without a row since
 # they were added, because nothing read that table.
 #
 # A retune changes the first and nothing forces the other two to follow. That
@@ -766,7 +766,7 @@ self_check() {
     fail=1
     return
   fi
-  # Issue #398: three states. A check that could not run is not a report about
+  # Three states (#398). A check that could not run is not a report about
   # the lint's message.
   case "$out" in
     '')

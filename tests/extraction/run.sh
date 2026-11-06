@@ -6,7 +6,7 @@
 #
 #   1. Poppler (pdftotext) extraction vs. the committed *.expected.txt baseline.
 #      Proves the visible text, its Unicode mapping, and its reading order agree.
-#   2. No /ActualText in the PDF (issue #72). Poppler recovers interword spaces
+#   2. No /ActualText in the PDF (#72). Poppler recovers interword spaces
 #      from glyph geometry, so check 1 alone cannot see per-word /ActualText
 #      spans — but PDFKit-class consumers concatenate them and merge words. This
 #      check is the portable guard and runs everywhere, including Linux CI.
@@ -52,11 +52,11 @@ out="$root/build/extraction"
 mkdir -p "$out" || exit 1
 
 # Extracted-text guards that answer "could not check" apart from "absent"
-# (issue #398).
+# (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
-# Fixture selection (issue #359). The pattern is a shell glob matched anywhere
+# Fixture selection (#359). The pattern is a shell glob matched anywhere
 # in the basename, so `resume` behaves as a substring search and `statement-*`
 # anchors at the start; it is left unquoted in the `case` below for that reason.
 # With no pattern every fixture runs, which is what CI and `make check` invoke.
@@ -145,7 +145,7 @@ normalize() {
 # to <slot>.got and the difference to <slot>.diff. Returns diff's own status.
 #
 # The scratch file is load-bearing rather than tidy. This ran as
-# `diff -u "$exp" <(printf '%s\n' "$got")` until issue #392, which fails under a
+# `diff -u "$exp" <(printf '%s\n' "$got")` until #392, which fails under a
 # restricted sandbox with
 #
 #   diff: /dev/fd/63: Operation not permitted
@@ -353,8 +353,8 @@ EOF
     echo "  extraction OK (poppler)"
   fi
 
-  # Issue #72: per-word /ActualText spans carry no interword space, so any
-  # consumer that trusts them over glyph geometry merges adjacent words. The
+  # Per-word /ActualText spans carry no interword space, so any
+  # consumer that trusts them over glyph geometry merges adjacent words (#72). The
   # package must not emit them at all.
   # -a: the PDF is uncompressed but still binary-ish, and grep without it
   # collapses every hit into a single "Binary file matches" line.
@@ -409,7 +409,7 @@ EOF
   fi
 done
 
-# Cross-medium identity (issue #278).
+# Cross-medium identity (#278).
 #
 # The two fixtures below share one body include and differ in one class option,
 # `medium'. Under `screen' a rule is drawn beneath author-written \href anchor
@@ -423,7 +423,7 @@ done
 # both files at once. The names are listed rather than derived, because the
 # claim is about this specific pair.
 #
-# Under a fixture filter (issue #359) it runs whenever *either* member is
+# Under a fixture filter (#359) it runs whenever *either* member is
 # selected, not only when both are. It compares committed baselines rather than
 # fresh output, so one member is enough to make the comparison meaningful — and
 # selecting exactly one is the case that most needs it: `--update` on a single

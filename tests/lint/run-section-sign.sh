@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-section-sign.sh — no SECTION SIGN in tracked files (issue #520)
+# run-section-sign.sh — no SECTION SIGN in tracked files (#520)
 #
 # `CONTRIBUTING.md', "Documentation heading convention", says a cross-reference
 # names its heading rather than numbering it, and gives

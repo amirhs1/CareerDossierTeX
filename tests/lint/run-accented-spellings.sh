@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-accented-spellings.sh — one ASCII spelling of `resume' (issue #543)
+# run-accented-spellings.sh — one ASCII spelling of `resume' (#543)
 #
 # `CONTRIBUTING.md', "One ASCII spelling for a word that has one",
 # says an English word with an ordinary ASCII spelling is written that way even

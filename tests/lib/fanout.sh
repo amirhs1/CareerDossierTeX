@@ -84,7 +84,7 @@ fanout_failed=0
 fanout_missing=0
 
 # Optional. When non-empty, each worker is handed its own PAR_TMPDIR beneath it,
-# so no two biber invocations share an unpacking cache; issue #392 measured why
+# so no two biber invocations share an unpacking cache; #392 measured why
 # warming a shared one cannot substitute. Directories must already exist —
 # created before dispatch, so a filesystem that cannot hold them stops the run
 # with one message instead of several workers failing on a lipo error.

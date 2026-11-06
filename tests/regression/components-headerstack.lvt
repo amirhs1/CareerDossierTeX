@@ -1,16 +1,16 @@
-% components-headerstack.lvt — issue #204 shared header-stack gap emission.
+% components-headerstack.lvt — #204 shared header-stack gap emission.
 %
 % The header stack must emit exactly one gap per boundary *between* two present
 % header lines, never a leading gap attached to an optional block. Which token
 % guards a boundary is decided by position, so the gap below the name stays
 % \CDossierSharedHeaderNameGapSkip whether or not the optional `headline' below
-% it is present. Before issue #204 that boundary silently fell back to
+% it is present. Before #204 that boundary silently fell back to
 % \CDossierSharedHeaderMetaGapSkip when the headline was absent.
 %
 % The letter class is the fixture because it is the prose class that uses the
 % shared header: it sets \parskip to \CDossierLetterParSkip document-wide, so the
 % logged document-wide \parskip and the logged gaps together also assert the
-% group-local zeroing of \parskip inside the stack (issue #220). Each emitted
+% group-local zeroing of \parskip inside the stack (#220). Each emitted
 % gap is logged in points, so the numbers are the assertion — a gap the stack
 % fails to emit, emits twice, emits from the wrong token, or emits reduced by an
 % un-zeroed \parskip all change the log.
@@ -44,8 +44,8 @@
   }
 \NewDocumentCommand \cdossiertestTraceAddvspace { } { \cdossiertest_trace_addvspace: }
 \NewDocumentCommand \cdossiertestTokens { } { \cdossiertest_tokens: }
-% Issue #255: the composed height of the stack, for the tests that have to
-% measure what reaches the page rather than what the stack claims. \ht + \dp so
+% The composed height of the stack, for the tests that have to
+% measure what reaches the page rather than what the stack claims (#255). \ht + \dp so
 % the last line's depth is not dropped.
 \box_new:N \l_cdossiertest_box
 \cs_new_protected:Npn \cdossiertest_boxheight:nn #1#2
@@ -62,7 +62,7 @@
   }
 \NewDocumentCommand \cdossiertestBoxHeight { m +m }
   { \cdossiertest_boxheight:nn {#1} {#2} }
-% Issue #224: a header line that announces when its body is executed. The
+% A header line that announces when its body is executed (#224). The
 % announcement is what distinguishes "stored unexpanded and used once, in place"
 % from "expanded at push time" or "used twice".
 \NewDocumentCommand \cdossiertestMark { m }
@@ -97,8 +97,8 @@
   \par
 }
 
-% Issue #223: the boundary below the stack is owned by the *letter's* token, not
-% by a token shared with the record classes. All three families ship at one
+% The boundary below the stack is owned by the *letter's* token, not
+% by a token shared with the record classes (#223). All three families ship at one
 % ratio, so equal values cannot tell them apart; the three tokens are given
 % distinct, deliberately un-calibrated values here and the emitted gap names
 % which one the class selected. Before the split this reported 44.0pt.
@@ -112,8 +112,8 @@
   \par
 }
 
-% Issue #224: the stack is a public composition API, so a caller that is neither
-% \MakeCDossierHeader nor \MakeCDossierStatementHeader gets the same contract.
+% The stack is a public composition API, so a caller that is neither
+% \MakeCDossierHeader nor \MakeCDossierStatementHeader gets the same contract (#224).
 % Position decides the token for an arbitrary line list too: the name gap guards
 % the first boundary and the meta gap every later one, whatever the lines are.
 \TEST{public-triple-emits-the-positional-gaps}{
@@ -153,8 +153,8 @@
   \TYPE{empty-stack-done}
 }
 
-% Issue #255: every test above records the *claim* — the argument \addvspace was
-% called with. A claim is not a rendered gap: \addvspace takes the maximum of
+% Every test above records the *claim* — the argument \addvspace was
+% called with (#255). A claim is not a rendered gap: \addvspace takes the maximum of
 % the adjacent claims, so a token can be traced at every boundary it names and
 % still contribute nothing to the page. That is the condition #204 exists to
 % prevent, and it was found reproduced inside a fixture during #206.
@@ -169,7 +169,7 @@
 %
 % The letter class is what makes this worth measuring rather than deriving. Its
 % \parskip is a visible 0.25 line, and the stack subtracts \parskip from every
-% gap it emits and zeroes it for its own group (issue #220). If that isolation
+% gap it emits and zeroes it for its own group (#220). If that isolation
 % were lost, the traced claims above would not change at all and only these
 % heights would move.
 \TEST{stack-heights-are-the-rendered-gaps}{

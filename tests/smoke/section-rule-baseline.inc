@@ -1,8 +1,8 @@
 % Shared regression: the section rule sits a fixed distance below the heading
 % baseline.
 %
-% Issue #169. `\CDossierRecordSectionRuleGapSkip' is the distance from the
-% section heading's baseline to the top of the decorative rule. That distance
+% `\CDossierRecordSectionRuleGapSkip' is the distance from the
+% section heading's baseline to the top of the decorative rule (#169). That distance
 % must not depend on the heading's glyphs.
 %
 % Before the fix the rule was placed relative to the heading's *box bottom*,

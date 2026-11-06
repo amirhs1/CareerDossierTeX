@@ -1,4 +1,4 @@
-% Shared issue #144 assertion: the statement name must invoke the calibrated
+% Shared #144 assertion: the statement name must invoke the calibrated
 % name token and resolve to the selected class size, not fixed LaTeX \Huge.
 \ExplSyntaxOn
 \bool_new:N \g__cdossier_test_statement_name_size_bool

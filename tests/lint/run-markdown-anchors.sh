@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-markdown-anchors.sh — every Markdown anchor link resolves (issue #407)
+# run-markdown-anchors.sh — every Markdown anchor link resolves (#407)
 #
 # The documentation set navigates by cross-document links, and #259 made that
 # load-bearing: `docs/API.md` and `docs/MIGRATION.md` now point at
@@ -64,7 +64,7 @@ root="$(cd "$here/../.." && pwd)"
 fixtures="$here/fixtures"
 fail=0
 
-# Output guards that answer "could not check" apart from "absent" (issue #398).
+# Output guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
@@ -99,7 +99,7 @@ function anchor(h,   s) {
 
 # Load one target file's anchors. Sets loaded[path] to 1 if it was readable,
 # and -1 if it was not, so a missing file is distinguished from one with no
-# headings rather than the two reading alike (issue #398).
+# headings rather than the two reading alike (#398).
 function load(path,   line, h, fence, n) {
   if (path in loaded) return loaded[path]
   fence = 0; n = 0
@@ -170,7 +170,7 @@ fence { next }
 }
 END {
   # Report how much was actually inspected, so "nothing matched" cannot read as
-  # a pass (issue #398's lesson, applied to the scan rather than to a guard).
+  # a pass (#398's lesson, applied to the scan rather than to a guard).
   printf "CHECKED\t%d\n", checked
   exit bad ? 1 : 0
 }
@@ -247,7 +247,7 @@ self_check() {
     fail=1
     return
   fi
-  # Issue #398: read three states, not two. A check that could not run is not a
+  # Read three states, not two (#398). A check that could not run is not a
   # report about the lint's message.
   text_contains "$out" "$expected"
   case "$?" in

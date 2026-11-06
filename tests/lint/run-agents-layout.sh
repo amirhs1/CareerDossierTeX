@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-agents-layout.sh — AGENTS.md "Layout" lists manifest.txt's entries (issue #584)
+# run-agents-layout.sh — AGENTS.md "Layout" lists manifest.txt's entries (#584)
 #
 # AGENTS.md, "Layout" copies manifest.txt's two groups, "The Work" and
 # "Distributed with the Work", entry for entry, and says to change both in the
@@ -29,7 +29,7 @@ root="$(cd "$here/../.." && pwd)"
 fixtures="$here/fixtures"
 fail=0
 
-# Output guards that answer "could not check" apart from "absent" (issue #398).
+# Output guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 

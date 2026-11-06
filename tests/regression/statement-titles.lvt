@@ -7,7 +7,7 @@
 % overrides it, and the six examples are compiled but never asserted — so no
 % test pinned these defaults. This test asserts all seven type values at the
 % token level, independent of fonts and page breaking, without the redundant
-% per-subtype tagged fixtures that issue #102 excludes.
+% per-subtype tagged fixtures that #102 excludes.
 \input{regression-test}
 \documentclass{careerdossier-statement}
 \CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }

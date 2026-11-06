@@ -1,4 +1,4 @@
-% Shared body for the link-decoration extraction pair (issue #278).
+% Shared body for the link-decoration extraction pair (#278).
 %
 % Both fixtures that \input this differ in exactly one class option, `medium'.
 % Their committed baselines must therefore be identical, character for

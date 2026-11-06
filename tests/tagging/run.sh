@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # run.sh -- tagged-PDF structure, extraction, and PDF/UA-2 validation checks.
 #
-# Issue #28 established the structural half of this suite: semantic
+# #28 established the structural half of this suite: semantic
 # headings/lists/paragraphs/links, artifact-marked decoration and pagination,
 # logical extraction order, an absent structure tree when tagging is not
 # requested, and equivalent tagged/untagged word geometry.
 #
-# Issue #77 adds the release gates that #28 deliberately deferred:
+# #77 adds the release gates that #28 deliberately deferred:
 #
 #   * PDF/UA-2 validation. Each profile has a *-ua2.tex variant that shares the
 #     body include and only adds pdfstandard=ua-2, so a veraPDF result here
@@ -19,7 +19,7 @@
 #   * A toolchain record, because a validation result is only meaningful
 #     alongside the versions that produced it.
 #
-# Issue #302 adds a check that is not an extraction check at all. All three
+# #302 adds a check that is not an extraction check at all. All three
 # extractors above rebuild words from glyph geometry, which makes the entire
 # matrix blind to two pieces of content separated by nothing but positioning
 # glue. structure-text.pl decodes the marked-content runs from the content
@@ -49,7 +49,7 @@
 #
 # or, through the Makefile:  make tagging FIXTURE=<pattern>
 #
-# The selectable unit is the fixture GROUP, not the .tex file (issue #367).
+# The selectable unit is the fixture GROUP, not the .tex file (#367).
 #
 # A group is a base fixture plus the companions that mean nothing on their own:
 # `<group>-untagged.tex', which exists to be compared against the tagged build,
@@ -66,7 +66,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 
 # Extracted-text guards that answer "could not check" apart from "absent"
-# (issue #398).
+# (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
@@ -85,7 +85,7 @@ export TEXINPUTS="$here:$root:${TEXINPUTS:-}"
 # database rather than duplicating it.
 export BIBINPUTS="$root/tests/bibliography:${BIBINPUTS:-}"
 
-# Fixture-group selection (issue #367), the interface issue #359 gave the other
+# Fixture-group selection (#367), the interface #359 gave the other
 # four runners. The pattern is a shell glob matched anywhere in the group name,
 # so `cv' behaves as a substring search and `resume-*' anchors at the start; it
 # is left unquoted in the `case' below for exactly that reason.
@@ -102,7 +102,7 @@ export BIBINPUTS="$root/tests/bibliography:${BIBINPUTS:-}"
 # baseline regeneration should rewrite only the baselines the change was meant
 # to move.
 #
-# Fixture-group concurrency (issue #390) is opt-in through `--jobs N`, which
+# Fixture-group concurrency (#390) is opt-in through `--jobs N`, which
 # `make tagging JOBS=N` passes through. With no `--jobs`, or `--jobs 1`, this
 # runner takes the serial path below and is the suite it has always been.
 fixture_filter=""
@@ -195,7 +195,7 @@ skipped=()
 # Groups that were selected and then ran nothing at all, because the only gate
 # they have is unavailable here. Without this a scoped run that selected one
 # such group would print the same closing line as a scoped run that checked it
-# (issue #367). Populated only under a filter: unfiltered, a gate that did not
+# (#367). Populated only under a filter: unfiltered, a gate that did not
 # run is already named in `skipped', and adding a second notice there would
 # change the full-run output this change is required to leave alone.
 gated_out=()
@@ -303,7 +303,7 @@ record_failure() {
 }
 
 # The two polarities of an extracted-text assertion, in this runner's idiom
-# (issue #398). Both treat "the check could not be performed" as a failure of
+# (#398). Both treat "the check could not be performed" as a failure of
 # their own rather than folding it into a verdict, and say which it was.
 #
 # require_text is the branch whose old spelling produced the hollow *failure*
@@ -351,7 +351,7 @@ forbid_match() { # <text> <ere> <what is wrong when it matches>
 }
 
 # A validation result without the toolchain that produced it is not reviewable
-# evidence. Issue #77 requires these versions be recorded with the results.
+# evidence. #77 requires these versions be recorded with the results.
 record_toolchain() {
   {
     echo "# CareerDossierTeX tagging-validation toolchain record"
@@ -450,7 +450,7 @@ check_structure() {
   check_identity_title "$base" "$pdf"
 }
 
-# Issue #268: a heading element records that some words are a heading. It does
+# A heading element records that some words are a heading (#268). It does
 # not record where the section it names begins or ends -- that is the enclosing
 # `Sect' division, and without one every heading and every paragraph is a flat
 # sibling with nothing tying content to the heading that introduces it.
@@ -493,9 +493,9 @@ check_section_divisions() {
   esac
 }
 
-# Issue #305: the identity heading is the document's /H1 -- it outranks every
+# The identity heading is the document's /H1 -- it outranks every
 # section heading in every family -- so it must carry a title at least as much
-# as the headings beneath it do. #268 gave section headings their `/T' and left
+# as the headings beneath it do (#305). #268 gave section headings their `/T' and left
 # the identity without one, which is the inconsistency this closes.
 #
 # The name is asserted per profile from the fixture's own `name' field rather
@@ -534,10 +534,10 @@ check_heading_title() {
     || record_failure "$base does not record '$title' as its heading element's title"
 }
 
-# Issue #267: the document identity (the name) is depth 1 of the shared
+# The document identity (the name) is depth 1 of the shared
 # heading primitive -- the kernel's dflt namespace maps that depth to `/H1' --
 # so it must be the document's *only* `/H1', and it must outrank every other
-# heading. Every one of the five named profiles carries exactly one `/S
+# heading (#267). Every one of the five named profiles carries exactly one `/S
 # /section' element (the name); a resume/CV/statement section heading is `/S
 # /subsection' (`/H2') and a statement subsection would be `/S /subsubsection'
 # (`/H3'). These three literal tags cannot collide as substrings of one
@@ -558,8 +558,8 @@ check_heading_hierarchy() {
   fi
 }
 
-# Issue #337: the record classes' second heading level, as the structure tree
-# sees it. check_heading_hierarchy above states the rule this enforces — an /H3
+# The record classes' second heading level, as the structure tree
+# sees it (#337). check_heading_hierarchy above states the rule this enforces — an /H3
 # with no /H2 is a skipped level — but every fixture that runs it has zero /H3
 # elements, so its `h3 > 0' branch has never been reached by anything. This is
 # the fixture that reaches it, and it asserts the positive form rather than the
@@ -700,7 +700,7 @@ check_page_two_artifact_stream() {
       "$base page two must artifact-mark its header and folio (found $text_artifacts text artifacts)"
 }
 
-# Tagged + labelled contact line (issue #125).
+# Tagged + labelled contact line (#125).
 #
 # The contract in careerdossier-components.sty is that a contact label and an
 # unlinked contact value are meaningful content that must reach the structure
@@ -765,10 +765,10 @@ check_contact_label_tagging() {
   echo "  RECORDED: structure roles (report: $base-structure.txt)"
 }
 
-# Underlined link text under `medium=screen' (issue #278).
+# Underlined link text under `medium=screen' (#278).
 #
 # The decoration is drawn by ulem, and \uline reboxes what it underlines. Boxed
-# text under tagging is exactly how the v0.6.0 regression of issue #161
+# text under tagging is exactly how the v0.6.0 regression of #161
 # happened: the run became a bare /Artifact, invisible to assistive technology,
 # while veraPDF validated it and all three extractors read it back intact. So
 # neither veraPDF nor the extraction matrix can be the guard here.
@@ -827,7 +827,7 @@ check_link_decoration_tagging() {
   fi
 }
 
-# Structure-element text (issue #302).
+# Structure-element text (#302).
 #
 # Every other extraction check below asks an extractor what the page says, and
 # Poppler, MuPDF, and PDFKit all rebuild words and lines from glyph *geometry*.
@@ -889,7 +889,7 @@ check_structure_text_separators() {
   done
 }
 
-# The `entrymeta=inline' form of the assertion above (issue #230).
+# The `entrymeta=inline' form of the assertion above (#230).
 #
 # It needs its own function because the inline separator is a marked-content
 # artifact, and an artifact interrupts the enclosing run: `Engineer | 2024-2026'
@@ -906,7 +906,7 @@ check_structure_text_separators() {
 #   separated  what the joined text must be — and it is character-for-character
 #              what the `column' form of the same heading produces, which is the
 #              claim `entrymeta' rests on: it moves ink, not structure.
-#   glued      issue #302 all over again. It would mean the leading space is not
+#   glued      #302 all over again. It would mean the leading space is not
 #              reaching the content stream as a real U+0020, so the two cells
 #              arrive as one word.
 #   barred     the `|' itself reaching the structure tree. It would mean the
@@ -998,7 +998,7 @@ check_untagged() {
   fi
 }
 
-# ViewerPreferences /DisplayDocTitle (issue #277).
+# ViewerPreferences /DisplayDocTitle (#277).
 #
 # A viewer shows the filename in its window title, tab bar, and recent-documents
 # list unless the catalog asks it not to, so the /Title careerdossier-metadata
@@ -1140,7 +1140,7 @@ validate_ua2() {
 
 # Tagged BibLaTeX, recorded separately and deliberately non-blocking.
 #
-# Tagging support inside BibLaTeX and Biber is upstream work. Issue #77 scopes
+# Tagging support inside BibLaTeX and Biber is upstream work. #77 scopes
 # this fixture to recording current behavior: a failure here is reported and
 # retained, but only fails the suite if CareerDossierTeX's own code caused it,
 # which is a judgement the maintainer makes from the retained report.
@@ -1176,7 +1176,7 @@ check_biblatex_feasibility() {
 }
 
 # --------------------------------------------------------------------------
-# The twelve units (issue #390).
+# The twelve units (#390).
 #
 # Each is a function that prints everything the serial runner printed for its
 # group and reports its verdict through its return status alone, because a
@@ -1255,7 +1255,7 @@ fi
 return "$fail"
 }
 
-# Entry metadata set inline (issue #230). Outside the five-document loop for the
+# Entry metadata set inline (#230). Outside the five-document loop for the
 # same reason as the fixture above: it is a one-page document with no
 # continuation furniture. The option's rendered and extracted output is pinned
 # by tests/extraction; what only this suite can see is what `inline' does to the
@@ -1280,7 +1280,7 @@ fi
 return "$fail"
 }
 
-# Link decoration under `medium=screen' (issue #278). Outside the five-document
+# Link decoration under `medium=screen' (#278). Outside the five-document
 # loop for the same reason as the two fixtures above: one page, no continuation
 # furniture. What only this suite can see is whether ulem's rebox pushed the
 # underlined anchor text out of the structure tree.
@@ -1300,7 +1300,7 @@ fi
 return "$fail"
 }
 
-# The full recipient block (issue #302). Outside the loop because it is a
+# The full recipient block (#302). Outside the loop because it is a
 # one-page fixture with no continuation furniture, and because the only thing it
 # is here to pin is the recipient block -- including the `\\' the user writes
 # inside recipient-address, which no other fixture sets.
@@ -1323,7 +1323,7 @@ fi
 return "$fail"
 }
 
-# The second heading level (issue #337). Outside the five-document loop for the
+# The second heading level (#337). Outside the five-document loop for the
 # same reason as the fixtures above: one page, no continuation furniture.
 #
 # Everything this fixture is here for is invisible on the rendered page. The
@@ -1345,7 +1345,7 @@ fi
 return "$fail"
 }
 
-# Grouped publication-list numbering (issue #355). Outside the five-document
+# Grouped publication-list numbering (#355). Outside the five-document
 # loop for the same reason as the fixtures above: one page, no continuation
 # furniture.
 #
@@ -1380,7 +1380,7 @@ fi
 return "$fail"
 }
 
-# The feasibility fixture is a selectable group like any other (issue #367). It
+# The feasibility fixture is a selectable group like any other (#367). It
 # is the one group whose *only* path is behind a gate, so selecting it on a
 # machine without Biber runs nothing at all -- recorded below rather than left
 # to print as a pass.
@@ -1488,7 +1488,7 @@ fi
 
 # A gate that is unavailable and a group that was never selected are different
 # facts, and under a filter they would otherwise reach the reader as the same
-# blank space (issue #367). This names the groups that were asked for and then
+# blank space (#367). This names the groups that were asked for and then
 # checked nothing.
 if [ "${#gated_out[@]}" -gt 0 ]; then
   echo "SELECTED BUT NOT RUN — nothing was checked for:"

@@ -2,7 +2,7 @@
 // pdfkit-extract.js — extract a PDF's text layer through Apple PDFKit.
 //
 // Poppler (pdftotext) recovers interword spaces from glyph geometry, so it
-// cannot see the failure mode in issue #72. PDFKit's `PDFDocument.string`
+// cannot see the failure mode in #72. PDFKit's `PDFDocument.string`
 // treats /ActualText as authoritative and concatenates the spans directly,
 // which is what Preview, Quick Look, Spotlight, Safari, and macOS copy/paste
 // all do. This script exposes that consumer path to the fixture runner.

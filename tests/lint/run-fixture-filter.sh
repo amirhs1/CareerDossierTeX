@@ -3,7 +3,7 @@
 #
 # `make smoke`, `make layout`, `make extract-test`, and `make tagging` take an
 # optional `FIXTURE=<pattern>` that scopes the run to the fixtures matching it
-# (issues #359 and #367). That selection is the one part of a test runner whose
+# (#359 and #367). That selection is the one part of a test runner whose
 # own failure mode is a *pass*: a suite that selects nothing makes none of its
 # assertions and reports every one of them clean. This script is what stops that
 # being silent.
@@ -63,7 +63,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 
 # Membership and output guards that answer "could not check" apart from
-# "absent" (issue #398).
+# "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
@@ -270,7 +270,7 @@ EOF
     echo "    passes every assertion this suite makes, and reports so."
     fail=1
   else
-    # Three states, not two (issue #398): a non-zero exit whose reason could
+    # Three states, not two (#398): a non-zero exit whose reason could
     # not be read has not been shown to be the documented one.
     text_contains "$nomatch_out" 'NO FIXTURE MATCHES'
     case "$?" in
@@ -309,7 +309,7 @@ EOF
     echo "  an unknown option is rejected (exit $rc)"
   fi
 
-  # 6. Fan-out (issue #390): where a runner has a `--jobs' path, the units it
+  # 6. Fan-out (#390): where a runner has a `--jobs' path, the units it
   #    would dispatch must cover the serial universe exactly.
   #
   #    This is the one assertion the checks above cannot make. They establish
@@ -373,7 +373,7 @@ for suite in smoke layout extraction tagging; do
   #
   # The recipe line is extracted first and then examined with `case', rather
   # than matched whole with one `grep -F'. A whole-line match was what this did
-  # until the JOBS pass-through joined the recipe (issue #390), and it broke on
+  # until the JOBS pass-through joined the recipe (#390), and it broke on
   # a change that was correct — a literal match asserts the argument list's
   # exact text, which is more than the contract needs and less than it means.
   # `case' also avoids the `printf | grep -q' form, whose SIGPIPE race under

@@ -6,9 +6,9 @@
 
 \CDossierHighlightAuthor{family={Lovelace}, given={Ada}}
 \CDossierHighlightAuthor{family={Lovelace}, given={A.}}
-% Issue #541. Declared with ordinary spaces, the way the name reads; Biber
+% Declared with ordinary spaces, the way the name reads; Biber
 % writes the parsed part with a delimiter macro between the words instead, and
-% the tests below drive the matcher with both spellings.
+% the tests below drive the matcher with both spellings (#541).
 \CDossierHighlightAuthor{family={Van den Berg}, given={Maria Elena}}
 
 \ExplSyntaxOn
@@ -20,7 +20,7 @@
       { \TYPE{ [#1/#2]=highlight } }
       { \TYPE{ [#1/#2]=ordinary } }
   }
-% The declaration side of issue #541, which \cdossiertestBibName cannot reach:
+% The declaration side of #541, which \cdossiertestBibName cannot reach:
 % that one drives the parsed name part, and this drives the declared one. The
 % declaration is stored globally and a group would not contain it, but it is
 % matched here, so it is not among the ones reported at \end{document}.
@@ -69,9 +69,9 @@
   \cdossiertestBibName{Hopper}{Grace}
 }
 
-% Issue #541. Biber does not separate the words of a multi-word name part with
+% Biber does not separate the words of a multi-word name part with
 % a space: `given = {Maria Elena}' reaches \namepartgiven as
-% `Maria\bibnamedelima Elena'. Comparing that against the declaration's
+% `Maria\bibnamedelima Elena' (#541). Comparing that against the declaration's
 % ordinary space matched nothing and said nothing, so the only symptom was a
 % name left in the regular weight. The delimiter spellings here are copied from
 % a .bbl Biber wrote, not invented: \bibnamedelima between words,
@@ -101,7 +101,7 @@
   \cdossiertestBibFormatting{bibliography}
 }
 
-% The URL glue policy of issue #312. The PDF-level assertion lives in
+% The URL glue policy of #312. The PDF-level assertion lives in
 % tests/links, which needs Biber and Poppler and is therefore skippable; this
 % one is the cheap, always-run statement of what the package sets, and it is
 % what would notice a value drifting back toward a stretchable cap.

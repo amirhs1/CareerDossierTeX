@@ -45,18 +45,18 @@
 \TEST{subject-is-serif-bold}{    \cdossiertestRole{\CDossierSubjectStyle}    }
 \TEST{body-is-serif-regular}{    \cdossiertestRole{\CDossierBodyStyle}       }
 
-% Issue #299: the subject role and the entry-title role resolve to the same
+% The subject role and the entry-title role resolve to the same
 % shape today, and each is asserted on its own line above rather than against
-% the other. The two are independent semantic decisions that happen to agree;
+% the other (#299). The two are independent semantic decisions that happen to agree;
 % an assertion of the form `subject equals entrytitle' would pass for a
 % definition that couples them, which is exactly what this role removes.
 
-% \CDossierMutedStyle is not asserted here. Issue #271 made de-emphasis
+% \CDossierMutedStyle is not asserted here. #271 made de-emphasis
 % configurable, and `muted=gray' resolves to a colour, which this package does
 % not own; the complete role moved to careerdossier-components and is asserted
 % in components-muted.lvt.
 
-% Issue #75: the regression harness and typography package must use LuaTeX.
+% The regression harness and typography package must use LuaTeX (#75).
 \TEST{lualatex-engine-contract}{
   \cdossiertestEngine
 }

@@ -11,7 +11,7 @@
 \documentclass{article}
 \usepackage{careerdossier-components}
 
-%% The furniture primitive is an expl3 private name (issue #242), so the call
+%% The furniture primitive is an expl3 private name (#242), so the call
 %% has to sit inside \ExplSyntaxOn: outside it the `_' is a subscript and the
 %% name silently splits into \_ plus text, leaving the page styles unset.
 \ExplSyntaxOn
@@ -71,7 +71,7 @@
     \tl_set:Nn \l__cdossiertest_runninglabel_tl { Updated }
   }
 
-%% Issue #242 classified the furniture primitive as class-to-package plumbing
+%% #242 classified the furniture primitive as class-to-package plumbing
 %% rather than a member of the author-facing \MakeCDossier... family, and
 %% renamed it. Asserting only that the private name works would leave the
 %% public one free to reappear, so both halves are pinned: the old name must be

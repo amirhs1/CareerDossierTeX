@@ -1,18 +1,18 @@
 % Shared regression: the list-edge tokens own the whole gap at both ends of a
 % list, and the two ends are independently controlled.
 %
-% Issue #176. The tokens are documented as the sole owners of the vertical
+% The tokens are documented as the sole owners of the vertical
 % distance between a list and the content around it, and the vertical-rhythm
-% table in docs/ARCHITECTURE.md reports their values as those distances.
+% table in docs/ARCHITECTURE.md reports their values as those distances (#176).
 % LaTeX's `\list' adds `\partopsep' on top of `topsep' whenever the list opens
 % a new paragraph, and the `article' default is a fixed 3 pt that no CDossier
 % token owns and that does not rescale with `fontsize'. Without an explicit
 % `partopsep = 0pt' the real gap was the token plus 3 pt -- wrong in absolute
 % terms, and proportionally larger at 10pt than at 12pt.
 %
-% Issue #191. `topsep' is LaTeX's only list-edge key and is used at both ends,
+% `topsep' is LaTeX's only list-edge key and is used at both ends,
 % so a class that passes one token through it cannot give the closing edge a
-% different value. The second fixture below perturbs
+% different value (#191). The second fixture below perturbs
 % `\CDossierRecordListEdgeBelowSkip' alone: without the closing-edge
 % mechanism the list would still emit `\CDossierRecordListEdgeAboveSkip' below
 % itself and the assertion would fail. Keeping the perturbed value distinct
@@ -36,10 +36,10 @@
   \end{CDossierItemize}%
 }
 
-% Issue #193. A tagged build replaces LaTeX's list internals with LaTeX Lab's
+% A tagged build replaces LaTeX's list internals with LaTeX Lab's
 % block templates, which do not take their closing spacing from `\@topsepadd',
 % so the closing token reaches that path through the block template's own
-% closing-edge keys instead. Both assertions below therefore hold on the tagged
+% closing-edge keys instead (#193). Both assertions below therefore hold on the tagged
 % path as well, and the fixtures that compile this file with tagging on are what
 % keep the two paths from drifting apart again.
 

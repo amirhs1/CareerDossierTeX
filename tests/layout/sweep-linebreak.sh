@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# sweep-linebreak.sh — line-breaking calibration instrument (issue #316).
+# sweep-linebreak.sh — line-breaking calibration instrument (#316).
 #
 # Forces a line-breaking parameter to each of several candidate values, rebuilds
 # the corpus, and reports what each value costs and buys. This is the harness

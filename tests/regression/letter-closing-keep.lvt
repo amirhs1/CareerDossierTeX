@@ -1,4 +1,4 @@
-% letter-closing-keep.lvt — issue #421, the closing block's keep-together.
+% letter-closing-keep.lvt — #421, the closing block's keep-together.
 %
 % \MakeCDossierClosing emits the closing text and the signature name as two
 % separate one-line paragraphs with \vspace{\CDossierLetterSignatureGapSkip}

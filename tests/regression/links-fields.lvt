@@ -6,9 +6,9 @@
 % present, an existing scheme is preserved, email becomes a mailto: target,
 % ORCID identifiers gain their canonical resolver URL, and the link wrapper
 % degrades to plain visible text when hyperref is absent — announcing that
-% degradation exactly once for the whole document (issue #329).
+% degradation exactly once for the whole document (#329).
 %
-% The linkedin, github, and scholar cases (issue #330) pin the displayed text as
+% The linkedin, github, and scholar cases (#330) pin the displayed text as
 % well as the target, in the form `[display] -> [target]'. Normalization is
 % visible, so those two must agree: a bare identifier is expanded to the
 % service's canonical address for both, and every value already carrying a `/'
@@ -83,9 +83,9 @@
 \begin{document}
 \START
 
-%% Issue #329. The degradation is checked below; this is its signal, and the
+%% The degradation is checked below; this is its signal, and the
 %% property under test is that it appears exactly *once* per document however
-%% many links degrade. So it is asserted first, on a contact line carrying five
+%% many links degrade (#329). So it is asserted first, on a contact line carrying five
 %% linked fields at once — and every later test in this file renders a further
 %% link with hyperref still absent, so the silence in each of their baselines is
 %% the other half of the assertion. tests/regression/links-fields-hyperref
@@ -125,9 +125,9 @@
   \cdossiertestHrefBranch
 }
 
-%% Issue #330. Three input forms per key: the bare identifier, which is the one
+%% Three input forms per key: the bare identifier, which is the one
 %% that changes; the domain-qualified form every shipped profile uses; and the
-%% fully written-out address. Only the first may differ from its input.
+%% fully written-out address (#330). Only the first may differ from its input.
 \TEST{linkedin-bare-handle-gains-canonical-address}{
   \cdossiertestProfile{linkedin}{ada-lovelace}
 }

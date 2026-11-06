@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # run-text-guards.sh — the committed negative controls for tests/lib/text.sh.
 #
-# Issue #398. The runners assert on extracted text through a predicate that must
-# answer three things apart: present, absent, and *could not be checked*. The
+# The runners assert on extracted text through a predicate that must
+# answer three things apart: present, absent, and *could not be checked* (#398). The
 # defect was a predicate that answered two, so a check that could not run was
 # reported as a verdict — as "text missing" in the plain branches, and, in the
 # inverted `medium=screen` branches, as a pass.
@@ -371,8 +371,8 @@ else
 fi
 
 printf '\n== control 9: the code-point scan fires on genuinely bad text ==\n'
-# Issue #514. tests/extraction/run.sh asserts that extracted text carries no
-# U+FFFD and no Private Use Area code point. That guard passes on every fixture
+# tests/extraction/run.sh asserts that extracted text carries no
+# U+FFFD and no Private Use Area code point (#514). That guard passes on every fixture
 # in the suite today — which is exactly what a guard that cannot fire at all
 # also does. So it is re-proved here against text known to be bad, on every run,
 # rather than trusted because the suite is green.

@@ -1,4 +1,4 @@
-% statement-prose-edges.lvt — issue #255 rendered prose heading boundaries.
+% statement-prose-edges.lvt — #255 rendered prose heading boundaries.
 %
 % The six tokens that shape a statement's vertical rhythm were pinned only by
 % value: `tokens-statement-defaults' echoes them, `tokens-invariants' compares
@@ -6,7 +6,7 @@
 % \addvspace *claims*. None of those is evidence that a gap reaches the page.
 % A token that loses its maximum at every boundary a fixture happens to contain
 % still moves an echoed number when its ratio changes, so the baseline shifts
-% and the test looks like it is doing its job — the condition issue #204 exists
+% and the test looks like it is doing its job — the condition #204 exists
 % to prevent, reproduced once inside `resume-entry-edges' and found again here.
 %
 % \pagetotal is the assertion, as in `resume-entry-edges': it is the height of

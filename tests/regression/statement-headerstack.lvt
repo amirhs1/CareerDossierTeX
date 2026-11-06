@@ -1,4 +1,4 @@
-% statement-headerstack.lvt — issue #204 statement header via the shared stack.
+% statement-headerstack.lvt — #204 statement header via the shared stack.
 %
 % The statement header used to emit \CDossierSharedHeaderMetaGapSkip from four
 % separate sites, each attached as a *leading* skip on the optional block below
@@ -60,8 +60,8 @@
   \par
 }
 
-% Issue #223: the boundary below the stack is owned by the *prose* token, not by
-% a token shared with the record classes. All three families ship at one ratio,
+% The boundary below the stack is owned by the *prose* token, not by
+% a token shared with the record classes (#223). All three families ship at one ratio,
 % so equal values cannot tell them apart; the three tokens are given distinct,
 % deliberately un-calibrated values here and the emitted gap names which one the
 % class selected. Before the split this reported 44.0pt.

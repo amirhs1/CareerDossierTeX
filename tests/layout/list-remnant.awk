@@ -1,5 +1,5 @@
 # list-remnant.awk — how many typeset lines the lone item of a split list
-# occupies on one page (issue #564), from `pdftotext -bbox-layout` output.
+# occupies on one page (#564), from `pdftotext -bbox-layout` output.
 #
 # The list-orphan policy is stated in lines (#562): a page may not carry a
 # remnant of a split list that is a single typeset line. A page carrying one

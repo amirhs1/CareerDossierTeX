@@ -6,7 +6,7 @@
 # A library, sourced rather than executed. Every runner that asserts something
 # about a PDF's extracted text asks two questions of it: capture the text, then
 # ask whether a string is in it. This file owns both, because the two-state
-# spelling of the second question is issue #398.
+# spelling of the second question is #398.
 #
 # THE DEFECT IT REPLACES
 #
@@ -259,7 +259,7 @@ text_page() {
 # text matches something expected; this one asks whether it is *valid at all* --
 # free of the replacement character U+FFFD and of any Private Use Area code
 # point U+E000-U+F8FF. `docs/ATS-EXTRACTION.md` "What ATS-friendly means"
-# names both as things extracted text must not contain, and until issue #514
+# names both as things extracted text must not contain, and until #514
 # neither was asserted anywhere.
 #
 # Why a baseline comparison does not already cover this. The suite asserts that

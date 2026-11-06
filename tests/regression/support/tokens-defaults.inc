@@ -1,7 +1,7 @@
 % Shared regression body: the layout-input defaults every class ends up with.
 %
-% Issue #528. Included by the four `tokens-*-defaults.lvt' fixtures, one per
-% class. Each fixture loads its class, may define \cdossiertestClassDefaults
+% Included by the four `tokens-*-defaults.lvt' fixtures, one per
+% class (#528). Each fixture loads its class, may define \cdossiertestClassDefaults
 % for the probes only that class has, and inputs this file; l3build copies it
 % from `tests/regression/support/' into the test directory before each run.
 % The reasoning below is about the toolkit, not about a class, so it lives
@@ -20,16 +20,16 @@
     \TYPE{body-size = \dim_use:N \CDossierBodySize}
     \TYPE{page-margin = \dim_use:N \CDossierPageMargin}
     \cdossiertestClassDefaults
-    %% Issue #272: \emergencystretch is one shared policy expressed as one
-    %% token. Pinning the resolved value *and* its identity with the token
+    %% \emergencystretch is one shared policy expressed as one
+    %% token (#272). Pinning the resolved value *and* its identity with the token
     %% catches both halves of the defect this replaced: a class writing its own
     %% literal again, and a class silently setting nothing at all.
     \TYPE{emergency-stretch = \dim_use:N \emergencystretch}
     \dim_compare:nNnTF { \emergencystretch } = { \CDossierEmergencyStretch }
       { \TYPE{line-break-flexibility = shared} }
       { \TYPE{line-break-flexibility = local} }
-    %% Issue #309: hyphenation is a decided policy, and the decision was to
-    %% keep TeX's defaults (50/50) in all four families. Only a recorded
+    %% Hyphenation is a decided policy, and the decision was to
+    %% keep TeX's defaults (50/50) in all four families (#309). Only a recorded
     %% baseline can express that: in the source, a parameter nobody thought
     %% about and a parameter deliberately left alone look identical, which is
     %% how this went unowned long enough to need an issue. Pinning both values
@@ -41,7 +41,7 @@
   }
 \ExplSyntaxOff
 \makeatletter
-%% Issue #335: the bottom-fill state this class actually ends up in. Nothing in
+%% The bottom-fill state this class actually ends up in (#335). Nothing in
 %% the toolkit sets it -- \raggedbottom is inherited from `article.cls', which
 %% issues it only in the \if@twoside false branch and switches to \flushbottom
 %% for \if@twocolumn. The club/widow penalties in careerdossier-tokens.sty are
@@ -69,8 +69,8 @@
     \fi
   \endgroup
 }
-%% Issue #351: the club/widow decision rests on two more inherited quantities,
-%% and the toolkit sets neither of them either. A rigid \topskip is what leaves
+%% The club/widow decision rests on two more inherited quantities,
+%% and the toolkit sets neither of them either (#351). A rigid \topskip is what leaves
 %% the page builder with no stretch to judge a short page on, and \@secpenalty
 %% is the -300 bonus before every section that becomes live, and moves breaks
 %% *earlier*, the moment it gains some. careerdossier-tokens.sty states the

@@ -112,7 +112,7 @@
 \NewDocumentCommand \cdossiertestBodyCatcode { }
   { \cdossiertest_body_catcode: }
 
-%% Issue #242 classified the body-size primitive as class-to-package plumbing
+%% #242 classified the body-size primitive as class-to-package plumbing
 %% and renamed it. Asserting only that the private name works would leave the
 %% public one free to reappear, so both halves are pinned: the old name must be
 %% undefined, not merely unused.

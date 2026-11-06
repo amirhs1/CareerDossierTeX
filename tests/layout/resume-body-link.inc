@@ -1,4 +1,4 @@
-% Shared fixture for the body-text link matrix (issue #308).
+% Shared fixture for the body-text link matrix (#308).
 %
 % A long link in body text has no supported break point of its own: plain text
 % sets it as one token, and \emergencystretch cannot rescue a line that holds

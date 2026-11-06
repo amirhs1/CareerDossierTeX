@@ -1,4 +1,4 @@
-% Shared issue #144 assertion: every statement-header line must select its
+% Shared #144 assertion: every statement-header line must select its
 % calibrated size command rather than an inherited LaTeX relative size.
 \ExplSyntaxOn
 \int_new:N \g__cdossier_test_statement_name_size_int

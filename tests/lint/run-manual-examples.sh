@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run-manual-examples.sh — the manual's published templates are all compiled
-# (issue #458)
+# (#458)
 #
 # `doc/careerdossier.tex' "Complete examples" publishes complete documents a
 # reader is expected to copy. A published template is a promise that the code in
@@ -52,7 +52,7 @@ set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 
-# Output guards that answer "could not check" apart from "absent" (issue #398).
+# Output guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 

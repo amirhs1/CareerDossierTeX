@@ -1,4 +1,4 @@
-% resume-section-structure.lvt — issue #268 the resume section's tagged shape.
+% resume-section-structure.lvt — #268 the resume section's tagged shape.
 %
 % A section heading has to do two things: name the section, and open the `Sect'
 % division that encloses the heading and everything under it until the next
@@ -52,8 +52,8 @@
   \cdossiertestQuiet{\CDossierSection{Education}}
 }
 
-% Issue #337: the second heading level, in the same contract and in the same
-% order. Depth 3, not a repeat of 2 -- issue #267 fixed the identity at depth 1
+% The second heading level, in the same contract and in the same
+% order (#337). Depth 3, not a repeat of 2 -- #267 fixed the identity at depth 1
 % and a section at depth 2, so `sec/3/title' is what maps to `/H3' and keeps the
 % hierarchy unskipped. The division is opened before the heading here too, so a
 % subsection encloses the entries under it rather than sitting beside them, and

@@ -1,4 +1,4 @@
-% resume-subsection-edges.lvt — issue #337 record subsection boundaries.
+% resume-subsection-edges.lvt — #337 record subsection boundaries.
 %
 % \CDossierSubsection is new on this class, and three of its four contracts are
 % invisible in the token values alone.
@@ -13,7 +13,7 @@
 %    the guard off again.
 %
 % 2. Where the guard is off, \CDossierRecordSubsectionAboveSkip owns the
-%    boundary. It must, or it would be the dead token issue #204 retired two
+%    boundary. It must, or it would be the dead token #204 retired two
 %    others for.
 %
 % 3. \CDossierRecordSubsectionBelowSkip owns the boundary under the heading
@@ -23,7 +23,7 @@
 %    pair serves both, and it is why the ratio is 0.375 and could not be ported
 %    from \CDossierProseSubsectionBelowSkip, which ties the entry claim.
 %
-% 4. Issue #340, a second time. The shared heading primitive ends `\par\nobreak',
+% 4. #340, a second time. The shared heading primitive ends `\par\nobreak',
 %    and a break at glue is legal only when a non-discardable item precedes it,
 %    so glue placed straight after that penalty is not a breakpoint. A section
 %    escapes this because its rule puts a box between the two; a subsection has
@@ -41,9 +41,9 @@
 %
 % The breakpoint counter for 4 is the one from resume-entry-edges.lvt.
 %
-% Issue #562: the two `whatsit' nodes at the list's closing edge are the
+% The two `whatsit' nodes at the list's closing edge are the
 % auxiliary-file writes that carry the list's item count and its edge line
-% counts. They moved into the vertical list when the policy began ending the
+% counts (#562). They moved into the vertical list when the policy began ending the
 % final item's paragraph itself in order to read `\prevgraf'; before that the
 % writes were contributed while the last item's paragraph was still open, so they
 % sat in a horizontal list this dump cannot see. Every skip and penalty around
@@ -204,7 +204,7 @@
   \cdossiertestList{subsection-then-list}
 }
 
-% Contract 4. A run of empty subsections, the shape issue #340 filed against
+% Contract 4. A run of empty subsections, the shape #340 filed against
 % empty sections. Every boundary in the run must stay a legal breakpoint; with
 % the subsection's own zero penalty removed the count collapses, because each
 % heading's \nobreak sits immediately before the glue that would otherwise carry

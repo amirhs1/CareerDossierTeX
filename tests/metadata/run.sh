@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # run.sh -- PDF metadata on the DEFAULT (untagged) build path.
 #
-# Issue #276. Every other suite that sees a /Lang sees one the kernel put there:
+# Every other suite that sees a /Lang sees one the kernel put there:
 # all thirteen fixtures that produce one pass \DocumentMetadata{lang=en}, and
-# \DocumentMetadata is what writes the catalog entry in that case. The package's
+# \DocumentMetadata is what writes the catalog entry in that case (#276). The package's
 # own contribution -- the derived `pdflang' in careerdossier-metadata -- is
 # therefore invisible to the existing suites, and so is anything that breaks it.
 # This suite exists to look at the path a user actually takes when they do not
@@ -22,7 +22,7 @@
 # The last one is the exception to the "default path" framing, and is here
 # because it has nowhere better to be: it is a question about the Info
 # dictionary, which is this suite's subject, and it cannot be asked from one
-# path alone. Issue #428, where the tagged path shipped `Cover Letter -- Name'
+# path alone. #428, where the tagged path shipped `Cover Letter -- Name'
 # against the default path's `Cover Letter – Name' from identical source.
 #
 # The third is the one with teeth. Without \DocumentMetadata the kernel's PDF
@@ -136,9 +136,9 @@ fi
 echo
 
 echo "== the derived /Title is the same on both build paths =="
-# Issue #428. Everything above this line is about the default path, because
+# Everything above this line is about the default path, because
 # \DocumentMetadata writes those catalog entries itself and hides what the
-# package contributes. /Title is the one field where the comparison is the
+# package contributes (#428). /Title is the one field where the comparison is the
 # subject: both paths carry it, they disagreed, and no suite could see it.
 #
 # The two writers serialise the same string differently -- hyperref's
@@ -274,7 +274,7 @@ fi
 echo
 
 echo "== a user's own '--' is spelled the same on both paths =="
-# Issue #439, and the half #428 left out of scope. That one removed the
+# #439, and the half #428 left out of scope. That one removed the
 # package's own `--' from the derived string; this one is about a `--' the
 # package did not write and only composes in, which no change to the builder's
 # own spelling can reach.
@@ -337,7 +337,7 @@ done
 echo
 
 echo "== a document's own /Title and /Author survive on both paths =="
-# Issue #440, and the counterpart to the section above: that one is about the
+# #440, and the counterpart to the section above: that one is about the
 # value this package derives, this one about the value it must not derive.
 #
 # The tagged half is the fixture the bug was reported against. hyperref's
@@ -363,7 +363,7 @@ done
 echo
 
 echo "== a document's own '--' is upstream's to spell, and the paths differ =="
-# Issue #442, and the only check in this suite that asserts the two paths
+# #442, and the only check in this suite that asserts the two paths
 # DISAGREE. Read the reason before changing it.
 #
 # The three sections above converge the paths because the string is the

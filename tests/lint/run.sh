@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# run.sh — CareerDossierTeX option lint (issue #233)
+# run.sh — CareerDossierTeX option lint (#233)
 #
 # Every choice-valued public option must name its accepted values when it is
-# given one that is not accepted (issue #212). That takes two hand-written
+# given one that is not accepted (#212). That takes two hand-written
 # pieces, in two places in the same file:
 #
 #   \msg_new:nnnn { <module> } { unknown-<key> } { ... } { ... }
@@ -27,7 +27,7 @@
 # for the wrong module, and a handler pointing at another key's message would
 # otherwise satisfy (1) while reporting the wrong accepted values.
 #
-# Issue #266 moved the options every class shares into two generators in
+# #266 moved the options every class shares into two generators in
 # careerdossier-base.sty, \__cdossier_base_declare_shared_options:nnn and
 # \__cdossier_base_declare_record_options:nnn. Their `.choices:nn' keys are
 # templates: the module is the parameter #1, filled in by each call, so in a
@@ -75,7 +75,7 @@ set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 
-# Output guards that answer "could not check" apart from "absent" (issue #398).
+# Output guards that answer "could not check" apart from "absent" (#398).
 # shellcheck source=tests/lib/text.sh
 . "$root/tests/lib/text.sh"
 
@@ -230,7 +230,7 @@ lint_file() {
 $choices
 EOF
 
-  # Generator calls (issue #266). The call's status applies to every key the
+  # Generator calls (#266). The call's status applies to every key the
   # generator declares, so each is reported and counted as this file's own.
   local call cmod cpath ppath keys literal
   ppath="$(printf '%s' "$flat" \
@@ -329,7 +329,7 @@ else
   echo "  $checked choice-valued options checked, and $templates generator templates"
 fi
 
-# The package that owns each generated option's behaviour (issue #266, the
+# The package that owns each generated option's behaviour (#266, the
 # table under "Problem"). `paper' has none: the classes resolve it themselves,
 # so the generator is its only declaration.
 echo
@@ -403,7 +403,7 @@ self_check() {
     echo "  $fixture EXPECTED FAILURE but the lint passed it"
     fail=1
   else
-    # Issue #398: read three states, not two. A check that could not run is not
+    # Read three states, not two (#398). A check that could not run is not
     # a report about the lint's message.
     text_contains "$out" "$expected"
     case "$?" in

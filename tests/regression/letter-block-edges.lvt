@@ -1,4 +1,4 @@
-% letter-block-edges.lvt — issue #255 rendered letter block boundaries.
+% letter-block-edges.lvt — #255 rendered letter block boundaries.
 %
 % Every one of the letter's seven spacing tokens was pinned only by value:
 % `tokens-letter-defaults' echoes six of them, `tokens-invariants' compares them
@@ -6,7 +6,7 @@
 % \addvspace *claims* and the document-wide \parskip. None of that is evidence
 % that a gap reaches the page — an echoed number moves whenever the ratio moves,
 % whether or not the token ever wins a maximum, which is the unreachable-token
-% condition issue #204 exists to prevent and issue #206 found reproduced inside
+% condition #204 exists to prevent and #206 found reproduced inside
 % `resume-entry-edges'.
 %
 % The instrument here is the composed height of a \vbox, not \pagetotal. The

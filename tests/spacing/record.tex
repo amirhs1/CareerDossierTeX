@@ -26,9 +26,9 @@
 \begin{document}
 
 % -- header stack into the body copy that follows it -----------------------
-% Issue #419: the boundary below the stack is emitted outside the group that
+% The boundary below the stack is emitted outside the group that
 % zeroes `\parskip' for the lines above it, so it is the one header boundary
-% whose rendered gap can differ from its token. The record classes read the
+% whose rendered gap can differ from its token (#419). The record classes read the
 % same measurement as the prose ones only because `RecordParSkip' is zero,
 % which is exactly why all three fixtures measure it rather than one.
 \setbox\ProbeHeaderBox=\vbox{%
