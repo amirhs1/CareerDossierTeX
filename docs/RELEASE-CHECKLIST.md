@@ -264,6 +264,9 @@ GitHub release can. Verify the archive manually before upload.
 - [ ] The `[release]` issue is closed by hand once the tag is pushed
       (`CONTRIBUTING.md`, "2. Every pull request links an issue, with three
       exceptions").
+- [ ] A pushed release tag is neither deleted nor moved. The tag ruleset
+      blocks both until the maintainer disables it (`CONTRIBUTING.md`, "What
+      actually gates a merge").
 
 ---
 
