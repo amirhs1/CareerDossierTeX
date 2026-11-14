@@ -1136,6 +1136,15 @@ That is not hypothetical: this paragraph said sixteen, named `manual` as the job
 that was deliberately not yet required, and was falsified within the hour when
 the maintainer required it (#451).
 
+`Protect Main` covers branches only. A second ruleset, which targets tags,
+covers the release tags (`v*`); read its rules the same way, by its target and
+not from this paragraph:
+
+```bash
+gh api repos/amirhs1/CareerDossierTeX/rulesets \
+  --jq '.[] | select(.target=="tag") | {name, enforcement, rules: [.rules[].type]}'
+```
+
 Do not require a status check in the ruleset until that check has completed
 successfully at least once. Once it has, delete the "this is a new check"
 comment that guarded it in `.github/workflows/build.yml` — a comment that
