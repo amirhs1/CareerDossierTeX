@@ -245,6 +245,10 @@ person running you:
   issue, the maintainer (recorded as `Why:`), or the outside report the change
   answers, such as a bug report, a security alert, or a CI failure; otherwise
   describe only what changed.
+- Attribute a change to someone's request or approval in a commit, pull
+  request, issue, or comment; state what changed. Credit whoever reported a
+  problem or found a bug by linking their issue, pull request, or comment, not
+  by @-mentioning them.
 - Decide the public API, typography, or test baselines. Propose options; the
   maintainer decides.
 - Implement a postponed feature as current.
