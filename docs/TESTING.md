@@ -870,6 +870,14 @@ synthetic page geometry: a lone single-line item counts as one line, a wrapped
 one counts its continuation lines at an indent read from the item, and a page
 whose geometry could not be read gets no verdict.
 
+### Smoke verdict lint
+
+`tests/lint/run-smoke-verdicts.sh` — plants entries the smoke runner cannot
+read (`Pass`, `pass needle`, an unknown verdict, and no verdict) in a copy of
+`tests/smoke/run.sh` and runs each one alone. Each must fail the run with
+`UNKNOWN VERDICT` and quote its entry. The runner checks the verdict before the
+fixture file and before any compile, so the lint needs no TeX (#695).
+
 ### Commit-message hook lint
 
 `tests/lint/run-commit-msg-hook.sh` — runs `.githooks/commit-msg` over four
