@@ -189,8 +189,10 @@ change both in the same commit.
 - A path not listed is Supervised. Work that touches security, credentials,
   private data, or published results is never Delegated, whatever the table
   says.
-- Apply only wording the maintainer supplies: `AI-POLICY.md` and the two tier
-  tables.
+- Governing prose (`AI-POLICY.md` and the two tier tables): draft wording,
+  or improve a draft the maintainer wrote, only as a proposal. Mark it in
+  the pull request's "Notes for review". It stands once the maintainer
+  approves it.
 - A change listed under "Ask first" needs that approval in any tier; the tier
   then sets how closely it is reviewed.
 - Never edit `LICENSE`: it is the official LPPL text, kept unchanged.
