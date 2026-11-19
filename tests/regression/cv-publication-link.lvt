@@ -32,6 +32,11 @@
     \hbox_set:Nn \l_cdossiertest_box
       { \__cdossier_cv_publication_link:nn { DOI } {#1} }
   }
+\cs_new_protected:Npn \cdossiertestPublicationUrl #1
+  {
+    \hbox_set:Nn \l_cdossiertest_box
+      { \__cdossier_cv_publication_link:nn { URL } {#1} }
+  }
 \cs_new_protected:Npn \cdossiertestWithoutHref #1
   {
     \group_begin:
@@ -64,6 +69,17 @@
 \TEST{unlinked-publication-target-warns-only-once}{
   \cdossiertestWithoutHref{\cdossiertestPublicationLink{10.1000/xyz456}}
   \cdossiertestPublicationLink{10.1000/xyz789}
+}
+
+%% #687: the publication link applies the same rule as the contact line and
+%% \CDossierLink. Markup in a DOI or URL raises one `link-markup' error that
+%% names the key and the command, instead of ending the build inside hyperref
+%% with `TeX capacity exceeded'; and `\$' reaches the link as `$', silently.
+\TEST{publication-markup-is-one-error}{
+  \cdossiertestPublicationLink{10.1000/\emph{xyz}}
+  \cdossiertestPublicationUrl{example.com/\textbf{paper}}
+  \cdossiertestPublicationUrl{\url{example.com/paper}}
+  \cdossiertestPublicationUrl{example.com/a\$b}
 }
 
 \END

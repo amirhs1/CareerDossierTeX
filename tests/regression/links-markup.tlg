@@ -1,0 +1,157 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: email
+============================================================
+! Package careerdossier-components Error: The 'email' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......cdossiertestMarkup{email}{}{@example.com}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\emph {ada}@example.com'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'email' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......cdossiertestMarkup{email}{}{@example.com}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\textbf {ada}@example.com'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'email' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......cdossiertestMarkup{email}{}{@example.com}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\url {ada.example}@example.com'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 2: website
+============================================================
+! Package careerdossier-components Error: The 'website' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......ossiertestMarkup{website}{example.com/}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\emph {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'website' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......ossiertestMarkup{website}{example.com/}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\textbf {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'website' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......ossiertestMarkup{website}{example.com/}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\url {ada.example}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 3: linkedin
+============================================================
+! Package careerdossier-components Error: The 'linkedin' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......nkedin}{\cdossiertestMarkup{linkedin}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\emph {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'linkedin' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......nkedin}{\cdossiertestMarkup{linkedin}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\textbf {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'linkedin' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......nkedin}{\cdossiertestMarkup{linkedin}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\url {ada.example}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 4: github
+============================================================
+! Package careerdossier-components Error: The 'github' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......T{github}{\cdossiertestMarkup{github}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\emph {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'github' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......T{github}{\cdossiertestMarkup{github}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\textbf {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'github' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......T{github}{\cdossiertestMarkup{github}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\url {ada.example}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 5: scholar
+============================================================
+! Package careerdossier-components Error: The 'scholar' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......scholar}{\cdossiertestMarkup{scholar}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\emph {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'scholar' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......scholar}{\cdossiertestMarkup{scholar}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\textbf {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The 'scholar' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......scholar}{\cdossiertestMarkup{scholar}{}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\url {ada.example}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 6: orcid
+============================================================
+Package careerdossier-base Warning: The 'orcid' value 'https://orcid.org/\emph {ada}' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+! Package careerdossier-components Error: The 'orcid' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......ertestMarkup{orcid}{https://orcid.org/}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'https://orcid.org/\emph {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+Package careerdossier-base Warning: The 'orcid' value 'https://orcid.org/\textbf {ada}' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+! Package careerdossier-components Error: The 'orcid' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......ertestMarkup{orcid}{https://orcid.org/}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'https://orcid.org/\textbf {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+Package careerdossier-base Warning: The 'orcid' value 'https://orcid.org/\url {ada.example}' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+! Package careerdossier-components Error: The 'orcid' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ......ertestMarkup{orcid}{https://orcid.org/}{}}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'https://orcid.org/\url {ada.example}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 7: bodylink
+============================================================
+! Package careerdossier-components Error: The \CDossierLink argument contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\emph {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The \CDossierLink argument contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\textbf {ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The \CDossierLink argument contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\url {example.com/ada}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 8: macro-expanding-to-markup
+============================================================
+! Package careerdossier-components Error: The 'website' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\cdossiertestBad '. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================
+============================================================
+TEST 9: accepted-forms-say-nothing
+============================================================
+============================================================

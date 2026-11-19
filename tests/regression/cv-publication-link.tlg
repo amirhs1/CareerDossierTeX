@@ -13,3 +13,22 @@ Package careerdossier-components Warning: Links are typeset as plain text becaus
 TEST 3: unlinked-publication-target-warns-only-once
 ============================================================
 ============================================================
+============================================================
+TEST 4: publication-markup-is-one-error
+============================================================
+! Package careerdossier-components Error: The publication 'doi' value contains '\emph', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '10.1000/\emph {xyz}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The publication 'url' value contains '\textbf', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is 'example.com/\textbf {paper}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+! Package careerdossier-components Error: The publication 'url' value contains '\url', which a link cannot carry.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+A link value is an address: it is typeset as written and becomes the link's target, so it cannot hold formatting, a nested link, or another command. The value is '\url {example.com/paper}'. Write the address as plain text. A macro that expands to text and the escaped special characters are accepted. The value is typeset as plain text, without a link.
+============================================================

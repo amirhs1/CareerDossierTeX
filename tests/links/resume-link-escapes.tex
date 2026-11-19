@@ -1,0 +1,55 @@
+% resume-link-escapes.tex — every form a link value accepts keeps its visible
+% text (#687).
+%
+% The visible half of tests/annotations/resume-link-escapes-actions.tex, which
+% has the same body and asserts the targets; keep the two in step. #687 made a
+% link value reject markup, and the forms below must still pass and show the
+% address as written: a macro that expands to text, the raw special
+% characters, and each documented escape. `\$' and `\textdollar' used to show
+% `a\protect\TU\textdollarb'; they now show `a$b'.
+%
+% LINKTOKEN: dollar$l@example.test
+% LINKTOKEN: example.test/field-ada
+% LINKTOKEN: example.test/macro-ada
+% LINKTOKEN: example.test/raw-a&b
+% LINKTOKEN: example.test/raw-a_b
+% LINKTOKEN: example.test/raw-a~b
+% LINKTOKEN: example.test/raw-a$b
+% LINKTOKEN: example.test/raw-a^b
+% LINKTOKEN: example.test/raw-a#b
+% LINKTOKEN: example.test/esc-a_b
+% LINKTOKEN: example.test/esc-a#b
+% LINKTOKEN: example.test/esc-a&b
+% LINKTOKEN: example.test/esc-a%b
+% LINKTOKEN: example.test/esc-a^b
+% LINKTOKEN: example.test/esc-a~b
+% LINKTOKEN: example.test/esc-a$b
+\documentclass{careerdossier-resume}
+\newcommand{\cdossierfixtureSite}{ada}
+\CDossierSetup{
+  name    = {Ada Lovelace},
+  email   = {dollar\$l@example.test},
+  website = {example.test/field-\cdossierfixtureSite},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Links}
+\CDossierLink{example.test/macro-\cdossierfixtureSite}\par
+\CDossierLink{example.test/raw-a&b}\par
+\CDossierLink{example.test/raw-a_b}\par
+\CDossierLink{example.test/raw-a~b}\par
+\CDossierLink{example.test/raw-a$b}\par
+\CDossierLink{example.test/raw-a^b}\par
+\CDossierLink{example.test/raw-a#b}\par
+\CDossierLink{example.test/esc-a\_b}\par
+\CDossierLink{example.test/esc-a\#b}\par
+\CDossierLink{example.test/esc-a\&b}\par
+\CDossierLink{example.test/esc-a\%b}\par
+\CDossierLink{example.test/esc-a\^{}b}\par
+\CDossierLink{example.test/esc-a\~b}\par
+\CDossierLink{example.test/esc-a\textunderscore b}\par
+\CDossierLink{example.test/esc-a\textasciitilde b}\par
+\CDossierLink{example.test/esc-a\string~b}\par
+\CDossierLink{example.test/esc-a\$b}\par
+\CDossierLink{example.test/esc-a\textdollar b}\par
+\end{document}

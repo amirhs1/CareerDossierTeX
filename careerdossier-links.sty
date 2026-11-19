@@ -306,6 +306,95 @@
 \cs_new_protected:Npn \__cdossier_links_hashescape:N #1
   { \regex_replace_all:nnN { \cP\# } { \c{\#} } #1 }
 
+%% A link value holds text, not markup (#687).
+%%
+%% url.sty typesets an address character by character and hyperref writes it
+%% into the link target, and neither can carry formatting. `\emph', `\textbf',
+%% or a nested `\url' in a link value ended the build inside hyperref with
+%% `TeX capacity exceeded', a message that names neither the field nor the
+%% command; plain hyperref, with none of this toolkit loaded, does the same.
+%% Most other commands built, and silently gave a target and a visible
+%% address full of kernel internals. So every value that becomes a link is
+%% checked here first, by the one function every link site calls, and a value
+%% that carries a command is one error that names the field and the command.
+%%
+%% What passes is exactly what built correctly before the check existed,
+%% measured rather than assumed against main before #687:
+%%
+%%   - a macro of the document's own that expands to text. The value is
+%%     expanded with \text_expand:n before it is looked at, which expands such
+%%     a macro and stops at robust commands, so `\newcommand{\site}{ada}' passes
+%%     and one that expands to `\emph{ada}' is reported for the `\emph';
+%%   - the raw special characters, and `\string~';
+%%   - the escapes the manual documents, and their text-command spellings:
+%%     \c__cdossier_links_escape_regex lists them. hyperref turns each into its
+%%     character in the target, and url.sty does in the visible text.
+%%
+%% `\$' and `\textdollar' are the two escapes hyperref does not translate: they
+%% reached both the target and the page as `\protect\TU\textdollar'. The manual
+%% promises that escaping a character is harmless, so they are rewritten here
+%% to the raw `$', which works, in the value itself rather than in a copy, and
+%% before anything is built from it.
+%%
+%% The test runs on a copy, so the value that is linked is the one the author
+%% wrote, with only the `$' rewrite applied. A raw `#' in the copy is first
+%% made `\#', as \__cdossier_links_hashescape:N does, because a parameter
+%% character cannot pass through the expansion.
+%%
+%% On a failed check the caller typesets the value as plain text without a
+%% link, so the error is reported once: nothing that could fail a second time
+%% reaches hyperref.
+\regex_const:Nn \c__cdossier_links_escape_regex
+  {
+    \c{ (?: _ | \# | & | \% | \^ | \~ | \$
+          | textunderscore | textasciitilde | textdollar ) }
+  }
+\regex_const:Nn \c__cdossier_links_dollar_regex { \c{ (?: \$ | textdollar ) } }
+\regex_const:Nn \c__cdossier_links_command_regex { \c{.*} }
+
+\tl_new:N  \l__cdossier_links_check_tl
+\seq_new:N \l__cdossier_links_check_seq
+
+\msg_new:nnnn { careerdossier-components } { link-markup }
+  { The~#1~contains~'#3',~which~a~link~cannot~carry. }
+  {
+    A~link~value~is~an~address:~it~is~typeset~as~written~and~becomes~the~
+    link's~target,~so~it~cannot~hold~formatting,~a~nested~link,~or~another~
+    command.~The~value~is~'#2'.~Write~the~address~as~plain~text.~A~macro~
+    that~expands~to~text~and~the~escaped~special~characters~are~accepted.~
+    The~value~is~typeset~as~plain~text,~without~a~link.
+  }
+\cs_generate_variant:Nn \msg_error:nnnnn { nneee }
+\cs_generate_variant:Nn \regex_extract_once:NnNTF { NV }
+
+%% #1: the value, a token-list variable, rewritten in place for `$'.
+%% #2: what to call it in the error, such as `'email'~value'. It is expanded
+%%     when the error is raised, so a caller may compute it.
+\prg_new_protected_conditional:Npnn \__cdossier_links_value_if_text:Nn #1#2
+  { TF }
+  {
+    \regex_replace_all:NnN \c__cdossier_links_dollar_regex { \cM\$ } #1
+    \tl_set_eq:NN \l__cdossier_links_check_tl #1
+    \__cdossier_links_hashescape:N \l__cdossier_links_check_tl
+    \tl_set:Ne \l__cdossier_links_check_tl
+      { \text_expand:n { \l__cdossier_links_check_tl } }
+    \regex_replace_all:NnN \c__cdossier_links_escape_regex { }
+      \l__cdossier_links_check_tl
+    \regex_extract_once:NVNTF \c__cdossier_links_command_regex
+      \l__cdossier_links_check_tl \l__cdossier_links_check_seq
+      {
+        %% The match is one control sequence. \token_to_str:N spells it
+        %% without the space \tl_to_str:N would add after a control word.
+        \tl_set:Ne \l__cdossier_links_check_tl
+          { \seq_item:Nn \l__cdossier_links_check_seq { 1 } }
+        \msg_error:nneee { careerdossier-components } { link-markup } {#2}
+          { \tl_to_str:N #1 }
+          { \exp_after:wN \token_to_str:N \l__cdossier_links_check_tl }
+        \prg_return_false:
+      }
+      { \prg_return_true: }
+  }
+
 %% Link wrapper. The visible identifier is wrapped in \nolinkurl so long URLs
 %% gain URL-aware breakpoints instead of overrunning the margin; the theme sets
 %% \urlstyle{same} so the text stays in the body font rather than switching to
@@ -428,19 +517,27 @@
   {
     \group_begin:
       \tl_set:Nn \l__cdossier_links_disp_tl {#1}
-      \tl_set:Nn \l__cdossier_links_url_tl  {#1}
-      \tl_remove_all:Nn \l__cdossier_links_url_tl { ~ }
-      \tl_if_eq:NNF \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
-        {
-          \msg_warning:nnV { careerdossier-components } { link-target-space }
-            \l__cdossier_links_url_tl
-        }
-      \__cdossier_links_scheme:N \l__cdossier_links_url_tl
-      \cs_if_exist:NT \UrlBreaks
-        { \tl_put_right:NV \UrlBreaks \c__cdossier_links_anybreak_tl }
-      \__cdossier_links_link:VV
-        \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+      \__cdossier_links_value_if_text:NnTF \l__cdossier_links_disp_tl
+        { \token_to_str:N \CDossierLink \c_space_tl argument }
+        { \__cdossier_links_bodylink: }
+        { \tl_use:N \l__cdossier_links_disp_tl }
     \group_end:
+  }
+%% The link half of \CDossierLink, once its argument has passed the check.
+\cs_new_protected:Npn \__cdossier_links_bodylink:
+  {
+    \tl_set_eq:NN \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+    \tl_remove_all:Nn \l__cdossier_links_url_tl { ~ }
+    \tl_if_eq:NNF \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+      {
+        \msg_warning:nnV { careerdossier-components } { link-target-space }
+          \l__cdossier_links_url_tl
+      }
+    \__cdossier_links_scheme:N \l__cdossier_links_url_tl
+    \cs_if_exist:NT \UrlBreaks
+      { \tl_put_right:NV \UrlBreaks \c__cdossier_links_anybreak_tl }
+    \__cdossier_links_link:VV
+      \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
   }
 
 \NewDocumentCommand \CDossierLink { m }
@@ -464,9 +561,15 @@
 \cs_new_protected:Npn \__cdossier_links_mail:n #1
   {
     \tl_set:Nx \l__cdossier_links_disp_tl { \CDossierFieldValue {#1} }
-    \tl_set:Ne \l__cdossier_links_url_tl
-      { \tl_to_str:n { mailto: } \exp_not:V \l__cdossier_links_disp_tl }
-    \__cdossier_links_link:VV \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+    \__cdossier_links_value_if_text:NnTF \l__cdossier_links_disp_tl
+      { '#1'~value }
+      {
+        \tl_set:Ne \l__cdossier_links_url_tl
+          { \tl_to_str:n { mailto: } \exp_not:V \l__cdossier_links_disp_tl }
+        \__cdossier_links_link:VV
+          \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+      }
+      { \tl_use:N \l__cdossier_links_disp_tl }
   }
 
 %% Services whose bare identifier has a documented canonical address, and the
@@ -525,18 +628,35 @@
 \cs_new_protected:Npn \__cdossier_links_web:n #1
   {
     \tl_set:Nx \l__cdossier_links_disp_tl { \CDossierFieldValue {#1} }
-    \__cdossier_links_canonical:n {#1}
-    \tl_set_eq:NN \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
-    \__cdossier_links_scheme:N \l__cdossier_links_url_tl
-    \__cdossier_links_link:VV \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+    \__cdossier_links_value_if_text:NnTF \l__cdossier_links_disp_tl
+      { '#1'~value }
+      {
+        \__cdossier_links_canonical:n {#1}
+        \tl_set_eq:NN \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+        \__cdossier_links_scheme:N \l__cdossier_links_url_tl
+        \__cdossier_links_link:VV
+          \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
+      }
+      { \tl_use:N \l__cdossier_links_disp_tl }
   }
 
 %% ORCID: unlike an ordinary web-profile value, a bare ORCID identifier has a
 %% documented canonical destination. Keep the identifier visible with a text
 %% label, so its meaning does not depend on a colour, icon, or link annotation.
+%%
+%% The value is checked first, as every link value is (#687); the link is
+%% built by \__cdossier_links_orcid_link: below, and a value that fails is
+%% typeset as plain text under the same label.
 \cs_new_protected:Npn \__cdossier_links_orcid:
   {
     \tl_set:Nx \l__cdossier_links_disp_tl { \CDossierFieldValue { orcid } }
+    \__cdossier_links_value_if_text:NnTF \l__cdossier_links_disp_tl
+      { 'orcid'~value }
+      { \__cdossier_links_orcid_link: }
+      { ORCID:\nobreakspace \tl_use:N \l__cdossier_links_disp_tl }
+  }
+\cs_new_protected:Npn \__cdossier_links_orcid_link:
+  {
     \tl_set_eq:NN \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
     \str_set:NV \l__cdossier_links_scheme_str \l__cdossier_links_url_tl
     \str_if_in:NnF \l__cdossier_links_scheme_str { :// }

@@ -487,10 +487,23 @@
 %% at \__cdossier_links_scheme:N in careerdossier-links (#328).
 \regex_const:Nn \c__cdossier_cv_publication_doi_prefix_regex { \A doi: \s* }
 
+%% The value is checked first by careerdossier-links, which owns the rule that
+%% a link value holds text, not markup (#687): formatting in a DOI or URL is
+%% one error naming the key, and the value is then typeset unlinked. The same
+%% check rewrites `\$' to the raw `$', so the shown value is read back from it
+%% and the target copied from that.
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
-    \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
-    \tl_set:Nn \l__cdossier_cv_publication_shown_tl  {#2}
+    \tl_set:Nn \l__cdossier_cv_publication_shown_tl {#2}
+    \__cdossier_links_value_if_text:NnTF \l__cdossier_cv_publication_shown_tl
+      { publication~ \str_if_eq:nnTF {#1} { DOI } { 'doi' } { 'url' } ~ value }
+      { \__cdossier_cv_publication_href:n {#1} }
+      { #1:\nobreakspace \tl_use:N \l__cdossier_cv_publication_shown_tl }
+  }
+\cs_new_protected:Npn \__cdossier_cv_publication_href:n #1
+  {
+    \tl_set_eq:NN \l__cdossier_cv_publication_target_tl
+      \l__cdossier_cv_publication_shown_tl
     \str_if_eq:nnT {#1} { DOI }
       {
         \regex_replace_once:NnN \c__cdossier_cv_publication_doi_prefix_regex
@@ -538,7 +551,7 @@
         %% package that owns the message: a publication identifier that is not
         %% a link has the same cause and the same remedy (#329).
         \__cdossier_links_inert:
-        #1:\nobreakspace #2
+        #1:\nobreakspace \tl_use:N \l__cdossier_cv_publication_shown_tl
       }
   }
 
