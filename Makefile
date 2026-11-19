@@ -54,6 +54,12 @@
 #   make extract-test FIXTURE=statement
 #   make tagging    FIXTURE=cv-subsection     one tagged-PDF fixture group
 #
+# `check` and `check-serial` never pass a selector on (#692): both run every
+# suite unfiltered whether TEST or FIXTURE is on their command line or in the
+# environment. `check-serial` empties the two with target-specific overrides
+# below it, and tests/check-parallel.sh empties them on every target it
+# dispatches.
+#
 # `smoke`, `layout`, and `tagging` also take JOBS=N, which composes with
 # FIXTURE; see "Fanning out inside a suite" below.
 #
@@ -275,6 +281,14 @@ check: ## The gate: every suite, or only the lints on a docs-only change; FULL=1
 # set from, so it is load-bearing beyond being an alternative.
 check-serial: $(CHECK_TARGETS) ## check's targets one after another, deterministic
 	@printf '\nAll suites passed.\n'
+
+# Never filtered (#692). A target-specific value reaches every prerequisite, and
+# `override` lets it outrank a FIXTURE or TEST on the command line as well as
+# one left in the environment, so the suites below always run in full. The
+# parallel path empties the same two in tests/check-parallel.sh, and its
+# `--self-test` asserts both.
+check-serial: override FIXTURE :=
+check-serial: override TEST :=
 
 # Not in `help`: an implementation detail of the driver, not a target a
 # contributor invokes. It exists so the driver reads the list make expands
