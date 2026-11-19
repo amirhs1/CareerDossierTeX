@@ -44,7 +44,8 @@ description: Open a draft GitHub pull request whose body is the full report, and
    three bytes, so it can flag a line of 72 characters or fewer; shorten it.
 5. Title and labels: follow "Names" in CONTRIBUTING.md. The type comes from
    the branch name; the areas, from the parts the diff changes. If the branch
-   prefix and the intended type label disagree, stop and ask.
+   prefix, the title's type, and the `type:` label do not all agree, stop and
+   ask the person running you. Never put a closing keyword in the title.
 6. Push the branch. Read the focused issue's milestone and the Project's title
    live, with `project-metadata`'s first step, then open a draft with them and
    read it back with `gh pr view`:
