@@ -304,6 +304,36 @@ no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
 ## [Unreleased]
 
+### `\CDossierFieldValue` stops on an unknown field name
+
+**A document that passes `\CDossierFieldValue` a name the profile does not
+define now stops with an error.** The call used to expand to nothing, so a
+misspelt name built and left an empty value
+([#707](https://github.com/amirhs1/CareerDossierTeX/issues/707)). It now names
+the field, as `\CDossierPrintField` and `\CDossierIfFieldTF` already did for the
+same name. The error is raised during expansion, so TeX reports a misused
+`\???` before the message:
+
+    ! Use of \??? doesn't match its definition.
+    <argument> \???
+                     ! Package careerdossier-base Error: Field 'emial' is unknown.
+
+A document whose calls name only supported fields builds and renders as before,
+and a supported field that is absent still expands to nothing. Correct the
+name:
+
+Before:
+
+    \CDossierFieldValue{emial}
+
+After:
+
+    \CDossierFieldValue{email}
+
+Reason: a misspelt field name built silently where the two sibling accessors
+stop on it, and the change is made before the `v1.0.0` freeze so that it does
+not later need a major release.
+
 ### `\CDossierHeaderEnd` empties the header stack, and a stray line is an error
 
 **This needs a source edit only in a document that drives the header stack

@@ -623,14 +623,17 @@ only what the document type requires.
 Every file should identify itself and its minimum kernel date:
 
 ```tex
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\NeedsTeXFormat{LaTeX2e}[2024-11-01]
 \ProvidesClass{careerdossier-resume}
   [2026-07-30 v0.6.0 ATS-conscious resume class]
 ```
 
-Choose the actual date based on the newest kernel interface used. The current LaTeX
-class/package author guide notes that kernel key-value options
-(`\DeclareKeys`/`\ProcessKeyOptions`) require at least the 2022-06-01 release.
+Choose the actual date based on the newest kernel interface used. Here that is
+`\tag_suspend:n`, the newest one known to be used:
+`careerdossier-components.sty` calls it on the untagged path, where no tagging
+package is loaded, and the kernel defines a placeholder for it only from its
+2024-11-01 release (the kernel's `doc/latex/base/changes.txt` lists it under
+that release).
 
 Fail early and clearly under the wrong engine (the canonical check lives in
 `careerdossier-typography.sty`). Do not allow pdfLaTeX or XeLaTeX to proceed until
