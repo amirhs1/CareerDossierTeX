@@ -365,6 +365,31 @@ line was accepted with no stack open, so a second header written without
 with no warning. The behavior of a public command is settled before the
 `v1.0.0` freeze.
 
+### A key on the statement's `\CDossierSection` is an error
+
+**A statement that passes a key to `\CDossierSection` now stops with an
+error.** `careerdossier-statement` gives `\CDossierSection` the signature the
+resume and CV use, an optional key list followed by the title, and supports no
+key in it ([#690](https://github.com/amirhs1/CareerDossierTeX/issues/690)).
+Until now the class read `[` as the title and printed the rest of the option as
+body text, and the build succeeded. A key copied from a resume or CV section,
+such as `entrymeta`, now stops the build with an error that names it, and an
+empty `[]` builds as no optional argument does. A statement that passes no
+optional argument needs no edit and renders as before. Remove the key:
+
+Before:
+
+    \CDossierSection[entrymeta=inline]{Background}
+
+After:
+
+    \CDossierSection{Background}
+
+Reason: an unsupported option is rejected with a clear error, never accepted
+and ignored. No key is supported because `entrymeta`, the resume's and CV's one
+`\CDossierSection` key, sets how entries lay out their metadata, and a
+statement has no entries.
+
 ## [0.11.0] - 2026-11-06
 
 ### `medium` defaults to `screen`

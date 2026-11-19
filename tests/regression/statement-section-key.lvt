@@ -1,0 +1,56 @@
+% statement-section-key.lvt — #690: the statement class's \CDossierSection
+% takes the optional argument the resume and CV take, and rejects every key in
+% it, because the statement class supports no \CDossierSection key.
+%
+% The claims that are false if this test fails: `\CDossierSection[]{T}' hands
+% the heading the same title as `\CDossierSection{T}', so an empty optional
+% argument is never printed as the heading or as body text; and
+% `\CDossierSection[entrymeta=inline]{T}' raises the class's
+% unknown-section-key error, which names the key and says the class supports
+% no key. The expected lines come from #690's approved acceptance criteria and
+% from the message of the same name in careerdossier-resume.cls and
+% careerdossier-cv.cls, not from a saved run.
+%
+% \section is stubbed to a trace line, so what is asserted is the title the
+% class hands the restyled `\section*' it wraps; statement-prose-edges.lvt owns
+% what that heading draws. The material is set in a box, as
+% resume-section-entrymeta.lvt does, so no page is shipped.
+\input{regression-test}
+\documentclass{careerdossier-statement}
+\CDossierSetup{
+  name = {Ada Lovelace},
+  email = {ada@example.com},
+}
+
+\ExplSyntaxOn
+\box_new:N \l_cdossiertest_box
+\NewDocumentCommand \cdossiertestQuiet { +m }
+  {
+    \vbox_set:Nn \l_cdossiertest_box
+      {
+        \RenewDocumentCommand \section { s m } { \TYPE { section:~##2 } }
+        #1
+      }
+  }
+\ExplSyntaxOff
+
+\begin{document}
+\START
+
+\TEST{empty-optional-argument-sets-the-same-heading}{
+  \cdossiertestQuiet{
+    \CDossierSection{Background}
+    Body.
+    \CDossierSection[]{Background}
+    Body.
+  }
+}
+
+\TEST{section-key-is-rejected}{
+  \cdossiertestQuiet{
+    \CDossierSection[entrymeta=inline]{Background}
+  }
+}
+
+\END
+\end{document}
