@@ -184,4 +184,69 @@
   \cdossiertestBoxHeight{header-three-lines}{\MakeCDossierHeader}
 }
 
+% #708: \CDossierHeaderEnd empties the stack it renders, and a line pushed with
+% no stack open stops with an error that names \CDossierHeaderLine. Before #708
+% a second \CDossierHeaderLine … \CDossierHeaderEnd written without
+% \CDossierHeaderBegin printed the earlier header again before the new line.
+% Each test below runs two stacks inside one \TEST group, because the group
+% around every test restores the stack and would hide the defect between tests.
+% The `line-body' announcements say which lines each \CDossierHeaderEnd
+% renders, and the traced gaps say whether it emitted the boundary below. Every
+% gap is the letter's 9.96875pt below-stack claim that tests 2, 3, and 6 pin.
+
+% A second \CDossierHeaderEnd with no line pushed since the first renders
+% nothing: no line again, and no second boundary below the stack.
+\TEST{end-empties-the-stack}{
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{\cdossiertestMark{FIRSTHEADER}}
+  \CDossierHeaderEnd
+  \par
+  \CDossierHeaderEnd
+  \par
+  \TYPE{second-end-done}
+}
+
+% The issue's minimal example: after one header, a line with no
+% \CDossierHeaderBegin before it is an error that names \CDossierHeaderLine.
+% The line is dropped, so the \CDossierHeaderEnd after it renders nothing.
+\TEST{line-after-end-is-an-error}{
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{\cdossiertestMark{FIRSTHEADER}}
+  \CDossierHeaderEnd
+  \par
+  \TYPE{body-one}
+  \CDossierHeaderLine{\cdossiertestMark{SECONDHEADER}}
+  \CDossierHeaderEnd
+  \par
+  \TYPE{body-two}
+}
+
+% No stack has been opened in this group at all: the same error, and the same
+% empty \CDossierHeaderEnd after it.
+\TEST{line-before-any-stack-is-an-error}{
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderLine{\cdossiertestMark{ORPHAN}}
+  \CDossierHeaderEnd
+  \par
+  \TYPE{orphan-done}
+}
+
+% The minimal example with \CDossierHeaderBegin added before the second line:
+% the second header prints SECONDHEADER alone, below its own boundary.
+\TEST{begin-opens-a-second-stack}{
+  \cdossiertestTraceAddvspace
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{\cdossiertestMark{FIRSTHEADER}}
+  \CDossierHeaderEnd
+  \par
+  \TYPE{body-one}
+  \CDossierHeaderBegin
+  \CDossierHeaderLine{\cdossiertestMark{SECONDHEADER}}
+  \CDossierHeaderEnd
+  \par
+  \TYPE{body-two}
+}
+
 \END

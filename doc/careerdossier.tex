@@ -1302,8 +1302,14 @@ a blank line nor a gap behind. Emit a line conditionally by calling
         tagged element --- and keeps it.
   \item \cmd{CDossierHeaderEnd} renders the collected lines, each as its own
         centred paragraph, and emits the boundary below the stack.
+  \item \cmd{CDossierHeaderEnd} then empties the stack and closes it, so every
+        header opens with its own \cmd{CDossierHeaderBegin}.
+  \item A \cmd{CDossierHeaderLine} with no stack open --- before any
+        \cmd{CDossierHeaderBegin}, or after a \cmd{CDossierHeaderEnd} --- is
+        an error that names it, and the line is dropped.
   \item A stack with no lines renders nothing, including no boundary below it.
-  \item No validation is performed: the wrapper commands keep their own.
+  \item The stack checks nothing else: the wrapper commands keep their own
+        validation.
 \end{itemize}
 
 A worked example --- a resume wanting \key{location} on a line of its own

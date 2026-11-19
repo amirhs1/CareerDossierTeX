@@ -703,6 +703,16 @@
 %% wrappers: neither `name' nor a statement type is a precondition of stacking
 %% lines.
 %%
+%% The one rule the stack does enforce is its own bracketing (#708).
+%% \CDossierHeaderEnd empties the stack it renders and closes it, and a
+%% \CDossierHeaderLine with no stack open is an error that drops the line.
+%% Before #708 \CDossierHeaderEnd left its lines in place, so a second
+%% `\CDossierHeaderLine ... \CDossierHeaderEnd' written without
+%% \CDossierHeaderBegin printed the earlier header again above the new line.
+%% \CDossierHeaderEnd with no stack open is not an error: the stack is then
+%% empty, and an empty stack renders nothing. The open state is local, like the
+%% sequence it guards, so a stack opened inside a group is closed outside it.
+%%
 %% A caller pushes only the lines it will actually print, in reading order, and
 %% the helper interleaves the gaps. Position decides the token, not presence:
 %% the boundary below the name is always \CDossierSharedHeaderNameGapSkip and
@@ -743,6 +753,7 @@
 %% what a document that loads this package without one of the four classes gets.
 %% ---------------------------------------------------------------------------
 \seq_new:N \l__cdossier_components_headerstack_seq
+\bool_new:N \l__cdossier_components_headerstack_open_bool
 \int_new:N \l__cdossier_components_headerline_int
 \tl_new:N \l__cdossier_components_headerbelow_tl
 \tl_set:Nn \l__cdossier_components_headerbelow_tl
@@ -754,14 +765,34 @@
 \cs_new_protected:Npn \__cdossier_components_headerbelow:N #1
   { \tl_set:Nn \l__cdossier_components_headerbelow_tl {#1} }
 
+\msg_new:nnnn { careerdossier-components } { headerline-outside-stack }
+  { \c_backslash_str CDossierHeaderLine~used~with~no~header~stack~open. }
+  {
+    Each~\c_backslash_str CDossierHeaderLine~belongs~between~a~
+    \c_backslash_str CDossierHeaderBegin~and~a~
+    \c_backslash_str CDossierHeaderEnd,~and~
+    \c_backslash_str CDossierHeaderEnd~closes~the~stack~it~renders.~
+    Open~a~stack~with~\c_backslash_str CDossierHeaderBegin~first.~
+    This~line~is~dropped.
+  }
+
+%% \CDossierHeaderBegin still discards any lines an abandoned stack left
+%% behind -- one opened and never ended -- before it opens its own.
 \NewDocumentCommand \CDossierHeaderBegin { }
-  { \seq_clear:N \l__cdossier_components_headerstack_seq }
+  {
+    \seq_clear:N \l__cdossier_components_headerstack_seq
+    \bool_set_true:N \l__cdossier_components_headerstack_open_bool
+  }
 
 %% The argument is stored unexpanded and re-used once, so a line may carry
 %% structure -- the name and the statement's title line each wrap themselves in
 %% \__cdossier_typography_heading:nnn and keep their heading tagging.
 \NewDocumentCommand \CDossierHeaderLine { m }
-  { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
+  {
+    \bool_if:NTF \l__cdossier_components_headerstack_open_bool
+      { \seq_put_right:Nn \l__cdossier_components_headerstack_seq {#1} }
+      { \msg_error:nn { careerdossier-components } { headerline-outside-stack } }
+  }
 
 %% A gap that precedes a paragraph has to be reduced by the `\parskip' that
 %% paragraph contributes on its own; see the block comment above. Every
@@ -811,6 +842,10 @@
         \exp_args:No \__cdossier_components_headerstack_gap:N
           \l__cdossier_components_headerbelow_tl
       }
+    %% Emptied and closed at the caller's group level, where Begin and Line set
+    %% them, so the next header starts from nothing (#708).
+    \seq_clear:N \l__cdossier_components_headerstack_seq
+    \bool_set_false:N \l__cdossier_components_headerstack_open_bool
   }
 
 %% ---------------------------------------------------------------------------
