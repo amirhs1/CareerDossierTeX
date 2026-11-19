@@ -47,6 +47,14 @@
 # at or inside the text edge, read from word geometry via label-edge.awk
 # (#688).
 #
+# A fixture carrying
+#
+#   % STRANDCONTROL: <title>
+#
+# declares that its heading <title> ends a page once the heading bounds are 0,
+# and the runner rebuilds it that way and requires the stranded-heading check to
+# name it (#744). See the stranded-heading block below.
+#
 # Final visual correctness (spacing, balance, typographic detail) remains a
 # human review of the rendered PDF; this runner guards the properties a machine
 # can check reliably without freezing an unsettled design.
@@ -230,6 +238,51 @@ layout_fixture_medium() { # <fixture.tex>
     print|screen) printf '%s\n' "${found:-screen}" ;;
     *) return 1 ;;
   esac
+}
+
+# The section and subsection titles a fixture typesets, one per line, for the
+# stranded-heading check below (#333, #337, #744).
+#
+# One pattern reads both spellings, \CDossierSection and \CDossierSubsection,
+# so the two cannot drift apart. Until #744 they had: the pattern spelt the
+# optional `Sub' before a lower-case `section', which \CDossierSubsection
+# matched and \CDossierSection never could, so no section heading was checked.
+#
+# The fixture's own source is not the whole of what it typesets. A fixture may
+# \input an `.inc' body it shares with its siblings, or, as every *-a4-* and
+# *-screen-* wrapper does, the `.tex' fixture it wraps, and a heading in that
+# file is on its pages too. So every \input is followed, up to eight levels
+# below the fixture, and its titles are collected with the fixture's.
+# A name without an extension resolves as TeX would, trying `.tex' after it.
+layout_heading_titles() { # <file> [depth]
+  local file="$1" depth="${2:-0}" child
+  [ "$depth" -le 8 ] || return 0
+  [ -f "$file" ] || file="$file.tex"
+  [ -f "$file" ] || return 0
+  sed -n -E 's/.*\\CDossier(Subs|S)ection\{([^}]*)\}.*/\2/p' "$file"
+  while IFS= read -r child; do
+    layout_heading_titles "$child" $(( depth + 1 ))
+  done < <(sed -n -E 's/^[^%]*\\input\{([^}]*)\}.*/\1/p' "$file")
+}
+
+# Prints each heading in <titles> that is the last line of text on a page of
+# <pdf> other than its last, as `<page>\t<title>', and nothing when none is.
+# The folio is not text for this purpose: `Page N of M' is furniture, and a
+# heading directly above it is still the last thing the page says.
+layout_stranded_headings() { # <pdf> <pages> <titles>
+  local pdf="$1" pages="$2" titles="$3" n last_line sec
+  for (( n = 1; n < pages; n++ )); do
+    last_line="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$pdf" - \
+                 | sed '/^\f/d' | grep -v '^[[:space:]]*$' \
+                 | grep -Ev 'Page [0-9]+ of [0-9]+' | tail -1)"
+    while IFS= read -r sec; do
+      [ -n "$sec" ] || continue
+      [ "$last_line" = "$sec" ] && printf '%s\t%s\n' "$n" "$sec"
+    done <<EOF
+$titles
+EOF
+  done
+  return 0
 }
 
 # Blank letter fields (#689), for letter-blank-fields only.
@@ -789,39 +842,84 @@ EOF
     # to prevent and it needs asserting rather than eyeballing.
     #
     # This runs for every fixture, not only the *keeptogether* ones, and needs no
-    # per-fixture bookkeeping: the section titles are read out of the fixture's
-    # own source, so a fixture that gains a section is covered the moment it does.
-    # The KEEPTOGETHER directives cannot do this job — they assert the particular
-    # pairs a fixture happens to declare, and a heading stranded at the foot of a
-    # page is a property of every page boundary in every fixture.
+    # per-fixture bookkeeping: the section titles are read out of the source the
+    # fixture typesets, so a fixture that gains a section is covered the moment
+    # it does. The KEEPTOGETHER directives cannot do this job — they assert the
+    # particular pairs a fixture happens to declare, and a heading stranded at
+    # the foot of a page is a property of every page boundary in every fixture.
     #
-    # \CDossierSubsection is collected by the same pattern (#337). It is the
+    # \CDossierSubsection is collected with \CDossierSection (#337). It is the
     # same failure — a heading alone at the foot of a page, introducing nothing —
     # and \CDossierSubsectionNeedLines is the bound that prevents it, so it needs
-    # the same assertion rather than a second one. The `sub' alternative is
-    # optional in the pattern rather than matched separately so that the two
-    # spellings cannot drift apart here.
-    sections="$(sed -n 's/.*\\CDossier\(Sub\)\{0,1\}section{\([^}]*\)}.*/\2/p' "$tex")"
+    # the same assertion rather than a second one. layout_heading_titles says
+    # which files are read and why one pattern serves both spellings.
+    sections="$(layout_heading_titles "$tex")"
     if [ -n "$sections" ] && [ "$pages" -gt 1 ]; then
-      strand_fail=0
-      for (( n = 1; n < pages; n++ )); do
-        last_line="$(pdftotext -enc UTF-8 -f "$n" -l "$n" "$out/$base.pdf" - \
-                     | sed '/^\f/d' | grep -v '^[[:space:]]*$' \
-                     | grep -Ev 'Page [0-9]+ of [0-9]+' | tail -1)"
-        while IFS= read -r sec; do
-          [ -n "$sec" ] || continue
-          if [ "$last_line" = "$sec" ]; then
-            echo "  STRANDED SECTION HEADING: page $n ends with '$sec'"
-            strand_fail=1
-          fi
+      stranded="$(layout_stranded_headings "$out/$base.pdf" "$pages" "$sections")"
+      if [ -n "$stranded" ]; then
+        while IFS="$(printf '\t')" read -r n sec; do
+          echo "  STRANDED SECTION HEADING: page $n ends with '$sec'"
         done <<EOF
-$sections
+$stranded
 EOF
-      done
-      if [ "$strand_fail" -ne 0 ]; then
         fail=1
       else
         echo "  no page ends with a section heading"
+      fi
+    fi
+
+    # Negative control for the check above (#744).
+    #
+    # For most of its life that check read no section heading at all: its
+    # pattern could not match \CDossierSection, and every fixture printed
+    # nothing where a stranded heading would have been reported. Nothing failed,
+    # because the bounds were keeping headings off the page foot anyway, so a
+    # check that cannot see and a page with nothing to see read alike.
+    #
+    # A fixture carrying
+    #
+    #   % STRANDCONTROL: <title>
+    #
+    # declares that with the heading bounds off — \CDossierSectionNeedLines and
+    # \CDossierSubsectionNeedLines at 0 — the heading <title> ends a page. The
+    # runner rebuilds it that way and requires the check to report <title> by
+    # name. The shipped values are untouched: the control sets them in a
+    # wrapper, as the club/widow control does its penalties, and is built twice
+    # so its folio reads `Page N of M' and is skipped as furniture.
+    strand_declared="$(sed -n 's/^% STRANDCONTROL:[[:space:]]*//p' "$tex" | head -1)"
+    if [ -n "$strand_declared" ]; then
+      sc="$control_dir/$base-strand"
+      {
+        printf '\\AddToHook{begindocument/before}'
+        printf '{\\CDossierSectionNeedLines=0 \\CDossierSubsectionNeedLines=0 }\n'
+        printf '\\input{%s}\n' "$tex"
+      } > "$sc.tex"
+      if ! { lualatex -halt-on-error -interaction=nonstopmode \
+               -output-directory="$control_dir" "$sc.tex" > "$sc.stdout" 2>&1 \
+             && lualatex -halt-on-error -interaction=nonstopmode \
+               -output-directory="$control_dir" "$sc.tex" >> "$sc.stdout" 2>&1; }; then
+        echo "  STRAND CONTROL FAILED TO COMPILE (see $sc.log)"; fail=1
+      else
+        sc_pages="$(grep -oE 'Output written on .*\(([0-9]+) page' "$sc.log" \
+                    | grep -oE '\(([0-9]+) page' | grep -oE '[0-9]+' | tail -1)"
+        sc_seen="$(layout_stranded_headings "$sc.pdf" "${sc_pages:-0}" "$sections" \
+                   | cut -f2)"
+        if [ "${sc_pages:-0}" -lt 2 ]; then
+          echo "  UNCHECKABLE STRAND CONTROL: the control build produced"
+          echo "    ${sc_pages:-no} page(s), so no page boundary was examined."
+          fail=1
+        elif text_contains_line "$sc_seen" "$strand_declared"; then
+          echo "  negative control fired: '$strand_declared' stranded with the bounds at 0"
+        else
+          echo "  STRAND NEGATIVE CONTROL DID NOT FIRE: this fixture declares"
+          echo "    '$strand_declared' stranded with \\CDossierSectionNeedLines and"
+          echo "    \\CDossierSubsectionNeedLines at 0, and the check reported"
+          echo "    '${sc_seen:-nothing}'. Its clean result above is therefore not"
+          echo "    evidence of anything. Check first that the title pattern in"
+          echo "    layout_heading_titles still matches the heading's spelling,"
+          echo "    then re-derive the fixture's entry count."
+          fail=1
+        fi
       fi
     fi
   else
