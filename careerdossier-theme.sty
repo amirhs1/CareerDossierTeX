@@ -19,9 +19,9 @@
 %% link tokens. Colour never carries meaning by itself; these tokens exist so
 %% components and classes do not hard-code colours.
 %%
-%% Responsibilities: \CDossierTextColor, \CDossierMutedColor,
-%% \CDossierRuleColor, and \CDossierLinkColor; print-safe contrast; and the
-%% extension points a later colour theme would use.
+%% Responsibilities: \CDossierTextColor, \CDossierMutedColor, and
+%% \CDossierRuleColor; the link colour hyperref reads; print-safe contrast; and
+%% the extension points a later colour theme would use.
 %%
 %% Not this file: any dimension. Page geometry, the type scale, and vertical
 %% rhythm belong to careerdossier-tokens; resume margins and letter paragraph
@@ -57,13 +57,16 @@
 %%
 %% `\CDossierPrimaryColor' was retired in #270: it reached no component,
 %% class, or example, and its colour, `cdossier-primary', was `gray 0' -- the
-%% same value as `cdossier-text' under a different name. See
+%% same value as `cdossier-text' under a different name.
+%%
+%% The link-colour switch was retired in #727 on the same grounds: hyperref
+%% colours links by the colour name, `cdossier-link', in the hook below, so the
+%% switch recoloured no link, and `cdossier-link' is `gray 0' too. See
 %% docs/MIGRATION.md.
 %% ---------------------------------------------------------------------------
 \NewDocumentCommand \CDossierTextColor    { } { \color { cdossier-text }    }
 \NewDocumentCommand \CDossierMutedColor   { } { \color { cdossier-muted }   }
 \NewDocumentCommand \CDossierRuleColor    { } { \color { cdossier-rule }    }
-\NewDocumentCommand \CDossierLinkColor    { } { \color { cdossier-link }    }
 
 %% ---------------------------------------------------------------------------
 %% Print-safe links. When hyperref is present, links are coloured black and

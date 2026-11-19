@@ -2430,23 +2430,22 @@ shape today. That is two independent decisions agreeing, not one role with two
 names: redefining either leaves the other alone. Do not define one in terms of
 the other.
 
-\cmd{CDossierMutedStyle} and \cmd{CDossierLinkStyle} are published by the
-components package rather than the typography package, because each resolves to
-something the typography package does not own --- a colour and a rule
-respectively. Both are available in every document class. A document that wants
+\cmd{CDossierMutedStyle} is published by the components package and
+\cmd{CDossierLinkStyle} by the links package, rather than the typography
+package, because each resolves to something the typography package does not
+own --- a colour and a rule respectively. Both are available in every document class. A document that wants
 a different link affordance redefines \cmd{CDossierLinkStyle}.
 
 Their visual definitions may evolve before \texttt{v1.0.0}.
 
 \subsection{Colour}
 
-The monochrome theme exposes four semantic tokens:
+The monochrome theme exposes three semantic tokens:
 
 \begin{latexcode}
 \CDossierTextColor
 \CDossierMutedColor
 \CDossierRuleColor
-\CDossierLinkColor
 \end{latexcode}
 
 \cmd{CDossierMutedColor} is gray 0.30, measured at 8.52:1 against white under
