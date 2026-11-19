@@ -1207,6 +1207,7 @@ Release preparation should verify:
 - the working tree is clean.
 
 `.agents/skills/draft-release/SKILL.md` says how the section and the notes are
-written, and which LaTeX-package details a release states.
+written, which LaTeX-package details a release states, and which commit the
+release tag goes on.
 
 Tagging and publishing a release should occur only after the release-preparation pull request is merged.
