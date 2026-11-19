@@ -1,0 +1,4 @@
+# A run-name-coverage.sh control backlog (#694). Lint input.
+# FROZEN AT 2 entries
+CDossierFixtureUntested  no test names it (control)
+CDossierFixtureRetired  no test names it (control)

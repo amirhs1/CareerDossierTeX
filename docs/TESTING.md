@@ -776,6 +776,21 @@ entry with no reason, a stale entry, an entry whose fixture now names itself,
 and more entries than its `FROZEN AT` line each fail. One committed control
 per verdict runs the same check over `tests/lint/fixtures/header*`.
 
+### Name-coverage lint
+
+`tests/lint/run-name-coverage.sh` — every public name the Work defines appears
+in a regression test (#694). A public name is a `CDossier` or `MakeCDossier`
+name outside a TeX comment in a `.sty` or `.cls` file of the Work, the set
+`tests/lint/run-manual-names.sh` holds the manual to. A regression test is a
+tracked `tests/regression/*.lvt` with the `tests/regression/support/` files it
+inputs, and a name counts when it appears there outside a comment. The lint
+checks that a test names each public name, not what the test asserts about it.
+`tests/lint/name-coverage-backlog.txt` declares the names that had no test when
+it landed, each with a reason, and the lint keeps that list shrinking by the
+same five verdicts as the fixture-header backlog. `--list` prints every name it
+checks, marked `tested` or `backlog`. One committed control per verdict runs
+the same check over `tests/lint/fixtures/name*`.
+
 ### Markdown anchor lint
 
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree
