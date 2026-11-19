@@ -42,7 +42,7 @@
 %% formatting, or font selection. A kernel page style is preferred to reviving
 %% the prototypes' fancyhdr/lastpage dependency solely for `Page n of m'.
 
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\NeedsTeXFormat{LaTeX2e}[2024-11-01]
 \ProvidesExplClass {careerdossier-cv} {2026-11-06} {0.11.0}
   {CareerDossierTeX English academic CV class}
 

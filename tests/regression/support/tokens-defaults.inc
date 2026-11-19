@@ -38,6 +38,26 @@
     %% package rather than by writing the parameter.
     \TYPE{hyphen-penalty = \int_use:N \tex_hyphenpenalty:D}
     \TYPE{ex-hyphen-penalty = \int_use:N \tex_exhyphenpenalty:D}
+    %% The three page-break penalties (#694). The manual, "Typographic
+    %% page-break penalties", documents all three at 10000 in every family,
+    %% and that 9999 paginates as 0 does: a one-unit drift switches the rule
+    %% off, and only a layout fixture that happened to land on that break
+    %% would notice. So each value is pinned, as \emergencystretch is above,
+    %% and so is its identity with its token. The two halves fail apart. A
+    %% changed token moves the values and leaves the identity `shared'; a
+    %% class that stops calling \CDossierApplyPageBreakPenalties, or sets a
+    %% primitive after it, leaves LaTeX's own values and reads `local'.
+    \TYPE{broken-penalty = \int_use:N \tex_brokenpenalty:D}
+    \TYPE{club-penalty = \int_use:N \tex_clubpenalty:D}
+    \TYPE{widow-penalty = \int_use:N \tex_widowpenalty:D}
+    \bool_lazy_all:nTF
+      {
+        { \int_compare_p:nNn { \tex_brokenpenalty:D } = { \CDossierBrokenPenalty } }
+        { \int_compare_p:nNn { \tex_clubpenalty:D } = { \CDossierClubPenalty } }
+        { \int_compare_p:nNn { \tex_widowpenalty:D } = { \CDossierWidowPenalty } }
+      }
+      { \TYPE{page-break-penalties = shared} }
+      { \TYPE{page-break-penalties = local} }
   }
 \ExplSyntaxOff
 \makeatletter
