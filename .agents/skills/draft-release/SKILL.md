@@ -47,7 +47,15 @@ disable-model-invocation: true
    - no line claims ATS, WCAG, or PDF/UA conformance or broad accessibility,
      and a preview feature does not read as a general capability
      (AGENTS.md, "Settled decisions").
-7. Release notes: the same categories without the heading, then your trailer
-   block (AGENTS.md, "Provenance"). Create the draft, and never publish it:
-   `gh release create v<version> --draft --title v<version> --notes-file <file>`.
-8. To revise the draft: `gh release edit v<version> --notes-file <file>`.
+7. When the release-preparation pull request has merged, update `main` and
+   record the release commit, its merge commit: `git rev-parse HEAD`.
+8. Release notes: the same categories without the heading, then your trailer
+   block (AGENTS.md, "Provenance"). Create the draft on the commit step 7
+   recorded, and never publish it:
+   `gh release create v<version> --draft --target <full SHA> --title v<version> --notes-file <file>`.
+   The person running you creates and pushes the annotated tag on that
+   commit before publishing. Before the push, check the tag:
+   `git rev-parse 'v<version>^{commit}'` prints the SHA from step 7. A
+   pushed `v*` tag cannot be moved (CONTRIBUTING.md, "What actually gates
+   a merge").
+9. To revise the draft: `gh release edit v<version> --notes-file <file>`.

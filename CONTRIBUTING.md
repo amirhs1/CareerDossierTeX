@@ -213,7 +213,7 @@ A short name is a few lowercase words joined by hyphens. Pick the type for the
 main purpose of the work.
 
 Labels combine: one `type:` plus one or more `area:`. There are no
-combination labels. Status, priority, and release are not labels. Three labels
+combination labels. Status and priority are not labels. Three labels
 sit outside the two axes: `breaking-change`, `technical-debt`, and
 `help-wanted`.
 
@@ -599,10 +599,8 @@ Three properties make this safe to trust:
 
 Scoping is a development-loop convenience and nothing more. CI's required
 checks, which run every suite unscoped, are the gate, and a scoped run is never
-evidence of a full one in the PR body. Before a push, run `make lint` and the
-one suite that owns the changed behaviour (`TEST=` or `FIXTURE=`); run
-`make check` as well when the change touches a shared package, a class, or a
-baseline, or when you want the full run before CI. On a docs-only branch
+evidence of a full one in the PR body. Before a push, run the local checks that
+`AGENTS.md`, "Commands", lists as the pull request gate. On a docs-only branch
 `make check` runs only the lints, under "The full run, and the serial path"
 above, the local mirror of CI's docs-only run.
 
@@ -1207,6 +1205,7 @@ Release preparation should verify:
 - the working tree is clean.
 
 `.agents/skills/draft-release/SKILL.md` says how the section and the notes are
-written, and which LaTeX-package details a release states.
+written, which LaTeX-package details a release states, and which commit the
+release tag goes on.
 
 Tagging and publishing a release should occur only after the release-preparation pull request is merged.

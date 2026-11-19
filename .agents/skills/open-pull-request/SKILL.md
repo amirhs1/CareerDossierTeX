@@ -5,12 +5,10 @@ description: Open a draft GitHub pull request whose body is the full report, and
 
 # Open a pull request
 
-1. Check the branch, the working tree, and `HEAD`; the branch is not `main`.
-   Run the checks AGENTS.md, "Commands", sets before a push: `make lint`,
-   the suite that owns the change, and `make check` when the change touches
-   a shared package, a class, or a baseline. CI's required checks are the
-   gate: once they finish, add the run, by its ID, to the body's "Checks run"
-   with `gh pr edit`.
+1. Check the branch, the working tree, and `HEAD`; the branch is not
+   `main`. Run the pull request gate in AGENTS.md, "Commands". Once CI's
+   required checks finish, add the run, by its ID, to the body's "Checks
+   run", check the trailer block as in step 4, and run `gh pr edit`.
 2. Before the push, review the diff: `git status --short`, then the whole
    branch diff, `git diff origin/main...HEAD`, for unrelated files, generated
    artifacts, secrets, private data, and accidental deletions. A change on the
@@ -36,9 +34,16 @@ description: Open a draft GitHub pull request whose body is the full report, and
      long check result in "Checks run" and a short one in the trailer.
 
    Write it to a file outside the repository, by absolute path.
+
+   Then check the trailer block, the body's last paragraph:
+   `awk -v RS= 'END { print }' <file> | LC_ALL=C awk 'length > 72'` prints
+   nothing, and `git interpret-trailers --parse <file>` prints every trailer.
+   Fix the body until both hold. The check counts bytes, and an em dash is
+   three bytes, so it can flag a line of 72 characters or fewer; shorten it.
 5. Title and labels: follow "Names" in CONTRIBUTING.md. The type comes from
    the branch name; the areas, from the parts the diff changes. If the branch
-   prefix and the intended type label disagree, stop and ask.
+   prefix, the title's type, and the `type:` label do not all agree, stop and
+   ask the person running you. Never put a closing keyword in the title.
 6. Push the branch. Read the focused issue's milestone and the Project's title
    live, with `project-metadata`'s first step, then open a draft with them and
    read it back with `gh pr view`:
@@ -55,7 +60,8 @@ description: Open a draft GitHub pull request whose body is the full report, and
    asserts the focused issue's parent and `Size`.
 8. If the branch already has a pull request, first check
    `gh pr view <n> --json state`, and stop if it has merged. Otherwise push,
-   then replace its body and read it back:
+   check the trailer block as in step 4, then replace its body and read it
+   back:
    `gh pr edit <n> --body-file <file>`. When the update pushed commits,
    re-score `Size` from the whole diff with `project-metadata`, "Updating an
    open pull request" in its `reference.md`, and assert it on the pull request

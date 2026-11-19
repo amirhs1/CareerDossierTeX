@@ -14,7 +14,9 @@ description: Write or change a test under tests/: an l3build regression test, a 
 2. Start from the test-case list in the approved acceptance criteria: for
    each case, the behaviour, the input, and the source of the expected value.
    Do not add cases the list lacks without saying so.
-3. Show the red run before the fix, even for a defect that does not crash:
+3. Leave other files' tests as they are; when rewriting a file, carry forward
+   every test that still states a valid contract.
+4. Show the red run before the fix, even for a defect that does not crash:
    `docs/TESTING.md`, "Test-driven where practical; test-as-you-go always".
    Run the `Makefile` target: `make regression TEST=<name>`, or
    `make smoke FIXTURE=<pattern>` and the same for `layout`, `extract-test`,
@@ -37,9 +39,9 @@ description: Write or change a test under tests/: an l3build regression test, a 
 
 ## Each test
 
-4. Open the file with a comment naming the issue and the claim that is false
+5. Open the file with a comment naming the issue and the claim that is false
    if the test fails, as `tests/regression/resume-entry-edges.lvt` does.
-5. In an `.lvt`: `\input{regression-test}`, `\START`, one `\TEST` per claim,
+6. In an `.lvt`: `\input{regression-test}`, `\START`, one `\TEST` per claim,
    and `\OMIT`…`\TIMO` around log output the test does not assert, such as
    allocation numbers. Sources: the `l3build` manual (CTAN,
    `macros/latex/contrib/l3build/l3build.pdf`), "2 Writing test files" and
@@ -47,35 +49,35 @@ description: Write or change a test under tests/: an l3build regression test, a 
    "l3build: A modern Lua test suite for TeX programming", TUGboat 35:3
    (2014), "3.1 Modes of testing" and "4.3 The structure of test files"; and
    `latex3/latex2e` `base/testfiles/` as a worked corpus.
-6. `\TYPE` the measured value, not the token's definition: `docs/TESTING.md`,
+7. `\TYPE` the measured value, not the token's definition: `docs/TESTING.md`,
    "Spacing tokens: reporting a value is not rendering a gap".
-7. Name a fixture for the assertions it should get: `*two-page*`, `*-valid`,
+8. Name a fixture for the assertions it should get: `*two-page*`, `*-valid`,
    `*-bad-*`, and `-ua2` select them (`docs/TESTING.md`, "The suites"). A
    misnamed fixture asserts less than it appears to.
-8. Take each expected value from documented behaviour, a page a person
+9. Take each expected value from documented behaviour, a page a person
    inspected, an independent implementation, or a reproducible computation,
    and name it in the commit's `Ground-truth-source:` trailer (`AGENTS.md`,
    "Provenance"). Output that `l3build save` wrote is not a source. With none
    of the four, test a property, such as the same input giving the same
    output or a missing field leaving no stray separator; say so in the header
    comment, and omit the trailer.
-9. A new lint carries a fixture with a planted violation it must reject:
-   `docs/TESTING.md`, "Section-sign lint".
+10. A new lint carries a fixture with a planted violation it must reject:
+    `docs/TESTING.md`, "Section-sign lint".
 
 ## After you write
 
-10. Read the whole new baseline or its diff before committing it, and
+11. Read the whole new baseline or its diff before committing it, and
     regenerate every line that echoes a changed value: `docs/TESTING.md`,
     "Baselines are load-bearing". Never regenerate a baseline or weaken a
     test to turn a suite green (`AGENTS.md`, "Do not").
-11. Regenerate extraction and tagging baselines only with the runner's
+12. Regenerate extraction and tagging baselines only with the runner's
     `--update`; each extractor keeps its own, and PDFKit's regenerate only on
     macOS. Report every gate the runner's summary says it skipped, such as
     veraPDF for `-ua2`: `docs/TESTING.md`, "Tagged-PDF suite".
-12. Run the focused target, then the affected suites, and `make check` in
-    the background with the sandbox off when the change touches a shared
-    package, a class, or a baseline (AGENTS.md, "Commands"). Report what
-    each printed under `.github/pull_request_template.md`, "Checks run".
+13. Run the focused target, then the affected suites, then the rest of the
+    pull request gate in AGENTS.md, "Commands", with `make check` in the
+    background and the sandbox off. Report what each printed under
+    `.github/pull_request_template.md`, "Checks run".
 
 ## Example
 
