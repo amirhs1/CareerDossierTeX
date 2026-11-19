@@ -213,6 +213,8 @@ verdicts follow the path list `CONTRIBUTING.md`, "CI expectations", documents.
 | `docsonlyfixture-workflow.txt` | full: `.github/workflows/build.yml`, beside `.github/ISSUE_TEMPLATE/` |
 | `docsonlyfixture-rename.txt` | full: a `.sty` renamed into `docs/`, listed as both sides |
 | `docsonlyfixture-classifier.txt` | full: `tests/lib/docs-only.sh` itself |
+| `docsonlyfixture-readme.txt` | full: `README.md`, which `build.lua` ships (#691) |
+| `docsonlyfixture-changelog.txt` | full: `CHANGELOG.md`, which `build.lua` ships (#691) |
 | `docsonlyfixture-empty.txt` | full: an empty change |
 
 Each "full" list but the last keeps a docs path beside the one that disqualifies

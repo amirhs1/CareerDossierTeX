@@ -48,11 +48,12 @@ ever exists for a tree that passed — but it does **not** run the shell-driven
 suites, so `make check` is still the gate before a release.
 
 It produces `build/distrib/ctan/careerdossier/`, one top-level directory holding
-the ten Work files, `README.md`, `LICENSE`, `CHANGELOG.md`, `manifest.txt`, and
-`doc/` with the manual's source and the PDF typeset from it. Two artifacts land
-outside `build/` because l3build puts them there — `careerdossier-ctan.zip` at
-the repository root and `doc/careerdossier.pdf` beside its source. Both are
-ignored by `.gitignore`, and `make clean` removes both.
+every package and class `manifest.txt` lists, `README.md`, `LICENSE`,
+`CHANGELOG.md`, `manifest.txt`, and `doc/` with the manual's source and the PDF
+typeset from it. Two artifacts land outside `build/` because l3build puts them
+there — `careerdossier-ctan.zip` at the repository root and
+`doc/careerdossier.pdf` beside its source. Both are ignored by `.gitignore`, and
+`make clean` removes both.
 
 `make ctan-lint` checks the configuration, and `make check` dispatches it on
 every run ([`TESTING.md`](TESTING.md#ctan-packaging-lint), "CTAN packaging
@@ -120,8 +121,8 @@ an Overleaf project, sets the compiler to LuaLaTeX, and compiles.
 `uploadconfig` in `build.lua` carries the CTAN upload form: package name,
 version, author, licence `lppl1.3c`, summary and description, topics, repository,
 bug tracker, and support channel. The version is **derived from the Work** rather
-than restated, so it cannot disagree with the ten `\ProvidesExpl*` declarations
-the version lint holds equal.
+than restated, so it cannot disagree with the `\ProvidesExpl*` declarations the
+version lint holds equal.
 
 Two fields need a decision at upload time rather than in the file:
 

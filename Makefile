@@ -16,6 +16,7 @@
 # run-text-guards.sh drives tests/lib/text.sh over synthetic text,
 # run-list-remnant.sh drives tests/layout/list-remnant.awk over synthetic
 # page geometry,
+# run-smoke-verdicts.sh runs a copy of the smoke runner over planted entries,
 # run-commit-msg-hook.sh runs .githooks/commit-msg over fixture messages,
 # and check-parallel.sh --self-test exercises check-parallel's accounting
 # controls against synthetic workers.
@@ -53,6 +54,12 @@
 #   make layout     FIXTURE='resume-*'        pattern anchored at the start
 #   make extract-test FIXTURE=statement
 #   make tagging    FIXTURE=cv-subsection     one tagged-PDF fixture group
+#
+# `check` and `check-serial` never pass a selector on (#692): both run every
+# suite unfiltered whether TEST or FIXTURE is on their command line or in the
+# environment. `check-serial` empties the two with target-specific overrides
+# below it, and tests/check-parallel.sh empties them on every target it
+# dispatches.
 #
 # `smoke`, `layout`, and `tagging` also take JOBS=N, which composes with
 # FIXTURE; see "Fanning out inside a suite" below.
@@ -276,6 +283,14 @@ check: ## The gate: every suite, or only the lints on a docs-only change; FULL=1
 check-serial: $(CHECK_TARGETS) ## check's targets one after another, deterministic
 	@printf '\nAll suites passed.\n'
 
+# Never filtered (#692). A target-specific value reaches every prerequisite, and
+# `override` lets it outrank a FIXTURE or TEST on the command line as well as
+# one left in the environment, so the suites below always run in full. The
+# parallel path empties the same two in tests/check-parallel.sh, and its
+# `--self-test` asserts both.
+check-serial: override FIXTURE :=
+check-serial: override TEST :=
+
 # Not in `help`: an implementation detail of the driver, not a target a
 # contributor invokes. It exists so the driver reads the list make expands
 # rather than a copy of it.
@@ -290,7 +305,7 @@ check-parallel: check ## Alias of check, which is parallel by default since #399
 
 test: check ## Alias for check
 
-lint: ## Static lint: option values, version declarations, fixture selection, fixture headers that name their file, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, testphase keys outside their owner, accented spellings, manual names, public-name test coverage, manual examples, documented token values, text guards, the list-remnant line count, the commit-msg hook, the docs-only classifier, shellcheck over the harness, and the check-parallel controls
+lint: ## Static lint: option values, version declarations, fixture selection, fixture headers that name their file, Markdown anchors, prose section pointers, AGENTS.md "Layout" against manifest.txt, the section sign, testphase keys outside their owner, accented spellings, manual names, public-name test coverage, manual examples, documented token values, text guards, the list-remnant line count, the smoke verdict parser, the commit-msg hook, the docs-only classifier, shellcheck over the harness, and the check-parallel controls
 	tests/lint/run.sh
 	tests/lint/run-version-declarations.sh
 	tests/lint/run-fixture-filter.sh
@@ -307,6 +322,7 @@ lint: ## Static lint: option values, version declarations, fixture selection, fi
 	tests/lint/run-token-values.sh
 	tests/lint/run-text-guards.sh
 	tests/lint/run-list-remnant.sh
+	tests/lint/run-smoke-verdicts.sh
 	tests/lint/run-commit-msg-hook.sh
 	tests/lint/run-docs-only.sh
 	tests/lint/run-shellcheck.sh

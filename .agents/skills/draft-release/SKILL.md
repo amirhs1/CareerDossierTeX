@@ -35,8 +35,8 @@ disable-model-invocation: true
    (`create-branch`), and open a pull request.
 6. Before that pull request, check what this package's users need stated:
    - every `\ProvidesExplPackage` and `\ProvidesExplClass` line carries the
-     release date and version; `make lint` checks only that the ten agree with
-     each other;
+     release date and version; `make lint` checks only that these lines agree
+     with each other;
    - every added, renamed, or removed public command, environment, class
      option, or key has its line, and a rename has its `docs/MIGRATION.md`
      entry;

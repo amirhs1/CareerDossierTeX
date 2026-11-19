@@ -32,7 +32,7 @@
 %% are all written with two heading levels; and preserve logical source and
 %% extraction order.
 
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\NeedsTeXFormat{LaTeX2e}[2024-11-01]
 \ProvidesExplClass {careerdossier-resume} {2026-11-06} {0.11.0}
   {CareerDossierTeX English industry resume class}
 
