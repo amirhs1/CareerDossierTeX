@@ -469,6 +469,7 @@ gate, not the stage where feature tests are first created. See
 - [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, and pull-request workflow, and the names each takes
 - [`docs/TESTING.md`](docs/TESTING.md): the test suites, review targets, and coverage expectations
+- [`SECURITY.md`](SECURITY.md): how to report a vulnerability privately, never in a public issue
 - [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution policy: verification, disclosure, and accountability
 - [`AGENTS.md`](AGENTS.md): the operating contract for coding agents
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files

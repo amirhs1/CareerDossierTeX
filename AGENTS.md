@@ -77,6 +77,7 @@ tests/                        lint, regression, smoke, layout, extraction,
 
 Repository only
 AI-POLICY.md                  the AI policy for contributors
+SECURITY.md                   how to report a vulnerability privately
 CLAUDE.md                     Claude Code's rules; it imports this file
 .agents/skills/               one SKILL.md per task; .claude/skills/ links each
 .claude/settings.json         Claude Code's permissions and sandbox
