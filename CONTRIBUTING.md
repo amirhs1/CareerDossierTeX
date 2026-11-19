@@ -161,10 +161,11 @@ exception. Close the issue by hand once the last such action is done.
 
 ### 3. Every pull request comes from a focused branch
 
-Branch from an up-to-date `main`, one issue per branch where practical. Direct
-commits and pushes to `main` are reserved to the maintainer; `AGENTS.md`,
-"Git", states that reservation and the rest of the maintainer-only action set,
-which this guide does not repeat.
+Branch from an up-to-date `main`, for one issue or for a batch of issues that
+change the same files or run the same suite. `AGENTS.md`, "Git", sets the terms
+of a batch. Direct commits and pushes to `main` are reserved to the maintainer;
+that section states the reservation and the rest of the maintainer-only action
+set, which this guide does not repeat.
 
 A branch has no deadline: it lives until it merges or is closed, and the
 `Protect Main` ruleset already requires it to be up to date with `main` before
