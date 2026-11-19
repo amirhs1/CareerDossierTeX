@@ -39,6 +39,14 @@
 # assertion, and this is the proof that the assertion is still testing the
 # token rather than passing for some unrelated reason (#310).
 #
+# A fixture carrying
+#
+#   % LABELEDGE: <n>
+#
+# declares <n> numbered-list labels, and the runner requires every one to start
+# at or inside the text edge, read from word geometry via label-edge.awk
+# (#688).
+#
 # Final visual correctness (spacing, balance, typographic detail) remains a
 # human review of the rendered PDF; this runner guards the properties a machine
 # can check reliably without freezing an unsettled design.
@@ -744,6 +752,45 @@ EOF
     fi
 
     [ "$fill_fail" -eq 0 ] || fail=1
+  fi
+
+  # Numbered-list label edges (#688). A fixture carrying
+  #
+  #   % LABELEDGE: <n>
+  #
+  # declares a document that prints <n> list labels of the shape `N)', and
+  # every one of them must start at or inside the text edge. The label box of
+  # CDossierPublications was once sized from `1)' alone, so from `10)' on each
+  # label sat a digit's width in the margin; nothing overflowed and the log
+  # was clean, so only the word geometry shows it. label-edge.awk owns the
+  # geometry. The declared count is the positive control: a build that printed
+  # fewer labels, or none, fails rather than passing with nothing to check.
+  label_declared="$(sed -n 's/^% LABELEDGE:[[:space:]]*//p' "$tex" | head -1)"
+  if [ -n "$label_declared" ]; then
+    if ! command -v pdftotext >/dev/null 2>&1; then
+      echo "  UNCHECKABLE LABEL EDGES: pdftotext is absent"; fail=1
+    else
+      label_records="$(pdftotext -bbox "$out/$base.pdf" - \
+        | awk -f "$here/label-edge.awk")"
+      label_seen="$(printf '%s\n' "$label_records" \
+        | awk -F'\t' '$1 == "SUMMARY" { print $2 }')"
+      label_edge="$(printf '%s\n' "$label_records" \
+        | awk -F'\t' '$1 == "SUMMARY" { print $3 }')"
+      label_out="$(printf '%s\n' "$label_records" \
+        | awk -F'\t' '$1 == "INTRUDES" {
+            printf "    %s starts at %s, left of the text edge at %s\n", $2, $3, $4 }')"
+      if [ "${label_seen:-0}" != "$label_declared" ]; then
+        echo "  LABEL COUNT MISMATCH: the fixture declares $label_declared labels,"
+        echo "    the PDF carries ${label_seen:-none}, so the edge check proves nothing"
+        fail=1
+      elif [ -n "$label_out" ]; then
+        echo "  LABELS IN THE MARGIN:"
+        printf '%s\n' "$label_out"
+        fail=1
+      else
+        echo "  all $label_seen labels start at or inside the text edge ($label_edge)"
+      fi
+    fi
   fi
 
   case "$base" in
