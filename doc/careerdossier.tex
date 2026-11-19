@@ -1074,20 +1074,24 @@ produce empty separators or blank lines.
 \textbf{Key} & \textbf{Required} & \textbf{Default or behaviour} \\
 \midrule
 \endhead
-\key{date} & No & \cmd{today} \\
+\key{date} & No & \cmd{today}; date line omitted when empty \\
 \key{recipient-name} & No & Omitted when empty \\
 \key{recipient-title} & No & Omitted when empty \\
 \key{recipient-organization} & No & Omitted when empty \\
 \key{recipient-address} & No & Omitted when empty; may contain \texttt{\textbackslash\textbackslash} \\
 \key{subject} & No & Entire subject line omitted when empty \\
-\key{salutation} & No & \texttt{Dear Hiring Manager,} \\
-\key{closing} & No & \texttt{Sincerely,} \\
+\key{salutation} & No & \texttt{Dear Hiring Manager,}; salutation line omitted when empty \\
+\key{closing} & No & \texttt{Sincerely,}; closing line omitted when empty \\
 \bottomrule
 \end{longtable}
 
-The recipient block collapses cleanly when one or more optional fields are
-absent: an absent block or subject omits both the content and its following
-block skip.
+A blank value, empty or spaces only, is treated as absent. The recipient block
+collapses cleanly when one or more optional fields are absent: an absent block
+or subject omits both the content and its following block skip. A blank
+\key{date} or \key{salutation} is omitted the same way, so with a blank
+salutation the body begins where the salutation would have been. A blank
+\key{closing} omits only the closing line: the signature space and the name are
+still typeset.
 
 \section{Statements}
 \label{sec:statement}
@@ -1253,11 +1257,13 @@ for the supported contact fields; prefixes the text labels of
 
 \cmd{MakeCDossierLetterhead} renders the cover-letter opening material in order:
 the shared sender identity, the date, the recipient block, the optional subject,
-and the salutation. An absent recipient block or subject omits both the content
-and its following block skip.
+and the salutation. A blank date, recipient block, subject, or salutation omits
+both the content and the space that follows it.
 
 \cmd{MakeCDossierClosing} renders the configured closing, suitable signature
-space, and the profile \key{name}, and validates that \key{name} exists.
+space, and the profile \key{name}, and validates that \key{name} exists. A
+blank closing omits only the closing line; the signature space and the name
+remain.
 
 The three are a single unit for pagination: the closing text and the signature
 name always land on the same page, whichever page that turns out to be. When

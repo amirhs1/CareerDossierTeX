@@ -224,6 +224,173 @@ layout_fixture_medium() { # <fixture.tex>
   esac
 }
 
+# Blank letter fields (#689), for letter-blank-fields only.
+#
+# The fixture is a filled letter. This builds it a second time with `date`,
+# `salutation`, and `closing` blanked, through a wrapper like the controls in
+# layout_fixture, and compares the two builds. Every claim sets a distance in
+# the blank build against the matching distance in the filled one, so nothing
+# here is a reference value: the filled build is the reference #689 decided on.
+# The fixture's header comment states each claim.
+#
+# Positions are `pdftotext -bbox` word boxes, in bp. Every marker is set in the
+# body font at the body size, so the difference of two yMin values is the
+# difference of two baselines. Two distances count as equal within
+# $letter_blank_tol bp: equal TeX glue sums give equal PDF positions, and the
+# smallest defect #689 measured is 3.61 bp.
+letter_blank_tol=0.01
+
+# letter_marker <bbox> <word> <first|last> <yMin|yMax>
+#
+# Prints the attribute of the first or last word box whose text is <word>.
+# Returns 1, printing nothing, when no box carries that text, and 2 when the
+# extraction could not be performed (#398).
+letter_marker() {
+  text_is_unavailable "$1" && return 2
+  awk -v word="$2" -v which="$3" -v attr="$4" '
+    index($0, ">" word "</word>") && match($0, attr "=\"[-0-9.]+\"") {
+      value = substr($0, RSTART + length(attr) + 2, RLENGTH - length(attr) - 3)
+      found = 1
+      if (which == "first") { print value; exit }
+    }
+    END { if (!found) exit 1; if (which == "last") print value }
+  ' <<< "$1"
+}
+
+letter_minus() { # <a> <b>: prints a - b
+  awk -v a="$1" -v b="$2" 'BEGIN { printf "%.3f\n", a - b }'
+}
+
+letter_near() { # <a> <b>: 0 when a and b agree within $letter_blank_tol
+  awk -v a="$1" -v b="$2" -v t="$letter_blank_tol" \
+    'BEGIN { d = a - b; if (d < 0) d = -d; exit !(d <= t) }'
+}
+
+letter_blank_fields() { # <fixture.tex> <base>
+  local tex="$1" base="$2" blank pass bbox_f bbox_b sig_gap
+  local var build word which attr value state fail=0
+  local hdr_f date_f rcpt_f sal_f end_f close_f
+  local hdr_b rcpt_b start_b end_b end_bottom_b name_b
+  local want got
+  blank="$control_dir/$base-blank"
+  {
+    printf '\\AddToHook{begindocument/before}'
+    printf '{\\CDossierLetterSetup{date={},salutation={},closing={}}}\n'
+    printf '\\input{%s}\n' "$tex"
+  } > "$blank.tex"
+  # Two passes, as the fixture itself gets, so the two builds differ in the
+  # three values and in nothing else.
+  for pass in 1 2; do
+    if ! lualatex -halt-on-error -interaction=nonstopmode \
+         -output-directory="$control_dir" "$blank.tex" \
+         > "$blank.stdout" 2>&1; then
+      echo "  BLANK-FIELD BUILD FAILED TO COMPILE on pass $pass (see $blank.log)"
+      return 1
+    fi
+  done
+
+  bbox_f="$(pdftotext -bbox "$out/$base.pdf" - 2>/dev/null)" \
+    || bbox_f="$CDTEXT_UNAVAILABLE"
+  bbox_b="$(pdftotext -bbox "$blank.pdf" - 2>/dev/null)" \
+    || bbox_b="$CDTEXT_UNAVAILABLE"
+
+  # Every position is read before any claim is judged. A claim made about a
+  # position that was never read would be a verdict about a page nobody
+  # measured (#398), so a missing marker fails the check on its own terms.
+  while read -r var build word which attr; do
+    if [ "$build" = filled ]; then
+      value="$(letter_marker "$bbox_f" "$word" "$which" "$attr")"
+    else
+      value="$(letter_marker "$bbox_b" "$word" "$which" "$attr")"
+    fi
+    state=$?
+    if [ "$state" -eq 1 ] || { [ "$state" -eq 0 ] && [ -z "$value" ]; }; then
+      echo "  BLANK-FIELD MARKER NOT FOUND: '$word' in the $build build"; fail=1
+    elif [ "$state" -ne 0 ]; then
+      echo "  UNCHECKABLE BLANK FIELDS: the $build build yielded no word boxes"
+      fail=1
+    fi
+    printf -v "$var" '%s' "$value"
+  done <<'EOF'
+hdr_f        filled headerline@example.com first yMin
+date_f       filled DATELINE               first yMin
+rcpt_f       filled RECIPIENTLINE          first yMin
+sal_f        filled SALUTATIONLINE         first yMin
+end_f        filled BODYEND                first yMin
+close_f      filled CLOSINGLINE            first yMin
+hdr_b        blank  headerline@example.com first yMin
+rcpt_b       blank  RECIPIENTLINE          first yMin
+start_b      blank  BODYSTART              first yMin
+end_b        blank  BODYEND                first yMin
+end_bottom_b blank  BODYEND                first yMax
+name_b       blank  SIGNATURELINE          last  yMin
+EOF
+  sig_gap="$(sed -n 's/^CDOSSIERTEST signature-gap-bp=//p' "$blank.log" | head -1)"
+  case "$sig_gap" in
+    ''|*[!0-9.]*)
+      echo "  UNCHECKABLE BLANK CLOSING: $blank.log records no signature gap"
+      fail=1
+      ;;
+  esac
+  [ "$fail" -eq 0 ] || return 1
+
+  # A blank date: the recipient line takes the date line's place.
+  want="$(letter_minus "$date_f" "$hdr_f")"
+  got="$(letter_minus "$rcpt_b" "$hdr_b")"
+  if letter_near "$got" "$want"; then
+    echo "  blank date: recipient line ${got} bp below the header, as a date's"
+  else
+    echo "  BLANK DATE MOVES THE RECIPIENT: ${got} bp below the header, where a"
+    echo "    filled date's line sits ${want} bp below it"
+    fail=1
+  fi
+
+  # A blank salutation: the body takes the salutation's place.
+  want="$(letter_minus "$sal_f" "$rcpt_f")"
+  got="$(letter_minus "$start_b" "$rcpt_b")"
+  if letter_near "$got" "$want"; then
+    echo "  blank salutation: body ${got} bp below the recipient, as a salutation's"
+  else
+    echo "  BLANK SALUTATION MOVES THE BODY: ${got} bp below the recipient line,"
+    echo "    where a filled salutation's line sits ${want} bp below it"
+    fail=1
+  fi
+
+  # A blank closing: the name is still typeset, below the body.
+  if awk -v n="$name_b" -v e="$end_b" 'BEGIN { exit !(n > e) }'; then
+    echo "  blank closing: the name is still typeset below the body"
+  else
+    echo "  BLANK CLOSING DROPS THE NAME: no SIGNATURELINE below the body"
+    return 1
+  fi
+
+  # No closing line: the name sits one signature gap below the place of the
+  # filled closing line, so neither that line nor its paragraph space is left.
+  want="$(awk -v c="$close_f" -v e="$end_f" -v g="$sig_gap" \
+            'BEGIN { printf "%.3f\n", c - e + g }')"
+  got="$(letter_minus "$name_b" "$end_b")"
+  if letter_near "$got" "$want"; then
+    echo "  blank closing: no closing line; the name sits ${sig_gap} bp below its place"
+  else
+    echo "  BLANK CLOSING LEAVES SPACE: the name sits ${got} bp below the body's"
+    echo "    last line, where the filled closing line's place plus the"
+    echo "    ${sig_gap} bp signature gap is ${want} bp"
+    fail=1
+  fi
+
+  # The gap from the body's last line to the name, between em-boxes.
+  got="$(letter_minus "$name_b" "$end_bottom_b")"
+  if awk -v a="$got" -v g="$sig_gap" -v t="$letter_blank_tol" \
+       'BEGIN { exit !(a + t >= g) }'; then
+    echo "  blank closing: ${got} bp from the body to the name, at least ${sig_gap} bp"
+  else
+    echo "  BLANK CLOSING NARROWS THE SIGNATURE GAP: ${got} bp from the body's"
+    echo "    last line to the name, below the ${sig_gap} bp signature gap"
+    fail=1
+  fi
+  return "$fail"
+}
+
 # One fixture, start to finish (#390).
 #
 # `local fail` shadows the global deliberately. Every assertion below already
@@ -510,6 +677,11 @@ EOF
         if [ "$contact_item_fail" -eq 0 ]; then
           echo "  every contact item remains on one visual line"
         fi
+        ;;
+      letter-blank-fields)
+        # A second build with three fields blanked, compared with this one
+        # (#689); see letter_blank_fields above.
+        letter_blank_fields "$tex" "$base" || fail=1
         ;;
     esac
 

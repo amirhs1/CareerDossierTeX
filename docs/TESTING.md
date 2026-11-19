@@ -289,8 +289,10 @@ not a rendered gap. Both fixtures keep those traces; `components-headerstack`
 adds composed heights alongside them.
 
 `tests/layout/` renders rather than reports, but it asserts page counts,
-overfull boxes, furniture, media box, and widow/orphan behaviour — not gaps. A
-spacing change of a grid step or two moves nothing it looks at. It is
+overfull boxes, furniture, media box, and widow/orphan behaviour — not token
+gaps. Its one gap comparison, `letter-blank-fields`, compares two builds of one
+letter and names no token value except the signature gap's floor. A spacing
+change of a grid step or two moves nothing it looks at. It is
 corroboration when a retune flips a page count, not a per-token instrument.
 
 Verify a new shape by perturbing the ratio and rebuilding — do not assume it
@@ -460,7 +462,11 @@ across a break, and the page-fill floor. `tests/layout/page-break-check.awk` and
 `page-fill.awk` do the log parsing. `*keeptogether*` fixtures also assert that no
 heading is stranded and that no split list leaves a single typeset line on a
 page; `list-remnant.awk` counts a lone item's lines from the hanging indent its
-continuation lines start at.
+continuation lines start at. `letter-blank-fields` is built a second time with
+`date`, `salutation`, and `closing` blank, and the runner checks from
+`pdftotext -bbox` positions that a blank date or salutation gives its place to
+the next line, and that a blank closing leaves the name one signature gap below
+the closing line's place (#689).
 
 The furniture is checked against the medium a fixture's class options name, in
 its `\documentclass[...]` or, for a wrapper, a `\PassOptionsToClass` before the

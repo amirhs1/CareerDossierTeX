@@ -1,0 +1,56 @@
+% letter-blank-fields.tex — #689: a blank `date`, `salutation`, or `closing`
+% counts as absent. The claims, each false if this fixture's check fails:
+%
+%   - with `date={}`, the recipient line sits as far below the header as a
+%     filled date's line does;
+%   - with `salutation={}`, the body's first line sits as far below the
+%     recipient line as a filled salutation's line does;
+%   - with `closing={}`, no closing line is typeset, the name still is, and the
+%     gap from the body's last line to the name is at least
+%     \CDossierLetterSignatureGapSkip.
+%
+% Property test: no reference rendering exists, so tests/layout/run.sh
+% compares two builds of this file. This file is the filled build. The runner
+% writes a wrapper that blanks the three fields at begindocument/before, after
+% this file's own \CDossierLetterSetup, so the two builds differ in those three
+% values only. It then reads every line's position from `pdftotext -bbox` in
+% both builds.
+%
+% "No closing line is typeset" is read as a position. An empty paragraph prints
+% nothing that extraction could find, but it still claims space. So the check
+% asks that the blank build's name sit exactly \CDossierLetterSignatureGapSkip
+% below the place of the filled build's closing line: the closing line and its
+% paragraph space are gone, and the signature gap stays. The gap clause is
+% measured between `pdftotext`'s em-boxes, which are taller than the ink, so it
+% never reports more white than the page has.
+%
+% Each marker is one word that appears once in each build. The name is the
+% exception: the header prints it too, so the runner reads its last occurrence.
+\documentclass{careerdossier-letter}
+\CDossierSetup{
+  name  = {Ada SIGNATURELINE},
+  email = {headerline@example.com},
+}
+\CDossierLetterSetup{
+  date           = {DATELINE},
+  recipient-name = {RECIPIENTLINE},
+  salutation     = {SALUTATIONLINE},
+  closing        = {CLOSINGLINE},
+}
+% The floor the gap clause measures against, in the unit pdftotext reports.
+\ExplSyntaxOn
+\iow_log:x
+  {
+    CDOSSIERTEST~signature-gap-bp=
+    \dim_to_decimal_in_bp:n { \CDossierLetterSignatureGapSkip }
+  }
+\ExplSyntaxOff
+\begin{document}
+\MakeCDossierLetterhead
+
+BODYSTART is the first line of the letter body.
+
+BODYEND is the last line of the letter body.
+
+\MakeCDossierClosing
+\end{document}
