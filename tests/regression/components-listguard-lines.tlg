@@ -16,3 +16,9 @@ TEST 2: components-listguard-lines-unrecorded
 ============================================================
 unrecorded nodes = P10000 g H P10000 g H P9997 g H whatsit whatsit P-51 g
 ============================================================
+============================================================
+TEST 3: components-listguard-lines-tokens
+============================================================
+one-line-edges-apart nodes = P9998 g H P9999 g H P9999 g H whatsit whatsit P-51 g
+unrecorded-apart nodes = P9998 g H P9999 g H P9990 g H whatsit whatsit P-51 g
+============================================================

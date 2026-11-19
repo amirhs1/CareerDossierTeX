@@ -1,5 +1,6 @@
-% components-listguard-lines.lvt — the list-orphan guard measures
-% lines, not items (#562).
+% components-listguard-lines.lvt — the list-edge guard measures
+% lines, not items (#562), and each list boundary reads the token that owns it
+% (#726).
 %
 % The layout fixtures assert the *consequence* — a page that fills — and cannot
 % see the decision. This file asserts the decision itself, boundary by boundary,
@@ -24,9 +25,13 @@
 % The two `whatsit' nodes before each closing `P-51' are the auxiliary-file
 % writes; cv-entry-keep-penalty.lvt explains why they are visible here.
 %
-% P10000 is \CDossierHeadingKeepPenalty, P9997 \CDossierListOrphanPenalty, and
-% P-51 LaTeX's own \@endparpenalty where the list closes. Consecutive glue
-% collapses to a single `g'.
+% At the default values the first P10000 is the list's `beginpenalty', which is
+% \CDossierHeadingKeepPenalty; a later P10000 is a list-edge guard,
+% \CDossierListEdgeKeepPenalty; P9997 is \CDossierListInteriorPenalty; and
+% P-51 is LaTeX's own \@endparpenalty where the list closes. The defaults
+% cannot tell the first two tokens apart, so the last test gives the three
+% tokens three different values (#726). Consecutive glue collapses to a single
+% `g'.
 \input{regression-test}
 \documentclass{careerdossier-resume}
 \CDossierSetup{
@@ -73,7 +78,15 @@
 % once, and with neither edge a single line it is free.
 \cdossier@setlistlen{4}{2}
 \cdossier@setlistedge{4}{2}{2}
+% List 6: three items, both edge items recorded as one line, as list 1 is. Lists
+% 5 and 7 are left unrecorded. List 6 is the first list of the last test.
+\cdossier@setlistlen{6}{3}
+\cdossier@setlistedge{6}{1}{1}
 \makeatother
+
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestSetPenalty #1#2 { \int_set:Nn #1 {#2} }
+\ExplSyntaxOff
 
 \begin{document}
 \START
@@ -102,6 +115,25 @@
   \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
     Three.\end{CDossierItemize}}
   \cdossiertestNodes{unrecorded}
+}
+
+% The boundaries read three tokens, not two (#726). With the heading keep at
+% 9998, the edge keep at 9999, and the interior value at 9990, a one-line-edged
+% list (serial 6) must show 9998 before its first item and 9999 at both guarded
+% edges, and the unrecorded list after it (serial 7) 9990 at its unguarded
+% boundary. Were the edge guards still
+% reading \CDossierHeadingKeepPenalty, they would show 9998. The three values
+% are the ones set below, not output of the implementation.
+\TEST{components-listguard-lines-tokens}{
+  \cdossiertestSetPenalty \CDossierHeadingKeepPenalty { 9998 }
+  \cdossiertestSetPenalty \CDossierListEdgeKeepPenalty { 9999 }
+  \cdossiertestSetPenalty \CDossierListInteriorPenalty { 9990 }
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
+    Three.\end{CDossierItemize}}
+  \cdossiertestNodes{one-line-edges-apart}
+  \setbox9=\vbox{\begin{CDossierItemize}\item One.\item Two.\item
+    Three.\end{CDossierItemize}}
+  \cdossiertestNodes{unrecorded-apart}
 }
 
 \END

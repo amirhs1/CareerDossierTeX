@@ -36,7 +36,8 @@
 #   - BROKEN keeps bulleted list lines: a bullet's own text can be hyphenated
 #     across the break, and in this corpus that is exactly where it happens.
 #   - CLUB/WIDOW excludes them: list boundaries are already governed by
-#     CDossierListOrphanPenalty and asserted by the *keeptogether* fixtures,
+#     CDossierListEdgeKeepPenalty and CDossierListInteriorPenalty and
+#     asserted by the *keeptogether* fixtures,
 #     and a bullet's naturally short last line is not a prose remnant.
 #
 # Invoke as:

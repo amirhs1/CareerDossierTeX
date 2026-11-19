@@ -2112,7 +2112,7 @@ normally rather than overflowing.
 \subsection{Keep-together penalties}
 \label{sec:keep-penalties}
 
-The resume and CV state the entry and list rules with two named penalties. Each
+The resume and CV state the entry and list rules with three named penalties. Each
 is read when the boundary it guards is set, so a document that sets one changes
 every boundary set after the assignment.
 
@@ -2123,24 +2123,24 @@ every boundary set after the assignment.
 \endhead
 \cmd{CDossierHeadingKeepPenalty} & \texttt{10000} & between the two lines of
   an entry heading; between an entry heading and the first line of its body;
-  before a list's first item; after a list's first item when that item is one
-  line, and before its last item when that item is one line \\
-\cmd{CDossierListOrphanPenalty} & \texttt{9997} & every other boundary
+  before a list's first item \\
+\cmd{CDossierListEdgeKeepPenalty} & \texttt{10000} & after a list's first
+  item when that item is one line, and before its last item when that item is
+  one line \\
+\cmd{CDossierListInteriorPenalty} & \texttt{9997} & every other boundary
   between two list items \\
 \bottomrule
 \end{longtable}
 
 \texttt{10000} forbids the break, and a value below it does not.
-\cmd{CDossierListOrphanPenalty} is deliberately below it, so a list longer than
+\cmd{CDossierListInteriorPenalty} is deliberately below it, so a list longer than
 a page can still break somewhere in its middle.
 
-\cmd{CDossierHeadingKeepPenalty} has a second job: when a section or subsection
-heading lacks the room its bound below requires, the class breaks the page with
-the negative of this value, which at \texttt{10000} forces the break. Lowering
-the token below \texttt{10000} therefore weakens both the keeps in the table and
-that forced break.
+When a section or subsection heading lacks the room its bound below requires,
+the class forces a page break before it. No token sets that break: lowering
+any of the three penalties leaves it forced.
 
-Both are integers, and are set the way the two bounds below are.
+All three are integers, and are set the way the two bounds below are.
 
 \subsection{\cmd{CDossierSectionNeedLines}}
 
