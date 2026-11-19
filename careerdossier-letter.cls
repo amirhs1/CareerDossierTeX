@@ -33,7 +33,7 @@
 %% identity; and process family=industry|academic as a label- and metadata-only
 %% choice with industry as the default.
 
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\NeedsTeXFormat{LaTeX2e}[2024-11-01]
 \ProvidesExplClass {careerdossier-letter} {2026-11-06} {0.11.0}
   {CareerDossierTeX English cover-letter class}
 

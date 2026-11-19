@@ -42,7 +42,7 @@
 %% formatting, or font selection. A kernel page style is preferred to reviving
 %% the prototypes' fancyhdr/lastpage dependency solely for `Page n of m'.
 
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\NeedsTeXFormat{LaTeX2e}[2024-11-01]
 \ProvidesExplClass {careerdossier-cv} {2026-11-06} {0.11.0}
   {CareerDossierTeX English academic CV class}
 
@@ -469,7 +469,14 @@
   }
 
 %% Normalize a DOI or fallback URL target while leaving the displayed value
-%% unchanged. A DOI may be a bare identifier, doi.org path, or complete URL.
+%% unchanged. A DOI may be a bare identifier, doi.org path, or complete URL,
+%% and a bare identifier may carry a leading `doi:' prefix, which is dropped
+%% from the target before the resolver is added (#688): left in, it would
+%% give `https://doi.org/doi:10.1234/abc', which resolves to no DOI. The
+%% prefix is matched in lower case, as written in the DOI's own URI form, and
+%% any space after it goes too. l3regex matches a character by its code
+%% whatever its category, so the user's catcode-12 colon matches the pattern's
+%% letter one.
 %%
 %% The scheme goes in with :Ne and \tl_to_str:n so its colon is an ordinary
 %% character. A literal colon here is a letter under expl3, and hyperref finds
@@ -478,10 +485,17 @@
 %% file, appends `.pdf', and emits a GoToR "open a remote PDF" action rather
 %% than a URI action -- silently, and only in the annotation. See the same note
 %% at \__cdossier_links_scheme:N in careerdossier-links (#328).
+\regex_const:Nn \c__cdossier_cv_publication_doi_prefix_regex { \A doi: \s* }
+
 \cs_new_protected:Npn \__cdossier_cv_publication_link:nn #1#2
   {
     \tl_set:Nn \l__cdossier_cv_publication_target_tl {#2}
     \tl_set:Nn \l__cdossier_cv_publication_shown_tl  {#2}
+    \str_if_eq:nnT {#1} { DOI }
+      {
+        \regex_replace_once:NnN \c__cdossier_cv_publication_doi_prefix_regex
+          { } \l__cdossier_cv_publication_target_tl
+      }
     \str_set:NV \l__cdossier_cv_publication_target_str
       \l__cdossier_cv_publication_target_tl
     \str_if_in:NnF \l__cdossier_cv_publication_target_str { :// }
@@ -528,11 +542,26 @@
       }
   }
 
+%% The period that closes a value is added only when the value does not
+%% already end in `.', `?', or `!' (#688), so `Lovelace, A.' and `Can
+%% Machines Think?' are not followed by a second mark. Closing braces after the
+%% mark are looked through, so a value ending `\emph{Why?}' counts as ending in
+%% `?'. The test reads the value as written, so a mark produced by a macro at
+%% the end of a value is not seen and the period is still added.
+\regex_const:Nn \c__cdossier_cv_publication_stop_regex { [\.\?\!] \cE.* \Z }
+\tl_new:N \l__cdossier_cv_publication_last_tl
+
+\cs_new_protected:Npn \__cdossier_cv_publication_period:N #1
+  { \regex_match:NVF \c__cdossier_cv_publication_stop_regex #1 { . } }
+
 \cs_new_protected:Npn \__cdossier_cv_publication_render:
   {
     \item
-    \tl_use:N \l__cdossier_cv_publication_authors_tl .\space
-    \emph { \tl_use:N \l__cdossier_cv_publication_title_tl } .
+    \tl_use:N \l__cdossier_cv_publication_authors_tl
+    \__cdossier_cv_publication_period:N \l__cdossier_cv_publication_authors_tl
+    \space
+    \emph { \tl_use:N \l__cdossier_cv_publication_title_tl }
+    \__cdossier_cv_publication_period:N \l__cdossier_cv_publication_title_tl
     \seq_clear:N \l__cdossier_cv_publication_details_seq
     \tl_if_blank:VF \l__cdossier_cv_publication_venue_tl
       {
@@ -545,9 +574,17 @@
           \l__cdossier_cv_publication_date_tl
       }
     \seq_if_empty:NF \l__cdossier_cv_publication_details_seq
-      { \space \seq_use:Nn \l__cdossier_cv_publication_details_seq { ,~ } . }
+      {
+        \space \seq_use:Nn \l__cdossier_cv_publication_details_seq { ,~ }
+        \seq_get_right:NN \l__cdossier_cv_publication_details_seq
+          \l__cdossier_cv_publication_last_tl
+        \__cdossier_cv_publication_period:N \l__cdossier_cv_publication_last_tl
+      }
     \tl_if_blank:VF \l__cdossier_cv_publication_note_tl
-      { \space \tl_use:N \l__cdossier_cv_publication_note_tl . }
+      {
+        \space \tl_use:N \l__cdossier_cv_publication_note_tl
+        \__cdossier_cv_publication_period:N \l__cdossier_cv_publication_note_tl
+      }
     %% DOI wins when both identifiers are present; URL is the fallback.
     \tl_if_blank:VTF \l__cdossier_cv_publication_doi_tl
       {
@@ -572,13 +609,64 @@
 %% gained the first branch with the calibrated token system and this list did
 %% not, so until now it had no tagged path at all (#218 and #193).
 %%
-%% enumitem's `*' resolves the label box from the *first* item's label and keeps
-%% that width however long the list runs, so `\textbf{1)}' is the box the
-%% untagged path measures and the one the tagged path has to reproduce. It is
-%% written out rather than derived from the `label' key above it because the
-%% label is a template for every item and this is one rendered instance of it;
-%% CDossierItemize states its own `\textbullet' twice for the same reason.
+%% The label box is as wide as the widest label the list prints, on both
+%% paths (#688). enumitem's `*' sized it from the first label alone and kept
+%% that width however long the list ran, so from `10)' on every label sat a
+%% digit's width in the margin. The last label is known only once the list has
+%% ended, so each list records it in the auxiliary file under a per-list serial
+%% and reads it back on the next run -- the two-pass arrangement
+%% careerdossier-components uses for a bullet list's length, and the page
+%% furniture for the page count. The box is the widest of the labels from the
+%% first to the recorded last, each measured, and a list that ends with a
+%% different width from the one it was set with warns that another run is
+%% needed. With nothing recorded yet the box is sized from the first label
+%% alone, as before, so a first pass of a list that reaches `10)' still sets
+%% those labels in the margin and warns.
+%%
+%% A list of nine or fewer entries keeps the box `1)' gave, on every pass,
+%% because the figures of both body fonts share one width; the measurement does
+%% not rely on that, and the warning compares widths, not counts, so such a
+%% list never asks for a rerun.
+%%
+%% The label is written out here rather than derived from the `label' key
+%% below because that key is a template for every item and this is one
+%% rendered instance of it; CDossierItemize states its own `\textbullet' twice
+%% for the same reason.
+%%
+%% The record is written to the aux at once, with \iow_now:Ne, never
+%% through a deferred \write: a deferred write leaves a node in the list, and
+%% there it blocks the closing edge's \addvspace and joins the last item's
+%% paragraph. The value is the list's own, not a page number, so it does not
+%% need to wait for shipout. Like LaTeX's own aux writes it is skipped under
+%% \nofiles, where the aux is never opened.
+\cs_new_protected:Npn \cdossier@cv@setpublast #1#2
+  { \cs_gset:cpn { cdossier@cv@publast@ #1 } {#2} }
+
 \dim_new:N \l__cdossier_cv_publication_label_width_dim
+\dim_new:N \l__cdossier_cv_publication_label_final_dim
+\int_new:N \g__cdossier_cv_publications_id_int
+\int_new:N \l__cdossier_cv_publications_offset_int
+\int_new:N \l__cdossier_cv_publications_last_int
+
+\msg_new:nnn { careerdossier-cv } { publication-label-rerun }
+  {
+    Publication~list~label~widths~need~another~run:~
+    rerun~LaTeX~to~settle~the~label~box.
+  }
+
+%% #1: the dimension to set; #2: the last label number. The labels run from
+%% the one after the list's offset to #2, and at least the first is measured.
+\cs_new_protected:Npn \__cdossier_cv_publications_label_width:Nn #1#2
+  {
+    \dim_zero:N #1
+    \int_step_inline:nnn
+      { \l__cdossier_cv_publications_offset_int + 1 }
+      { \int_max:nn {#2} { \l__cdossier_cv_publications_offset_int + 1 } }
+      {
+        \hbox_set:Nn \l_tmpa_box { \textbf { ##1 ) } }
+        \dim_set:Nn #1 { \dim_max:nn {#1} { \box_wd:N \l_tmpa_box } }
+      }
+  }
 
 %% The carry is seeded onto `enumi' after \begin{enumerate} rather than through
 %% enumitem's `start' or `resume' key, and that is deliberate. The tagged branch
@@ -602,11 +690,28 @@
     \bool_set_true:N \l__cdossier_cv_publications_active_bool
     \tl_set:Nn \l__cdossier_cv_publications_numbering_tl { restart }
     \keys_set:nn { cdossier / publications } {#1}
+    \int_zero:N \l__cdossier_cv_publications_offset_int
+    \tl_if_eq:NnT \l__cdossier_cv_publications_numbering_tl { continue }
+      {
+        \int_set_eq:NN \l__cdossier_cv_publications_offset_int
+          \g__cdossier_cv_publications_carry_int
+      }
+    \int_gincr:N \g__cdossier_cv_publications_id_int
+    \cs_if_exist:cTF
+      { cdossier@cv@publast@ \int_use:N \g__cdossier_cv_publications_id_int }
+      {
+        \int_set:Nn \l__cdossier_cv_publications_last_int
+          {
+            \use:c
+              { cdossier@cv@publast@ \int_use:N \g__cdossier_cv_publications_id_int }
+          }
+      }
+      { \int_zero:N \l__cdossier_cv_publications_last_int }
+    \__cdossier_cv_publications_label_width:Nn
+      \l__cdossier_cv_publication_label_width_dim
+      { \l__cdossier_cv_publications_last_int }
     \tag_if_active:TF
       {
-        \hbox_set:Nn \l_tmpa_box { \textbf { 1) } }
-        \dim_set:Nn \l__cdossier_cv_publication_label_width_dim
-          { \box_wd:N \l_tmpa_box }
         \begin { enumerate }
           [
             label      = \textbf { \arabic*) } ,
@@ -629,7 +734,13 @@
         \begin { enumerate }
           [
             label      = \textbf { \arabic*) } ,
-            leftmargin = * ,
+            leftmargin =
+              \dim_eval:n
+                {
+                  \l__cdossier_cv_publication_label_width_dim
+                  + \CDossierListLabelSep
+                } ,
+            labelwidth = \l__cdossier_cv_publication_label_width_dim ,
             labelsep   = \CDossierListLabelSep ,
             topsep     = \CDossierRecordListEdgeAboveSkip ,
             itemsep    = \CDossierRecordItemSepSkip ,
@@ -644,6 +755,21 @@
     %% Read before \end{enumerate}: the counter is stepped inside the list's
     %% group, and this is the last number the list actually labelled.
     \int_gset_eq:NN \g__cdossier_cv_publications_carry_int \c@enumi
+    \__cdossier_cv_publications_label_width:Nn
+      \l__cdossier_cv_publication_label_final_dim { \c@enumi }
+    \dim_compare:nNnF
+      { \l__cdossier_cv_publication_label_final_dim }
+      = { \l__cdossier_cv_publication_label_width_dim }
+      { \msg_warning:nn { careerdossier-cv } { publication-label-rerun } }
+    \legacy_if:nT { @filesw }
+      {
+        \iow_now:Ne \@auxout
+          {
+            \token_to_str:N \cdossier@cv@setpublast
+              { \int_use:N \g__cdossier_cv_publications_id_int }
+              { \int_use:N \c@enumi }
+          }
+      }
     \__cdossier_components_listedge_after:
     \end { enumerate }
     \bool_set_false:N \l__cdossier_cv_publications_active_bool

@@ -1,0 +1,24 @@
+# name-coverage-backlog.txt — the public-name coverage ratchet (#694)
+#
+# Every public name the Work defines should appear in a regression test:
+# `tests/lint/run-name-coverage.sh' enforces it. This file declares the names
+# that did not, measured on branch test/penalties-name-coverage, cut from
+# `main' at f14132b, on 2026-11-19: 4 of the 86 public names, after #694's own
+# penalty lines in tests/regression/support/tokens-defaults.inc.
+#
+# THIS LIST MAY ONLY SHRINK, and the lint makes it so: an untested name not
+# listed here fails; an entry whose name a test now covers fails until it is
+# removed; an entry for a name the Work no longer defines fails; and more
+# entries than the frozen size below fails. When the last entry goes, delete
+# this file and the lint's backlog branch; it says so.
+#
+# Format: the name without its backslash, whitespace, then the reason. THE
+# REASON IS MANDATORY; an entry without one fails the lint. Blank lines and
+# `#' comments are ignored.
+#
+# FROZEN AT 4 entries, the measured size above.
+
+CDossierApplyPageBreakPenalties   no test names it; tokens-defaults.inc pins its effect through page-break-penalties, and names it only in a comment
+CDossierEntryMetaSeparator        no regression test names it
+CDossierHeadingKeepPenalty        no regression test names it
+CDossierListOrphanPenalty         no regression test names it
