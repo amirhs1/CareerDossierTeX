@@ -11,3 +11,9 @@ TEST 2: cv-entry-keep-penalty-list
 ============================================================
 listed nodes = g H P10000 g P10000 g H P10000 g H whatsit whatsit P-51 g
 ============================================================
+============================================================
+TEST 3: cv-entry-keep-penalty-tokens
+============================================================
+edge-keep-lowered nodes = g H P10000 g P10000 g H P9999 g H whatsit whatsit P-51 g
+heading-keep-lowered nodes = g H P9999 g P9999 g H P10000 g H whatsit whatsit P-51 g
+============================================================

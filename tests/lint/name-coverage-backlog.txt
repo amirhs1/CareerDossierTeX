@@ -16,9 +16,7 @@
 # REASON IS MANDATORY; an entry without one fails the lint. Blank lines and
 # `#' comments are ignored.
 #
-# FROZEN AT 4 entries, the measured size above.
+# FROZEN AT 2 entries: the measured size above, less the two #726 covered.
 
 CDossierApplyPageBreakPenalties   no test names it; tokens-defaults.inc pins its effect through page-break-penalties, and names it only in a comment
 CDossierEntryMetaSeparator        no regression test names it
-CDossierHeadingKeepPenalty        no regression test names it
-CDossierListOrphanPenalty         no regression test names it

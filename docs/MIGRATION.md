@@ -390,6 +390,41 @@ and ignored. No key is supported because `entrymeta`, the resume's and CV's one
 `\CDossierSection` key, sets how entries lay out their metadata, and a
 statement has no entries.
 
+### The list penalties are split and renamed
+
+**A document that names `\CDossierListOrphanPenalty` now stops with an
+undefined-control-sequence error.** The token is renamed
+`\CDossierListInteriorPenalty`, with no alias, and its value and meaning are
+unchanged: the value at every list boundary that strands no single line
+([#726](https://github.com/amirhs1/CareerDossierTeX/issues/726)). A new token,
+`\CDossierListEdgeKeepPenalty`, default `10000`, now guards the two boundaries
+that would strand a one-line first or last item. `\CDossierHeadingKeepPenalty`
+keeps only the heading keeps: a document that sets it no longer changes those
+list-edge guards, nor the forced page break before a section or subsection
+heading that lacks room, which no token sets any more. At the default values
+nothing reflows. Rename the token:
+
+Before:
+
+    \ExplSyntaxOn
+    \int_set:Nn \CDossierListOrphanPenalty { 9000 }
+    \ExplSyntaxOff
+
+After:
+
+    \ExplSyntaxOn
+    \int_set:Nn \CDossierListInteriorPenalty { 9000 }
+    \ExplSyntaxOff
+
+A document that lowered `\CDossierHeadingKeepPenalty` to weaken the list-edge
+guards sets `\CDossierListEdgeKeepPenalty` as well.
+
+Reason: neither name said what the token does.
+`\CDossierHeadingKeepPenalty` also guarded the list edges and, negated, forced
+the page break before a heading, and `\CDossierListOrphanPenalty` is the value
+at the boundaries that strand no line. After `v1.0.0`, changing either needs a
+major release.
+
 ## [0.11.0] - 2026-11-06
 
 ### `medium` defaults to `screen`

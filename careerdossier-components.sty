@@ -1058,7 +1058,12 @@
 %% every document would become one section per page. The smoke and layout
 %% fixtures would catch that, but not as directly as this reads.
 %%
-%% `\penalty -\CDossierHeadingKeepPenalty' rather than `\newpage': this runs
+%% The break is forced by a private constant, -10000, the value at or below
+%% which TeX always breaks, and not by negating CDossierHeadingKeepPenalty
+%% (#726): a document that lowers the heading keep must not turn this forced
+%% break into a mere suggestion.
+%%
+%% A forced `\penalty' rather than `\newpage': this runs
 %% before the section's own `\addvspace', so the forced break discards the glue
 %% at the boundary in the ordinary way, and the heading arrives at the top of the
 %% next page with no leading skip. `\newpage' would contribute a `\vfil' first.
@@ -1067,6 +1072,7 @@
 %% second heading level states its own line count (\CDossierSubsectionNeedLines)
 %% through the same code rather than through a second copy of it. The
 %% section-specific name is kept because both record classes call it.
+\int_const:Nn \c__cdossier_components_forcebreak_int { -10000 }
 \cs_new_protected:Npn \__cdossier_components_heading_need:N #1
   {
     \dim_compare:nNnF { \tex_pagegoal:D } = { \c_max_dim }
@@ -1074,7 +1080,7 @@
         \dim_compare:nNnT
           { \tex_pagegoal:D - \tex_pagetotal:D } <
           { #1 \CDossierBodyLeading }
-          { \penalty -\CDossierHeadingKeepPenalty }
+          { \penalty \c__cdossier_components_forcebreak_int }
       }
   }
 
@@ -1639,8 +1645,8 @@
                     { \l__cdossier_components_waslastlines_int } < { 2 } }
               }
           }
-          { \use:c { @itempenalty } = \CDossierHeadingKeepPenalty \scan_stop: }
-          { \use:c { @itempenalty } = \CDossierListOrphanPenalty \scan_stop: }
+          { \use:c { @itempenalty } = \CDossierListEdgeKeepPenalty \scan_stop: }
+          { \use:c { @itempenalty } = \CDossierListInteriorPenalty \scan_stop: }
       }
   }
 

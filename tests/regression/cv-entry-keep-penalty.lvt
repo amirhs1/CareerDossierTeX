@@ -1,4 +1,5 @@
-% cv-entry-keep-penalty.lvt — #332, the CV half.
+% cv-entry-keep-penalty.lvt — #332, the CV half; and #726, the entry's keeps
+% and the list's edge guard read different tokens.
 %
 % careerdossier-cv declares its own CDossierEntry rather than sharing the
 % resume's, so the guard that decides whether the keep penalty is emitted exists
@@ -56,6 +57,10 @@
 }
 \makeatother
 
+\ExplSyntaxOn
+\cs_new_protected:Npn \cdossiertestSetPenalty #1#2 { \int_set:Nn #1 {#2} }
+\ExplSyntaxOff
+
 \begin{document}
 \START
 
@@ -78,6 +83,30 @@
     \begin{CDossierItemize}\item First bullet.\item Second
     bullet.\end{CDossierItemize}\end{CDossierEntry}}
   \cdossiertestNodes{listed}
+}
+
+% The same listed entry with one token moved at a time (#726). Its first two
+% penalties are heading keeps, \CDossierHeadingKeepPenalty: the entry's body
+% guard and the list's `beginpenalty'. Its third is the list-edge guard,
+% \CDossierListEdgeKeepPenalty: a two-item list's one interior boundary, guarded
+% because nothing is recorded for this list. Lowering the edge keep to 9999 must
+% move the third alone; lowering the heading keep to 9999 must move the first two
+% alone. The 9999 is the value set below.
+\TEST{cv-entry-keep-penalty-tokens}{
+  \begingroup
+  \cdossiertestSetPenalty \CDossierListEdgeKeepPenalty { 9999 }
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Listed Entry}]%
+    \begin{CDossierItemize}\item First bullet.\item Second
+    bullet.\end{CDossierItemize}\end{CDossierEntry}}
+  \cdossiertestNodes{edge-keep-lowered}
+  \endgroup
+  \begingroup
+  \cdossiertestSetPenalty \CDossierHeadingKeepPenalty { 9999 }
+  \setbox9=\vbox{\begin{CDossierEntry}[title = {Listed Entry}]%
+    \begin{CDossierItemize}\item First bullet.\item Second
+    bullet.\end{CDossierItemize}\end{CDossierEntry}}
+  \cdossiertestNodes{heading-keep-lowered}
+  \endgroup
 }
 
 \END
