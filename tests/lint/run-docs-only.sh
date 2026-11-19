@@ -13,8 +13,10 @@
 #      list gets the verdict the table in tests/lint/fixtures/README.md gives
 #      it. The expected verdicts come from the documented path list in
 #      CONTRIBUTING.md, "CI expectations", not from running the classifier.
-#      `-sty`, `-manual`, `-makefile`, `-workflow`, `-rename`, and `-classifier`
-#      are the planted violations: a list that is docs-only but for one path.
+#      `-sty`, `-manual`, `-makefile`, `-workflow`, `-rename`, `-classifier`,
+#      `-readme`, and `-changelog` are the planted violations: a list that is
+#      docs-only but for one path. `-readme` and `-changelog` hold a `.md` file
+#      that build.lua ships in the release archive (`textfiles`, #691).
 #   2. Over a working tree (`--worktree`), in a throwaway repository: a
 #      committed, a staged, an unstaged, and an untracked change each count, a
 #      staged rename of a `.sty` into docs/ counts as touching the `.sty`, and
@@ -100,6 +102,8 @@ expect_paths docsonlyfixture-makefile.txt full
 expect_paths docsonlyfixture-workflow.txt full
 expect_paths docsonlyfixture-rename.txt full
 expect_paths docsonlyfixture-classifier.txt full
+expect_paths docsonlyfixture-readme.txt full
+expect_paths docsonlyfixture-changelog.txt full
 expect_paths docsonlyfixture-empty.txt full
 
 "$classifier" --no-such-option < /dev/null > /dev/null 2>&1
