@@ -253,8 +253,32 @@
 %% so only the section half of the sentence above was true. They now render a
 %% second level under the same name, from one shared renderer, for the same
 %% reason this class wraps one `\@startsection' twice.
-\NewDocumentCommand \CDossierSection { m }
-  { \section* {#1} }
+%%
+%% \CDossierSection takes the resume's and CV's optional argument too (#690), so
+%% a section copied from either is rejected rather than printed: with a single
+%% mandatory argument, `[' became the heading and the rest of the option became
+%% body text, and the build exited 0. The class supports no key there. The
+%% record classes' one key, `entrymeta', sets how entries lay out their
+%% metadata, and a statement has no entries. So the key family holds only its
+%% unknown-key handler, every key stops the build with an error that names it,
+%% and `[]' sets no key and builds as no optional argument does.
+%% \CDossierSubsection takes no optional argument in any class.
+\msg_new:nnnn { careerdossier-statement } { unknown-section-key }
+  { Unknown~CDossierSection~key~'#1'. }
+  { The~statement~class~supports~no~CDossierSection~key. }
+
+\keys_define:nn { cdossier / statement / section }
+  {
+    unknown .code:n =
+      { \msg_error:nnx { careerdossier-statement } { unknown-section-key }
+          { \l_keys_key_str } } ,
+  }
+
+\NewDocumentCommand \CDossierSection { O{} m }
+  {
+    \keys_set:nn { cdossier / statement / section } {#1}
+    \section* {#2}
+  }
 \NewDocumentCommand \CDossierSubsection { m }
   { \subsection* {#1} }
 

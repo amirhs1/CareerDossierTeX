@@ -1,0 +1,13 @@
+% statement-bad-section-key.tex — smoke fixture: a key in the optional argument
+% of the statement class's \CDossierSection must stop the build with an error
+% that names the key, not be printed as the heading and the body text (#690).
+% The statement class supports no \CDossierSection key. `entrymeta', the
+% resume's and CV's one key, is the key an author who copies a resume section
+% into a statement brings with it.
+\documentclass[type=teaching]{careerdossier-statement}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+\begin{document}
+\MakeCDossierStatementHeader
+\CDossierSection[entrymeta=inline]{Background}
+Body.
+\end{document}

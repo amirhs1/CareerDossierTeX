@@ -1,0 +1,18 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+============================================================
+TEST 1: empty-optional-argument-sets-the-same-heading
+============================================================
+section: Background
+section: Background
+============================================================
+============================================================
+TEST 2: section-key-is-rejected
+============================================================
+! Package careerdossier-statement Error: Unknown CDossierSection key 'entrymeta'.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+The statement class supports no CDossierSection key.
+section: Background
+============================================================

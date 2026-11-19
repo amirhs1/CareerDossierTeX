@@ -251,6 +251,8 @@ cases=(
   "statement-bad-bodyfont fail|Unknown 'bodyfont' value 'decorative' for careerdossier-statement."
   "statement-unknown-option fail|Unknown class option 'format'"
   "statement-unknown-meta-key fail|Unknown \CDossierStatementSetup key"
+  "statement-bad-section-key fail|Unknown CDossierSection key 'entrymeta'."
+  "statement-section-empty-option pass"
   "statement-missing-name fail|required profile field 'name' is not"
   "statement-missing-email fail|required profile field 'email' is not"
   "statement-research-without-affiliation pass"

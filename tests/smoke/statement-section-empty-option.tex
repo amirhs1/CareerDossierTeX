@@ -1,0 +1,12 @@
+% statement-section-empty-option.tex — smoke fixture: an empty optional
+% argument on the statement class's \CDossierSection builds, with a clean log,
+% as no optional argument does (#690). statement-section-key.lvt asserts that
+% the two forms hand the heading the same title; this fixture asserts that the
+% empty form builds a whole document.
+\documentclass[type=teaching]{careerdossier-statement}
+\CDossierSetup{ name = {Ada Lovelace}, email = {ada@example.com} }
+\begin{document}
+\MakeCDossierStatementHeader
+\CDossierSection[]{Background}
+Body.
+\end{document}

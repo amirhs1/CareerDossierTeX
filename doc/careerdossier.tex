@@ -1384,9 +1384,22 @@ block contributes --- never their sum. A section that opens with an entry, a
 bullet list, or an ordinary paragraph therefore yields one predictable gap
 rather than three different ones.
 
-The argument is user-visible text; the command does not translate it. The
-statement class defines \cmd{CDossierSection} too, without a rule, on the
-prose heading rhythm, and with no optional argument, since it has no entries.
+The argument is user-visible text; the command does not translate it.
+
+The statement class defines \cmd{CDossierSection} too, without a rule and on
+the prose heading rhythm. It has the same signature, an optional key list
+followed by the title, but takes no key: \opt{entrymeta} sets how entries lay
+out their metadata, and a statement has no entries.
+
+\begin{latexcode}
+\CDossierSection{Background}
+\CDossierSection[]{Background}                  % the same heading
+\CDossierSection[entrymeta=inline]{Background}  % an error
+\end{latexcode}
+
+Any key in a statement is an error that names the key, so a section copied
+from a resume or CV is reported rather than printed as text. An empty key list
+builds as no optional argument does.
 
 \subsection{\cmd{CDossierSubsection}}
 
