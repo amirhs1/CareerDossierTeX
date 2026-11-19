@@ -309,8 +309,12 @@ improvements separately.
   Draft the change for them instead.
 - You may open issues and pull requests, write commits, and post comments. The
   person running you is responsible for what you submit.
-- Work on one focused issue per branch, from an up-to-date `main`. Once review
-  has begun, bring the branch up to date by merging `main` into it, and do not
+- Work on one focused issue per branch, or on a batch of issues that change the
+  same files or run the same suite, from an up-to-date `main`. In a batch, each
+  issue gets its own coherent commit and its own `Closes #n`; a change to the
+  public API, a baseline, or typography never shares a branch with unrelated
+  work; and a batch that scores `L` needs approval first. Once review has
+  begun, bring the branch up to date by merging `main` into it, and do not
   amend, rebase, or force-push published commits unless asked.
 - Push only the focused branch, and only when it is close-out-complete. Green
   CI says nothing about the documentation, the trailer blocks, or the Project
