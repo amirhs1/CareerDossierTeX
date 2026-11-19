@@ -383,8 +383,12 @@ each to `build/check-parallel/NN-<target>.log`, and replays them in `Makefile`
 order. It accounts for every dispatched target, warms the font cache, and gives
 each worker its own biber cache. On a docs-only change it narrows the dispatch
 to `DOCS_ONLY_TARGETS` and skips the two cache proofs, which none of those
-targets needs. `--self-test` drives its six committed controls; the sixth pins
-that only a docs-only verdict, with no `FULL=1`, narrows the run. The `Makefile`
+targets needs. It dispatches every target with `TEST` and `FIXTURE` emptied, as
+`check-serial` empties them for its prerequisites, so a leftover filter never
+narrows the full run (#692). `--self-test` drives its seven committed controls;
+the sixth pins that only a docs-only verdict, with no `FULL=1`, narrows the run,
+and the seventh dry-runs both paths with a sentinel filter on the command line,
+in the environment, and in `MAKEFLAGS`. The `Makefile`
 header owns why `JOBS` defaults to 4.
 
 ### Fanning out inside a suite
@@ -892,10 +896,10 @@ than 0 or 1, fails the lint rather than counting as a rejection.
 the docs-only path list, over the `docsonlyfixture-*` path lists and over a
 throwaway repository built under `build/`. A list that is docs-only but for one
 `.sty`, `doc/careerdossier.tex`, `Makefile`, `build.yml`, a rename into `docs/`,
-or the classifier itself is not docs-only, and nor is an empty change; a
-committed, staged, unstaged, or untracked change each counts; no `origin/main`
-and no git checkout are unclassified. An exit status other than 0, 1, or 2
-fails the lint.
+the classifier itself, or `README.md` or `CHANGELOG.md`, which the release
+archive ships, is not docs-only, and nor is an empty change; a committed,
+staged, unstaged, or untracked change each counts; no `origin/main` and no git
+checkout are unclassified. An exit status other than 0, 1, or 2 fails the lint.
 
 ### Shell-harness lint
 
