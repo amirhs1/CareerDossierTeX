@@ -599,10 +599,8 @@ Three properties make this safe to trust:
 
 Scoping is a development-loop convenience and nothing more. CI's required
 checks, which run every suite unscoped, are the gate, and a scoped run is never
-evidence of a full one in the PR body. Before a push, run `make lint` and the
-one suite that owns the changed behaviour (`TEST=` or `FIXTURE=`); run
-`make check` as well when the change touches a shared package, a class, or a
-baseline, or when you want the full run before CI. On a docs-only branch
+evidence of a full one in the PR body. Before a push, run the local checks that
+`AGENTS.md`, "Commands", lists as the pull request gate. On a docs-only branch
 `make check` runs only the lints, under "The full run, and the serial path"
 above, the local mirror of CI's docs-only run.
 

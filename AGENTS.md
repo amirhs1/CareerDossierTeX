@@ -14,23 +14,21 @@ class, fill in one profile, and expect every document to share one look.
 | Run all tests        | `make check`, optional; on a docs-only change it runs only the lints, and `make check FULL=1` runs everything |
 | Run one test         | `make regression TEST=<name>`; `make smoke FIXTURE=<pattern>`, and likewise for `layout`, `extract-test`, and `tagging` |
 | Lint / format        | `make lint`                                                                              |
-| Gate                 | the required checks on `Protect Main`, which CI runs on every pull request               |
+| Pull request gate    | CI: the required checks on `Protect Main`; locally: `make lint`, the suite that owns the change, and `make check` when the change touches a shared package, a class, or a baseline |
 
-Before a push, run `make lint` and the suite that owns the change (`TEST=` or
-`FIXTURE=`). CI is the gate: its required checks must pass before a merge
-(`CONTRIBUTING.md`, "What actually gates a merge"). `make check` runs every
-suite locally, and is worth running before a push that touches a shared
-package, a class, or a baseline, or when you want the full run before CI; run it
-in the background. It also tests the TeX Live on your machine, where CI tests
-one pinned image.
+Before a push, run the local checks of the pull request gate. Run `make check`
+in the background, and run it too whenever you want the full run before CI: it
+tests the TeX Live on your machine, where CI tests one pinned image. CI's
+required checks must pass before a merge (`CONTRIBUTING.md`, "What actually
+gates a merge").
 
 CI, in `.github/workflows/`, runs every local suite and more, in a pinned TeX
 Live container, except that a docs-only pull request skips its TeX jobs
 (`CONTRIBUTING.md`, "CI expectations"). Call a change complete only once its
-required checks have passed, and cite that CI run by its ID; until then, say
-they are pending. Report the actual output, not the expected output, do not
-describe a change as working because it reads correctly, and say how far your
-local checks reach.
+required checks have passed, and cite that CI run by its ID in "Checks run";
+until then, say they are pending. Report the actual output, not the expected
+output, do not describe a change as working because it reads correctly, and
+say how far your local checks reach.
 
 - Run the `Makefile` targets, never a hand-written engine invocation: they write
   to `build/` and keep the source tree free of artifacts.
@@ -286,7 +284,7 @@ person running you:
    coherent change that passes it, and preserve unrelated work. A behaviour
    change carries its tests in `tests/` and its documentation in the same
    change; never defer known coverage to a later testing issue.
-5. **Verify** with the checks "Commands" sets before a push, and
+5. **Verify** with the pull request gate in "Commands" before a push, and
    **self-review** the full branch diff, the logs, the artifacts, and the
    documentation. The gate runs after the push: read its result before you
    call the change complete.
