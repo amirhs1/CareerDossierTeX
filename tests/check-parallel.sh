@@ -669,8 +669,11 @@ self_test() {
   # two disagree rather than for the two spellings anticipated here.
   local serial_list="$scratch/serial-prereqs.txt"
   local driver_list="$scratch/driver-targets.txt"
+  # GNU make 4 also prints check-serial's target-specific variables (#692) as
+  # `check-serial: override TEST := ` lines; a prerequisite name never holds
+  # `=`, so those lines are dropped before the rule line is read.
   (cd "$root" && make -pn check-serial 2>/dev/null) \
-    | sed -n 's/^check-serial:[[:space:]]*//p' \
+    | sed -n '/^check-serial:.*=/d; s/^check-serial:[[:space:]]*//p' \
     | head -1 | tr ' ' '\n' | sed '/^$/d' | sort > "$serial_list"
   printf '%s\n' ${targets[@]+"${targets[@]}"} | sed '/^$/d' | sort > "$driver_list"
 
