@@ -28,7 +28,7 @@ runner="$root/tests/smoke/run.sh"
 scratch="$root/build/lint/smoke-verdicts"
 rm -rf "$scratch"
 mkdir -p "$scratch/tests/smoke" "$scratch/tests/lib" || exit 2
-cp "$root/tests/lib/text.sh" "$scratch/tests/lib/" || exit 2
+cp "$root/tests/lib/text.sh" "$root/tests/lib/fanout.sh" "$scratch/tests/lib/" || exit 2
 
 fail=0
 arms=0

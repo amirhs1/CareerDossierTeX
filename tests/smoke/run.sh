@@ -336,6 +336,7 @@ fi
 smoke_engine_contract() {
   local unit_fail=0 engine job rc engine_log
   echo "== $engine_fixture.tex (engine contract) =="
+  smoke_glyph_guard
   if ! lualatex -halt-on-error -interaction=nonstopmode -output-directory="$out" \
       "$engine_fixture.tex" > "$out/$engine_fixture-lualatex.stdout" 2>&1; then
     echo "  LuaLaTeX EXPECTED PASS but compile failed"
@@ -463,6 +464,7 @@ smoke_case() {
       ;;
   esac
   if [ ! -f "$tex" ]; then echo "  MISSING fixture $tex"; return 1; fi
+  smoke_glyph_guard
 
   # `fail-once' counts reports across the whole preamble, so it must not stop
   # at the first one. Every other expectation keeps -halt-on-error. The flag is
@@ -583,27 +585,41 @@ fi
 # in flight, and — for the parallel one — the accounting assertion that a unit
 # which left no verdict is a failure rather than a smaller denominator.
 
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+scratch="$root/build/fanout/smoke"
+rm -rf "$scratch"
+mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
+
+# The glyph guard (#693), required on both paths before the first compile. A
+# nullfont run compiles every expected-pass fixture empty, and a fixture that
+# must fail can still fail as intended without a font; only this build says
+# which run it was. Under fan-out it matters twice over: several LuaLaTeX
+# processes racing to build a cold luaotfload cache is precisely when it goes
+# wrong, so it runs once before dispatch. Serially it runs at the first unit
+# that compiles, so an entry that fails by name before any compile (an unknown
+# verdict, #695) still needs no TeX; tests/lint/run-smoke-verdicts.sh runs on
+# the TeX-free lint runner for that reason. `exit`, not `return`: a run with no
+# real font must stop, not count one failed fixture and go on.
+glyph_guard_done=0
+smoke_glyph_guard() {
+  [ "$glyph_guard_done" -eq 1 ] && return 0
+  fanout_warm_fonts "$scratch" || exit 1
+  glyph_guard_done=1
+}
+
 if [ "$jobs" -eq 1 ]; then
   for (( i = 0; i < ${#unit_names[@]}; i++ )); do
     eval "${unit_cmds[$i]}" || fail=1
   done
 else
-  # shellcheck source=tests/lib/fanout.sh
-  . "$root/tests/lib/fanout.sh"
-  scratch="$root/build/fanout/smoke"
-  rm -rf "$scratch"
-  mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
-
   fanout_reset
   for (( i = 0; i < ${#unit_names[@]}; i++ )); do
     fanout_add "${unit_names[$i]}" "${unit_cmds[$i]}" || exit 2
   done
 
   echo "fixture concurrency: $jobs at a time (the gate is the serial run)"
-  # Required before fan-out, not merely nice to have: several LuaLaTeX processes
-  # racing to build a cold luaotfload cache is precisely when it goes wrong, and
-  # a nullfont run compiles every fixture empty and passes every one of them.
-  fanout_warm_fonts "$scratch" || exit 1
+  smoke_glyph_guard
   echo
   fanout_run "$jobs" "$scratch"
   fanout_gather "$scratch"
