@@ -46,6 +46,18 @@
     scholar , orcid , affiliation , language
   }
 
+%% The same names as keys of a property list, for the one check that must run
+%% by expansion (#707): \CDossierFieldValue is called inside `x'-type
+%% expansion, and \clist_if_in:NnTF cannot be expanded while \prop_if_in:NnTF
+%% can. The values are empty; only the keys are read. Built from the list
+%% above, so the two cannot disagree.
+\cs_new:Npn \__cdossier_base_known_entry:n #1 { #1 = { } , }
+\exp_args:NNe \prop_const_from_keyval:Nn \c__cdossier_base_known_prop
+  {
+    \clist_map_function:NN \c__cdossier_base_fields_clist
+      \__cdossier_base_known_entry:n
+  }
+
 %% ---------------------------------------------------------------------------
 %% Storage: profile field name -> value.
 %% ---------------------------------------------------------------------------
@@ -82,6 +94,16 @@
 \msg_new:nnnn { careerdossier-base } { unknown-field }
   { Unknown~profile~field~'#1'. }
   { The~supported~fields~are:~\clist_use:Nn \c__cdossier_base_fields_clist { ,~ } . }
+
+%% The same error for \CDossierFieldValue, which raises it by expansion (#707).
+%% TeX shows an expandable error only inside a context line, which it crops at
+%% `error_line', 79 characters by default; after the `<argument> \??? '
+%% context and the `! Package careerdossier-base Error: ' prefix, 26 are left
+%% for the text. Hence a shorter message than `unknown-field', with the name
+%% near its start, where cropping cannot hide it, and no list of the supported
+%% fields, which an expandable error has no way to print.
+\msg_new:nnn { careerdossier-base } { unknown-field-expandable }
+  { Field~'#1'~is~unknown. }
 
 \msg_new:nnnn { careerdossier-base } { unknown-key }
   { Unknown~\c_backslash_str CDossierSetup~key~'#1'. }
@@ -501,13 +523,30 @@
   }
 
 %% \CDossierFieldValue {field} -- expands to the stored value, or nothing if the
-%% field is absent. Intended for shared components that need the raw value (for
-%% example to build a link target). It does not typeset and does not validate.
+%% field is absent, and errors on an unknown field name (#707). Intended for
+%% shared components that need the raw value (for example to build a link
+%% target). It does not typeset.
+%%
+%% It stays expandable: careerdossier-links and careerdossier-metadata call it
+%% inside `x'-type expansion, and a heading purifies the title it is given. So
+%% the name is checked against \c__cdossier_base_known_prop rather than by the
+%% protected \__cdossier_base_check_known:n, and the error is l3msg's
+%% expandable form, `unknown-field-expandable'. TeX reports it as the misuse
+%% of a control sequence named \??? and prints the message after it. Nothing is
+%% expanded after the error.
+%%
 %% \prop_item:Nn returns \q_no_value when the key is absent; guard it so that a
 %% missing field always expands to empty rather than leaking the quark.
 \NewExpandableDocumentCommand \CDossierFieldValue { m }
   {
-    \prop_if_in:NnTF \g__cdossier_base_fields_prop {#1}
-      { \prop_item:Nn \g__cdossier_base_fields_prop {#1} }
-      { }
+    \prop_if_in:NnTF \c__cdossier_base_known_prop {#1}
+      {
+        \prop_if_in:NnTF \g__cdossier_base_fields_prop {#1}
+          { \prop_item:Nn \g__cdossier_base_fields_prop {#1} }
+          { }
+      }
+      {
+        \msg_expandable_error:nnn { careerdossier-base }
+          { unknown-field-expandable } {#1}
+      }
   }
