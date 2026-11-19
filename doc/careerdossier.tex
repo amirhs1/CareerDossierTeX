@@ -1994,6 +1994,29 @@ not set are still derived, so overriding \texttt{pdftitle} alone leaves
 \texttt{/Author} and \texttt{/Lang} in place. This holds whether or not you opt
 into tagging.
 
+The title and the author have a second route, and it wins too: a \cmd{title}
+and an \cmd{author} in the preamble, passed through \textsf{hyperref}'s
+\texttt{pdfusetitle} option. The classes load
+\textsf{hyperref} themselves, so the option goes in before
+\cmd{documentclass}:
+
+\begin{latexcode}
+\PassOptionsToPackage{pdfusetitle}{hyperref}
+\documentclass{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace} }
+\title{Ada Lovelace, Selected Work}
+\author{A. Lovelace}
+\end{latexcode}
+
+\texttt{/Title} is then the document's \cmd{title} and \texttt{/Author} its
+\cmd{author}, on both build paths, and each derived value stands aside. For
+each field the order is: the value set with \cmd{hypersetup}
+(\texttt{pdftitle} or \texttt{pdfauthor}), then \cmd{title} or \cmd{author}
+under \texttt{pdfusetitle}, then the derived value. The two are independent:
+give only a \cmd{title} and \texttt{/Author} is still derived from
+\key{name}. Without \texttt{pdfusetitle}, neither command plays any part in
+the metadata.
+
 The language has a second route, and it wins too:
 
 \begin{latexcode}

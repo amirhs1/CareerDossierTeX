@@ -48,7 +48,9 @@
 %% \CDossierSetup does not run until the preamble.
 %%
 %% Precedence: each field is written only when the document has not already set
-%% it, so a user's own \hypersetup wins wherever it appears in the preamble.
+%% it, so a user's own \hypersetup wins wherever it appears in the preamble, and
+%% so do a \title and an \author passed through hyperref's `pdfusetitle'
+%% (#740).
 %% That matters because tests/smoke/ats-user-template-doc.tex
 %% places \hypersetup *before* \CDossierSetup; a blind write here would silently
 %% discard it.
@@ -273,6 +275,52 @@
       { \prg_return_false: }
   }
 
+%% Has the document supplied this field through hyperref's `pdfusetitle'? (#740)
+%%
+%% #1 is `title' or `author'. A third way into /Title and /Author, and one
+%% neither reader above can see, because when this package runs nothing has
+%% been written yet. `pdfusetitle' makes hyperref record the argument of \title
+%% in \Hy@title and of \author in \Hy@author, and the value reaches the PDF
+%% later: at the first page on the default path, where hyperref copies it into
+%% \@pdftitle or \@pdfauthor, and at the last page under \DocumentMetadata,
+%% where the kernel's title support sets pdftitle and pdfauthor from \title and
+%% \author itself. Both copy only when the field has not been set by then --
+%% and this package sets the derived values at \begin{document}, earlier than
+%% either, so the document's own \title and \author used to lose on both
+%% paths. The fix is to stand aside, not to write the value here: each writer
+%% then spells it as it would for any document.
+%%
+%% \Hy@title and \Hy@author are defined only once the command has been given
+%% -- hyperref also records one given before it loaded, and skips the
+%% kernel's `No \title given' and `No \author given' defaults -- so existence
+%% is the reading, and a blank argument counts as none. The value is read
+%% through one expansion, never expanded further: it is the user's text
+%% (#687). Without `pdfusetitle' the switch is false and neither command plays
+%% any part in the metadata, as before. The switch is defined only when
+%% hyperref is loaded, which the one caller already requires; the guard keeps
+%% the conditional safe on its own.
+%%
+%% These names are read, never redefined.
+\prg_new_protected_conditional:Npnn \__cdossier_metadata_usetitle_if_set:n #1
+  { F , TF }
+  {
+    \cs_if_exist:cTF { ifHy@pdfusetitle }
+      {
+        \legacy_if:nTF { Hy@pdfusetitle }
+          {
+            \cs_if_exist:cTF { Hy@ #1 }
+              {
+                \exp_args:Nv \tl_if_blank:nTF { Hy@ #1 }
+                  { \prg_return_false: }
+                  { \prg_return_true: }
+              }
+              { \prg_return_false: }
+          }
+          { \prg_return_false: }
+      }
+      { \prg_return_false: }
+  }
+
 %% Apply the derived metadata. Only ever called when hyperref is present.
 \cs_new_protected:Npn \__cdossier_metadata_pdfmeta:
   {
@@ -282,8 +330,12 @@
           {
             \__cdossier_metadata_hyp_if_unset:nT { @pdftitle }
               {
-                \__cdossier_metadata_pdftitle:
-                \hypersetup { pdftitle = { \l__cdossier_metadata_pdfname_tl } }
+                \__cdossier_metadata_usetitle_if_set:nF { title }
+                  {
+                    \__cdossier_metadata_pdftitle:
+                    \hypersetup
+                      { pdftitle = { \l__cdossier_metadata_pdfname_tl } }
+                  }
               }
           }
         \__cdossier_metadata_kernel_info_if_set:nF { Author }
@@ -294,12 +346,15 @@
             %% passes the /Title check and fails the /Author one.
             \__cdossier_metadata_hyp_if_unset:nT { @pdfauthor }
               {
-                \tl_set:Nx \l__cdossier_metadata_pdfauthor_tl
-                  { \CDossierFieldValue { name } }
-                \__cdossier_metadata_pdfligatures:N
-                  \l__cdossier_metadata_pdfauthor_tl
-                \hypersetup
-                  { pdfauthor = { \l__cdossier_metadata_pdfauthor_tl } }
+                \__cdossier_metadata_usetitle_if_set:nF { author }
+                  {
+                    \tl_set:Nx \l__cdossier_metadata_pdfauthor_tl
+                      { \CDossierFieldValue { name } }
+                    \__cdossier_metadata_pdfligatures:N
+                      \l__cdossier_metadata_pdfauthor_tl
+                    \hypersetup
+                      { pdfauthor = { \l__cdossier_metadata_pdfauthor_tl } }
+                  }
               }
           }
       }
