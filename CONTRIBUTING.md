@@ -213,7 +213,7 @@ A short name is a few lowercase words joined by hyphens. Pick the type for the
 main purpose of the work.
 
 Labels combine: one `type:` plus one or more `area:`. There are no
-combination labels. Status, priority, and release are not labels. Three labels
+combination labels. Status and priority are not labels. Three labels
 sit outside the two axes: `breaking-change`, `technical-debt`, and
 `help-wanted`.
 
