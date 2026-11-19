@@ -54,3 +54,43 @@ stack-one-line height = 20.76875pt
 header-two-lines height = 45.74774pt
 header-three-lines height = 64.46649pt
 ============================================================
+============================================================
+TEST 9: end-empties-the-stack
+============================================================
+line-body FIRSTHEADER
+addvspace = 9.96875pt
+second-end-done
+============================================================
+============================================================
+TEST 10: line-after-end-is-an-error
+============================================================
+line-body FIRSTHEADER
+addvspace = 9.96875pt
+body-one
+! Package careerdossier-components Error: \CDossierHeaderLine used with no header stack open.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+Each \CDossierHeaderLine belongs between a \CDossierHeaderBegin and a \CDossierHeaderEnd, and \CDossierHeaderEnd closes the stack it renders. Open a stack with \CDossierHeaderBegin first. This line is dropped.
+body-two
+============================================================
+============================================================
+TEST 11: line-before-any-stack-is-an-error
+============================================================
+! Package careerdossier-components Error: \CDossierHeaderLine used with no header stack open.
+For immediate help type H <return>.
+ ...                                              
+l. ...}
+Each \CDossierHeaderLine belongs between a \CDossierHeaderBegin and a \CDossierHeaderEnd, and \CDossierHeaderEnd closes the stack it renders. Open a stack with \CDossierHeaderBegin first. This line is dropped.
+orphan-done
+============================================================
+============================================================
+TEST 12: begin-opens-a-second-stack
+============================================================
+line-body FIRSTHEADER
+addvspace = 9.96875pt
+body-one
+line-body SECONDHEADER
+addvspace = 9.96875pt
+body-two
+============================================================

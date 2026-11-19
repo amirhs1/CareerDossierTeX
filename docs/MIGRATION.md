@@ -334,6 +334,37 @@ Reason: a misspelt field name built silently where the two sibling accessors
 stop on it, and the change is made before the `v1.0.0` freeze so that it does
 not later need a major release.
 
+### `\CDossierHeaderEnd` empties the header stack, and a stray line is an error
+
+**This needs a source edit only in a document that drives the header stack
+itself** and writes a `\CDossierHeaderLine` with no `\CDossierHeaderBegin`
+before it. `\CDossierHeaderEnd` now empties the stack it renders and closes it,
+and a `\CDossierHeaderLine` with no stack open stops with an error that names
+it ([#708](https://github.com/amirhs1/CareerDossierTeX/issues/708)). That
+includes a document's first header: a missing `\CDossierHeaderBegin` used to
+make no difference there, and is now an error too. `\MakeCDossierHeader`,
+`\MakeCDossierStatementHeader`, and a document that opens every header with
+`\CDossierHeaderBegin` render as before.
+
+Open each header with `\CDossierHeaderBegin`:
+
+Before:
+
+    \CDossierHeaderLine{...}
+    \CDossierHeaderEnd
+
+After:
+
+    \CDossierHeaderBegin
+    \CDossierHeaderLine{...}
+    \CDossierHeaderEnd
+
+Reason: `\CDossierHeaderEnd` rendered the stack without emptying it, and a
+line was accepted with no stack open, so a second header written without
+`\CDossierHeaderBegin` printed the earlier header again before its new line,
+with no warning. The behavior of a public command is settled before the
+`v1.0.0` freeze.
+
 ### A key on the statement's `\CDossierSection` is an error
 
 **A statement that passes a key to `\CDossierSection` now stops with an
