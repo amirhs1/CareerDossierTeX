@@ -51,7 +51,7 @@
 #             size of that atom and is meaningful only here.
 #   keep      a policy rule ended the page early. In this toolkit that is
 #             `\__cdossier_components_section_need:`, the bounded section keep
-#             from #333, which emits a bare `\penalty -\CDossierHeadingKeepPenalty`
+#             from #333, which emits a bare forced `\penalty -10000` (#726)
 #             — deliberately not `\newpage`, precisely so it contributes no fil.
 #   eject     the source ended the page: `\newpage`, `\vfill`, or the
 #             `\end{document}` flush, each of which contributes fil first. How

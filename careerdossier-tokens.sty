@@ -108,9 +108,13 @@
 %% ordinary \widowpenalty/\clubpenalty handling.
 %%
 %% CDossierHeadingKeepPenalty is a hard \nobreak-strength value (10000). It
-%% guards the boundaries that must never be broken: an entry heading's own two
-%% lines, the entry heading and the first line of its body, and the two list
-%% boundaries that would leave a single typeset line stranded.
+%% guards the heading keeps that must never be broken: an entry heading's own
+%% two lines, and the entry heading and the first line of its body.
+%%
+%% CDossierListEdgeKeepPenalty, also 10000, guards the two list boundaries that
+%% would leave a single typeset line stranded (#726). It was
+%% CDossierHeadingKeepPenalty's job until then, so lowering the heading keep
+%% also weakened these guards; the two are now set apart.
 %%
 %% "a bounded amount of material" used to be claimed here, and it was
 %% true of each of those boundaries alone and false of them together (#562). A list's
@@ -137,9 +141,10 @@
 %% CDossierSectionNeedLines -- which bounds it and leaves the boundaries inside
 %% the section legal.
 %%
-%% CDossierListOrphanPenalty guards every other list boundary and is
-%% deliberately below 10000, so a list longer than a page still breaks
-%% somewhere in its middle instead of overflowing. Together the two values
+%% CDossierListInteriorPenalty, renamed in #726, is the value at every other
+%% list boundary, the ones that strand no single line, and is deliberately
+%% below 10000, so a list longer than a page still breaks somewhere in its
+%% middle instead of overflowing. Together the two list values
 %% mean an over-long list breaks, but never at a position that isolates a
 %% single line: these penalties refuse to strand a one-line item, and the club
 %% and widow values below refuse to split a longer one so as to strand one of
@@ -147,8 +152,10 @@
 %% mechanism that measures them.
 \int_new:N \CDossierHeadingKeepPenalty
 \int_set:Nn \CDossierHeadingKeepPenalty { 10000 }
-\int_new:N \CDossierListOrphanPenalty
-\int_set:Nn \CDossierListOrphanPenalty { 9997 }
+\int_new:N \CDossierListEdgeKeepPenalty
+\int_set:Nn \CDossierListEdgeKeepPenalty { 10000 }
+\int_new:N \CDossierListInteriorPenalty
+\int_set:Nn \CDossierListInteriorPenalty { 9997 }
 
 %% CDossierSectionNeedLines is the section heading's keep, expressed as a bound
 %% instead of a prohibition (#333). A section heading is placed only when

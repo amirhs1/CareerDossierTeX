@@ -420,7 +420,7 @@ argument: it is an accepted limitation, not an oversight.
 `careerdossier-tokens.sty` owns the named typographic penalties (#171), which
 `\CDossierApplyPageBreakPenalties` applies, and the resume/CV-only structural
 keep-together penalties (#145), which the components and the two record classes
-read where they are used. All but `\CDossierListOrphanPenalty` (`9997`, so an
+read where they are used. All but `\CDossierListInteriorPenalty` (`9997`, so an
 over-long list can still break) default to `10000`, which `\raggedbottom` is
 what makes safe — and that `\raggedbottom` is inherited from `article.cls`
 rather than set here, which is why the `tokens-*-defaults` baselines assert each
