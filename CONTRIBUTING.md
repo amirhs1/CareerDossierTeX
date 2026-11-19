@@ -892,7 +892,9 @@ Update it when:
 
 - a public command or key is renamed;
 - behavior changes incompatibly;
-- users need a replacement example.
+- users need a replacement example;
+- rendered output changes with no name changing, by a fix or by a new default,
+  which takes a line under `docs/MIGRATION.md`, "Status", rather than an entry.
 
 An entry takes this shape, and belongs in the same pull request as the change it
 describes:
@@ -961,7 +963,8 @@ A public API change should answer:
 - Can it be tested with a minimal example?
 - Does it create unnecessary future compatibility obligations?
 
-Before `v1.0.0`, breaking changes are allowed but must be documented in `CHANGELOG.md` and `MIGRATION.md`.
+Which release may carry a breaking change, and what a deprecation owes, is in
+[`docs/API.md`, "Stability policy"](docs/API.md#stability-policy).
 
 ## Pull requests
 
