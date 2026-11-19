@@ -33,7 +33,7 @@
 %% identity; and process family=industry|academic as a label- and metadata-only
 %% choice with industry as the default.
 
-\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+\NeedsTeXFormat{LaTeX2e}[2024-11-01]
 \ProvidesExplClass {careerdossier-letter} {2026-11-06} {0.11.0}
   {CareerDossierTeX English cover-letter class}
 
@@ -308,8 +308,9 @@
 %% ---------------------------------------------------------------------------
 %% \MakeCDossierLetterhead -- the letter opening: centered sender identity,
 %% date, recipient block, optional subject, and salutation. Each optional block
-%% and the vertical space that follows it are emitted together, so an absent
-%% recipient or subject leaves no gap. \MakeCDossierHeader validates `name'.
+%% and the vertical space that follows it are emitted together, so a blank date,
+%% recipient, subject, or salutation leaves no gap; with a blank salutation the
+%% body takes its place (#689). \MakeCDossierHeader validates `name'.
 %%
 %% The header -> date boundary is owned by the header stack's own
 %% below-token, which \MakeCDossierHeader has already contributed (#204) -- for
@@ -329,9 +330,12 @@
   {
     \MakeCDossierHeader
     \par
-    \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_date_tl }
-    \par
-    \addvspace { \CDossierLetterBlockSkip }
+    \tl_if_blank:VF \l__cdossier_letter_date_tl
+      {
+        \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_date_tl }
+        \par
+        \addvspace { \CDossierLetterBlockSkip }
+      }
     \__cdossier_letter_has_recipient:T
       {
         \noindent { \CDossierBodyStyle \__cdossier_letter_recipient: }
@@ -344,14 +348,23 @@
         \par
         \addvspace { \CDossierLetterBlockSkip }
       }
-    \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_salutation_tl }
-    \par
-    \addvspace { \CDossierLetterBodyAboveSkip }
+    \tl_if_blank:VF \l__cdossier_letter_salutation_tl
+      {
+        \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_salutation_tl }
+        \par
+        \addvspace { \CDossierLetterBodyAboveSkip }
+      }
   }
 
 %% ---------------------------------------------------------------------------
 %% \MakeCDossierClosing -- the letter close: the configured closing, signature
 %% space, and the profile name. Validates `name' because it prints it.
+%%
+%% A blank closing drops only the closing line and its paragraph space; the
+%% body's closing edge, the signature space, and the name stay (#689). The
+%% \nobreak below stays outside that guard: with no closing line it follows the
+%% \addvspace glue, which remains the one legal break between the body and the
+%% name, as it is when a closing line is present.
 %%
 %% The body's closing edge is \CDossierLetterBodyBelowSkip, the pair
 %% of \CDossierLetterBodyAboveSkip that opens it (#204). It previously borrowed
@@ -381,8 +394,11 @@
     \__cdossier_base_require_name:N \MakeCDossierClosing
     \par
     \addvspace { \CDossierLetterBodyBelowSkip }
-    \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
-    \par
+    \tl_if_blank:VF \l__cdossier_letter_closing_tl
+      {
+        \noindent { \CDossierBodyStyle \tl_use:N \l__cdossier_letter_closing_tl }
+        \par
+      }
     \nobreak
     \vspace { \CDossierLetterSignatureGapSkip }
     \noindent { \CDossierBodyStyle \CDossierPrintField { name } }

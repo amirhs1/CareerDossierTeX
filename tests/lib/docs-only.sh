@@ -47,6 +47,12 @@
 # `doc/careerdossier.tex` is not on the list: the `manual` job builds it. This
 # script is not on it either, so a change to it runs everything.
 #
+# The files build.lua ships in the release archive, its `textfiles`, are never
+# docs-only, although `README.md` and `CHANGELOG.md` match `.*\.md$`: the
+# `regression` job runs tests/lint/run-ctan-config.sh, which checks that every
+# file the archive lists exists, and a docs-only change would skip it (#691).
+# `shipped` below repeats `textfiles`; change both together.
+#
 # Renames are listed as both sides (--no-renames), so moving a source file into
 # docs/ still counts as touching the file it removes. A path git prints quoted,
 # because it holds an unusual character, matches nothing here and so counts as
@@ -57,6 +63,7 @@
 set -uo pipefail
 
 docs='^(docs/|\.agents/|\.github/ISSUE_TEMPLATE/|\.claude/|\.codex/|\.githooks/|\.gitmessage$|.*\.md$)'
+shipped='^(README\.md|LICENSE|CHANGELOG\.md|manifest\.txt)$'
 
 unclassified() {
   printf 'docs-only: cannot classify: %s\n' "$*" >&2
@@ -69,7 +76,7 @@ classify_paths() {
   while IFS= read -r line || [ -n "$line" ]; do
     [ -n "$line" ] || continue
     count=$((count + 1))
-    if ! [[ "$line" =~ $docs ]]; then
+    if [[ "$line" =~ $shipped ]] || ! [[ "$line" =~ $docs ]]; then
       printf 'docs-only: not docs-only: %s\n' "$line" >&2
       return 1
     fi

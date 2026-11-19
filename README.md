@@ -85,8 +85,8 @@ should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 | Component | Minimum | Verified against |
 |---|---|---|
-| LaTeX kernel | `2022-06-01` | `2026-06-01` |
-| TeX Live | 2022 — the release carrying that kernel | 2026 |
+| LaTeX kernel | `2024-11-01` | `2026-06-01` |
+| TeX Live | 2024 — the release carrying that kernel | 2026 |
 | Engine | LuaHBTeX (any release providing the above) | LuaHBTeX 1.24.0 |
 | `pdfmanagement-testphase` (tagged preview only) | — | 0.97c (2026-05-26) |
 | `tagpdf` (tagged preview only) | — | 1.0c (2026-05-17) |
@@ -94,7 +94,7 @@ should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
 The two columns answer different questions, and the difference is deliberate.
 
 **Minimum** is what the code declares. Every file of the Work carries
-`\NeedsTeXFormat{LaTeX2e}[2022-06-01]`, so an older kernel names itself in a
+`\NeedsTeXFormat{LaTeX2e}[2024-11-01]`, so an older kernel names itself in a
 LaTeX warning at the top of the log — the kernel treats this as a warning, not
 an error, so the build continues and may then fail obscurely; the warning is
 the thing to read first. MiKTeX is supported on the same terms — any release

@@ -114,6 +114,15 @@ fi
 
 fail=0
 
+# Checked before the first compile, as tests/links/run.sh does (#695). Without
+# Poppler the extraction below captured nothing, and `--update` then wrote that
+# empty text over every selected *.expected.txt and reported a clean run.
+if ! command -v pdftotext > /dev/null 2>&1; then
+  echo "pdftotext (Poppler) is required: this suite compares extracted text"
+  echo "against its baselines and has nothing to compare, or to write, without it."
+  exit 1
+fi
+
 # Build uncompressed so /ActualText is greppable in the PDF without needing
 # qpdf, mutool, or a Python zlib helper that CI images may not carry. LuaHBTeX
 # exposes both compression controls directly; changing them does not affect
@@ -238,7 +247,12 @@ for tex in "${fixtures[@]}"; do
     -output-directory="$out" "$lua_input" >> "$out/$base.stdout" 2>&1 || {
     echo "  RERUN FAILED (see $out/$base.log)"; fail=1; continue; }
 
-  got="$(pdftotext -enc UTF-8 "$out/$base.pdf" - | normalize)"
+  # A failed extraction stops this fixture before `--update` can write its
+  # output as a baseline (#695); under `pipefail` the status is pdftotext's.
+  if ! got="$(pdftotext -enc UTF-8 "$out/$base.pdf" - | normalize)"; then
+    echo "  PDFTOTEXT FAILED on $out/$base.pdf: nothing was compared or written"
+    fail=1; continue
+  fi
 
   # Before any baseline is consulted, and before `--update` can write one.
   # A regeneration that would bless malformed text says so on the run that
