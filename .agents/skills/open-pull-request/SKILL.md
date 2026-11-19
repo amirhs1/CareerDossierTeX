@@ -58,10 +58,11 @@ description: Open a draft GitHub pull request whose body is the full report, and
    for a pull request scored `L`, its extra obligation: stay draft and
    recommend splitting, unless broad scope was already approved. It also
    asserts the focused issue's parent and `Size`.
-8. If the branch already has a pull request, first check
-   `gh pr view <n> --json state`, and stop if it has merged. Otherwise push,
-   check the trailer block as in step 4, then replace its body and read it
-   back:
+8. If the branch already has a pull request, first check that it is
+   open: `gh pr view <n> --json state --jq .state`. If it says
+   `MERGED` or `CLOSED`, stop: the change needs a new branch. Otherwise
+   push, check the trailer block as in step 4, then replace its body and
+   read it back:
    `gh pr edit <n> --body-file <file>`. When the update pushed commits,
    re-score `Size` from the whole diff with `project-metadata`, "Updating an
    open pull request" in its `reference.md`, and assert it on the pull request
