@@ -14,7 +14,6 @@ TEST 2: public-color-tokens-defined
 \CDossierTextColor defined
 \CDossierMutedColor defined
 \CDossierRuleColor defined
-\CDossierLinkColor defined
 ============================================================
 ============================================================
 TEST 3: link-color-reaches-the-hyperref-hook

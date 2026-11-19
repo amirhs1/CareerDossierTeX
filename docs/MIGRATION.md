@@ -390,6 +390,31 @@ and ignored. No key is supported because `entrymeta`, the resume's and CV's one
 `\CDossierSection` key, sets how entries lay out their metadata, and a
 statement has no entries.
 
+### `\CDossierLinkColor` removed
+
+No source edit is required unless a document called `\CDossierLinkColor`
+directly — no CareerDossierTeX component, class, or example ever did. Such a
+document now stops with an undefined-control-sequence error. No document
+reflows, and links keep their colour: hyperref still reads the colour name
+`cdossier-link`. `\CDossierTextColor` replaces the command with no visual
+change: both were `gray 0`
+([#727](https://github.com/amirhs1/CareerDossierTeX/issues/727)).
+
+Before:
+
+    {\CDossierLinkColor ...}
+
+After:
+
+    {\CDossierTextColor ...}
+
+Reason: the command reached nothing. Links take their colour from the name
+`cdossier-link`, so redefining the command recoloured no link, and its value
+equalled `\CDossierTextColor`, the grounds on which `\CDossierPrimaryColor` was
+retired in [#270](https://github.com/amirhs1/CareerDossierTeX/issues/270). It
+is removed before the `v1.0.0` freeze, after which removing a public name
+needs a major release.
+
 ### The list penalties are split and renamed
 
 **A document that names `\CDossierListOrphanPenalty` now stops with an
