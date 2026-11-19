@@ -19,6 +19,11 @@
 %
 % Re-derive the count if the filler, the fontsize, or the margin changes; the
 % figure is a property of this exact content.
+%
+% The runner rebuilds this fixture with the heading bounds at 0 and requires
+% the check to report "Education" stranded (#744), so a check that stops
+% reading section headings fails here rather than passing in silence.
+% STRANDCONTROL: Education
 \documentclass[fontsize=11pt, margin=narrow, medium=print]{careerdossier-resume}
 \CDossierSetup{
   name     = {Ada Lovelace},
