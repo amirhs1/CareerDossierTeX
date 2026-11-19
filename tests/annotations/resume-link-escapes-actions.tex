@@ -1,0 +1,70 @@
+% resume-link-escapes-actions.tex — every form a link value accepts keeps its
+% target (#687).
+%
+% #687 made a link value reject markup: a command left once the value is
+% expanded is an error. This fixture is the other side of that rule, the forms
+% that must still pass and reach the PDF as the address the reader sees: a
+% macro of the document's own that expands to text, the raw special
+% characters, and each escape the manual documents. Run against main at
+% 9e67305, before the rule existed, every target here but the three `$' ones
+% already matched the address written, so a pass means the rule changed none
+% of them.
+%
+% The three `$' targets are the change. `\$' and `\textdollar' used to reach
+% the target as kernel internals, `a\\protect\040\\TU\\textdollar\040b'; they
+% now reach it as `$', as `\_' reaches it as `_'. The e-mail address carries
+% `\$' for the mailto: branch.
+%
+% tests/links/resume-link-escapes.tex has the same body and asserts the
+% visible text. Keep the two in step.
+%
+% URIEXPECT: mailto:dollar$l@example.test
+% URIEXPECT: https://example.test/field-ada
+% URIEXPECT: https://example.test/macro-ada
+% URIEXPECT: https://example.test/raw-a&b
+% URIEXPECT: https://example.test/raw-a_b
+% URIEXPECT: https://example.test/raw-a~b
+% URIEXPECT: https://example.test/raw-a$b
+% URIEXPECT: https://example.test/raw-a^b
+% URIEXPECT: https://example.test/raw-a#b
+% URIEXPECT: https://example.test/esc-a_b
+% URIEXPECT: https://example.test/esc-a#b
+% URIEXPECT: https://example.test/esc-a&b
+% URIEXPECT: https://example.test/esc-a%b
+% URIEXPECT: https://example.test/esc-a^b
+% URIEXPECT: https://example.test/esc-a~b
+% URIEXPECT: https://example.test/esc-a_b
+% URIEXPECT: https://example.test/esc-a~b
+% URIEXPECT: https://example.test/esc-a~b
+% URIEXPECT: https://example.test/esc-a$b
+% URIEXPECT: https://example.test/esc-a$b
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\newcommand{\cdossierfixtureSite}{ada}
+\CDossierSetup{
+  name    = {Ada Lovelace},
+  email   = {dollar\$l@example.test},
+  website = {example.test/field-\cdossierfixtureSite},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Links}
+\CDossierLink{example.test/macro-\cdossierfixtureSite}\par
+\CDossierLink{example.test/raw-a&b}\par
+\CDossierLink{example.test/raw-a_b}\par
+\CDossierLink{example.test/raw-a~b}\par
+\CDossierLink{example.test/raw-a$b}\par
+\CDossierLink{example.test/raw-a^b}\par
+\CDossierLink{example.test/raw-a#b}\par
+\CDossierLink{example.test/esc-a\_b}\par
+\CDossierLink{example.test/esc-a\#b}\par
+\CDossierLink{example.test/esc-a\&b}\par
+\CDossierLink{example.test/esc-a\%b}\par
+\CDossierLink{example.test/esc-a\^{}b}\par
+\CDossierLink{example.test/esc-a\~b}\par
+\CDossierLink{example.test/esc-a\textunderscore b}\par
+\CDossierLink{example.test/esc-a\textasciitilde b}\par
+\CDossierLink{example.test/esc-a\string~b}\par
+\CDossierLink{example.test/esc-a\$b}\par
+\CDossierLink{example.test/esc-a\textdollar b}\par
+\end{document}

@@ -1,0 +1,100 @@
+% links-markup.lvt — markup in a link value stops with one clear error
+% (#687).
+%
+% A link value is an address: url.sty typesets it character by character and
+% hyperref writes it into the link target. Neither can carry formatting, and
+% before #687 `\emph', `\textbf', or a nested `\url' in any link field ended
+% the build inside hyperref with `TeX capacity exceeded', a message that names
+% neither the field nor the command. The claim here is the replacement: each
+% such value raises exactly one `link-markup' error, which names the field and
+% the command, and nothing else is logged -- no second error from hyperref, so
+% the value really was kept away from it.
+%
+% The last two tests are the other half of the rule. A macro of the
+% document's own is expanded before the check, so one that expands to
+% `\emph' is rejected for the `\emph', and one that expands to text, every
+% documented escape, and `\$' pass in silence.
+%
+% The orcid test also carries careerdossier-base's `orcid-shape' warning for
+% each value. It is raised when the value is stored, not by the link, and is
+% expected: none of these values is an ORCID iD.
+%
+% Property test: the expected behaviour is the approved acceptance criterion
+% in #687, not a rendering. The baseline pins the message text.
+%
+% Each helper is defined under \ExplSyntaxOn so the private names tokenize
+% correctly; catcodes cannot be switched inside a \TEST body.
+\input{regression-test}
+\documentclass{article}
+\usepackage{careerdossier-components}
+\usepackage{hyperref}
+
+\newcommand{\cdossiertestSite}{ada}
+\newcommand{\cdossiertestBad}{\emph{ada}}
+
+\ExplSyntaxOn
+%% The log is the whole assertion, so what is typeset goes into a box and is
+%% discarded rather than shipped out.
+\box_new:N \l_cdossiertest_box
+
+%% Render a contact line that holds one field, set to the given value.
+\cs_new_protected:Npn \cdossiertestField #1#2
+  {
+    \clist_map_inline:nn
+      { email , website , linkedin , github , scholar , orcid }
+      { \CDossierSetup{ ##1 = {} } }
+    \CDossierSetup{ #1 = {#2} }
+    \hbox_set:Nn \l_cdossiertest_box { \__cdossier_components_contactline: }
+  }
+
+%% The three kinds of markup the criterion names, in one field.
+\cs_new_protected:Npn \cdossiertestMarkup #1#2#3
+  {
+    \cdossiertestField {#1} { #2 \emph{ada} #3 }
+    \cdossiertestField {#1} { #2 \textbf{ada} #3 }
+    \cdossiertestField {#1} { #2 \url{ada.example} #3 }
+  }
+
+\cs_new_protected:Npn \cdossiertestBodyLink #1
+  { \hbox_set:Nn \l_cdossiertest_box { \CDossierLink {#1} } }
+\ExplSyntaxOff
+
+\begin{document}
+
+%% Load the fonts before the capture starts, so their log lines do not sit in
+%% the baseline.
+\cdossiertestField{email}{ada@example.com}
+
+\START
+
+\TEST{email}{\cdossiertestMarkup{email}{}{@example.com}}
+\TEST{website}{\cdossiertestMarkup{website}{example.com/}{}}
+\TEST{linkedin}{\cdossiertestMarkup{linkedin}{}{}}
+\TEST{github}{\cdossiertestMarkup{github}{}{}}
+\TEST{scholar}{\cdossiertestMarkup{scholar}{}{}}
+\TEST{orcid}{\cdossiertestMarkup{orcid}{https://orcid.org/}{}}
+
+\TEST{bodylink}{
+  \cdossiertestBodyLink{example.com/\emph{ada}}
+  \cdossiertestBodyLink{example.com/\textbf{ada}}
+  \cdossiertestBodyLink{\url{example.com/ada}}
+}
+
+%% A macro is expanded before the check, so the command it leaves is named.
+\TEST{macro-expanding-to-markup}{
+  \cdossiertestField{website}{example.com/\cdossiertestBad}
+}
+
+%% Nothing is logged for a value the rule accepts.
+\TEST{accepted-forms-say-nothing}{
+  \cdossiertestField{website}{example.com/\cdossiertestSite}
+  \cdossiertestField{website}{example.com/a\_b\#c\&d\%e\^{}f\~g}
+  \cdossiertestField{website}{example.com/a\textunderscore b\textasciitilde c}
+  \cdossiertestField{website}{example.com/a\string~b}
+  \cdossiertestField{website}{example.com/a\$b\textdollar c}
+  \cdossiertestField{email}{a\_b@example.com}
+  \cdossiertestBodyLink{example.com/a\$b}
+}
+
+\END
+\end{document}

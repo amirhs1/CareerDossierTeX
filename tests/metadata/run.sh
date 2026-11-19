@@ -488,6 +488,28 @@ for field in Title Author Subject; do
 done
 echo
 
+echo "== stored user text reaches /Title and /Author as its text =="
+# #687. The statement's `title' and the profile's `name' both hold `\emph' and
+# `\_', and both reach the Info dictionary. Before the fix the title builder
+# expanded the stored title a second time, and `\emph' stopped the build at
+# \begin{document} -- so the compile itself is the first assertion here.
+#
+# The expected strings are the text the reader sees on the page: `\emph'
+# changes the font and adds no characters, and `\_' is an underscore. They are
+# built here from their parts rather than copied out of a build; `2013' is the
+# EN DASH separator the #428 block above documents.
+expected_stored_title_hex="\
+$(ascii_utf16be_hex 'Teaching Statement for Analysis and Notes_One ')$en_dash_hex\
+$(ascii_utf16be_hex ' Ada Lovelace_Byron')"
+expected_stored_author_hex="$(ascii_utf16be_hex 'Ada Lovelace_Byron')"
+for job in statement-stored-text-default statement-stored-text-tagged; do
+  if compile_fixture "$job.tex" "$job"; then
+    read_info "$job" Title "$expected_stored_title_hex"
+    read_info "$job" Author "$expected_stored_author_hex"
+  fi
+done
+echo
+
 if [ "$fail" -eq 0 ]; then
   echo "ALL METADATA FIXTURES PASSED"
 else

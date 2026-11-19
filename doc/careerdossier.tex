@@ -941,6 +941,19 @@ In practice this affects \key{website} and \cmd{CDossierLink} far more than the
 three keys above, since a LinkedIn or GitHub handle and a Scholar identifier are
 restricted to letters, digits, hyphens, and underscores.
 
+\subsubsection{Formatting in a link value}
+\label{sec:link-markup}
+
+A value that becomes a link is an address, not formatted text: it is typeset as
+written and becomes the link's target. That covers \key{email}, \key{website},
+\key{linkedin}, \key{github}, \key{scholar}, \key{orcid}, the argument of
+\cmd{CDossierLink}, and a publication's \key{doi} and \key{url}. A formatting
+command such as \cmd{emph} or \cmd{textbf}, a nested \cmd{url}, or any other
+command left once the value is expanded is an error that names the field and
+the command, and the value is then typeset as plain text without a link. A
+macro of your own that expands to text is accepted, and so are the escaped
+characters above, \verb|\$| among them.
+
 \subsection{ORCID}
 \label{sec:orcid}
 
