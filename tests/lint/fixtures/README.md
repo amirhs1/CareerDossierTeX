@@ -213,6 +213,8 @@ verdicts follow the path list `CONTRIBUTING.md`, "CI expectations", documents.
 | `docsonlyfixture-workflow.txt` | full: `.github/workflows/build.yml`, beside `.github/ISSUE_TEMPLATE/` |
 | `docsonlyfixture-rename.txt` | full: a `.sty` renamed into `docs/`, listed as both sides |
 | `docsonlyfixture-classifier.txt` | full: `tests/lib/docs-only.sh` itself |
+| `docsonlyfixture-readme.txt` | full: `README.md`, which `build.lua` ships (#691) |
+| `docsonlyfixture-changelog.txt` | full: `CHANGELOG.md`, which `build.lua` ships (#691) |
 | `docsonlyfixture-empty.txt` | full: an empty change |
 
 Each "full" list but the last keeps a docs path beside the one that disqualifies
@@ -247,3 +249,22 @@ outside the lint's own scope.
 | `headerfixture-unnamed.tex` | `headerbacklog-stale.txt` | `STALE ENTRY`: it also lists a file that does not exist |
 | `headerfixture-named.tex` | `headerbacklog-fixed.txt` | `FIXED, DROP THE ENTRY` |
 | `headerfixture-unnamed.tex`, `headerfixture-unnamed-2.tex` | `headerbacklog-over.txt` | `OVER THE FROZEN SIZE`: two entries, frozen at one |
+
+## Name-coverage fixtures
+
+These pin the verdicts of `tests/lint/run-name-coverage.sh` (issue #694).
+`namefixture-work.sty` stands in for the Work: it defines two public names,
+`\CDossierFixtureTested` and `\CDossierFixtureUntested`, and mentions a third
+only in a comment. `namefixture-partial.lvt` names the first and discusses the
+second only in a comment; `namefixture-full.lvt` names the second. Like the
+files above they are lint input and are never compiled.
+
+| Tests | Backlog | Verdict |
+| --- | --- | --- |
+| `namefixture-partial.lvt`, `namefixture-full.lvt` | `namebacklog-empty.txt` | `OK` |
+| `namefixture-partial.lvt` | `namebacklog-empty.txt` | `UNTESTED NAME`: a comment covers nothing |
+| `namefixture-partial.lvt` | `namebacklog-ok.txt` | `OK`: declared, with a reason |
+| `namefixture-partial.lvt`, `namefixture-full.lvt` | `namebacklog-ok.txt` | `COVERED, DROP THE ENTRY` |
+| `namefixture-partial.lvt` | `namebacklog-noreason.txt` | `NO REASON` |
+| `namefixture-partial.lvt` | `namebacklog-stale.txt` | `STALE ENTRY`: it lists the name the Work mentions only in a comment |
+| `namefixture-partial.lvt` | `namebacklog-over.txt` | `OVER THE FROZEN SIZE`: one entry, frozen at none |

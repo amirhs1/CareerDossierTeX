@@ -1,0 +1,34 @@
+% resume-itemize-label.tex — extraction fixture for an item's optional label.
+%
+% Purpose (#686)
+%   `\item[<label>]' inside CDossierItemize replaces the bullet with <label>,
+%   as the kernel's `\item' does. If this fixture fails with `• [–] Dash label
+%   item.', the list policy's `\item' wrapper has hidden the `[' from the
+%   kernel's optional-argument check, so the default bullet was set and the
+%   bracketed label was typeset as text.
+%
+%   The expected text comes from an independent implementation: the same
+%   `\item[--]' in the kernel's plain `itemize' extracts as `– <text>'. The
+%   fixture keeps that plain list after the CDossierItemize, so the baseline
+%   shows both, and the two dash lines must read alike apart from their text.
+%   An item with no optional argument keeps the bullet, and `\item[]' sets an
+%   empty label, as it does in the kernel.
+%
+%   The committed baseline (resume-itemize-label.expected.txt) is the
+%   assertion; regenerate it only for an intended, reviewed output change.
+%
+% Compile: lualatex -halt-on-error -interaction=nonstopmode resume-itemize-label.tex
+% (run from the repository root, or with the root on TEXINPUTS as run.sh does)
+\documentclass{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\begin{CDossierItemize}
+  \item Bullet item before the label.
+  \item[--] Dash label item.
+  \item[] Empty label item.
+  \item Bullet item after the label.
+\end{CDossierItemize}
+\begin{itemize}
+  \item[--] Kernel dash item.
+\end{itemize}
+\end{document}

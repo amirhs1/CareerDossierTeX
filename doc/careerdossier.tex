@@ -1075,20 +1075,24 @@ produce empty separators or blank lines.
 \textbf{Key} & \textbf{Required} & \textbf{Default or behaviour} \\
 \midrule
 \endhead
-\key{date} & No & \cmd{today} \\
+\key{date} & No & \cmd{today}; date line omitted when empty \\
 \key{recipient-name} & No & Omitted when empty \\
 \key{recipient-title} & No & Omitted when empty \\
 \key{recipient-organization} & No & Omitted when empty \\
 \key{recipient-address} & No & Omitted when empty; may contain \texttt{\textbackslash\textbackslash} \\
 \key{subject} & No & Entire subject line omitted when empty \\
-\key{salutation} & No & \texttt{Dear Hiring Manager,} \\
-\key{closing} & No & \texttt{Sincerely,} \\
+\key{salutation} & No & \texttt{Dear Hiring Manager,}; salutation line omitted when empty \\
+\key{closing} & No & \texttt{Sincerely,}; closing line omitted when empty \\
 \bottomrule
 \end{longtable}
 
-The recipient block collapses cleanly when one or more optional fields are
-absent: an absent block or subject omits both the content and its following
-block skip.
+A blank value, empty or spaces only, is treated as absent. The recipient block
+collapses cleanly when one or more optional fields are absent: an absent block
+or subject omits both the content and its following block skip. A blank
+\key{date} or \key{salutation} is omitted the same way, so with a blank
+salutation the body begins where the salutation would have been. A blank
+\key{closing} omits only the closing line: the signature space and the name are
+still typeset.
 
 \section{Statements}
 \label{sec:statement}
@@ -1254,11 +1258,13 @@ for the supported contact fields; prefixes the text labels of
 
 \cmd{MakeCDossierLetterhead} renders the cover-letter opening material in order:
 the shared sender identity, the date, the recipient block, the optional subject,
-and the salutation. An absent recipient block or subject omits both the content
-and its following block skip.
+and the salutation. A blank date, recipient block, subject, or salutation omits
+both the content and the space that follows it.
 
 \cmd{MakeCDossierClosing} renders the configured closing, suitable signature
-space, and the profile \key{name}, and validates that \key{name} exists.
+space, and the profile \key{name}, and validates that \key{name} exists. A
+blank closing omits only the closing line; the signature space and the name
+remain.
 
 The three are a single unit for pagination: the closing text and the signature
 name always land on the same page, whichever page that turns out to be. When
@@ -1480,6 +1486,12 @@ defined outside the entry, or placed outside it.
 A resume-appropriate itemized list with controlled indentation and spacing.
 Prefer it over globally redefining \env{itemize}.
 
+\texttt{\textbackslash item[<label>]} replaces the bullet with
+\texttt{<label>}, as it does in \env{itemize}: \verb|\item[--]| sets a dash,
+and \verb|\item[]| sets no label.
+A \env{CDossierItemize} can be nested inside an item of another one, to any
+depth \env{itemize} itself allows; each nested list is indented one step further.
+
 The space above the list is \cmd{CDossierRecordListEdgeAboveSkip} and the space
 below is \cmd{CDossierRecordListEdgeBelowSkip}. Each token is the complete gap
 at its end of the list, and both collapse with the adjacent block's own spacing
@@ -1531,7 +1543,7 @@ only inside that environment, and takes these keys:
 \key{title} & Yes & Publication title \\
 \key{venue} & No & Journal, book, conference, or publisher \\
 \key{date} & No & Year or display date \\
-\key{doi} & No & DOI value or complete DOI URL \\
+\key{doi} & No & DOI: a bare identifier, the same with a \texttt{doi:} prefix, a \texttt{doi.org/} path, or a complete DOI URL \\
 \key{url} & No & Fallback public URL \\
 \key{note} & No & Short status or contribution note \\
 \bottomrule
@@ -1542,7 +1554,25 @@ present, the DOI is the displayed link and the URL is the fallback. Each entry
 renders in this order: authors, italic title, the comma-joined present
 \key{venue} and \key{date} values, \key{note}, and the preferred visible
 identifier. Sentence punctuation is emitted only around present groups, so
-absent optional fields leave no stray separators.
+absent optional fields leave no stray separators, and a value that already ends
+in a full stop, a question mark, or an exclamation mark gets no second mark:
+\texttt{Lovelace, A.} and \texttt{Can Machines Think?} are followed directly by
+the next group.
+
+The \key{doi} key accepts four spellings of one identifier, and all four link
+to the same address. A bare identifier, \texttt{10.9999/example.2026.1}, links
+to \texttt{https://doi.org/10.9999/example.2026.1}. With a lower-case
+\texttt{doi:} prefix, \texttt{doi:10.9999/example.2026.1}, the prefix is dropped
+from the link. A \texttt{doi.org/} path gains \texttt{https://}, and a complete
+URL is used as supplied. The visible identifier is the value as written, so a
+prefixed value shows its prefix.
+
+The label box is as wide as the widest label the list prints, so from
+\texttt{10)} on the labels still start inside the text edge. The last label is
+known only once the list ends, so it is recorded in the auxiliary file and used
+on the next run. A list that reaches \texttt{10)} settles on the second run,
+which \texttt{latexmk} makes on its own, and until then LaTeX warns that
+another run is needed.
 
 \subsubsection{Numbering across grouped lists}
 
@@ -1670,8 +1700,10 @@ first branch when the field exists and is nonblank, and the second otherwise.
 Both branches are long, so they may contain full paragraphs.
 
 \cmd{CDossierFieldValue}\texttt{\{email\}} expands to the stored value, or to
-nothing when the field is absent. It does not typeset and does not validate the
-field name.
+nothing when the field is absent. It does not typeset. For an unknown field name
+it stops with an error that names the field. The error is raised during
+expansion, so \TeX{} first reports a misused \cmd{???}, and the message does not
+list the supported fields.
 
 Expandability is what makes the last of these the correct choice anywhere the
 value is written into the PDF rather than onto the page --- a heading's recorded

@@ -111,10 +111,20 @@ fixture_matches() {
 # mathematics and intentionally loads neither Unicode-math package.
 allow='not available for font|Ligatures=CommonOff|ContextualOff, DiscretionaryOff|Neither unicode-math nor lua-unicode-math|rerun|Reading font info|geometry|hyperref|fancyhdr'
 
-# Fixture expectations:
+# Fixture expectations, one entry per fixture. The basename ends at the first
+# space; the verdict runs from there to the first `|', or to the end of the
+# entry when it has none; each later `|' opens a substring:
 #
-#   "<basename> <pass|fail> [expected log substring]"
+#   "<basename> pass"
+#   "<basename> fail"
+#   "<basename> fail|<expected log substring>"
 #   "<basename> fail-once|<expected substring>|<substring expected exactly once>"
+#
+# The verdict is everything between that space and the first `|', so it must be
+# exactly `pass', `fail', or `fail-once'. Anything else, such as `Pass' or a
+# substring separated by a space (`pass needle'), fails that entry by name
+# before anything is compiled (#695); tests/lint/run-smoke-verdicts.sh is the
+# control.
 #
 # Substrings are matched against the log with whitespace flattened, so they may
 # span the log's wrapped lines. The `fail-once' pair is split on the last `|',
@@ -132,6 +142,8 @@ cases=(
   "resume-section-rule-baseline-12pt pass"
   "resume-itemize-alignment pass"
   "resume-itemize-trailing-glue pass"
+  "resume-itemize-nested pass"
+  "resume-itemize-nested-tagged pass"
   "resume-list-edge-gap pass"
   "resume-list-edge-gap-tagged pass"
   "resume-list-edge-gap-tagged-10pt pass"
@@ -174,6 +186,7 @@ cases=(
   "cv-section-rule-baseline pass"
   "cv-publication-list-tokens pass"
   "cv-itemize-trailing-glue pass"
+  "cv-itemize-nested pass"
   "cv-list-edge-gap pass"
   "cv-list-edge-gap-tagged pass"
   "cv-publication-list-edge-gap pass"
@@ -438,6 +451,17 @@ smoke_case() {
   if [ "$expect" = "fail-once" ]; then once="${needle##*|}"; needle="${needle%|*}"; fi
   tex="$base.tex"
   echo "== $tex ($expect) =="
+  # Before the compile and the fixture check: the `case' below has a branch for
+  # each verdict and none for anything else, so an unread verdict would pass
+  # (#695).
+  case "$expect" in
+    pass|fail|fail-once) ;;
+    *)
+      echo "  UNKNOWN VERDICT '$expect' in the entry \"$entry\""
+      echo "    expected pass, fail, or fail-once; see \"Fixture expectations\"."
+      return 1
+      ;;
+  esac
   if [ ! -f "$tex" ]; then echo "  MISSING fixture $tex"; return 1; fi
 
   # `fail-once' counts reports across the whole preamble, so it must not stop

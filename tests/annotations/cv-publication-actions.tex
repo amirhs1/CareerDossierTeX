@@ -4,8 +4,11 @@
 % careerdossier-cv normalizes a DOI or a fallback URL with its own copy of the
 % scheme insertion, so it carried the same defect at three sites: the bare DOI
 % (whole `https://doi.org/' prefix), the `doi.org/' spelling (scheme only), and
-% the fallback URL (scheme only). All five entries below must produce URI
+% the fallback URL (scheme only). All six entries below must produce URI
 % actions, and each written-out spelling must match its short form exactly.
+%
+% A DOI written with a `doi:' prefix must link to the same address as the bare
+% identifier rather than to `https://doi.org/doi:...' (#688).
 %
 % Addresses are kept short so no entry's identifier wraps; see the note in
 % resume-contact-actions.tex on why a wrap would confuse the comparison.
@@ -14,6 +17,7 @@
 % URIEXPECT: https://doi.org/10.9999/bare
 % URIEXPECT: https://doi.org/10.9999/host
 % URIEXPECT: https://doi.org/10.9999/full
+% URIEXPECT: https://doi.org/10.9999/prefixed
 % URIEXPECT: https://example.invalid/note
 % URIEXPECT: https://example.invalid/full
 \documentclass{careerdossier-cv}
@@ -40,6 +44,11 @@
     authors = {Ada Lovelace},
     title   = {A Written-Out DOI},
     doi     = {https://doi.org/10.9999/full}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {A Prefixed DOI},
+    doi     = {doi:10.9999/prefixed}
   }
   \CDossierPublication{
     authors = {Ada Lovelace},

@@ -289,8 +289,10 @@ not a rendered gap. Both fixtures keep those traces; `components-headerstack`
 adds composed heights alongside them.
 
 `tests/layout/` renders rather than reports, but it asserts page counts,
-overfull boxes, furniture, media box, and widow/orphan behaviour — not gaps. A
-spacing change of a grid step or two moves nothing it looks at. It is
+overfull boxes, furniture, media box, and widow/orphan behaviour — not token
+gaps. Its one gap comparison, `letter-blank-fields`, compares two builds of one
+letter and names no token value except the signature gap's floor. A spacing
+change of a grid step or two moves nothing it looks at. It is
 corroboration when a retune flips a page count, not a per-token instrument.
 
 Verify a new shape by perturbing the ratio and rebuilding — do not assume it
@@ -383,8 +385,12 @@ each to `build/check-parallel/NN-<target>.log`, and replays them in `Makefile`
 order. It accounts for every dispatched target, warms the font cache, and gives
 each worker its own biber cache. On a docs-only change it narrows the dispatch
 to `DOCS_ONLY_TARGETS` and skips the two cache proofs, which none of those
-targets needs. `--self-test` drives its six committed controls; the sixth pins
-that only a docs-only verdict, with no `FULL=1`, narrows the run. The `Makefile`
+targets needs. It dispatches every target with `TEST` and `FIXTURE` emptied, as
+`check-serial` empties them for its prerequisites, so a leftover filter never
+narrows the full run (#692). `--self-test` drives its seven committed controls;
+the sixth pins that only a docs-only verdict, with no `FULL=1`, narrows the run,
+and the seventh dry-runs both paths with a sentinel filter on the command line,
+in the environment, and in `MAKEFLAGS`. The `Makefile`
 header owns why `JOBS` defaults to 4.
 
 ### Fanning out inside a suite
@@ -460,7 +466,11 @@ across a break, and the page-fill floor. `tests/layout/page-break-check.awk` and
 `page-fill.awk` do the log parsing. `*keeptogether*` fixtures also assert that no
 heading is stranded and that no split list leaves a single typeset line on a
 page; `list-remnant.awk` counts a lone item's lines from the hanging indent its
-continuation lines start at.
+continuation lines start at. `letter-blank-fields` is built a second time with
+`date`, `salutation`, and `closing` blank, and the runner checks from
+`pdftotext -bbox` positions that a blank date or salutation gives its place to
+the next line, and that a blank closing leaves the name one signature gap below
+the closing line's place (#689).
 
 The furniture is checked against the medium a fixture's class options name, in
 its `\documentclass[...]` or, for a wrapper, a `\PassOptionsToClass` before the
@@ -772,6 +782,21 @@ entry with no reason, a stale entry, an entry whose fixture now names itself,
 and more entries than its `FROZEN AT` line each fail. One committed control
 per verdict runs the same check over `tests/lint/fixtures/header*`.
 
+### Name-coverage lint
+
+`tests/lint/run-name-coverage.sh` — every public name the Work defines appears
+in a regression test (#694). A public name is a `CDossier` or `MakeCDossier`
+name outside a TeX comment in a `.sty` or `.cls` file of the Work, the set
+`tests/lint/run-manual-names.sh` holds the manual to. A regression test is a
+tracked `tests/regression/*.lvt` with the `tests/regression/support/` files it
+inputs, and a name counts when it appears there outside a comment. The lint
+checks that a test names each public name, not what the test asserts about it.
+`tests/lint/name-coverage-backlog.txt` declares the names that had no test when
+it landed, each with a reason, and the lint keeps that list shrinking by the
+same five verdicts as the fixture-header backlog. `--list` prints every name it
+checks, marked `tested` or `backlog`. One committed control per verdict runs
+the same check over `tests/lint/fixtures/name*`.
+
 ### Markdown anchor lint
 
 `tests/lint/run-markdown-anchors.sh` — every `file.md#anchor` link in the tree
@@ -870,6 +895,14 @@ synthetic page geometry: a lone single-line item counts as one line, a wrapped
 one counts its continuation lines at an indent read from the item, and a page
 whose geometry could not be read gets no verdict.
 
+### Smoke verdict lint
+
+`tests/lint/run-smoke-verdicts.sh` — plants entries the smoke runner cannot
+read (`Pass`, `pass needle`, an unknown verdict, and no verdict) in a copy of
+`tests/smoke/run.sh` and runs each one alone. Each must fail the run with
+`UNKNOWN VERDICT` and quote its entry. The runner checks the verdict before the
+fixture file and before any compile, so the lint needs no TeX (#695).
+
 ### Commit-message hook lint
 
 `tests/lint/run-commit-msg-hook.sh` — runs `.githooks/commit-msg` over four
@@ -884,10 +917,10 @@ than 0 or 1, fails the lint rather than counting as a rejection.
 the docs-only path list, over the `docsonlyfixture-*` path lists and over a
 throwaway repository built under `build/`. A list that is docs-only but for one
 `.sty`, `doc/careerdossier.tex`, `Makefile`, `build.yml`, a rename into `docs/`,
-or the classifier itself is not docs-only, and nor is an empty change; a
-committed, staged, unstaged, or untracked change each counts; no `origin/main`
-and no git checkout are unclassified. An exit status other than 0, 1, or 2
-fails the lint.
+the classifier itself, or `README.md` or `CHANGELOG.md`, which the release
+archive ships, is not docs-only, and nor is an empty change; a committed,
+staged, unstaged, or untracked change each counts; no `origin/main` and no git
+checkout are unclassified. An exit status other than 0, 1, or 2 fails the lint.
 
 ### Shell-harness lint
 

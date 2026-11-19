@@ -589,6 +589,11 @@ Three properties make this safe to trust:
   docs-only change is the exception at the level of whole suites: `make check`
   then runs only the lints, under "The full run, and the serial path" above, and a
   docs-only pull request skips CI's TeX jobs, under "CI expectations".
+- **`make check` never takes a selector.** `make check` and `make check-serial`
+  run every suite unfiltered even when `TEST` or `FIXTURE` is on their command
+  line or left exported in the shell, so a leftover filter cannot turn the full
+  run into a partial one that still ends "All suites passed."
+  `tests/check-parallel.sh --self-test` asserts it for both paths.
 - **A selector that matches nothing fails the run.** Every assertion these
   suites make is made per fixture, so a run that selected no fixture passes all
   of them — "0 fixtures, all passed" and "the suite is clean" print the same
@@ -1197,9 +1202,10 @@ Release preparation should verify:
 - supported examples compile locally;
 - the accumulated test suite passes without adding milestone-end coverage;
 - CI passes on `main`;
-- version strings are updated — `make lint` asserts that the ten Work files
-  declare the same version and date as each other, so a bump that missed one is
-  caught, but nothing checks the pair against the tag you are about to cut;
+- version strings are updated — `make lint` asserts that every package and
+  class `manifest.txt` lists declares the same version and date as the others,
+  so a bump that missed one is caught, but nothing checks the pair against the
+  tag you are about to cut;
 - `README.md` reflects current support;
 - the manual matches implementation;
 - the `draft-release` skill has drafted the `CHANGELOG.md` section and the
