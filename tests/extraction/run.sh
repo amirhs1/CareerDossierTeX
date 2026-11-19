@@ -123,6 +123,13 @@ if ! command -v pdftotext > /dev/null 2>&1; then
   exit 1
 fi
 
+# The glyph guard (#693): one small build, after `--list` and before any
+# fixture compiles, that must prove it typeset real glyphs. A nullfont build
+# extracts empty text, and `--update` must never write a baseline from it.
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+fanout_warm_fonts "$root/build/glyph-guard/extraction" || exit 1
+
 # Build uncompressed so /ActualText is greppable in the PDF without needing
 # qpdf, mutool, or a Python zlib helper that CI images may not carry. LuaHBTeX
 # exposes both compression controls directly; changing them does not affect

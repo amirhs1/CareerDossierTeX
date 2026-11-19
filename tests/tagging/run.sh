@@ -1560,27 +1560,31 @@ done
 
 record_toolchain
 
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+scratch="$root/build/fanout/tagging"
+rm -rf "$scratch"
+mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
+
+# Required on both paths, before any fixture compiles (#693), and this suite is
+# where it bites hardest: a nullfont run still produces a structure tree, still
+# extracts, and still validates, so it would pass every gate below having
+# typeset nothing. Under fan-out it matters twice over: several LuaLaTeX
+# processes racing to build a cold luaotfload cache is when it goes wrong.
+fanout_warm_fonts "$scratch" || exit 1
+echo
+
 if [ "$jobs" -eq 1 ]; then
   for (( i = 0; i < ${#unit_names[@]}; i++ )); do
     eval "${unit_cmds[$i]}" || fail=1
   done
 else
-  # shellcheck source=tests/lib/fanout.sh
-  . "$root/tests/lib/fanout.sh"
-  scratch="$root/build/fanout/tagging"
-  rm -rf "$scratch"
-  mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
-
   fanout_reset
   for (( i = 0; i < ${#unit_names[@]}; i++ )); do
     fanout_add "${unit_names[$i]}" "${unit_cmds[$i]}" || exit 2
   done
 
   echo "fixture-group concurrency: $jobs at a time (the gate is the serial run)"
-  # Required before fan-out, and this suite is where it bites hardest: a
-  # nullfont run still produces a structure tree, still extracts, and still
-  # validates — it would pass every gate below having typeset nothing.
-  fanout_warm_fonts "$scratch" || exit 1
   echo
   fanout_run "$jobs" "$scratch"
   fanout_gather "$scratch"
