@@ -72,8 +72,9 @@
 #     before anything is dispatched.
 #
 # `--self-test` exercises the accounting assertion, the failure path, the
-# per-worker cache isolation, the extraction verdict, and the docs-only
-# scoping, against synthetic workers, synthetic logs, and stub classifiers. It
+# per-worker cache isolation, the extraction verdict, the docs-only scoping,
+# and that no leftover TEST or FIXTURE reaches a sub-suite on either path,
+# against synthetic workers, synthetic logs, stub classifiers, and dry runs. It
 # compiles nothing and needs neither TeX nor biber. `make lint` runs it, which
 # is how the negative controls stay committed rather than performed once by
 # hand.
@@ -112,7 +113,8 @@
 #   --list       print the full target list, before any docs-only scoping,
 #                and exit.
 #   --self-test  run the accounting, failure-path, biber-isolation,
-#                biber-extraction, and docs-only scoping controls; compile
+#                biber-extraction, docs-only scoping, and leftover-filter
+#                controls; compile
 #                nothing.
 #
 # Output lands in build/check-parallel/, which is gitignored and removed by
@@ -373,6 +375,23 @@ closing_line() {
 
 batch_names=()
 batch_cmds=()
+
+# The command one target is dispatched with. A function, so that --self-test
+# runs the command the gate runs rather than a copy of it.
+#
+# JOBS is passed explicitly, always. A command-line variable outranks the one
+# this run's own MAKEFLAGS would otherwise hand down, so the fan-out inside a
+# target is what was asked for here and never an accident of how the outer run
+# was invoked. `JOBS=1' leaves each runner on its serial path.
+#
+# FIXTURE and TEST are emptied the same way, for the same reason (#692): a
+# filter typed on `make check`'s command line lands in MAKEFLAGS, and one left
+# exported in the shell is in the environment, and either would otherwise reach
+# every dispatched suite and turn the full run into a partial one that still
+# ends "All suites passed." An explicit empty value outranks both.
+dispatch_cmd() { # <target>
+  printf 'make JOBS=%s FIXTURE= TEST= %s' "$inner_jobs" "$1"
+}
 
 slot_for() { fanout_slot "$1" "$2"; }
 
@@ -947,6 +966,66 @@ self_test() {
   classifier="$saved_classifier"
   targets=(${full_list[@]+"${full_list[@]}"})
 
+  printf '\n== control 7: a leftover TEST or FIXTURE never narrows check (#692) ==\n'
+  # `make smoke FIXTURE=<pattern>` and `make regression TEST=<name>` scope one
+  # suite. Left in the shell, or typed on `make check`'s command line, the same
+  # variables used to reach every sub-suite of the gate, which then ended
+  # "All suites passed." over a partial run. The runners read the filters only
+  # as arguments make expands, so a dry run shows exactly what each sub-suite
+  # would receive: a sentinel filter must appear in none of it.
+  #
+  # Each probe clears the filters and MAKEFLAGS first, so a lint run that is
+  # itself inside a filtered make tests these routes and not that one.
+  local sentinel=cdossier-leftover-filter-692 probe route leak=0 probe_ok=1
+  probe="$scratch/c7.serial"
+  : > "$probe"
+  for route in command-line environment; do
+    (
+      cd "$root" || exit 1
+      unset MAKEFLAGS MFLAGS MAKELEVEL FIXTURE TEST
+      if [ "$route" = command-line ]; then
+        make -n --no-print-directory check-serial \
+          FIXTURE="$sentinel" TEST="$sentinel"
+      else
+        FIXTURE="$sentinel" TEST="$sentinel" \
+          make -n --no-print-directory check-serial
+      fi
+    ) >> "$probe" 2>&1 || probe_ok=0
+  done
+  # The parallel path: the exact command each target is dispatched with, under
+  # what `make check FIXTURE=... TEST=...` hands this driver — the filters in
+  # the environment and in MAKEFLAGS, in the form GNU make writes it. The `n`
+  # there makes each dispatched make a dry run without changing its command.
+  probe="$scratch/c7.parallel"
+  : > "$probe"
+  for t in ${full_list[@]+"${full_list[@]}"}; do
+    (
+      cd "$root" || exit 1
+      unset MFLAGS MAKELEVEL
+      export FIXTURE="$sentinel" TEST="$sentinel"
+      export MAKEFLAGS="n --no-print-directory -- TEST=$sentinel FIXTURE=$sentinel"
+      eval "$(dispatch_cmd "$t")"
+    ) >> "$probe" 2>&1 || probe_ok=0
+  done
+  for probe in "$scratch/c7.serial" "$scratch/c7.parallel"; do
+    route="${probe##*.}"
+    # Not vacuous: the dry run must have printed the filtered suites' commands.
+    if [ "$probe_ok" -eq 0 ] \
+       || ! grep 'l3build check' "$probe" > /dev/null 2>&1 \
+       || ! grep 'tests/smoke/run.sh' "$probe" > /dev/null 2>&1; then
+      printf '  FAIL: the %s dry run did not print the sub-suites; see %s\n' \
+        "$route" "$probe"
+      leak=1
+    elif grep "$sentinel" "$probe" > /dev/null 2>&1; then
+      printf '  FAIL: a leftover filter reaches the %s path of check:\n' "$route"
+      grep "$sentinel" "$probe" | sed 's/^/          /'
+      leak=1
+    else
+      printf '  ok: no filter reaches a sub-suite on the %s path\n' "$route"
+    fi
+  done
+  [ "$leak" -eq 0 ] || fails=$((fails + 1))
+
   printf '\n'
   if [ "$fails" -ne 0 ]; then
     printf 'check-parallel --self-test: %d control(s) FAILED.\n' "$fails"
@@ -1009,11 +1088,7 @@ fi
 batch_names=(${targets[@]+"${targets[@]}"})
 batch_cmds=()
 for target in ${targets[@]+"${targets[@]}"}; do
-  # JOBS is passed explicitly, always. A command-line variable outranks the one
-  # this run's own MAKEFLAGS would otherwise hand down, so the fan-out inside a
-  # target is what was asked for here and never an accident of how the outer run
-  # was invoked. `JOBS=1' leaves each runner on its serial path.
-  batch_cmds+=("make JOBS=$inner_jobs $target")
+  batch_cmds+=("$(dispatch_cmd "$target")")
 done
 
 # The two tool proofs guard LuaLaTeX and biber runs. DOCS_ONLY_TARGETS compiles
