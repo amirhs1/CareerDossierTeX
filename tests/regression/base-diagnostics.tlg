@@ -38,3 +38,29 @@ l. ...}
 Provide a name before rendering identity content, for example:
 \CDossierSetup {name = Ada Lovelace }
 ============================================================
+============================================================
+TEST 5: unknown-field-in-value-errors
+============================================================
+! Use of \??? doesn't match its definition.
+<argument> \???  
+                 ! Package careerdossier-base Error: Field 'emial' is unknown.
+l. ...}
+If you say, e.g., `\def\a1{...}', then you must always
+put `1' after `\a', since control sequence names are
+made up of letters only. The macro here has not been
+followed by the required stuff, so I'm ignoring it.
+[]
+============================================================
+============================================================
+TEST 6: unknown-long-field-in-value-names-it
+============================================================
+! Use of \??? doesn't match its definition.
+<argument> \???  
+                 ! Package careerdossier-base Error: Field 'affiliations' is...
+l. ...}
+If you say, e.g., `\def\a1{...}', then you must always
+put `1' after `\a', since control sequence names are
+made up of letters only. The macro here has not been
+followed by the required stuff, so I'm ignoring it.
+[]
+============================================================

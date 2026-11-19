@@ -1,9 +1,9 @@
 % base-diagnostics.lvt — careerdossier-base error paths.
 %
 % Covers the actionable diagnostics the base module must raise: an unknown
-% \CDossierSetup key, an unknown profile field passed to a field accessor, and
-% the required-name guard firing before any identity content is rendered. This
-% file never sets `name`, so the required-name state is clean.
+% \CDossierSetup key, an unknown profile field passed to any of the three field
+% accessors, and the required-name guard firing before any identity content is
+% rendered. This file never sets `name`, so the required-name state is clean.
 %
 % The required-name guard is a private expl3 call, so it is wrapped in a helper
 % defined here under \ExplSyntaxOn: catcodes cannot be switched inside the
@@ -34,6 +34,22 @@
 
 \TEST{missing-required-name-errors}{
   \cdossiertestRequireName
+}
+
+% #707: \CDossierFieldValue stops on a field name the profile does not define,
+% as its two siblings above do, instead of expanding to nothing. \TYPE expands
+% its argument fully, so the brackets also assert that the accessor is still
+% expandable: a protected call would survive into the log as a command name.
+% The error is the expandable form l3msg gives, and nothing is typeset after
+% it. TeX crops that form's message, so its wording is shorter than the
+% siblings' and puts the name first; the second case, a misspelling longer
+% than any field name, asserts that the crop falls after the name.
+\TEST{unknown-field-in-value-errors}{
+  \TYPE{[\CDossierFieldValue{emial}]}
+}
+
+\TEST{unknown-long-field-in-value-names-it}{
+  \TYPE{[\CDossierFieldValue{affiliations}]}
 }
 
 \END

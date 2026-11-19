@@ -1687,8 +1687,10 @@ first branch when the field exists and is nonblank, and the second otherwise.
 Both branches are long, so they may contain full paragraphs.
 
 \cmd{CDossierFieldValue}\texttt{\{email\}} expands to the stored value, or to
-nothing when the field is absent. It does not typeset and does not validate the
-field name.
+nothing when the field is absent. It does not typeset. For an unknown field name
+it stops with an error that names the field. The error is raised during
+expansion, so \TeX{} first reports a misused \cmd{???}, and the message does not
+list the supported fields.
 
 Expandability is what makes the last of these the correct choice anywhere the
 value is written into the PDF rather than onto the page --- a heading's recorded
