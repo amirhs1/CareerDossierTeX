@@ -35,6 +35,13 @@ mkdir -p "$out" || exit 1
 cd "$here" || exit 1
 export TEXINPUTS="$root:${TEXINPUTS:-}"
 
+# The glyph guard (#693): one small build, before any fixture compiles, that
+# must prove it typeset real glyphs. A nullfont build gives the comparisons
+# below empty text to read, and `--update` must never write a baseline from it.
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+fanout_warm_fonts "$root/build/glyph-guard/bibliography" || exit 1
+
 base="cv-bibliography"
 expected="$base.expected.txt"
 update=0

@@ -66,6 +66,14 @@ if ! command -v lualatex >/dev/null 2>&1; then
   exit 1
 fi
 
+# The glyph guard (#693): one small build, before any fixture compiles, that
+# must prove it typeset real glyphs. A nullfont build can still write a
+# catalog, an /Info dictionary, and /Lang, so the checks below need not notice
+# an empty page.
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+fanout_warm_fonts "$root/build/glyph-guard/metadata" || exit 1
+
 record_failure() {
   echo "  FAIL: $1"
   fail=1

@@ -98,14 +98,15 @@ fanout_slot() { printf '%02d-%s' "$1" "$2"; }
 
 # fanout_warm_fonts <scratch>
 #
-# One small LuaLaTeX build, before any worker starts, that is required to prove
-# it typeset real glyphs.
+# One small LuaLaTeX build, before any fixture compiles or any worker starts,
+# that is required to prove it typeset real glyphs.
 #
 # LuaLaTeX needs to write luaotfload's font cache. Where it cannot, fontspec
-# falls back to nullfont, every document typesets empty, and every suite passes
-# having measured nothing. Serially the first compile pays the cache-warming
-# cost once; under fan-out several processes race to build it at once, which is
-# exactly when it goes wrong.
+# falls back to nullfont, every document typesets empty, and a suite can pass
+# having measured nothing. That holds on a serial path as much as a fan-out
+# one, so every runner that compiles calls this first, on every path (#693);
+# under fan-out it also keeps several processes from racing to build a cold
+# cache at once, which is exactly when it goes wrong.
 #
 # Exit status alone does not prove it: a nullfont document compiles cleanly and
 # is empty. So the log is checked for the two signatures of that state as well.
@@ -138,13 +139,13 @@ WARMTEX
   if ! (cd "$warm" && lualatex -halt-on-error -interaction=nonstopmode warm.tex) \
        > "$warm/warm.stdout" 2>&1; then
     printf 'fanout: the font-cache warm-up build FAILED.\n' >&2
-    printf 'Nothing was dispatched. See %s\n' "$warm/warm.stdout" >&2
+    printf 'Nothing else was run. See %s\n' "$warm/warm.stdout" >&2
     tail -20 "$warm/warm.stdout" 2>/dev/null | sed 's/^/  /' >&2
     return 1
   fi
 
   if [ ! -f "$warm/warm.log" ]; then
-    printf 'fanout: the warm-up build wrote no log; refusing to fan out.\n' >&2
+    printf 'fanout: the warm-up build wrote no log; refusing to run.\n' >&2
     return 1
   fi
 
@@ -152,7 +153,7 @@ WARMTEX
      || grep 'nullfont' "$warm/warm.log" > /dev/null 2>&1; then
     printf 'fanout: the warm-up build typeset with NO REAL FONT.\n' >&2
     printf 'luaotfload could not use its cache, so every fixture would compile\n' >&2
-    printf 'empty documents and pass. Nothing was dispatched. Run this from an\n' >&2
+    printf 'empty documents and pass. Nothing else was run. Run this from an\n' >&2
     printf 'ordinary interactive shell rather than a restricted sandbox.\n' >&2
     printf 'See %s\n' "$warm/warm.log" >&2
     return 1

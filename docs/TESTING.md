@@ -373,8 +373,13 @@ carries the full diagnosis in comments at the repair site.
 
 The same failure mode governs LuaLaTeX itself: where luaotfload cannot write its
 font cache, fontspec falls back to `nullfont` and every document typesets empty,
-so a sweep or suite reports a clean result it never measured. Suspicious speed
-or an implausibly clean arm is the tell; grep a `.log` for
+so a sweep or suite reports a clean result it never measured. Every runner that
+compiles therefore starts with the glyph guard, `fanout_warm_fonts` in
+`tests/lib/fanout.sh`: one small build that must typeset real glyphs before any
+fixture compiles, on the serial path as well as the fan-out path (#693). A
+failed or `nullfont` guard build stops the suite with a `fanout:` message
+before it compares anything. Outside those runners, suspicious speed or an
+implausibly clean arm is the tell; grep a `.log` for
 `not loadable: metric data not found` before believing it, and never regenerate
 a baseline from such a run.
 
