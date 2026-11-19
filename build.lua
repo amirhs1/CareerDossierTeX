@@ -138,16 +138,17 @@ textfiles = { "README.md", "LICENSE", "CHANGELOG.md", "manifest.txt" }
 
 -- Keep the archive's directory layout the same as the repository's, so
 -- doc/careerdossier.tex and doc/careerdossier.pdf sit together in doc/ and the
--- ten Work files stay at the top level beside the README. With l3build's
+-- Work files stay at the top level beside the README. With l3build's
 -- default the manual's source would be flattened in among the .sty and .cls
 -- files, which reads as though it were one of them.
 flatten = false
 
--- No .tds.zip. TDS packaging is optional, and this package installs as ten
--- files into tex/latex/careerdossier/ with no scripts, fonts, or generated
--- assets to place — CTAN's own installers derive that tree from the archive
--- without help. Set rather than left to l3build's default so that the decision
--- is recorded where the value is (docs/RELEASE-CHECKLIST.md, "TDS packaging").
+-- No .tds.zip. TDS packaging is optional, and this package installs as its
+-- package and class files into tex/latex/careerdossier/ with no scripts,
+-- fonts, or generated assets to place — CTAN's own installers derive that tree
+-- from the archive without help. Set rather than left to l3build's default so
+-- that the decision is recorded where the value is (docs/RELEASE-CHECKLIST.md,
+-- "TDS packaging").
 packtdszip = false
 
 -- CTAN upload metadata. `l3build upload' is not run here and must not be:

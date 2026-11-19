@@ -1194,9 +1194,10 @@ Release preparation should verify:
 - supported examples compile locally;
 - the accumulated test suite passes without adding milestone-end coverage;
 - CI passes on `main`;
-- version strings are updated — `make lint` asserts that the ten Work files
-  declare the same version and date as each other, so a bump that missed one is
-  caught, but nothing checks the pair against the tag you are about to cut;
+- version strings are updated — `make lint` asserts that every package and
+  class `manifest.txt` lists declares the same version and date as the others,
+  so a bump that missed one is caught, but nothing checks the pair against the
+  tag you are about to cut;
 - `README.md` reflects current support;
 - the manual matches implementation;
 - the `draft-release` skill has drafted the `CHANGELOG.md` section and the
