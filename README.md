@@ -405,6 +405,16 @@ make manual
 ```
 
 Run `make help` for the full target list.
+[`examples/README.md`](examples/README.md) says what each example is and how to
+build a copy of one outside the repository.
+
+### Troubleshooting
+
+The manual's "Troubleshooting" section, in
+[`doc/careerdossier.tex`](doc/careerdossier.tex), covers the three failures
+that come from the TeX installation rather than from a document: a TeX Gyre
+font that cannot be found, blank pages or no usable `luaotfload` font cache
+(`nullfont` in the log), and an empty bibliography because Biber did not run.
 
 A configuration is supported only after its examples compile locally and in GitHub Actions.
 
