@@ -376,6 +376,14 @@ An empty `projectItems` means step 2's `--project` matched nothing. Add the PR
 to the Project before writing fields, rather than writing them against a row
 that does not exist.
 
+`gh pr create` can exit 1 after it has opened the pull request, with
+`pull request update failed: GraphQL: Content already exists in this project`:
+the pull request is already in the Project, as on #704, where the Project's
+auto-add workflow is the likely cause. Its labels, assignee, and milestone are
+applied. Take the pull request's URL from the output, do not run
+`gh pr create` again, and run this step: one item in the Project means the add
+happened, and the fields can be written.
+
 ### 4. Write every field in one mutation
 
 One aliased `updateProjectV2ItemFieldValue` per value: the PR's Status, Phase,
