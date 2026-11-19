@@ -1467,6 +1467,12 @@ defined outside the entry, or placed outside it.
 A resume-appropriate itemized list with controlled indentation and spacing.
 Prefer it over globally redefining \env{itemize}.
 
+\texttt{\textbackslash item[<label>]} replaces the bullet with
+\texttt{<label>}, as it does in \env{itemize}: \verb|\item[--]| sets a dash,
+and \verb|\item[]| sets no label.
+A \env{CDossierItemize} can be nested inside an item of another one, to any
+depth \env{itemize} itself allows; each nested list is indented one step further.
+
 The space above the list is \cmd{CDossierRecordListEdgeAboveSkip} and the space
 below is \cmd{CDossierRecordListEdgeBelowSkip}. Each token is the complete gap
 at its end of the list, and both collapse with the adjacent block's own spacing
