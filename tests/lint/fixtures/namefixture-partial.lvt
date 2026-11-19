@@ -1,0 +1,3 @@
+% namefixture-partial.lvt — a run-name-coverage.sh control test (#694). Lint input.
+% It discusses \CDossierFixtureUntested only in this comment, which covers nothing.
+\TYPE{\CDossierFixtureTested}
