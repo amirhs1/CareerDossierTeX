@@ -6,7 +6,7 @@ description: Open a GitHub issue from this repository's issue forms, with its ti
 # Open an issue
 
 1. A suspected vulnerability never goes into a public issue: stop and tell the
-   person running you.
+   person running you, and point them to `SECURITY.md`.
 2. Search for a duplicate first:
    `gh issue list --state all --search "<terms>"`.
 3. Title: follow "Names" in CONTRIBUTING.md.

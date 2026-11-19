@@ -1,8 +1,9 @@
 # CareerDossierTeX release checklist
 
-The per-release gate: what a release has to satisfy before it is tagged, the one
-step that follows the tag, and what CTAN additionally requires of the uploaded
-archive at `v1.0.0`. It is the one file that answers "is this releasable yet";
+The per-release gate: the ordered procedure that cuts a release, what a release
+has to satisfy before it is tagged, the steps that follow the tag, and what
+CTAN additionally requires of the uploaded archive at `v1.0.0`. It is the one
+file that answers "is this releasable yet" and "what do I do next";
 `docs/ROADMAP.md` owns which release a change belongs to, and
 `.agents/skills/draft-release/SKILL.md` owns how `CHANGELOG.md` sections and the
 GitHub Release notes are written.
@@ -10,6 +11,109 @@ GitHub Release notes are written.
 The checks below reference [`ATS-EXTRACTION.md`](ATS-EXTRACTION.md) for the
 font, extraction, and tagging policy each one asserts, and
 [`TESTING.md`](TESTING.md) for the suites that run them.
+
+## Release procedure
+
+The steps in order. Anyone with write access can run the steps not marked
+**maintainer**; those are reserved to the maintainer (`AGENTS.md`, "Git"). An
+agent runs steps 2, 6, and 7 through the `draft-release` skill, which drafts
+and never publishes; a person follows the same steps of that skill by hand.
+`<version>` is `<MAJOR>.<MINOR>.<PATCH>`, chosen by the maintainer, and
+`<date>` is the release date, `YYYY-MM-DD`.
+
+1. **Scope.** Every issue in the release's milestone is closed except the
+   `[release]` issue, and `main`'s CI is green. Update `main` and start from a
+   clean tree:
+
+   ```bash
+   git switch main
+   git pull --ff-only
+   git status --short
+   ```
+
+   The last command prints nothing.
+2. **Branch and changelog.** Create the release-preparation branch from
+   `main`, with the type `release` (`CONTRIBUTING.md`, "Names"), and write the
+   `CHANGELOG.md` section and the release notes on it: the `draft-release`
+   skill's steps 2 to 6. A rename also adds its `docs/MIGRATION.md` entry.
+3. **Version and date.** On the same branch, write `<version>` and `<date>`
+   in every place that names the current release:
+   - the `\ProvidesExplPackage` or `\ProvidesExplClass` line of every file
+     `manifest.txt` lists;
+   - `\CDossierManualVersion` and `\CDossierManualDate` in
+     `doc/careerdossier.tex`;
+   - `README.md`, its status line and "Releases";
+   - `docs/MIGRATION.md`, the line that names the current published release;
+   - `docs/ROADMAP.md`, the release's row in "Releases and phases".
+
+   `make lint` checks that the declarations agree with each other and with the
+   manual. Nothing checks them against the tag, so read the diff.
+4. **Verify.** On the branch, run the full suite and the two builds a release
+   ships:
+
+   ```bash
+   make check FULL=1
+   make examples
+   make manual
+   ```
+
+   The suite passes as it stands: a release adds no coverage of its own.
+   Open `build/manual/careerdossier.pdf` and confirm that its title page
+   states `<version>` and `<date>`, and that the manual and `README.md`
+   describe what the release supports. `LICENSE` is unchanged, and
+   `manifest.txt` lists the files the release ships. Then work through
+   "Release checklist" below. At `v1.0.0` and after, that includes its "CTAN"
+   group and `make ctan`, whose archive is extracted and read by hand
+   ("Building the archive").
+5. **Pull request.** Open the release-preparation pull request. Its required
+   checks pass, and the **maintainer** merges it.
+6. **Release commit.** Update `main` and record the merge commit; it is the
+   commit the tag goes on:
+
+   ```bash
+   git switch main
+   git pull --ff-only
+   git rev-parse HEAD
+   ```
+
+7. **Draft the GitHub Release** on that commit, unpublished:
+
+   ```bash
+   gh release create v<version> --draft --target <full SHA> \
+     --title v<version> --notes-file <notes file>
+   ```
+
+8. **Attach the manual.** With `HEAD` still at the SHA step 6 printed, build
+   `careerdossier.pdf` from a clean tree and attach it to the draft:
+
+   ```bash
+   git rev-parse HEAD
+   make clean
+   make manual
+   gh release upload v<version> build/manual/careerdossier.pdf
+   gh release view v<version> --json assets --jq '.assets[].name'
+   ```
+
+   The last command lists `careerdossier.pdf`. Selected example PDFs from
+   `make examples` may be attached the same way (`CONTRIBUTING.md`,
+   "Generated files").
+9. **Tag** (**maintainer**). Create the annotated tag on the release commit,
+   check it, then push it:
+
+   ```bash
+   git tag -a v<version> <full SHA> -m v<version>
+   git rev-parse 'v<version>^{commit}'
+   git push origin v<version>
+   ```
+
+   The second command prints the SHA from step 6. A pushed `v*` tag is
+   neither moved nor deleted ("After the tag").
+10. **Publish** (**maintainer**). Read the draft once more, its notes and its
+    assets, and publish it from the release's page on GitHub.
+11. **After the tag.** Work through "After the tag" below.
+12. **CTAN** (**maintainer**, `v1.0.0` and after). Submitting the archive to
+    CTAN is a separate decision and the maintainer's act alone; nothing in
+    this procedure submits it. "Upload metadata" lists what an upload needs.
 
 ## CTAN readiness **(planned — v1.0.0)**
 

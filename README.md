@@ -405,8 +405,18 @@ make manual
 ```
 
 Run `make help` for the full target list.
+[`examples/README.md`](examples/README.md) says what each example is and how to
+build a copy of one outside the repository.
 
 A configuration is supported only after its examples compile locally and in GitHub Actions.
+
+### Troubleshooting
+
+The manual's "Troubleshooting" section, in
+[`doc/careerdossier.tex`](doc/careerdossier.tex), covers the three failures
+that come from the TeX installation rather than from a document: a TeX Gyre
+font that cannot be found, blank pages or no usable `luaotfload` font cache
+(`nullfont` in the log), and an empty bibliography because Biber did not run.
 
 ## Development and testing policy
 
@@ -459,6 +469,7 @@ gate, not the stage where feature tests are first created. See
 - [`docs/ATS-EXTRACTION.md`](docs/ATS-EXTRACTION.md): design guidance for ATS-safe output and text extraction (reference material, not shipped-behavior docs)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): issue, branch, commit, and pull-request workflow, and the names each takes
 - [`docs/TESTING.md`](docs/TESTING.md): the test suites, review targets, and coverage expectations
+- [`SECURITY.md`](SECURITY.md): how to report a vulnerability privately, never in a public issue
 - [`AI-POLICY.md`](AI-POLICY.md): AI-assisted contribution policy: verification, disclosure, and accountability
 - [`AGENTS.md`](AGENTS.md): the operating contract for coding agents
 - [`docs/MIGRATION.md`](docs/MIGRATION.md): migration from earlier class files
