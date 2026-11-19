@@ -36,6 +36,12 @@ description: Open a draft GitHub pull request whose body is the full report, and
      long check result in "Checks run" and a short one in the trailer.
 
    Write it to a file outside the repository, by absolute path.
+
+   Then check the trailer block, the body's last paragraph:
+   `awk -v RS= 'END { print }' <file> | LC_ALL=C awk 'length > 72'` prints
+   nothing, and `git interpret-trailers --parse <file>` prints every trailer.
+   Fix the body until both hold. The check counts bytes, and an em dash is
+   three bytes, so it can flag a line of 72 characters or fewer; shorten it.
 5. Title and labels: follow "Names" in CONTRIBUTING.md. The type comes from
    the branch name; the areas, from the parts the diff changes. If the branch
    prefix and the intended type label disagree, stop and ask.
@@ -55,7 +61,8 @@ description: Open a draft GitHub pull request whose body is the full report, and
    asserts the focused issue's parent and `Size`.
 8. If the branch already has a pull request, first check
    `gh pr view <n> --json state`, and stop if it has merged. Otherwise push,
-   then replace its body and read it back:
+   check the trailer block as in step 4, then replace its body and read it
+   back:
    `gh pr edit <n> --body-file <file>`. When the update pushed commits,
    re-score `Size` from the whole diff with `project-metadata`, "Updating an
    open pull request" in its `reference.md`, and assert it on the pull request
