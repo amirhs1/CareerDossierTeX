@@ -1,0 +1,41 @@
+% resume-stored-text-actions.tex — a stored profile value reaches its link
+% target as the address the reader sees (#687).
+%
+% Each link field holds an address written with `\_', the ordinary way to type
+% an underscore in LaTeX, and its target must carry a plain `_'. Before #687
+% the e-mail branch built its `mailto:' target by expanding the stored value a
+% second time, so `\_' reached the PDF as the kernel's internal underscore
+% command: `mailto:ada\\protect\040\\TU\\textunderscore\040l@example.test'.
+% The page and the extracted text stayed correct; only the target broke.
+%
+% The other five fields copy the stored value instead of re-expanding it, and
+% are here so that a change to them is caught too: the issue asks for every
+% user-facing field that reaches a link target. The ORCID value is a full URL,
+% the form the module passes through unchanged; it is not an ORCID iD, so the
+% build logs the `orcid-shape' warning, which this suite does not read.
+%
+% Expected targets: the visible address, with the documented scheme or
+% canonical prefix (docs/API.md) in front -- the issue's expected behaviour.
+%
+% URIEXPECT: mailto:ada_l@example.test
+% URIEXPECT: https://example.test/ada_l
+% URIEXPECT: https://linkedin.com/in/ada_l
+% URIEXPECT: https://github.com/ada_l
+% URIEXPECT: https://scholar.google.com/citations?user=ada_l
+% URIEXPECT: https://example.test/orcid_l
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{
+  name     = {Ada Lovelace},
+  email    = {ada\_l@example.test},
+  website  = {example.test/ada\_l},
+  linkedin = {ada\_l},
+  github   = {ada\_l},
+  scholar  = {ada\_l},
+  orcid    = {https://example.test/orcid\_l},
+}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Notes}
+A paragraph, so the document has a body.
+\end{document}

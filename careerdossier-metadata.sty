@@ -126,13 +126,23 @@
 %% wrong. Naming it by code point keeps this file ASCII, which matters for a
 %% package that ships to CTAN; ^^^^ notation is the kernel's own way to do that
 %% and needs no package.
+%%
+%% The doctype is spliced in with \exp_not:V, not expanded (#687). On the
+%% statement class it is the user's `title', and expanding stored user text
+%% a second time breaks on ordinary markup: `\emph' stopped the build at
+%% \begin{document}. Left unexpanded, it reaches \pdfstringdef, or the
+%% kernel's PDF management on the tagged path, as the user wrote it, and each
+%% of those reduces markup to its text.
 \cs_new_protected:Npn \__cdossier_metadata_pdftitle:
   {
     \tl_set:Nx \l__cdossier_metadata_pdfname_tl { \CDossierFieldValue { name } }
     \tl_if_blank:VF \l__cdossier_metadata_doctype_tl
       {
-        \tl_put_left:Nx \l__cdossier_metadata_pdfname_tl
-          { \l__cdossier_metadata_doctype_tl \c_space_tl ^^^^2013 \c_space_tl }
+        \tl_put_left:Ne \l__cdossier_metadata_pdfname_tl
+          {
+            \exp_not:V \l__cdossier_metadata_doctype_tl
+            \c_space_tl ^^^^2013 \c_space_tl
+          }
       }
     \__cdossier_metadata_pdfligatures:N \l__cdossier_metadata_pdfname_tl
   }

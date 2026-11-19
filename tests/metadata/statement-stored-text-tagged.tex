@@ -1,0 +1,15 @@
+% Stored user text in /Title and /Author on the tagged build path -- #687.
+%
+% statement-stored-text-default.tex with one line added. Keep the two bodies
+% identical: under \DocumentMetadata the kernel's PDF management writes the Info
+% dictionary instead of hyperref's \pdfstringdef, so the same source has to be
+% checked through both writers.
+\DocumentMetadata{lang=en, tagging=on}
+\documentclass[type=teaching]{careerdossier-statement}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Ada \emph{L}ovelace\_Byron}, email={metadata@example.test} }
+\CDossierStatementSetup{ title={Teaching Statement for \emph{Analysis} and Notes\_One} }
+\begin{document}
+\MakeCDossierHeader
+A paragraph, so the document has a body.
+\end{document}

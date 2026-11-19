@@ -1,0 +1,19 @@
+% Stored user text in /Title and /Author on the default build path -- #687.
+%
+% Half of a pair. Its twin, statement-stored-text-tagged.tex, is this file with
+% a \DocumentMetadata line added and nothing else changed.
+%
+% The statement class is the one whose /Title carries two user fields: the
+% `title' key is the doctype in front of the name. Both fields hold `\emph' and
+% `\_'. Before #687 \__cdossier_metadata_pdftitle: expanded the stored title a
+% second time, and `\emph' then stopped the build at \begin{document} with
+% `Argument of \reserved@a has an extra }'. /Author goes through its own route
+% out of `name' and is asserted for the same input.
+\documentclass[type=teaching]{careerdossier-statement}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Ada \emph{L}ovelace\_Byron}, email={metadata@example.test} }
+\CDossierStatementSetup{ title={Teaching Statement for \emph{Analysis} and Notes\_One} }
+\begin{document}
+\MakeCDossierHeader
+A paragraph, so the document has a body.
+\end{document}

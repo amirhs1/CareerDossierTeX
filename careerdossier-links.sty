@@ -453,11 +453,19 @@
 %% luck: it took the same wrong branch, but \@hyper@linkfile saw what looked
 %% like an extension in the address's domain and fell back to a URL, so no
 %% `.pdf' was appended. That is not something to rely on (#328).
+%%
+%% The stored address is spliced into the target with \exp_not:V, not
+%% expanded again (#687). \CDossierFieldValue already returns the value
+%% unexpanded, so a second expansion is the only one: it turned a robust
+%% `\_' into the kernel's internal underscore command, and the target read
+%% `mailto:ada\protect \TU\textunderscore l@...' while the page looked right.
+%% Unexpanded, `\_' reaches hyperref as the web-profile branch below gives it,
+%% and becomes `_' there.
 \cs_new_protected:Npn \__cdossier_links_mail:n #1
   {
     \tl_set:Nx \l__cdossier_links_disp_tl { \CDossierFieldValue {#1} }
-    \tl_set:Nx \l__cdossier_links_url_tl
-      { \tl_to_str:n { mailto: } \l__cdossier_links_disp_tl }
+    \tl_set:Ne \l__cdossier_links_url_tl
+      { \tl_to_str:n { mailto: } \exp_not:V \l__cdossier_links_disp_tl }
     \__cdossier_links_link:VV \l__cdossier_links_url_tl \l__cdossier_links_disp_tl
   }
 
