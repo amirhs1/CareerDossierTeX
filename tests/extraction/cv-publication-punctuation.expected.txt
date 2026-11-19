@@ -1,0 +1,5 @@
+Ada Lovelace
+Publications
+1) Lovelace, A. Can Machines Think? J. Ex., 2026.
+2) Hopper, G. Engines That Compute! Proc. Ex. Invited talk.
+3) Grace Hopper. A Title Without Punctuation. Peer reviewed.

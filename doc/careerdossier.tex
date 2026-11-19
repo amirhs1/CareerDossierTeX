@@ -1517,7 +1517,7 @@ only inside that environment, and takes these keys:
 \key{title} & Yes & Publication title \\
 \key{venue} & No & Journal, book, conference, or publisher \\
 \key{date} & No & Year or display date \\
-\key{doi} & No & DOI value or complete DOI URL \\
+\key{doi} & No & DOI: a bare identifier, the same with a \texttt{doi:} prefix, a \texttt{doi.org/} path, or a complete DOI URL \\
 \key{url} & No & Fallback public URL \\
 \key{note} & No & Short status or contribution note \\
 \bottomrule
@@ -1528,7 +1528,25 @@ present, the DOI is the displayed link and the URL is the fallback. Each entry
 renders in this order: authors, italic title, the comma-joined present
 \key{venue} and \key{date} values, \key{note}, and the preferred visible
 identifier. Sentence punctuation is emitted only around present groups, so
-absent optional fields leave no stray separators.
+absent optional fields leave no stray separators, and a value that already ends
+in a full stop, a question mark, or an exclamation mark gets no second mark:
+\texttt{Lovelace, A.} and \texttt{Can Machines Think?} are followed directly by
+the next group.
+
+The \key{doi} key accepts four spellings of one identifier, and all four link
+to the same address. A bare identifier, \texttt{10.9999/example.2026.1}, links
+to \texttt{https://doi.org/10.9999/example.2026.1}. With a lower-case
+\texttt{doi:} prefix, \texttt{doi:10.9999/example.2026.1}, the prefix is dropped
+from the link. A \texttt{doi.org/} path gains \texttt{https://}, and a complete
+URL is used as supplied. The visible identifier is the value as written, so a
+prefixed value shows its prefix.
+
+The label box is as wide as the widest label the list prints, so from
+\texttt{10)} on the labels still start inside the text edge. The last label is
+known only once the list ends, so it is recorded in the auxiliary file and used
+on the next run. A list that reaches \texttt{10)} settles on the second run,
+which \texttt{latexmk} makes on its own, and until then LaTeX warns that
+another run is needed.
 
 \subsubsection{Numbering across grouped lists}
 

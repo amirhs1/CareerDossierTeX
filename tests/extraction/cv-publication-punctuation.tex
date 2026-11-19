@@ -1,0 +1,30 @@
+% cv-publication-punctuation.tex — issue #688: a publication value that
+% already ends in `.', `?', or `!' gets no second mark. False if the list adds
+% its period after authors, title, the venue and date group, or note whatever
+% the value ends with, as in `Lovelace, A.. Can Machines Think?.'. The
+% expected text is the issue's "Expected behavior" applied to each value.
+\documentclass{careerdossier-cv}
+\CDossierSetup{name={Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{
+    authors = {Lovelace, A.},
+    title   = {Can Machines Think?},
+    venue   = {J. Ex.},
+    date    = {2026}
+  }
+  \CDossierPublication{
+    authors = {Hopper, G.},
+    title   = {Engines That Compute!},
+    venue   = {Proc. Ex.},
+    note    = {Invited talk.}
+  }
+  \CDossierPublication{
+    authors = {Grace Hopper},
+    title   = {A Title Without Punctuation},
+    note    = {Peer reviewed}
+  }
+\end{CDossierPublications}
+\end{document}

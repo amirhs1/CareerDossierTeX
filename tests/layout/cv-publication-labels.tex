@@ -1,0 +1,26 @@
+% cv-publication-labels.tex — issue #688: every label of an 11-entry
+% CDossierPublications list starts at or inside the text edge. False if the
+% label box is sized from `1)' rather than from the widest label, which puts
+% `10)' and `11)' a digit's width into the margin. Property test: the edge is
+% the page's own leftmost non-label word, the section heading.
+%
+% LABELEDGE: 11
+\documentclass{careerdossier-cv}
+\CDossierSetup{name={Ada Lovelace}}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Publications}
+\begin{CDossierPublications}
+  \CDossierPublication{authors={Author 1}, title={Title 1}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 2}, title={Title 2}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 3}, title={Title 3}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 4}, title={Title 4}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 5}, title={Title 5}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 6}, title={Title 6}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 7}, title={Title 7}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 8}, title={Title 8}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 9}, title={Title 9}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 10}, title={Title 10}, venue={Venue}, date={2026}}
+  \CDossierPublication{authors={Author 11}, title={Title 11}, venue={Venue}, date={2026}}
+\end{CDossierPublications}
+\end{document}
