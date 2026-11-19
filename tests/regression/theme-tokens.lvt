@@ -8,7 +8,10 @@
 % *used* by a consumer, not only declared.
 %
 % `\CDossierPrimaryColor' is not tested here: it was retired in #270 for
-% reaching no consumer. See docs/MIGRATION.md.
+% reaching no consumer. The link-colour switch was retired in #727 for the same
+% reason: links take their colour from the name `cdossier-link', which the
+% `link-color-reaches-the-hyperref-hook' test below still asserts. See
+% docs/MIGRATION.md.
 %
 % Existence alone does not catch a token that nothing calls: #255 found the
 % same shape in the spacing fixtures, where 17 of 25 tokens were reported
@@ -25,12 +28,12 @@
 %     effect on the real page. The renewals last only until the end of the
 %     `\TEST' that makes them, because l3build runs each `\TEST' body inside
 %     a group.
-%   - `\CDossierLinkColor' is never called as a command by its consumer: the
-%     `package/hyperref/after' hook hands `hypersetup' the raw color name,
-%     because `allcolors' takes a color name, not a switch. What "used" means
-%     for this token is that hyperref's own link-color macro, `\@linkcolor',
-%     resolves to that same name -- proving the hook actually fired, which is
-%     exactly the class of bug #276 and #277 found in nearby hooks.
+%   - The link color has no switch: the `package/hyperref/after' hook hands
+%     `hypersetup' the raw color name, because `allcolors' takes a color name,
+%     not a switch. What "used" means for `cdossier-link' is that hyperref's
+%     own link-color macro, `\@linkcolor', resolves to that same name --
+%     proving the hook actually fired, which is exactly the class of bug #276
+%     and #277 found in nearby hooks.
 %
 % \extractcolorspec reports a color's model and specification as {model}{spec};
 % comparing that string is stable across xcolor versions.
@@ -90,7 +93,6 @@
   \cdossiertestTokenExists\CDossierTextColor
   \cdossiertestTokenExists\CDossierMutedColor
   \cdossiertestTokenExists\CDossierRuleColor
-  \cdossiertestTokenExists\CDossierLinkColor
 }
 
 \TEST{link-color-reaches-the-hyperref-hook}{
