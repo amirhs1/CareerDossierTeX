@@ -74,6 +74,14 @@ These entries keep the numbers they were written with.
 > joined `v0.11.0` with a third `entrymeta` value, `leader`, and its follow-up
 > [#682](https://github.com/amirhs1/CareerDossierTeX/issues/682) settled where
 > a lone location's leader starts.
+>
+> **Moved on 2026-11-19.**
+> [#96](https://github.com/amirhs1/CareerDossierTeX/issues/96), the NVDA pass on
+> Windows, and [#280](https://github.com/amirhs1/CareerDossierTeX/issues/280),
+> structural templates, left `v1.0.0` and have no milestone. The project has no
+> Windows machine to run the NVDA pass, and templates add no public interface,
+> so neither needs the freeze. The definition of `1.0.0` now asks for the
+> VoiceOver pass on the statement fixture (#274) alone.
 
 ## Releases and phases
 
@@ -251,8 +259,8 @@ named profiles pass veraPDF `ua2` and a three-extractor round trip
 VoiceOver pass on 2026-07-20 confirmed correct reading order with all
 decorative and repeated page furniture silent ("Screen-reader reading-order
 checks"). NVDA on Windows stays platform-deferred under
-[issue #96](https://github.com/amirhs1/CareerDossierTeX/issues/96), now in
-`v1.0.0`; the release documents that rather than claiming a Windows result.
+[issue #96](https://github.com/amirhs1/CareerDossierTeX/issues/96), which has
+no milestone; the release documents that rather than claiming a Windows result.
 
 ### Explicit non-goals
 
@@ -381,7 +389,7 @@ semantic colour tokens declared but never consumed.
   workflow instead.
 - a `templates/` folder. Proposed in
   [issue #280](https://github.com/amirhs1/CareerDossierTeX/issues/280), which
-  now carries `v1.0.0`; a non-goal of this release, not of the project.
+  has no milestone; a non-goal of this release, not of the project.
 
 ## Phase 8: `v0.9.0 — Documentation, Examples, and Release Readiness`
 
@@ -478,9 +486,9 @@ Declare a stable and fully documented interface.
 - deprecation policy is documented;
 - examples are complete;
 - CI verifies all supported configurations;
-- manual screen-reader passes are recorded for VoiceOver on the statement
-  fixture (#274) and NVDA on Windows (#96), so both sit together as one release
-  criterion;
+- a manual VoiceOver screen-reader pass is recorded for the statement fixture
+  (#274). The NVDA pass on Windows (#96) is not a release criterion: it has no
+  milestone until someone on Windows can run it;
 - the uploaded archive satisfies the CTAN packaging requirements, which
   [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
   states in full and this file does not restate (#448).
