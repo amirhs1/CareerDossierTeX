@@ -884,10 +884,10 @@ than 0 or 1, fails the lint rather than counting as a rejection.
 the docs-only path list, over the `docsonlyfixture-*` path lists and over a
 throwaway repository built under `build/`. A list that is docs-only but for one
 `.sty`, `doc/careerdossier.tex`, `Makefile`, `build.yml`, a rename into `docs/`,
-or the classifier itself is not docs-only, and nor is an empty change; a
-committed, staged, unstaged, or untracked change each counts; no `origin/main`
-and no git checkout are unclassified. An exit status other than 0, 1, or 2
-fails the lint.
+the classifier itself, or `README.md` or `CHANGELOG.md`, which the release
+archive ships, is not docs-only, and nor is an empty change; a committed,
+staged, unstaged, or untracked change each counts; no `origin/main` and no git
+checkout are unclassified. An exit status other than 0, 1, or 2 fails the lint.
 
 ### Shell-harness lint
 
