@@ -1102,28 +1102,31 @@ EOF
 
 fail=0
 
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+scratch="$root/build/fanout/layout"
+rm -rf "$scratch"
+mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
+
+# Required on both paths, before any fixture compiles (#693): a nullfont run
+# produces no overfull box, no stranded heading, and no underfull page, so it
+# passes every assertion above having typeset nothing. Under fan-out it matters
+# twice over: several LuaLaTeX processes racing to build a cold luaotfload cache
+# is when it goes wrong.
+fanout_warm_fonts "$scratch" || exit 1
+echo
+
 if [ "$jobs" -eq 1 ]; then
   for tex in "${fixtures[@]}"; do
     layout_fixture "$tex" || fail=1
   done
 else
-  # shellcheck source=tests/lib/fanout.sh
-  . "$root/tests/lib/fanout.sh"
-  scratch="$root/build/fanout/layout"
-  rm -rf "$scratch"
-  mkdir -p "$scratch" || { echo "cannot create $scratch" >&2; exit 2; }
-
   fanout_reset
   for tex in "${fixtures[@]}"; do
     fanout_add "${tex%.tex}" "layout_fixture '$tex'" || exit 2
   done
 
   echo "fixture concurrency: $jobs at a time (the gate is the serial run)"
-  # Required before fan-out: several LuaLaTeX processes racing to build a cold
-  # luaotfload cache is when it goes wrong, and a nullfont run produces no
-  # overfull box, no stranded heading, and no underfull page — it passes every
-  # assertion above having typeset nothing.
-  fanout_warm_fonts "$scratch" || exit 1
   echo
   fanout_run "$jobs" "$scratch"
   fanout_gather "$scratch"

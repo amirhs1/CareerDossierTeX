@@ -54,6 +54,13 @@ export TEXINPUTS="$root:${TEXINPUTS:-}"
 fail=0
 skipped=""
 
+# The glyph guard (#693): one small build, before any fixture compiles, that
+# must prove it typeset real glyphs. A nullfont build extracts no text, and a
+# check that finds no broken URL in no text reads exactly like a pass.
+# shellcheck source=tests/lib/fanout.sh
+. "$root/tests/lib/fanout.sh"
+fanout_warm_fonts "$root/build/glyph-guard/links" || exit 1
+
 have_biber=1
 if ! command -v biber > /dev/null 2>&1 || ! command -v latexmk > /dev/null 2>&1; then
   have_biber=0
