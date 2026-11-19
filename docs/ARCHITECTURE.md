@@ -656,8 +656,7 @@ a late, confusing font error appears. LuaLaTeX is the supported engine.
 project to. Neither is restated here. What belongs to this document is which
 surface owns what:
 
-- The manual, `doc/careerdossier.tex`, describes every public name. A name
-  absent from it is internal and may change without a migration note.
+- The manual, `doc/careerdossier.tex`, describes every public name.
 - Key families are split by responsibility rather than pooled into one global
   family:
 
