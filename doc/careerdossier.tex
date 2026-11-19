@@ -854,6 +854,14 @@ Any other value is used exactly as written, with only the \texttt{https://}
 scheme supplied when it carries none. A \texttt{www.}\ host, a trailing slash,
 and query parameters are all preserved.
 
+A value carries a scheme when it contains \texttt{://} or begins with
+\texttt{mailto:} or \texttt{tel:}, written in lower case. Every link value
+follows this one rule: \key{website}, \key{linkedin}, \key{github},
+\key{scholar}, \cmd{CDossierLink}, and a publication's \key{url}. Anything else gains \texttt{https://}, so
+\texttt{urn:} and \texttt{doi:} are not read as schemes, and neither is a port
+number: \texttt{example.org:8080/ada} links to
+\addr{https://example.org:8080/ada}.
+
 \key{website} has no canonical host by definition and is never expanded: a value
 with no \texttt{/} or \texttt{.}\ is displayed and linked exactly as written.
 \key{orcid} keeps its own normalization and its \texttt{ORCID:} label
@@ -1591,6 +1599,10 @@ from the link. A \texttt{doi.org/} path gains \texttt{https://}, and a complete
 URL is used as supplied. The visible identifier is the value as written, so a
 prefixed value shows its prefix.
 
+A \key{url} is normalized as \cmd{CDossierLink} is: a value with no scheme
+gains \texttt{https://}, and one with a scheme, a \texttt{mailto:} address
+among them, links as written (section~\ref{sec:webkeys}).
+
 The label box is as wide as the widest label the list prints, so from
 \texttt{10)} on the labels still start inside the text edge. The last label is
 known only once the list ends, so it is recorded in the auxiliary file and used
@@ -1643,7 +1655,8 @@ The supported way to put a link in body text --- a bullet, an entry, a letter
 paragraph, a statement paragraph. The argument is both the text that appears on
 the page and, once normalized, the link target: a value carrying no scheme gains
 \texttt{https://}, exactly as \key{website} does, and a value that has one keeps
-it. The displayed text is the argument as written, never the normalized target.
+it, \texttt{mailto:} and \texttt{tel:} among them
+(section~\ref{sec:webkeys}). The displayed text is the argument as written, never the normalized target.
 
 \cmd{CDossierLink} takes no bare identifier: body text has no service to expand
 one against (\S\ref{sec:webkeys}).
