@@ -1461,6 +1461,10 @@
 \ExplSyntaxOn
 
 \int_new:N \g__cdossier_components_listid_int
+%% This list's own serial (#686). The global counter has moved on by the time
+%% a list that holds a nested list ends, so the aux records are written under
+%% the serial the list took when it began.
+\int_new:N \l__cdossier_components_listid_int
 \int_new:N \l__cdossier_components_itemidx_int
 \int_new:N \l__cdossier_components_itemtotal_int
 %% This run's measurements, written to the aux at the list's end.
@@ -1608,6 +1612,8 @@
 \cs_new_protected:Npn \__cdossier_components_listpolicy_begin:
   {
     \int_gincr:N \g__cdossier_components_listid_int
+    \int_set_eq:NN \l__cdossier_components_listid_int
+      \g__cdossier_components_listid_int
     \int_zero:N \l__cdossier_components_itemidx_int
     \tl_set:Nx \l__cdossier_components_listkey_tl
       { cdossier@listlen@ \int_use:N \g__cdossier_components_listid_int }
@@ -1623,21 +1629,46 @@
       \l__cdossier_components_wasfirstlines_int { cdossier@listfirst@ }
     \__cdossier_components_listedge_read:Nn
       \l__cdossier_components_waslastlines_int { cdossier@listlast@ }
-    \cs_set_eq:NN \l__cdossier_components_saved_item \item
-    \cs_set_protected:Npn \item
+    %% Save the real `\item' only when it is not already the policy's own
+    %% (#686). Inside a nested list `\item' is the enclosing list's
+    %% wrapper, which calls the saved copy by name, so saving it again would
+    %% make the wrapper call itself. The enclosing list's copy is still in
+    %% scope and is the right one. The copy is taken here rather than at load
+    %% time because LaTeX Lab replaces `\item' at the start of a tagged
+    %% document.
+    \cs_if_eq:NNF \item \__cdossier_components_item:
+      { \cs_set_eq:NN \l__cdossier_components_saved_item \item }
+    \cs_set_eq:NN \item \__cdossier_components_item:
+  }
+
+%% The policy's `\item'. The kernel's `\item' and LaTeX Lab's both look for
+%% their optional label with the very next token, so the wrapper takes the
+%% `[<label>]' itself and hands it on directly after the real `\item' (#686);
+%% left in the input, it would sit behind the measurement below and be typeset
+%% as text after the default bullet. Spaces before the `[' are skipped, as the
+%% kernel skips them. The label is passed on braced, so a label that holds a
+%% `]' inside braces reaches the real `\item' whole.
+\cs_new_protected:Npn \__cdossier_components_item:
+  {
+    \peek_meaning_ignore_spaces:NTF [
+      { \__cdossier_components_item_label:w }
+      { \__cdossier_components_item_do:n { } }
+  }
+\cs_new_protected:Npn \__cdossier_components_item_label:w [ #1 ]
+  { \__cdossier_components_item_do:n { [ {#1} ] } }
+\cs_new_protected:Npn \__cdossier_components_item_do:n #1
+  {
+    \int_incr:N \l__cdossier_components_itemidx_int
+    \__cdossier_components_itempenalty:
+    \l__cdossier_components_saved_item #1
+    %% The real `\item' has just ended the preceding item's paragraph, so
+    %% `\prevgraf' is that item's line count -- and at item 2 the preceding
+    %% item is item 1. This is measurement for the *next* run; this run's
+    %% penalty above was decided from the last one.
+    \int_compare:nNnT { \l__cdossier_components_itemidx_int } = { 2 }
       {
-        \int_incr:N \l__cdossier_components_itemidx_int
-        \__cdossier_components_itempenalty:
-        \l__cdossier_components_saved_item
-        %% The real `\item' has just ended the preceding item's paragraph, so
-        %% `\prevgraf' is that item's line count -- and at item 2 the preceding
-        %% item is item 1. This is measurement for the *next* run; this run's
-        %% penalty above was decided from the last one.
-        \int_compare:nNnT { \l__cdossier_components_itemidx_int } = { 2 }
-          {
-            \int_set:Nn \l__cdossier_components_firstlines_int
-              { \tex_prevgraf:D }
-          }
+        \int_set:Nn \l__cdossier_components_firstlines_int
+          { \tex_prevgraf:D }
       }
   }
 
@@ -1713,10 +1744,10 @@
       }
       { \msg_warning:nn { careerdossier-components } { list-rerun } }
     \use:c { cdossier@writelistlen }
-      { \int_use:N \g__cdossier_components_listid_int }
+      { \int_use:N \l__cdossier_components_listid_int }
       { \int_use:N \l__cdossier_components_itemidx_int }
     \use:c { cdossier@writelistedge }
-      { \int_use:N \g__cdossier_components_listid_int }
+      { \int_use:N \l__cdossier_components_listid_int }
       { \int_use:N \l__cdossier_components_firstlines_int }
       { \int_use:N \l__cdossier_components_lastlines_int }
   }
