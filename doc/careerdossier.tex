@@ -981,12 +981,17 @@ the value and the expected form:
 \texttt{0000-0002-1825-009X7} & warns --- too long \\
 \addr{https://example.org/ada-lovelace} & warns --- not an ORCID address \\
 \addr{scholar.google.com/citations?user=example} & warns --- a value in the wrong key \\
+\addr{https://0000-0002-1825-0097} & warns --- a scheme with no \texttt{orcid.org/} host \\
+\texttt{www.0000-0002-1825-0097} & warns --- a \texttt{www.}\ with no \texttt{orcid.org/} host \\
 \bottomrule
 \end{longtable}
 
-An optional \texttt{www.}, a lowercase \texttt{x} checksum character, and one
-trailing slash are accepted without a warning: they resolve, and warning about a
-working value would only teach authors to ignore the warning that matters.
+An optional \texttt{www.}\ before the \texttt{orcid.org/} host, a lowercase
+\texttt{x} checksum character, and one trailing slash are accepted without a
+warning: they resolve, and warning about a working value would only teach
+authors to ignore the warning that matters. A scheme or a \texttt{www.}\ is part
+of an address only together with that host; without it the link would be
+broken, so the value warns.
 
 The check never stops the build, and nothing about the stored value, the link
 target, or the label depends on its outcome --- an author holding an identifier

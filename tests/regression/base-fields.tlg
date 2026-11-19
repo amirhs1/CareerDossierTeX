@@ -217,3 +217,24 @@ l. ...}
 The accepted values are BCP 47 language tags: a two- or three-letter language code, optionally followed by hyphen-separated subtags of one to eight letters or digits, for example en, en-GB, fr-CA, or es-419. The value was not recorded.
 [fr-CA]
 ============================================================
+============================================================
+TEST 32: orcid-scheme-without-the-host-warns-once
+============================================================
+Package careerdossier-base Warning: The 'orcid' value 'https://0000-0002-1825-0097' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+[https://0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 33: orcid-www-without-the-host-warns-once
+============================================================
+Package careerdossier-base Warning: The 'orcid' value 'www.0000-0002-1825-0097' does not look like an ORCID iD.
+(careerdossier-base)                An ORCID iD is sixteen digits in four hyphen-separated groups with a final digit or X, for example 0000-0002-1825-0097; a complete https://orcid.org/ URL is also accepted.
+(careerdossier-base)                The value is used as given, so check it before publishing.
+[www.0000-0002-1825-0097]
+============================================================
+============================================================
+TEST 34: orcid-www-with-the-host-is-accepted
+============================================================
+[https://www.orcid.org/0000-0002-1825-0097]
+============================================================

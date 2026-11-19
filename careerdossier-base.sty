@@ -176,15 +176,19 @@
 %% `ORCID:' label changes either way.
 %%
 %% One pattern covers every accepted form: the bare iD, optionally preceded by
-%% an `http://' or `https://' scheme, an optional `www.', and an optional
-%% `orcid.org/' host. A lowercase `x' checksum character and a single trailing
-%% slash are tolerated -- both are what an address bar hands back, and warning
-%% about a value that does resolve is the false alarm that teaches authors to
-%% ignore the real one. Spaces would be significant in the pattern, so it
-%% carries none.
+%% the `orcid.org/' host, which may itself carry an `http://' or `https://'
+%% scheme and a `www.'. The scheme and the `www.' sit inside the host's group
+%% on purpose (#740): as three independent optional groups they let
+%% `https://0000-...' and `www.0000-...' through, and neither is an address --
+%% careerdossier-links links the first as written and prefixes the second
+%% with `https://orcid.org/', and both links are broken. A lowercase `x'
+%% checksum character and a single trailing slash are tolerated -- both are
+%% what an address bar hands back, and warning about a value that does resolve
+%% is the false alarm that teaches authors to ignore the real one. Spaces
+%% would be significant in the pattern, so it carries none.
 %% ---------------------------------------------------------------------------
 \regex_const:Nn \c__cdossier_base_orcid_regex
-  { \A(?:https?://)?(?:www\.)?(?:orcid\.org/)?\d{4}-\d{4}-\d{4}-\d{3}[0-9Xx]/?\Z }
+  { \A(?:(?:https?://)?(?:www\.)?orcid\.org/)?\d{4}-\d{4}-\d{4}-\d{3}[0-9Xx]/?\Z }
 \str_new:N \l__cdossier_base_orcid_str
 
 \cs_new_protected:Npn \__cdossier_base_orcid_check:n #1
