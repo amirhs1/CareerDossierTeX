@@ -13,11 +13,22 @@ entry is required and the shape it takes; the stability policy it serves is in
 
 ## Status
 
-`v0.11.0` is the current published release. Each line says whether a release
+`v0.12.0` is the current published release. Each line says whether a release
 needs a source edit and whether documents reflow; its section has the detail
 and the recipes. A document coming from `v0.5.x` or earlier needs every section
 from `v0.6.0` up.
 
+- [`v0.12.0`](#0120---2026-11-20): a source edit only where a document names
+  `\CDossierLinkColor` or `\CDossierListOrphanPenalty`, passes a key to a
+  statement's `\CDossierSection`, writes a `\CDossierHeaderLine` with no
+  `\CDossierHeaderBegin` before it, or passes `\CDossierFieldValue` an unknown
+  field name: each now stops with an error. A resume or CV whose section
+  heading falls near the foot of a page can break up to about two lines
+  earlier. Some output changes with no source edit and no section here: a
+  publication list's label width, a blank letter `date`, `salutation`, or
+  `closing`, the PDF `/Title` and `/Author` under `pdfusetitle`, a location
+  with no organization under `entrymeta=leader`, and the structure of a tagged
+  entry heading; [`CHANGELOG.md`](../CHANGELOG.md) lists them.
 - [`v0.11.0`](#0110---2026-11-06): no source edit. A document that passes no
   `medium` option loses its running header and `Page N of M` folio and
   underlines `\href` text; `medium=print` restores it. Every resume and CV
@@ -302,7 +313,7 @@ requires no migration. To try it, add `\DocumentMetadata` before
 Tagged output is a tested preview for the five fixture profiles only and carries
 no PDF/UA, WCAG, or ATS conformance claim. See the manual for scope.
 
-## [Unreleased]
+## [0.12.0] - 2026-11-20
 
 ### `\CDossierFieldValue` stops on an unknown field name
 

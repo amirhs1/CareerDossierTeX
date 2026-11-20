@@ -8,25 +8,28 @@ and the options at a glance. The PDF manual — `make manual`, or the
 reference; [`CONTRIBUTING.md`](CONTRIBUTING.md) is for people changing the
 code.
 
-> **Status:** `v0.11.0 — Interface Changes` is the current published release.
-> It ships the last breaking and additive interface changes before `v1.0.0`
-> freezes the interface, so that they are used in a release first.
+> **Status:** `v0.12.0 — Pre-freeze Corrections` is the current published
+> release. It fixes the defects and settles the public names that the
+> 2026-11-07 repository review found, before `v1.0.0` freezes the interface,
+> because after the freeze each such change would need a major release.
 >
-> **Two defaults change, and each is restored with one line.** A document that
-> passes no `medium` option now renders as `medium=screen`: no running header or
-> `Page N of M` folio, and author-written `\href` text underlined. A resume or CV
-> leaves more white below each section rule, as much as a statement leaves below
-> a section heading, so a document that fills its last page may gain one.
+> **Six breaking changes, each with its recipe.** `\CDossierLinkColor` is
+> removed, and `\CDossierListOrphanPenalty` is renamed
+> `\CDossierListInteriorPenalty`. An unknown field name in
+> `\CDossierFieldValue`, a key on a statement's `\CDossierSection`, and a
+> `\CDossierHeaderLine` outside a header stack now stop with an error. A
+> section heading needs nine lines of room instead of four, so one near the
+> foot of a page moves to the next page with its first entry.
 >
-> **Added:** a `language` key for `\CDossierSetup`, which declares the document
-> language for the PDF's `/Lang`; an `entrymeta` key on `\CDossierSection` in
-> the resume and CV, so one section can use another layout; and a third
-> `entrymeta` value, `leader`, which fills the gap before an entry's dates with a
-> dotted leader, set by `\CDossierEntryMetaLeader` and
-> `\CDossierEntryMetaLeaderSep`. A bibliography now follows a later change to
-> `\CDossierListLabelSep` or `\CDossierRecordItemSepSkip`, and the manual
-> documents the public names that survived the `v0.10.0` classification. See
-> [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade path.
+> **Added:** `\CDossierListEdgeKeepPenalty`, and a "Troubleshooting" section in
+> the manual. **Fixed:** nested `CDossierItemize` lists and item labels; the
+> publication list's label width, `doi:` prefixes, and doubled periods; blank
+> letter fields; stored text in the PDF `/Title` and `mailto:` targets;
+> `mailto:` and `tel:` link values; and, in tagged output, the separators
+> VoiceOver read on a statement's application line and in an
+> `entrymeta=inline` entry heading. The minimum LaTeX kernel is now
+> `2024-11-01`. See [`docs/MIGRATION.md`](docs/MIGRATION.md) for the upgrade
+> path.
 >
 > Before `v1.0.0` the public interface may still change between minor versions;
 > such changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) and
@@ -487,7 +490,7 @@ supported examples should be treated as supported.
 The current release is:
 
 ```text
-v0.11.0 — Interface Changes
+v0.12.0 — Pre-freeze Corrections
 ```
 
 Source archives and selected example PDFs are available through GitHub Releases.
@@ -495,9 +498,9 @@ Source archives and selected example PDFs are available through GitHub Releases.
 ## Roadmap
 
 Everything in the support matrix above is in the current release, named under
-[Releases](#releases). Two releases remain planned: `v0.12.0` ships the
-corrections that the freeze must not wait for, and `v1.0.0` then declares the
-public interface stable and fully documented. Nothing is scheduled after that.
+[Releases](#releases). One release remains planned: `v1.0.0` declares the
+public interface stable and fully documented, after every file is reviewed.
+Nothing is scheduled after that.
 
 [`docs/ROADMAP.md`](docs/ROADMAP.md#releases-and-phases) owns the release table —
 every version, its goal, its status, and its phase, including the two milestones
