@@ -89,7 +89,7 @@ should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
 | TeX Live | 2024 — the release carrying that kernel | 2026 |
 | Engine | LuaHBTeX (any release providing the above) | LuaHBTeX 1.24.0 |
 | `pdfmanagement-testphase` (tagged preview only) | — | 0.97c (2026-05-26) |
-| `tagpdf` (tagged preview only) | — | 1.0c (2026-05-17) |
+| `tagpdf` (tagged preview only) | — | 1.0d (2026-07-25) locally; 1.0c (2026-05-17) in CI |
 
 The two columns answer different questions, and the difference is deliberate.
 
@@ -353,8 +353,9 @@ Those five profiles were independently verified: each passes the **veraPDF**
 PDF/UA-2 validator, their text extraction agrees across **Poppler, MuPDF, and
 Apple PDFKit**. A **macOS VoiceOver** reading-order pass covered the four
 `v0.4.0` profiles and confirmed that headings, lists, and links are announced
-correctly while decorative rules and repeated page furniture stay silent; the
-statement fixture has not received a screen-reader pass. The screen-reader procedure and its
+correctly while decorative rules and repeated page furniture stay silent. The
+statement fixture's pass on 2026-11-20 failed one item: VoiceOver announces the
+separator on its application line. The screen-reader procedure and its
 recorded result are in
 [`docs/TESTING.md`](docs/TESTING.md#screen-reader-reading-order-checks); the
 toolchain each run was measured on is written to `tests/tagging/reports/`.
