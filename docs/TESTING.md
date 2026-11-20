@@ -601,8 +601,10 @@ checks that structure exists and is well-formed; only a screen reader shows
 whether decorative rules stay silent and whether headings, entries, and contact
 lines arrive in a sensible order.
 
-> **Status: macOS done, Windows outstanding.** A VoiceOver pass was performed by
-> the maintainer on 2026-07-20; results below. The NVDA pass has not been run.
+> **Status: macOS done for four of the five tagged profiles, Windows
+> outstanding.** A VoiceOver pass was performed by the maintainer on
+> 2026-07-20; results below. The statement fixture's VoiceOver pass has not
+> been performed yet. The NVDA pass has not been run.
 
 **macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
 Read top to bottom with `VO`+`→` over all four tagged fixtures.
@@ -639,6 +641,24 @@ link would misreport the link's extent. No change is warranted.
 > `Page N` wording. The folio now reads `Page N of M`; its artifact marking was
 > re-verified programmatically and is unchanged, but a quick re-listen to
 > `cv.pdf` page two would fully close this out.
+
+**macOS / VoiceOver (⌘F5), statement fixture — not yet performed.** The
+statement fixture (`tests/tagging/statement.tex`) arrived after the 2026-07-20
+pass, and its headings use the kernel's sectioning machinery rather than the
+shared display primitive, so its structure tree differs from the four above.
+Its pass is tracked in
+[issue #274](https://github.com/amirhs1/CareerDossierTeX/issues/274). Read top
+to bottom with `VO`+`→`, as above; no item below has a result yet.
+
+- [ ] headings announced as headings, in source order;
+- [ ] no list announced — the fixture contains none;
+- [ ] the contact line announced as one coherent run — no merged words, no
+      character-by-character spelling;
+- [ ] links announced as links;
+- [ ] horizontal rules and separators **not** announced;
+- [ ] the running header (`<name> -- <running-title>`) **not** announced on
+      page two; and
+- [ ] the `Page N of M` folio **not** announced on either page.
 
 **Windows / NVDA — deferred.** This project has no Windows machine and CI has no
 Windows runner, so the NVDA pass is platform-deferred rather than complete. The
