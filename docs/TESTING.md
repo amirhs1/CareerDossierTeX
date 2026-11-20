@@ -606,7 +606,8 @@ lines arrive in a sensible order.
 > 2026-11-20 (the statement fixture: one item failed on the `9262394` build,
 > and a re-listen after its fix found the separator silent; and the three
 > `entrymeta` fixtures: the `inline` separator was announced and the `leader`
-> fill was not); results below. The NVDA pass has not been run.
+> fill was not, and a re-listen after its fix found the separator silent);
+> results below. The NVDA pass has not been run.
 
 **macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
 Read top to bottom with `VO`+`→` over all four tagged fixtures.
@@ -687,7 +688,8 @@ silent". The macOS version and the viewer for this listen were not stated.
 The re-listen covered the application line's separator only: the other six
 items were not re-judged on this build.
 
-**macOS / VoiceOver, entry-heading joins — performed 2026-11-20, Preview.**
+**macOS / VoiceOver (⌘F5), entry-heading joins, macOS 15.7.5 — performed
+2026-11-20, Preview.**
 `entrymeta=inline` and `entrymeta=leader` arrived after the 2026-07-20 pass.
 The maintainer listened to three PDFs that `make tagging FIXTURE=entrymeta`
 built at commit `27a19f7`:
@@ -696,8 +698,7 @@ built at commit `27a19f7`:
 Experience section is `column`
 ([issue #767](https://github.com/amirhs1/CareerDossierTeX/issues/767)). In
 each, one `text` structure element held a whole heading line, so the join's
-layout artifact sat inside it. The macOS version was not stated. As heard, from
-the maintainer's transcripts:
+layout artifact sat inside it. As heard, from the maintainer's transcripts:
 
 - **announced:** the `inline` separator, at every place listened to:
   "Engineer, vertical line, 2024 to 2026", "Example Labs, vertical line,
@@ -717,8 +718,29 @@ The separator failed checklist item 5. The leader passed it, although it sat
 inside one element exactly as the separator did, so that structure is not
 always heard. [Issue #767](https://github.com/amirhs1/CareerDossierTeX/issues/767)
 gives each heading cell its own element under every `entrymeta` value, which
-`tests/tagging/artifact-straddle.pl` now checks for these fixtures. The
-re-listen after that change has not been run.
+`tests/tagging/artifact-straddle.pl` now checks for these fixtures.
+
+**Re-listen after the fix — 2026-11-20, macOS 15.7.5, Preview.** The
+maintainer listened to the same three fixtures, built by `make tagging
+FIXTURE=entrymeta` at commit `6fe2739`. There each heading cell is its own
+`text` element ([PR #769](https://github.com/amirhs1/CareerDossierTeX/pull/769)),
+and a location with no organization has no leader before it
+([PR #770](https://github.com/amirhs1/CareerDossierTeX/pull/770)). As reported:
+
+- **not announced:** "vertical line", at any of the seven `inline` places;
+- **not announced:** the `leader` fill;
+- **changed:** VoiceOver reads each cell of a heading as its own item: the
+  title, the dates, the organization, and the location. Before the fix, the
+  title and the dates were one item, and the organization and the location
+  another.
+
+Two other structures were built for this listen and not committed: one `text`
+element per line with each cell a `Span` inside it, and one with the title as
+the line's own text and the dates a `Span` inside it. VoiceOver read the cells
+of both as separate items too, and announced neither the separator nor the
+leader. So one item per line came only with the structure under which the
+separator was announced. The per-cell structure is kept: a listener hears
+every cell, in order, and no separator.
 
 **Windows / NVDA — deferred.** This project has no Windows machine and CI has no
 Windows runner, so the NVDA pass is platform-deferred rather than complete. The
