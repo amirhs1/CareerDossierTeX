@@ -638,9 +638,11 @@ link stops, which is information a listener needs. Merging the period into the
 link would misreport the link's extent. No change is warranted.
 
 > **Note:** the VoiceOver pass above covered the CV folio in its previous
-> `Page N` wording. The folio now reads `Page N of M`; its artifact marking was
-> re-verified programmatically and is unchanged, but a quick re-listen to
-> `cv.pdf` page two would fully close this out.
+> `Page N` wording. The folio now reads `Page N of M`. Its artifact marking was
+> re-verified programmatically, and on 2026-11-20 (macOS 15.7.5, Preview) the
+> maintainer re-listened to `cv.pdf` page two, built by `make tagging` at
+> commit `9262394`. The running header and the `Page N of M` folio were **not**
+> announced, which closes this note.
 
 **macOS / VoiceOver (⌘F5), statement fixture, macOS 15.7.5 — performed
 2026-11-20, Preview.** The statement fixture (`tests/tagging/statement.tex`)
