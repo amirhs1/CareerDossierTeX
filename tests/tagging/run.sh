@@ -982,6 +982,44 @@ check_structure_text_inline_joins() {
   done
 }
 
+# No layout artifact inside one structure element's content (#759).
+#
+# A separator marked /Artifact<</Type /Layout>> is skipped by assistive
+# technology only when it falls between structure elements. On the statement's
+# application line one `text' element owned the content on both sides of the
+# ` | ', and VoiceOver read it aloud as "vertical line" in the #274 pass, while
+# veraPDF, the extraction matrix, and check_structure_text above all passed:
+# each reads marked content, and none asks which element owns the content
+# around an artifact. artifact-straddle.pl asks exactly that and prints one
+# line per text-bearing layout artifact whose neighbouring runs on both sides
+# belong to one element.
+#
+# A property check with no reference value: the expected output is empty.
+#
+# It runs for the five profiles only. Run over every fixture group on
+# 2026-11-20 it also flagged resume-entrymeta-inline, resume-entrymeta-leader,
+# and resume-section-entrymeta, where an entry heading's inline separator or
+# leader sits inside one `text' element. That is outside #759, so those
+# groups do not run it until their own fix lands.
+check_artifact_straddle() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+  local got="$work/$base.straddle"
+
+  if ! perl "$here/artifact-straddle.pl" "$pdf" >"$got" 2>"$got.err"; then
+    record_failure "$base layout artifacts could not be checked against their structure elements"
+    sed 's/^/    /' "$got.err"
+    return
+  fi
+  if [ -s "$got" ]; then
+    record_failure \
+      "$base has a layout artifact inside one structure element's content (page, MCID before, MCID after, element, role):"
+    sed 's/^/    /' "$got"
+  else
+    echo "  VERIFIED: every text-bearing layout artifact falls between structure elements"
+  fi
+}
+
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
 # disagree on how to linearize the two-column entry header, so each owns a
 # baseline; sharing one would only record whichever library ran last.
@@ -1235,6 +1273,7 @@ tagging_profile() {
   check_page_two_artifact_stream "$base"
   check_extraction "$base"
   check_structure_text "$base"
+  check_artifact_straddle "$base"
   # The two-cell rows this profile actually renders, as "separated|glued".
   # Every one of these passed the extraction baselines above while glued.
   case "$base" in
