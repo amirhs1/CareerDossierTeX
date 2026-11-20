@@ -659,7 +659,8 @@ as above, over the PDF `make tagging` built at commit `9262394`
 - [ ] **failed:** horizontal rules and separators **not** announced.
       VoiceOver announced "vertical line" between "Application for Faculty
       Role" and "Application ID: APP-104". The separators on the contact line
-      were not announced;
+      were not announced. Tracked in
+      [issue #759](https://github.com/amirhs1/CareerDossierTeX/issues/759);
 - [x] the running header (`<name> -- <running-title>`) **not** announced on
       page two; and
 - [x] the `Page N of M` folio **not** announced on either page.
