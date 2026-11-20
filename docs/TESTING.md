@@ -601,10 +601,10 @@ checks that structure exists and is well-formed; only a screen reader shows
 whether decorative rules stay silent and whether headings, entries, and contact
 lines arrive in a sensible order.
 
-> **Status: macOS done for four of the five tagged profiles, Windows
-> outstanding.** A VoiceOver pass was performed by the maintainer on
-> 2026-07-20; results below. The statement fixture's VoiceOver pass has not
-> been performed yet. The NVDA pass has not been run.
+> **Status: macOS done, with one failure on the statement fixture; Windows
+> outstanding.** VoiceOver passes were performed by the maintainer on
+> 2026-07-20 (four fixtures, every item passed) and 2026-11-20 (the statement
+> fixture, one item failed); results below. The NVDA pass has not been run.
 
 **macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
 Read top to bottom with `VO`+`→` over all four tagged fixtures.
@@ -642,23 +642,30 @@ link would misreport the link's extent. No change is warranted.
 > re-verified programmatically and is unchanged, but a quick re-listen to
 > `cv.pdf` page two would fully close this out.
 
-**macOS / VoiceOver (⌘F5), statement fixture — not yet performed.** The
-statement fixture (`tests/tagging/statement.tex`) arrived after the 2026-07-20
-pass, and its headings use the kernel's sectioning machinery rather than the
-shared display primitive, so its structure tree differs from the four above.
-Its pass is tracked in
-[issue #274](https://github.com/amirhs1/CareerDossierTeX/issues/274). Read top
-to bottom with `VO`+`→`, as above; no item below has a result yet.
+**macOS / VoiceOver (⌘F5), statement fixture, macOS 15.7.5 — performed
+2026-11-20, Preview.** The statement fixture (`tests/tagging/statement.tex`)
+arrived after the 2026-07-20 pass, and its headings use the kernel's
+sectioning machinery rather than the shared display primitive, so its
+structure tree differs from the four above. Read top to bottom with `VO`+`→`,
+as above, over the PDF `make tagging` built at commit `9262394`
+([issue #274](https://github.com/amirhs1/CareerDossierTeX/issues/274)).
 
-- [ ] headings announced as headings, in source order;
-- [ ] no list announced — the fixture contains none;
-- [ ] the contact line announced as one coherent run — no merged words, no
-      character-by-character spelling;
-- [ ] links announced as links;
-- [ ] horizontal rules and separators **not** announced;
-- [ ] the running header (`<name> -- <running-title>`) **not** announced on
+- [x] headings announced as headings, in source order;
+- [x] no list announced — the fixture contains none;
+- [x] the contact line announced as one coherent run — no merged words, no
+      character-by-character spelling. The ORCID is read in four-digit
+      groups, which was judged acceptable;
+- [x] links announced as links;
+- [ ] **failed:** horizontal rules and separators **not** announced.
+      VoiceOver announced "vertical line" between "Application for Faculty
+      Role" and "Application ID: APP-104". The separators on the contact line
+      were not announced;
+- [x] the running header (`<name> -- <running-title>`) **not** announced on
       page two; and
-- [ ] the `Page N of M` folio **not** announced on either page.
+- [x] the `Page N of M` folio **not** announced on either page.
+
+**One item failed.** The application line's separator is announced, so on the
+statement fixture decorative furniture is not fully silent to VoiceOver.
 
 **Windows / NVDA — deferred.** This project has no Windows machine and CI has no
 Windows runner, so the NVDA pass is platform-deferred rather than complete. The
