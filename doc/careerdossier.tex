@@ -686,7 +686,10 @@ All three values are equivalent on the tagged path: the separator and the
 leader are emitted as layout artifacts, exactly as the contact line's
 \texttt{|} is, so a consumer reading the structure tree receives the same
 logical text under every value and assistive technology is not made to announce
-a vertical bar or a row of periods.
+a vertical bar or a row of periods. Each cell of a heading line is its own
+structure element under every value, so a mark falls between two elements, as
+on the contact line: while one element held the whole line, VoiceOver announced
+the \opt{inline} separator as ``vertical line''.
 
 \paragraph{\cmd{CDossierEntryMetaSeparator}} is the mark \opt{entrymeta=inline}
 places between two cells, with its surrounding space. The default is

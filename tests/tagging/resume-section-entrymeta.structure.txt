@@ -21,15 +21,19 @@
 1	20	subsection	Experience
 1	21	text	
 1	22	text	
-1	23	text	Engineer 2024–2026
-1	24	text	Example Labs Toronto
-1	25	itemlabel	•
-1	26	text	First column achievement in source order.
+1	23	text	Engineer 
+1	24	text	2024–2026
+1	25	text	Example Labs 
+1	26	text	Toronto
 1	27	itemlabel	•
-1	28	text	Second column achievement with a meaningful 
-1	29	Link	work link
-1	30	text	.
-1	31	text	Associate Engineer 2022–2024
-1	32	text	Example Services Ottawa
-1	33	itemlabel	•
-1	34	text	Later column achievement that follows the first entry on the same page.
+1	28	text	First column achievement in source order.
+1	29	itemlabel	•
+1	30	text	Second column achievement with a meaningful 
+1	31	Link	work link
+1	32	text	.
+1	33	text	Associate Engineer 
+1	34	text	2022–2024
+1	35	text	Example Services 
+1	36	text	Ottawa
+1	37	itemlabel	•
+1	38	text	Later column achievement that follows the first entry on the same page.

@@ -6,13 +6,15 @@
 1	5	subsection	Experience
 1	6	text	
 1	7	text	
-1	8	text	Engineer 2024–2026
-1	9	text	Example Labs Toronto
-1	10	itemlabel	•
-1	11	text	Shipped the analytical engine, documented in a 
-1	12	Link	public write-up
-1	13	text	 that a reader can follow.
-1	14	itemlabel	•
-1	15	text	An address the reader sees in full: 
-1	16	Link	example.test/notes
-1	17	text	.
+1	8	text	Engineer 
+1	9	text	2024–2026
+1	10	text	Example Labs 
+1	11	text	Toronto
+1	12	itemlabel	•
+1	13	text	Shipped the analytical engine, documented in a 
+1	14	Link	public write-up
+1	15	text	 that a reader can follow.
+1	16	itemlabel	•
+1	17	text	An address the reader sees in full: 
+1	18	Link	example.test/notes
+1	19	text	.

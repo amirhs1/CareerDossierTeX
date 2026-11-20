@@ -1361,15 +1361,47 @@
 %% kerns. The gap here was that tagpdf marks only glue with a positive natural
 %% width, and `\hfill' has none. See tests/tagging/*.structure.txt.
 %%
+%% Under tagging, each cell is its own `text' structure element, and each
+%% heading line turns automatic paragraph tagging off, as
+%% \__cdossier_typography_heading:nnn does for a heading line, so the cell
+%% elements are not nested inside a paragraph's own (#767). With the whole
+%% line in one paragraph element, the `inline' separator's layout artifact sat
+%% inside that element's content, and VoiceOver announced it as "vertical
+%% line" (2026-11-20). The join -- its word boundary and its mark -- is typeset
+%% at the end of the cell it follows, inside that cell's element: the word
+%% boundary must reach the structure text, and the mark, being an artifact,
+%% ends the cell's marked content, so it falls between two elements, as the
+%% contact line's separators do. The untagged branch typesets the same tokens
+%% in the same order as before.
+%%
 %% #1 title (required, nonblank), #2 organization, #3 location, #4 dates.
 %% ---------------------------------------------------------------------------
+\cs_new_protected:Npn \__cdossier_components_entryline:n #1
+  {
+    \tag_if_active:TF
+      {
+        \UseTaggingSocket { para/off }
+        \noindent #1 \par
+        \UseTaggingSocket { para/restore }
+      }
+      { \noindent #1 \par }
+  }
+
 \cs_new_protected:Npn \__cdossier_components_entryhead:nnnn #1#2#3#4
   {
-    \noindent
-    { \CDossierEntryTitleStyle #1 }
-    \tl_if_blank:nF {#4}
-      { \__cdossier_components_entryjoin: { \CDossierMutedStyle #4 } }
-    \par
+    \__cdossier_components_entryline:n
+      {
+        \__cdossier_typography_text_content:n
+          {
+            { \CDossierEntryTitleStyle #1 }
+            \tl_if_blank:nF {#4} { \__cdossier_components_entryjoin: }
+          }
+        \tl_if_blank:nF {#4}
+          {
+            \__cdossier_typography_text_content:n
+              { { \CDossierMutedStyle #4 } }
+          }
+      }
     \bool_lazy_or:nnT
       { ! \tl_if_blank_p:n {#2} }
       { ! \tl_if_blank_p:n {#3} }
@@ -1378,44 +1410,46 @@
         %% one visual heading unit (#145). Without this, the two lines could land on
         %% opposite sides of a page break.
         \penalty \CDossierHeadingKeepPenalty
-        \noindent
-        \tl_if_blank:nF {#2} { { \CDossierBodyStyle #2 } }
-        \tl_if_blank:nF {#3}
+        \__cdossier_components_entryline:n
           {
-            %% The join is guarded here rather than taken from
-            %% \__cdossier_components_entryjoin:, because this is the one place
-            %% where the values need differently shaped guards.
-            %%
-            %% An organization-less entry must not open its line with a
-            %% separator -- rule 5's stray "|", on the horizontal axis -- so the
-            %% visible mark and the fake space are both conditional on #2. But
-            %% `column's `\hfill' is not a separator at all: it is what puts a
-            %% lone location at the right margin, which is exactly where the
-            %% column form wants it whether or not an organization precedes it.
-            %% Hoisting it into the guard would move that location to the left
-            %% margin, so it stays unconditional.
-            %%
-            %% `leader' takes `column's shape with the leader in the \hfill's
-            %% place. A leader opening the line would be the stray separator
-            %% again (#678), so a lone location's leader starts where the
-            %% title ends (#682), with no fake space, since nothing precedes
-            %% it on the line.
-            \str_case:Vn \l__cdossier_components_entrymeta_tl
+            \tl_if_blank:nTF {#2}
               {
-                { column }
-                  { \tl_if_blank:nF {#2} { \pdffakespace } \hfill }
-                { inline }
-                  { \tl_if_blank:nF {#2} { \CDossierEntryMetaSeparator } }
-                { leader }
+                %% An organization-less entry must not open its line with a
+                %% separator -- rule 5's stray "|", on the horizontal axis --
+                %% so the visible mark and the fake space are both absent
+                %% here. But `column's `\hfill' is not a separator at all: it
+                %% is what puts a lone location at the right margin, which is
+                %% exactly where the column form wants it whether or not an
+                %% organization precedes it, so it stays.
+                %%
+                %% `leader' takes `column's shape with the leader in the
+                %% \hfill's place. A leader opening the line would be the
+                %% stray separator again (#678), so a lone location's leader
+                %% starts where the title ends (#682), with no fake space,
+                %% since nothing precedes it on the line.
+                \tl_if_blank:nF {#3}
                   {
-                    \tl_if_blank:nTF {#2}
-                      { \__cdossier_components_entryleader_lone:nn {#1} {#3} }
-                      { \pdffakespace \__cdossier_components_entryleader: }
+                    \str_case:Vn \l__cdossier_components_entrymeta_tl
+                      {
+                        { column } { \hfill }
+                        { leader }
+                          { \__cdossier_components_entryleader_lone:nn {#1} {#3} }
+                      }
                   }
               }
-            { \CDossierMutedStyle #3 }
+              {
+                \__cdossier_typography_text_content:n
+                  {
+                    { \CDossierBodyStyle #2 }
+                    \tl_if_blank:nF {#3} { \__cdossier_components_entryjoin: }
+                  }
+              }
+            \tl_if_blank:nF {#3}
+              {
+                \__cdossier_typography_text_content:n
+                  { { \CDossierMutedStyle #3 } }
+              }
           }
-        \par
       }
   }
 \cs_generate_variant:Nn \__cdossier_components_entryhead:nnnn { VVVV }

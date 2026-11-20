@@ -925,10 +925,10 @@ check_structure_text_separators() {
   done
 }
 
-# The `entrymeta=inline' form of the assertion above (#230).
+# The entry-heading form of the assertion above (#230, #767).
 #
-# It needs its own function because the inline separator is a marked-content
-# artifact, and an artifact interrupts the enclosing run: `Engineer | 2024-2026'
+# It needs its own function because each cell of an entry heading is its own
+# structure element, under every `entrymeta' value (#767), so `Engineer 2024-2026'
 # decodes as the two runs `Engineer ' and `2024-2026' rather than as one. The
 # per-line grep above would therefore find neither the separated form nor the
 # glued one and report the fixture as changed, which is not what happened. So
@@ -937,7 +937,8 @@ check_structure_text_separators() {
 # are made against that string.
 #
 # Three forms per join, and all three are named rather than derived, because
-# each fails for a different reason:
+# each fails for a different reason. The barred form may be empty, for a
+# `column' heading, whose join has no mark:
 #
 #   separated  what the joined text must be — and it is character-for-character
 #              what the `column' form of the same heading produces, which is the
@@ -971,7 +972,7 @@ check_structure_text_inline_joins() {
     rest="${triple#*::}"
     glued="${rest%%::*}"
     barred="${rest#*::}"
-    if grep -Fq "$barred" "$joined"; then
+    if [ -n "$barred" ] && grep -Fq "$barred" "$joined"; then
       record_failure \
         "$base joined structure text contains '$barred': the join's mark (the inline separator or the leader) is reaching the structure tree as content instead of as a layout artifact"
     elif grep -Fq "$glued" "$joined"; then
@@ -999,11 +1000,14 @@ check_structure_text_inline_joins() {
 #
 # A property check with no reference value: the expected output is empty.
 #
-# It runs for the five profiles only. Run over every fixture group on
-# 2026-11-20 it also flagged resume-entrymeta-inline, resume-entrymeta-leader,
-# and resume-section-entrymeta, where an entry heading's inline separator or
-# leader sits inside one `text' element. That is outside #759, so those
-# groups do not run it until their own fix lands.
+# It runs for the five profiles and for the three entrymeta groups. In those
+# groups it flagged every entry heading with a join, because one `text'
+# element held the whole heading line. On 2026-11-20 the maintainer listened
+# to those PDFs with VoiceOver (#767): it announced "vertical line" at every
+# `inline' separator, and said nothing at any `leader' fill, though both sat
+# inside one element alike. So the structure this check rejects is not always
+# heard; it is what made the separator heard. Each heading cell is now its own
+# element under every `entrymeta' value, and the check holds for all three.
 check_artifact_straddle() {
   local base="$1"
   local pdf="$work/$base.pdf"
@@ -1277,21 +1281,24 @@ tagging_profile() {
   check_extraction "$base"
   check_structure_text "$base"
   check_artifact_straddle "$base"
-  # The two-cell rows this profile actually renders, as "separated|glued".
-  # Every one of these passed the extraction baselines above while glued.
+  # The two-cell rows this profile actually renders. Every one of these
+  # passed the extraction baselines above while glued. An entry heading's
+  # cells are separate elements (#767), so its rows are checked on the joined
+  # text, as "separated::glued::" with no barred form under `column'; the
+  # letters' rows are one run each, as "separated|glued".
   case "$base" in
     resume)
-      check_structure_text_separators resume \
-        'Engineer 2024–2026|Engineer2024–2026' \
-        'Example Labs Toronto|Example LabsToronto' \
-        'Senior Engineer 2022–2024|Senior Engineer2022–2024' \
-        'Example Services Ottawa|Example ServicesOttawa'
+      check_structure_text_inline_joins resume \
+        'Engineer 2024–2026::Engineer2024–2026::' \
+        'Example Labs Toronto::Example LabsToronto::' \
+        'Senior Engineer 2022–2024::Senior Engineer2022–2024::' \
+        'Example Services Ottawa::Example ServicesOttawa::'
       ;;
     cv)
-      check_structure_text_separators cv \
-        'Researcher 2023–2026|Researcher2023–2026' \
-        'Example University Toronto|Example UniversityToronto' \
-        'Instructor 2025|Instructor2025'
+      check_structure_text_inline_joins cv \
+        'Researcher 2023–2026::Researcher2023–2026::' \
+        'Example University Toronto::Example UniversityToronto::' \
+        'Instructor 2025::Instructor2025::'
       ;;
     letter)
       check_structure_text_separators letter \
@@ -1342,6 +1349,7 @@ local fail=0
 echo "== resume-entrymeta-inline =="
 if compile_fixture resume-entrymeta-inline.tex resume-entrymeta-inline; then
   check_structure_text resume-entrymeta-inline
+  check_artifact_straddle resume-entrymeta-inline
   check_structure_text_inline_joins resume-entrymeta-inline \
     'Engineer 2024–2026::Engineer2024–2026::Engineer | 2024–2026' \
     'Example Labs Toronto::Example LabsToronto::Example Labs | Toronto' \
@@ -1368,6 +1376,7 @@ local fail=0
 echo "== resume-entrymeta-leader =="
 if compile_fixture resume-entrymeta-leader.tex resume-entrymeta-leader; then
   check_structure_text resume-entrymeta-leader
+  check_artifact_straddle resume-entrymeta-leader
   check_structure_text_inline_joins resume-entrymeta-leader \
     'Engineer 2024–2026::Engineer2024–2026::Engineer .' \
     'Example Labs Toronto::Example LabsToronto::Example Labs .' \
@@ -1398,6 +1407,7 @@ local fail=0
 echo "== resume-section-entrymeta =="
 if compile_fixture resume-section-entrymeta.tex resume-section-entrymeta; then
   check_structure_text resume-section-entrymeta
+  check_artifact_straddle resume-section-entrymeta
   check_structure_text_inline_joins resume-section-entrymeta \
     'PhD, Physics 2012–2016::PhD, Physics2012–2016::PhD, Physics | 2012–2016' \
     'Example University Toronto::Example UniversityToronto::Example University | Toronto' \
