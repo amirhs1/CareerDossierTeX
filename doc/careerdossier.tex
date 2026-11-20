@@ -2560,6 +2560,111 @@ metadata overwritten by a later setup call, fields accepted but not displayed by
 the active class, and links degraded to plain text because \textsf{hyperref} is
 absent. Each explains the likely effect and the corrective action.
 
+\section{Troubleshooting}
+\label{sec:troubleshooting}
+
+Three failures come from the \TeX{} installation rather than from a document,
+and the toolkit cannot report any of them itself. Each is described by what
+you see first.
+
+\subsection{A font cannot be found}
+
+The build stops with a \textsf{fontspec} error that names a font file:
+
+\begin{plaincode}
+! Package fontspec Error:
+(fontspec)   The font "texgyretermes-regular" cannot be found;
+\end{plaincode}
+
+The name begins \texttt{texgyretermes-} for the default serif body, or
+\texttt{texgyreheros-} for the sans family. The classes load the
+\textsf{TeX Gyre} fonts by file name from the \TeX{} distribution, so a copy
+installed in the operating system is not used, and a reduced installation may
+not carry them. Ask the distribution whether it has the file:
+
+\begin{plaincode}
+kpsewhich texgyretermes-regular.otf
+\end{plaincode}
+
+If that prints nothing, install the \textsf{tex-gyre} package: on \TeX{} Live,
+\texttt{tlmgr install tex-gyre}; on MiK\TeX{}, through the MiK\TeX{} Console.
+A full installation of either distribution already has it.
+
+\subsection{Blank pages, or no usable font cache}
+
+LuaLaTeX loads fonts through \textsf{luaotfload}, which keeps a cache of font
+data in a directory it must be able to write. When it cannot use that cache,
+one of two things happens.
+
+\begin{itemize}
+  \item The build stops at once, and the log says
+        \texttt{no writeable cache path}.
+  \item The build \emph{succeeds} and the PDF has the right number of pages
+        with no text on them. The log then reports each font as
+        \texttt{not loadable: metric data not found or bad} and names
+        \texttt{nullfont}, \TeX{}'s empty font, which took the place of
+        every font.
+\end{itemize}
+
+The second form is the one to know, because nothing reports it as an error.
+If a PDF is unexpectedly empty, search the \file{.log} file for
+\texttt{nullfont} before looking at the document.
+
+The cache lives in the first writable directory of the list this command
+prints; on a personal installation that is your own \texttt{TEXMFVAR}:
+
+\begin{plaincode}
+kpsewhich -var-value TEXMFCACHE
+\end{plaincode}
+
+Make sure one of those directories exists and that your user can write to it,
+then rebuild the cache and compile again:
+
+\begin{plaincode}
+luaotfload-tool --update --force
+\end{plaincode}
+
+A build that runs somewhere with a read-only home directory, such as a
+container or a sandbox, shows the same symptoms; there, set
+\texttt{TEXMFCACHE} and \texttt{TEXMFVAR} to a directory the build can write. The first build after an installation or an update
+is slow while the cache is filled, which is normal.
+
+\subsection{The bibliography is empty}
+
+This applies only to a document that loads \file{careerdossier-biblatex}
+(section~\ref{sec:biblatex}). The document compiles, the publications are missing,
+and the log says:
+
+\begin{plaincode}
+LaTeX Warning: Empty bibliography on input line ...
+Package biblatex Warning: Please (re)run Biber on the file:
+\end{plaincode}
+
+Biber has not run. LuaLaTeX alone never runs it; the sequence is LuaLaTeX,
+then Biber, then LuaLaTeX twice more, and latexmk performs it for you:
+
+\begin{plaincode}
+latexmk -lualatex cv.tex
+\end{plaincode}
+
+Three causes remain when latexmk was used.
+
+\begin{itemize}
+  \item \textbf{Biber is not installed.} \texttt{biber --version} then fails.
+        Install the \textsf{biber} package of your distribution.
+  \item \textbf{The \file{.bib} file was not found.} latexmk then reports
+        that the file is not in the search path, does not run Biber, and
+        still finishes without an error. Correct the path given to
+        \cmd{addbibresource}, which is read relative to the directory you
+        compile in, or name the directory that holds the file in
+        \texttt{BIBINPUTS}.
+  \item \textbf{An editor compiles with a fixed recipe.} Set the editor to
+        build with latexmk, or add Biber to its recipe.
+\end{itemize}
+
+A CV that lists its publications with \env{CDossierPublications} needs
+neither BibLaTeX nor Biber.
+
 \section{Complete examples}
 \label{sec:examples}
 

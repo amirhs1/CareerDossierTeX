@@ -1197,25 +1197,15 @@ silently building an unpinned `HEAD` if a fetch ever resolved differently.
 
 ## Release contributions
 
-Release preparation should verify:
+The ordered procedure that cuts a release, from scope to the steps after the
+tag, is [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md#release-procedure),
+"Release procedure". It names the files that carry the version, the checks to
+run, the commit the tag goes on, and attaching `careerdossier.pdf` to the
+GitHub Release. Its "Release checklist" is the gate a release has to satisfy.
 
-- release-blocking issues are closed;
-- supported examples compile locally;
-- the accumulated test suite passes without adding milestone-end coverage;
-- CI passes on `main`;
-- version strings are updated — `make lint` asserts that every package and
-  class `manifest.txt` lists declares the same version and date as the others,
-  so a bump that missed one is caught, but nothing checks the pair against the
-  tag you are about to cut;
-- `README.md` reflects current support;
-- the manual matches implementation;
-- the `draft-release` skill has drafted the `CHANGELOG.md` section and the
-  GitHub Release notes;
-- `LICENSE` and `manifest.txt` remain accurate;
-- the working tree is clean.
+`.agents/skills/draft-release/SKILL.md` says how the `CHANGELOG.md` section and
+the notes are written and which LaTeX-package details a release states; an
+agent runs the procedure's drafting steps through it.
 
-`.agents/skills/draft-release/SKILL.md` says how the section and the notes are
-written, which LaTeX-package details a release states, and which commit the
-release tag goes on.
-
-Tagging and publishing a release should occur only after the release-preparation pull request is merged.
+Tagging and publishing a release occur only after the release-preparation pull
+request is merged.

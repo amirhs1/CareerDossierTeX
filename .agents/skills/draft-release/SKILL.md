@@ -7,8 +7,9 @@ disable-model-invocation: true
 # Draft a release
 
 1. Check the branch, the working tree, and `HEAD`: on `main`, clean, and
-   level with `origin/main`. Confirm the rest of CONTRIBUTING.md,
-   "Release contributions", is done.
+   level with `origin/main`. Confirm step 1 of docs/RELEASE-CHECKLIST.md,
+   "Release procedure", is done. That procedure orders the whole release;
+   this skill runs its steps 2, 6, and 7.
 2. Tag and release title: both `v<MAJOR>.<MINOR>.<PATCH>`, as
    CONTRIBUTING.md, "Names", sets them. The person running you chooses the
    version.
@@ -59,3 +60,6 @@ disable-model-invocation: true
    pushed `v*` tag cannot be moved (CONTRIBUTING.md, "What actually gates
    a merge").
 9. To revise the draft: `gh release edit v<version> --notes-file <file>`.
+10. Attaching `careerdossier.pdf` to the draft is step 8 of
+    docs/RELEASE-CHECKLIST.md, "Release procedure"; run it only when the
+    person running you asks.
