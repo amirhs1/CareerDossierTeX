@@ -2188,16 +2188,26 @@ All three are integers, and are set the way the two bounds below are.
 The section heading's keep, expressed as a bound. A section heading is placed
 only when at least this many lines of body leading remain on the page;
 otherwise the page breaks before the heading and the heading opens the next one.
-It defaults to \texttt{4}, which is what the heading needs to introduce
-anything: the heading and its rule, the two lines of the first entry heading,
-and that entry's first line of body.
+It defaults to \texttt{9}, which is what the heading commits before the
+section's first point where the page may break, the space around the heading
+and its rule included. That material is the heading and its rule, then any
+subsection that opens the section, then the two lines of the first entry
+heading, then that entry's first two lines of body, which the list and the
+club penalty keep together. At \texttt{10pt} it measures 8.15 lines when the
+section opens with a subsection and 6.75 lines when it opens with an entry. A
+smaller bound lets the heading be placed and then leaves it alone at the foot
+of the page.
 
-It is a count of lines rather than a dimension, because it is a statement about
-content --- the same four lines at every \opt{fontsize}.
+A section that opens with an entry therefore moves to the next page with up to
+about two lines more room than it needed. A document in which no section
+opens with a subsection needs no more than \texttt{7}:
 
 \begin{latexcode}
-\int_set:Nn \CDossierSectionNeedLines { 6 }
+\int_set:Nn \CDossierSectionNeedLines { 7 }
 \end{latexcode}
+
+It is a count of lines rather than a dimension, because it is a statement about
+content --- the same nine lines at every \opt{fontsize}.
 
 \subsection{\cmd{CDossierSubsectionNeedLines}}
 

@@ -12,8 +12,9 @@
 % The entry count is not arbitrary. At nineteen filler entries and
 % \CDossierSectionNeedLines = 0, "Education" is the last line on page one — a
 % stranded section heading, the thing #145 forbids and the failure this
-% bound exists to prevent. At the committed value of 4 the heading moves to page
-% two instead. That two-sided behaviour is what makes this fixture an assertion
+% bound exists to prevent. At every value from 4 to the committed 9 (#733) the
+% heading moves to page two instead, so the count separates "bound off" from
+% every value the bound has had. That two-sided behaviour is what makes this fixture an assertion
 % rather than a rendering: the runner's "no page ends with a section heading"
 % check passes here for a reason, and would fail if the bound stopped working.
 %

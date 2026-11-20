@@ -1,6 +1,19 @@
 % resume-two-page.tex — layout stress: enough content to span two pages, so a
 % page break falls inside the body. Verifies that entries, sections, and lists
 % break across pages without page numbers appearing and without overfull boxes.
+%
+% Accepted page fill below the global floor (#733). Page one fills 83.3% of
+% its goal and leaves 120.66pt blank. The "Education" section after it opens
+% with an entry and would fit in that space, but the space is less than the
+% nine lines \CDossierSectionNeedLines requires, so the section opens page two.
+% That is the price of a bound tall enough for a section that opens with a
+% subsection, and it is declared here rather than tuned away by changing this
+% content, so that the next change to the bound sees it. At the earlier bound
+% of 4 this page filled 99.6%.
+%
+% Delete this line if a later change closes the hole. The runner fails a
+% declaration that is no longer needed, so nothing has to remember to.
+% PAGEFILLFLOOR: 83
 \documentclass[fontsize=11pt, margin=narrow, medium=print]{careerdossier-resume}
 \CDossierSetup{
   name     = {Ada Lovelace},

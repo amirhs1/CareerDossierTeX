@@ -1,0 +1,95 @@
+% resume-section-need-entry-led.tex — a section heading is not stranded
+% when its first entry is taller than the bound used to allow (#733).
+%
+% This is the issue's minimal reproducer. The "Target" section opens with an
+% entry whose first block cannot break: its two heading lines are kept with
+% each other and with the bullet under them (#145), and the glue after the
+% section rule is a legal breakpoint (#333). So the heading reaches the page
+% foot alone unless \CDossierSectionNeedLines asks for room enough for that
+% whole block, and the glue around it, before placing the heading.
+%
+% The filler count is not arbitrary. Measured on 2026-11-19, two passes each,
+% with the page read by pdftotext: at 46 lines of filler "Target" is the last
+% line on page one and its entry opens page two when the bound is 0, 4 (the
+% value before #733), or 5, and both move to page two at every value from 6 to
+% the committed 9. The runner's "no page ends with a section heading" check is
+% what fails at the smaller values, so this fixture is an assertion rather than
+% a rendering. It does not separate 9 from 6, 7, or 8: an entry-led section
+% needs less than a subsection-led one, and its sibling separates 6 from 7.
+%
+% Re-derive the count if the filler, the fontsize, the margin, or a vertical
+% token changes; the figure is a property of this exact content. Its sibling,
+% resume-section-need-subsection-led.tex, is the same shape with a subsection
+% between the heading and the entry.
+%
+% Accepted page fill below the global floor (#733). Page one fills 89.2% of
+% its goal and leaves 78.15pt blank, 5.75 lines of body leading: the room
+% that was left when the heading arrived, just short of the 5.75 lines it
+% keeps with it. A filler count that strands the heading at the old bound
+% leaves at least the heading's own lines blank once the heading moves, so the
+% short page is what this fixture tests rather than a defect in it. At the old bound
+% of 4 the same page filled 93.4%, ending on the stranded heading.
+% PAGEFILLFLOOR: 89
+%
+% The runner rebuilds this fixture with the heading bounds at 0 and requires
+% the check to report "Target" stranded (#744).
+% STRANDCONTROL: Target
+\documentclass{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\CDossierSection{Filler}
+Filler line 1.\par
+Filler line 2.\par
+Filler line 3.\par
+Filler line 4.\par
+Filler line 5.\par
+Filler line 6.\par
+Filler line 7.\par
+Filler line 8.\par
+Filler line 9.\par
+Filler line 10.\par
+Filler line 11.\par
+Filler line 12.\par
+Filler line 13.\par
+Filler line 14.\par
+Filler line 15.\par
+Filler line 16.\par
+Filler line 17.\par
+Filler line 18.\par
+Filler line 19.\par
+Filler line 20.\par
+Filler line 21.\par
+Filler line 22.\par
+Filler line 23.\par
+Filler line 24.\par
+Filler line 25.\par
+Filler line 26.\par
+Filler line 27.\par
+Filler line 28.\par
+Filler line 29.\par
+Filler line 30.\par
+Filler line 31.\par
+Filler line 32.\par
+Filler line 33.\par
+Filler line 34.\par
+Filler line 35.\par
+Filler line 36.\par
+Filler line 37.\par
+Filler line 38.\par
+Filler line 39.\par
+Filler line 40.\par
+Filler line 41.\par
+Filler line 42.\par
+Filler line 43.\par
+Filler line 44.\par
+Filler line 45.\par
+Filler line 46.\par
+
+\CDossierSection{Target}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Org}, location = {Here}, dates = {2024--Present}]
+\begin{CDossierItemize}
+\item First bullet line.
+\end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}
