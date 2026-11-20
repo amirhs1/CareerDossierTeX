@@ -583,6 +583,8 @@ Documentation and policy:
   (#274), and stop VoiceOver announcing the application line's separator,
   the defect that pass found (#759);
 - record the VoiceOver re-listen after the separator fix (#765);
+- record how VoiceOver reads an entry heading's `inline` separator and
+  `leader` fill, and stop it announcing the separator (#767);
 - record this section's scope, which is this entry (#755);
 - record the 2026-11-20 split that retitled this release (#763);
 - advise naming an organization for an entry that has none (#771).
