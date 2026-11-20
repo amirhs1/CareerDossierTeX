@@ -6,6 +6,42 @@ The project follows [Semantic Versioning](https://semver.org/). From `0.10.0`, e
 
 Before `v1.0.0`, breaking changes may occur, but they must be documented here and in `docs/MIGRATION.md`.
 
+## [0.12.0](https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.12.0) - 2026-11-20
+
+_If you are upgrading: please see [docs/MIGRATION.md](docs/MIGRATION.md)._
+
+### Changed
+
+- **Breaking:** Stop `\CDossierFieldValue` with an error that names the field when it is given a name the profile does not define, as `\CDossierPrintField` and `\CDossierIfFieldTF` already did; a defined field that is absent still expands to nothing ([`c0e3fa3`](https://github.com/amirhs1/CareerDossierTeX/commit/c0e3fa3), [#716](https://github.com/amirhs1/CareerDossierTeX/pull/716))
+- **Breaking:** Empty the header stack at `\CDossierHeaderEnd`, and stop with an error on a `\CDossierHeaderLine` that no `\CDossierHeaderBegin` opened, so a second header no longer prints the first one again ([`18c7432`](https://github.com/amirhs1/CareerDossierTeX/commit/18c7432), [#718](https://github.com/amirhs1/CareerDossierTeX/pull/718))
+- **Breaking:** Give the statement class's `\CDossierSection` the optional key list the resume and CV take, and stop with an error on any key in it; an empty `[]` builds as no optional argument does ([`9d69640`](https://github.com/amirhs1/CareerDossierTeX/commit/9d69640), [#720](https://github.com/amirhs1/CareerDossierTeX/pull/720))
+- **Breaking:** Rename `\CDossierListOrphanPenalty` to `\CDossierListInteriorPenalty`, with no alias, and stop `\CDossierHeadingKeepPenalty` setting the list-edge guards and the forced break before a heading that lacks room ([`42dcb18`](https://github.com/amirhs1/CareerDossierTeX/commit/42dcb18), [#743](https://github.com/amirhs1/CareerDossierTeX/pull/743))
+- **Breaking:** Raise `\CDossierSectionNeedLines` from 4 to 9, so a section heading near the foot of a page moves to the next page with its first entry instead of being left alone ([`e9fb976`](https://github.com/amirhs1/CareerDossierTeX/commit/e9fb976), [#754](https://github.com/amirhs1/CareerDossierTeX/pull/754))
+- Raise the declared minimum LaTeX kernel to `2024-11-01`, the kernel of TeX Live 2024; an older kernel names itself in a warning at the top of the log ([`1e86da2`](https://github.com/amirhs1/CareerDossierTeX/commit/1e86da2), [#725](https://github.com/amirhs1/CareerDossierTeX/pull/725))
+- Let a document's own `\title` and `\author` under hyperref's `pdfusetitle` set the PDF's `/Title` and `/Author` in place of the derived values; a value set with `\hypersetup` still comes first ([`6b1e99b`](https://github.com/amirhs1/CareerDossierTeX/commit/6b1e99b), [#753](https://github.com/amirhs1/CareerDossierTeX/pull/753))
+- Under `entrymeta=leader`, place a location with no organization flush right with nothing before it, as under `column`, in place of a dotted leader with nothing on its left; the manual suggests an `organization` value such as `Self-employed` to keep such an entry's heading line like the others ([`b13f927`](https://github.com/amirhs1/CareerDossierTeX/commit/b13f927), [#770](https://github.com/amirhs1/CareerDossierTeX/pull/770); [`bd14f28`](https://github.com/amirhs1/CareerDossierTeX/commit/bd14f28), [#772](https://github.com/amirhs1/CareerDossierTeX/pull/772))
+
+### Added
+
+- Add `\CDossierListEdgeKeepPenalty`, default `10000`, which guards the list boundaries that would strand a one-line first or last item ([`42dcb18`](https://github.com/amirhs1/CareerDossierTeX/commit/42dcb18), [#743](https://github.com/amirhs1/CareerDossierTeX/pull/743))
+- Add a "Troubleshooting" section to the manual, for a TeX Gyre font that cannot be found, a luaotfload font cache that cannot be used, and an empty bibliography, and an `examples/README.md` on building the examples inside and outside the repository ([`a1d3c0c`](https://github.com/amirhs1/CareerDossierTeX/commit/a1d3c0c), [#752](https://github.com/amirhs1/CareerDossierTeX/pull/752))
+
+### Removed
+
+- **Breaking:** Remove `\CDossierLinkColor`, which no link read; `\CDossierTextColor` has the same value, and links keep their colour ([`1156321`](https://github.com/amirhs1/CareerDossierTeX/commit/1156321), [#742](https://github.com/amirhs1/CareerDossierTeX/pull/742))
+
+### Fixed
+
+- Fix a nested `CDossierItemize`, which failed to build, and an item's optional `[<label>]`, which was lost ([`36575d4`](https://github.com/amirhs1/CareerDossierTeX/commit/36575d4), [#724](https://github.com/amirhs1/CareerDossierTeX/pull/724))
+- Fix the publication list's label width, which was sized from `1)` alone, a `doi:` prefix that reached the link target, and a doubled period after a value that already ended in one; a list whose label width changes asks for another run ([`7fda8b6`](https://github.com/amirhs1/CareerDossierTeX/commit/7fda8b6), [#722](https://github.com/amirhs1/CareerDossierTeX/pull/722))
+- Fix a blank `date`, `salutation`, or `closing` in a letter leaving an empty line and its space; a blank value is now treated as absent ([`f5974a9`](https://github.com/amirhs1/CareerDossierTeX/commit/f5974a9), [#721](https://github.com/amirhs1/CareerDossierTeX/pull/721))
+- Fix stored text being expanded a second time in the PDF `/Title` and a `mailto:` target, which stopped a statement whose `title` held `\emph` and broke an address written with `\_` ([`080b0f3`](https://github.com/amirhs1/CareerDossierTeX/commit/080b0f3), [#729](https://github.com/amirhs1/CareerDossierTeX/pull/729))
+- Fix markup such as `\emph` in a link value: it now stops with one error that names the field and the command, and the value is typeset without a link ([`ed7de5d`](https://github.com/amirhs1/CareerDossierTeX/commit/ed7de5d), [#729](https://github.com/amirhs1/CareerDossierTeX/pull/729))
+- Fix an `orcid` value with a scheme or `www.` but no `orcid.org/` host passing the shape check; it now draws the `orcid-shape` warning ([`aed462f`](https://github.com/amirhs1/CareerDossierTeX/commit/aed462f), [#753](https://github.com/amirhs1/CareerDossierTeX/pull/753))
+- Fix a `mailto:` or `tel:` link value being linked as `https://mailto:...`; every link value now reads them as schemes ([`dcf74f8`](https://github.com/amirhs1/CareerDossierTeX/commit/dcf74f8), [#753](https://github.com/amirhs1/CareerDossierTeX/pull/753))
+- Fix VoiceOver reading the separator of a tagged statement's application line, by giving each part of the line its own structure element ([`fe4d54e`](https://github.com/amirhs1/CareerDossierTeX/commit/fe4d54e), [#760](https://github.com/amirhs1/CareerDossierTeX/pull/760))
+- Fix VoiceOver reading the `entrymeta=inline` separator in a tagged entry heading, by giving each cell of the heading its own structure element under every `entrymeta` value; VoiceOver now reads each cell as its own item ([`811f44f`](https://github.com/amirhs1/CareerDossierTeX/commit/811f44f), [#769](https://github.com/amirhs1/CareerDossierTeX/pull/769))
+
 ## [0.11.0](https://github.com/amirhs1/CareerDossierTeX/releases/tag/v0.11.0) - 2026-11-06
 
 _If you are upgrading: please see [docs/MIGRATION.md](docs/MIGRATION.md)._
