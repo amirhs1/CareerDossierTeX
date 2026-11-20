@@ -435,7 +435,8 @@ Remove duplication, fix defects, and give each rule one home, so that the
 
 **This release adds no public interface.** Public commands, keys, and options
 may still change here; work that changes them on purpose belongs to `v0.11.0`,
-and work that documents or freezes them belongs to `v1.0.0`.
+and work that documents or freezes them belongs to `v1.0.0`, which also took
+the last fixes and renames before the freeze (Phase 11, "Scope").
 
 Tracked under
 [milestone `v0.10.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
@@ -466,7 +467,9 @@ release of their own, so they are used before `v1.0.0` freezes them.
 
 **This release changes the public interface on purpose.** Work that only
 documents or freezes the interface stays in `v1.0.0`. #675 is the one
-exception, at the maintainer's decision.
+exception, at the maintainer's decision. The review of this release, on
+2026-11-07, led `v1.0.0` to change public names and a documented default as
+well (#726, #727, #733).
 
 Tracked under
 [milestone `v0.11.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/15)
@@ -477,6 +480,13 @@ and [epic #597](https://github.com/amirhs1/CareerDossierTeX/issues/597).
 ### Goal
 
 Declare a stable and fully documented interface.
+
+The release also carried behaviour and interface work that this charter does
+not name, and "Scope" below records it with the rest. The repository review of
+2026-11-07, run against the released `v0.11.0` and triaged in #696, found
+defects in documented behaviour and public names that did not do what they
+said, and each such change was settled here because after the freeze it would
+need a major release (#707, #710).
 
 ### Definition of `1.0.0`
 
@@ -496,6 +506,76 @@ Declare a stable and fully documented interface.
 After this release, public commands, keys, options, and documented behaviour
 should be treated as stable. This is the freeze.
 
+### Scope
+
+Behaviour and public interface, settled before the freeze:
+
+- let a nested `CDossierItemize` build, and keep an item's optional label
+  (#686);
+- stop re-expanding stored user text in the PDF title and link targets (#687);
+- fix the publication list's label width, `doi:` prefixes, and doubled
+  punctuation (#688);
+- treat a blank `date`, `salutation`, or `closing` in a letter as absent
+  (#689);
+- accept `[<keys>]` on the statement class's `\CDossierSection` and reject
+  every key, since a statement has no entries (#690);
+- make `\CDossierFieldValue` reject an unknown field name (#707);
+- empty the header stack at `\CDossierHeaderEnd`, and reject a
+  `\CDossierHeaderLine` outside a stack (#708);
+- raise the declared LaTeX kernel floor to `2024-11-01` (#709);
+- split `\CDossierHeadingKeepPenalty`, adding
+  `\CDossierListEdgeKeepPenalty`, and rename `\CDossierListOrphanPenalty` to
+  `\CDossierListInteriorPenalty` (#726);
+- retire `\CDossierLinkColor`, which no link reads (#727);
+- raise `\CDossierSectionNeedLines` from 4 to 9, because a section heading was
+  stranded when its first entry was taller than the need-check (#733);
+- settle what `orcid`, a publication `url`, and `\title` under `pdfusetitle`
+  accept (#740).
+
+Six of these carry a `docs/MIGRATION.md` entry: #690, #707, #708, #726, #727,
+and #733.
+
+The build and test harness:
+
+- run the CTAN configuration lint when a shipped Markdown file changes (#691);
+- stop a leftover `TEST` or `FIXTURE` from narrowing `make check` (#692);
+- prove real glyphs on every test path that compiles (#693);
+- assert the page-break penalties, and require a regression test for every
+  public name (#694);
+- fail the smoke and extraction runners when they cannot check (#695);
+- make the layout runner's stranded-heading check see section headings
+  (#744).
+
+Documentation and policy:
+
+- write the deprecation policy, now in `docs/API.md`, "Stability policy"
+  (#265);
+- stop counting ten Work files where `manifest.txt` lists twelve (#669);
+- decide that the `CHANGELOG.md` sections before `0.10.0` stay as they
+  shipped; closed as not planned (#670);
+- protect release tags with a ruleset, and document it (#697);
+- record that #96 and #280 left this release (#711);
+- add user troubleshooting, an ordered release procedure, and a security
+  policy (#746);
+- record this section's scope, which is this entry (#755).
+
+The agent instruction set:
+
+- forbid attributing a change to a request (#699);
+- take up the agent-template changes merged on 2026-11-18 (#701);
+- stop the `open-pull-request` skill from updating a closed pull request
+  (#703);
+- say what a Project add error after `gh pr create` means (#705);
+- let a branch carry a batch of related issues (#748).
+
+Review triage and audit:
+
+- triage the remaining findings of the 2026-11-07 repository review (#696);
+- audit every public name for a rename, split, or retirement before the
+  freeze (#710), which opened #726 and #727.
+
 Tracked under
 [milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/14)
-and [epic #539](https://github.com/amirhs1/CareerDossierTeX/issues/539).
+and [epic #539](https://github.com/amirhs1/CareerDossierTeX/issues/539), which
+stay canonical for the delivered list. This section keeps the long-scope form
+until the release ships, and joins the shipped phases at the tag (#540).
