@@ -1,0 +1,99 @@
+% resume-section-need-subsection-led.tex — a section heading is not
+% stranded when a subsection and a tall first entry follow it (#733).
+%
+% The same shape as resume-section-need-entry-led.tex, with a
+% \CDossierSubsection between the section heading and its first entry. A
+% subsection that opens its section is exempt from its own bound (#337), so
+% \CDossierSectionNeedLines alone has to find room for the heading, the rule,
+% the subsection line, and the entry's unbreakable first block. That is one
+% line more than the entry-led shape needs, and it is what sets the value.
+%
+% The filler count is not arbitrary. Measured on 2026-11-19, two passes each,
+% with the page read by pdftotext: at 45 lines of filler "Target" and its
+% subsection "Industry" end page one and the entry opens page two when the
+% bound is 0, 4 (the value before #733), 5, or 6, and all three move to page
+% two at every value from 7 to the committed 9. The runner's "no page ends with
+% a section heading" check is what fails at the smaller values.
+%
+% Why the committed value is 9 and not 7 is not in this fixture: its first
+% entry has one bullet. With two bullets the block is a line taller, and 7 and
+% 8 still strand it at some page positions; #733 records that sweep.
+%
+% Re-derive the count if the filler, the fontsize, the margin, or a vertical
+% token changes; the figure is a property of this exact content.
+%
+% Accepted page fill below the global floor (#733). Page one fills 87.3% of
+% its goal and leaves 91.75pt blank, 6.75 lines of body leading: the room
+% that was left when the heading arrived, short of the 7.15 lines the heading,
+% its subsection, and the entry need together. A filler count that strands the
+% heading at the old bound leaves at least the heading's own lines blank once
+% the heading moves, so the short page is what this fixture tests rather than
+% a defect in it. At
+% the old bound of 4 the same page filled 93.9%, ending on the stranded
+% subsection.
+% PAGEFILLFLOOR: 87
+%
+% The stranded line the runner reports is "Industry", the subsection, because
+% it is the last line of text on the page; "Target" sits directly above it.
+% The runner rebuilds this fixture with the heading bounds at 0 and requires
+% the check to report "Industry" stranded (#744).
+% STRANDCONTROL: Industry
+\documentclass{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\CDossierSection{Filler}
+Filler line 1.\par
+Filler line 2.\par
+Filler line 3.\par
+Filler line 4.\par
+Filler line 5.\par
+Filler line 6.\par
+Filler line 7.\par
+Filler line 8.\par
+Filler line 9.\par
+Filler line 10.\par
+Filler line 11.\par
+Filler line 12.\par
+Filler line 13.\par
+Filler line 14.\par
+Filler line 15.\par
+Filler line 16.\par
+Filler line 17.\par
+Filler line 18.\par
+Filler line 19.\par
+Filler line 20.\par
+Filler line 21.\par
+Filler line 22.\par
+Filler line 23.\par
+Filler line 24.\par
+Filler line 25.\par
+Filler line 26.\par
+Filler line 27.\par
+Filler line 28.\par
+Filler line 29.\par
+Filler line 30.\par
+Filler line 31.\par
+Filler line 32.\par
+Filler line 33.\par
+Filler line 34.\par
+Filler line 35.\par
+Filler line 36.\par
+Filler line 37.\par
+Filler line 38.\par
+Filler line 39.\par
+Filler line 40.\par
+Filler line 41.\par
+Filler line 42.\par
+Filler line 43.\par
+Filler line 44.\par
+Filler line 45.\par
+
+\CDossierSection{Target}
+\CDossierSubsection{Industry}
+\begin{CDossierEntry}[title = {Senior Data Scientist}, organization = {Org}, location = {Here}, dates = {2024--Present}]
+\begin{CDossierItemize}
+\item First bullet line.
+\end{CDossierItemize}
+\end{CDossierEntry}
+
+\end{document}

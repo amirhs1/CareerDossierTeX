@@ -22,6 +22,19 @@
 % introduces, and an entry heading's two lines still travel together.
 % KEEPTOGETHER: Certificates ||| Professional Certificate in Accessible Document Production
 % KEEPTOGETHER: Ph.D. in Computer Science ||| University of Toronto
+%
+% Accepted page fill below the global floor (#733). Page one fills 84.0% of
+% its goal and leaves 115.31pt blank: that space is less than the nine lines
+% \CDossierSectionNeedLines requires, so the empty "Reserved" section and the
+% "Education" section after it both open page two. It is declared here rather
+% than tuned away by changing this content, so that the next change to the
+% bound sees it. At the earlier bound of 4 this page filled 99.6%. At 7 and 8
+% it filled 88.3%, and "Reserved" ended the page alone: an empty section that
+% fits, followed by one that does not, is a shape the bound does not cover.
+%
+% Delete this line if a later change closes the hole. The runner fails a
+% declaration that is no longer needed, so nothing has to remember to.
+% PAGEFILLFLOOR: 84
 \documentclass[fontsize=11pt, margin=narrow, medium=print]{careerdossier-resume}
 \CDossierSetup{
   name     = {Ada Lovelace},

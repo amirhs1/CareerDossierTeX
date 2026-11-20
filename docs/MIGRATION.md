@@ -450,6 +450,34 @@ the page break before a heading, and `\CDossierListOrphanPenalty` is the value
 at the boundaries that strand no line. After `v1.0.0`, changing either needs a
 major release.
 
+### A section heading needs nine lines of room, not four
+
+**This changes rendered output in a resume or CV where a section heading
+arrives near the foot of a page.** `\CDossierSectionNeedLines`, the room a
+section heading requires before it is placed, moves from 4 to 9 lines of body
+leading ([#733](https://github.com/amirhs1/CareerDossierTeX/issues/733)).
+Four lines did not cover what the heading keeps with it: the heading could be
+placed and then left alone at the foot of the page, with its first entry on the
+next. Such a heading now opens the next page with that entry. No source edit
+is required. A page that ends before a section heading can end up to about two
+lines earlier than before. None of the eleven shipped examples changes its page
+breaks, and the letter and statement classes do not change.
+
+To restore the previous bound, set the token after `\documentclass`:
+
+    \ExplSyntaxOn
+    \int_set:Nn \CDossierSectionNeedLines { 4 }
+    \ExplSyntaxOff
+
+A document in which no section opens with a subsection needs no more than `7`.
+
+Reason: the bound was shorter than the material a section heading keeps with
+it, so a heading could be stranded at the foot of a page, the case
+[#145](https://github.com/amirhs1/CareerDossierTeX/issues/145) and
+[#333](https://github.com/amirhs1/CareerDossierTeX/issues/333) set out to
+prevent. The change is made before the `v1.0.0` freeze because
+after it a changed default would need a minor release.
+
 ## [0.11.0] - 2026-11-06
 
 ### `medium` defaults to `screen`

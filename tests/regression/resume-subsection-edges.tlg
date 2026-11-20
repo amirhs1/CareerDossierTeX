@@ -9,7 +9,7 @@ subsection-below = 5.1pt
 entry-above = 4.25pt
 list-edge-above = 3.4pt
 subsection-need-lines = 3
-section-need-lines = 4
+section-need-lines = 9
 ============================================================
 ============================================================
 TEST 2: guard-verdict-by-neighbour

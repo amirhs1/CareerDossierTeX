@@ -162,19 +162,38 @@
 %% at least this many lines of body leading remain on the page; otherwise the
 %% page breaks *before* the heading and the heading opens the next one.
 %%
-%% Four lines is what the heading actually needs to introduce anything: the
-%% heading and its rule, the two lines of the first entry heading, and that
-%% entry's first line of body. Fewer strands the heading in the sense #145
-%% forbids; more would start pushing headings to the next page for no gain,
-%% since a section is free to break immediately after its first entry.
+%% Nine lines is what the heading commits before the section's first legal
+%% breakpoint, glue included (#733). The check runs before the heading's own
+%% above-skip, and the glue after the rule is a breakpoint, so a bound shorter
+%% than that block lets the heading be placed and then leaves it alone at the
+%% foot of the page -- the stranding #145 forbids. The block, measured at 10pt
+%% in body leading from the check to the foot of the first material that cannot
+%% break, is:
+%%
+%%   an entry with one bullet first                         5.75
+%%   an entry with two or more bullets first                6.75
+%%   a subsection, then an entry with one bullet            7.15
+%%   a subsection, then an entry with two or more bullets   8.15
+%%
+%% Two bullets cost a line more because a one-line first item is held to the
+%% next item (CDossierListEdgeKeepPenalty) and a longer one keeps its first two
+%% lines together (the club penalty). A subsection that opens its section is
+%% exempt from its own bound (CDossierSubsectionNeedLines, below), so this
+%% bound has to cover it as well. Nine is the smallest whole count above the
+%% largest of the four; 4, the value before #733, stranded every shape, and 7
+%% and 8 still stranded the last one.
+%%
+%% The price falls on the commoner shape: a section that opens with an entry
+%% moves to the next page with up to 2.25 lines more room than it needed, and
+%% the page it leaves is that much shorter.
 %%
 %% This replaces a keep with no ceiling at all, so it can only commit less
 %% material to a page than the penalty it succeeds, never more. It is a count of
 %% lines rather than a dimension because it is a statement about content -- the
-%% same four lines at every fontsize -- and \CDossierBodyLeading supplies the
+%% same nine lines at every fontsize -- and \CDossierBodyLeading supplies the
 %% measure at the point of use.
 \int_new:N \CDossierSectionNeedLines
-\int_set:Nn \CDossierSectionNeedLines { 4 }
+\int_set:Nn \CDossierSectionNeedLines { 9 }
 
 %% CDossierSubsectionNeedLines is the same bound for the record classes' second
 %% heading level (#337), and it is smaller because a subsection commits
@@ -185,7 +204,7 @@
 %%
 %% A subsection that opens its section directly is exempt from this check
 %% altogether -- see \__cdossier_components_subsection:n. The section's own
-%% four-line bound already placed that material, so re-testing here could only
+%% bound already placed that material, so re-testing here could only
 %% break the page between a section heading and the subsection immediately under
 %% it, which is the stranding #145 forbids.
 \int_new:N \CDossierSubsectionNeedLines

@@ -6,8 +6,9 @@
 % moment: when a subsection heading reaches the page with fewer than that many
 % lines left. resume-section-need.tex reaches that moment for a section; nothing
 % reached it for a subsection, and the two are separate code paths with separate
-% counts (4 lines against 3, because a subsection has no rule and the entry
-% heading under it carries its own keep down to its first body line).
+% counts (\CDossierSectionNeedLines and \CDossierSubsectionNeedLines). This
+% fixture's result does not depend on the section's count: measured on
+% 2026-11-19, page one ends "Toronto, ON" at every section bound from 0 to 9.
 %
 % The filler is bodiless entries in two-line steps, as in resume-section-need.tex
 % and for the same reason: bullet lists break internally, so a heading filled up
