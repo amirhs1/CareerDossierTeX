@@ -89,7 +89,7 @@ should read [`docs/MIGRATION.md`](docs/MIGRATION.md).
 | TeX Live | 2024 — the release carrying that kernel | 2026 |
 | Engine | LuaHBTeX (any release providing the above) | LuaHBTeX 1.24.0 |
 | `pdfmanagement-testphase` (tagged preview only) | — | 0.97c (2026-05-26) |
-| `tagpdf` (tagged preview only) | — | 1.0c (2026-05-17) |
+| `tagpdf` (tagged preview only) | — | 1.0d (2026-07-25) locally; 1.0c (2026-05-17) in CI |
 
 The two columns answer different questions, and the difference is deliberate.
 
