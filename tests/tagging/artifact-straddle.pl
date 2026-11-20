@@ -4,16 +4,15 @@
 #
 # A ` | ' separator is typeset as `/Artifact<</Type /Layout>> BDC ... EMC',
 # which tells assistive technology to skip it, and veraPDF UA-2 accepts it
-# wherever it falls. Where it falls still matters. On the statement's
+# wherever it falls. Where it falls appears to matter. On the statement's
 # application line one `text' structure element owned the marked content on
-# both sides of the separator, and VoiceOver read that element's text with
-# the artifact's glyph in it: "Application for Faculty Role, vertical line,
-# Application ID: APP-104" (2026-11-20, macOS 15.7.5, Preview). On the contact
-# line each field is its own element, the separator falls between two
-# elements, and VoiceOver said nothing for it. Extraction baselines,
-# structure-text.pl, and veraPDF all passed both lines alike, because each
-# reads marked content and none asks which element owns the content around an
-# artifact.
+# both sides of the separator, and VoiceOver announced "vertical line" between
+# the context and the application ID (#759; 2026-11-20, macOS 15.7.5,
+# Preview). On the contact line each field is its own element, the separator
+# falls between two elements, and VoiceOver said nothing for it. Extraction
+# baselines, structure-text.pl, and veraPDF all passed both lines alike,
+# because each reads marked content and none asks which element owns the
+# content around an artifact.
 #
 # This script asks exactly that. It maps every MCID on every page to the
 # structure element whose /K holds it, walks each page's content stream in

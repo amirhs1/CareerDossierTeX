@@ -984,11 +984,12 @@ check_structure_text_inline_joins() {
 
 # No layout artifact inside one structure element's content (#759).
 #
-# A separator marked /Artifact<</Type /Layout>> is skipped by assistive
-# technology only when it falls between structure elements. On the statement's
-# application line one `text' element owned the content on both sides of the
-# ` | ', and VoiceOver read it aloud as "vertical line" in the #274 pass, while
-# veraPDF, the extraction matrix, and check_structure_text above all passed:
+# In the #274 VoiceOver pass, the statement's application line was the one
+# place a ` | ' marked /Artifact<</Type /Layout>> was announced, as "vertical
+# line". It was also the one place a single `text' element owned the content on
+# both sides of it; on the contact line every separator falls between two
+# elements and none was announced. veraPDF, the extraction matrix, and
+# check_structure_text above all passed both lines alike:
 # each reads marked content, and none asks which element owns the content
 # around an artifact. artifact-straddle.pl asks exactly that and prints one
 # line per text-bearing layout artifact whose neighbouring runs on both sides
