@@ -584,7 +584,8 @@ Documentation and policy:
   the defect that pass found (#759);
 - record the VoiceOver re-listen after the separator fix (#765);
 - record this section's scope, which is this entry (#755);
-- record the 2026-11-20 split that retitled this release (#763).
+- record the 2026-11-20 split that retitled this release (#763);
+- advise naming an organization for an entry that has none (#771).
 
 The agent instruction set:
 
