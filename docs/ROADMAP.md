@@ -106,7 +106,7 @@ must agree.
 | `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Released | 8 | `Phase 8 — Documentation, Examples, and Release Readiness` |
 | `v0.10.0` | Duplication removed, defects fixed, and each rule given one home | Released | 9 | `Phase 9 — Consolidation and Correctness` |
 | `v0.11.0` | The last breaking and additive interface changes before the freeze | Released | 10 | `Phase 10 — Interface Changes` |
-| `v1.0.0` | Stable, documented public API — the freeze | Planned | 11 | `Phase 11 — Stable API` |
+| `v1.0.0` | Stable, documented public API — the freeze, with the last fixes and renames before it | Planned | 11 | `Phase 11 — Stable API` |
 | `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** | — | _(none — never had an option)_ |
 
 A patch release shares the phase of the minor release it corrects, a release
