@@ -600,9 +600,8 @@ semantic roles, and the page-break penalty that holds the two heading lines
 together, and a missing \key{organization}, \key{location}, or \key{dates}
 leaves no stray separator under \opt{inline} and no stray leader under
 \opt{leader}, just as it leaves no empty column under \opt{column}. Under
-\opt{leader}, a location with no organization sits flush right, and its leader
-starts where the title above ends rather than at the margin, because a leader
-must not open the line.
+\opt{leader}, a location with no organization sits flush right with nothing
+before it, as under \opt{column}: a leader needs a cell on its left.
 
 \paragraph{Per section.} The resume and CV also take the key on
 \cmd{CDossierSection}, so one section can use another layout:
@@ -676,11 +675,11 @@ Senior Engineer . . . . . . . . . . . . . . . . . . 2024-Present
 
 They are copied and pasted with the heading, too. In exchange, every entry's
 dates and location extract on its own heading lines, including the last entry
-on a page, which no list-edge value achieves under \opt{column}. That includes
-a location with no organization, whose leader starts where the title ends; a
-title wider than the line leaves that leader no room, and the location then
-sits flush right after blank space. \opt{leader} is not the default because
-the dots are a visible design change.
+on a page, which no list-edge value achieves under \opt{column}. One shape is
+outside that: a location with no organization has no leader before it, so it
+extracts as it does under \opt{column}, and Poppler can read it away from its
+entry, after the last bullet on the page. \opt{leader} is not the default
+because the dots are a visible design change.
 
 All three values are equivalent on the tagged path: the separator and the
 leader are emitted as layout artifacts, exactly as the contact line's
