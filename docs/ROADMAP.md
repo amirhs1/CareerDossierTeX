@@ -89,9 +89,11 @@ These entries keep the numbers they were written with.
 > `v0.12.0 — Pre-freeze Corrections`, with its epic #539 and release #540, and
 > keeps every issue it had closed: it ships the pre-freeze corrections as an
 > ordinary minor release. A new `v1.0.0 — Stable Public API` milestone carries
-> the freeze, under new epic #761 and release #762, and the ten open issues
-> that had no milestone joined it: #730, #731, #732, #736, #737, #738, #741,
-> #745, #747, and #750. The freeze point did not move: it is still `v1.0.0`,
+> the freeze, under new epic #761 and release #762, and eleven open issues
+> that had no milestone joined it: #280, #730, #731, #732, #736, #737, #738,
+> #741, #745, #747, and #750. So #280, which the entry above records as
+> having no milestone, is in `v1.0.0` again; #96 and #120 still have none.
+> The freeze point did not move: it is still `v1.0.0`,
 > the release after which public commands, keys, options, and documented
 > behaviour are stable. Only the release that carries it moved, one phase
 > later. The Project's `Phase 11 — Stable API` became
@@ -576,7 +578,8 @@ Documentation and policy:
 - add user troubleshooting, an ordered release procedure, and a security
   policy (#746);
 - record a manual VoiceOver screen-reader pass for the statement fixture
-  (#274);
+  (#274), and stop VoiceOver announcing the application line's separator,
+  the defect that pass found (#759);
 - record this section's scope, which is this entry (#755);
 - record the 2026-11-20 split that retitled this release (#763).
 
