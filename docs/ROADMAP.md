@@ -82,6 +82,23 @@ These entries keep the numbers they were written with.
 > Windows machine to run the NVDA pass, and templates add no public interface,
 > so neither needs the freeze. The definition of `1.0.0` now asks for the
 > VoiceOver pass on the statement fixture (#274) alone.
+>
+> **Split on 2026-11-20.** The maintainer does not want to release a stable
+> version in Phase 11, now `v0.12.0`'s phase, and wants every file checked
+> before the freeze. So the milestone that carried the freeze was retitled
+> `v0.12.0 — Pre-freeze Corrections`, with its epic #539 and release #540, and
+> keeps every issue it had closed: it ships the pre-freeze corrections as an
+> ordinary minor release. A new `v1.0.0 — Stable Public API` milestone carries
+> the freeze, under new epic #761 and release #762, and the ten open issues
+> that had no milestone joined it: #730, #731, #732, #736, #737, #738, #741,
+> #745, #747, and #750. The freeze point did not move: it is still `v1.0.0`,
+> the release after which public commands, keys, options, and documented
+> behaviour are stable. Only the release that carries it moved, one phase
+> later. The Project's `Phase 11 — Stable API` became
+> `Phase 11 — Pre-freeze Corrections`, and it gained `Phase 12 — Stable API`.
+> An entry above that names `v1.0.0` between 2026-08-30 and 2026-11-19 means
+> the milestone now titled `v0.12.0`. See
+> [issue #763](https://github.com/amirhs1/CareerDossierTeX/issues/763).
 
 ## Releases and phases
 
@@ -106,7 +123,8 @@ must agree.
 | `v0.9.0` | Documentation set, revised examples, PDF manual, and CTAN archive | Released | 8 | `Phase 8 — Documentation, Examples, and Release Readiness` |
 | `v0.10.0` | Duplication removed, defects fixed, and each rule given one home | Released | 9 | `Phase 9 — Consolidation and Correctness` |
 | `v0.11.0` | The last breaking and additive interface changes before the freeze | Released | 10 | `Phase 10 — Interface Changes` |
-| `v1.0.0` | Stable, documented public API — the freeze, with the last fixes and renames before it | Planned | 11 | `Phase 11 — Stable API` |
+| `v0.12.0` | The fixes and renames that the 2026-11-07 review found, released before the freeze | Planned | 11 | `Phase 11 — Pre-freeze Corrections` |
+| `v1.0.0` | Stable, documented public API — the freeze, after every file is reviewed | Planned | 12 | `Phase 12 — Stable API` |
 | `v1.1.0` | Themes and font families | **Closed empty — 2026-08-05** | — | _(none — never had an option)_ |
 
 A patch release shares the phase of the minor release it corrects, a release
@@ -435,8 +453,8 @@ Remove duplication, fix defects, and give each rule one home, so that the
 
 **This release adds no public interface.** Public commands, keys, and options
 may still change here; work that changes them on purpose belongs to `v0.11.0`,
-and work that documents or freezes them belongs to `v1.0.0`, which also took
-the last fixes and renames before the freeze (Phase 11, "Scope").
+the last fixes and renames before the freeze went to `v0.12.0` (Phase 11,
+"Scope"), and `v1.0.0` freezes the result (Phase 12).
 
 Tracked under
 [milestone `v0.10.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/5)
@@ -466,47 +484,47 @@ release of their own, so they are used before `v1.0.0` freezes them.
 - every breaking change recorded with its migration in `MIGRATION.md`.
 
 **This release changes the public interface on purpose.** Work that only
-documents or freezes the interface stays in `v1.0.0`. #675 is the one
-exception, at the maintainer's decision. The review of this release, on
-2026-11-07, led `v1.0.0` to change public names and a documented default as
+documents or freezes the interface belongs to the releases after it. #675 is
+the one exception, at the maintainer's decision. The review of this release, on
+2026-11-07, led `v0.12.0` to change public names and a documented default as
 well (#726, #727, #733).
 
 Tracked under
 [milestone `v0.11.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/15)
 and [epic #597](https://github.com/amirhs1/CareerDossierTeX/issues/597).
 
-## Phase 11: `v1.0.0 — Stable Public API`
+## Phase 11: `v0.12.0 — Pre-freeze Corrections`
 
 ### Goal
 
-Declare a stable and fully documented interface.
+Release, before the freeze, the corrections it must not wait for. The
+repository review of 2026-11-07, run against the released `v0.11.0` and
+triaged in #696, found defects in documented behaviour and public names that
+did not do what they said, and each such change is settled here because after
+the freeze it would need a major release (#707, #710).
 
-The release also carried behaviour and interface work that this charter does
-not name, and "Scope" below records it with the rest. The repository review of
-2026-11-07, run against the released `v0.11.0` and triaged in #696, found
-defects in documented behaviour and public names that did not do what they
-said, and each such change was settled here because after the freeze it would
-need a major release (#707, #710).
+Until 2026-11-20 this milestone was titled `v1.0.0` and carried the freeze;
+"Renumbering and retitling history", **Split on 2026-11-20**, records the move.
 
-### Definition of `1.0.0`
+### Definition of `0.12.0`
 
-- public commands, options, keys, and environments are documented;
-- supported engines and languages are tested;
-- migration paths exist for renamed features;
-- deprecation policy is documented;
-- examples are complete;
-- CI verifies all supported configurations;
-- a manual VoiceOver screen-reader pass is recorded for the statement fixture
-  (#274). The NVDA pass on Windows (#96) is not a release criterion: it has no
-  milestone until someone on Windows can run it;
-- the uploaded archive satisfies the CTAN packaging requirements, which
-  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
-  states in full and this file does not restate (#448).
+- the behaviour and public-name corrections that the 2026-11-07 review found
+  (#696), and the renames and retirements that the audit of every public name
+  opened (#710), settled;
+- the build and test harness repairs that the review found;
+- user troubleshooting, an ordered release procedure, and a security policy
+  (#746);
+- a manual VoiceOver screen-reader pass recorded for the statement fixture
+  (#274), and the defect that pass found fixed (#759);
+- every breaking change recorded with its migration in `MIGRATION.md`.
 
-After this release, public commands, keys, options, and documented behaviour
-should be treated as stable. This is the freeze.
+**This release freezes nothing.** It is an ordinary minor release: public
+commands, keys, options, and documented behaviour may still change after it,
+until `v1.0.0` freezes them (Phase 12).
 
 ### Scope
+
+Every issue below was closed in `v0.12.0`.
 
 Behaviour and public interface, settled before the freeze:
 
@@ -557,7 +575,10 @@ Documentation and policy:
 - record that #96 and #280 left this release (#711);
 - add user troubleshooting, an ordered release procedure, and a security
   policy (#746);
-- record this section's scope, which is this entry (#755).
+- record a manual VoiceOver screen-reader pass for the statement fixture
+  (#274);
+- record this section's scope, which is this entry (#755);
+- record the 2026-11-20 split that retitled this release (#763).
 
 The agent instruction set:
 
@@ -575,7 +596,40 @@ Review triage and audit:
   freeze (#710), which opened #726 and #727.
 
 Tracked under
-[milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/14)
+[milestone `v0.12.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/14)
 and [epic #539](https://github.com/amirhs1/CareerDossierTeX/issues/539), which
 stay canonical for the delivered list. This section keeps the long-scope form
 until the release ships, and joins the shipped phases at the tag (#540).
+
+## Phase 12: `v1.0.0 — Stable Public API`
+
+### Goal
+
+Declare a stable and fully documented interface.
+
+The release follows `v0.12.0`, which ships the pre-freeze corrections, so that
+every file is reviewed before the interface is declared stable.
+
+### Definition of `1.0.0`
+
+- public commands, options, keys, and environments are documented;
+- supported engines and languages are tested;
+- migration paths exist for renamed features;
+- deprecation policy is documented;
+- examples are complete;
+- CI verifies all supported configurations;
+- every file is reviewed before the freeze;
+- a manual VoiceOver screen-reader pass is recorded for the statement fixture
+  (#274, done in `v0.12.0`). The NVDA pass on Windows (#96) is not a
+  release criterion: it has no milestone until someone on Windows can run it;
+- the uploaded archive satisfies the CTAN packaging requirements, which
+  [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md#ctan-readiness-planned--v100)
+  states in full and this file does not restate (#448).
+
+After this release, public commands, keys, options, and documented behaviour
+should be treated as stable. This is the freeze.
+
+Tracked under
+[milestone `v1.0.0`](https://github.com/amirhs1/CareerDossierTeX/milestone/16)
+and [epic #761](https://github.com/amirhs1/CareerDossierTeX/issues/761), whose
+sub-issue graph is canonical for what the release holds (#762).
