@@ -495,7 +495,8 @@ Source archives and selected example PDFs are available through GitHub Releases.
 ## Roadmap
 
 Everything in the support matrix above is in the current release, named under
-[Releases](#releases). One release remains planned: `v1.0.0` declares the
+[Releases](#releases). Two releases remain planned: `v0.12.0` ships the
+corrections that the freeze must not wait for, and `v1.0.0` then declares the
 public interface stable and fully documented. Nothing is scheduled after that.
 
 [`docs/ROADMAP.md`](docs/ROADMAP.md#releases-and-phases) owns the release table —
