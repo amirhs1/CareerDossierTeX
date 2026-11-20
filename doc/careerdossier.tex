@@ -678,8 +678,9 @@ dates and location extract on its own heading lines, including the last entry
 on a page, which no list-edge value achieves under \opt{column}. One shape is
 outside that: a location with no organization has no leader before it, so it
 extracts as it does under \opt{column}, and Poppler can read it away from its
-entry, after the last bullet on the page. \opt{leader} is not the default
-because the dots are a visible design change.
+entry, after the last bullet on the page. A value in \key{organization}, such
+as \texttt{Self-employed}, gives that line a leader like any other.
+\opt{leader} is not the default because the dots are a visible design change.
 
 All three values are equivalent on the tagged path: the separator and the
 leader are emitted as layout artifacts, exactly as the contact line's
@@ -1496,6 +1497,13 @@ self-documenting and can be extended without changing the meaning of existing
 arguments. Missing optional keys are omitted without leaving visible punctuation
 or spacing artifacts. The environment controls the entry heading and local
 spacing but does not force bullet content.
+
+An entry with a location and no organization, such as freelance or
+self-employed work, is valid: its location keeps its place on the second
+heading line, with no separator or leader before it. To give it the same
+heading line as the other entries, name the arrangement in \key{organization},
+for example \texttt{organization = \{Self-employed\}}; the line then joins as
+any other does, under every \opt{entrymeta} value.
 
 An entry body may be empty. A body-less entry --- the normal shape for an
 \emph{Education} or \emph{Certificates} section, where the heading carries the
