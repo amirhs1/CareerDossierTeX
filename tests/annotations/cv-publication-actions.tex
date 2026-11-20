@@ -10,6 +10,14 @@
 % A DOI written with a `doi:' prefix must link to the same address as the bare
 % identifier rather than to `https://doi.org/doi:...' (#688).
 %
+% A fallback URL that carries a scheme of its own keeps it (#740): a link
+% value carries a scheme when it contains `://' or begins with `mailto:' or
+% `tel:', the rule careerdossier-links applies to every link value. Before the
+% fix the `mailto:' entry linked to `https://mailto:pub@example.test'. A port
+% number is not a scheme, so `example.invalid:8080/x' still gains `https://';
+% a test for any `letters:' prefix would read `example.invalid' as one. The
+% scheme-less fallback URL above is the case that still gains `https://'.
+%
 % Addresses are kept short so no entry's identifier wraps; see the note in
 % resume-contact-actions.tex on why a wrap would confuse the comparison.
 %
@@ -20,6 +28,8 @@
 % URIEXPECT: https://doi.org/10.9999/prefixed
 % URIEXPECT: https://example.invalid/note
 % URIEXPECT: https://example.invalid/full
+% URIEXPECT: mailto:pub@example.test
+% URIEXPECT: https://example.invalid:8080/x
 \documentclass{careerdossier-cv}
 \input{uncompressed.inc}
 \CDossierSetup{
@@ -59,6 +69,16 @@
     authors = {Ada Lovelace},
     title   = {A Written-Out Fallback URL},
     url     = {https://example.invalid/full}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {A Mail Fallback URL},
+    url     = {mailto:pub@example.test}
+  }
+  \CDossierPublication{
+    authors = {Ada Lovelace},
+    title   = {A Fallback URL With a Port},
+    url     = {example.invalid:8080/x}
   }
 \end{CDossierPublications}
 \end{document}

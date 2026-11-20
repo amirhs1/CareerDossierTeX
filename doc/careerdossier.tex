@@ -854,6 +854,14 @@ Any other value is used exactly as written, with only the \texttt{https://}
 scheme supplied when it carries none. A \texttt{www.}\ host, a trailing slash,
 and query parameters are all preserved.
 
+A value carries a scheme when it contains \texttt{://} or begins with
+\texttt{mailto:} or \texttt{tel:}, written in lower case. Every link value
+follows this one rule: \key{website}, \key{linkedin}, \key{github},
+\key{scholar}, \cmd{CDossierLink}, and a publication's \key{url}. Anything else gains \texttt{https://}, so
+\texttt{urn:} and \texttt{doi:} are not read as schemes, and neither is a port
+number: \texttt{example.org:8080/ada} links to
+\addr{https://example.org:8080/ada}.
+
 \key{website} has no canonical host by definition and is never expanded: a value
 with no \texttt{/} or \texttt{.}\ is displayed and linked exactly as written.
 \key{orcid} keeps its own normalization and its \texttt{ORCID:} label
@@ -981,12 +989,17 @@ the value and the expected form:
 \texttt{0000-0002-1825-009X7} & warns --- too long \\
 \addr{https://example.org/ada-lovelace} & warns --- not an ORCID address \\
 \addr{scholar.google.com/citations?user=example} & warns --- a value in the wrong key \\
+\addr{https://0000-0002-1825-0097} & warns --- a scheme with no \texttt{orcid.org/} host \\
+\texttt{www.0000-0002-1825-0097} & warns --- a \texttt{www.}\ with no \texttt{orcid.org/} host \\
 \bottomrule
 \end{longtable}
 
-An optional \texttt{www.}, a lowercase \texttt{x} checksum character, and one
-trailing slash are accepted without a warning: they resolve, and warning about a
-working value would only teach authors to ignore the warning that matters.
+An optional \texttt{www.}\ before the \texttt{orcid.org/} host, a lowercase
+\texttt{x} checksum character, and one trailing slash are accepted without a
+warning: they resolve, and warning about a working value would only teach
+authors to ignore the warning that matters. A scheme or a \texttt{www.}\ is part
+of an address only together with that host; without it the link would be
+broken, so the value warns.
 
 The check never stops the build, and nothing about the stored value, the link
 target, or the label depends on its outcome --- an author holding an identifier
@@ -1586,6 +1599,10 @@ from the link. A \texttt{doi.org/} path gains \texttt{https://}, and a complete
 URL is used as supplied. The visible identifier is the value as written, so a
 prefixed value shows its prefix.
 
+A \key{url} is normalized as \cmd{CDossierLink} is: a value with no scheme
+gains \texttt{https://}, and one with a scheme, a \texttt{mailto:} address
+among them, links as written (section~\ref{sec:webkeys}).
+
 The label box is as wide as the widest label the list prints, so from
 \texttt{10)} on the labels still start inside the text edge. The last label is
 known only once the list ends, so it is recorded in the auxiliary file and used
@@ -1638,7 +1655,8 @@ The supported way to put a link in body text --- a bullet, an entry, a letter
 paragraph, a statement paragraph. The argument is both the text that appears on
 the page and, once normalized, the link target: a value carrying no scheme gains
 \texttt{https://}, exactly as \key{website} does, and a value that has one keeps
-it. The displayed text is the argument as written, never the normalized target.
+it, \texttt{mailto:} and \texttt{tel:} among them
+(section~\ref{sec:webkeys}). The displayed text is the argument as written, never the normalized target.
 
 \cmd{CDossierLink} takes no bare identifier: body text has no service to expand
 one against (\S\ref{sec:webkeys}).
@@ -1988,6 +2006,29 @@ A field you set is never overwritten, and the order does not matter --- the
 not set are still derived, so overriding \texttt{pdftitle} alone leaves
 \texttt{/Author} and \texttt{/Lang} in place. This holds whether or not you opt
 into tagging.
+
+The title and the author have a second route, and it wins too: a \cmd{title}
+and an \cmd{author} in the preamble, passed through \textsf{hyperref}'s
+\texttt{pdfusetitle} option. The classes load
+\textsf{hyperref} themselves, so the option goes in before
+\cmd{documentclass}:
+
+\begin{latexcode}
+\PassOptionsToPackage{pdfusetitle}{hyperref}
+\documentclass{careerdossier-resume}
+\CDossierSetup{ name = {Ada Lovelace} }
+\title{Ada Lovelace, Selected Work}
+\author{A. Lovelace}
+\end{latexcode}
+
+\texttt{/Title} is then the document's \cmd{title} and \texttt{/Author} its
+\cmd{author}, on both build paths, and each derived value stands aside. For
+each field the order is: the value set with \cmd{hypersetup}
+(\texttt{pdftitle} or \texttt{pdfauthor}), then \cmd{title} or \cmd{author}
+under \texttt{pdfusetitle}, then the derived value. The two are independent:
+give only a \cmd{title} and \texttt{/Author} is still derived from
+\key{name}. Without \texttt{pdfusetitle}, neither command plays any part in
+the metadata.
 
 The language has a second route, and it wins too:
 

@@ -1,0 +1,21 @@
+% resume-usetitle-tagged.tex -- a document's own \title and \author under
+% pdfusetitle on the tagged path (#740).
+%
+% resume-usetitle-default.tex with one line added. Keep the two bodies
+% identical: the assertion is that the same \title and \author reach /Title
+% and /Author whichever path builds them. On this path hyperref's driver does
+% not copy either itself; the kernel's title support does, at the last page, and only when no
+% pdftitle or pdfauthor has been set -- so the derived values used to win
+% here too.
+\DocumentMetadata{lang=en, tagging=on}
+\PassOptionsToPackage{pdfusetitle}{hyperref}
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Usetitle Fixture}, email={metadata@example.test} }
+\title{Usetitle Fixture Own Title}
+\author{Usetitle Fixture Own Author}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Notes}
+A paragraph, so the resume has a body.
+\end{document}

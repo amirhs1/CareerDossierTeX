@@ -13,6 +13,10 @@
 % rescued only by \@hyper@linkfile mistaking `example.test' for a file
 % extension. That is luck, not behaviour, and this fixture pins the result.
 %
+% A body link that carries a `mailto:' or `tel:' scheme keeps it (#740), by
+% the one rule careerdossier-links applies to every link value. Before the fix
+% both gained `https://' in front: `https://mailto:body@example.test'.
+%
 % Keep every address short enough that its line does not wrap. A wrapped link
 % is emitted as two annotations sharing one action, and the runner compares
 % multisets — a wrap would show up as an unexplained duplicate rather than as
@@ -24,6 +28,8 @@
 % URIEXPECT: https://github.com/ada
 % URIEXPECT: https://example.invalid/body
 % URIEXPECT: https://example.invalid/written
+% URIEXPECT: mailto:body@example.test
+% URIEXPECT: tel:+15550100
 \documentclass{careerdossier-resume}
 \input{uncompressed.inc}
 \CDossierSetup{
@@ -39,4 +45,8 @@
 A scheme-less body link: \CDossierLink{example.invalid/body}.
 
 A written-out body link: \CDossierLink{https://example.invalid/written}.
+
+A mail body link: \CDossierLink{mailto:body@example.test}.
+
+A telephone body link: \CDossierLink{tel:+15550100}.
 \end{document}

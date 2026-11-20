@@ -465,10 +465,21 @@
 %% scheme of its own. Shared by the web-profile fields and by \CDossierLink so
 %% both accept the same input, `example.org/path' as readily as a full URL.
 %%
+%% A value carries a scheme when it contains `://' or begins with `mailto:' or
+%% `tel:' (#740), decided on 2026-11-19. Those two schemes have no `//', so a
+%% `://' test alone read `mailto:ada@example.org' as scheme-less and linked it
+%% to `https://mailto:ada@example.org'. Anything else still gains https://, so
+%% `urn:' and `doi:' are not schemes under this rule, and nothing new is an
+%% error. The rule is deliberately not a general `letters:' test: the host of
+%% `example.com:8080/x' would read as one. The test is the conditional below,
+%% and careerdossier-cv's publication links call it too, so every link value
+%% follows one rule.
+%%
 %% Detect an existing scheme by string, not by token list: the value's colon is
 %% an ordinary character (catcode 12) while a literal colon in this package is a
 %% letter (catcode 11) under expl3, so a catcode-sensitive \tl_if_in: would never
-%% match and would double the scheme.
+%% match and would double the scheme. The pattern is safe either way: l3regex
+%% matches a character by its code, whatever its category.
 %%
 %% The same catcode difference decides what the *inserted* scheme becomes, and
 %% getting it wrong is silent. hyperref splits an \href target on a catcode-12
@@ -479,10 +490,19 @@
 %% copy-paste integrity all still correct. Hence :Ne and \tl_to_str:n, which
 %% put the scheme in at catcode 12, exactly as a document that wrote the
 %% address out in full would (#328).
-\cs_new_protected:Npn \__cdossier_links_scheme:N #1
+\regex_const:Nn \c__cdossier_links_scheme_regex { \A(?:mailto|tel): | :// }
+\prg_new_protected_conditional:Npnn \__cdossier_links_target_if_scheme:N #1
+  { F , TF }
   {
     \str_set:NV \l__cdossier_links_scheme_str #1
-    \str_if_in:NnF \l__cdossier_links_scheme_str { :// }
+    \regex_match:NVTF \c__cdossier_links_scheme_regex
+      \l__cdossier_links_scheme_str
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+\cs_new_protected:Npn \__cdossier_links_scheme:N #1
+  {
+    \__cdossier_links_target_if_scheme:NF #1
       { \tl_put_left:Ne #1 { \tl_to_str:n { https:// } } }
   }
 

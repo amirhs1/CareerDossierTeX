@@ -20,7 +20,9 @@
 #     own pdflang still beats it, and under \DocumentMetadata the kernel's tag
 #     stays and a disagreeing key is reported once (#288);
 #   * /Lang survives careerdossier-components being loaded AFTER hyperref;
-#   * the derived /Title is the same string on the default and tagged paths.
+#   * the derived /Title is the same string on the default and tagged paths;
+#   * a document's own \title and \author, passed through hyperref's
+#     pdfusetitle, win over the derived /Title and /Author on both paths (#740).
 #
 # The last one is the exception to the "default path" framing, and is here
 # because it has nowhere better to be: it is a question about the Info
@@ -412,6 +414,28 @@ for job in letter-override-default letter-override-tagged; do
   if compile_fixture "$job.tex" "$job"; then
     read_info "$job" Title "$expected_override_title_hex"
     read_info "$job" Author "$expected_override_author_hex"
+  fi
+done
+echo
+
+echo "== a document's own \\title and \\author under pdfusetitle win on both paths =="
+# #740. hyperref's `pdfusetitle' copies \title into /Title only when no
+# pdftitle has been set by then -- at the first page on the default path, and
+# through the kernel's title support at the last page on the tagged one. The
+# derived /Title was set at \begin{document}, earlier than either, so the
+# document's own \title lost on both paths while careerdossier-metadata's
+# header promises that a value the document sets itself is left untouched.
+#
+# `pdfusetitle' copies \author into /Author the same way, and the derived
+# /Author used to win over it for the same reason, so the fixtures give both.
+# Both expected strings are built here from their parts, not copied out of a
+# build, and neither is a value this profile would derive.
+expected_usetitle_title_hex="$(ascii_utf16be_hex 'Usetitle Fixture Own Title')"
+expected_usetitle_author_hex="$(ascii_utf16be_hex 'Usetitle Fixture Own Author')"
+for job in resume-usetitle-default resume-usetitle-tagged; do
+  if compile_fixture "$job.tex" "$job"; then
+    read_info "$job" Title "$expected_usetitle_title_hex"
+    read_info "$job" Author "$expected_usetitle_author_hex"
   fi
 done
 echo

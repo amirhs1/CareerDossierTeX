@@ -189,4 +189,22 @@
   \TYPE{[\CDossierFieldValue{language}]}
 }
 
+% The `orcid' shape check again (#740). A scheme or a `www.' belongs to an
+% ORCID address only together with the `orcid.org/' host: without the host the
+% value is not an address the link code can use, and it used to pass the check
+% and become a broken link. The first two cases are false if either passes in
+% silence; the third is the manual's "an optional www." and must stay silent.
+% They sit at the end of the file so the earlier tests keep their numbers.
+\TEST{orcid-scheme-without-the-host-warns-once}{
+  \cdossiertestOrcid{https://0000-0002-1825-0097}
+}
+
+\TEST{orcid-www-without-the-host-warns-once}{
+  \cdossiertestOrcid{www.0000-0002-1825-0097}
+}
+
+\TEST{orcid-www-with-the-host-is-accepted}{
+  \cdossiertestOrcid{https://www.orcid.org/0000-0002-1825-0097}
+}
+
 \END

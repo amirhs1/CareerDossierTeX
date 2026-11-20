@@ -509,21 +509,25 @@
         \regex_replace_once:NnN \c__cdossier_cv_publication_doi_prefix_regex
           { } \l__cdossier_cv_publication_target_tl
       }
-    \str_set:NV \l__cdossier_cv_publication_target_str
-      \l__cdossier_cv_publication_target_tl
-    \str_if_in:NnF \l__cdossier_cv_publication_target_str { :// }
+    %% Whether the target already carries a scheme is careerdossier-links'
+    %% rule, not this class's (#740): `://', or a leading `mailto:' or `tel:'.
+    %% A fallback URL is then normalized exactly as \CDossierLink is; a DOI
+    %% takes the resolver instead of the bare scheme.
+    \str_if_eq:nnTF {#1} { DOI }
       {
-        \str_if_eq:nnTF {#1} { DOI }
+        \__cdossier_links_target_if_scheme:NF
+          \l__cdossier_cv_publication_target_tl
           {
+            \str_set:NV \l__cdossier_cv_publication_target_str
+              \l__cdossier_cv_publication_target_tl
             \str_if_in:NnTF \l__cdossier_cv_publication_target_str { doi.org/ }
               { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
                   { \tl_to_str:n { https:// } } }
               { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
                   { \tl_to_str:n { https://doi.org/ } } }
           }
-          { \tl_put_left:Ne \l__cdossier_cv_publication_target_tl
-              { \tl_to_str:n { https:// } } }
       }
+      { \__cdossier_links_scheme:N \l__cdossier_cv_publication_target_tl }
     %% A raw `#' in the target is rewritten to \# by the package that owns
     %% links, for the reason given at \__cdossier_links_hashescape:N in
     %% careerdossier-links: hyperref's own \edef fails on a parameter

@@ -1,0 +1,31 @@
+% resume-usetitle-default.tex -- a document's own \title and \author under
+% pdfusetitle on the default path (#740).
+%
+% Half of a pair. Its twin, resume-usetitle-tagged.tex, is this file with a
+% \DocumentMetadata line added and nothing else changed.
+%
+% hyperref's `pdfusetitle' copies \title into /Title only when no pdftitle is
+% set by the time the first page ships out. The derived /Title used to be set
+% at \begin{document}, before that, so the document's own \title lost --
+% against careerdossier-metadata's promise that a value the document sets
+% itself is left untouched. run.sh asserts that /Title is this \title.
+%
+% `pdfusetitle' copies \author into /Author the same way, and the derived
+% /Author used to win over it too; run.sh asserts that /Author is this
+% \author. A document that gives no \author keeps the derived name, as
+% every other fixture in this suite shows.
+%
+% Both strings are plain ASCII words, as in letter-override-default.tex, and
+% neither can be derived from this profile, whose derived title is
+% `Resume <en dash> Usetitle Fixture' and derived author `Usetitle Fixture'.
+\PassOptionsToPackage{pdfusetitle}{hyperref}
+\documentclass{careerdossier-resume}
+\input{uncompressed.inc}
+\CDossierSetup{ name={Usetitle Fixture}, email={metadata@example.test} }
+\title{Usetitle Fixture Own Title}
+\author{Usetitle Fixture Own Author}
+\begin{document}
+\MakeCDossierHeader
+\CDossierSection{Notes}
+A paragraph, so the resume has a body.
+\end{document}
