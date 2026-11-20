@@ -604,8 +604,9 @@ lines arrive in a sensible order.
 > **Status: macOS done, Windows outstanding.** VoiceOver passes were performed
 > by the maintainer on 2026-07-20 (four fixtures, every item passed) and
 > 2026-11-20 (the statement fixture: one item failed on the `9262394` build,
-> and a re-listen after its fix found the separator silent); results below.
-> The NVDA pass has not been run.
+> and a re-listen after its fix found the separator silent; and the three
+> `entrymeta` fixtures: the `inline` separator was announced and the `leader`
+> fill was not); results below. The NVDA pass has not been run.
 
 **macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
 Read top to bottom with `VO`+`→` over all four tagged fixtures.
@@ -685,6 +686,39 @@ whether the separator stayed silent, the maintainer answered "Yes, it was
 silent". The macOS version and the viewer for this listen were not stated.
 The re-listen covered the application line's separator only: the other six
 items were not re-judged on this build.
+
+**macOS / VoiceOver, entry-heading joins — performed 2026-11-20, Preview.**
+`entrymeta=inline` and `entrymeta=leader` arrived after the 2026-07-20 pass.
+The maintainer listened to three PDFs that `make tagging FIXTURE=entrymeta`
+built at commit `27a19f7`:
+`resume-entrymeta-inline.pdf`, `resume-entrymeta-leader.pdf`, and
+`resume-section-entrymeta.pdf`, whose Education section is `inline` and whose
+Experience section is `column`
+([issue #767](https://github.com/amirhs1/CareerDossierTeX/issues/767)). In
+each, one `text` structure element held a whole heading line, so the join's
+layout artifact sat inside it. The macOS version was not stated. As heard, from
+the maintainer's transcripts:
+
+- **announced:** the `inline` separator, at every place listened to:
+  "Engineer, vertical line, 2024 to 2026", "Example Labs, vertical line,
+  Toronto", and "Example Services, vertical line, Ottawa" in the inline
+  fixture; "PhD, Physics, vertical line, 2012 to 2016", "Example University,
+  vertical line, Toronto", "MSc, Physics, vertical line, 2010 to 2012", and
+  "Example Institute, vertical line, Ottawa" in the section fixture;
+- **not announced:** the `leader` fill, at every place listened to:
+  "Engineer, 2024 to 2026", "Example Labs. Toronto.", and "Example Services.
+  Ottawa." in the leader fixture, and the leader before "Remote", whose title
+  and location were already separate elements;
+- **not announced:** the contact line's separators, in all three; and the
+  `column` headings of the section fixture ("Engineer, 2024 to 2026",
+  "Associate Engineer, 2022 to 2024"), whose join has no mark.
+
+The separator failed checklist item 5. The leader passed it, although it sat
+inside one element exactly as the separator did, so that structure is not
+always heard. [Issue #767](https://github.com/amirhs1/CareerDossierTeX/issues/767)
+gives each heading cell its own element under every `entrymeta` value, which
+`tests/tagging/artifact-straddle.pl` now checks for these fixtures. The
+re-listen after that change has not been run.
 
 **Windows / NVDA — deferred.** This project has no Windows machine and CI has no
 Windows runner, so the NVDA pass is platform-deferred rather than complete. The

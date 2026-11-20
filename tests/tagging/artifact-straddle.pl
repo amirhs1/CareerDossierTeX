@@ -14,6 +14,14 @@
 # because each reads marked content and none asks which element owns the
 # content around an artifact.
 #
+# The same structure is not always heard. In resume entry headings, where one
+# `text' element held the whole line, VoiceOver announced "vertical line" at
+# every `entrymeta=inline' separator and said nothing at any
+# `entrymeta=leader' dotted fill (#767; 2026-11-20, Preview). So a line this
+# script prints is a structure under which an artifact has been announced, not
+# proof that this one will be; what decides it beyond the structure is not
+# known.
+#
 # This script asks exactly that. It maps every MCID on every page to the
 # structure element whose /K holds it, walks each page's content stream in
 # order, and for each layout artifact that shows text (a Tj or TJ before its

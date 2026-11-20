@@ -18,7 +18,8 @@
 1	17	text	
 1	18	text	
 1	19	subsubsection	Academic
-1	20	text	Researcher 2023–2026
-1	21	text	Example University
-1	22	itemlabel	•
-1	23	text	Grouped under a subsection rather than under a section of its own.
+1	20	text	Researcher 
+1	21	text	2023–2026
+1	22	text	Example University
+1	23	itemlabel	•
+1	24	text	Grouped under a subsection rather than under a section of its own.

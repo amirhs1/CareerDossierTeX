@@ -112,7 +112,7 @@ TEST 13: leader-title-alone-emits-no-leader
 >entrytitle
 ============================================================
 ============================================================
-TEST 14: leader-location-without-organization-fills-from-the-title-end
+TEST 14: leader-location-without-organization-emits-no-leader
 ============================================================
 >entrytitle
 >fakespace
@@ -121,12 +121,6 @@ TEST 14: leader-location-without-organization-fills-from-the-title-end
 >leadermark
 >artifact-end
 >muted
->entrytitle
->muted
->artifact-begin
->body
->leadermark
->artifact-end
 >muted
 ============================================================
 ============================================================

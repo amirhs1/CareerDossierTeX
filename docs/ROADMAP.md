@@ -550,7 +550,9 @@ Behaviour and public interface, settled before the freeze:
 - raise `\CDossierSectionNeedLines` from 4 to 9, because a section heading was
   stranded when its first entry was taller than the need-check (#733);
 - settle what `orcid`, a publication `url`, and `\title` under `pdfusetitle`
-  accept (#740).
+  accept (#740);
+- drop the leader before a location with no organization under
+  `entrymeta=leader` (#768).
 
 Six of these carry a `docs/MIGRATION.md` entry: #690, #707, #708, #726, #727,
 and #733.

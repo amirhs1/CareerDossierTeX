@@ -1,0 +1,11 @@
+% resume-bad-entry-title.tex — smoke fixture: a CDossierEntry with no title
+% must stop with `entry-missing-title', even when every optional field is set
+% (expected failure, #768). The title is the one required entry field, so no
+% heading line can open with an empty left cell.
+\documentclass{careerdossier-resume}
+\CDossierSetup{name = {Ada Lovelace}}
+\begin{document}
+\begin{CDossierEntry}[organization = {Example Corp}, location = {Remote},
+  dates = {2024--2026}]
+\end{CDossierEntry}
+\end{document}
