@@ -580,6 +580,7 @@ Documentation and policy:
 - record a manual VoiceOver screen-reader pass for the statement fixture
   (#274), and stop VoiceOver announcing the application line's separator,
   the defect that pass found (#759);
+- record the VoiceOver re-listen after the separator fix (#765);
 - record this section's scope, which is this entry (#755);
 - record the 2026-11-20 split that retitled this release (#763).
 
