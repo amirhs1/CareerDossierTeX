@@ -601,10 +601,11 @@ checks that structure exists and is well-formed; only a screen reader shows
 whether decorative rules stay silent and whether headings, entries, and contact
 lines arrive in a sensible order.
 
-> **Status: macOS done, with one failure on the statement fixture; Windows
-> outstanding.** VoiceOver passes were performed by the maintainer on
-> 2026-07-20 (four fixtures, every item passed) and 2026-11-20 (the statement
-> fixture, one item failed); results below. The NVDA pass has not been run.
+> **Status: macOS done, Windows outstanding.** VoiceOver passes were performed
+> by the maintainer on 2026-07-20 (four fixtures, every item passed) and
+> 2026-11-20 (the statement fixture: one item failed on the `9262394` build,
+> and a re-listen after its fix found the separator silent); results below.
+> The NVDA pass has not been run.
 
 **macOS / VoiceOver (⌘F5), macOS 15.7.5 — performed 2026-07-20, Preview.**
 Read top to bottom with `VO`+`→` over all four tagged fixtures.
@@ -658,17 +659,32 @@ as above, over the PDF `make tagging` built at commit `9262394`
       character-by-character spelling. The ORCID is read in four-digit
       groups, which was judged acceptable;
 - [x] links announced as links;
-- [ ] **failed:** horizontal rules and separators **not** announced.
-      VoiceOver announced "vertical line" between "Application for Faculty
-      Role" and "Application ID: APP-104". The separators on the contact line
-      were not announced. Tracked in
-      [issue #759](https://github.com/amirhs1/CareerDossierTeX/issues/759);
+- [ ] **failed:** horizontal rules and separators **not** announced. On the
+      `9262394` build, VoiceOver announced "vertical line" between
+      "Application for Faculty Role" and "Application ID: APP-104". The
+      separators on the contact line were not announced. Fixed in
+      [PR #760](https://github.com/amirhs1/CareerDossierTeX/pull/760)
+      ([issue #759](https://github.com/amirhs1/CareerDossierTeX/issues/759));
+      see the re-listen below;
 - [x] the running header (`<name> -- <running-title>`) **not** announced on
       page two; and
 - [x] the `Page N of M` folio **not** announced on either page.
 
-**One item failed.** The application line's separator is announced, so on the
-statement fixture decorative furniture is not fully silent to VoiceOver.
+**One item failed, and has since been fixed.** On the `9262394` build, the
+application line's separator was announced. The cause was that one structure
+element held both parts of the line, so the separator's artifact sat inside
+it. [PR #760](https://github.com/amirhs1/CareerDossierTeX/pull/760) gave each
+part its own element
+([issue #759](https://github.com/amirhs1/CareerDossierTeX/issues/759)).
+
+**Re-listen after the fix — 2026-11-20.** The maintainer listened again to the
+statement fixture's PDF, built by `make tagging` from the fix branch
+`fix/statement-separator` at commit `fe4d54e`. That commit's classes,
+packages, and statement fixture are identical to the merged code. Asked
+whether the separator stayed silent, the maintainer answered "Yes, it was
+silent". The macOS version and the viewer for this listen were not stated.
+The re-listen covered the application line's separator only: the other six
+items were not re-judged on this build.
 
 **Windows / NVDA — deferred.** This project has no Windows machine and CI has no
 Windows runner, so the NVDA pass is platform-deferred rather than complete. The
