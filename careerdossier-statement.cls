@@ -437,16 +437,49 @@
       { \__cdossier_base_require_field:n { website } }
   }
 
+%% The application line: the context, then the application ID, with the
+%% shared ` | ' separator between them only when both are present.
+%%
+%% Each part is its own text structure element, so the separator falls
+%% between two elements, as it does on the contact line. Left to automatic
+%% paragraph tagging, the whole line was one element whose own content held
+%% the separator's layout artifact, and VoiceOver announced "vertical line"
+%% there while it skipped the contact line's separators (#759). The tagged
+%% branch turns paragraph tagging off for
+%% this one line, as the heading primitive in careerdossier-typography does,
+%% because a text element nested inside the paragraph's own text element is
+%% not a valid parent and child. It ends the paragraph itself so tagging is
+%% restored only after the line is broken; the header stack's own `\par' then
+%% finds vertical mode and does nothing. The untagged branch is the line as it
+%% always was.
 \cs_new_protected:Npn \__cdossier_statement_contextline:
   {
+    \tag_if_active:TF
+      {
+        \UseTaggingSocket { para/off }
+        \__cdossier_statement_contextparts:
+        \par
+        \UseTaggingSocket { para/restore }
+      }
+      { \__cdossier_statement_contextparts: }
+  }
+
+\cs_new_protected:Npn \__cdossier_statement_contextparts:
+  {
     \tl_if_blank:VF \l__cdossier_statement_context_tl
-      { \tl_use:N \l__cdossier_statement_context_tl }
+      {
+        \__cdossier_typography_text_content:n
+          { \tl_use:N \l__cdossier_statement_context_tl }
+      }
     \bool_lazy_and:nnT
       { ! \tl_if_blank_p:V \l__cdossier_statement_context_tl }
       { ! \tl_if_blank_p:V \l__cdossier_statement_application_id_tl }
       { \__cdossier_components_sep: }
     \tl_if_blank:VF \l__cdossier_statement_application_id_tl
-      { Application~ID:~\tl_use:N \l__cdossier_statement_application_id_tl }
+      {
+        \__cdossier_typography_text_content:n
+          { Application~ID:~\tl_use:N \l__cdossier_statement_application_id_tl }
+      }
   }
 
 %% The header lines and the gaps between them are emitted by the

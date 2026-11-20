@@ -148,6 +148,8 @@ groups=(
   cv-subsection
   cv-publication-numbering
   resume-displaydoctitle-off
+  statement-context-only
+  statement-application-id-only
   biblatex-ua2
 )
 
@@ -982,6 +984,45 @@ check_structure_text_inline_joins() {
   done
 }
 
+# No layout artifact inside one structure element's content (#759).
+#
+# In the #274 VoiceOver pass, the statement's application line was the one
+# place a ` | ' marked /Artifact<</Type /Layout>> was announced, as "vertical
+# line". It was also the one place a single `text' element owned the content on
+# both sides of it; on the contact line every separator falls between two
+# elements and none was announced. veraPDF, the extraction matrix, and
+# check_structure_text above all passed both lines alike:
+# each reads marked content, and none asks which element owns the content
+# around an artifact. artifact-straddle.pl asks exactly that and prints one
+# line per text-bearing layout artifact whose neighbouring runs on both sides
+# belong to one element.
+#
+# A property check with no reference value: the expected output is empty.
+#
+# It runs for the five profiles only. Run over every fixture group on
+# 2026-11-20 it also flagged resume-entrymeta-inline, resume-entrymeta-leader,
+# and resume-section-entrymeta, where an entry heading's inline separator or
+# leader sits inside one `text' element. That is outside #759, so those
+# groups do not run it until their own fix lands.
+check_artifact_straddle() {
+  local base="$1"
+  local pdf="$work/$base.pdf"
+  local got="$work/$base.straddle"
+
+  if ! perl "$here/artifact-straddle.pl" "$pdf" >"$got" 2>"$got.err"; then
+    record_failure "$base layout artifacts could not be checked against their structure elements"
+    sed 's/^/    /' "$got.err"
+    return
+  fi
+  if [ -s "$got" ]; then
+    record_failure \
+      "$base has a layout artifact inside one structure element's content (page, MCID before, MCID after, element, role):"
+    sed 's/^/    /' "$got"
+  else
+    echo "  VERIFIED: every text-bearing layout artifact falls between structure elements"
+  fi
+}
+
 # One extractor against its own committed baseline. Poppler, MuPDF, and PDFKit
 # disagree on how to linearize the two-column entry header, so each owns a
 # baseline; sharing one would only record whichever library ran last.
@@ -1235,6 +1276,7 @@ tagging_profile() {
   check_page_two_artifact_stream "$base"
   check_extraction "$base"
   check_structure_text "$base"
+  check_artifact_straddle "$base"
   # The two-cell rows this profile actually renders, as "separated|glued".
   # Every one of these passed the extraction baselines above while glued.
   case "$base" in
@@ -1491,6 +1533,75 @@ fi
 return "$fail"
 }
 
+# The statement's application line with one of its two parts (#759).
+#
+# The statement profile sets both the context and the application ID, so it
+# only covers the line with its separator. These two groups set one part each,
+# which is the other path through \__cdossier_statement_contextline:'s tagged
+# branch: paragraph tagging off, one text element, `\par', paragraph tagging
+# restored, and no separator. They are property checks with no committed
+# baseline. The expected text is the part the fixture's own body sets, word
+# for word:
+#
+#   * it compiles with no tagpdf diagnostic (compile_fixture), which is what
+#     caught the first draft of the fix nesting P inside P;
+#   * the part reaches the structure tree as one `text' run of exactly that
+#     text, and the absent part reaches it nowhere;
+#   * no `|' reaches the structure tree as content, and no `|' sits at a line
+#     edge of the extracted page, so a missing part leaves no stray separator
+#     (a separator is an artifact, which the structure text cannot see);
+#   * check_artifact_straddle, check_untagged, and check_visual_equivalence,
+#     as for a profile, and veraPDF UA-2 on the -ua2 variant.
+#
+# Arguments: the group, then which part it sets: `context' or
+# `application-id'.
+tagging_statement_application_part() {
+  local base="$1"
+  local part="$2"
+  local fail=0
+  local present absent got runs
+  case "$part" in
+    context)
+      present='Application for Faculty Role'
+      absent='Application ID'
+      ;;
+    application-id)
+      present='Application ID: APP-104'
+      absent='Application for Faculty Role'
+      ;;
+  esac
+  got="$work/$base.structure.got"
+  echo "== $base =="
+  compile_fixture "$base.tex" "$base" || return 1
+  compile_fixture "$base-untagged.tex" "$base-untagged" || return 1
+
+  if perl "$here/structure-text.pl" "$work/$base.pdf" >"$got" 2>"$got.err"; then
+    # Role and text of each run, without the page and MCID.
+    runs="$(awk -F'\t' '{ print $3 "\t" $4 }' "$got")"
+    require_text_line "$runs" "$(printf 'text\t%s' "$present")" \
+      "$base has no text run of exactly '$present'"
+    forbid_text "$runs" "$absent" \
+      "$base carries '$absent', which its body does not set"
+    forbid_text "$runs" '|' \
+      "$base has a '|' in its structure text: a separator is reaching the structure tree as content"
+  else
+    record_failure "$base structure-element text could not be decoded"
+    sed 's/^/    /' "$got.err"
+  fi
+  # A separator emitted for a missing part is an artifact, so the structure
+  # text above cannot see it; the page can. It would sit at a line edge.
+  forbid_match "$(text_extract "$work/$base.pdf")" '\|[[:space:]]*$|^[[:space:]]*\|' \
+    "$base has a stray separator at a line edge"
+  check_artifact_straddle "$base"
+  check_untagged "$base"
+  check_visual_equivalence "$base"
+
+  if [ "$have_verapdf" -eq 1 ]; then
+    compile_fixture "$base-ua2.tex" "$base-ua2" && validate_ua2 "$base"
+  fi
+  return "$fail"
+}
+
 # The feasibility fixture is a selectable group like any other (#367). It
 # is the one group whose *only* path is behind a gate, so selecting it on a
 # machine without Biber runs nothing at all -- recorded below rather than left
@@ -1534,6 +1645,9 @@ unit_for_group() {
     cv-subsection)              printf 'tagging_cv_subsection' ;;
     cv-publication-numbering)   printf 'tagging_cv_publication_numbering' ;;
     resume-displaydoctitle-off) printf 'tagging_resume_displaydoctitle_off' ;;
+    statement-context-only)     printf 'tagging_statement_application_part %s %s' "$1" context ;;
+    statement-application-id-only)
+                                printf 'tagging_statement_application_part %s %s' "$1" application-id ;;
     biblatex-ua2)               printf 'tagging_biblatex_ua2' ;;
   esac
 }
