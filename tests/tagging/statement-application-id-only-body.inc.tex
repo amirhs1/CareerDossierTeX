@@ -1,0 +1,20 @@
+% statement-application-id-only-body.inc.tex (#759)
+% The statement's application line with the application ID alone. Tagged,
+% that is one text element holding only that part and no separator: the
+% one-part path through \__cdossier_statement_contextline:. Shared by the
+% plain, -untagged, and -ua2 fixtures of this group.
+\documentclass[type=research]{careerdossier-statement}
+\CDossierSetup{
+  name={Tagged Research Statement},
+  email={statement@example.test},
+  phone={+1 555 0104}
+}
+\CDossierStatementSetup{
+  application-id={APP-104}
+}
+\begin{document}
+\MakeCDossierStatementHeader
+
+The statement paragraph follows the header.
+
+\end{document}
