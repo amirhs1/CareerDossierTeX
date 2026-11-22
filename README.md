@@ -516,8 +516,8 @@ Three rules shape how work is divided here:
 - every issue carries a release milestone and hangs off that release's epic;
 - every pull request links an issue, except a revert, a release chore, or a
   CI/tooling repair, which state their rationale in the pull request body;
-- every pull request comes from a focused branch: one issue, or a batch of
-  related issues.
+- every pull request comes from a focused branch and is one self-contained
+  change, usually one issue.
 
 See [Work item structure](CONTRIBUTING.md#work-item-structure) for the full
 statement and the reasoning behind each.

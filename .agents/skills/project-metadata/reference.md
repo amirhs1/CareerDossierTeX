@@ -52,29 +52,36 @@ Score the diff on both axes and take the **larger** of the two tiers:
 
 | | XS | S | M | L |
 |---|---|---|---|---|
-| files changed | ≤4 | 5–14 | 15–40 | >40 |
-| lines (additions+deletions) | <50 | <250 | <3,000 | ≥3,000 |
+| files changed | ≤2 | 3–9 | 10–40 | >40 |
+| lines (additions+deletions) | <30 | <100 | <1,000 | ≥1,000 |
 
 Neither axis alone is sufficient: a change spread across many files with small
 per-file diffs and a change concentrated in few files with a large diff both
 need to be caught, and only the larger of the two tiers catches both.
 
-**Measured fit** (2026-09-02, n=261 merged PRs currently carrying a `Size` in
-the `CareerDossierTeX Development` Project — recorded XS 45, S 95, M 108,
-L 13): this table reproduces the recorded value for 204/261 (78.2%) — XS
-38/45 (84%), S 65/95 (68%), M 97/108 (90%), **L 4/13 (31%)**. The previous
-thresholds (files ≤2/3–8/9–20/>20, lines <50/<250/<700/≥700) reproduced only
-167/261 (64.0%) against the same data, which is why this table replaces
-rather than adjusts them — the v0.9.0 backfill moved the distribution enough
-to invalidate the old fit. Re-run "Re-measuring the Size fit" in the appendix
-before trusting either number for a release far from 2026-09-02.
+**Source.** The line bounds of `S` and `L` come from Google's code-review
+guide, ["Small CLs"](https://google.github.io/eng-practices/review/developer/small-cls.html):
+"100 lines is usually a reasonable size" and "1000 lines is usually too
+large". The guide sets no other bound, so the `XS` bounds and the file counts
+are this project's choice (2026-11-21). The `L` file bound keeps the previous
+table's, close to the guide's example of a change spread across 50 files. A
+deleted file may count as one line, as the guide allows; say so in the pull
+request when that changes the tier.
 
-**`L` is a judgement call, not primarily a diff-size threshold.** The 9
-recorded-`L` PRs this table misses span 4–81 files and 511–5,978 lines —
-ranges that overlap heavily with recorded `M` — and no retuning of these two
-axes reproduces them without fitting a boundary to a single outlier PR.
-Treat a broad or risky-feeling change as `L` even when the table says `M`;
-the table is not a ceiling on `L`.
+**Measured effect** (2026-11-21, the 375 merged pull requests in the
+`CareerDossierTeX Development` Project): this table scores them XS 55, S 73,
+M 218, L 29. The previous table, whose `L` began at 3,000 lines or 41 files,
+scored them XS 84, S 118, M 165, L 8, and the recorded values are XS 84,
+S 120, M 162, L 9. So about one past pull request in thirteen would now score
+`L`, and more than half fall in `M`. Recorded values keep the table they were
+scored with. Re-run "Re-measuring the Size fit" in the appendix before quoting
+these numbers far from 2026-11-21.
+
+**`L` means "split it".** It is the tier the guide calls usually too large. A
+pull request expected to score `L` needs a stated reason it cannot be split,
+and approval before its branch starts (`AGENTS.md`, "Git"). Treat a broad or
+risky change as `L` even when the table says `M`: the table is not a ceiling
+on `L`.
 
 Three cases the table does not cover:
 
@@ -744,8 +751,8 @@ string and id from step 1.
 The query behind "Size guide" above. It pages through every item in the
 Project (`first:100`; repeat with `-f c=<endCursor>` from the previous
 response's `pageInfo`, adding `$c:String!` and `after:$c` to the query, until
-`hasNextPage` is `false` — six pages at 546 sized items, the count when this
-was last run) and returns each item's recorded `Size` next to its own diff
+`hasNextPage` is `false` — eight pages on 2026-11-21, when this was last run)
+and returns each item's recorded `Size` next to its own diff
 stats in one pass, `PullRequest` and `Issue` content both, so no second query
 is needed to cross-reference the two:
 
@@ -772,9 +779,9 @@ query($p:ID!){
 ```
 
 Score each `state:"MERGED"` `PullRequest` node against the table in "Size
-guide" above (files-changed tier, lines-changed tier, take the larger) and
-compare against its own `size.name` — that comparison is the measured-fit
-number reported there. `stateReason` marks the `not_planned` carve-out on
+guide" above (files-changed tier, lines-changed tier, take the larger): the
+count per tier is the measured effect reported there, and comparing each score
+with its own `size.name` shows how far the recorded values sit from the table. `stateReason` marks the `not_planned` carve-out on
 `Issue` nodes, and `closingIssuesReferences` is how an issue's own
 `size.name` is checked against the multi-issue-PR carve-out rather than
 assumed to equal its closing PR's score.

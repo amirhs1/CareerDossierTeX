@@ -161,9 +161,9 @@ exception. Close the issue by hand once the last such action is done.
 
 ### 3. Every pull request comes from a focused branch
 
-Branch from an up-to-date `main`, for one issue or for a batch of issues that
-change the same files or run the same suite. `AGENTS.md`, "Git", sets the terms
-of a batch. Direct commits and pushes to `main` are reserved to the maintainer;
+Branch from an up-to-date `main`, for one issue, or for several issues only
+when together they are one self-contained change. `AGENTS.md`, "Git", sets the
+terms. Direct commits and pushes to `main` are reserved to the maintainer;
 that section states the reservation and the rest of the maintainer-only action
 set, which this guide does not repeat.
 
