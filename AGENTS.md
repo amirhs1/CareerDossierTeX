@@ -310,19 +310,31 @@ improvements separately.
   Draft the change for them instead.
 - You may open issues and pull requests, write commits, and post comments. The
   person running you is responsible for what you submit.
-- Work on one focused issue per branch, or on a batch of issues that change the
-  same files or run the same suite, from an up-to-date `main`. In a batch, each
-  issue gets its own coherent commit and its own `Closes #n`; a change to the
-  public API, a baseline, or typography never shares a branch with unrelated
-  work; and a batch that scores `L` needs approval first. Once review has
-  begun, bring the branch up to date by merging `main` into it, and do not
-  amend, rebase, or force-push published commits unless asked.
+- Work on one focused issue per branch, from an up-to-date `main`. Each pull
+  request is one self-contained change: it does one thing and carries the tests
+  and documentation that change needs. Several issues share a branch only when
+  together they are one change, such as one fix applied in several places; each
+  then gets its own commits and its own `Closes #n`. Sharing files is not
+  enough. Never bundle issues to save merge-from-main cycles: that cost belongs
+  to the repository configuration, which only the maintainer changes.
+- A refactor gets its own pull request, apart from fixes and features; a small
+  local cleanup may come along. A change to the public API or to typography
+  gets its own pull request. A baseline changes only in the pull request whose
+  behaviour change causes it, and that pull request names it.
+- A pull request expected to score `L` in the "Size guide" of
+  `.agents/skills/project-metadata/reference.md` needs a stated reason it
+  cannot be split, and approval before its branch starts.
+- Each writer works in its own worktree; never run two writers in one checkout.
+  Independent changes may run at the same time, but a change that moves or
+  rewrites code another change edits runs after it.
+- Once review has begun, bring the branch up to date by merging `main` into it,
+  and do not amend, rebase, or force-push published commits unless asked.
 - Push only the focused branch, and only when it is close-out-complete. Green
   CI says nothing about the documentation, the trailer blocks, or the Project
   fields. Anything found after a push goes in the first line of your next
   message; a discovery outside the issue's scope becomes a follow-up issue.
 - Pull requests merge with a merge commit, so each commit lands on `main`
-  unchanged; keep each one coherent.
+  unchanged; keep each one coherent, and leave the build working after it.
 - Names: as `CONTRIBUTING.md`, "Names", sets them.
 
 ## Provenance
