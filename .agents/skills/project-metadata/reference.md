@@ -108,12 +108,6 @@ edit counts once, so an issue scores the same however it was split. One pull
 request is the special case: its own counts, so a single-pull-request issue
 scores as before.
 
-A real case: #591 shipped as #595 (`Closes #591`, 3 files, 171 additions) and
-#596 (`Refs #591`, 1 file, 63 additions and 145 deletions, a file #595 had
-already changed). Together that is 3 distinct files and 379 lines, which is `M`;
-#591 carries `S`, the closing pull request's score alone (measured 2026-11-23
-with the audit query below on milestone `v0.10.0`).
-
 The pull request path writes it: step 3a of the appendix scores the issue's
 pull requests together, and step 4 gives the focused issue that value when the
 pull request closes that issue and no other, when it opens and again on each
@@ -468,9 +462,6 @@ names another issue is left out of `prs`, so the score can understate; say so in
 the pull request when one is. The query reads up to 10 closing pull requests, 100
 cross-references, and 100 paths of each pull request (more than 40 distinct paths
 is already `L`), and stops with an error when a list is longer.
-
-Measured 2026-11-23 on #591, which `v0.10.0` shipped as #595 and #596:
-`{"closesOthers":[],"files":3,"lines":379,"prs":[595,596],"size":"M"}`.
 
 ### 4. Write every field in one mutation
 
@@ -879,10 +870,9 @@ writes outside a field mutation: an issue's parent, and the `Size` an issue
 takes from its pull requests. Run it before a release, and after any hand
 correction of either. It prints one line per finding and exits 1, or prints
 nothing and exits 0. Put the milestone's exact title in both places (`-f m=` and
-`$m`). The `query:` argument is a partial match (`v0.1` returns `v0.1.0`,
-`v0.1.1`, `v0.10.0`, and `v0.11.0`; measured 2026-11-05), so the `--jq` keeps
-only the milestone whose title equals `$m`, and stops when that one is not among
-the first three matches.
+`$m`). The `query:` argument is a partial match (`v0.1` also returns `v0.1.1`
+and `v0.10.0`), so the `--jq` keeps only the milestone whose title equals `$m`,
+and stops when that one is not among the first three matches.
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -f m=<milestone> -f query='
@@ -963,26 +953,12 @@ and the merged ones whose body says `Refs #n` and names no other issue:
   that pull request's recorded `Size`, as before. Recorded values keep the table
   they were scored with, so nothing is re-scored here.
 - **Any other count**: the issue's `Size` must equal the tier of their union, as
-  "Size guide" scores it, which uses the table as it stands. A finding reads
-  `#591 Size S, PRs #595, #596 score M (3 files, 379 lines)`.
+  "Size guide" scores it, which uses the table as it stands.
 - **A list the query cannot read in full** (more than 3 closing pull requests,
   or 25 cross-references, on an issue it checks): a finding saying to score the
   issue by hand, never a silent pass. Each pull request's paths stop at 41, since
   41 distinct paths are already `L`.
 
 The `Refs` pull requests are found by cross-reference, not by milestone, so one
-filed under another milestone still counts. The page sizes keep the query under GitHub's limit of 500,000 nodes: with five milestones, 20
-cross-references, and 100 paths it asked for 1,000,000 (measured 2026-11-23).
-
-Measured 2026-11-23, in the same shell, one run per milestone:
-
-| milestone | output | exit |
-| --- | --- | --- |
-| `v0.12.0` (closed; every issue had one closing pull request) | nothing | 0 |
-| `v0.11.0` | nothing | 0 |
-| `v1.0.0` (open) | nothing | 0 |
-| `v0.10.0` | `#591 Size S, PRs #595, #596 score M (3 files, 379 lines)` | 1 |
-
-The one finding is the case "Size guide" describes. To show the one-pull-request
-comparison is live, replace `select(size != ($x | size))` with `select(true)` and
-run `v0.12.0`: it prints 33 lines, one per such issue, and exits 1.
+filed under another milestone still counts. The page sizes keep the query under
+GitHub's limit of 500,000 nodes; raising any of them can exceed it.
