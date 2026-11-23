@@ -169,7 +169,9 @@ set, which this guide does not repeat.
 
 A branch has no deadline: it lives until it merges or is closed, and the
 `Protect Main` ruleset already requires it to be up to date with `main` before
-it merges. Bring it up to date by merging `main` into it; once review has
+it merges. Each update reruns every required check, so bring a branch up to
+date only when it is next to merge, or for one of the other reasons `AGENTS.md`,
+"Git", names. Bring it up to date by merging `main` into it; once review has
 begun, do not rebase it.
 
 ## Names

@@ -315,8 +315,10 @@ improvements separately.
   and documentation that change needs. Several issues share a branch only when
   together they are one change, such as one fix applied in several places; each
   then gets its own commits and its own `Closes #n`. Sharing files is not
-  enough. Never bundle issues to save merge-from-main cycles: that cost belongs
-  to the repository configuration, which only the maintainer changes.
+  enough. Never bundle issues to save merge-from-main cycles. The rule that a
+  branch is up to date before it merges is repository configuration, which only
+  the maintainer changes; updating a branch only when it is next to merge, below,
+  is what keeps that cost down.
 - A refactor gets its own pull request, apart from fixes and features; a small
   local cleanup may come along. A change to the public API or to typography
   gets its own pull request. A baseline changes only in the pull request whose
@@ -327,6 +329,12 @@ improvements separately.
 - Each writer works in its own worktree; never run two writers in one checkout.
   Independent changes may run at the same time, but a change that moves or
   rewrites code another change edits runs after it.
+- Bring an open pull request's branch up to date with `main` only when it is
+  next to merge, or when it conflicts with `main`, needs code that merged after
+  it branched, or a reviewer asks for its current state. Never update a branch
+  just because another pull request merged: each update reruns every required
+  check, and only the run on its newest commit counts. The maintainer picks the
+  next pull request to merge, then updates it on GitHub or asks for it.
 - Once review has begun, bring the branch up to date by merging `main` into it,
   and do not amend, rebase, or force-push published commits unless asked.
 - Push only the focused branch, and only when it is close-out-complete. Green
