@@ -14,13 +14,13 @@ class, fill in one profile, and expect every document to share one look.
 | Run all tests        | `make check`, optional; on a docs-only change it runs only the lints, and `make check FULL=1` runs everything |
 | Run one test         | `make regression TEST=<name>`; `make smoke FIXTURE=<pattern>`, and likewise for `layout`, `extract-test`, and `tagging` |
 | Lint / format        | `make lint`                                                                              |
-| Pull request gate    | CI: the required checks on `Protect Main`; locally: `make lint`, the suite that owns the change, and `make check` when the change touches a shared package, a class, or a baseline |
+| Pull request gate    | CI: the required checks on `Protect Main`; locally: `make lint` and the suite that owns the change |
 
-Before a push, run the local checks of the pull request gate. Run `make check`
-in the background, and run it too whenever you want the full run before CI: it
-tests the TeX Live on your machine, where CI tests one pinned image. CI's
-required checks must pass before a merge (`CONTRIBUTING.md`, "What actually
-gates a merge").
+Before a push, run the local checks of the pull request gate; CI then runs
+every suite on the pull request. Run the full local suite, `make check FULL=1`,
+in the background, before a release and after you update TeX Live: it tests the
+TeX Live on your machine, where CI tests one pinned image. CI's required checks
+must pass before a merge (`CONTRIBUTING.md`, "What actually gates a merge").
 
 CI, in `.github/workflows/`, runs every local suite and more, in a pinned TeX
 Live container, except that a docs-only pull request skips its TeX jobs

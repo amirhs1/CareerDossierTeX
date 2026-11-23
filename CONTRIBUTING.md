@@ -507,11 +507,12 @@ run while the target itself is called for by
 
 `make check` runs its twelve targets four at a time — about four minutes on the
 maintainer's machine where `check-serial` takes seven, as orientation rather
-than a figure to plan around. It is optional before a push: the required checks
-CI runs are the gate ("What actually gates a merge" below), and `AGENTS.md`,
-"Commands", says when the full local run is worth it. It also tests the TeX Live
-on your machine, where CI tests one pinned image. Set the worker count with
-`JOBS`, or take the deterministic path instead:
+than a figure to plan around. A push does not need it: the required checks CI
+runs on every pull request are the gate ("What actually gates a merge" below).
+The full local run, `make check FULL=1`, is due before a release and after you
+update TeX Live, because it tests the TeX Live on your machine, where CI tests
+one pinned image; `AGENTS.md`, "Commands", states the rule. Set the worker
+count with `JOBS`, or take the deterministic path instead:
 
 ```bash
 make check                     # the full run: twelve targets, four at a time
@@ -685,8 +686,9 @@ what you are changing; it is reference material, not a document to read through.
 
 "Local builds" above is the other half: how to invoke a suite, how to scope one
 while you iterate, and how a target relates to its CI job. CI's required checks
-are the gate ("What actually gates a merge"), and `make check` is the optional
-full local run.
+are the gate ("What actually gates a merge"), and `make check` is the full local
+run, due before a release and after a TeX Live update ("The full run, and the
+serial path").
 
 ## Coding conventions
 
