@@ -445,8 +445,9 @@ suites plus every supported example build — with:
 make check
 ```
 
-`make check` runs those targets four at a time and is optional before a push:
-the required checks CI runs on a pull request are the gate. `make check-serial`
+`make check` runs those targets four at a time. A push does not need it: the
+required checks CI runs on every pull request are the gate, and the full local
+run is due before a release and after a TeX Live update. `make check-serial`
 runs the same targets singly when a deterministic pass is worth more than the
 wall clock, and [`CONTRIBUTING.md`](CONTRIBUTING.md) "The full run, and the
 serial path" says when each is worth reaching for.
