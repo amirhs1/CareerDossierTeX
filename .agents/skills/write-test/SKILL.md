@@ -75,8 +75,7 @@ description: Write or change a test under tests/: an l3build regression test, a 
     macOS. Report every gate the runner's summary says it skipped, such as
     veraPDF for `-ua2`: `docs/TESTING.md`, "Tagged-PDF suite".
 13. Run the focused target, then the affected suites, then the rest of the
-    pull request gate in AGENTS.md, "Commands", with `make check` in the
-    background and the sandbox off. Report what each printed under
+    pull request gate in AGENTS.md, "Commands". Report what each printed under
     `.github/pull_request_template.md`, "Checks run".
 
 ## Example
