@@ -1,149 +1,93 @@
 # GitHub Project metadata
 
-This is the canonical repository procedure for populating and verifying the
-GitHub Project fields, labels, milestone, and assignee on an **issue or a pull
-request**. It applies to every agent.
+How to set and verify the Project fields, labels, milestone, assignee, and
+parent of an issue or a pull request. The rules are the same for both objects;
+where one differs, the section says so. `.agents/skills/open-pull-request/SKILL.md`
+holds what is pull-request-only: the close-out gate, the body, and the push.
 
-The fields, their option ids, and the read-back obligation do not depend on
-which of the two objects carries them. Where a rule genuinely does depend on it,
-this file says so at that point; `.agents/skills/open-pull-request/SKILL.md`
-holds what is PR-only — the close-out gate, the PR body, and the push.
+Contents: Project field values (Size guide; Sizing an item that has no diff
+yet) · Label selection · Status transitions · Routine authorization ·
+Verification · Appendix: steps 1 to 5; Filing an issue instead; Updating an open
+pull request; Read option strings live; Auditing a milestone before a release.
 
 ## Project field values
 
-For a **newly opened draft pull request**:
+| Field | Newly opened draft pull request | Newly filed issue |
+| --- | --- | --- |
+| Status | the in-progress option | `Ready` if defined enough to start, else `Backlog` |
+| Phase | inherited from the focused issue | the phase paired with the milestone |
+| Priority | inherited from the focused issue | judged from the work |
+| Size | scored from the completed diff ("Size guide") | estimated ("Sizing an item that has no diff yet") |
+| Start date, Target date | unset | unset |
 
-- **Status:** the in-progress option — `CONTRIBUTING.md`, "Project Status
-  convention", for what it means, the appendix's discovery query for how
-  it is spelled
-- **Phase:** inherit from the focused issue
-- **Priority:** inherit from the focused issue
-- **Size:** score the actual completed diff against the "Size guide" below
-- **Start date:** leave unset for routine items
-- **Target date:** leave unset for routine items
-- **The focused issue's Size:** the size of the issue's pull requests together,
-  when this pull request closes that issue and no other, except the cases
-  "Size guide" names; the pull request's own, when it is the issue's only one
+`CONTRIBUTING.md`, "Project Status convention", defines what each `Status`
+means, and "Phase numbering convention" pairs phases with milestones. Never set
+a higher priority than the focused issue's. Where an inherited field's source
+has none, leave it unset and report it.
 
-For a **newly filed issue**, the same four fields are required and only their
-sources differ:
-
-- **Status:** `Ready` when the issue is defined enough to start, `Backlog` when
-  it is accepted but not scheduled — `CONTRIBUTING.md`, "Project Status
-  convention", for the vocabulary
-- **Phase:** the phase paired with the issue's milestone
-- **Priority:** judged from the work, since there is nothing to inherit from
-- **Size:** estimated, not measured — see "Sizing an item that has no diff yet"
-  below
+A pull request that closes the focused issue and no other also writes that
+issue's `Size`, as "Size guide" scores it.
 
 An issue also takes a **parent**: its milestone's release epic, the issue in
-that milestone whose title begins `[epic]`. `CONTRIBUTING.md`, "1. Every issue
-carries a milestone", states the rule. A patch release has no epic, and an epic
-is not its own sub-issue, so neither takes a parent.
-
+that milestone whose title begins `[epic]` (`CONTRIBUTING.md`, "1. Every issue
+carries a milestone"). A patch release has no epic, and an epic is not its own
+sub-issue, so neither takes a parent.
 
 ### Size guide
 
-`Size` is scored from a diff, so a pull request is the object it applies to
-directly; "An issue takes the size of its pull requests together" below is the
-bridge to the other one, and "Sizing an item that has no diff yet" covers the
-case where no diff exists.
-
-Score the diff on both axes and take the **larger** of the two tiers:
+Score a diff on both axes and take the **larger** tier, so that neither a change
+spread thinly over many files nor a large change to a few escapes:
 
 | | XS | S | M | L |
 |---|---|---|---|---|
 | files changed | ≤2 | 3–9 | 10–40 | >40 |
 | lines (additions+deletions) | <30 | <100 | <1,000 | ≥1,000 |
 
-Neither axis alone is sufficient: a change spread across many files with small
-per-file diffs and a change concentrated in few files with a large diff both
-need to be caught, and only the larger of the two tiers catches both.
+A deleted file may count as one line; say so in the pull request when that
+changes the tier.
 
-**Source.** The line bounds of `S` and `L` come from Google's code-review
-guide, ["Small CLs"](https://google.github.io/eng-practices/review/developer/small-cls.html):
-"100 lines is usually a reasonable size" and "1000 lines is usually too
-large". The guide sets no other bound, so the `XS` bounds and the file counts
-are this project's choice (2026-11-21). The `L` file bound keeps the previous
-table's, close to the guide's example of a change spread across 50 files. A
-deleted file may count as one line, as the guide allows; say so in the pull
-request when that changes the tier.
+**`L` means "split it".** A pull request expected to score `L` needs a stated
+reason it cannot be split, and approval before its branch starts (`AGENTS.md`,
+"Git"); one that scores `L` stays draft with a recommendation to split it,
+unless broad scope was approved. Treat a broad or risky change as `L` even when
+the table says `M`.
 
-**Measured effect** (2026-11-21, the 375 merged pull requests in the
-`CareerDossierTeX Development` Project): this table scores them XS 55, S 73,
-M 218, L 29. The previous table, whose `L` began at 3,000 lines or 41 files,
-scored them XS 84, S 118, M 165, L 8, and the recorded values are XS 84,
-S 120, M 162, L 9. So about one past pull request in thirteen would now score
-`L`, and more than half fall in `M`. Recorded values keep the table they were
-scored with. Re-run "Re-measuring the Size fit" in the appendix before quoting
-these numbers far from 2026-11-21.
+**An issue takes the size of its pull requests together.** An issue that holds
+several findings ships as several pull requests, each saying `Refs #n` and the
+last saying `Closes #n` (`AGENTS.md`, "Git"), so the last one alone understates
+it. Its pull requests are those that close it and those whose body says
+`Refs #n`, merged or open, each naming no other issue with `Closes` or `Refs`.
+Score them as one diff: the **distinct files** across them and the **sum** of
+their lines. A file several of them edit counts once, so an issue scores the
+same however it was split; with one pull request, the score is that one's own.
 
-**`L` means "split it".** It is the tier the guide calls usually too large. A
-pull request expected to score `L` needs a stated reason it cannot be split,
-and approval before its branch starts (`AGENTS.md`, "Git"). Treat a broad or
-risky change as `L` even when the table says `M`: the table is not a ceiling
-on `L`.
+The pull request that closes the issue and no other writes this value (step 3a
+scores it, step 4 writes it), when it opens and on each update that changes the
+diff. A pull request that only says `Refs #n` writes nothing: the issue keeps
+its estimate until the closing pull request opens.
 
-Three cases the table does not cover:
+Three cases take no size from a pull request:
 
-- **A PR closing more than one issue does not give each issue the PR's own
-  size.** #456 (17 files, 582 lines, `M`) closed both #447 and #450, and
-  each is individually `S`. Score the PR from its own diff; do not propagate
-  that score to every issue it closes.
-- **An issue closed `not_planned` has no diff to score.** Its `Size` is an
-  estimate from the issue body, not a measurement — #395 (`M`) and #433
-  (`XS`) are the current examples.
-- **Epics and release-preparation issues do not follow this rule.** Copy the
-  previous release's pair instead.
+- **A pull request that closes more than one issue.** Score it from its own
+  diff; each issue keeps its own `Size`.
+- **An issue closed `not_planned`.** Its `Size` is an estimate from its body.
+- **An epic or a release-preparation issue.** Copy the previous release's pair.
 
-**An issue takes the size of its pull requests together**, except the three
-cases above. An issue that holds several findings ships as several pull
-requests, each saying `Refs #n` and the last saying `Closes #n` (`AGENTS.md`,
-"Git"), so the last one's size alone understates it. Its pull requests are
-those that close it and those whose body says `Refs #n`, merged or open, and
-each names no other issue with `Closes` or `Refs`. Score them as one diff on
-the table above: the **distinct files** changed across them and the **sum** of
-their additions and deletions, then the larger tier. A file several of them
-edit counts once, so an issue scores the same however it was split. One pull
-request is the special case: its own counts, so a single-pull-request issue
-scores as before.
-
-The pull request path writes it: step 3a of the appendix scores the issue's
-pull requests together, and step 4 gives the focused issue that value when the
-pull request closes that issue and no other, when it opens and again on each
-update that changes the diff. It writes nothing when the pull request closes
-more than that one issue, or only refers to it with `Refs #n`, which closes
-nothing: the issue keeps its filing-time estimate until the pull request that
-closes it opens.
+Recorded values keep the table they were scored with; never re-score a past
+item to fit a later table.
 
 ### Sizing an item that has no diff yet
 
-An issue's `Size` must be set when it is filed, which is before any diff exists
-and long before the closing PR does. Leaving it blank is not an option — a blank
-is unfinished work, per "Verification" below.
-
-Predict the diff instead of guessing the tier. The issue's `Likely files`
-section is required to be the output of a **search command**, not of recall, so
-the file count is already measured; score that count and a line estimate on the
-same two axes and take the larger tier. Re-score from the real diff when the PR
-opens rather than inheriting the filing-time number — the guide's rule is about
-a diff, and the estimate is only standing in for one. An issue planned as
-several pull requests is predicted as they will be scored, together: its `Likely
-files` already names every file the pull requests will change.
-
-### Two rules that bound any value set here
-
-If a pull request scores `L`, keep it draft and recommend splitting it unless
-broad scope was already approved.
-
-Do not infer a higher priority than the focused issue. Where a field is
-inherited and its source has none, leave it unset and report it.
-
+An issue's `Size` is set when it is filed, before any diff exists, and a blank
+is unfinished work. Predict the diff: the issue's `Likely files` is the output
+of a search command, so score its file count and a line estimate on the same two
+axes, and take the larger tier. For an issue planned as several pull requests,
+predict them together. The closing pull request re-scores it from the real
+diffs.
 
 ## Label selection
 
-Use only the labels `CONTRIBUTING.md`, "Names", lists; they exist on the
-repository, and this command shows them live:
+Use only the labels `CONTRIBUTING.md`, "Names", lists:
 
 ```bash
 gh label list --limit 100
@@ -160,42 +104,29 @@ gh label list --limit 100
 | Agent instructions, skills, or workflow docs | `type:docs`, `area:agents` |
 | Agent sandbox, permissions, or settings config | `type:ci`, `area:agents` |
 
-An issue or a pull request may carry several area labels but should normally
-carry exactly one primary type label. An issue filed from `development.md`
-pre-applies no `type:*` label at all — that form spans six of them — so
-applying one is part of filing the issue, not an optional extra.
-
-The two `area:agents` rows differ by what the change *is*, not what it touches.
-Editing `AGENTS.md`, a `SKILL.md`, or a `reference.md` is documentation.
-Changing `.claude/settings.json` or `.codex/config.toml` alters how a tool is
-permitted to execute, which is closer to build and CI configuration.
-
+Apply one primary `type:*` label and every relevant `area:*` label. The
+`development.md` issue form pre-applies no `type:*` label, so filing from it
+includes choosing one. The two `area:agents` rows differ by what the change is:
+editing `AGENTS.md`, a `SKILL.md`, or a `reference.md` is documentation;
+changing `.claude/settings.json` or `.codex/config.toml` changes how a tool may
+run, which is closer to CI.
 
 ## Status transitions
 
-`CONTRIBUTING.md`, "Project Status convention", is the canonical
-statement of the `Status` vocabulary and of the issue and PR transitions through
-it — including which value a newly opened draft PR takes and when it changes.
-Read the value there; this skill does not restate it, and an answer derived from
-anywhere else is wrong.
+`CONTRIBUTING.md`, "Project Status convention", states the `Status` vocabulary
+and every issue and pull request transition; take the value from there. Two
+cases it leaves here:
 
-Two cases that section leaves to this skill, because they are procedure rather
-than naming:
+- a pull request closed without merge: restore or keep the issue's status;
+- blocked work: keep a non-`Done` status and say in the issue what blocks it;
+  there is no `blocked` label.
 
-- PR closed without merge → restore or preserve the appropriate issue status;
-- blocked work → keep an appropriate non-`Done` status, and say in the issue
-  what blocks it; there is no `blocked` label.
-
-Prefer GitHub Project workflows for deterministic transitions such as merged PRs
-and closed issues becoming `Done`. "Project Status convention" also carries the
-warning about transcribing option strings exactly, which applies to every value
-set here.
-
+Leave deterministic transitions, such as a merged pull request becoming `Done`,
+to the Project's workflows.
 
 ## Routine authorization
 
-The following are pre-authorized on an issue or pull request whose underlying
-work is itself authorized:
+Pre-authorized on an issue or pull request whose work is itself authorized:
 
 - assignment to `amirhs1`;
 - existing labels;
@@ -205,93 +136,46 @@ work is itself authorized:
 - Project values derived from the issue and the item's actual scope;
 - moving the focused issue to the in-progress option.
 
-Obtain explicit approval before:
+Ask first before:
 
 - creating, renaming, deleting, or recoloring labels;
 - creating, editing, closing, or deleting milestones;
 - creating or changing Project fields, allowed values, workflows, or views;
 - changing Phase or Priority contrary to the issue.
 
-Everything `AGENTS.md`, "Git", reserves to the maintainer is reserved here too.
-That section states the action set; this list does not repeat it, and adds only
-the GitHub-object cases an agent meets while populating metadata.
-
+Everything `AGENTS.md`, "Git", reserves to the maintainer stays reserved.
 
 ## Verification
 
-After writing the fields, read the metadata back from GitHub — do not report
-what you intended to set — and confirm each of:
+Read every value back from GitHub and assert it equals what you set: a null
+field and a wrong one read alike in prose, but not in a comparison. Step 5 does
+this in one call. Check:
 
-- assignee;
-- labels;
-- milestone;
-- Project membership;
-- Status;
-- Phase;
-- Priority;
-- Size;
+- assignee, labels, milestone, and Project membership;
+- Status, Phase, Priority, and Size;
 - on an issue, its parent;
-- fields intentionally left unset and why.
+- on a pull request, also its URL and draft status, its base and head branches,
+  the issue its body closes, and that issue's Status, Size, and parent.
 
-A pull request additionally confirms four items, which
-`.agents/skills/open-pull-request/SKILL.md` lists too: its URL and draft status;
-its base and head branches; the focused issue its body links; and, when it
-scores `L`, its extra obligation — stay draft and recommend splitting, unless
-broad scope was already approved. It also confirms two values on the focused
-issue besides its `Status`: its parent, and its `Size`, which equals what
-"Size guide" scores for the issue's pull requests together, the pull request's
-own when it is the only one.
+A blank is unfinished work: fill it and read back again. The only legitimate
+blanks:
 
-A blank field in that read-back is unfinished work, not a reporting line. Fill
-it and read back again. The appendix has the queries, and reads the list back in
-one call — as an assertion that each value equals the intended one, not as a
-list to eyeball, because a null field and a wrongly-set field read alike in
-prose.
+- **Milestone, Phase, and Priority on a pull request**, when the focused issue
+  has none; report the missing issue field. Never pick a milestone the issue
+  lacks: an unmilestoned issue is usually postponed work.
+- **The parent**, on an epic, an issue in a patch release, or an issue with no
+  milestone. Anywhere else, attach it with the mutation in "Filing an issue
+  instead".
 
-Which blanks are legitimate:
-
-- **Status, Size, assignee, and labels** are determinable from the item itself,
-  so none of them may be left unset. `Status` comes from
-  `CONTRIBUTING.md`, "Project Status convention"; `Size` from "Size guide"
-  above — judged on the completed diff for a pull request, and predicted
-  per "Sizing an item that has no diff yet" for a freshly filed issue.
-- **Milestone, Phase, and Priority** on a *pull request* are inherited and must
-  not be invented. Each may stay blank, and only when the focused issue itself
-  has none — in which case name the missing *issue* field, not the PR field.
-  On an *issue* there is nothing to inherit from: the milestone is required by
-  `CONTRIBUTING.md`, "1. Every issue carries a milestone" (with the one
-  exception that section names), and `Phase` follows the milestone.
-  `CONTRIBUTING.md`, "Phase numbering convention", defines it.
-- **The parent** may be blank only on an issue in a patch release, an epic, or
-  an issue with no milestone. Anywhere else a missing parent is unfinished
-  work: attach it with the mutation in "Filing an issue instead", and read back
-  again.
-
-A deliberately unmilestoned issue is the ordinary case for work the maintainer
-has postponed, and a PR against one inherits no milestone. Do not read the rule
-against blank fields as licence to pick a milestone the issue does not have —
-that silently pulls postponed work into a release.
-
-If Project API access is unavailable, still set every field that is reachable
-without it. Report the exact fields that could not be updated rather than
-claiming completion.
-
-The read-back above is not a report of its own. `AGENTS.md`, "Report back",
-defines the one report shape, and this list goes in its "2 Checks run" section,
-under the report's one verdict, which covers the work as a whole and not only
-its metadata.
-
+Status, Size, assignee, and labels are never blank. If Project access is
+unavailable (a missing `project` scope or identifier), set every reachable
+field and report exactly which could not be set. The read-back goes in the
+report's "2 Checks run" (`AGENTS.md`, "Report back").
 
 ## Appendix: gh command reference
 
-These commands are how an agent (or the maintainer) actually reads and writes
-the Project. Step 4 is object-neutral: an item id is an item id. The other four
-steps are written for a pull request, because that is the busier path, and
-"Filing an issue instead", after step 5, gives an issue's own steps in their
-place.
-
-Repository metadata (assignee, labels, milestone) needs only the `repo` token
-scope; Project reads/writes additionally need `read:project` and `project`:
+Repository metadata needs the `repo` token scope; the Project needs
+`read:project` and `project` too:
 
 ```bash
 gh auth refresh -s read:project,project
@@ -299,30 +183,17 @@ gh auth refresh -s read:project,project
 
 ### The shape of the sequence
 
-The `gh project` sub-commands expose one identifier per invocation — project
-number, then field ids, then item ids, then one write per field — so the
-straightforward path costs sixteen round-trips for one ordinary item. None
-of that is a rule; it is the sub-command surface, and it is paid on every
-branch.
-
-`gh api graphql` removes the id-discovery and per-field calls without removing
-anything the rules require: it batches inside one request, and it still reads
-every id and option string live in the same run, so nothing is cached into the
-tree. `CLAUDE.md`, "Sandbox and permissions", says why it is the only form that
-batches here.
-
-The five steps below cost five calls, and with `gh label list` and `gh issue
-view` the whole path from "branch ready" to "metadata verified" is **seven**.
-When the focused issue has other pull requests, step 3a adds one call.
-
-What the collapse does not buy is a shorter verification. Batching four writes
-into one document adds a way for one write to fail among four successes, so
-step 5 is more load-bearing here, not less.
+Each step is one `gh api graphql` call, which batches what `gh project` does
+one id or one field per call, and still reads every id live; `CLAUDE.md`,
+"Sandbox and permissions", says why `gh` runs alone. A pull request takes seven
+calls with `gh label list` and `gh issue view`, eight with step 3a. Batched
+writes can fail one alias among many, so step 5 matters more, not less. Steps 1
+to 5 are for a pull request; "Filing an issue instead" gives an issue's own.
 
 ### 1. Discover every id in one query
 
-Project id, every field id, every single-select option id, and the focused
-issue's item id with its current Status, Phase, and Priority:
+The project, its field and option ids, and the focused issue's item, parent,
+milestone, and current values:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
@@ -357,19 +228,15 @@ query($owner:String!,$repo:String!,$issue:Int!){
 ```
 
 From the `CareerDossierTeX Development` node take the project id and title, the
-`Status`, `Phase`, `Priority`, and `Size` field ids, and the option id of each
-value you intend to set. From the issue's own item take the milestone, Phase,
-and Priority to inherit. From its milestone's issues take the release epic, the
-first whose title begins `[epic]`, for step 5 to assert as the issue's parent;
-a patch milestone lists none. The issue's own title says whether it is an epic
-or a release-preparation issue (`[epic]`, `[release]`), which step 4's
-`issueSize` alias skips.
+four field ids, and the option id of each value to set. From the issue take its
+item id, the milestone, Phase, and Priority to inherit, and its release epic:
+the first issue in its milestone whose title begins `[epic]`. Its own title says
+whether it is an epic or a release issue (`[epic]`, `[release]`), which step 4
+writes no `Size` to.
 
 ### 2. Open the PR fully configured (repo scope)
 
-Assignee, labels, milestone, and Project membership are all `gh pr create`
-flags, so they cost no call of their own. Use the project title exactly as
-step 1 returned it:
+Use the milestone and project title exactly as step 1 returned them:
 
 ```bash
 gh pr create --draft --base main --head <branch> \
@@ -379,14 +246,10 @@ gh pr create --draft --base main --head <branch> \
   --project "<project title from step 1>"
 ```
 
-When updating an existing PR rather than opening one, the same flags are
-`--add-assignee`, `--add-label`, `--milestone`, and `--add-project` on
-`gh pr edit`.
+To update an open pull request, `gh pr edit` takes `--add-assignee`,
+`--add-label`, `--milestone`, and `--add-project`.
 
 ### 3. Read the new PR's item id
-
-The PR did not exist when step 1 ran, and a field write addresses an item by id,
-so this read is the one that cannot be folded away:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F pr=<pr-number> -f query='
@@ -397,27 +260,17 @@ query($owner:String!,$repo:String!,$pr:Int!){
 }'
 ```
 
-An empty `projectItems` means step 2's `--project` matched nothing. Add the PR
-to the Project before writing fields, rather than writing them against a row
-that does not exist.
-
-`gh pr create` can exit 1 after it has opened the pull request, with
-`pull request update failed: GraphQL: Content already exists in this project`:
-the pull request is already in the Project, as on #704, where the Project's
-auto-add workflow is the likely cause. Its labels, assignee, and milestone are
-applied. Take the pull request's URL from the output, do not run
-`gh pr create` again, and run this step: one item in the Project means the add
-happened, and the fields can be written.
+An empty `projectItems` means `--project` matched nothing: add the pull request
+to the Project before writing fields. If `gh pr create` exits 1 with `Content
+already exists in this project`, the pull request was opened and the Project's
+auto-add got there first; do not run it again, take the URL from the output, and
+run this step.
 
 ### 3a. Score the focused issue's pull requests together
 
 Run this when the pull request closes the focused issue and no other, and the
-issue may have other pull requests: an earlier one that says `Refs #n`, or a
-second closing one. Skip it when the issue has no other, and give step 4's
-`issueSize` alias the pull request's own option. The query reads every pull
-request that closes the issue or cites it, with its changed paths, and scores
-them as "Size guide" says: the distinct paths, the summed additions and
-deletions, the larger tier.
+issue may have other pull requests: an earlier `Refs #n` one, or a second
+closing one. Otherwise give step 4's `issueSize` the pull request's own option.
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
@@ -455,20 +308,15 @@ fragment pr on PullRequest{
        closesOthers:([$closing[] | select(.closingIssuesReferences.totalCount != 1) | .number])}'
 ```
 
-Take the `Size` option name from `size` and its id from step 1. A non-empty
-`closesOthers` means a closing pull request closes another issue too, which is
-the first case "Size guide" names: write nothing. A `Refs` pull request that
-names another issue is left out of `prs`, so the score can understate; say so in
-the pull request when one is. The query reads up to 10 closing pull requests, 100
-cross-references, and 100 paths of each pull request (more than 40 distinct paths
-is already `L`), and stops with an error when a list is longer.
+Take `size`'s option id from step 1. A non-empty `closesOthers` means write
+nothing ("Size guide", first case). A `Refs` pull request that names another
+issue is left out of `prs`; say so in the pull request. The query stops when a
+list is longer than it reads.
 
 ### 4. Write every field in one mutation
 
-One aliased `updateProjectV2ItemFieldValue` per value: the PR's Status, Phase,
-Priority, and Size, the focused issue's move to the in-progress option, and the
-focused issue's Size. Each alias selects back the value it just wrote, so the
-response is evidence rather than an exit status:
+The pull request's Status, Phase, Priority, and Size, and the focused issue's
+Status and Size; each alias reads back what it wrote:
 
 ```bash
 gh api graphql \
@@ -502,25 +350,20 @@ mutation($p:ID!,$pi:ID!,$ii:ID!,$fSt:ID!,$fPh:ID!,$fPr:ID!,$fSz:ID!,
 }'
 ```
 
-The `issueSize` alias writes `$oIz`, the option for the issue's pull requests
-together: step 3a's `size`, or, for an issue with no other pull request, the
-same option as `$oSz`. Drop it, and leave the issue's `Size` as it is, when
-"Size guide" says the issue takes no size from the pull request: the body closes
-more than one issue, or none (`Refs #n`), or the focused issue is an epic or a
-release-preparation issue.
+`$oIz` is step 3a's option, or `$oSz` when the issue has no other pull request.
+Drop the `issueSize` alias when "Size guide" gives the issue no size from this
+pull request: it closes more than one issue or none, or the issue is an epic or
+a release issue. Text, date, and number fields take `text:`, `date:`, or
+`number:` instead of `singleSelectOptionId:`.
 
-Text, date, and number fields take `text:`, `date:`, or `number:` in `value:`
-instead of `singleSelectOptionId:`.
-
-**A batched write fails per alias, not per call.** When one alias is rejected,
-its entry in `data` is `null`, `errors[].path` names it, and `gh` exits
-non-zero — while the others have already applied. So a zero exit is not six
-successes, and neither is a response that merely contains data. Read every
+A batched write fails per alias: a rejected alias is `null`, `errors[].path`
+names it, and `gh` exits non-zero while the others have applied. Read every
 returned name.
 
 ### 5. Read the verification list back in one query
 
-One query covers repository metadata and both items' Project fields:
+Fill `$want` from what you set, then run it; it prints the table and exits 1 on
+any mismatch:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX \
@@ -548,18 +391,7 @@ query($owner:String!,$repo:String!,$pr:Int!,$issue:Int!){
       }}
     }
   }
-}'
-```
-
-Reading that output is not the check. **Assert the values**, because a null
-field and a wrongly-set field read alike in prose but not in a comparison. Put
-the assertion in the same call's own `--jq`. It compares every value
-"Verification" lists, the pull request's four items, and the focused issue's
-Status, Size, and parent against what you meant to set, and exits non-zero on
-any mismatch:
-
-```bash
-gh api graphql … -f query='…' --jq '
+}' --jq '
     {"url":"<pr-url>","isDraft":true,"base":"main","head":"<branch>",
      "assignees":["amirhs1"],"labels":["<label>","<label>"],
      "milestone":"<milestone>","closes":[<issue-number>],
@@ -588,52 +420,21 @@ gh api graphql … -f query='…' --jq '
     | if all(.[]; .ok) then . else halt_error(1) end'
 ```
 
-Write `$want` from what you set, never from what came back:
-
-- `assignees` and `labels` sorted, because `$got` sorts them;
-- `closes` with each issue the body closes with `Closes #n`, or `[]` for a body
-  that only refers to one;
-- `null` for an inherited field the focused issue lacks, which "Verification"
-  permits;
-- `issueSize` as step 4 wrote it, or, where step 4 dropped that alias, the
-  issue's `Size` from step 1;
-- `issueParent` as the release epic step 1 found, or `null` where
-  "Verification" allows no parent. A mismatch here is a missing sub-issue
-  link, not a field step 4 sets: attach it as "Filing an issue instead" does,
-  then read back again.
-
-Never pipe the call to `jq` instead. The pipe puts `gh` inside the sandbox,
-where its request is denied (`CLAUDE.md`, "Sandbox and permissions"); `jq`
-then reads empty input, prints nothing, and exits 0, so the denial reads as a
-pass. `gh`'s `--jq` takes no `--argjson`, which is why the intended values are
-bound inside the expression.
-
-Select the item by project rather than taking `nodes[0]`: a PR that ends up in
-two projects would otherwise be checked against whichever row came back first,
-which is the same class of mistake as writing a field to the wrong item. An
-item missing from the Project selects `{}`, so the missing membership fails as
-the `project` row, with each of that item's fields `null`, and the table is
-still printed.
-
-`halt_error(1)` makes `gh` print the offending table and exit 1, so a mismatch
-cannot be read as a pass. Report the printed table in the report's "2 Checks
-run" section.
-
-Two items on the list stay with the reader, because they are decisions rather
-than values: why a field was left unset, which the report states; and, for a
-pull request scored `L`, the recommendation to split it. Staying draft, the
-other half of that obligation, is the `isDraft` row.
+In `$want`, sort `assignees` and `labels`; give `closes` as each `Closes #n`, or
+`[]`; `null` for an inherited field the issue lacks; `issueSize` as step 4 wrote
+it, or step 1's value where step 4 dropped it; `issueParent` as step 1's epic,
+or `null` where "Verification" allows none. A wrong parent is a missing
+sub-issue link: attach it as "Filing an issue instead" does. Never pipe `gh` to
+`jq`: piped, `gh` runs in the sandbox and is denied, and `jq` exits 0 on empty
+input.
 
 ### Filing an issue instead
 
-Step 4 keeps its shape with one alias fewer. Every other step changes: step 1
-reads no issue, step 2 files it, step 3 is not needed, and step 5 reads the
-issue alone.
+Step 1 reads no issue, step 2 files it, step 3 is not needed, step 4 drops the
+`issueStatus` and `issueSize` aliases, and step 5 reads the issue alone.
 
-**Step 1 reads no issue.** The issue does not exist until step 2 files it, and
-step 1's query declares `$issue:Int!`, so run without one it fails:
-`Variable $issue of type Int! was provided invalid value`. Read the Project and
-the open milestones instead:
+**Step 1** reads the Project and the open milestones; its pull request form
+fails without an issue number:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -f query='
@@ -653,13 +454,10 @@ query($owner:String!,$repo:String!){
 }'
 ```
 
-Take the project id, field ids, and option ids as step 1 does. There is no
-focused issue to inherit from, so `CONTRIBUTING.md`, "1. Every issue carries a
-milestone", decides which milestone the issue takes, and this list gives its
-exact string. "Project field values" above gives the four Project values.
+`CONTRIBUTING.md`, "1. Every issue carries a milestone", decides the milestone,
+and this list gives its exact string.
 
-**Step 2 becomes `gh issue create`.** It takes the same metadata flags, so the
-issue is filed fully configured in one call:
+**Step 2** files the issue fully configured:
 
 ```bash
 gh issue create --title "[area] Verb object" --body-file <body.md> \
@@ -667,13 +465,9 @@ gh issue create --title "[area] Verb object" --body-file <body.md> \
   --milestone "<milestone string from step 1>"
 ```
 
-`gh issue create` has **no `--project` flag**, which is the one asymmetry with
-`gh pr create`. Add the issue to the Project with a mutation instead, in two
-calls with each `gh` alone: a `gh` nested in `$(…)` inside the mutation runs
-sandboxed and is denied (`CLAUDE.md`, "Sandbox and permissions"). The same
-mutation makes the issue a sub-issue of its release epic, so the first call
-reads both node ids: the issue's own, and the epic's, found in the issue's
-milestone as the first issue whose title begins `[epic]`:
+`gh issue create` has no `--project` flag, so a mutation adds the issue to the
+Project and makes it a sub-issue of its epic. Read both node ids first, then
+write them, each `gh` call alone:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<n> -f query='
@@ -690,8 +484,6 @@ query($owner:String!,$repo:String!,$issue:Int!){
        epic:([.milestone.issues.nodes[]? | select(.title | startswith("[epic]"))][0] // null)}'
 ```
 
-Then write both ids into the mutation:
-
 ```bash
 gh api graphql -f p=<project-id from step 1> -f c=<issue id from the call above> \
   -f e=<epic id from the call above> -f query='
@@ -701,31 +493,12 @@ mutation($p:ID!,$c:ID!,$e:ID!){
 }'
 ```
 
-Drop the `sub` alias and the `$e` variable when `epic` is `null` (a patch
-release, or an issue with no milestone) or names the issue itself (filing the
-release epic). `sub` selects back the parent it wrote, which is the evidence;
-step 5 asserts it again.
+Drop `sub` and `$e` when `epic` is `null` or names the issue itself. `add`
+returns the existing item if auto-add got there first; `sub` on an issue that
+already has a parent is `null` with a `VALIDATION` error, and `gh` exits 1
+though `add` applied. Step 4 writes to `add`'s item id.
 
-The mutation is safe to run when the Project's auto-add workflow has already
-added the issue: `add` returns that item's id and adds no second item. `sub`
-is not idempotent. On an issue that already has a parent, the epic included,
-`sub` is `null` with a `VALIDATION` error, `Issue may not contain duplicate
-sub-issues and Sub issue may only have one parent`, and `gh` exits 1 even
-though `add` applied (measured 2026-11-05 on #632). Take the item id from
-`add`, and let step 5 show which parent the issue has.
-
-The returned `item.id` is what step 4 writes against, so **step 3 is not needed
-on this path** — the mutation that adds the item already returns its id, while
-a PR's item id has to be read back separately.
-
-**Step 4 drops the `issueStatus` and `issueSize` aliases.** There is no second
-object to write, so the mutation carries four aliases rather than six.
-
-**Step 5 reads the issue alone.** Its query declares `$pr:Int!`, which an issue
-does not have, and its assertion builds rows only a pull request has. This query
-and assertion cover the nine values "Verification" lists for an issue, with
-step 5's pattern and its rules for writing `$want`; `parent` is the epic's
-number from the id read above, or `null` where it found none:
+**Step 5** asserts the issue's nine values the same way:
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
@@ -764,115 +537,42 @@ query($owner:String!,$repo:String!,$issue:Int!){
     | if all(.[]; .ok) then . else halt_error(1) end'
 ```
 
-Why a field was left unset stays with the reader, as on the pull request path.
-
-When several issues are filed together, add them one call at a time rather than
-batching the `addProjectV2ItemById` aliases: the order of sequential calls is
-the order they appear in the Project and in an epic's sub-issue graph, and that
-order is maintainer-curated.
+File several issues one call at a time: the order of the calls is their order in
+the Project and under the epic, which the maintainer curates.
 
 ### Updating an open pull request
 
-`.agents/skills/open-pull-request/SKILL.md`, step 8, updates a pull request
-that is already open. When the update pushes commits, the diff `Size` was
-scored from has changed, so score it again; an update to the body alone
-changes no field and skips this.
-
-Score the whole branch diff, not the new commits, from the pull request's own
-counts against "Size guide":
+When an update to an open pull request pushes commits, re-score the whole
+branch diff, not the new commits, from its own counts:
 
 ```bash
 gh pr view <pr-number> --json changedFiles,additions,deletions
 ```
 
-Then run steps 1, 3, 4, and 5 above as for a new pull request. Step 4 carries
-only the `size` and `issueSize` aliases, with `issueSize` dropped in the same
-cases, and declares only the variables they use (`$p`, `$pi`, `$ii`, `$fSz`,
-`$oSz`, `$oIz`): GraphQL rejects a declared variable that nothing uses. Run step
-3a again first when the issue has other pull requests: an update can change this
-pull request's files and lines, and with them the union. Step 5 runs in full, so the fields the update did not touch are asserted
-unchanged.
+Then run steps 1, 3, 3a when the issue has other pull requests, 4, and 5. Step
+4 carries only the `size` and `issueSize` aliases and declares only the
+variables they use (`$p`, `$pi`, `$ii`, `$fSz`, `$oSz`, `$oIz`): GraphQL rejects
+a declared variable that nothing uses. Step 5 runs in full. An update to the
+body alone changes no field.
 
 ### Read option strings live, never from prose
 
-The live Project is authoritative for the exact text and id of an option; this
-document and `CONTRIBUTING.md` are authoritative for *which* option to
-choose and what it means. Those are different questions, and a transcription of
-the first into prose drifts silently — which is why step 1 exists, why no id
-appears anywhere in this tree, and why the option names `CONTRIBUTING.md`,
-"Project Status convention", lists are there for their meaning, never for a
-lookup.
-
-The casing is the part that bites, because the lookup is by name. A
-`select(.name=="In progress")` against an option actually called `In Progress`
-yields an empty option id. This exact mismatch existed between the Project and
-the "Project Status convention" section until 2026-08-04, when the
-documentation was corrected to match the Project; assume it can recur.
-
-Under `gh project item-edit` that empty id set nothing and reported no error.
-Under step 4 it is a `VALIDATION` error — `The single select option Id does not
-belong to the field` — with the alias `null` and a non-zero exit. That is the
-one behavioral difference between the old sequence and this one, and it is in
-the safe direction: the silent failure became a loud one. It is still not a
-substitute for step 5, which is what catches a *valid* id written to the wrong
+Take each option's exact name and id from step 1, never from this file or
+`CONTRIBUTING.md`, which say only which option to choose. The lookup is by
+name, and a drifted transcription, such as `In progress` for `In Progress`,
+resolves to no id: step 4 then fails with `The single select option Id does not
+belong to the field`. Step 5 still has to catch a valid id written to the wrong
 row.
-
-So: take `Status` semantics from `CONTRIBUTING.md`, "Project Status
-convention", and `Phase` from its "Phase numbering convention", take `Priority`
-and `Size` from "Project field values" above, and take every literal option
-string and id from step 1.
-
-### Re-measuring the Size fit
-
-The query behind "Size guide" above. It pages through every item in the
-Project (`first:100`; repeat with `-f c=<endCursor>` from the previous
-response's `pageInfo`, adding `$c:String!` and `after:$c` to the query, until
-`hasNextPage` is `false` — eight pages on 2026-11-21, when this was last run)
-and returns each item's recorded `Size` next to its own diff
-stats in one pass, `PullRequest` and `Issue` content both, so no second query
-is needed to cross-reference the two:
-
-```bash
-gh api graphql -f p=<project-id> -f query='
-query($p:ID!){
-  node(id:$p){
-    ... on ProjectV2{
-      items(first:100){
-        pageInfo{hasNextPage endCursor}
-        nodes{
-          size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}
-          content{
-            __typename
-            ... on Issue{number state stateReason}
-            ... on PullRequest{number state changedFiles additions deletions
-              closingIssuesReferences(first:10){nodes{number}}}
-          }
-        }
-      }
-    }
-  }
-}'
-```
-
-Score each `state:"MERGED"` `PullRequest` node against the table in "Size
-guide" above (files-changed tier, lines-changed tier, take the larger): the
-count per tier is the measured effect reported there, and comparing each score
-with its own `size.name` shows how far the recorded values sit from the table. `stateReason` marks the `not_planned` carve-out on
-`Issue` nodes, and `closingIssuesReferences` is how an issue's own
-`size.name` is checked against the multi-issue-PR carve-out rather than
-assumed to equal its closing PR's score alone: an issue with more than one pull
-request scores their union ("Size guide").
 
 ### Auditing a milestone before a release
 
-One read-only query checks a whole milestone for the two values this skill
-writes outside a field mutation: an issue's parent, and the `Size` an issue
-takes from its pull requests. Run it before a release, and after any hand
-correction of either. It prints one line per finding and exits 1, or prints
-nothing and exits 0. Put the milestone's exact title in both places (`-f m=` and
-`$m`). The `query:` argument is a partial match (`v0.1` also returns `v0.1.1`
-and `v0.10.0`), so the `--jq` keeps only the milestone whose title equals `$m`,
-and stops when that one is not among the first three matches.
+One read-only query checks a milestone for the two values written outside a
+field mutation: each issue's parent, and the `Size` it takes from its pull
+requests. Run it before a release and after any hand correction. It prints one
+line per finding and exits 1, or prints nothing and exits 0. Put the exact
+milestone title in `-f m=` and in `$m`: `query:` matches partially, so the
+`--jq` keeps only the exact title, and stops when it is not among the first
+three matches.
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -f m=<milestone> -f query='
@@ -938,27 +638,14 @@ fragment pr on PullRequest{
     | if length == 0 then empty else join("\n") + "\n" | halt_error(1) end'
 ```
 
-The parent half follows `CONTRIBUTING.md`, "1. Every issue carries a
-milestone": the release epic is the milestone's first issue titled `[epic]`,
-and in a patch milestone, which has none, any parent is a finding. It checks
-the direct parent only, so a topic epic's children would be listed.
+**Parent:** every issue but the epic has the milestone's first `[epic]` issue
+as its direct parent; in a patch milestone, any parent is a finding.
 
-The `Size` half skips the three cases "Size guide" names (`[epic]` and
-`[release]` titles, `not_planned`, a pull request closing more than one issue),
-and an issue with no merged closing pull request, since there is no diff to
-take a size from. For each other issue it reads the pull requests that close it
-and the merged ones whose body says `Refs #n` and names no other issue:
-
-- **One closing pull request and no `Refs` one**: the issue's `Size` must equal
-  that pull request's recorded `Size`, as before. Recorded values keep the table
-  they were scored with, so nothing is re-scored here.
-- **Any other count**: the issue's `Size` must equal the tier of their union, as
-  "Size guide" scores it, which uses the table as it stands.
-- **A list the query cannot read in full** (more than 3 closing pull requests,
-  or 25 cross-references, on an issue it checks): a finding saying to score the
-  issue by hand, never a silent pass. Each pull request's paths stop at 41, since
-  41 distinct paths are already `L`.
-
-The `Refs` pull requests are found by cross-reference, not by milestone, so one
-filed under another milestone still counts. The page sizes keep the query under
-GitHub's limit of 500,000 nodes; raising any of them can exceed it.
+**`Size`:** skipping the cases "Size guide" exempts and issues with no merged
+closing pull request, it reads each issue's closing pull requests and the merged
+ones that say `Refs #n` and name no other issue, found by cross-reference
+whatever their milestone. With one closing pull request and no `Refs` one, the
+issue's `Size` equals that pull request's recorded one; with any other count, it
+equals the tier of their union. More than 3 closing pull requests or 25
+cross-references is a finding to score by hand, never a pass; paths stop at 41,
+already `L`. Raising any page size can exceed GitHub's limit of 500,000 nodes.
