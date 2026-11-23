@@ -40,7 +40,8 @@ skill for the fields.
    in one mutation". A batched write fails per alias, not per call. An issue
    becomes a sub-issue of its milestone's release epic when it joins the
    Project; a pull request that closes only the focused issue gives that issue
-   its own `Size`.
+   the `Size` of the issue's pull requests together (`reference.md`, "Size
+   guide", and step 3a), which is its own when the issue has no other.
 5. Read every field back and **assert** it, per `reference.md`,
    "Verification", the parent included. A blank is unfinished work, not a
    reporting line: fill it and read back again.

@@ -21,8 +21,9 @@ For a **newly opened draft pull request**:
 - **Size:** score the actual completed diff against the "Size guide" below
 - **Start date:** leave unset for routine items
 - **Target date:** leave unset for routine items
-- **The focused issue's Size:** the pull request's own, when the pull request
-  closes that issue and no other, except the cases "Size guide" names
+- **The focused issue's Size:** the size of the issue's pull requests together,
+  when this pull request closes that issue and no other, except the cases
+  "Size guide" names; the pull request's own, when it is the issue's only one
 
 For a **newly filed issue**, the same four fields are required and only their
 sources differ:
@@ -44,9 +45,9 @@ is not its own sub-issue, so neither takes a parent.
 ### Size guide
 
 `Size` is scored from a diff, so a pull request is the object it applies to
-directly; "An issue takes the size of the PR that closed it" below is the bridge
-to the other one, and "Sizing an item that has no diff yet" covers the case
-where no diff exists.
+directly; "An issue takes the size of its pull requests together" below is the
+bridge to the other one, and "Sizing an item that has no diff yet" covers the
+case where no diff exists.
 
 Score the diff on both axes and take the **larger** of the two tiers:
 
@@ -95,12 +96,31 @@ Three cases the table does not cover:
 - **Epics and release-preparation issues do not follow this rule.** Copy the
   previous release's pair instead.
 
-**An issue takes the size of the PR that closed it**, except the three cases
-above. The pull request path writes it: step 4 of the appendix gives the
-focused issue the pull request's `Size` when the pull request opens, and again
-on each update that changes the diff. It writes nothing when the pull request
-closes more than that one issue, or only refers to it with `Refs #n`, which
-closes nothing.
+**An issue takes the size of its pull requests together**, except the three
+cases above. An issue that holds several findings ships as several pull
+requests, each saying `Refs #n` and the last saying `Closes #n` (`AGENTS.md`,
+"Git"), so the last one's size alone understates it. Its pull requests are
+those that close it and those whose body says `Refs #n`, merged or open, and
+each names no other issue with `Closes` or `Refs`. Score them as one diff on
+the table above: the **distinct files** changed across them and the **sum** of
+their additions and deletions, then the larger tier. A file several of them
+edit counts once, so an issue scores the same however it was split. One pull
+request is the special case: its own counts, so a single-pull-request issue
+scores as before.
+
+A real case: #591 shipped as #595 (`Closes #591`, 3 files, 171 additions) and
+#596 (`Refs #591`, 1 file, 63 additions and 145 deletions, a file #595 had
+already changed). Together that is 3 distinct files and 379 lines, which is `M`;
+#591 carries `S`, the closing pull request's score alone (measured 2026-11-23
+with the audit query below on milestone `v0.10.0`).
+
+The pull request path writes it: step 3a of the appendix scores the issue's
+pull requests together, and step 4 gives the focused issue that value when the
+pull request closes that issue and no other, when it opens and again on each
+update that changes the diff. It writes nothing when the pull request closes
+more than that one issue, or only refers to it with `Refs #n`, which closes
+nothing: the issue keeps its filing-time estimate until the pull request that
+closes it opens.
 
 ### Sizing an item that has no diff yet
 
@@ -113,7 +133,9 @@ section is required to be the output of a **search command**, not of recall, so
 the file count is already measured; score that count and a line estimate on the
 same two axes and take the larger tier. Re-score from the real diff when the PR
 opens rather than inheriting the filing-time number — the guide's rule is about
-a diff, and the estimate is only standing in for one.
+a diff, and the estimate is only standing in for one. An issue planned as
+several pull requests is predicted as they will be scored, together: its `Likely
+files` already names every file the pull requests will change.
 
 ### Two rules that bound any value set here
 
@@ -222,8 +244,9 @@ A pull request additionally confirms four items, which
 its base and head branches; the focused issue its body links; and, when it
 scores `L`, its extra obligation — stay draft and recommend splitting, unless
 broad scope was already approved. It also confirms two values on the focused
-issue besides its `Status`: its parent, and its `Size`, which equals the pull
-request's when "Size guide" says the issue takes it.
+issue besides its `Status`: its parent, and its `Size`, which equals what
+"Size guide" scores for the issue's pull requests together, the pull request's
+own when it is the only one.
 
 A blank field in that read-back is unfinished work, not a reporting line. Fill
 it and read back again. The appendix has the queries, and reads the list back in
@@ -296,6 +319,7 @@ batches here.
 
 The five steps below cost five calls, and with `gh label list` and `gh issue
 view` the whole path from "branch ready" to "metadata verified" is **seven**.
+When the focused issue has other pull requests, step 3a adds one call.
 
 What the collapse does not buy is a shorter verification. Batching four writes
 into one document adds a way for one write to fail among four successes, so
@@ -391,6 +415,63 @@ applied. Take the pull request's URL from the output, do not run
 `gh pr create` again, and run this step: one item in the Project means the add
 happened, and the fields can be written.
 
+### 3a. Score the focused issue's pull requests together
+
+Run this when the pull request closes the focused issue and no other, and the
+issue may have other pull requests: an earlier one that says `Refs #n`, or a
+second closing one. Skip it when the issue has no other, and give step 4's
+`issueSize` alias the pull request's own option. The query reads every pull
+request that closes the issue or cites it, with its changed paths, and scores
+them as "Size guide" says: the distinct paths, the summed additions and
+deletions, the larger tier.
+
+```bash
+gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -F issue=<issue-number> -f query='
+query($owner:String!,$repo:String!,$issue:Int!){
+  repository(owner:$owner,name:$repo){
+    issue(number:$issue){
+      closedByPullRequestsReferences(first:10){pageInfo{hasNextPage} nodes{...pr}}
+      timelineItems(first:100,itemTypes:[CROSS_REFERENCED_EVENT]){pageInfo{hasNextPage} nodes{
+        ... on CrossReferencedEvent{source{...pr}}}}
+    }
+  }
+}
+fragment pr on PullRequest{
+  number state body additions deletions
+  files(first:100){nodes{path}}
+  closingIssuesReferences(first:5){totalCount}
+}' --jq '
+    def tier($f; $l): ["XS","S","M","L"][
+        ([ (if $f <= 2 then 0 elif $f <= 9 then 1 elif $f <= 40 then 2 else 3 end),
+           (if $l < 30 then 0 elif $l < 100 then 1 elif $l < 1000 then 2 else 3 end) ] | max) ];
+    <issue-number> as $n
+    | .data.repository.issue as $x
+    | if $x.closedByPullRequestsReferences.pageInfo.hasNextPage or $x.timelineItems.pageInfo.hasNextPage
+      then "more pull requests than the query reads: score it by hand" | halt_error(1) else . end
+    | [$x.closedByPullRequestsReferences.nodes[] | select(.state == "MERGED" or .state == "OPEN")] as $closing
+    | [ $x.timelineItems.nodes[].source
+        | select(.number != null and (.state == "MERGED" or .state == "OPEN"))
+        | select(.body // "" | test("(?i)\\brefs #\($n)\\b"))
+        | select([.body | scan("(?i)(?:closes|refs) #([0-9]+)") | .[0]] | unique | length == 1)
+        | select(. as $p | ([$closing[].number] | index($p.number)) == null) ] as $refs
+    | ($closing + $refs) as $prs
+    | ([$prs[].files.nodes[].path] | unique | length) as $f
+    | ([$prs[] | .additions + .deletions] | add) as $l
+    | {size:tier($f; $l), files:$f, lines:$l, prs:[$prs[].number],
+       closesOthers:([$closing[] | select(.closingIssuesReferences.totalCount != 1) | .number])}'
+```
+
+Take the `Size` option name from `size` and its id from step 1. A non-empty
+`closesOthers` means a closing pull request closes another issue too, which is
+the first case "Size guide" names: write nothing. A `Refs` pull request that
+names another issue is left out of `prs`, so the score can understate; say so in
+the pull request when one is. The query reads up to 10 closing pull requests, 100
+cross-references, and 100 paths of each pull request (more than 40 distinct paths
+is already `L`), and stops with an error when a list is longer.
+
+Measured 2026-11-23 on #591, which `v0.10.0` shipped as #595 and #596:
+`{"closesOthers":[],"files":3,"lines":379,"prs":[595,596],"size":"M"}`.
+
 ### 4. Write every field in one mutation
 
 One aliased `updateProjectV2ItemFieldValue` per value: the PR's Status, Phase,
@@ -405,9 +486,10 @@ gh api graphql \
   -f fPr=<priority-field-id> -f fSz=<size-field-id> \
   -f oSt=<pr-status-option-id> -f oPh=<phase-option-id> \
   -f oPr=<priority-option-id> -f oSz=<size-option-id> \
-  -f oIs=<issue-status-option-id> -f query='
+  -f oIs=<issue-status-option-id> -f oIz=<issue-size-option-id> -f query='
 mutation($p:ID!,$pi:ID!,$ii:ID!,$fSt:ID!,$fPh:ID!,$fPr:ID!,$fSz:ID!,
-         $oSt:String!,$oPh:String!,$oPr:String!,$oSz:String!,$oIs:String!){
+         $oSt:String!,$oPh:String!,$oPr:String!,$oSz:String!,$oIs:String!,
+         $oIz:String!){
   status: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$pi,
     fieldId:$fSt,value:{singleSelectOptionId:$oSt}}){projectV2Item{
       fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
@@ -424,16 +506,17 @@ mutation($p:ID!,$pi:ID!,$ii:ID!,$fSt:ID!,$fPh:ID!,$fPr:ID!,$fSz:ID!,
     fieldId:$fSt,value:{singleSelectOptionId:$oIs}}){projectV2Item{
       fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
   issueSize: updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$ii,
-    fieldId:$fSz,value:{singleSelectOptionId:$oSz}}){projectV2Item{
+    fieldId:$fSz,value:{singleSelectOptionId:$oIz}}){projectV2Item{
       fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
 }'
 ```
 
-The `issueSize` alias writes the pull request's own option to the focused
-issue, so it needs no variable of its own. Drop it, and leave the issue's
-`Size` as it is, when "Size guide" says the issue does not take the pull
-request's size: the body closes more than one issue, or none (`Refs #n`), or
-the focused issue is an epic or a release-preparation issue.
+The `issueSize` alias writes `$oIz`, the option for the issue's pull requests
+together: step 3a's `size`, or, for an issue with no other pull request, the
+same option as `$oSz`. Drop it, and leave the issue's `Size` as it is, when
+"Size guide" says the issue takes no size from the pull request: the body closes
+more than one issue, or none (`Refs #n`), or the focused issue is an epic or a
+release-preparation issue.
 
 Text, date, and number fields take `text:`, `date:`, or `number:` in `value:`
 instead of `singleSelectOptionId:`.
@@ -714,7 +797,9 @@ gh pr view <pr-number> --json changedFiles,additions,deletions
 Then run steps 1, 3, 4, and 5 above as for a new pull request. Step 4 carries
 only the `size` and `issueSize` aliases, with `issueSize` dropped in the same
 cases, and declares only the variables they use (`$p`, `$pi`, `$ii`, `$fSz`,
-`$oSz`): GraphQL rejects a declared variable that nothing uses. Step 5 runs in full, so the fields the update did not touch are asserted
+`$oSz`, `$oIz`): GraphQL rejects a declared variable that nothing uses. Run step
+3a again first when the issue has other pull requests: an update can change this
+pull request's files and lines, and with them the union. Step 5 runs in full, so the fields the update did not touch are asserted
 unchanged.
 
 ### Read option strings live, never from prose
@@ -784,37 +869,49 @@ count per tier is the measured effect reported there, and comparing each score
 with its own `size.name` shows how far the recorded values sit from the table. `stateReason` marks the `not_planned` carve-out on
 `Issue` nodes, and `closingIssuesReferences` is how an issue's own
 `size.name` is checked against the multi-issue-PR carve-out rather than
-assumed to equal its closing PR's score.
+assumed to equal its closing PR's score alone: an issue with more than one pull
+request scores their union ("Size guide").
 
 ### Auditing a milestone before a release
 
 One read-only query checks a whole milestone for the two values this skill
 writes outside a field mutation: an issue's parent, and the `Size` an issue
-takes from the pull request that closed it. Run it before a release, and after
-any hand correction of either. It prints one line per finding and exits 1, or
-prints nothing and exits 0. Put the milestone's exact title in both places
-(`-f m=` and `$m`). The `query:` argument is a partial match (`v0.1` returns
-`v0.1.0`, `v0.1.1`, `v0.10.0`, and `v0.11.0`; measured 2026-11-05), so the
-`--jq` keeps only the milestone whose title equals `$m`.
+takes from its pull requests. Run it before a release, and after any hand
+correction of either. It prints one line per finding and exits 1, or prints
+nothing and exits 0. Put the milestone's exact title in both places (`-f m=` and
+`$m`). The `query:` argument is a partial match (`v0.1` returns `v0.1.0`,
+`v0.1.1`, `v0.10.0`, and `v0.11.0`; measured 2026-11-05), so the `--jq` keeps
+only the milestone whose title equals `$m`, and stops when that one is not among
+the first three matches.
 
 ```bash
 gh api graphql -f owner=amirhs1 -f repo=CareerDossierTeX -f m=<milestone> -f query='
 query($owner:String!,$repo:String!,$m:String!){
   repository(owner:$owner,name:$repo){
-    milestones(query:$m,first:5,states:[OPEN,CLOSED]){nodes{title
+    milestones(query:$m,first:3,states:[OPEN,CLOSED]){nodes{title
       issues(first:100){pageInfo{hasNextPage} nodes{
         number title stateReason parent{number}
-        projectItems(first:10){nodes{project{title}
+        projectItems(first:5){nodes{project{title}
           size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
-        closedByPullRequestsReferences(first:5){nodes{number state
-          closingIssuesReferences(first:10){totalCount}
-          projectItems(first:10){nodes{project{title}
-            size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}}}
+        closedByPullRequestsReferences(first:3){pageInfo{hasNextPage} nodes{...pr}}
+        timelineItems(first:25,itemTypes:[CROSS_REFERENCED_EVENT]){pageInfo{hasNextPage} nodes{
+          ... on CrossReferencedEvent{source{...pr}}}}
       }}
     }}
   }
+}
+fragment pr on PullRequest{
+  number state body additions deletions
+  files(first:41){nodes{path}}
+  closingIssuesReferences(first:5){totalCount}
+  projectItems(first:3){nodes{project{title}
+    size:fieldValueByName(name:"Size"){... on ProjectV2ItemFieldSingleSelectValue{name}}}}
 }' --jq '
     def size: [.projectItems.nodes[] | select(.project.title | test("CareerDossierTeX")) | .size.name][0];
+    def tier($f; $l): ["XS","S","M","L"][
+        ([ (if $f <= 2 then 0 elif $f <= 9 then 1 elif $f <= 40 then 2 else 3 end),
+           (if $l < 30 then 0 elif $l < 100 then 1 elif $l < 1000 then 2 else 3 end) ] | max) ];
+    def names: map("#\(.number)") | join(", ");
     "<milestone>" as $m
     | [ .data.repository.milestones.nodes[] | select(.title == $m) ] as $ms
     | if ($ms | length) != 1 then "milestone \($m) not found" | halt_error(1) else $ms[0] end
@@ -827,19 +924,65 @@ query($owner:String!,$repo:String!,$m:String!){
           | select((.title | test("^\\[(epic|release)\\]")) | not)
           | select(.stateReason != "NOT_PLANNED")
           | . as $x
-          | [.closedByPullRequestsReferences.nodes[] | select(.state == "MERGED")] as $prs
-          | select($prs | length == 1)
-          | $prs[0] | select(.closingIssuesReferences.totalCount == 1)
-          | select(size != ($x | size))
-          | "#\($x.number) Size \($x | size // "none"), closing PR #\(.number) \(size // "none")" ) ]
+          | [.closedByPullRequestsReferences.nodes[] | select(.state == "MERGED")] as $closing
+          | select($closing | length > 0)
+          | [ .timelineItems.nodes[].source
+              | select(.number != null and .state == "MERGED")
+              | select(.body // "" | test("(?i)\\brefs #\($x.number)\\b"))
+              | select([.body | scan("(?i)(?:closes|refs) #([0-9]+)") | .[0]] | unique | length == 1)
+              | select(. as $p | ([$closing[].number] | index($p.number)) == null) ] as $refs
+          | ($closing + $refs) as $prs
+          | if $x.closedByPullRequestsReferences.pageInfo.hasNextPage or $x.timelineItems.pageInfo.hasNextPage
+            then "#\($x.number) cites more pull requests than the query reads: score it by hand"
+            elif ($refs | length) == 0 and ($closing | length) == 1
+            then $closing[0] | select(.closingIssuesReferences.totalCount == 1)
+                 | select(size != ($x | size))
+                 | "#\($x.number) Size \($x | size // "none"), closing PR #\(.number) \(size // "none")"
+            elif ($closing | map(.closingIssuesReferences.totalCount) | all(. == 1))
+            then ([$prs[].files.nodes[].path] | unique | length) as $f
+                 | ([$prs[] | .additions + .deletions] | add) as $l
+                 | tier($f; $l) as $t
+                 | select($t != ($x | size))
+                 | "#\($x.number) Size \($x | size // "none"), PRs \($prs | names) score \($t) (\($f) files, \($l) lines)"
+            else empty end ) ]
     | if length == 0 then empty else join("\n") + "\n" | halt_error(1) end'
 ```
 
 The parent half follows `CONTRIBUTING.md`, "1. Every issue carries a
 milestone": the release epic is the milestone's first issue titled `[epic]`,
 and in a patch milestone, which has none, any parent is a finding. It checks
-the direct parent only, so a topic epic's children would be listed. The `Size`
-half skips the three cases "Size guide" names (`[epic]` and `[release]`
-titles, `not_planned`, a pull request closing more than one issue), and an
-issue with no merged closing pull request or with more than one, since neither
-has one diff to take a size from.
+the direct parent only, so a topic epic's children would be listed.
+
+The `Size` half skips the three cases "Size guide" names (`[epic]` and
+`[release]` titles, `not_planned`, a pull request closing more than one issue),
+and an issue with no merged closing pull request, since there is no diff to
+take a size from. For each other issue it reads the pull requests that close it
+and the merged ones whose body says `Refs #n` and names no other issue:
+
+- **One closing pull request and no `Refs` one**: the issue's `Size` must equal
+  that pull request's recorded `Size`, as before. Recorded values keep the table
+  they were scored with, so nothing is re-scored here.
+- **Any other count**: the issue's `Size` must equal the tier of their union, as
+  "Size guide" scores it, which uses the table as it stands. A finding reads
+  `#591 Size S, PRs #595, #596 score M (3 files, 379 lines)`.
+- **A list the query cannot read in full** (more than 3 closing pull requests,
+  or 25 cross-references, on an issue it checks): a finding saying to score the
+  issue by hand, never a silent pass. Each pull request's paths stop at 41, since
+  41 distinct paths are already `L`.
+
+The `Refs` pull requests are found by cross-reference, not by milestone, so one
+filed under another milestone still counts. The page sizes keep the query under GitHub's limit of 500,000 nodes: with five milestones, 20
+cross-references, and 100 paths it asked for 1,000,000 (measured 2026-11-23).
+
+Measured 2026-11-23, in the same shell, one run per milestone:
+
+| milestone | output | exit |
+| --- | --- | --- |
+| `v0.12.0` (closed; every issue had one closing pull request) | nothing | 0 |
+| `v0.11.0` | nothing | 0 |
+| `v1.0.0` (open) | nothing | 0 |
+| `v0.10.0` | `#591 Size S, PRs #595, #596 score M (3 files, 379 lines)` | 1 |
+
+The one finding is the case "Size guide" describes. To show the one-pull-request
+comparison is live, replace `select(size != ($x | size))` with `select(true)` and
+run `v0.12.0`: it prints 33 lines, one per such issue, and exits 1.

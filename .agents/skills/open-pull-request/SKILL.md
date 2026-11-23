@@ -52,12 +52,13 @@ description: Open a draft GitHub pull request whose body is the full report, and
    ready or merge it.
 7. Set its fields with `project-metadata`: the focused issue's `Phase` and
    `Priority`, the in-progress `Status`, and `Size` scored from the diff; when
-   the pull request closes only the focused issue, that issue takes the same
-   `Size`. Its read-back adds four items for a pull request: the URL and draft
-   status; the base and head branches; the focused issue the body links; and,
-   for a pull request scored `L`, its extra obligation: stay draft and
-   recommend splitting, unless broad scope was already approved. It also
-   asserts the focused issue's parent and `Size`.
+   the pull request closes only the focused issue, that issue takes the `Size`
+   of its pull requests together, the same as this one when it has no other
+   (`project-metadata`, "Size guide"). Its read-back adds four items for a
+   pull request: the URL and draft status; the base and head branches; the
+   focused issue the body links; and, for a pull request scored `L`, its extra
+   obligation: stay draft and recommend splitting, unless broad scope was
+   already approved. It also asserts the focused issue's parent and `Size`.
 8. If the branch already has a pull request, first check that it is
    open: `gh pr view <n> --json state --jq .state`. If it says
    `MERGED` or `CLOSED`, stop: the change needs a new branch. Otherwise
